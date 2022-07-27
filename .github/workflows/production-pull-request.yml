@@ -1,0 +1,29 @@
+name: Production:Pull Request CI / CD
+
+on: 
+ pull_request:
+   branches: [main]
+
+jobs:
+  build-test-prod:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Install Dependencies
+      run: yarn
+      
+    - name: Check Format
+      run: yarn format
+      
+    - name: Lint
+      run: yarn lint
+
+    - name: Build
+      run: yarn build:gh-pages
+
+    - name: Run tests
+      run: yarn test
+      

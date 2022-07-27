@@ -1,0 +1,3 @@
+[submodule "packages/hts-open-dex-react-ui"]
+	path = packages/hts-open-dex-react-ui
+	url = git@github.com:damiano-melcarne-lab49/hts-open-dex-react-ui.git

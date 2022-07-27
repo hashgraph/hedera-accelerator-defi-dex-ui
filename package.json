@@ -1,0 +1,154 @@
+{
+  "name": "hts-open-dex-react-ui",
+  "author": "LAB49",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "main": "src/index.tsx",
+  "jest": {},
+  "dependencies": {
+    "@chakra-ui/icons": "^2.0.4",
+    "@chakra-ui/react": "^2.2.3",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "framer-motion": "^6.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.7.4",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "build:gh-pages": "react-scripts build && rm -rf docs && mv build docs",
+    "test": "react-scripts test --coverage",
+    "test:jest": "jest -c jest.config.js --watch",
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build:storybook": "build-storybook -s public",
+    "deploy:storybook": "gh-pages -d docs",
+    "deploy:app": "gh-pages -d build",
+    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint ./src --fix .js,.jsx,.ts,.tsx",
+    "format": "npx prettier -c src",
+    "format:write": "npx prettier -c src --write",
+    "prepare": "husky install",
+    "postinstall": "husky install"
+  },
+  "eslintConfig": {
+    "root": true,
+    "plugins": [
+      "react",
+      "react-hooks"
+    ],
+    "extends": [
+      "react-app",
+      "eslint:recommended",
+      "prettier"
+    ],
+    "rules": {
+      "max-len": [
+        "error",
+        {
+          "code": 120
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts?(x)"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+          "@typescript-eslint",
+          "eslint-plugin-tsdoc"
+        ],
+        "extends": [
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "rules": {
+          "tsdoc/syntax": "warn"
+        }
+      },
+      {
+        "files": [
+          "**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)"
+        ],
+        "env": {
+          "jest/globals": true
+        },
+        "plugins": [
+          "testing-library",
+          "jest"
+        ],
+        "extends": [
+          "react-app/jest",
+          "plugin:testing-library/react",
+          "plugin:jest/recommended"
+        ]
+      },
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-interactions": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/builder-webpack5": "^6.5.9",
+    "@storybook/manager-webpack5": "^6.5.9",
+    "@storybook/node-logger": "^6.5.9",
+    "@storybook/preset-create-react-app": "^4.1.2",
+    "@storybook/react": "^6.5.9",
+    "@storybook/testing-library": "^0.0.13",
+    "@testing-library/dom": "^8.16.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.43",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
+    "babel-plugin-named-exports-order": "^0.0.2",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-jest": "^26.5.3",
+    "eslint-plugin-react": "^7.30.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-storybook": "^0.6.1",
+    "eslint-plugin-testing-library": "^5.5.1",
+    "eslint-plugin-tsdoc": "^0.2.16",
+    "gh-pages": "^4.0.0",
+    "hashconnect": "^0.1.10",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.3",
+    "prop-types": "^15.8.1",
+    "typedoc": "^0.23.8",
+    "typescript": "^4.7.4",
+    "webpack": "^5.73.0"
+  }
+}
