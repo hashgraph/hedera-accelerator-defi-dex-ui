@@ -14,7 +14,7 @@
 - [Setup Local Environment](#setup-local-environment)
 - [Usage](#usage)
 
-# Installation
+## Installation
 
 Install dependencies with yarn.
 
