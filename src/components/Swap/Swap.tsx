@@ -96,11 +96,11 @@ const Swap = (props: SwapProps) => {
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
       <VStack align="stretch" minWidth="sm">
-        <Box data-testid="swap-component" bg="rgb(36, 38, 76)" borderRadius="24px" width="100%" padding="1rem">
+        <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
           <Heading
             as="p"
             size="sm"
-            color="white"
+            color="black"
             paddingLeft="5px"
             paddingTop="0.5rem"
             paddingBottom="0.5rem"
@@ -115,10 +115,10 @@ const Swap = (props: SwapProps) => {
                 value={inputToken?.amount}
                 onChangeHandler={handleInputAmountChange}
               />
+              <Text>Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "-"}</Text>
             </Box>
             <Box flex="4">
               <TokenSelector value={inputToken?.symbol} onChangeHandler={handleInputTokenChange} />
-              <Text>Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "-"}</Text>
             </Box>
           </Flex>
           <Flex>
@@ -133,10 +133,10 @@ const Swap = (props: SwapProps) => {
                 value={outputToken?.amount}
                 onChangeHandler={handleOutputAmountChange}
               />
+              <Text>Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
             </Box>
             <Box flex="4">
               <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputTokenChange} />
-              <Text>Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
             </Box>
           </Flex>
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
