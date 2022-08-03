@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Center, HStack, VStack, Button, Text } from "@chakra-ui/react";
 import { Swap } from "../../../components";
 import { useHashConnectContext } from "../../../context";
 
 const Trade = (): JSX.Element => {
   const { clearWalletPairings, walletData, network, connectionStatus, installedExtensions } = useHashConnectContext();
-
   return (
     <HStack>
       <Box margin="1rem">

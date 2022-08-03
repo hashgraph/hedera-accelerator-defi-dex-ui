@@ -164,20 +164,20 @@ const swapTokenB = async () => {
   await pairCurrentPosition();
 };
 
-const get100LABTokens = async () => {
+const get100LABTokens = async (receivingAccoundId: string) => {
   const tokenQuantity = 100;
   const L49ATokenId = TokenId.fromString("0.0.47646195");
   const L49BTokenId = TokenId.fromString("0.0.47646196");
   const swapContractAccountId = AccountId.fromString("0.0.47645191");
-  const myAccountId = AccountId.fromString("0.0.34728121");
+  const targetAccountId = AccountId.fromString(receivingAccoundId);
 
   console.log(`Moving ${tokenQuantity} units of L49A and L49B from the Swap contract to Wallet.`);
 
   const transaction = await new TransferTransaction()
     .addTokenTransfer(L49ATokenId, swapContractAccountId, -tokenQuantity)
-    .addTokenTransfer(L49ATokenId, myAccountId, tokenQuantity)
+    .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
     .addTokenTransfer(L49BTokenId, swapContractAccountId, -tokenQuantity)
-    .addTokenTransfer(L49BTokenId, myAccountId, tokenQuantity)
+    .addTokenTransfer(L49BTokenId, targetAccountId, tokenQuantity)
     .freezeWith(client);
 
   //Sign with the sender account private key
