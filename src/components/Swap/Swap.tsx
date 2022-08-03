@@ -1,8 +1,14 @@
-import { ChakraProvider, Box, Heading, VStack } from "@chakra-ui/react";
+import { ChakraProvider, Box, Heading, VStack, HStack, Flex, Spacer } from "@chakra-ui/react";
 import { HashConnectTypes } from "hashconnect";
 import { WalletConnectionStatus, Networks, HashConnectState } from "../../hooks/useHashConnect";
 import { HederaOpenDexTheme } from "../../HederaOpenDEX/styles";
-import { TokenAmountInput, SwapTokenInputsButton, ConnectToWalletButton, CallSwapContractButton } from "../base";
+import {
+  TokenAmountInput,
+  TokenSelector,
+  SwapTokenInputsButton,
+  ConnectToWalletButton,
+  CallSwapContractButton,
+} from "../base";
 export interface SwapProps {
   inputToken?: {
     symbol: string;
@@ -38,9 +44,27 @@ const Swap = (props: SwapProps) => {
           >
             Swap
           </Heading>
-          <TokenAmountInput data-testid="swap-input" value={inputToken?.amount} />
-          <SwapTokenInputsButton data-testid="swap-component" variant="swap" />
-          <TokenAmountInput data-testid="swap-output" value={outputToken?.amount} />
+          <Flex>
+            <Box flex="5">
+              <TokenAmountInput data-testid="swap-input" value={inputToken?.amount} />
+            </Box>
+            <Box flex="4">
+              <TokenSelector />
+            </Box>
+          </Flex>
+          <Flex>
+            <Spacer />
+            <SwapTokenInputsButton data-testid="swap-component" variant="swap" />
+            <Spacer />
+          </Flex>
+          <Flex>
+            <Box flex="5">
+              <TokenAmountInput data-testid="swap-output" value={outputToken?.amount} />
+            </Box>
+            <Box flex="4">
+              <TokenSelector />
+            </Box>
+          </Flex>
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
             <CallSwapContractButton data-testid="swap-tokens-button" variant="secondary" />
           ) : (

@@ -1,7 +1,7 @@
 import { useEffect, useCallback, Dispatch } from "react";
 import { HashConnect, HashConnectTypes, MessageTypes } from "hashconnect";
-import { ActionType, HashConnectActions } from "./actionsTypes";
-import { HashConnectState } from "./hashConnectReducer";
+import { ActionType, HashConnectActions } from "./reducers/actionsTypes";
+import { HashConnectState } from "./reducers/hashConnectReducer";
 import { ConnectionStatus } from "./types";
 
 const useHashConnectEvents = (
