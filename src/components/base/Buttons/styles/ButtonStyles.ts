@@ -13,18 +13,18 @@ export const ButtonStyles: ComponentStyleConfig = {
   sizes: {},
   variants: {
     primary: {
-      bg: "rgba(21, 61, 111, 0.44)",
-      color: "rgb(80, 144, 234)",
+      bg: "black",
+      color: "white",
     },
     secondary: {
-      bg: "rgb(126, 132, 255)",
+      bg: "black",
       color: "white",
     },
     swap: {
       border: "2px",
       padding: "0.75rem",
-      bg: "rgba(21, 61, 111, 0.44)",
-      color: "rgb(80, 144, 234)",
+      bg: "black",
+      color: "white",
       fontSize: "16px",
       marginBottom: "1rem",
     },

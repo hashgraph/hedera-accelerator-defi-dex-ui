@@ -1,5 +1,21 @@
 import React, { useCallback } from "react";
-import { Box, Center, HStack, VStack, Button, Text, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  HStack,
+  VStack,
+  Button,
+  Text,
+  Heading,
+  Table,
+  TableCaption,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
 
@@ -14,11 +30,11 @@ const Pool = (): JSX.Element => {
 
   return (
     <HStack>
-      <Box data-testid="pool-component" bg="rgb(36, 38, 76)" borderRadius="24px" width="100%" padding="1rem">
+      <Box data-testid="pool-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
         <Heading
           as="p"
           size="sm"
-          color="white"
+          color="black"
           paddingLeft="5px"
           paddingTop="0.5rem"
           paddingBottom="0.5rem"
@@ -37,17 +53,34 @@ const Pool = (): JSX.Element => {
               border="2px"
               marginTop="0.5rem"
               marginBottom="0.5rem"
-              bg="rgba(21, 61, 111, 0.44)"
-              color="rgb(80, 144, 234)"
+              bg="black"
+              color="white"
               fontSize="16px"
               fontWeight="500"
             >
-              {"Get L49A<>L49B Swap Contract Balance"}
+              {"Get L49A<>L49B Swap Contract Balances"}
             </Button>
-            <Text
-              width="400px"
-              textAlign="center"
-            >{`Swap Contract Balance L49A: ${balance.tokenA} L49B: ${balance.tokenB}`}</Text>
+            <TableContainer>
+              <Table variant="simple">
+                <TableCaption>Swap Contract Token Balances</TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th>Token</Th>
+                    <Th>Amount</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>L49A</Td>
+                    <Td isNumeric>{Number(balance.tokenA)}</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>L49B</Td>
+                    <Td isNumeric>{Number(balance.tokenB)}</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </TableContainer>
             <Button
               onClick={swapTokenAWithB}
               data-testid="swap-a-with-b-button"
@@ -57,8 +90,8 @@ const Pool = (): JSX.Element => {
               border="2px"
               marginTop="0.5rem"
               marginBottom="0.5rem"
-              bg="rgba(21, 61, 111, 0.44)"
-              color="rgb(80, 144, 234)"
+              bg="black"
+              color="white"
               fontSize="16px"
               fontWeight="500"
             >
@@ -73,8 +106,8 @@ const Pool = (): JSX.Element => {
               border="2px"
               marginTop="0.5rem"
               marginBottom="0.5rem"
-              bg="rgba(21, 61, 111, 0.44)"
-              color="rgb(80, 144, 234)"
+              bg="black"
+              color="white"
               fontSize="16px"
               fontWeight="500"
             >
@@ -89,8 +122,8 @@ const Pool = (): JSX.Element => {
               border="2px"
               marginTop="0.5rem"
               marginBottom="0.5rem"
-              bg="rgba(21, 61, 111, 0.44)"
-              color="rgb(80, 144, 234)"
+              bg="black"
+              color="white"
               fontSize="16px"
               fontWeight="500"
             >
@@ -105,12 +138,12 @@ const Pool = (): JSX.Element => {
               border="2px"
               marginTop="0.5rem"
               marginBottom="0.5rem"
-              bg="rgba(21, 61, 111, 0.44)"
-              color="rgb(80, 144, 234)"
+              bg="black"
+              color="white"
               fontSize="16px"
               fontWeight="500"
             >
-              {"Get 100 L49A and L49B Tokens"}
+              {"Send 100 L49A and L49B To Wallet"}
             </Button>
 
             <Text></Text>

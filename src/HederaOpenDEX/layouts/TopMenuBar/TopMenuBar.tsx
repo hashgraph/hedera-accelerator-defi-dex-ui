@@ -49,11 +49,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
         <Box textAlign="right">
           <Popover>
             <PopoverTrigger>
-              <Button bg="rgb(36, 38, 76)" color="white" size="sm" padding="15px" width="fit-content">
+              <Button bg="black" color="white" size="sm" padding="15px" width="fit-content">
                 <Box w="100%" marginRight="20px">
                   <HStack>
                     <Text marginRight="5px">Balance:</Text>
-                    <Text fontWeight="bold" color="rgb(80, 144, 234)">
+                    <Text fontWeight="bold" color="white">
                       {walletData?.pairedAccountBalance?.hbars ?? "-"}
                     </Text>
                   </HStack>
@@ -61,30 +61,33 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                 <Box w="100%">
                   <HStack>
                     <Text marginRight="5px">Status:</Text>
-                    <Text fontWeight="bold" color="rgb(80, 144, 234)">
+                    <Text fontWeight="bold" color="white">
                       {connectionStatus || "Not paired"}
                     </Text>
                   </HStack>
                 </Box>
               </Button>
             </PopoverTrigger>
-            <PopoverContent bg="rgb(36, 38, 76)" color="white" textAlign="center">
+            <PopoverContent bg="white" color="black" textAlign="center">
               <PopoverHeader fontWeight="bold">Account</PopoverHeader>
               <VStack>
                 <Text size="md" padding="0.4rem 0">
-                  network: <b style={{ color: "rgb(80, 144, 234)" }}>{network || "-"}</b>
+                  network: <b style={{ color: "black" }}>{network || "-"}</b>
                 </Text>
                 <Text size="md" padding="0.4rem 0">
-                  account: <b style={{ color: "rgb(80, 144, 234)" }}>{walletData?.pairedAccounts?.[0] || "-"}</b>
+                  account: <b style={{ color: "black" }}>{walletData?.pairedAccounts?.[0] || "-"}</b>
                 </Text>
                 <Text size="md" padding="0.4rem 0">
-                  wallet type: <b style={{ color: "rgb(80, 144, 234)" }}>{walletData?.pairedWalletData?.name || "-"}</b>
+                  wallet type: <b style={{ color: "black" }}>{walletData?.pairedWalletData?.name || "-"}</b>
                 </Text>
                 <Text size="md" padding="0.4rem 0">
-                  balance:{" "}
-                  <b style={{ color: "rgb(80, 144, 234)" }}>{walletData?.pairedAccountBalance?.hbars ?? "-"}</b>
+                  balance: <b style={{ color: "black" }}>{walletData?.pairedAccountBalance?.hbars ?? "-"}</b>
                 </Text>
-                <Link href={`https://hashscan.io/#/testnet/account/${walletData?.pairedAccounts?.[0]}`} isExternal>
+                <Link
+                  color="#0180FF"
+                  href={`https://hashscan.io/#/testnet/account/${walletData?.pairedAccounts?.[0]}`}
+                  isExternal
+                >
                   <ExternalLinkIcon mx="1px" /> View on Hashscan
                 </Link>
                 <Button onClick={clearWalletPairings} variant="secondary">

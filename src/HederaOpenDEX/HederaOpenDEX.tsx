@@ -10,15 +10,7 @@ const menuOptions = ["Swap", "Pool"];
 const HederaOpenDEX = () => {
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
-      <Container
-        color="white"
-        w="100%"
-        minHeight="1600px"
-        maxHeight="100%"
-        maxWidth="100%"
-        bg="rgb(20, 22, 59)"
-        centerContent
-      >
+      <Container color="black" w="100%" minHeight="1600px" maxHeight="100%" maxWidth="100%" bg="#F5F5F5" centerContent>
         <Router>
           <TopMenuBar menuOptions={menuOptions}></TopMenuBar>
           <Routes>
