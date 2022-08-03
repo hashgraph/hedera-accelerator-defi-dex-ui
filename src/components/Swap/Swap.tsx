@@ -1,8 +1,10 @@
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useState, useReducer, Dispatch } from "react";
 import { ChakraProvider, Box, Heading, VStack, HStack, Flex, Spacer, Text } from "@chakra-ui/react";
 import { HashConnectTypes } from "hashconnect";
 import { WalletConnectionStatus, Networks, HashConnectState } from "../../hooks/useHashConnect";
 import { HederaOpenDexTheme } from "../../HederaOpenDEX/styles";
+import { swapReducer, initialSwapState, initSwapReducer, ActionType, SwapState, SwapActions } from "./reducers";
+
 import {
   TokenAmountInput,
   TokenSelector,
@@ -16,14 +18,6 @@ const tokenSymbolToAccountID = new Map<string, string>([
   ["L49B", "0.0.47646195"],
 ]);
 export interface SwapProps {
-  inputToken?: {
-    symbol: string;
-    amount: number;
-  };
-  outputToken?: {
-    symbol: string;
-    amount: number;
-  };
   // connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -35,52 +29,46 @@ export interface SwapProps {
 
 const Swap = (props: SwapProps) => {
   const { walletData, connectionStatus } = props;
-  const [inputToken, setTokenInput] = useState({
-    symbol: "",
-    amount: 0.0,
-  });
-  const [outputToken, setTokenOutput] = useState({
-    symbol: "",
-    amount: 0.0,
-  });
+  const [swapState, dispatch] = useReducer(swapReducer, initialSwapState, initSwapReducer);
+  const { inputToken, outputToken } = swapState;
 
-  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>, targetField: string, setStateValue: any) => {
-    const v = event?.target as HTMLInputElement;
-    setStateValue((prevState: any) => ({
-      ...prevState,
-      [targetField]: v.value,
-    }));
-  }, []);
+  const handleSwapInputsChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>, actionType: ActionType, field: string) => {
+      const inputElement = event?.target as HTMLInputElement;
+      dispatch({ type: actionType, field, payload: inputElement.value });
+    },
+    []
+  );
 
   const handleInputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      handleChange(event, "amount", setTokenInput);
+      handleSwapInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "amount");
     },
-    [setTokenInput, handleChange]
+    [handleSwapInputsChange]
   );
 
-  const handleInputTokenChange = useCallback(
+  const handleInputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      handleChange(event, "symbol", setTokenInput);
+      handleSwapInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "symbol");
     },
-    [setTokenInput, handleChange]
+    [handleSwapInputsChange]
   );
 
   const handleOutputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      handleChange(event, "amount", setTokenOutput);
+      handleSwapInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "amount");
     },
-    [setTokenOutput, handleChange]
+    [handleSwapInputsChange]
   );
 
-  const handleOutputTokenChange = useCallback(
+  const handleOutputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      console.log(event);
-      handleChange(event, "symbol", setTokenOutput);
+      handleSwapInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "symbol");
     },
-    [setTokenOutput, handleChange]
+    [handleSwapInputsChange]
   );
 
+  const swapTokens = useCallback(() => dispatch({ type: ActionType.SWITCH_INPUT_AND_OUTPUT_TOKEN }), [dispatch]);
   const getBalanceByTokenSymbol = useCallback(
     (tokenSymbol: string): number => {
       if (tokenSymbol === "HBAR") {
@@ -112,18 +100,18 @@ const Swap = (props: SwapProps) => {
             <Box flex="5">
               <TokenAmountInput
                 data-testid="swap-input"
-                value={inputToken?.amount}
+                value={swapState?.inputToken?.amount}
                 onChangeHandler={handleInputAmountChange}
               />
               <Text>Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "-"}</Text>
             </Box>
             <Box flex="4">
-              <TokenSelector value={inputToken?.symbol} onChangeHandler={handleInputTokenChange} />
+              <TokenSelector value={inputToken?.symbol} onChangeHandler={handleInputSymbolChange} />
             </Box>
           </Flex>
           <Flex>
             <Spacer />
-            <SwapTokenInputsButton data-testid="swap-component" variant="swap" />
+            <SwapTokenInputsButton onClick={swapTokens} data-testid="swap-component" variant="swap" />
             <Spacer />
           </Flex>
           <Flex>
@@ -136,7 +124,7 @@ const Swap = (props: SwapProps) => {
               <Text>Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
             </Box>
             <Box flex="4">
-              <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputTokenChange} />
+              <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
             </Box>
           </Flex>
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
