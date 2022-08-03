@@ -94,7 +94,7 @@ const Pool = (): JSX.Element => {
               fontSize="16px"
               fontWeight="500"
             >
-              {"Add L49A<>LAB49B Liquidity"}
+              {"Add L49A<>L49B Liquidity"}
             </Button>
             <Button
               onClick={sendLABTokensToConnectedWallet}
