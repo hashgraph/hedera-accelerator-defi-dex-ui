@@ -1,4 +1,5 @@
 import React from "react";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Menu,
   MenuItem,
@@ -14,7 +15,9 @@ import {
   Button,
   PopoverContent,
   PopoverHeader,
+  Link,
 } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useHashConnectContext } from "../../../context";
 
 export interface TopMenuBarProps {
@@ -34,9 +37,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           <HStack spacing="24px">
             {props.menuOptions.map((menuOption) => {
               return (
-                <MenuItem w="auto" fontWeight="500" _hover={{ bg: "gray.600" }}>
-                  {menuOption}
-                </MenuItem>
+                <RouterLink to={`/${menuOption.toLowerCase()}`}>
+                  <MenuItem key={menuOption} w="auto" fontWeight="500" _hover={{ bg: "gray.600" }}>
+                    {menuOption}
+                  </MenuItem>
+                </RouterLink>
               );
             })}
           </HStack>
@@ -49,7 +54,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                   <HStack>
                     <Text marginRight="5px">Balance:</Text>
                     <Text fontWeight="bold" color="rgb(80, 144, 234)">
-                      {"-"}
+                      {walletData?.pairedAccountBalance?.hbars ?? "-"}
                     </Text>
                   </HStack>
                 </Box>
@@ -76,8 +81,12 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                   wallet type: <b style={{ color: "rgb(80, 144, 234)" }}>{walletData?.pairedWalletData?.name || "-"}</b>
                 </Text>
                 <Text size="md" padding="0.4rem 0">
-                  balance: <b style={{ color: "rgb(80, 144, 234)" }}>-</b>
+                  balance:{" "}
+                  <b style={{ color: "rgb(80, 144, 234)" }}>{walletData?.pairedAccountBalance?.hbars ?? "-"}</b>
                 </Text>
+                <Link href={`https://hashscan.io/#/testnet/account/${walletData?.pairedAccounts?.[0]}`} isExternal>
+                  <ExternalLinkIcon mx="1px" /> View on Hashscan
+                </Link>
                 <Button onClick={clearWalletPairings} variant="secondary">
                   Disconnect From Wallet
                 </Button>

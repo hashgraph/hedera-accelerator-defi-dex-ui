@@ -1,5 +1,6 @@
 import React, { useReducer, useContext } from "react";
 import { HashConnectTypes } from "hashconnect";
+import { AccountBalanceJson } from "@hashgraph/sdk";
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
 import {

@@ -1,10 +1,11 @@
 import React from "react";
 import { ChakraProvider, Container } from "@chakra-ui/react";
-import { Trade } from "./pages/Trade";
+import { Trade, Pool } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import { HederaOpenDexTheme } from "./styles";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-const menuOptions = ["Swap", "Pool", "Stake"];
+const menuOptions = ["Swap", "Pool"];
 
 const HederaOpenDEX = () => {
   return (
@@ -18,8 +19,14 @@ const HederaOpenDEX = () => {
         bg="rgb(20, 22, 59)"
         centerContent
       >
-        <TopMenuBar menuOptions={menuOptions}></TopMenuBar>
-        <Trade></Trade>
+        <Router>
+          <TopMenuBar menuOptions={menuOptions}></TopMenuBar>
+          <Routes>
+            <Route path="/" element={<Navigate to="/swap" />} />
+            <Route path="/swap" element={<Trade />} />
+            <Route path="/pool" element={<Pool />} />
+          </Routes>
+        </Router>
       </Container>
     </ChakraProvider>
   );

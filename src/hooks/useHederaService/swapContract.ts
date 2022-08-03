@@ -7,6 +7,7 @@ import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
   Client,
+  TransferTransaction,
 } from "@hashgraph/sdk";
 
 import { TokenBalance } from "./HederaServiceContext";
@@ -20,9 +21,7 @@ const createClient = () => {
   const myPrivateKey = privateKey1 + privatekey2;
 
   if (myAccountId == null || myPrivateKey == null) {
-    throw new Error(
-      "Environment variables myAccountId and myPrivateKey must be present"
-    );
+    throw new Error("Environment variables myAccountId and myPrivateKey must be present");
   }
 
   const client = Client.forTestnet();
@@ -34,17 +33,13 @@ const client = createClient();
 let tokenA = TokenId.fromString("0.0.47646195").toSolidityAddress();
 let tokenB = TokenId.fromString("0.0.47646196").toSolidityAddress();
 const treasure = AccountId.fromString("0.0.47645191").toSolidityAddress();
-const treasureKey = PrivateKey.fromString(
-  "308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5"
-);
+const treasureKey = PrivateKey.fromString("308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5");
 const contractId = "0.0.47712695";
 
 const createLiquidityPool = async () => {
   const tokenAQty = new BigNumber(5);
   const tokenBQty = new BigNumber(5);
-  console.log(
-    `Creating a pool of ${tokenAQty} units of token A and ${tokenBQty} units of token B.`
-  );
+  console.log(`Creating a pool of ${tokenAQty} units of token A and ${tokenBQty} units of token B.`);
   const liquidityPool = await new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(2000000)
@@ -68,9 +63,7 @@ const createLiquidityPool = async () => {
 const addLiquidity = async () => {
   const tokenAQty = new BigNumber(10);
   const tokenBQty = new BigNumber(10);
-  console.log(
-    `Adding ${tokenAQty} units of token A and ${tokenBQty} units of token B to the pool.`
-  );
+  console.log(`Adding ${tokenAQty} units of token A and ${tokenBQty} units of token B to the pool.`);
   const addLiquidityTx = await new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(2000000)
@@ -95,9 +88,7 @@ const addLiquidity = async () => {
 const removeLiquidity = async () => {
   const tokenAQty = new BigNumber(3);
   const tokenBQty = new BigNumber(3);
-  console.log(
-    `Removing ${tokenAQty} units of token A and ${tokenBQty} units of token B from the pool.`
-  );
+  console.log(`Removing ${tokenAQty} units of token A and ${tokenBQty} units of token B from the pool.`);
   const removeLiquidity = await new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(2000000)
@@ -155,13 +146,15 @@ const swapTokenB = async () => {
   const swapToken = await new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(2000000)
-    .setFunction("swapToken",
+    .setFunction(
+      "swapToken",
       new ContractFunctionParameters()
         .addAddress(treasure)
         .addAddress(tokenA)
         .addAddress(tokenB)
         .addInt64(tokenAQty)
-        .addInt64(tokenBQty))
+        .addInt64(tokenBQty)
+    )
     .freezeWith(client)
     .sign(treasureKey);
   const swapTokenTx = await swapToken.execute(client);
@@ -171,6 +164,36 @@ const swapTokenB = async () => {
   await pairCurrentPosition();
 };
 
+const get100LABTokens = async () => {
+  const tokenQuantity = 100;
+  const L49ATokenId = TokenId.fromString("0.0.47646195");
+  const L49BTokenId = TokenId.fromString("0.0.47646196");
+  const swapContractAccountId = AccountId.fromString("0.0.47645191");
+  const myAccountId = AccountId.fromString("0.0.34728121");
+
+  console.log(`Moving ${tokenQuantity} units of L49A and L49B from the Swap contract to Wallet.`);
+
+  const transaction = await new TransferTransaction()
+    .addTokenTransfer(L49ATokenId, swapContractAccountId, -tokenQuantity)
+    .addTokenTransfer(L49ATokenId, myAccountId, tokenQuantity)
+    .addTokenTransfer(L49BTokenId, swapContractAccountId, -tokenQuantity)
+    .addTokenTransfer(L49BTokenId, myAccountId, tokenQuantity)
+    .freezeWith(client);
+
+  //Sign with the sender account private key
+  const signTx = await transaction.sign(treasureKey);
+
+  //Sign with the client operator private key and submit to a Hedera network
+  const txResponse = await signTx.execute(client);
+
+  //Request the receipt of the transaction
+  const receipt = await txResponse.getReceipt(client);
+
+  //Obtain the transaction consensus status
+  const transactionStatus = receipt.status;
+
+  console.log("The transaction consensus status " + transactionStatus.toString());
+};
 
 const pairCurrentPosition = async () => {
   const getPairQty = await new ContractExecuteTransaction()
@@ -182,43 +205,30 @@ const pairCurrentPosition = async () => {
   const response = await getPairQtyTx.getRecord(client);
   const tokenAQty = response.contractFunctionResult!.getInt64(0);
   const tokenBQty = response.contractFunctionResult!.getInt64(1);
-  console.log(
-    `${tokenAQty} units of token A and ${tokenBQty} units of token B are present in the pool. \n`
-  );
+  console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B are present in the pool. \n`);
 };
 
 const getContributorTokenShare = async () => {
   const getContributorTokenShare = await new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(1000000)
-    .setFunction(
-      "getContributorTokenShare",
-      new ContractFunctionParameters().addAddress(treasure)
-    )
+    .setFunction("getContributorTokenShare", new ContractFunctionParameters().addAddress(treasure))
     .freezeWith(client);
-  const getContributorTokenShareTx = await getContributorTokenShare.execute(
-    client
-  );
+  const getContributorTokenShareTx = await getContributorTokenShare.execute(client);
   const response = await getContributorTokenShareTx.getRecord(client);
   const tokenAQty = response.contractFunctionResult!.getInt64(0);
   const tokenBQty = response.contractFunctionResult!.getInt64(1);
-  return `${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`
-  console.log(
-    `${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`
-  );
+  return `${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`;
+  console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`);
 };
 
 const getTokenBalance = async () => {
   const getTokenBalance = await new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(1000000)
-    .setFunction(
-      "getPairQty"
-    )
+    .setFunction("getPairQty")
     .freezeWith(client);
-  const getTokenBalanceTx = await getTokenBalance.execute(
-    client
-  );
+  const getTokenBalanceTx = await getTokenBalance.execute(client);
   const response = await getTokenBalanceTx.getRecord(client);
   const tokenAQty = response.contractFunctionResult!.getInt64(0);
   const tokenBQty = response.contractFunctionResult!.getInt64(1);
@@ -239,13 +249,14 @@ async function main() {
 
 export {
   main,
+  get100LABTokens,
   createLiquidityPool,
   addLiquidity,
   removeLiquidity,
   swapTokenA,
   swapTokenB,
   getContributorTokenShare,
-  getTokenBalance
+  getTokenBalance,
 };
 
 // main()

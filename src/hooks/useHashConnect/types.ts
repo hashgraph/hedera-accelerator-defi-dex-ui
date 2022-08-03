@@ -4,7 +4,7 @@ export type ConnectionStatus = "Connected" | "Disconnected";
 
 export enum WalletConnectionStatus {
   INITIALIZING = "Initializing",
-  CONNECTED = "Connected",
+  READY_TO_PAIR = "Ready To Pair",
   PAIRED = "Paired",
 }
 

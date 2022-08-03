@@ -1,6 +1,7 @@
+import { AccountBalanceJson } from "@hashgraph/sdk";
 import { HashConnectState } from "./hashConnectReducer";
 import { MessageTypes } from "hashconnect";
-import { ConnectionStatus } from "./types";
+import { ConnectionStatus } from "../types";
 
 export enum ActionType {
   INIT_WALLET_CONNECTION = "INIT_WALLET_CONNECTION",
@@ -9,6 +10,7 @@ export enum ActionType {
   ADD_INSTALLED_EXTENSION = "ADD_INSTALLED_EXTENSION",
   WALLET_PAIRING_APPROVED = "WALLET_PAIRING_APPROVED",
   CONNECTION_STATUS_CHANGED = "CONNECTION_STATUS_CHANGED",
+  GET_WALLET_BALANCE = "GET_WALLET_BALANCE",
 }
 
 interface IInitWalletConnection {
@@ -38,9 +40,16 @@ interface ConnectionStatusChanged {
   payload: ConnectionStatus;
 }
 
+interface GetWalletBalance {
+  type: ActionType.GET_WALLET_BALANCE;
+  field: "walletData";
+  payload: AccountBalanceJson;
+}
+
 export type HashConnectActions =
   | IInitWalletConnection
   | IClearWalletPairings
   | AddInstalledExtension
   | WalletPairingApproved
-  | ConnectionStatusChanged;
+  | ConnectionStatusChanged
+  | GetWalletBalance;

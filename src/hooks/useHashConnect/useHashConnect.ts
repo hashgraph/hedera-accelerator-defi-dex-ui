@@ -1,7 +1,8 @@
-import { useEffect, useCallback, Dispatch } from "react";
+import { useEffect, useCallback, Dispatch, useState } from "react";
 import { HashConnect, HashConnectTypes } from "hashconnect";
-import { ActionType, HashConnectActions } from "./actionsTypes";
-import { HashConnectState } from "./hashConnectReducer";
+import { AccountBalanceJson } from "@hashgraph/sdk";
+import { ActionType, HashConnectActions } from "./reducers/actionsTypes";
+import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 import { WalletConnectionStatus } from "./types";
@@ -95,6 +96,23 @@ const useHashConnect = ({
     dispatch({ type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" });
   }, [dispatch]);
 
+  // const sendTransactionToWallet = useCallback(() => {
+  //   localStorage.removeItem("hashconnectData");
+  //   dispatch({ type: ActionType.SEND_TRANSACTION, field: "walletData" });
+  // }, [dispatch]);
+
+  // const sendTransactionToWallet = useCallback(() => {
+  //   localStorage.removeItem("hashconnectData");
+  //   dispatch({ type: ActionType.SEND_TRANSACTION, field: "walletData" });
+  // }, [dispatch]);
+
+  const getWalletBalance = useCallback(async () => {
+    const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+    const walletBalance = await provider.getAccountBalance(walletData.pairedAccounts[0]);
+    const walletBalanceJSON = walletBalance.toJSON();
+    dispatch({ type: ActionType.GET_WALLET_BALANCE, field: "walletData", payload: walletBalanceJSON });
+  }, [network, walletData.topicID, walletData.pairedAccounts, dispatch]);
+
   useEffect(() => {
     establishWalletConnection();
   }, []);
@@ -105,7 +123,10 @@ const useHashConnect = ({
 
   useEffect(() => {
     if (debug) console.log(walletConnectionStatus);
-  }, [debug, walletConnectionStatus]);
+    if (walletConnectionStatus === WalletConnectionStatus.PAIRED) {
+      getWalletBalance();
+    }
+  }, [debug, walletConnectionStatus, getWalletBalance]);
 
   return {
     connectToWallet,
