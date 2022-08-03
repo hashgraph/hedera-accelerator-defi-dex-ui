@@ -96,16 +96,6 @@ const useHashConnect = ({
     dispatch({ type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" });
   }, [dispatch]);
 
-  // const sendTransactionToWallet = useCallback(() => {
-  //   localStorage.removeItem("hashconnectData");
-  //   dispatch({ type: ActionType.SEND_TRANSACTION, field: "walletData" });
-  // }, [dispatch]);
-
-  // const sendTransactionToWallet = useCallback(() => {
-  //   localStorage.removeItem("hashconnectData");
-  //   dispatch({ type: ActionType.SEND_TRANSACTION, field: "walletData" });
-  // }, [dispatch]);
-
   const getWalletBalance = useCallback(async () => {
     const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
     const walletBalance = await provider.getAccountBalance(walletData.pairedAccounts[0]);
