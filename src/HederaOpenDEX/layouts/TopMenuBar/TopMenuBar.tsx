@@ -37,8 +37,8 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           <HStack spacing="24px">
             {props.menuOptions.map((menuOption) => {
               return (
-                <RouterLink to={`/${menuOption.toLowerCase()}`}>
-                  <MenuItem key={menuOption} w="auto" fontWeight="500" _hover={{ bg: "gray.600" }}>
+                <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
+                  <MenuItem w="auto" fontWeight="500" _hover={{ bg: "gray.600" }}>
                     {menuOption}
                   </MenuItem>
                 </RouterLink>

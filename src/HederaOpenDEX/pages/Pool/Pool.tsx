@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Box, Center, HStack, VStack, Button, Text, Heading } from "@chakra-ui/react";
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
+import { useHashConnectContext } from "../../../context";
 
 const Pool = (): JSX.Element => {
   const { balance, getBalance, getLABTokens, swapTokenAWithB, swapTokenBWithA, addLiquidityToPool } =
     useHederaService();
+  const { walletData } = useHashConnectContext();
+
+  const sendLABTokensToConnectedWallet = useCallback(() => {
+    getLABTokens(walletData?.pairedAccounts[0]);
+  }, [getLABTokens, walletData?.pairedAccounts]);
 
   return (
     <HStack>
@@ -36,12 +42,12 @@ const Pool = (): JSX.Element => {
               fontSize="16px"
               fontWeight="500"
             >
-              {"Get TokenA<>TokenB Pair Balance"}
+              {"Get L49A<>L49B Swap Contract Balance"}
             </Button>
             <Text
               width="400px"
               textAlign="center"
-            >{`Contract Balance TokenA: ${balance.tokenA} TokenB: ${balance.tokenB}`}</Text>
+            >{`Swap Contract Balance L49A: ${balance.tokenA} L49B: ${balance.tokenB}`}</Text>
             <Button
               onClick={swapTokenAWithB}
               data-testid="swap-a-with-b-button"
@@ -56,7 +62,7 @@ const Pool = (): JSX.Element => {
               fontSize="16px"
               fontWeight="500"
             >
-              Swap Token A With B
+              Swap L49A With L49B
             </Button>
             <Button
               onClick={swapTokenBWithA}
@@ -72,7 +78,7 @@ const Pool = (): JSX.Element => {
               fontSize="16px"
               fontWeight="500"
             >
-              Swap Token B With A
+              Swap L49B With L49A
             </Button>
             <Button
               onClick={addLiquidityToPool}
@@ -88,10 +94,10 @@ const Pool = (): JSX.Element => {
               fontSize="16px"
               fontWeight="500"
             >
-              {"Add TokenA<>TokenB Liquidity"}
+              {"Add L49A<>LAB49B Liquidity"}
             </Button>
             <Button
-              onClick={getLABTokens}
+              onClick={sendLABTokensToConnectedWallet}
               data-testid="get-L49A-tokens-button"
               size="lg"
               height="48px"

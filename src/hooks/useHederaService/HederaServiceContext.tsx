@@ -21,7 +21,7 @@ export interface HederaServiceContextProps {
   swapTokenAWithB: () => void;
   swapTokenBWithA: () => void;
   addLiquidityToPool: () => void;
-  getLABTokens: () => void;
+  getLABTokens: (targetAccoundId: string) => void;
 }
 
 const HederaServiceContext = React.createContext<HederaServiceContextProps>({
@@ -64,9 +64,9 @@ const HederaServiceProvider = ({ children }: HederaServiceProviderProps) => {
     console.log(`addLiquidity recieved...${balane}`);
   };
 
-  const getLABTokens = async () => {
+  const getLABTokens = async (targetAccoundId: string) => {
     console.log("Sending transaction for LAB token transfer...");
-    await get100LABTokens();
+    await get100LABTokens(targetAccoundId);
   };
 
   return (

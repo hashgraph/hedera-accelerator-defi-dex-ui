@@ -109,6 +109,7 @@ const useHashConnect = ({
   const getWalletBalance = useCallback(async () => {
     const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
     const walletBalance = await provider.getAccountBalance(walletData.pairedAccounts[0]);
+    console.log(walletBalance.toJSON());
     const walletBalanceJSON = walletBalance.toJSON();
     dispatch({ type: ActionType.GET_WALLET_BALANCE, field: "walletData", payload: walletBalanceJSON });
   }, [network, walletData.topicID, walletData.pairedAccounts, dispatch]);
