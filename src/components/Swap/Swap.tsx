@@ -11,13 +11,20 @@ import {
   SwapTokenInputsButton,
   ConnectToWalletButton,
   CallSwapContractButton,
+  SwapConfirmation,
 } from "../base";
 
-const tokenSymbolToAccountID = new Map<string, string>([
-  ["L49A", "0.0.47646196"],
-  ["L49B", "0.0.47646195"],
+export const tokenSymbolToAccountID = new Map<string, string>([
+  ["L49A", "0.0.47646195"],
+  ["L49B", "0.0.47646196"],
 ]);
 export interface SwapProps {
+  sendSwapTransaction: (
+    depositTokenAccountId: string,
+    depositTokenAmount: number,
+    receivingTokenAccountId: string,
+    receivingTokenAmount: number
+  ) => Promise<void>;
   // connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -28,7 +35,7 @@ export interface SwapProps {
 }
 
 const Swap = (props: SwapProps) => {
-  const { walletData, connectionStatus } = props;
+  const { walletData, connectionStatus, sendSwapTransaction } = props;
   const [swapState, dispatch] = useReducer(swapReducer, initialSwapState, initSwapReducer);
   const { inputToken, outputToken } = swapState;
 
@@ -69,6 +76,7 @@ const Swap = (props: SwapProps) => {
   );
 
   const swapTokens = useCallback(() => dispatch({ type: ActionType.SWITCH_INPUT_AND_OUTPUT_TOKEN }), [dispatch]);
+
   const getBalanceByTokenSymbol = useCallback(
     (tokenSymbol: string): number => {
       if (tokenSymbol === "HBAR") {
@@ -128,8 +136,9 @@ const Swap = (props: SwapProps) => {
             </Box>
           </Flex>
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
-            <CallSwapContractButton data-testid="swap-tokens-button" variant="secondary" />
+            <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
           ) : (
+            // <CallSwapContractButton data-testid="swap-tokens-button" variant="secondary" />
             <ConnectToWalletButton data-testid="connect-wallet-button" variant="primary" />
           )}
         </Box>

@@ -2670,6 +2670,11 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
+"@rest-hooks/use-enhanced-reducer@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@rest-hooks/use-enhanced-reducer/-/use-enhanced-reducer-1.1.2.tgz#5668a07b64c1c166a73ec5f5fec56cfc388a58c1"
+  integrity sha512-LqN/AdbZH4f72ADlcdGcsydX89N71olOp9WcCabp3NFs7MqIzXz/aQrXwboQhQBCDhbY6qUvsFuhrCDqRgRgEQ==
+
 "@rollup/plugin-babel@^5.2.0":
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-babel/-/plugin-babel-5.3.1.tgz#04bc0608f4aa4b2e4b1aebf284344d0f68fda283"
