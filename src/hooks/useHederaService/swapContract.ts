@@ -113,6 +113,7 @@ const removeLiquidity = async () => {
 const swapTokenA = async () => {
   const tokenAQty = new BigNumber(5);
   const tokenBQty = new BigNumber(0);
+  const walletAddress: string = AccountId.fromString("0.0.34728121").toSolidityAddress();
   console.log(`Swapping a ${tokenAQty} units of token A from the pool.`);
   // Need to pass different token B address so that only swap of token A is considered.
   tokenB = TokenId.fromString("0.0.47646100").toSolidityAddress();
@@ -173,7 +174,7 @@ const get100LABTokens = async (receivingAccoundId: string) => {
 
   console.log(`Moving ${tokenQuantity} units of L49A and L49B from the Swap contract to Wallet.`);
 
-  const transaction = await new TransferTransaction()
+  const transaction = new TransferTransaction()
     .addTokenTransfer(L49ATokenId, swapContractAccountId, -tokenQuantity)
     .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
     .addTokenTransfer(L49BTokenId, swapContractAccountId, -tokenQuantity)
@@ -196,7 +197,7 @@ const get100LABTokens = async (receivingAccoundId: string) => {
 };
 
 const pairCurrentPosition = async () => {
-  const getPairQty = await new ContractExecuteTransaction()
+  const getPairQty = new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(1000000)
     .setFunction("getPairQty")
@@ -209,7 +210,7 @@ const pairCurrentPosition = async () => {
 };
 
 const getContributorTokenShare = async () => {
-  const getContributorTokenShare = await new ContractExecuteTransaction()
+  const getContributorTokenShare = new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(1000000)
     .setFunction("getContributorTokenShare", new ContractFunctionParameters().addAddress(treasure))

@@ -42,26 +42,26 @@ const HederaServiceProvider = ({ children }: HederaServiceProviderProps) => {
   const getBalance = async () => {
     console.log("Balance query sent...");
     const balane = await getTokenBalance();
-    console.log(`Balance query recieved...${balane}`);
+    console.log(`Balance query received...${balane}`);
     setBalance({ tokenA: new BigNumber(balane.tokenAQty), tokenB: balane.tokenBQty });
   };
 
   const swapTokenAWithB = async () => {
     console.log("swapTokenA sent...");
     const balane = await swapTokenA();
-    console.log(`swapTokenA recieved...${balane}`);
+    console.log(`swapTokenA received...${balane}`);
   };
 
   const swapTokenBWithA = async () => {
     console.log("swapTokenB sent...");
     const balane = await swapTokenB();
-    console.log(`swapTokenB recieved...${balane}`);
+    console.log(`swapTokenB received...${balane}`);
   };
 
   const addLiquidityToPool = async () => {
     console.log("addLiquidity sent...");
     const balane = await addLiquidity();
-    console.log(`addLiquidity recieved...${balane}`);
+    console.log(`addLiquidity received...${balane}`);
   };
 
   const getLABTokens = async (targetAccoundId: string) => {
