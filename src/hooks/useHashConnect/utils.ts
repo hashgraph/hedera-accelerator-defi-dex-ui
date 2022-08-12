@@ -1,4 +1,4 @@
-import { HashConnectState } from "./hashConnectReducer";
+import { HashConnectState } from "./reducers/hashConnectReducer";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 
 const getLocalHashconnectData = (): HashConnectState | null => {

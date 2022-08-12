@@ -15,26 +15,26 @@ export const Basic: ComponentStory<typeof Swap> = (args) => <Swap {...args} />;
 
 export const ETH_to_USDC = Basic.bind({});
 
-ETH_to_USDC.args = {
-  inputToken: {
-    symbol: "ETH",
-    amount: 0.01,
-  },
-  outputToken: {
-    symbol: "USDC",
-    amount: 100,
-  },
-};
+// ETH_to_USDC.args = {
+//   inputToken: {
+//     symbol: "ETH",
+//     amount: 0.01,
+//   },
+//   outputToken: {
+//     symbol: "USDC",
+//     amount: 100,
+//   },
+// };
 
 export const BAT_to_HBAR = Basic.bind({});
 
-BAT_to_HBAR.args = {
-  inputToken: {
-    symbol: "BAT",
-    amount: 0.01123123,
-  },
-  outputToken: {
-    symbol: "HBAR",
-    amount: 10120,
-  },
-};
+// BAT_to_HBAR.args = {
+//   inputToken: {
+//     symbol: "BAT",
+//     amount: 0.01123123,
+//   },
+//   outputToken: {
+//     symbol: "HBAR",
+//     amount: 10120,
+//   },
+// };

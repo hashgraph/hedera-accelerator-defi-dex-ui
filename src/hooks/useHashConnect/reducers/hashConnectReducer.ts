@@ -1,7 +1,8 @@
+import { AccountBalanceJson } from "@hashgraph/sdk";
 import { HashConnectTypes } from "hashconnect";
 import { ActionType, HashConnectActions } from "./actionsTypes";
-import { getLocalHashconnectData } from "./utils";
-import { WalletConnectionStatus } from "./types";
+import { getLocalHashconnectData } from "../utils";
+import { WalletConnectionStatus } from "../types";
 
 export interface HashConnectState {
   walletConnectionStatus: WalletConnectionStatus;
@@ -13,6 +14,7 @@ export interface HashConnectState {
     walletPairingString: string;
     privateKey: string;
     pairedWalletData: HashConnectTypes.WalletMetadata | null;
+    pairedAccountBalance: AccountBalanceJson | null;
     pairedAccounts: string[];
   };
 }
@@ -27,6 +29,7 @@ const initialHashConnectState: HashConnectState = {
     walletPairingString: "",
     privateKey: "",
     pairedWalletData: null,
+    pairedAccountBalance: null,
     pairedAccounts: [],
   },
 };
@@ -42,7 +45,7 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
       const walletData = payload;
       return {
         ...state,
-        walletConnectionStatus: WalletConnectionStatus.CONNECTED,
+        walletConnectionStatus: WalletConnectionStatus.READY_TO_PAIR,
         [field]: {
           ...state[field],
           ...walletData,
@@ -53,10 +56,11 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
       const { field } = action;
       return {
         ...state,
-        walletConnectionStatus: WalletConnectionStatus.CONNECTED,
+        walletConnectionStatus: WalletConnectionStatus.READY_TO_PAIR,
         [field]: {
           ...state[field],
           pairedWalletData: null,
+          pairedAccountBalance: null,
           pairedAccounts: [],
         },
       };
@@ -88,6 +92,16 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
     }
     case ActionType.CONNECTION_STATUS_CHANGED: {
       return state;
+    }
+    case ActionType.GET_WALLET_BALANCE: {
+      const { field, payload } = action;
+      return {
+        ...state,
+        [field]: {
+          ...state[field],
+          pairedAccountBalance: payload,
+        },
+      };
     }
     default:
       throw new Error();

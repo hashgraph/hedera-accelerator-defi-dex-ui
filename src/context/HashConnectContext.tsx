@@ -1,5 +1,6 @@
 import React, { useReducer, useContext } from "react";
 import { HashConnectTypes } from "hashconnect";
+import { AccountBalanceJson } from "@hashgraph/sdk";
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
 import {
@@ -10,6 +11,12 @@ import {
 } from "../hooks/useHashConnect";
 
 export interface HashConnectContextProps {
+  sendSwapTransaction: (
+    depositTokenAccountId: string,
+    depositTokenAmount: number,
+    receivingTokenAccountId: string,
+    receivingTokenAmount: number
+  ) => Promise<void>;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -20,6 +27,7 @@ export interface HashConnectContextProps {
 }
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
+  sendSwapTransaction: () => Promise.resolve(),
   connectToWallet: () => null,
   clearWalletPairings: () => null,
   connectionStatus: WalletConnectionStatus.INITIALIZING,
@@ -42,7 +50,7 @@ const HashConnectProvider = ({
   debug = false,
 }: HashConnectProviderProps): JSX.Element => {
   const [hashConnectState, dispatch] = useReducer(hashConnectReducer, initialHashConnectState, initHashConnectReducer);
-  const { connectToWallet, clearWalletPairings } = useHashConnect({
+  const { connectToWallet, clearWalletPairings, sendSwapTransaction } = useHashConnect({
     hashConnectState,
     dispatch,
     network,
@@ -53,6 +61,7 @@ const HashConnectProvider = ({
   return (
     <HashConnectContext.Provider
       value={{
+        sendSwapTransaction,
         connectToWallet,
         clearWalletPairings,
         connectionStatus: hashConnectState.walletConnectionStatus,
