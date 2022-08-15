@@ -4,6 +4,11 @@ import { ButtonStyles, NumberInputStyles, NumberInputFieldStyles } from "../../c
 export const HederaOpenDexTheme = extendTheme({
   components: {
     Button: ButtonStyles,
+    Link: {
+      baseStyle: {},
+      variants: {},
+      defaultProps: {},
+    },
     NumberInput: NumberInputStyles,
     NumberInputField: NumberInputFieldStyles,
   },
