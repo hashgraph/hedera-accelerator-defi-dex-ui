@@ -135,12 +135,14 @@ const Swap = (props: SwapProps) => {
               <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
             </Box>
           </Flex>
-          {connectionStatus === WalletConnectionStatus.PAIRED ? (
-            <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
-          ) : (
-            // <CallSwapContractButton data-testid="swap-tokens-button" variant="secondary" />
-            <ConnectToWalletButton data-testid="connect-wallet-button" variant="primary" />
-          )}
+          <Flex direction="column" grow="1">
+            {connectionStatus === WalletConnectionStatus.PAIRED ? (
+              <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
+            ) : (
+              // <CallSwapContractButton data-testid="swap-tokens-button" variant="secondary" />
+              <ConnectToWalletButton data-testid="connect-wallet-button" />
+            )}
+          </Flex>
         </Box>
       </VStack>
     </ChakraProvider>
