@@ -1,5 +1,5 @@
 export * from "./Text";
-export * from "./Button";
-export * from "./NumberInput";
+export * from "./Buttons";
+export * from "./Inputs";
 export * from "./Select";
 export * from "./Dialogs";

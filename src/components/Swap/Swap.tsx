@@ -1,12 +1,12 @@
 import { ChangeEvent, useCallback, useState, useReducer, Dispatch } from "react";
-import { ChakraProvider, Box, Heading, VStack, HStack, Flex, Spacer, Text, Button, IconButton } from "@chakra-ui/react";
+import { ChakraProvider, Box, Heading, Flex, Spacer, Text } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
 import { WalletConnectionStatus, Networks, HashConnectState } from "../../hooks/useHashConnect";
 import { HederaOpenDexTheme } from "../../HederaOpenDEX/styles";
 import { swapReducer, initialSwapState, initSwapReducer, ActionType, SwapState, SwapActions } from "./reducers";
 
-import { TokenAmountInput, TokenSelector, SwapConfirmation } from "../base";
+import { Button, IconButton, TokenAmountInput, TokenSelector, SwapConfirmation } from "../base";
 import { useHashConnectContext } from "../../context";
 
 export const tokenSymbolToAccountID = new Map<string, string>([
