@@ -29,12 +29,14 @@ export const ButtonStyles: ComponentStyleConfig = {
       color: "black",
     },
     "xs-text": {
+      height: "fit-content",
+      width: "fit-content",
       bg: "transparent",
       color: "#0180FF",
       textDecoration: "underline",
       fontWeight: "bold",
       fontSize: "xs",
-      padding: "4px 0",
+      padding: "0.25rem",
     },
   },
   defaultProps: {

@@ -87,72 +87,77 @@ const Swap = (props: SwapProps) => {
 
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
-      <VStack align="stretch" minWidth="sm">
-        <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
-          <Flex>
-            <Heading as="h4" size="lg">
-              Swap
-            </Heading>
-            <Spacer />
-            <IconButton
-              data-testid="settings-button"
-              aria-label="Open and close settings modal."
-              icon={<SettingsIcon w={6} h={6} />}
-              variant="settings"
-            />
-          </Flex>
-
+      <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+        <Flex>
+          <Heading as="h4" size="lg">
+            Swap
+          </Heading>
+          <Spacer />
+          <IconButton
+            data-testid="settings-button"
+            aria-label="Open and close settings modal."
+            icon={<SettingsIcon w={6} h={6} />}
+            variant="settings"
+          />
+        </Flex>
+        <Box border="1px solid black" borderRadius="5px" backgroundColor="#F2F2F2">
           <Flex>
             <Box flex="5">
               <TokenAmountInput
                 dataTestId="swap-input"
                 value={swapState?.inputToken?.amount}
                 onChangeHandler={handleInputAmountChange}
+                variant="token-amount-input"
               />
-              <Text fontSize="xs">Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "-"}</Text>
-              <Button variant="xs-text">Half</Button>
-              <Button variant="xs-text">Max</Button>
             </Box>
             <Box flex="4">
               <TokenSelector value={inputToken?.symbol} onChangeHandler={handleInputSymbolChange} />
             </Box>
           </Flex>
-          <Flex>
-            <IconButton
-              data-testid="switch-token-inputs-button"
-              aria-label="Switch the token amount and symbol input values."
-              icon={<UpDownIcon w={6} h={6} />}
-              onClick={swapTokens}
-              isRound={true}
-              variant="switch-token-inputs"
-            />
-          </Flex>
-          <Flex>
-            <Box flex="5">
-              <TokenAmountInput
-                dataTestId="swap-output"
-                value={outputToken?.amount}
-                onChangeHandler={handleOutputAmountChange}
-              />
-              <Text fontSize="xs">Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
-              <Button variant="xs-text">Half</Button>
-              <Button variant="xs-text">Max</Button>
-            </Box>
-            <Box flex="4">
-              <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
-            </Box>
-          </Flex>
-          <Flex direction="column" grow="1">
-            {connectionStatus === WalletConnectionStatus.PAIRED ? (
-              <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
-            ) : (
-              <Button data-testid="connect-wallet-button" onClick={connectToWallet}>
-                Connect Wallet
-              </Button>
-            )}
+          <Flex backgroundColor="#F2F2F2">
+            <Text fontSize="xs" padding="0.25rem" fontWeight="bold">
+              Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "Connect to View"}
+            </Text>
+            <Button variant="xs-text">Half</Button>
+            <Button variant="xs-text">Max</Button>
           </Flex>
         </Box>
-      </VStack>
+        <Flex>
+          <IconButton
+            data-testid="switch-token-inputs-button"
+            aria-label="Switch the token amount and symbol input values."
+            icon={<UpDownIcon w={6} h={6} />}
+            onClick={swapTokens}
+            isRound={true}
+            variant="switch-token-inputs"
+          />
+        </Flex>
+        <Flex>
+          <Box flex="5">
+            <TokenAmountInput
+              data-testid="swap-output"
+              value={outputToken?.amount}
+              onChangeHandler={handleOutputAmountChange}
+            />
+            <Text fontSize="xs">Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
+            <Button variant="xs-text">Half</Button>
+            <Button variant="xs-text">Max</Button>
+          </Box>
+          <Box flex="4">
+            <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
+          </Box>
+        </Flex>
+        <Flex direction="column" grow="1">
+          {connectionStatus === WalletConnectionStatus.PAIRED ? (
+            <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
+          ) : (
+            <Button data-testid="connect-wallet-button" onClick={connectToWallet}>
+              Connect Wallet
+            </Button>
+          )}
+        </Flex>
+      </Box>
+      {/* </VStack> */}
     </ChakraProvider>
   );
 };
