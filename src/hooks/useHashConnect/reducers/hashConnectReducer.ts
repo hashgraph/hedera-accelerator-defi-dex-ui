@@ -1,10 +1,11 @@
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { HashConnectTypes } from "hashconnect";
-import { ActionType, HashConnectActions } from "./actionsTypes";
+import { ActionType, HashConnectAction } from "../actions/actionsTypes";
 import { getLocalHashconnectData } from "../utils";
 import { WalletConnectionStatus } from "../types";
 
 export interface HashConnectState {
+  errorMessage: string | null;
   walletConnectionStatus: WalletConnectionStatus;
   installedExtensions: HashConnectTypes.WalletMetadata[];
   walletData: {
@@ -20,6 +21,7 @@ export interface HashConnectState {
 }
 
 const initialHashConnectState: HashConnectState = {
+  errorMessage: null,
   walletConnectionStatus: WalletConnectionStatus.INITIALIZING,
   installedExtensions: [],
   walletData: {
@@ -38,9 +40,18 @@ function initHashConnectReducer(initialHashConnectState: HashConnectState) {
   return getLocalHashconnectData() ?? initialHashConnectState;
 }
 
-function hashConnectReducer(state: HashConnectState, action: HashConnectActions): HashConnectState {
+function hashConnectReducer(state: HashConnectState, action: HashConnectAction): HashConnectState {
+  if (typeof action === "function") {
+    return state;
+  }
   switch (action.type) {
-    case ActionType.INIT_WALLET_CONNECTION: {
+    case ActionType.INITIALIZE_WALLET_CONNECTION_STARTED: {
+      return {
+        ...state,
+        walletConnectionStatus: WalletConnectionStatus.INITIALIZING,
+      };
+    }
+    case ActionType.INITIALIZE_WALLET_CONNECTION_SUCCEEDED: {
       const { field, payload } = action;
       const walletData = payload;
       return {
@@ -50,6 +61,59 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
           ...state[field],
           ...walletData,
         },
+      };
+    }
+    case ActionType.INITIALIZE_WALLET_CONNECTION_FAILED: {
+      const { payload } = action;
+      return {
+        ...state,
+        errorMessage: payload,
+      };
+    }
+    case ActionType.PAIR_WITH_CONNECTED_WALLET_STARTED: {
+      return state;
+    }
+    case ActionType.PAIR_WITH_CONNECTED_WALLET_SUCCEEDED: {
+      return state;
+    }
+    case ActionType.PAIR_WITH_CONNECTED_WALLET_FAILED: {
+      const { payload } = action;
+      return {
+        ...state,
+        errorMessage: payload,
+      };
+    }
+    case ActionType.PAIR_WITH_SELECTED_WALLET_EXTENSION_STARTED: {
+      return state;
+    }
+    case ActionType.PAIR_WITH_SELECTED_WALLET_EXTENSION_SUCCEEDED: {
+      return state;
+    }
+    case ActionType.PAIR_WITH_SELECTED_WALLET_EXTENSION_FAILED: {
+      const { payload } = action;
+      return {
+        ...state,
+        errorMessage: payload,
+      };
+    }
+    case ActionType.FETCH_ACCOUNT_BALANCE_STARTED: {
+      return state;
+    }
+    case ActionType.FETCH_ACCOUNT_BALANCE_SUCCEEDED: {
+      const { field, payload } = action;
+      return {
+        ...state,
+        [field]: {
+          ...state[field],
+          pairedAccountBalance: payload,
+        },
+      };
+    }
+    case ActionType.FETCH_ACCOUNT_BALANCE_FAILED: {
+      const { payload } = action;
+      return {
+        ...state,
+        errorMessage: payload,
       };
     }
     case ActionType.CLEAR_WALLET_PAIRINGS: {
@@ -90,18 +154,11 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
         },
       };
     }
-    case ActionType.CONNECTION_STATUS_CHANGED: {
+    case ActionType.RECEIVED_CONNECTION_STATUS_CHANGED: {
       return state;
     }
-    case ActionType.GET_WALLET_BALANCE: {
-      const { field, payload } = action;
-      return {
-        ...state,
-        [field]: {
-          ...state[field],
-          pairedAccountBalance: payload,
-        },
-      };
+    case ActionType.LOCAL_CONNECTION_STATUS_CHANGED: {
+      return state;
     }
     default:
       throw new Error();

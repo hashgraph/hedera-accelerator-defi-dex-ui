@@ -13,7 +13,13 @@ import {
   ContractId,
   Hbar,
 } from "@hashgraph/sdk";
-import { ActionType, HashConnectActions } from "./reducers/actionsTypes";
+import { ActionType, HashConnectAction } from "./actions/actionsTypes";
+import {
+  initializeWalletConnection,
+  pairWithConnectedWallet,
+  pairWithSelectedWalletExtension,
+  fetchAccountBalance,
+} from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
@@ -40,7 +46,7 @@ const hashconnect = new HashConnect(true);
 
 export interface UseHashConnectProps {
   hashConnectState: HashConnectState;
-  dispatch: Dispatch<HashConnectActions>;
+  dispatch: Dispatch<HashConnectAction>;
   network: string;
   dexMetaData: HashConnectTypes.AppMetadata;
   debug: boolean;
@@ -56,74 +62,15 @@ const useHashConnect = ({
   const { walletConnectionStatus, installedExtensions, walletData } = hashConnectState;
   useHashConnectEvents(hashconnect, hashConnectState, dispatch, debug);
 
-  const initWalletConnection = useCallback(async (): Promise<any> => {
-    const initData = await hashconnect.init(dexMetaData);
-    const privateKey = initData.privKey;
-    const nodeConnectionState = await hashconnect.connect();
-    const walletPairingString = hashconnect.generatePairingString(nodeConnectionState, network, debug ?? false);
-    hashconnect.findLocalWallets();
-    return {
-      network,
-      privateKey: privateKey,
-      topicID: nodeConnectionState.topic,
-      walletPairingString,
-    };
-  }, [dexMetaData, network, debug]);
-
-  const pairWallet = useCallback(
-    async (hashconnectData: HashConnectState) => {
-      const { walletData } = hashconnectData;
-      await hashconnect.init(dexMetaData, walletData.privateKey);
-      await hashconnect.connect(walletData.topicID, dexMetaData);
-    },
-    [dexMetaData]
-  );
-
   const saveToLocalStorage = useCallback(() => {
     const hashconnectDataJSON = JSON.stringify(hashConnectState);
     localStorage.setItem(HASHCONNECT_LOCAL_DATA_KEY, hashconnectDataJSON);
   }, [hashConnectState]);
 
-  const establishWalletConnection = useCallback(async () => {
-    if (debug) console.log("==== Establish Connection ====");
-    try {
-      if (walletConnectionStatus === WalletConnectionStatus.INITIALIZING) {
-        const updatedHashconnectData = await initWalletConnection();
-        dispatch({ type: ActionType.INIT_WALLET_CONNECTION, field: "walletData", payload: updatedHashconnectData });
-      } else {
-        await pairWallet(hashConnectState);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, [debug, dispatch, hashConnectState, walletConnectionStatus, initWalletConnection, pairWallet]);
-
-  const connectToWallet = useCallback(() => {
-    const hasInstalledExtensions = installedExtensions?.length > 0;
-    if (hasInstalledExtensions) {
-      if (walletData?.walletPairingString) {
-        const { walletPairingString } = walletData;
-        if (debug) console.log("Pairing String::", walletPairingString);
-        hashconnect.connectToLocalWallet(walletPairingString);
-      } else {
-        if (debug) console.log("==== No Extension found in browser ====");
-        return "wallet not installed";
-      }
-    }
-  }, [installedExtensions, walletData, debug]);
-
   const clearWalletPairings = useCallback(() => {
     localStorage.removeItem("hashconnectData");
     dispatch({ type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" });
   }, [dispatch]);
-
-  const getWalletBalance = useCallback(async () => {
-    const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
-    const walletBalance = await provider.getAccountBalance(walletData.pairedAccounts[0]);
-    console.log(walletBalance.toJSON());
-    const walletBalanceJSON = walletBalance.toJSON();
-    dispatch({ type: ActionType.GET_WALLET_BALANCE, field: "walletData", payload: walletBalanceJSON });
-  }, [network, walletData.topicID, walletData.pairedAccounts, dispatch]);
 
   const sendSwapTransaction = useCallback(
     async (
@@ -165,7 +112,18 @@ const useHashConnect = ({
   );
 
   useEffect(() => {
-    establishWalletConnection();
+    if (walletConnectionStatus === WalletConnectionStatus.INITIALIZING) {
+      dispatch(
+        initializeWalletConnection({
+          hashconnect,
+          network,
+          dexMetaData,
+          debug,
+        })
+      );
+    } else {
+      dispatch(pairWithConnectedWallet({ hashconnect, dexMetaData, hashConnectState }));
+    }
   }, []);
 
   useEffect(() => {
@@ -173,14 +131,14 @@ const useHashConnect = ({
   }, [hashConnectState, saveToLocalStorage]);
 
   useEffect(() => {
-    if (debug) console.log(walletConnectionStatus);
     if (walletConnectionStatus === WalletConnectionStatus.PAIRED) {
-      getWalletBalance();
+      dispatch(fetchAccountBalance({ hashconnect, hashConnectState, network }));
     }
-  }, [debug, walletConnectionStatus, getWalletBalance]);
+  }, [walletConnectionStatus]);
 
   return {
-    connectToWallet,
+    connectToWallet: () =>
+      dispatch(pairWithSelectedWalletExtension({ hashconnect, hashConnectState, installedExtensions })),
     sendSwapTransaction,
     clearWalletPairings,
   };
