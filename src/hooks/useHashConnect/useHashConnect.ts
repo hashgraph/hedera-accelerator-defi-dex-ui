@@ -19,6 +19,7 @@ import {
   pairWithConnectedWallet,
   pairWithSelectedWalletExtension,
   fetchAccountBalance,
+  sendSwapTransactionToWallet,
 } from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
@@ -72,45 +73,6 @@ const useHashConnect = ({
     dispatch({ type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" });
   }, [dispatch]);
 
-  const sendSwapTransaction = useCallback(
-    async (
-      depositTokenAccountId: string,
-      depositTokenAmount: number,
-      receivingTokenAccountId: string,
-      receivingTokenAmount: number
-    ) => {
-      const SWAP_CONTRACT_ID = ContractId.fromString("0.0.47712695");
-      const signingAccount = walletData.pairedAccounts[0];
-      const walletAddress: string = AccountId.fromString(signingAccount).toSolidityAddress();
-      const depositTokenAddress = TokenId.fromString(depositTokenAccountId).toSolidityAddress();
-      // temporarily mocking address to strictly swap token A.
-      const receivingTokenAddress = TokenId.fromString("0.0.47646100").toSolidityAddress();
-      const tokenAQty = new BigNumber(depositTokenAmount);
-      const tokenBQty = new BigNumber(receivingTokenAmount);
-      const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
-      const signer = hashconnect.getSigner(provider);
-
-      const swapTransaction = await new ContractExecuteTransaction()
-        .setContractId(SWAP_CONTRACT_ID)
-        .setGas(2000000)
-        .setFunction(
-          "swapToken",
-          new ContractFunctionParameters()
-            .addAddress(walletAddress)
-            .addAddress(depositTokenAddress) //token A
-            .addAddress(receivingTokenAddress)
-            .addInt64(tokenAQty)
-            .addInt64(tokenBQty)
-        )
-        .setNodeAccountIds([new AccountId(3)])
-        .freezeWithSigner(signer);
-
-      const result = await swapTransaction.executeWithSigner(signer);
-      console.log(result);
-    },
-    [network, walletData.topicID, walletData.pairedAccounts]
-  );
-
   useEffect(() => {
     if (walletConnectionStatus === WalletConnectionStatus.INITIALIZING) {
       dispatch(
@@ -139,7 +101,8 @@ const useHashConnect = ({
   return {
     connectToWallet: () =>
       dispatch(pairWithSelectedWalletExtension({ hashconnect, hashConnectState, installedExtensions })),
-    sendSwapTransaction,
+    sendSwapTransaction: (payload: any) =>
+      dispatch(sendSwapTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     clearWalletPairings,
   };
 };

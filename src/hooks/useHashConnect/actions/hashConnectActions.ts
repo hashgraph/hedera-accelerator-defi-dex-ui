@@ -1,4 +1,5 @@
-import { MessageTypes } from "hashconnect";
+import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
+import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
 import { WalletConnectionStatus } from "../types";
 import { getErrorMessage } from "../utils";
@@ -79,6 +80,25 @@ const fetchAccountBalanceSucceeded = (payload: any): HashConnectAction => {
 const fetchAccountBalanceFailed = (payload: string): HashConnectAction => {
   return {
     type: ActionType.FETCH_ACCOUNT_BALANCE_FAILED,
+    payload,
+  };
+};
+
+const sendSwapTransactionToWalletStarted = (): HashConnectAction => {
+  return {
+    type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED,
+  };
+};
+
+const sendSwapTransactionToWalletSucceeded = (): HashConnectAction => {
+  return {
+    type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED,
+  };
+};
+
+const sendSwapTransactionToWalletFailed = (payload: string): HashConnectAction => {
+  return {
+    type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_FAILED,
     payload,
   };
 };
@@ -164,4 +184,64 @@ const fetchAccountBalance = (payload: any) => {
   };
 };
 
-export { initializeWalletConnection, pairWithConnectedWallet, pairWithSelectedWalletExtension, fetchAccountBalance };
+const sendSwapTransactionToWallet = (payload: any) => {
+  return async (dispatch: any) => {
+    const {
+      depositTokenAccountId,
+      depositTokenAmount,
+      receivingTokenAccountId,
+      receivingTokenAmount,
+      hashconnect,
+      hashConnectState,
+      network,
+    } = payload;
+    const { walletData } = hashConnectState;
+    dispatch(sendSwapTransactionToWalletStarted());
+    const SWAP_CONTRACT_ID = ContractId.fromString("0.0.47712695");
+    const signingAccount = walletData.pairedAccounts[0];
+    const walletAddress: string = AccountId.fromString(signingAccount).toSolidityAddress();
+    const depositTokenAddress = TokenId.fromString(depositTokenAccountId).toSolidityAddress();
+    // temporarily mocking address to strictly swap token A.
+    const receivingTokenAddress = TokenId.fromString("0.0.47646100").toSolidityAddress();
+    const tokenAQty = new BigNumber(depositTokenAmount);
+    const tokenBQty = new BigNumber(receivingTokenAmount);
+    const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+    const signer = hashconnect.getSigner(provider);
+    try {
+      const swapTransaction = await new ContractExecuteTransaction()
+        .setContractId(SWAP_CONTRACT_ID)
+        .setGas(2000000)
+        .setFunction(
+          "swapToken",
+          new ContractFunctionParameters()
+            .addAddress(walletAddress)
+            .addAddress(depositTokenAddress) //token A
+            .addAddress(receivingTokenAddress)
+            .addInt64(tokenAQty)
+            .addInt64(tokenBQty)
+        )
+        .setNodeAccountIds([new AccountId(3)])
+        .freezeWithSigner(signer);
+
+      const result = await swapTransaction.executeWithSigner(signer);
+      dispatch(sendSwapTransactionToWalletSucceeded());
+      console.log(result);
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(sendSwapTransactionToWalletFailed(errorMessage));
+    }
+  };
+};
+
+// const clearWalletPairings = useCallback(() => {
+//   localStorage.removeItem("hashconnectData");
+//   dispatch({ type: ActionType.LOCAL_HASH_CONNECT_DATA_REMVOED, field: "walletData" });
+// }, [dispatch]);
+
+export {
+  sendSwapTransactionToWallet,
+  initializeWalletConnection,
+  pairWithConnectedWallet,
+  pairWithSelectedWalletExtension,
+  fetchAccountBalance,
+};

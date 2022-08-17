@@ -16,12 +16,7 @@ import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes"
 import { loggerMiddleware } from "../middleware";
 
 export interface HashConnectContextProps {
-  sendSwapTransaction: (
-    depositTokenAccountId: string,
-    depositTokenAmount: number,
-    receivingTokenAccountId: string,
-    receivingTokenAmount: number
-  ) => Promise<void>;
+  sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;

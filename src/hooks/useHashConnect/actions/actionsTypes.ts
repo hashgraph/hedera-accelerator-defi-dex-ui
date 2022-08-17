@@ -16,6 +16,9 @@ export enum ActionType {
   FETCH_ACCOUNT_BALANCE_STARTED = "FETCH_ACCOUNT_BALANCE_STARTED",
   FETCH_ACCOUNT_BALANCE_SUCCEEDED = "FETCH_ACCOUNT_BALANCE_SUCCEEDED",
   FETCH_ACCOUNT_BALANCE_FAILED = "FETCH_ACCOUNT_BALANCE_FAILED",
+  SEND_SWAP_TRANSACTION_TO_WALLET_STARTED = "SEND_SWAP_TRANSACTION_TO_WALLET_STARTED",
+  SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED = "SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED",
+  SEND_SWAP_TRANSACTION_TO_WALLET_FAILED = "SEND_SWAP_TRANSACTION_TO_WALLET_FAILED",
   CLEAR_WALLET_PAIRINGS = "CLEAR_WALLET_PAIRINGS",
   ADD_INSTALLED_EXTENSION = "ADD_INSTALLED_EXTENSION",
   WALLET_PAIRING_APPROVED = "WALLET_PAIRING_APPROVED",
@@ -89,6 +92,20 @@ interface FetchAccountBalanceFailed {
   payload: string;
 }
 
+/** SEND_SWAP_TRANSACTION_TO_WALLET Action Types */
+interface SendSwapTransactionToWalletStarted {
+  type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED;
+}
+
+interface SendSwapTransactionToWalletSucceeded {
+  type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED;
+}
+
+interface SendSwapTransactionToWalletFailed {
+  type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_FAILED;
+  payload: string;
+}
+
 interface IClearWalletPairings {
   type: ActionType.CLEAR_WALLET_PAIRINGS;
   field: "walletData";
@@ -129,6 +146,9 @@ export type HashConnectAction =
   | FetchAccountBalanceStarted
   | FetchAccountBalanceSucceeded
   | FetchAccountBalanceFailed
+  | SendSwapTransactionToWalletStarted
+  | SendSwapTransactionToWalletSucceeded
+  | SendSwapTransactionToWalletFailed
   | IClearWalletPairings
   | AddInstalledExtension
   | WalletPairingApproved

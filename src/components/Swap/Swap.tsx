@@ -19,12 +19,7 @@ export const tokenSymbolToAccountID = new Map<string, string>([
   ["L49B", "0.0.47646196"],
 ]);
 export interface SwapProps {
-  sendSwapTransaction: (
-    depositTokenAccountId: string,
-    depositTokenAmount: number,
-    receivingTokenAccountId: string,
-    receivingTokenAmount: number
-  ) => Promise<void>;
+  sendSwapTransaction: (payload: any) => void;
   // connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
