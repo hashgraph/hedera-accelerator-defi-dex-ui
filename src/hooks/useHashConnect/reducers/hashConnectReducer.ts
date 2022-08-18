@@ -1,7 +1,9 @@
-import { HashConnectTypes } from "hashconnect";
+import { AccountBalanceJson } from "@hashgraph/sdk";
+import { HashConnect, HashConnectTypes } from "hashconnect";
 import { ActionType, HashConnectActions } from "./actionsTypes";
-import { getLocalHashconnectData } from "./utils";
-import { WalletConnectionStatus } from "./types";
+import { getLocalHashconnectData } from "../utils";
+import { WalletConnectionStatus } from "../types";
+import { BladeSigner } from "@bladelabs/blade-web3.js";
 
 export interface HashConnectState {
   walletConnectionStatus: WalletConnectionStatus;
@@ -13,8 +15,11 @@ export interface HashConnectState {
     walletPairingString: string;
     privateKey: string;
     pairedWalletData: HashConnectTypes.WalletMetadata | null;
+    pairedAccountBalance: AccountBalanceJson | null;
     pairedAccounts: string[];
   };
+  selectedWalletName: "HashPack" | "Blade" | null;
+  bladeWallet: BladeSigner | null;
 }
 
 const initialHashConnectState: HashConnectState = {
@@ -27,8 +32,11 @@ const initialHashConnectState: HashConnectState = {
     walletPairingString: "",
     privateKey: "",
     pairedWalletData: null,
+    pairedAccountBalance: null,
     pairedAccounts: [],
   },
+  selectedWalletName: null,
+  bladeWallet: null,
 };
 
 function initHashConnectReducer(initialHashConnectState: HashConnectState) {
@@ -42,7 +50,7 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
       const walletData = payload;
       return {
         ...state,
-        walletConnectionStatus: WalletConnectionStatus.CONNECTED,
+        walletConnectionStatus: WalletConnectionStatus.READY_TO_PAIR,
         [field]: {
           ...state[field],
           ...walletData,
@@ -53,10 +61,11 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
       const { field } = action;
       return {
         ...state,
-        walletConnectionStatus: WalletConnectionStatus.CONNECTED,
+        walletConnectionStatus: WalletConnectionStatus.READY_TO_PAIR,
         [field]: {
           ...state[field],
           pairedWalletData: null,
+          pairedAccountBalance: null,
           pairedAccounts: [],
         },
       };
@@ -84,10 +93,29 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
           pairedWalletData: metadata,
           pairedAccounts,
         },
+        selectedWalletName: "HashPack",
+      };
+    }
+    case ActionType.BLADE_WALLET_CONNECTED: {
+      const { bladeWallet } = action;
+      return {
+        ...state,
+        bladeWallet,
+        selectedWalletName: "Blade",
       };
     }
     case ActionType.CONNECTION_STATUS_CHANGED: {
       return state;
+    }
+    case ActionType.GET_WALLET_BALANCE: {
+      const { field, payload } = action;
+      return {
+        ...state,
+        [field]: {
+          ...state[field],
+          pairedAccountBalance: payload,
+        },
+      };
     }
     default:
       throw new Error();

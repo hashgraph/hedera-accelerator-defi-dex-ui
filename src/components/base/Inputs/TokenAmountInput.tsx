@@ -1,8 +1,9 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { NumberInput, NumberInputProps, NumberInputField } from "@chakra-ui/react";
 
 interface TokenAmountInputProps extends NumberInputProps {
   dataTestId?: string;
+  onChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TokenAmountInput = ({
@@ -10,6 +11,7 @@ const TokenAmountInput = ({
   value,
   defaultValue = 0.0,
   precision = 2,
+  onChangeHandler,
   ...restProps
 }: TokenAmountInputProps) => {
   return (
@@ -20,7 +22,7 @@ const TokenAmountInput = ({
       precision={precision}
       {...restProps}
     >
-      <NumberInputField data-testid={`${dataTestId}-field`} />
+      <NumberInputField data-testid={`${dataTestId}-field`} onChange={onChangeHandler} />
     </NumberInput>
   );
 };

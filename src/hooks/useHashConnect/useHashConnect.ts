@@ -1,10 +1,24 @@
-import { useEffect, useCallback, Dispatch } from "react";
-import { HashConnect, HashConnectTypes } from "hashconnect";
-import { ActionType, HashConnectActions } from "./actionsTypes";
-import { HashConnectState } from "./hashConnectReducer";
+import { useEffect, useCallback, Dispatch, useState } from "react";
+import { HashConnect, HashConnectTypes, MessageTypes } from "hashconnect";
+import { BigNumber } from "bignumber.js";
+import {
+  ContractExecuteTransaction,
+  ContractFunctionParameters,
+  AccountId,
+  TokenId,
+  TransactionId,
+  AccountBalanceJson,
+  PrivateKey,
+  Client,
+  ContractId,
+  Hbar,
+} from "@hashgraph/sdk";
+import { ActionType, HashConnectActions } from "./reducers/actionsTypes";
+import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 import { WalletConnectionStatus } from "./types";
+import { BladeSigner } from "@bladelabs/blade-web3.js";
 
 /*
 const dexMetadata: HashConnectTypes.AppMetadata = {
@@ -13,7 +27,15 @@ const dexMetadata: HashConnectTypes.AppMetadata = {
   icon: "",
 };
 */
+const OPERATOR_ACCOUNT_ID = "0.0.47549759";
+const OPERATOR_PUBLIC_KEY = "302a300506032b6570032100a1dcb686465f9f4c22baaff9e321f057e82b5081e1d110969e7d512157979ab8";
+const OPERATOR_PRIVATE_KEY =
+  "302e020100300506032b657004220420ade33088ec47cd9d4ee4d9c9409567a4e39fddc2e4434aa6ace16e3278e253d5";
 
+const operatorId = AccountId.fromString(OPERATOR_ACCOUNT_ID);
+const operatorKey = PrivateKey.fromString(OPERATOR_PRIVATE_KEY);
+
+const client = Client.forTestnet().setOperator(operatorId, operatorKey);
 const hashconnect = new HashConnect(true);
 
 export interface UseHashConnectProps {
@@ -31,7 +53,7 @@ const useHashConnect = ({
   dexMetaData,
   debug,
 }: UseHashConnectProps) => {
-  const { walletConnectionStatus, installedExtensions, walletData } = hashConnectState;
+  const { walletConnectionStatus, installedExtensions, walletData, selectedWalletName, bladeWallet } = hashConnectState;
   useHashConnectEvents(hashconnect, hashConnectState, dispatch, debug);
 
   const initWalletConnection = useCallback(async (): Promise<any> => {
@@ -90,10 +112,86 @@ const useHashConnect = ({
     }
   }, [installedExtensions, walletData, debug]);
 
+  // prob dont need useCallback here
+  const connectToBlade = useCallback(async () => {
+    const bladeSigner = new BladeSigner();
+    await bladeSigner.createSession();
+    console.log("Account ID of Blade Signer:", bladeSigner.getAccountId().toString());
+    dispatch({ type: ActionType.BLADE_WALLET_CONNECTED, bladeWallet: bladeSigner });
+  }, [dispatch]);
+
   const clearWalletPairings = useCallback(() => {
     localStorage.removeItem("hashconnectData");
     dispatch({ type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" });
   }, [dispatch]);
+
+  const getWalletBalance = useCallback(async () => {
+    const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+    const walletBalance = await provider.getAccountBalance(walletData.pairedAccounts[0]);
+    console.log(walletBalance.toJSON());
+    const walletBalanceJSON = walletBalance.toJSON();
+    dispatch({ type: ActionType.GET_WALLET_BALANCE, field: "walletData", payload: walletBalanceJSON });
+  }, [network, walletData.topicID, walletData.pairedAccounts, dispatch]);
+
+  const sendSwapTransaction = useCallback(
+    async (
+      depositTokenAccountId: string,
+      depositTokenAmount: number,
+      receivingTokenAccountId: string,
+      receivingTokenAmount: number
+    ) => {
+      const SWAP_CONTRACT_ID = ContractId.fromString("0.0.47712695");
+      const depositTokenAddress = TokenId.fromString(depositTokenAccountId).toSolidityAddress();
+      // temporarily mocking address to strictly swap token A.
+      const receivingTokenAddress = TokenId.fromString("0.0.47646100").toSolidityAddress();
+      const tokenAQty = new BigNumber(depositTokenAmount);
+      const tokenBQty = new BigNumber(receivingTokenAmount);
+
+      console.log(selectedWalletName);
+      const swapTransaction = new ContractExecuteTransaction().setContractId(SWAP_CONTRACT_ID).setGas(2000000);
+
+      if (selectedWalletName === "HashPack") {
+        const signingAccount = walletData.pairedAccounts[0];
+        const walletAddress: string = AccountId.fromString(signingAccount).toSolidityAddress();
+        const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+        const signer = hashconnect.getSigner(provider);
+
+        const hashpackSwapTransaction = await swapTransaction
+          .setFunction(
+            "swapToken",
+            new ContractFunctionParameters()
+              .addAddress(walletAddress)
+              .addAddress(depositTokenAddress) //token A
+              .addAddress(receivingTokenAddress)
+              .addInt64(tokenAQty)
+              .addInt64(tokenBQty)
+          )
+          .setNodeAccountIds([new AccountId(3)])
+          .freezeWithSigner(signer);
+
+        const result = await hashpackSwapTransaction.executeWithSigner(signer);
+        console.log(result.toString());
+      } else {
+        // annoying Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+        //          Type 'undefined' is not assignable to type 'string'.ts(2345)
+        const bladeAccountAddress = bladeWallet?.getAccountId().toSolidityAddress() ?? "";
+        const bladeSwapTransaction = swapTransaction
+          .setFunction(
+            "swapToken",
+            new ContractFunctionParameters()
+              .addAddress(bladeAccountAddress)
+              .addAddress(depositTokenAddress) //token A
+              .addAddress(receivingTokenAddress)
+              .addInt64(tokenAQty)
+              .addInt64(tokenBQty)
+          )
+          .setNodeAccountIds([new AccountId(3)]);
+        const bladeResult = await bladeWallet?.call(bladeSwapTransaction);
+        console.log(bladeResult?.toString());
+      }
+    },
+    [network, walletData.topicID, walletData.pairedAccounts, selectedWalletName, bladeWallet]
+  );
 
   useEffect(() => {
     establishWalletConnection();
@@ -105,10 +203,15 @@ const useHashConnect = ({
 
   useEffect(() => {
     if (debug) console.log(walletConnectionStatus);
-  }, [debug, walletConnectionStatus]);
+    if (walletConnectionStatus === WalletConnectionStatus.PAIRED) {
+      getWalletBalance();
+    }
+  }, [debug, walletConnectionStatus, getWalletBalance]);
 
   return {
     connectToWallet,
+    connectToBlade,
+    sendSwapTransaction,
     clearWalletPairings,
   };
 };

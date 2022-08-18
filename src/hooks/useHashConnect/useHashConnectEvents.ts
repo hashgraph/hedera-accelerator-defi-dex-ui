@@ -1,7 +1,7 @@
 import { useEffect, useCallback, Dispatch } from "react";
 import { HashConnect, HashConnectTypes, MessageTypes } from "hashconnect";
-import { ActionType, HashConnectActions } from "./actionsTypes";
-import { HashConnectState } from "./hashConnectReducer";
+import { ActionType, HashConnectActions } from "./reducers/actionsTypes";
+import { HashConnectState } from "./reducers/hashConnectReducer";
 import { ConnectionStatus } from "./types";
 
 const useHashConnectEvents = (
@@ -51,6 +51,7 @@ const useHashConnectEvents = (
 
   useEffect(() => {
     if (debug) console.log("==== Setup Hashconnect Events ====");
+    // events are fired when specific_event in hashconnect.<specific_event> is triggered/fired
     hashconnect.foundExtensionEvent.on(handleFoundExtensionEvent);
     hashconnect.pairingEvent.on(handlePairingEvent);
     hashconnect.acknowledgeMessageEvent.on(handleAcknowledgeMessageEvent);
