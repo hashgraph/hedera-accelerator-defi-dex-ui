@@ -1,5 +1,5 @@
 import React, { useReducer, useContext } from "react";
-import { HashConnectTypes } from "hashconnect";
+import { HashConnect, HashConnectTypes } from "hashconnect";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
@@ -9,6 +9,7 @@ import {
   initialHashConnectState,
   initHashConnectReducer,
 } from "../hooks/useHashConnect";
+import { BladeSigner } from "@bladelabs/blade-web3.js";
 
 export interface HashConnectContextProps {
   sendSwapTransaction: (
@@ -24,6 +25,9 @@ export interface HashConnectContextProps {
   network: Networks;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
+  connectToBlade: () => void;
+  bladeWallet: BladeSigner | null;
+  selectedWalletName: 'HashPack' | 'Blade' | null;
 }
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
@@ -34,6 +38,9 @@ const HashConnectContext = React.createContext<HashConnectContextProps>({
   walletData: null,
   network: "testnet",
   installedExtensions: null,
+  connectToBlade: () => null,
+  bladeWallet: null,
+  selectedWalletName: null,
 });
 
 export interface HashConnectProviderProps {
@@ -50,7 +57,7 @@ const HashConnectProvider = ({
   debug = false,
 }: HashConnectProviderProps): JSX.Element => {
   const [hashConnectState, dispatch] = useReducer(hashConnectReducer, initialHashConnectState, initHashConnectReducer);
-  const { connectToWallet, clearWalletPairings, sendSwapTransaction } = useHashConnect({
+  const { connectToWallet, clearWalletPairings, sendSwapTransaction, connectToBlade } = useHashConnect({
     hashConnectState,
     dispatch,
     network,
@@ -68,6 +75,9 @@ const HashConnectProvider = ({
         walletData: hashConnectState.walletData,
         network,
         installedExtensions: hashConnectState.installedExtensions,
+        connectToBlade,
+        selectedWalletName: hashConnectState.selectedWalletName,
+        bladeWallet: hashConnectState.bladeWallet,
       }}
     >
       {children}

@@ -1,8 +1,9 @@
 import { AccountBalanceJson } from "@hashgraph/sdk";
-import { HashConnectTypes } from "hashconnect";
+import { HashConnect, HashConnectTypes } from "hashconnect";
 import { ActionType, HashConnectActions } from "./actionsTypes";
 import { getLocalHashconnectData } from "../utils";
 import { WalletConnectionStatus } from "../types";
+import { BladeSigner } from "@bladelabs/blade-web3.js";
 
 export interface HashConnectState {
   walletConnectionStatus: WalletConnectionStatus;
@@ -17,6 +18,8 @@ export interface HashConnectState {
     pairedAccountBalance: AccountBalanceJson | null;
     pairedAccounts: string[];
   };
+  selectedWalletName: 'HashPack' | 'Blade' | null;
+  bladeWallet: BladeSigner | null;
 }
 
 const initialHashConnectState: HashConnectState = {
@@ -32,6 +35,8 @@ const initialHashConnectState: HashConnectState = {
     pairedAccountBalance: null,
     pairedAccounts: [],
   },
+  selectedWalletName: null,
+  bladeWallet: null,
 };
 
 function initHashConnectReducer(initialHashConnectState: HashConnectState) {
@@ -88,7 +93,16 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
           pairedWalletData: metadata,
           pairedAccounts,
         },
+        selectedWalletName: 'HashPack',
       };
+    }
+    case ActionType.BLADE_WALLET_CONNECTED: {
+      const { bladeWallet } = action;
+      return {
+        ...state,
+        bladeWallet,
+        selectedWalletName: 'Blade',
+      }
     }
     case ActionType.CONNECTION_STATUS_CHANGED: {
       return state;

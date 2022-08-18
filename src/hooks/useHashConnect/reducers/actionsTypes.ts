@@ -2,6 +2,7 @@ import { AccountBalanceJson } from "@hashgraph/sdk";
 import { HashConnectState } from "./hashConnectReducer";
 import { MessageTypes } from "hashconnect";
 import { ConnectionStatus } from "../types";
+import { BladeSigner } from "@bladelabs/blade-web3.js";
 
 export enum ActionType {
   INIT_WALLET_CONNECTION = "INIT_WALLET_CONNECTION",
@@ -11,6 +12,7 @@ export enum ActionType {
   WALLET_PAIRING_APPROVED = "WALLET_PAIRING_APPROVED",
   CONNECTION_STATUS_CHANGED = "CONNECTION_STATUS_CHANGED",
   GET_WALLET_BALANCE = "GET_WALLET_BALANCE",
+  BLADE_WALLET_CONNECTED = "BLADE_WALLET_CONNECTED",
 }
 
 interface IInitWalletConnection {
@@ -46,10 +48,16 @@ interface GetWalletBalance {
   payload: AccountBalanceJson;
 }
 
+interface BladeWalletConnected {
+  type: ActionType.BLADE_WALLET_CONNECTED;
+  bladeWallet: BladeSigner;
+}
+
 export type HashConnectActions =
   | IInitWalletConnection
   | IClearWalletPairings
   | AddInstalledExtension
   | WalletPairingApproved
   | ConnectionStatusChanged
-  | GetWalletBalance;
+  | GetWalletBalance
+  | BladeWalletConnected;

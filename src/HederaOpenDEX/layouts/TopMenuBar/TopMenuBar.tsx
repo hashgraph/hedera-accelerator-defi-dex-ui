@@ -19,13 +19,13 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useHashConnectContext } from "../../../context";
+import { WalletConnect } from "../../../components/WalletConnect/WalletConnect";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
 }
 
 const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
-  const { walletData, network, connectionStatus, clearWalletPairings } = useHashConnectContext();
 
   return (
     <Menu>
@@ -47,55 +47,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           </HStack>
         </Center>
         <Box textAlign="right">
-          <Popover>
-            <PopoverTrigger>
-              <Button bg="black" color="white" size="sm" padding="15px" width="fit-content">
-                <Box w="100%" marginRight="20px">
-                  <HStack>
-                    <Text marginRight="5px">Balance:</Text>
-                    <Text fontWeight="bold" color="white">
-                      {walletData?.pairedAccountBalance?.hbars ?? "-"}
-                    </Text>
-                  </HStack>
-                </Box>
-                <Box w="100%">
-                  <HStack>
-                    <Text marginRight="5px">Status:</Text>
-                    <Text fontWeight="bold" color="white">
-                      {connectionStatus || "Not paired"}
-                    </Text>
-                  </HStack>
-                </Box>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent bg="white" color="black" textAlign="center">
-              <PopoverHeader fontWeight="bold">Account</PopoverHeader>
-              <VStack>
-                <Text size="md" padding="0.4rem 0">
-                  network: <b style={{ color: "black" }}>{network || "-"}</b>
-                </Text>
-                <Text size="md" padding="0.4rem 0">
-                  account: <b style={{ color: "black" }}>{walletData?.pairedAccounts?.[0] || "-"}</b>
-                </Text>
-                <Text size="md" padding="0.4rem 0">
-                  wallet type: <b style={{ color: "black" }}>{walletData?.pairedWalletData?.name || "-"}</b>
-                </Text>
-                <Text size="md" padding="0.4rem 0">
-                  balance: <b style={{ color: "black" }}>{walletData?.pairedAccountBalance?.hbars ?? "-"}</b>
-                </Text>
-                <Link
-                  color="#0180FF"
-                  href={`https://hashscan.io/#/testnet/account/${walletData?.pairedAccounts?.[0]}`}
-                  isExternal
-                >
-                  <ExternalLinkIcon mx="1px" /> View on Hashscan
-                </Link>
-                <Button onClick={clearWalletPairings} variant="secondary">
-                  Disconnect From Wallet
-                </Button>
-              </VStack>
-            </PopoverContent>
-          </Popover>
+          <WalletConnect />
         </Box>
       </Grid>
     </Menu>

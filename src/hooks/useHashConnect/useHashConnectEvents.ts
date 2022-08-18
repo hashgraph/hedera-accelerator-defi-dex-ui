@@ -51,6 +51,7 @@ const useHashConnectEvents = (
 
   useEffect(() => {
     if (debug) console.log("==== Setup Hashconnect Events ====");
+    // events are fired when specific_event in hashconnect.<specific_event> is triggered/fired
     hashconnect.foundExtensionEvent.on(handleFoundExtensionEvent);
     hashconnect.pairingEvent.on(handlePairingEvent);
     hashconnect.acknowledgeMessageEvent.on(handleAcknowledgeMessageEvent);
