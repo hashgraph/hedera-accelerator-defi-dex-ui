@@ -18,7 +18,7 @@ export interface HashConnectState {
     pairedAccountBalance: AccountBalanceJson | null;
     pairedAccounts: string[];
   };
-  selectedWalletName: 'HashPack' | 'Blade' | null;
+  selectedWalletName: "HashPack" | "Blade" | null;
   bladeWallet: BladeSigner | null;
 }
 
@@ -93,7 +93,7 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
           pairedWalletData: metadata,
           pairedAccounts,
         },
-        selectedWalletName: 'HashPack',
+        selectedWalletName: "HashPack",
       };
     }
     case ActionType.BLADE_WALLET_CONNECTED: {
@@ -101,8 +101,8 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectActions)
       return {
         ...state,
         bladeWallet,
-        selectedWalletName: 'Blade',
-      }
+        selectedWalletName: "Blade",
+      };
     }
     case ActionType.CONNECTION_STATUS_CHANGED: {
       return state;

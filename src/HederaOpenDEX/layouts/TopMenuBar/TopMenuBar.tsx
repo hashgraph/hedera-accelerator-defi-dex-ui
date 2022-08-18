@@ -26,7 +26,6 @@ export interface TopMenuBarProps {
 }
 
 const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
-
   return (
     <Menu>
       <Grid templateColumns="repeat(3, 1fr)" gap={6} padding="2rem 1rem" marginBottom="4rem" w="100%">

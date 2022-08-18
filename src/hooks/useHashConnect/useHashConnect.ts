@@ -116,8 +116,8 @@ const useHashConnect = ({
   const connectToBlade = useCallback(async () => {
     const bladeSigner = new BladeSigner();
     await bladeSigner.createSession();
-    console.log('Account ID of Blade Signer:', bladeSigner.getAccountId().toString());
-    dispatch({ type: ActionType.BLADE_WALLET_CONNECTED, bladeWallet: bladeSigner })
+    console.log("Account ID of Blade Signer:", bladeSigner.getAccountId().toString());
+    dispatch({ type: ActionType.BLADE_WALLET_CONNECTED, bladeWallet: bladeSigner });
   }, [dispatch]);
 
   const clearWalletPairings = useCallback(() => {
@@ -148,50 +148,47 @@ const useHashConnect = ({
       const tokenBQty = new BigNumber(receivingTokenAmount);
 
       console.log(selectedWalletName);
-      const swapTransaction = new ContractExecuteTransaction()
-        .setContractId(SWAP_CONTRACT_ID)
-        .setGas(2000000);
+      const swapTransaction = new ContractExecuteTransaction().setContractId(SWAP_CONTRACT_ID).setGas(2000000);
 
-      if (selectedWalletName === 'HashPack') {
+      if (selectedWalletName === "HashPack") {
         const signingAccount = walletData.pairedAccounts[0];
         const walletAddress: string = AccountId.fromString(signingAccount).toSolidityAddress();
         const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
         const signer = hashconnect.getSigner(provider);
 
-        const hashpackSwapTransaction = await swapTransaction.setFunction(
-          "swapToken",
-          new ContractFunctionParameters()
-            .addAddress(walletAddress)
-            .addAddress(depositTokenAddress) //token A
-            .addAddress(receivingTokenAddress)
-            .addInt64(tokenAQty)
-            .addInt64(tokenBQty)
-        )
+        const hashpackSwapTransaction = await swapTransaction
+          .setFunction(
+            "swapToken",
+            new ContractFunctionParameters()
+              .addAddress(walletAddress)
+              .addAddress(depositTokenAddress) //token A
+              .addAddress(receivingTokenAddress)
+              .addInt64(tokenAQty)
+              .addInt64(tokenBQty)
+          )
           .setNodeAccountIds([new AccountId(3)])
           .freezeWithSigner(signer);
 
         const result = await hashpackSwapTransaction.executeWithSigner(signer);
         console.log(result.toString());
       } else {
-        // annoying Argument of type 'string | undefined' is not assignable to parameter of type 'string'. 
+        // annoying Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
         //          Type 'undefined' is not assignable to type 'string'.ts(2345)
-        const bladeAccountAddress = bladeWallet?.getAccountId().toSolidityAddress() ?? '';
-        const bladeSwapTransaction = swapTransaction.setFunction(
-          "swapToken",
-          new ContractFunctionParameters()
-            .addAddress(bladeAccountAddress)
-            .addAddress(depositTokenAddress) //token A
-            .addAddress(receivingTokenAddress)
-            .addInt64(tokenAQty)
-            .addInt64(tokenBQty)
-        )
+        const bladeAccountAddress = bladeWallet?.getAccountId().toSolidityAddress() ?? "";
+        const bladeSwapTransaction = swapTransaction
+          .setFunction(
+            "swapToken",
+            new ContractFunctionParameters()
+              .addAddress(bladeAccountAddress)
+              .addAddress(depositTokenAddress) //token A
+              .addAddress(receivingTokenAddress)
+              .addInt64(tokenAQty)
+              .addInt64(tokenBQty)
+          )
           .setNodeAccountIds([new AccountId(3)]);
         const bladeResult = await bladeWallet?.call(bladeSwapTransaction);
         console.log(bladeResult?.toString());
       }
-
-
-
     },
     [network, walletData.topicID, walletData.pairedAccounts, selectedWalletName, bladeWallet]
   );

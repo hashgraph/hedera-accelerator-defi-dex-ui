@@ -27,7 +27,7 @@ export interface HashConnectContextProps {
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
   connectToBlade: () => void;
   bladeWallet: BladeSigner | null;
-  selectedWalletName: 'HashPack' | 'Blade' | null;
+  selectedWalletName: "HashPack" | "Blade" | null;
 }
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
