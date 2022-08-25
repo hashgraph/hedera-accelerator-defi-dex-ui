@@ -17,4 +17,9 @@ const getLocalHashconnectData = (): HashConnectState | null => {
   }
 };
 
-export { getLocalHashconnectData };
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
+export { getLocalHashconnectData, getErrorMessage };

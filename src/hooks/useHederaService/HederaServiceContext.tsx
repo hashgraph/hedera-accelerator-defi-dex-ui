@@ -36,7 +36,9 @@ const HederaServiceContext = React.createContext<HederaServiceContextProps>({
 export interface HederaServiceProviderProps {
   children?: React.ReactNode;
 }
-
+/*
+ * This hook is currently for testing purposes only.
+ */
 const HederaServiceProvider = ({ children }: HederaServiceProviderProps) => {
   const [balance, setBalance] = useState<TokenBalance>({ tokenA: new BigNumber(0), tokenB: new BigNumber(0) });
   const getBalance = async () => {
