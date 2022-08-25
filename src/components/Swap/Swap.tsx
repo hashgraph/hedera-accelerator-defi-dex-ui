@@ -107,7 +107,7 @@ const Swap = (props: SwapProps) => {
           <Flex>
             <Box flex="5">
               <TokenAmountInput
-                data-testid="swap-input"
+                dataTestId="swap-input"
                 value={swapState?.inputToken?.amount}
                 onChangeHandler={handleInputAmountChange}
               />
@@ -119,13 +119,13 @@ const Swap = (props: SwapProps) => {
           </Flex>
           <Flex>
             <Spacer />
-            <SwapTokenInputsButton onClick={swapTokens} data-testid="swap-component" variant="swap" />
+            <SwapTokenInputsButton onClick={swapTokens} data-testid="swap-token-inputs-button" variant="swap" />
             <Spacer />
           </Flex>
           <Flex>
             <Box flex="5">
               <TokenAmountInput
-                data-testid="swap-output"
+                dataTestId="swap-output"
                 value={outputToken?.amount}
                 onChangeHandler={handleOutputAmountChange}
               />

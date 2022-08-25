@@ -5,9 +5,9 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 test(
-  "US00001 -",
-  "Given: N/A, When: A user loads the Swap component",
-  "Then: The Swap component is visible on the screen.",
+  "US00001 -" +
+    "Given: N/A, When: A user loads the Swap component" +
+    "Then: The Swap component is visible on the screen.",
   async () => {
     render(<Swap props={mockSwapProps} />);
     expect(screen.getByTestId("swap-component")).toBeInTheDocument();
@@ -15,10 +15,10 @@ test(
 );
 
 test(
-  "US00002 -",
-  "Given: The Swap component is loaded",
-  "When: A user interacts with the Swap component",
-  "Then: The user can enter an input and output token amount to swap.",
+  "US00002 -" +
+    "Given: The Swap component is loaded" +
+    "When: A user interacts with the Swap component" +
+    "Then: The user can enter an input and output token amount to swap.",
   async () => {
     render(<Swap props={mockSwapProps} />);
     fireEvent.change(screen.getByTestId("swap-input-field"), {
@@ -33,10 +33,10 @@ test(
 );
 
 test(
-  "US00003 -",
-  "Given: The Swap component is loaded",
-  "When: A user loads the Swap component",
-  "Then: The user can click 'Connect Wallet'.",
+  "US00003 -" +
+    "Given: The Swap component is loaded" +
+    "When: A user loads the Swap component" +
+    "Then: The user can click 'Connect Wallet'.",
   async () => {
     render(<Swap props={mockSwapProps} />);
     userEvent.click(screen.getByTestId("connect-wallet-button"));

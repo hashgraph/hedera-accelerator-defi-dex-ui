@@ -22,13 +22,8 @@ jobs:
       run: yarn lint
 
     - name: Build
-      run: CI=false yarn build:gh-pages
+      run: CI=false yarn build
       
     - name: Run tests
       run: yarn test
-
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: docs
       
