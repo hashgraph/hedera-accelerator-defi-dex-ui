@@ -99,7 +99,7 @@ const Swap = (props: SwapProps) => {
           <Flex>
             <Box flex="5">
               <TokenAmountInput
-                dataTestId="swap-input"
+                data-testid="swap-input"
                 value={swapState?.inputToken?.amount}
                 onChangeHandler={handleInputAmountChange}
                 variant="token-amount-input"
