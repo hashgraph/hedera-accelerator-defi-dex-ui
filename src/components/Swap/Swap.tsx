@@ -1,18 +1,13 @@
 import { ChangeEvent, useCallback, useState, useReducer, Dispatch } from "react";
-import { ChakraProvider, Box, Heading, VStack, HStack, Flex, Spacer, Text } from "@chakra-ui/react";
+import { ChakraProvider, Box, Heading, Flex, Spacer, Text } from "@chakra-ui/react";
+import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
 import { WalletConnectionStatus, Networks, HashConnectState } from "../../hooks/useHashConnect";
 import { HederaOpenDexTheme } from "../../HederaOpenDEX/styles";
 import { swapReducer, initialSwapState, initSwapReducer, ActionType, SwapState, SwapActions } from "./reducers";
 
-import {
-  TokenAmountInput,
-  TokenSelector,
-  SwapTokenInputsButton,
-  ConnectToWalletButton,
-  CallSwapContractButton,
-  SwapConfirmation,
-} from "../base";
+import { Button, IconButton, TokenAmountInput, TokenSelector, SwapConfirmation } from "../base";
+import { useHashConnectContext } from "../../context";
 
 export const tokenSymbolToAccountID = new Map<string, string>([
   ["L49A", "0.0.47646195"],
@@ -38,6 +33,7 @@ const Swap = (props: SwapProps) => {
   const { walletData, connectionStatus, sendSwapTransaction } = props;
   const [swapState, dispatch] = useReducer(swapReducer, initialSwapState, initSwapReducer);
   const { inputToken, outputToken } = swapState;
+  const { connectToWallet } = useHashConnectContext();
 
   const handleSwapInputsChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>, actionType: ActionType, field: string) => {
@@ -91,58 +87,77 @@ const Swap = (props: SwapProps) => {
 
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
-      <VStack align="stretch" minWidth="sm">
-        <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
-          <Heading
-            as="p"
-            size="sm"
-            color="black"
-            paddingLeft="5px"
-            paddingTop="0.5rem"
-            paddingBottom="0.5rem"
-            marginBottom="1rem"
-          >
+      <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+        <Flex>
+          <Heading as="h4" size="lg">
             Swap
           </Heading>
+          <Spacer />
+          <IconButton
+            data-testid="settings-button"
+            aria-label="Open and close settings modal."
+            icon={<SettingsIcon w={6} h={6} />}
+            variant="settings"
+          />
+        </Flex>
+        <Box border="1px solid black" borderRadius="5px" backgroundColor="#F2F2F2">
           <Flex>
             <Box flex="5">
               <TokenAmountInput
                 dataTestId="swap-input"
                 value={swapState?.inputToken?.amount}
                 onChangeHandler={handleInputAmountChange}
+                variant="token-amount-input"
               />
-              <Text>Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "-"}</Text>
             </Box>
             <Box flex="4">
               <TokenSelector value={inputToken?.symbol} onChangeHandler={handleInputSymbolChange} />
             </Box>
           </Flex>
-          <Flex>
-            <Spacer />
-            <SwapTokenInputsButton onClick={swapTokens} data-testid="swap-token-inputs-button" variant="swap" />
-            <Spacer />
+          <Flex backgroundColor="#F2F2F2">
+            <Text fontSize="xs" padding="0.25rem" fontWeight="bold">
+              Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "Connect to View"}
+            </Text>
+            <Button variant="xs-text">Half</Button>
+            <Button variant="xs-text">Max</Button>
           </Flex>
-          <Flex>
-            <Box flex="5">
-              <TokenAmountInput
-                dataTestId="swap-output"
-                value={outputToken?.amount}
-                onChangeHandler={handleOutputAmountChange}
-              />
-              <Text>Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
-            </Box>
-            <Box flex="4">
-              <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
-            </Box>
-          </Flex>
+        </Box>
+        <Flex>
+          <IconButton
+            data-testid="switch-token-inputs-button"
+            aria-label="Switch the token amount and symbol input values."
+            icon={<UpDownIcon w={6} h={6} />}
+            onClick={swapTokens}
+            isRound={true}
+            variant="switch-token-inputs"
+          />
+        </Flex>
+        <Flex>
+          <Box flex="5">
+            <TokenAmountInput
+              data-testid="swap-output"
+              value={outputToken?.amount}
+              onChangeHandler={handleOutputAmountChange}
+            />
+            <Text fontSize="xs">Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "-"}</Text>
+            <Button variant="xs-text">Half</Button>
+            <Button variant="xs-text">Max</Button>
+          </Box>
+          <Box flex="4">
+            <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
+          </Box>
+        </Flex>
+        <Flex direction="column" grow="1">
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
             <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
           ) : (
-            // <CallSwapContractButton data-testid="swap-tokens-button" variant="secondary" />
-            <ConnectToWalletButton data-testid="connect-wallet-button" variant="primary" />
+            <Button data-testid="connect-wallet-button" onClick={connectToWallet}>
+              Connect Wallet
+            </Button>
           )}
-        </Box>
-      </VStack>
+        </Flex>
+      </Box>
+      {/* </VStack> */}
     </ChakraProvider>
   );
 };
