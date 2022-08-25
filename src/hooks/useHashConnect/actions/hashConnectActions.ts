@@ -225,6 +225,7 @@ const sendSwapTransactionToWallet = (payload: any) => {
 
       const result = await swapTransaction.executeWithSigner(signer);
       dispatch(sendSwapTransactionToWalletSucceeded());
+      /* TODO: Results will be saved in context state and displayed in the UI */
       console.log(result);
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -232,11 +233,6 @@ const sendSwapTransactionToWallet = (payload: any) => {
     }
   };
 };
-
-// const clearWalletPairings = useCallback(() => {
-//   localStorage.removeItem("hashconnectData");
-//   dispatch({ type: ActionType.LOCAL_HASH_CONNECT_DATA_REMVOED, field: "walletData" });
-// }, [dispatch]);
 
 export {
   sendSwapTransactionToWallet,
