@@ -5,7 +5,11 @@
   "private": true,
   "license": "MIT",
   "main": "src/index.tsx",
-  "jest": {},
+  "jest": {
+    "transformIgnorePatterns": [
+      "!node_modules/"
+    ]
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.4",
     "@chakra-ui/react": "^2.2.3",
