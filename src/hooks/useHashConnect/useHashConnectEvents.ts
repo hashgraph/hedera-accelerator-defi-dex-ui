@@ -1,18 +1,17 @@
 import { useEffect, useCallback, Dispatch } from "react";
 import { HashConnect, HashConnectTypes, MessageTypes } from "hashconnect";
-import { ActionType, HashConnectActions } from "./reducers/actionsTypes";
+import { ActionType, HashConnectAction } from "./actions/actionsTypes";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { ConnectionStatus } from "./types";
 
 const useHashConnectEvents = (
   hashconnect: HashConnect,
   hashConnectState: HashConnectState,
-  dispatch: Dispatch<HashConnectActions>,
+  dispatch: Dispatch<HashConnectAction>,
   debug: boolean
 ) => {
   const handleFoundExtensionEvent = useCallback(
     (walletMetadata: HashConnectTypes.WalletMetadata) => {
-      if (debug) console.debug("Found Extensions", walletMetadata);
       dispatch({ type: ActionType.ADD_INSTALLED_EXTENSION, payload: walletMetadata });
     },
     [dispatch, debug]
@@ -20,7 +19,6 @@ const useHashConnectEvents = (
 
   const handlePairingEvent = useCallback(
     (approvePairing: MessageTypes.ApprovePairing) => {
-      if (debug) console.log("Paring Approved", approvePairing);
       dispatch({ type: ActionType.WALLET_PAIRING_APPROVED, field: "walletData", payload: approvePairing });
     },
     [dispatch, debug]
@@ -32,8 +30,7 @@ const useHashConnectEvents = (
 
   const handleConnectionStatusChange = useCallback(
     (connectionStatus: ConnectionStatus) => {
-      console.log("Hashpack Connection Status Received", { connectionStatus });
-      dispatch({ type: ActionType.CONNECTION_STATUS_CHANGED, payload: connectionStatus });
+      dispatch({ type: ActionType.RECEIVED_CONNECTION_STATUS_CHANGED, payload: connectionStatus });
     },
     [dispatch]
   );

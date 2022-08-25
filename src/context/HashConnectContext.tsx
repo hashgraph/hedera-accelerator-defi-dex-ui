@@ -1,4 +1,5 @@
-import React, { useReducer, useContext } from "react";
+import React, { Reducer, useContext } from "react";
+import useEnhancedReducer, { Middleware } from "@rest-hooks/use-enhanced-reducer";
 import { HashConnectTypes } from "hashconnect";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
@@ -8,15 +9,14 @@ import {
   hashConnectReducer,
   initialHashConnectState,
   initHashConnectReducer,
+  HashConnectState,
+  thunkMiddleware,
 } from "../hooks/useHashConnect";
+import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes";
+import { loggerMiddleware } from "../middleware";
 
 export interface HashConnectContextProps {
-  sendSwapTransaction: (
-    depositTokenAccountId: string,
-    depositTokenAmount: number,
-    receivingTokenAccountId: string,
-    receivingTokenAmount: number
-  ) => Promise<void>;
+  sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -42,6 +42,7 @@ export interface HashConnectProviderProps {
   network?: Networks;
   debug?: boolean;
 }
+const init = initHashConnectReducer(initialHashConnectState);
 
 const HashConnectProvider = ({
   children,
@@ -49,7 +50,11 @@ const HashConnectProvider = ({
   network = "testnet",
   debug = false,
 }: HashConnectProviderProps): JSX.Element => {
-  const [hashConnectState, dispatch] = useReducer(hashConnectReducer, initialHashConnectState, initHashConnectReducer);
+  const [hashConnectState, dispatch] = useEnhancedReducer<Reducer<HashConnectState, HashConnectAction>>(
+    hashConnectReducer,
+    init,
+    [loggerMiddleware, thunkMiddleware]
+  );
   const { connectToWallet, clearWalletPairings, sendSwapTransaction } = useHashConnect({
     hashConnectState,
     dispatch,

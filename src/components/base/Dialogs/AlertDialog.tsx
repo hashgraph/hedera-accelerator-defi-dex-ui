@@ -14,12 +14,7 @@ import { SwapState } from "../../Swap/reducers";
 import { tokenSymbolToAccountID } from "../../Swap";
 
 interface SwapConfirmationProps {
-  sendSwapTransaction: (
-    depositTokenAccountId: string,
-    depositTokenAmount: number,
-    receivingTokenAccountId: string,
-    receivingTokenAmount: number
-  ) => Promise<void>;
+  sendSwapTransaction: (payload: any) => void;
   swapState: SwapState;
 }
 
@@ -32,7 +27,12 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
     const { inputToken, outputToken } = swapState;
     const inputTokenAccountId = tokenSymbolToAccountID.get(inputToken.symbol) ?? "";
     const outputTokenAccountId = tokenSymbolToAccountID.get(outputToken.symbol) ?? "";
-    await sendSwapTransaction(inputTokenAccountId, inputToken.amount, outputTokenAccountId, outputToken.amount);
+    sendSwapTransaction({
+      depositTokenAccountId: inputTokenAccountId,
+      depositTokenAmount: inputToken.amount,
+      receivingTokenAccountId: outputTokenAccountId,
+      receivingTokenAmount: outputToken.amount,
+    });
   }, [sendSwapTransaction, swapState]);
 
   return (
