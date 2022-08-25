@@ -14,7 +14,7 @@ import { TokenBalance } from "./HederaServiceContext";
 
 //dotenv.config();
 
-const createClient = () => {
+export const createClient = () => {
   const myAccountId = "0.0.34833380";
   const privateKey1 = "302e020100300506032b657004220420411127f31025a5";
   const privatekey2 = "f20a32a92f1baf13be0e767d62bffff10db3f5e5599a52da41";
