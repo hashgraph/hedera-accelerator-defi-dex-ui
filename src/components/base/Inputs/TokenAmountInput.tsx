@@ -2,12 +2,12 @@ import React, { ChangeEvent } from "react";
 import { NumberInput, NumberInputProps, NumberInputField } from "@chakra-ui/react";
 
 interface TokenAmountInputProps extends NumberInputProps {
-  dataTestId?: string;
+  "data-testid"?: string;
   onChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TokenAmountInput = ({
-  dataTestId,
+  "data-testid": dataTestId,
   value,
   defaultValue = 0.0,
   precision = 2,
