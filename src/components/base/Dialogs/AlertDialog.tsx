@@ -37,7 +37,9 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
 
   return (
     <>
-      <Button onClick={onOpen}>Swap</Button>
+      <Button onClick={onOpen} marginTop="1em">
+        Swap
+      </Button>
       <AlertDialog
         motionPreset="slideInBottom"
         leastDestructiveRef={cancelRef}

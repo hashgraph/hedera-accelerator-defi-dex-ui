@@ -1,7 +1,6 @@
 import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
-import { WalletConnectionStatus } from "../types";
 import { getErrorMessage } from "../utils";
 
 const initializeWalletConnectionStarted = (payload?: any): HashConnectAction => {
@@ -145,7 +144,7 @@ const pairWithConnectedWallet = (payload: any) => {
 
 /**
  *
- * @param payload
+ * @param payload -
  * @returns Async Action Creator
  */
 const pairWithSelectedWalletExtension = (payload: any) => {
@@ -189,7 +188,7 @@ const sendSwapTransactionToWallet = (payload: any) => {
     const {
       depositTokenAccountId,
       depositTokenAmount,
-      receivingTokenAccountId,
+      // receivingTokenAccountId,
       receivingTokenAmount,
       hashconnect,
       hashConnectState,

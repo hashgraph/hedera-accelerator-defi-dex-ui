@@ -78,7 +78,9 @@
           "plugin:@typescript-eslint/recommended"
         ],
         "rules": {
-          "tsdoc/syntax": "warn"
+          "tsdoc/syntax": "warn",
+          "@typescript-eslint/no-explicit-any": "off",
+          "react-hooks/exhaustive-deps": "off"
         }
       },
       {

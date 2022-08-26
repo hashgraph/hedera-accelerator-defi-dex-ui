@@ -10,8 +10,6 @@ import {
   TransferTransaction,
 } from "@hashgraph/sdk";
 
-import { TokenBalance } from "./HederaServiceContext";
-
 //dotenv.config();
 
 export const createClient = () => {
@@ -113,7 +111,7 @@ const removeLiquidity = async () => {
 const swapTokenA = async () => {
   const tokenAQty = new BigNumber(5);
   const tokenBQty = new BigNumber(0);
-  const walletAddress: string = AccountId.fromString("0.0.34728121").toSolidityAddress();
+  // const walletAddress: string = AccountId.fromString("0.0.34728121").toSolidityAddress();
   console.log(`Swapping a ${tokenAQty} units of token A from the pool.`);
   // Need to pass different token B address so that only swap of token A is considered.
   tokenB = TokenId.fromString("0.0.47646100").toSolidityAddress();
@@ -204,8 +202,8 @@ const pairCurrentPosition = async () => {
     .freezeWith(client);
   const getPairQtyTx = await getPairQty.execute(client);
   const response = await getPairQtyTx.getRecord(client);
-  const tokenAQty = response.contractFunctionResult!.getInt64(0);
-  const tokenBQty = response.contractFunctionResult!.getInt64(1);
+  const tokenAQty = response.contractFunctionResult?.getInt64(0);
+  const tokenBQty = response.contractFunctionResult?.getInt64(1);
   console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B are present in the pool. \n`);
 };
 
@@ -217,8 +215,8 @@ const getContributorTokenShare = async () => {
     .freezeWith(client);
   const getContributorTokenShareTx = await getContributorTokenShare.execute(client);
   const response = await getContributorTokenShareTx.getRecord(client);
-  const tokenAQty = response.contractFunctionResult!.getInt64(0);
-  const tokenBQty = response.contractFunctionResult!.getInt64(1);
+  const tokenAQty = response.contractFunctionResult?.getInt64(0);
+  const tokenBQty = response.contractFunctionResult?.getInt64(1);
   return `${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`;
   console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`);
 };
@@ -231,8 +229,8 @@ const getTokenBalance = async () => {
     .freezeWith(client);
   const getTokenBalanceTx = await getTokenBalance.execute(client);
   const response = await getTokenBalanceTx.getRecord(client);
-  const tokenAQty = response.contractFunctionResult!.getInt64(0);
-  const tokenBQty = response.contractFunctionResult!.getInt64(1);
+  const tokenAQty = response.contractFunctionResult?.getInt64(0);
+  const tokenBQty = response.contractFunctionResult?.getInt64(1);
   return { tokenAQty, tokenBQty };
   // return `${tokenAQty} units of token A and ${tokenBQty} units of token B in Contract balance.`
   // console.log(

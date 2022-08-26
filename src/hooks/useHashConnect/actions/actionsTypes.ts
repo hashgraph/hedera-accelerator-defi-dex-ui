@@ -1,5 +1,3 @@
-import { AccountBalanceJson } from "@hashgraph/sdk";
-import { HashConnectState } from "../reducers/hashConnectReducer";
 import { MessageTypes } from "hashconnect";
 import { ConnectionStatus } from "../types";
 

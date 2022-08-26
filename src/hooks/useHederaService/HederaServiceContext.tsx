@@ -1,14 +1,7 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useState } from "react";
 import { BigNumber } from "bignumber.js";
 
-import {
-  getContributorTokenShare,
-  get100LABTokens,
-  swapTokenA,
-  swapTokenB,
-  addLiquidity,
-  getTokenBalance,
-} from "./swapContract";
+import { get100LABTokens, swapTokenA, swapTokenB, addLiquidity, getTokenBalance } from "./swapContract";
 
 export interface TokenBalance {
   tokenA?: BigNumber;
@@ -45,7 +38,7 @@ const HederaServiceProvider = ({ children }: HederaServiceProviderProps) => {
     console.log("Balance query sent...");
     const balane = await getTokenBalance();
     console.log(`Balance query received...${balane}`);
-    setBalance({ tokenA: new BigNumber(balane.tokenAQty), tokenB: balane.tokenBQty });
+    setBalance({ tokenA: balane.tokenAQty, tokenB: balane.tokenBQty });
   };
 
   const swapTokenAWithB = async () => {

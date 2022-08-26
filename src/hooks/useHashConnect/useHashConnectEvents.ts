@@ -14,14 +14,14 @@ const useHashConnectEvents = (
     (walletMetadata: HashConnectTypes.WalletMetadata) => {
       dispatch({ type: ActionType.ADD_INSTALLED_EXTENSION, payload: walletMetadata });
     },
-    [dispatch, debug]
+    [dispatch]
   );
 
   const handlePairingEvent = useCallback(
     (approvePairing: MessageTypes.ApprovePairing) => {
       dispatch({ type: ActionType.WALLET_PAIRING_APPROVED, field: "walletData", payload: approvePairing });
     },
-    [dispatch, debug]
+    [dispatch]
   );
 
   const handleAcknowledgeMessageEvent = useCallback((acknowledgeData: MessageTypes.Acknowledge) => {
