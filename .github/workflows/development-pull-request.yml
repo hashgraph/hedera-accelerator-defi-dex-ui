@@ -22,7 +22,7 @@ jobs:
       run: yarn lint
 
     - name: Build
-      run: yarn build:gh-pages
+      run: CI=false yarn build
    
     - name: Run tests
       run: yarn test

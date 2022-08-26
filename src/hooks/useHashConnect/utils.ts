@@ -1,4 +1,4 @@
-import { HashConnectState } from "./hashConnectReducer";
+import { HashConnectState } from "./reducers/hashConnectReducer";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 
 const getLocalHashconnectData = (): HashConnectState | null => {
@@ -17,4 +17,9 @@ const getLocalHashconnectData = (): HashConnectState | null => {
   }
 };
 
-export { getLocalHashconnectData };
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
+export { getLocalHashconnectData, getErrorMessage };

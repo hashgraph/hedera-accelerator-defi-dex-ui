@@ -1,4 +1,5 @@
-import React, { useReducer, useContext } from "react";
+import React, { Reducer, useContext } from "react";
+import useEnhancedReducer from "@rest-hooks/use-enhanced-reducer";
 import { HashConnectTypes } from "hashconnect";
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
@@ -7,9 +8,14 @@ import {
   hashConnectReducer,
   initialHashConnectState,
   initHashConnectReducer,
+  HashConnectState,
+  thunkMiddleware,
 } from "../hooks/useHashConnect";
+import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes";
+import { loggerMiddleware } from "../middleware";
 
 export interface HashConnectContextProps {
+  sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -20,6 +26,7 @@ export interface HashConnectContextProps {
 }
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
+  sendSwapTransaction: () => Promise.resolve(),
   connectToWallet: () => null,
   clearWalletPairings: () => null,
   connectionStatus: WalletConnectionStatus.INITIALIZING,
@@ -34,6 +41,7 @@ export interface HashConnectProviderProps {
   network?: Networks;
   debug?: boolean;
 }
+const init = initHashConnectReducer(initialHashConnectState);
 
 const HashConnectProvider = ({
   children,
@@ -41,8 +49,12 @@ const HashConnectProvider = ({
   network = "testnet",
   debug = false,
 }: HashConnectProviderProps): JSX.Element => {
-  const [hashConnectState, dispatch] = useReducer(hashConnectReducer, initialHashConnectState, initHashConnectReducer);
-  const { connectToWallet, clearWalletPairings } = useHashConnect({
+  const [hashConnectState, dispatch] = useEnhancedReducer<Reducer<HashConnectState, HashConnectAction>>(
+    hashConnectReducer,
+    init,
+    [loggerMiddleware, thunkMiddleware]
+  );
+  const { connectToWallet, clearWalletPairings, sendSwapTransaction } = useHashConnect({
     hashConnectState,
     dispatch,
     network,
@@ -53,6 +65,7 @@ const HashConnectProvider = ({
   return (
     <HashConnectContext.Provider
       value={{
+        sendSwapTransaction,
         connectToWallet,
         clearWalletPairings,
         connectionStatus: hashConnectState.walletConnectionStatus,

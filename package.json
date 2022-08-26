@@ -5,18 +5,24 @@
   "private": true,
   "license": "MIT",
   "main": "src/index.tsx",
-  "jest": {},
+  "jest": {
+    "transformIgnorePatterns": [
+      "!node_modules/"
+    ]
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.4",
     "@chakra-ui/react": "^2.2.3",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@rest-hooks/use-enhanced-reducer": "^1.1.2",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
     "framer-motion": "^6.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
@@ -72,7 +78,9 @@
           "plugin:@typescript-eslint/recommended"
         ],
         "rules": {
-          "tsdoc/syntax": "warn"
+          "tsdoc/syntax": "warn",
+          "@typescript-eslint/no-explicit-any": "off",
+          "react-hooks/exhaustive-deps": "off"
         }
       },
       {
