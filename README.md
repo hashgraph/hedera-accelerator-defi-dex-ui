@@ -5,7 +5,7 @@
 <p>Status: <b>POC</b></p>
 <p align="center" style="font-size: 1.2rem;">A DEX (Decentralized Exchange) UI accelerator that operates on the Hedera network. The DEX UI utilizes React primitives from the <a href="https://github.com/hashgraph/hedera-accelerator-defi-dex-ui-components">hedera-accelerator-defi-dex-ui-components</a> UI component library.</p>
 
-[**Read The Docs**]()
+[**Read The Docs**](https://hashgraph.github.io/hedera-accelerator-defi-dex-ui/)
 </div>
 <hr />
 
