@@ -1,4 +1,4 @@
-import { Reducer, ReducerAction } from "react";
+import { ReducerAction } from "react";
 import { MiddlewareAPI, Dispatch } from "@rest-hooks/use-enhanced-reducer";
 import { HashConnectState } from "../hooks/useHashConnect/reducers/hashConnectReducer";
 import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes";

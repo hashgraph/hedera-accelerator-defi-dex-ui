@@ -21,6 +21,7 @@ export const ButtonStyles: ComponentStyleConfig = {
       bg: "white",
       color: "black",
       borderColor: "black",
+      margin: "1em 0",
     }),
     settings: {
       height: "42px",

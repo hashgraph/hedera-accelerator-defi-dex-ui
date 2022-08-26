@@ -1,7 +1,6 @@
 import React, { Reducer, useContext } from "react";
-import useEnhancedReducer, { Middleware } from "@rest-hooks/use-enhanced-reducer";
+import useEnhancedReducer from "@rest-hooks/use-enhanced-reducer";
 import { HashConnectTypes } from "hashconnect";
-import { AccountBalanceJson } from "@hashgraph/sdk";
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
 import {
