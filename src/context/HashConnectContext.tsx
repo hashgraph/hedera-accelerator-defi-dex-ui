@@ -16,6 +16,7 @@ import { loggerMiddleware } from "../middleware";
 
 export interface HashConnectContextProps {
   sendSwapTransaction: (payload: any) => void;
+  sendAddLiquidityTransaction: (payload: any) => void;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -27,6 +28,7 @@ export interface HashConnectContextProps {
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
   sendSwapTransaction: () => Promise.resolve(),
+  sendAddLiquidityTransaction: () => Promise.resolve(),
   connectToWallet: () => null,
   clearWalletPairings: () => null,
   connectionStatus: WalletConnectionStatus.INITIALIZING,
@@ -54,7 +56,7 @@ const HashConnectProvider = ({
     init,
     [loggerMiddleware, thunkMiddleware]
   );
-  const { connectToWallet, clearWalletPairings, sendSwapTransaction } = useHashConnect({
+  const { connectToWallet, clearWalletPairings, sendSwapTransaction, sendAddLiquidityTransaction } = useHashConnect({
     hashConnectState,
     dispatch,
     network,
@@ -66,6 +68,7 @@ const HashConnectProvider = ({
     <HashConnectContext.Provider
       value={{
         sendSwapTransaction,
+        sendAddLiquidityTransaction,
         connectToWallet,
         clearWalletPairings,
         connectionStatus: hashConnectState.walletConnectionStatus,
