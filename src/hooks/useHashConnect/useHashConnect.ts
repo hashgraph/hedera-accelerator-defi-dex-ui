@@ -7,6 +7,7 @@ import {
   pairWithSelectedWalletExtension,
   fetchAccountBalance,
   sendSwapTransactionToWallet,
+  sendAddLiquidityTransactionToWallet,
   fetchSpotPrices,
 } from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
@@ -79,6 +80,8 @@ const useHashConnect = ({
     sendSwapTransaction: (payload: any) =>
       dispatch(sendSwapTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     fetchSpotPrices: () => dispatch(fetchSpotPrices()),
+    sendAddLiquidityTransaction: (payload: any) =>
+      dispatch(sendAddLiquidityTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     clearWalletPairings,
   };
 };

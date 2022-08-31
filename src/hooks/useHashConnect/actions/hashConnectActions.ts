@@ -2,6 +2,7 @@ import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, Toke
 import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
 import { getErrorMessage } from "../utils";
+import { addLiquidity } from "../../useHederaService/swapContract";
 import { SWAP_CONTRACT_ID } from "../constants";
 import { getSpotPrice } from "../../useHederaService/swapContract";
 
@@ -121,6 +122,25 @@ const sendSwapTransactionToWalletFailed = (payload: string): HashConnectAction =
   return {
     type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_FAILED,
     payload,
+  };
+};
+
+const sendAddLiquidityTransactionToWalletStarted = (): HashConnectAction => {
+  return {
+    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED,
+  };
+};
+
+const SendAddLiquidityTransactionToWalletSucceeded = (): HashConnectAction => {
+  return {
+    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED,
+  };
+};
+
+const sendAddLiquidityTransactionToWalletFailed = (errorMessage: string): HashConnectAction => {
+  return {
+    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED,
+    errorMessage,
   };
 };
 
@@ -247,6 +267,49 @@ const sendSwapTransactionToWallet = (payload: any) => {
   };
 };
 
+const sendAddLiquidityTransactionToWallet = (payload: any) => {
+  return async (dispatch: any) => {
+    const {
+      firstTokenAddr,
+      firstTokenQty,
+      secondTokenAddr,
+      secondTokenQty,
+      addLiquidityContractAddr,
+      hashconnect,
+      hashConnectState,
+      network,
+    } = payload;
+
+    const firstTokenAddress = TokenId.fromString(firstTokenAddr).toSolidityAddress();
+    const secondTokenAddress = TokenId.fromString(secondTokenAddr).toSolidityAddress();
+    const firstTokenQuantity = new BigNumber(firstTokenQty);
+    const secondTokenQuantity = new BigNumber(secondTokenQty);
+    const addLiquidityContractAddress = ContractId.fromString(addLiquidityContractAddr);
+
+    const { walletData } = hashConnectState;
+    const signingAccount = walletData.pairedAccounts[0];
+    const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
+    const provider = hashconnect.getProvider(network, walletData.topicID, signingAccount);
+    const signer = hashconnect.getSigner(provider);
+    try {
+      dispatch(sendAddLiquidityTransactionToWalletStarted());
+      await addLiquidity({
+        firstTokenAddress,
+        firstTokenQuantity,
+        secondTokenAddress,
+        secondTokenQuantity,
+        addLiquidityContractAddress,
+        walletAddress,
+        signer,
+      });
+      dispatch(SendAddLiquidityTransactionToWalletSucceeded());
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(sendAddLiquidityTransactionToWalletFailed(errorMessage));
+    }
+  };
+};
+
 /**
  * Fetches the spot price for swapping L49A tokens for L49B tokens.
  *
@@ -279,6 +342,7 @@ const fetchSpotPrices = () => {
 
 export {
   sendSwapTransactionToWallet,
+  sendAddLiquidityTransactionToWallet,
   initializeWalletConnection,
   pairWithConnectedWallet,
   pairWithSelectedWalletExtension,

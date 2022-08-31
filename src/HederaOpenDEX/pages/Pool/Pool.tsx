@@ -18,11 +18,31 @@ import {
 } from "@chakra-ui/react";
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
+import {
+  ContractId,
+  TokenId,
+} from "@hashgraph/sdk";
 
 const Pool = (): JSX.Element => {
-  const { balance, getBalance, getLABTokens, swapTokenAWithB, swapTokenBWithA, addLiquidityToPool } =
+  const { balance, getBalance, getLABTokens, swapTokenAWithB, swapTokenBWithA,
+    // addLiquidityToPool // TODO: clean this up? or do we want the addLiquidityToPool logic to live in HederaService? 
+  } =
     useHederaService();
-  const { walletData } = useHashConnectContext();
+  const {
+    walletData,
+    sendAddLiquidityTransaction
+  } = useHashConnectContext();
+
+  const onAddLiquidityClick = () => {
+    sendAddLiquidityTransaction({
+      // TODO: add input fields and logic to make this dynamic. testing signer for now
+      firstTokenAddr: "0.0.47646195",
+      firstTokenQty: 15,
+      secondTokenAddr: "0.0.47646196",
+      secondTokenQty: 20,
+      addLiquidityContractAddr: ContractId.fromString("0.0.47712695")
+    })
+  }
 
   const sendLABTokensToConnectedWallet = useCallback(() => {
     getLABTokens(walletData?.pairedAccounts[0]);
@@ -114,7 +134,7 @@ const Pool = (): JSX.Element => {
               Swap L49B With L49A
             </Button>
             <Button
-              onClick={addLiquidityToPool}
+              onClick={onAddLiquidityClick}
               data-testid="add-liqidity-button"
               size="lg"
               height="48px"
