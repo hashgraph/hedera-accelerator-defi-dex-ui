@@ -21,8 +21,10 @@ jobs:
     - name: Lint
       run: yarn lint
 
-    - name: Build
-      run: CI=false yarn build
+    - name: Build App & Storybook
+      run: | 
+        CI=false yarn build
+        yarn build:storybook
    
     - name: Run tests
       run: yarn test
