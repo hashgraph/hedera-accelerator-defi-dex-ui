@@ -10,10 +10,13 @@ export const mockSwapProps: SwapProps = {
   //   symbol: "USDC",
   //   amount: 100,
   // },
+  title: "Swap",
   sendSwapTransaction: () => Promise.resolve(),
   connectionStatus: WalletConnectionStatus.INITIALIZING,
   // connectToWallet: () => null,
   clearWalletPairings: () => null,
+  fetchSpotPrices: () => null,
+  spotPrices: undefined,
   walletData: null,
   network: "testnet",
   metaData: {

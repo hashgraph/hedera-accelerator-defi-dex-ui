@@ -1,4 +1,3 @@
-//import dotenv from "dotenv";
 import { BigNumber } from "bignumber.js";
 import {
   AccountId,
@@ -9,8 +8,7 @@ import {
   Client,
   TransferTransaction,
 } from "@hashgraph/sdk";
-
-//dotenv.config();
+import { SWAP_CONTRACT_ID, L49A_TOKEN_ID, L49B_TOKEN_ID, TREASURY_ID, TREASURY_KEY } from "../useHashConnect/constants";
 
 export const createClient = () => {
   const myAccountId = "0.0.34833380";
@@ -28,11 +26,11 @@ export const createClient = () => {
 };
 
 const client = createClient();
-let tokenA = TokenId.fromString("0.0.47646195").toSolidityAddress();
-let tokenB = TokenId.fromString("0.0.47646196").toSolidityAddress();
-const treasure = AccountId.fromString("0.0.47645191").toSolidityAddress();
-const treasureKey = PrivateKey.fromString("308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5");
-const contractId = "0.0.47712695";
+let tokenA = TokenId.fromString(L49A_TOKEN_ID).toSolidityAddress();
+let tokenB = TokenId.fromString(L49B_TOKEN_ID).toSolidityAddress();
+const treasure = AccountId.fromString(TREASURY_ID).toSolidityAddress();
+const treasureKey = PrivateKey.fromString(TREASURY_KEY);
+const contractId = SWAP_CONTRACT_ID; // "0.0.47712695";
 
 const createLiquidityPool = async () => {
   const tokenAQty = new BigNumber(5);
@@ -221,8 +219,19 @@ const getContributorTokenShare = async () => {
   console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`);
 };
 
+const getSpotPrice = async () => {
+  const getSpotPrice = new ContractExecuteTransaction()
+    .setContractId(contractId)
+    .setGas(1000000)
+    .setFunction("getSpotPrice")
+    .freezeWith(client);
+  const getSpotPriceTransaction = await getSpotPrice.execute(client);
+  const response = await getSpotPriceTransaction.getRecord(client);
+  const spotPrice = response.contractFunctionResult?.getInt64(0);
+  return spotPrice;
+};
 const getTokenBalance = async () => {
-  const getTokenBalance = await new ContractExecuteTransaction()
+  const getTokenBalance = new ContractExecuteTransaction()
     .setContractId(contractId)
     .setGas(1000000)
     .setFunction("getPairQty")
@@ -256,11 +265,5 @@ export {
   swapTokenB,
   getContributorTokenShare,
   getTokenBalance,
+  getSpotPrice,
 };
-
-// main()
-//   .then(() => process.exit(0))
-//   .catch((error) => {
-//     console.error(error);
-//     process.exit(1);
-//   });

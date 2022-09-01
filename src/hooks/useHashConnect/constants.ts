@@ -1,1 +1,17 @@
 export const HASHCONNECT_LOCAL_DATA_KEY = "HASH_CONNECT_DATA";
+
+export const SWAP_CONTRACT_ID = "0.0.48143542";
+
+export const TREASURY_KEY =
+  "302e020100300506032b65700422042032d7b779e068ba58b5485748fa2e22dd45c52e9c2da9b1e5cb330bf3135666f2";
+
+export const TREASURY_ID = "0.0.48132580";
+
+export const L49A_TOKEN_ID = "0.0.47646195";
+
+export const L49B_TOKEN_ID = "0.0.47646196";
+
+export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
+  ["L49A", L49A_TOKEN_ID],
+  ["L49B", L49B_TOKEN_ID],
+]);

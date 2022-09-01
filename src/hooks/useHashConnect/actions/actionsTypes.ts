@@ -14,6 +14,9 @@ export enum ActionType {
   FETCH_ACCOUNT_BALANCE_STARTED = "FETCH_ACCOUNT_BALANCE_STARTED",
   FETCH_ACCOUNT_BALANCE_SUCCEEDED = "FETCH_ACCOUNT_BALANCE_SUCCEEDED",
   FETCH_ACCOUNT_BALANCE_FAILED = "FETCH_ACCOUNT_BALANCE_FAILED",
+  FETCH_SPOT_PRICES_STARTED = "FETCH_SPOT_PRICES_STARTED",
+  FETCH_SPOT_PRICES_SUCCEEDED = "FETCH_SPOT_PRICES_SUCCEEDED",
+  FETCH_SPOT_PRICES_FAILED = "FETCH_SPOT_PRICES_FAILED",
   SEND_SWAP_TRANSACTION_TO_WALLET_STARTED = "SEND_SWAP_TRANSACTION_TO_WALLET_STARTED",
   SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED = "SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED",
   SEND_SWAP_TRANSACTION_TO_WALLET_FAILED = "SEND_SWAP_TRANSACTION_TO_WALLET_FAILED",
@@ -90,6 +93,22 @@ interface FetchAccountBalanceFailed {
   payload: string;
 }
 
+/** GET_SPOT_PRICE Action Types */
+
+interface FetchSpotPricesStarted {
+  type: ActionType.FETCH_SPOT_PRICES_STARTED;
+}
+
+interface FetchSpotPricesSucceeded {
+  type: ActionType.FETCH_SPOT_PRICES_SUCCEEDED;
+  payload: Map<string, number | undefined> | undefined;
+}
+
+interface FetchSpotPricesFailed {
+  type: ActionType.FETCH_SPOT_PRICES_FAILED;
+  payload: string;
+}
+
 /** SEND_SWAP_TRANSACTION_TO_WALLET Action Types */
 interface SendSwapTransactionToWalletStarted {
   type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED;
@@ -144,6 +163,9 @@ export type HashConnectAction =
   | FetchAccountBalanceStarted
   | FetchAccountBalanceSucceeded
   | FetchAccountBalanceFailed
+  | FetchSpotPricesStarted
+  | FetchSpotPricesSucceeded
+  | FetchSpotPricesFailed
   | SendSwapTransactionToWalletStarted
   | SendSwapTransactionToWalletSucceeded
   | SendSwapTransactionToWalletFailed
