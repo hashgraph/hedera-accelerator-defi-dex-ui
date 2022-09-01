@@ -51,7 +51,7 @@ const useHashConnectEvents = (
     hashconnect.foundExtensionEvent.on(handleFoundExtensionEvent);
     hashconnect.pairingEvent.on(handlePairingEvent);
     hashconnect.acknowledgeMessageEvent.on(handleAcknowledgeMessageEvent);
-    hashconnect.connectionStatusChangeEvent.on(handleConnectionStatusChange);
+    hashconnect.connectionStatusChange.on(handleConnectionStatusChange);
     hashconnect.transactionEvent.on(handleTransactionEvent);
     hashconnect.additionalAccountRequestEvent.on(handleAdditionalAccountRequestEvent);
 
@@ -60,7 +60,7 @@ const useHashConnectEvents = (
       hashconnect.foundExtensionEvent.off(handleFoundExtensionEvent);
       hashconnect.pairingEvent.off(handlePairingEvent);
       hashconnect.acknowledgeMessageEvent.off(handleAcknowledgeMessageEvent);
-      hashconnect.connectionStatusChangeEvent.off(handleConnectionStatusChange);
+      hashconnect.connectionStatusChange.off(handleConnectionStatusChange);
       hashconnect.transactionEvent.off(handleTransactionEvent);
       hashconnect.additionalAccountRequestEvent.off(handleAdditionalAccountRequestEvent);
     };
@@ -73,7 +73,7 @@ const useHashConnectEvents = (
     handleTransactionEvent,
     handleAdditionalAccountRequestEvent,
     hashconnect.acknowledgeMessageEvent,
-    hashconnect.connectionStatusChangeEvent,
+    hashconnect.connectionStatusChange,
     hashconnect.foundExtensionEvent,
     hashconnect.pairingEvent,
     hashconnect.transactionEvent,

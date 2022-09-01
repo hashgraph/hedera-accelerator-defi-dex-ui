@@ -9061,10 +9061,10 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-hashconnect@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.2.2.tgz#33c06d350dab02b1c2691a713200594c7a1da65f"
-  integrity sha512-1h4VClayyJR3XdqCUGDXfz2TecIMNFXIv1bRx1QT705BONKafRh6S2amoauvS9LF72gLi2ox/abK8TM9Xybcbg==
+hashconnect@^0.1.10:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.1.10.tgz#f66e941c2e72c88c8770664c57fac91b8bb4a6c9"
+  integrity sha512-w4lxJLDZk9cJ+x9OXEVZjt4JRY38tVOKkzMrBfyJoWw+Dyx+6GUSgW4k3XUFzqk8p0/ZKlf3ficu8/nPL1FSwQ==
   dependencies:
     "@hashgraph/sdk" "^2.14.2"
     buffer "^6.0.3"
