@@ -100,7 +100,7 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
 
   const addLiquidityTxParams = new ContractExecuteTransaction()
     .setContractId(addLiquidityContractId)
-    .setGas(2000000)
+    .setGas(9000000)
     .setFunction(
       "addLiquidity",
       new ContractFunctionParameters()
@@ -109,7 +109,8 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
         .addAddress(secondTokenAddr)
         .addInt64(firstTokenQty)
         .addInt64(secondTokenQty)
-    );
+    )
+    .setNodeAccountIds([new AccountId(3)]);
 
   if (signer) {
     const addLiquidityTxWalletSigned = await addLiquidityTxParams.freezeWithSigner(signer);
@@ -313,4 +314,5 @@ export {
   getContributorTokenShare,
   getTokenBalance,
   getSpotPrice,
+  pairCurrentPosition,
 };
