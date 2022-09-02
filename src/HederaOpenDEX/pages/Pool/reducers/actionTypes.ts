@@ -42,10 +42,7 @@ interface SwitchTokens {
 //   errorMessage: string;
 // }
 
-export type PoolActions =
-  UpdateInputToken
-  | UpdateOutputToken
-  | SwitchTokens
-  // | GetPoolLiquidityStarted
-  // | GetPoolLiquiditySuccessful
-  // | GetPoolLiquidityFailed;
+export type PoolActions = UpdateInputToken | UpdateOutputToken | SwitchTokens;
+// | GetPoolLiquidityStarted
+// | GetPoolLiquiditySuccessful
+// | GetPoolLiquidityFailed;

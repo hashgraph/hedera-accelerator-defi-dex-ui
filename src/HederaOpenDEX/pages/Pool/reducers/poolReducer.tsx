@@ -15,7 +15,7 @@ export interface PoolState {
     [symbol: string]: {
       amount: number;
       address: string;
-    }
+    };
   };
 }
 
@@ -23,23 +23,23 @@ const initialPoolState: PoolState = {
   inputToken: {
     symbol: "",
     amount: 0.0,
-    address: ""
+    address: "",
   },
   outputToken: {
     symbol: "",
     amount: 0.0,
-    address: ""
+    address: "",
   },
   poolBalances: {
     L49A: {
       amount: 0,
-      address: "0.0.47646195"
+      address: "0.0.47646195",
     },
     L49B: {
       amount: 0,
-      address: "0.0.47646196"
-    }
-  }
+      address: "0.0.47646196",
+    },
+  },
 };
 
 function initPoolReducer(initialPoolState: PoolState) {

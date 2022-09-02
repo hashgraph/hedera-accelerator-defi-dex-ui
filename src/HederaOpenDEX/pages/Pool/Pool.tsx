@@ -1,16 +1,5 @@
 import React, { ChangeEvent, useCallback, useReducer, useState } from "react";
-import {
-  Box,
-  Center,
-  HStack,
-  VStack,
-  Button,
-  Text,
-  Heading,
-  Flex,
-  IconButton,
-  Spacer,
-} from "@chakra-ui/react";
+import { Box, Center, HStack, VStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
 import { ContractId, TokenId } from "@hashgraph/sdk";
@@ -36,8 +25,8 @@ const Pool = (): JSX.Element => {
 
   useCallback(() => {
     const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-    console.log('tokenBalances', tokenBalances);
-  }, [walletData])
+    console.log("tokenBalances", tokenBalances);
+  }, [walletData]);
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
   const { inputToken, outputToken } = poolState;
@@ -54,10 +43,10 @@ const Pool = (): JSX.Element => {
         amount: 0,
         address: "0.0.47646196",
         spotPrice: 0,
-        exchangeRate: 0
-      }
+        exchangeRate: 0,
+      },
     },
-    selectedToken: '',
+    selectedToken: "",
     firstInputVal: 0,
     secondInputVal: 0,
     hasAddedLiquidity: false,
@@ -78,24 +67,25 @@ const Pool = (): JSX.Element => {
 
   const handlePoolInputsChange = useCallback(
     (event: ChangeEvent<HTMLInputElement> | string | undefined, actionType: ActionType, field: string) => {
-      const inputElement = typeof (event) === 'string' ? { value: event } : event?.target as HTMLInputElement;
+      const inputElement = typeof event === "string" ? { value: event } : (event?.target as HTMLInputElement);
       // calculate the other token amount
       dispatch({ type: actionType, field, payload: inputElement.value });
-    }, []);
+    },
+    []
+  );
 
-  const handleInputAmountChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event);
-    handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "amount");
-  }, [handlePoolInputsChange]);
+  const handleInputAmountChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      console.log(event);
+      handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "amount");
+    },
+    [handlePoolInputsChange]
+  );
 
   const handleInputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "symbol");
-      handlePoolInputsChange(
-        tokenSymbolToAccountID.get(event.target.value),
-        ActionType.UPDATE_INPUT_TOKEN,
-        "address"
-      );
+      handlePoolInputsChange(tokenSymbolToAccountID.get(event.target.value), ActionType.UPDATE_INPUT_TOKEN, "address");
       setPoolState({
         ...localPoolState,
         selectedToken: event.target.value,
@@ -104,17 +94,17 @@ const Pool = (): JSX.Element => {
     [handlePoolInputsChange]
   );
 
-  const getPortionOfBalance = (field: 'inputToken' | 'outputToken', _portion: 'half' | 'max') => {
-    const selectedToken = field === 'inputToken' ? poolState.inputToken.symbol : poolState.outputToken.symbol;
+  const getPortionOfBalance = (field: "inputToken" | "outputToken", _portion: "half" | "max") => {
+    const selectedToken = field === "inputToken" ? poolState.inputToken.symbol : poolState.outputToken.symbol;
     const tokenBalance = getBalanceByTokenSymbol(selectedToken);
     // TODO: remove Math.floor when we are able to handle fractional values
-    const portion = _portion === 'half' ? Math.floor(tokenBalance / 2) : Math.floor(tokenBalance);
+    const portion = _portion === "half" ? Math.floor(tokenBalance / 2) : Math.floor(tokenBalance);
     handlePoolInputsChange(
       portion.toString(),
-      field === 'inputToken' ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
+      field === "inputToken" ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
       "amount"
     );
-  }
+  };
 
   const getBalanceByTokenSymbol = useCallback(
     (tokenSymbol: string): number => {
@@ -124,7 +114,8 @@ const Pool = (): JSX.Element => {
       console.log(tokenBalances);
       const tokenId = tokenSymbolToAccountID.get(tokenSymbol);
       return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance;
-    }, [walletData]
+    },
+    [walletData]
   );
 
   const handleOutputAmountChange = useCallback(
@@ -137,11 +128,7 @@ const Pool = (): JSX.Element => {
   const handleOutputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "symbol");
-      handlePoolInputsChange(
-        tokenSymbolToAccountID.get(event.target.value),
-        ActionType.UPDATE_OUTPUT_TOKEN,
-        "address"
-      );
+      handlePoolInputsChange(tokenSymbolToAccountID.get(event.target.value), ActionType.UPDATE_OUTPUT_TOKEN, "address");
     },
     [handlePoolInputsChange]
   );
@@ -155,13 +142,13 @@ const Pool = (): JSX.Element => {
   }, [dispatch]);
 
   const getExchangeRatio = useCallback(() => {
-    const selectedToken = localPoolState.selectedToken.toString()
-    return selectedToken ?
-      selectedToken === 'L49A' ?
-        localPoolState.poolBalances.L49A.exchangeRate :
-        localPoolState.poolBalances.L49B.exchangeRate :
-      '-';
-  }, [localPoolState])
+    const selectedToken = localPoolState.selectedToken.toString();
+    return selectedToken
+      ? selectedToken === "L49A"
+        ? localPoolState.poolBalances.L49A.exchangeRate
+        : localPoolState.poolBalances.L49B.exchangeRate
+      : "-";
+  }, [localPoolState]);
 
   const sendLABTokensToConnectedWallet = useCallback(() => {
     getLABTokens(walletData?.pairedAccounts[0]);
@@ -201,8 +188,12 @@ const Pool = (): JSX.Element => {
                 <Text fontSize="xs" padding="0.25rem" fontWeight="bold">
                   Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "Connect to View"}
                 </Text>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance('inputToken', 'half')}>Half</Button>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance('inputToken', 'max')}>Max</Button>
+                <Button variant="xs-text" onClick={() => getPortionOfBalance("inputToken", "half")}>
+                  Half
+                </Button>
+                <Button variant="xs-text" onClick={() => getPortionOfBalance("inputToken", "max")}>
+                  Max
+                </Button>
               </Flex>
             </Box>
             <Flex>
@@ -235,8 +226,12 @@ const Pool = (): JSX.Element => {
                 <Text fontSize="xs" padding="0.25rem" fontWeight="bold">
                   Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "Connect to View"}
                 </Text>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance('outputToken', 'half')}>Half</Button>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance('outputToken', 'max')}>Max</Button>
+                <Button variant="xs-text" onClick={() => getPortionOfBalance("outputToken", "half")}>
+                  Half
+                </Button>
+                <Button variant="xs-text" onClick={() => getPortionOfBalance("outputToken", "max")}>
+                  Max
+                </Button>
               </Flex>
             </Box>
             <Flex justifyContent={"space-between"} width={"100%"}>
@@ -253,7 +248,7 @@ const Pool = (): JSX.Element => {
                   Share of Pool
                 </Text>
                 <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  {localPoolState.hasAddedLiquidity ? '<0.1%' : '0.00%'}
+                  {localPoolState.hasAddedLiquidity ? "<0.1%" : "0.00%"}
                 </Text>
               </Flex>
               <Flex flexDirection={"column"}>
