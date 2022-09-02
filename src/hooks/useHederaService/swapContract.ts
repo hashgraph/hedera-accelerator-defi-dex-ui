@@ -44,7 +44,10 @@ let tokenA = TokenId.fromString("0.0.47646195").toSolidityAddress();
 let tokenB = TokenId.fromString("0.0.47646196").toSolidityAddress();
 const treasure = AccountId.fromString("0.0.47645191").toSolidityAddress();
 const treasureKey = PrivateKey.fromString("308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5");
-const contractId = ContractId.fromString("0.0.47712695");
+const contractId = ContractId.fromString("0.0.48143542");
+// [9: 02 AM] Abhishek Sharma
+// 0.0.48132729
+
 
 const createLiquidityPool = async () => {
   const tokenAQty = new BigNumber(5);
@@ -78,16 +81,18 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
     secondTokenQuantity,
     addLiquidityContractAddress,
     walletAddress,
-    signer
-  } = addLiquidityDetails ? addLiquidityDetails : {
-    firstTokenAddress: null,
-    firstTokenQuantity: null,
-    secondTokenAddress: null,
-    secondTokenQuantity: null,
-    addLiquidityContractAddress: null,
-    walletAddress: null,
-    signer: null
-  };
+    signer,
+  } = addLiquidityDetails
+      ? addLiquidityDetails
+      : {
+        firstTokenAddress: null,
+        firstTokenQuantity: null,
+        secondTokenAddress: null,
+        secondTokenQuantity: null,
+        addLiquidityContractAddress: null,
+        walletAddress: null,
+        signer: null,
+      };
 
   // TODO: remove fallbacks if no signer and not all details are provided
   const firstTokenAddr = firstTokenAddress ? firstTokenAddress : tokenA;
@@ -101,7 +106,7 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
 
   const addLiquidityTxParams = new ContractExecuteTransaction()
     .setContractId(addLiquidityContractId)
-    .setGas(2000000)
+    .setGas(9000000)
     .setFunction(
       "addLiquidity",
       new ContractFunctionParameters()
@@ -110,7 +115,8 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
         .addAddress(secondTokenAddr)
         .addInt64(firstTokenQty)
         .addInt64(secondTokenQty)
-    );
+    )
+    .setNodeAccountIds([new AccountId(3)]);
 
   if (signer) {
     const addLiquidityTxWalletSigned = await addLiquidityTxParams.freezeWithSigner(signer);
@@ -303,6 +309,7 @@ export {
   swapTokenB,
   getContributorTokenShare,
   getTokenBalance,
+  pairCurrentPosition,
 };
 
 // main()
