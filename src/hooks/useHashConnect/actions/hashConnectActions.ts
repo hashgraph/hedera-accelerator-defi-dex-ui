@@ -105,20 +105,20 @@ const sendSwapTransactionToWalletFailed = (payload: string): HashConnectAction =
 
 const sendAddLiquidityTransactionToWalletStarted = (): HashConnectAction => {
   return {
-    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
+    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED,
   };
 };
 
 const SendAddLiquidityTransactionToWalletSucceeded = (): HashConnectAction => {
   return {
-    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED
+    type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED,
   };
 };
 
 const sendAddLiquidityTransactionToWalletFailed = (errorMessage: string): HashConnectAction => {
   return {
     type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED,
-    errorMessage
+    errorMessage,
   };
 };
 
@@ -286,16 +286,15 @@ const sendAddLiquidityTransactionToWallet = (payload: any) => {
         secondTokenQuantity,
         addLiquidityContractAddress,
         walletAddress,
-        signer
+        signer,
       });
       dispatch(SendAddLiquidityTransactionToWalletSucceeded());
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       dispatch(sendAddLiquidityTransactionToWalletFailed(errorMessage));
     }
-
-  }
-}
+  };
+};
 
 export {
   sendSwapTransactionToWallet,

@@ -48,7 +48,6 @@ const contractId = ContractId.fromString("0.0.48143542");
 // [9: 02 AM] Abhishek Sharma
 // 0.0.48132729
 
-
 const createLiquidityPool = async () => {
   const tokenAQty = new BigNumber(5);
   const tokenBQty = new BigNumber(5);
@@ -83,8 +82,8 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
     walletAddress,
     signer,
   } = addLiquidityDetails
-      ? addLiquidityDetails
-      : {
+    ? addLiquidityDetails
+    : {
         firstTokenAddress: null,
         firstTokenQuantity: null,
         secondTokenAddress: null,

@@ -140,7 +140,7 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
       return {
         ...state,
         errorMessage,
-      }
+      };
     }
     case ActionType.CLEAR_WALLET_PAIRINGS: {
       const { field } = action;
