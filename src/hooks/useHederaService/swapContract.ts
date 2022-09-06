@@ -15,7 +15,6 @@ export const createClient = () => {
   const privateKey1 = "302e020100300506032b657004220420411127f31025a5";
   const privatekey2 = "f20a32a92f1baf13be0e767d62bffff10db3f5e5599a52da41";
   const myPrivateKey = privateKey1 + privatekey2;
-
   if (myAccountId == null || myPrivateKey == null) {
     throw new Error("Environment variables myAccountId and myPrivateKey must be present");
   }
@@ -247,16 +246,15 @@ const getTokenBalance = async () => {
   // );
 };
 
-async function main() {
-  await createLiquidityPool();
-  await addLiquidity();
-  await removeLiquidity();
-  await swapTokenA();
-  await getContributorTokenShare();
-}
+// async function main() {
+//   await createLiquidityPool();
+//   await addLiquidity();
+//   await removeLiquidity();
+//   await swapTokenA();
+//   await getContributorTokenShare();
+// }
 
 export {
-  main,
   get100LABTokens,
   createLiquidityPool,
   addLiquidity,
