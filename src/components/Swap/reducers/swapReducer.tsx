@@ -1,61 +1,62 @@
-import { ActionType, SwapActions } from "./actionTypes";
-
-export interface SwapState {
-  inputToken: {
-    symbol: string;
-    amount: number;
-  };
-  outputToken: {
-    symbol: string;
-    amount: number;
-  };
-}
+import { ActionType, SwapAction } from "../actions/actionTypes";
+import { SwapState } from "../types";
 
 const initialSwapState: SwapState = {
-  inputToken: {
-    symbol: "",
+  tokenToTrade: {
+    symbol: "HBAR",
     amount: 0.0,
+    balance: undefined,
   },
-  outputToken: {
-    symbol: "",
+  tokenToReceive: {
+    symbol: undefined,
     amount: 0.0,
+    balance: undefined,
   },
+  spotPrice: undefined,
 };
 
 function initSwapReducer(initialSwapState: SwapState) {
   return initialSwapState;
 }
 
-function swapReducer(state: SwapState, action: SwapActions) {
+function swapReducer(state: SwapState, action: SwapAction) {
   switch (action.type) {
-    case ActionType.UPDATE_INPUT_TOKEN: {
+    case ActionType.SET_TOKEN_TO_TRADE: {
       const { field, payload } = action;
       return {
         ...state,
-        inputToken: {
-          ...state.inputToken,
+        tokenToTrade: {
+          ...state.tokenToTrade,
           [field]: payload,
         },
       };
     }
-    case ActionType.UPDATE_OUTPUT_TOKEN: {
+    case ActionType.SET_TOKEN_TO_RECEIVE: {
       const { field, payload } = action;
       return {
         ...state,
-        outputToken: {
-          ...state.outputToken,
+        tokenToReceive: {
+          ...state.tokenToReceive,
           [field]: payload,
         },
       };
     }
-    case ActionType.SWITCH_INPUT_AND_OUTPUT_TOKEN: {
+    case ActionType.SWITCH_TOKEN_TO_TRADE_AND_RECIEVE: {
       return {
-        inputToken: {
-          ...state.outputToken,
+        ...state,
+        tokenToTrade: {
+          ...state.tokenToReceive,
         },
-        outputToken: {
-          ...state.inputToken,
+        tokenToReceive: {
+          ...state.tokenToTrade,
         },
+      };
+    }
+    case ActionType.SET_SPOT_PRICE: {
+      const { payload } = action;
+      return {
+        ...state,
+        spotPrice: payload,
       };
     }
     default:

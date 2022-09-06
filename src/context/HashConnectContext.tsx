@@ -18,9 +18,11 @@ export interface HashConnectContextProps {
   sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
+  fetchSpotPrices: () => void;
   connectionStatus: WalletConnectionStatus;
   walletData: any | null;
   network: Networks;
+  spotPrices: Map<string, number | undefined> | undefined;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
 }
@@ -29,9 +31,11 @@ const HashConnectContext = React.createContext<HashConnectContextProps>({
   sendSwapTransaction: () => Promise.resolve(),
   connectToWallet: () => null,
   clearWalletPairings: () => null,
+  fetchSpotPrices: () => null,
   connectionStatus: WalletConnectionStatus.INITIALIZING,
   walletData: null,
   network: "testnet",
+  spotPrices: undefined,
   installedExtensions: null,
 });
 
@@ -54,7 +58,7 @@ const HashConnectProvider = ({
     init,
     [loggerMiddleware, thunkMiddleware]
   );
-  const { connectToWallet, clearWalletPairings, sendSwapTransaction } = useHashConnect({
+  const { connectToWallet, clearWalletPairings, sendSwapTransaction, fetchSpotPrices } = useHashConnect({
     hashConnectState,
     dispatch,
     network,
@@ -68,6 +72,8 @@ const HashConnectProvider = ({
         sendSwapTransaction,
         connectToWallet,
         clearWalletPairings,
+        fetchSpotPrices,
+        spotPrices: hashConnectState.spotPrices,
         connectionStatus: hashConnectState.walletConnectionStatus,
         walletData: hashConnectState.walletData,
         network,

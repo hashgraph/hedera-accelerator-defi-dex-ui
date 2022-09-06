@@ -1,4 +1,3 @@
-import React from "react";
 import { Select } from "@chakra-ui/react";
 
 const TokenSelector = (props: any) => {
