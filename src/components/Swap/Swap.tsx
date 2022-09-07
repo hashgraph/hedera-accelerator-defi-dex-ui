@@ -20,12 +20,10 @@ import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks/useHashConnect";
-
-import { useHashConnectContext } from "../../context";
 export interface SwapProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;
-  // connectToWallet: () => void;
+  connectToWallet: () => void;
   clearWalletPairings: () => void;
   fetchSpotPrices: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -37,11 +35,9 @@ export interface SwapProps {
 }
 
 const Swap = (props: SwapProps) => {
-  const { title, spotPrices, walletData, connectionStatus, sendSwapTransaction } = props;
+  const { title, spotPrices, walletData, connectionStatus, connectToWallet, sendSwapTransaction } = props;
   const [swapState, dispatch] = useReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice } = swapState;
-
-  const { connectToWallet } = useHashConnectContext();
 
   const getTokenBalance = useCallback(
     (tokenSymbol: string): number => {
