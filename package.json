@@ -20,6 +20,7 @@
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
     "framer-motion": "^6.5.0",
+    "hashconnect": "^0.1.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
@@ -30,14 +31,12 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:gh-pages": "react-scripts build && rm -rf docs && mv build docs",
     "test": "react-scripts test --coverage",
     "test:jest": "jest -c jest.config.js --watch",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
-    "build:storybook": "build-storybook -s public",
+    "build:storybook": "build-storybook -o docs",
     "deploy:storybook": "gh-pages -d docs",
-    "deploy:app": "gh-pages -d build",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint ./src --fix .js,.jsx,.ts,.tsx",
     "format": "npx prettier -c src",
@@ -79,8 +78,7 @@
         ],
         "rules": {
           "tsdoc/syntax": "warn",
-          "@typescript-eslint/no-explicit-any": "off",
-          "react-hooks/exhaustive-deps": "off"
+          "@typescript-eslint/no-explicit-any": "off"
         }
       },
       {
@@ -124,6 +122,7 @@
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-docs": "^6.5.10",
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-interactions": "^6.5.9",
     "@storybook/addon-links": "^6.5.9",
@@ -133,6 +132,7 @@
     "@storybook/preset-create-react-app": "^4.1.2",
     "@storybook/react": "^6.5.9",
     "@storybook/testing-library": "^0.0.13",
+    "@storybook/theming": "^6.5.10",
     "@testing-library/dom": "^8.16.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.43",
@@ -151,11 +151,9 @@
     "eslint-plugin-testing-library": "^5.5.1",
     "eslint-plugin-tsdoc": "^0.2.16",
     "gh-pages": "^4.0.0",
-    "hashconnect": "^0.1.10",
     "husky": "^8.0.0",
     "lint-staged": "^13.0.3",
     "prop-types": "^15.8.1",
-    "typedoc": "^0.23.8",
     "typescript": "^4.7.4",
     "webpack": "^5.73.0"
   }

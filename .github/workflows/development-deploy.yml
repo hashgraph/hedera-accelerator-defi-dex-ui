@@ -21,9 +21,13 @@ jobs:
     - name: Lint
       run: yarn lint
 
-    - name: Build
-      run: CI=false yarn build
-      
-    - name: Run tests
-      run: yarn test
+    - name: Build App and Storybook
+      run: | 
+        CI=false yarn build
+        yarn build:storybook
+
+    - name: Deploy Storybook
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: docs
       

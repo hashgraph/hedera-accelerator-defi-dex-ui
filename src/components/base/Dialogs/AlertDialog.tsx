@@ -10,8 +10,8 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
 } from "@chakra-ui/react";
-import { SwapState } from "../../Swap/reducers";
-import { tokenSymbolToAccountID } from "../../Swap";
+import { SwapState } from "../../Swap";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../../hooks/useHashConnect";
 
 interface SwapConfirmationProps {
   sendSwapTransaction: (payload: any) => void;
@@ -24,20 +24,23 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
   const cancelRef = useRef<any>();
 
   const handleSwapTransaction = useCallback(async () => {
-    const { inputToken, outputToken } = swapState;
-    const inputTokenAccountId = tokenSymbolToAccountID.get(inputToken.symbol) ?? "";
-    const outputTokenAccountId = tokenSymbolToAccountID.get(outputToken.symbol) ?? "";
+    const { tokenToTrade, tokenToReceive } = swapState;
+    if (tokenToTrade.symbol === undefined || tokenToReceive.symbol === undefined) {
+      return;
+    }
+    const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
+    const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
     sendSwapTransaction({
-      depositTokenAccountId: inputTokenAccountId,
-      depositTokenAmount: inputToken.amount,
-      receivingTokenAccountId: outputTokenAccountId,
-      receivingTokenAmount: outputToken.amount,
+      depositTokenAccountId: tokenToTradeAccountId,
+      depositTokenAmount: tokenToTrade.amount,
+      receivingTokenAccountId: tokenToReceiveAccountId,
+      receivingTokenAmount: tokenToReceive.amount,
     });
   }, [sendSwapTransaction, swapState]);
 
   return (
     <>
-      <Button onClick={onOpen} marginTop="1em">
+      <Button onClick={onOpen} marginTop="0.5rem">
         Swap
       </Button>
       <AlertDialog
@@ -52,8 +55,8 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
           <AlertDialogHeader>Confirm Swap</AlertDialogHeader>
           <AlertDialogCloseButton />
           <AlertDialogBody>
-            Are you sure you want to Swap {swapState.inputToken.amount} {swapState.inputToken.symbol} for
-            {" " + swapState.outputToken.amount} {swapState.outputToken.symbol}?
+            Are you sure you want to Swap {swapState.tokenToTrade.amount} {swapState.tokenToTrade.symbol} for
+            {" " + swapState.tokenToReceive.amount} {swapState.tokenToReceive.symbol}?
           </AlertDialogBody>
           <AlertDialogFooter>
             <Button ref={cancelRef} onClick={handleSwapTransaction}>

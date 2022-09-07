@@ -5,10 +5,10 @@ module.exports = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "@storybook/preset-create-react-app",
-    "@chakra-ui/storybook-addon",
+    "@chakra-ui/storybook-addon"
   ],
   framework: "@storybook/react",
   core: {
-    builder: "@storybook/builder-webpack5",
-  },
+    builder: "@storybook/builder-webpack5"
+  }
 };
