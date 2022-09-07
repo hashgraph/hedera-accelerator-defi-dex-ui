@@ -3,7 +3,8 @@ name: Development:Pull Request CI/CD
 on:
  pull_request:
    branches: [develop]
-
+   types: [opened, reopened, synchronize , edited]
+   
 jobs:
   build-test-deploy-dev:
     runs-on: ubuntu-latest

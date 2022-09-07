@@ -4,6 +4,7 @@ import { useHashConnectContext } from "../../../context";
 
 const Trade = () => {
   const {
+    connectToWallet,
     clearWalletPairings,
     walletData,
     network,
@@ -21,6 +22,7 @@ const Trade = () => {
             title="Swap"
             sendSwapTransaction={sendSwapTransaction}
             connectionStatus={connectionStatus}
+            connectToWallet={connectToWallet}
             clearWalletPairings={clearWalletPairings}
             fetchSpotPrices={fetchSpotPrices}
             spotPrices={spotPrices}
