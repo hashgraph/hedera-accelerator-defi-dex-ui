@@ -11,7 +11,6 @@ import {
   AlertDialogFooter,
 } from "@chakra-ui/react";
 import { SwapState } from "../../Swap";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../../hooks/useHashConnect";
 
 interface SwapConfirmationProps {
   sendSwapTransaction: (payload: any) => void;
@@ -26,15 +25,12 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
   const handleSwapTransaction = useCallback(async () => {
     const { tokenToTrade, tokenToReceive } = swapState;
     if (tokenToTrade.symbol === undefined || tokenToReceive.symbol === undefined) {
+      console.error("Token types must be selected to Swap tokens.");
       return;
     }
-    const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
-    const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
     sendSwapTransaction({
-      depositTokenAccountId: tokenToTradeAccountId,
-      depositTokenAmount: tokenToTrade.amount,
-      receivingTokenAccountId: tokenToReceiveAccountId,
-      receivingTokenAmount: tokenToReceive.amount,
+      tokenToTrade: { ...tokenToTrade },
+      tokenToReceive: { ...tokenToReceive },
     });
   }, [sendSwapTransaction, swapState]);
 

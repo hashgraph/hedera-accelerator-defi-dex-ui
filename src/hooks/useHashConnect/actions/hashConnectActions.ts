@@ -4,6 +4,7 @@ import { ActionType, HashConnectAction } from "./actionsTypes";
 import { getErrorMessage } from "../utils";
 import { SWAP_CONTRACT_ID } from "../constants";
 import { getSpotPrice } from "../../useHederaService/swapContract";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../";
 
 const initializeWalletConnectionStarted = (payload?: any): HashConnectAction => {
   return {
@@ -207,19 +208,45 @@ const fetchAccountBalance = (payload: any) => {
 
 const sendSwapTransactionToWallet = (payload: any) => {
   return async (dispatch: any) => {
-    const { depositTokenAccountId, depositTokenAmount, hashconnect, hashConnectState, network } = payload;
+    const { tokenToTrade, /* tokenToReceive, */ hashconnect, hashConnectState, network } = payload;
     const { walletData } = hashConnectState;
     dispatch(sendSwapTransactionToWalletStarted());
+    /**
+     * Only L49A and L49B swaps are currently supported. The isTokenToTradeL49A and isTokenToTradeL49B booleans
+     * were created as a temporary work around to support the current swapToken Swap contract function logic.
+     * */
+    const isTokenToTradeL49A = tokenToTrade.symbol === "L49A";
+    const isTokenToTradeL49B = tokenToTrade.symbol === "L49B";
+
+    const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
+    // const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
     const signingAccount = walletData.pairedAccounts[0];
     const abstractSwapId = ContractId.fromString(SWAP_CONTRACT_ID);
-    const walletAddress: string = AccountId.fromString(signingAccount).toSolidityAddress();
-    const depositTokenAddress = TokenId.fromString(depositTokenAccountId).toSolidityAddress();
-    // temporarily mocking address to strictly swap token A.
-    const receivingTokenAddress = TokenId.fromString("0").toSolidityAddress();
-    const tokenAQty = new BigNumber(depositTokenAmount);
-    const tokenBQty = new BigNumber(0);
+    const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
+    /**
+     * Temporarily added ternary logic for tokenToTradeAddress and tokenToReceiveAddress due to current
+     * swapToken contract function limitations. The real account IDs for the trading and receiving tokens
+     * should be used instead of "0" in future contract iterations.
+     * */
+    // should be: const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
+    const tokenToTradeAddress = TokenId.fromString(
+      isTokenToTradeL49A ? tokenToTradeAccountId : "0"
+    ).toSolidityAddress();
+    // should be: const tokenToReceiveAddress = TokenId.fromString(tokenToReceiveAccountId).toSolidityAddress();
+    const tokenToReceiveAddress = TokenId.fromString(
+      isTokenToTradeL49B ? tokenToTradeAccountId : "0"
+    ).toSolidityAddress();
+    /**
+     * Temporarily added ternary logic for tokenToTradeAmount and tokenToReceiveAmount due to current swapToken
+     * contract function limitations.
+     * */
+    // should be: const tokenToTradeAmount = new BigNumber(tokenToTrade.amount)
+    const tokenToTradeAmount = new BigNumber(isTokenToTradeL49A ? tokenToTrade.amount : 0);
+    // should be: const tokenToReceiveAmount = new BigNumber(tokenToReceive.amount)
+    const tokenToReceiveAmount = new BigNumber(isTokenToTradeL49B ? tokenToTrade.amount : 0);
     const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
     const signer = hashconnect.getSigner(provider);
+
     try {
       const swapTransaction = await new ContractExecuteTransaction()
         .setContractId(abstractSwapId)
@@ -228,10 +255,10 @@ const sendSwapTransactionToWallet = (payload: any) => {
           "swapToken",
           new ContractFunctionParameters()
             .addAddress(walletAddress)
-            .addAddress(depositTokenAddress) //token A
-            .addAddress(receivingTokenAddress)
-            .addInt64(tokenAQty)
-            .addInt64(tokenBQty)
+            .addAddress(tokenToTradeAddress)
+            .addAddress(tokenToReceiveAddress)
+            .addInt64(tokenToTradeAmount)
+            .addInt64(tokenToReceiveAmount)
         )
         .setNodeAccountIds([new AccountId(3)])
         .freezeWithSigner(signer);
