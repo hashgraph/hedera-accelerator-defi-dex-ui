@@ -7,17 +7,17 @@ export enum ActionType {
   SET_SPOT_PRICE = "SET_SPOT_PRICE",
 }
 
-type tokenFields = keyof typeof initialSwapState.tokenToTrade;
+type TokenInputProperties = keyof typeof initialSwapState.tokenToTrade;
 
 interface SetTokenToTrade {
   type: ActionType.SET_TOKEN_TO_TRADE;
-  field: tokenFields;
+  field: TokenInputProperties;
   payload: string | number | undefined;
 }
 
 interface SetTokenToReceive {
   type: ActionType.SET_TOKEN_TO_RECEIVE;
-  field: tokenFields;
+  field: TokenInputProperties;
   payload: string | number | undefined;
 }
 
