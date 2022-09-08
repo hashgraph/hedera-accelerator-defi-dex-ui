@@ -3,6 +3,8 @@ import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
 import { getErrorMessage } from "../utils";
 import { addLiquidity } from "../../useHederaService/swapContract";
+import { SWAP_CONTRACT_ID } from "../constants";
+import { getSpotPrice } from "../../useHederaService/swapContract";
 
 const initializeWalletConnectionStarted = (payload?: any): HashConnectAction => {
   return {
@@ -80,6 +82,26 @@ const fetchAccountBalanceSucceeded = (payload: any): HashConnectAction => {
 const fetchAccountBalanceFailed = (payload: string): HashConnectAction => {
   return {
     type: ActionType.FETCH_ACCOUNT_BALANCE_FAILED,
+    payload,
+  };
+};
+
+const fetchSpotPricesStarted = (payload?: any): HashConnectAction => {
+  return {
+    type: ActionType.FETCH_SPOT_PRICES_STARTED,
+  };
+};
+
+const fetchSpotPricesSucceeded = (payload: any): HashConnectAction => {
+  return {
+    type: ActionType.FETCH_SPOT_PRICES_SUCCEEDED,
+    payload,
+  };
+};
+
+const fetchSpotPricesFailed = (payload: string): HashConnectAction => {
+  return {
+    type: ActionType.FETCH_SPOT_PRICES_FAILED,
     payload,
   };
 };
@@ -205,30 +227,22 @@ const fetchAccountBalance = (payload: any) => {
 
 const sendSwapTransactionToWallet = (payload: any) => {
   return async (dispatch: any) => {
-    const {
-      depositTokenAccountId,
-      depositTokenAmount,
-      // receivingTokenAccountId,
-      receivingTokenAmount,
-      hashconnect,
-      hashConnectState,
-      network,
-    } = payload;
+    const { depositTokenAccountId, depositTokenAmount, hashconnect, hashConnectState, network } = payload;
     const { walletData } = hashConnectState;
     dispatch(sendSwapTransactionToWalletStarted());
-    const SWAP_CONTRACT_ID = ContractId.fromString("0.0.47712695");
     const signingAccount = walletData.pairedAccounts[0];
+    const abstractSwapId = ContractId.fromString(SWAP_CONTRACT_ID);
     const walletAddress: string = AccountId.fromString(signingAccount).toSolidityAddress();
     const depositTokenAddress = TokenId.fromString(depositTokenAccountId).toSolidityAddress();
     // temporarily mocking address to strictly swap token A.
-    const receivingTokenAddress = TokenId.fromString("0.0.47646100").toSolidityAddress();
+    const receivingTokenAddress = TokenId.fromString("0").toSolidityAddress();
     const tokenAQty = new BigNumber(depositTokenAmount);
-    const tokenBQty = new BigNumber(receivingTokenAmount);
+    const tokenBQty = new BigNumber(0);
     const provider = hashconnect.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
     const signer = hashconnect.getSigner(provider);
     try {
       const swapTransaction = await new ContractExecuteTransaction()
-        .setContractId(SWAP_CONTRACT_ID)
+        .setContractId(abstractSwapId)
         .setGas(2000000)
         .setFunction(
           "swapToken",
@@ -296,6 +310,36 @@ const sendAddLiquidityTransactionToWallet = (payload: any) => {
   };
 };
 
+/**
+ * Fetches the spot price for swapping L49A tokens for L49B tokens.
+ *
+ * TODO: This action should be updated to dynamically request spot prices based
+ * on two different token symbols. This requires an update to the Swap contract spot price
+ * function to support token symbol parameters.
+ */
+const fetchSpotPrices = () => {
+  return async (dispatch: any) => {
+    dispatch(fetchSpotPricesStarted());
+    try {
+      const spotPrices = new Map<string, number | undefined>();
+      const precision = 10000000;
+      const spotPriceL49BToL49A = await getSpotPrice();
+      const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
+        ? spotPriceL49BToL49A.toNumber() / precision
+        : undefined;
+      const spotPriceL49AToL49BWithPrecision = spotPriceL49BToL49AWithPrecision
+        ? 1 / spotPriceL49BToL49AWithPrecision
+        : undefined;
+      spotPrices.set("L49A=>L49B", spotPriceL49AToL49BWithPrecision);
+      spotPrices.set("L49B=>L49A", spotPriceL49BToL49AWithPrecision);
+      dispatch(fetchSpotPricesSucceeded(spotPrices));
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      dispatch(fetchSpotPricesFailed(errorMessage));
+    }
+  };
+};
+
 export {
   sendSwapTransactionToWallet,
   sendAddLiquidityTransactionToWallet,
@@ -303,4 +347,5 @@ export {
   pairWithConnectedWallet,
   pairWithSelectedWalletExtension,
   fetchAccountBalance,
+  fetchSpotPrices,
 };

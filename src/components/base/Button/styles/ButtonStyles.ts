@@ -21,7 +21,7 @@ export const ButtonStyles: ComponentStyleConfig = {
       bg: "white",
       color: "black",
       borderColor: "black",
-      margin: "1em 0",
+      marginTop: "0.5rem",
     }),
     settings: {
       height: "42px",
@@ -37,7 +37,6 @@ export const ButtonStyles: ComponentStyleConfig = {
       textDecoration: "underline",
       fontWeight: "bold",
       fontSize: "xs",
-      padding: "0.25rem",
     },
   },
   defaultProps: {

@@ -8,6 +8,7 @@ import {
   fetchAccountBalance,
   sendSwapTransactionToWallet,
   sendAddLiquidityTransactionToWallet,
+  fetchSpotPrices,
 } from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
@@ -56,6 +57,9 @@ const useHashConnect = ({
     } else {
       dispatch(pairWithConnectedWallet({ hashconnect, dexMetaData, hashConnectState }));
     }
+    dispatch(fetchSpotPrices());
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -66,6 +70,8 @@ const useHashConnect = ({
     if (walletConnectionStatus === WalletConnectionStatus.PAIRED) {
       dispatch(fetchAccountBalance({ hashconnect, hashConnectState, network }));
     }
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletConnectionStatus]);
 
   return {
@@ -73,6 +79,7 @@ const useHashConnect = ({
       dispatch(pairWithSelectedWalletExtension({ hashconnect, hashConnectState, installedExtensions })),
     sendSwapTransaction: (payload: any) =>
       dispatch(sendSwapTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
+    fetchSpotPrices: () => dispatch(fetchSpotPrices()),
     sendAddLiquidityTransaction: (payload: any) =>
       dispatch(sendAddLiquidityTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     clearWalletPairings,

@@ -25,9 +25,6 @@ jobs:
       run: | 
         CI=false yarn build
         yarn build:storybook
-      
-    - name: Run tests
-      run: yarn test
 
     - name: Deploy Storybook
       uses: JamesIves/github-pages-deploy-action@v4
