@@ -28,6 +28,14 @@ const setTokenToReceiveBalance = (balance: number | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "balance", payload: balance };
 };
 
+/** SET TOKEN TO RECEIVE ACTION CREATORS */
+
+const swapTokenToTradeAndReceive = (): SwapAction => {
+  return { type: ActionType.SWITCH_TOKEN_TO_TRADE_AND_RECEIVE };
+};
+
+/** SET SPOT PRICE ACTION CREATORS */
+
 const setSpotPrice = (spotPrice: number | undefined): SwapAction => {
   return { type: ActionType.SET_SPOT_PRICE, payload: spotPrice };
 };
@@ -39,5 +47,6 @@ export {
   setTokenToReceiveAmount,
   setTokenToReceiveSymbol,
   setTokenToReceiveBalance,
+  swapTokenToTradeAndReceive,
   setSpotPrice,
 };
