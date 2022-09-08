@@ -87,8 +87,8 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
     walletAddress,
     signer,
   } = addLiquidityDetails
-      ? addLiquidityDetails
-      : {
+    ? addLiquidityDetails
+    : {
         firstTokenAddress: null,
         firstTokenQuantity: null,
         secondTokenAddress: null,

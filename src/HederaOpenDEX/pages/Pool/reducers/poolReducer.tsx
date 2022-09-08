@@ -5,17 +5,13 @@ export interface PoolState {
     symbol: string;
     amount: number;
     address: string;
+    spotPrice: number;
   };
   outputToken: {
     symbol: string;
     amount: number;
     address: string;
-  };
-  poolBalances: {
-    [symbol: string]: {
-      amount: number;
-      address: string;
-    };
+    spotPrice: number;
   };
 }
 
@@ -24,21 +20,13 @@ const initialPoolState: PoolState = {
     symbol: "",
     amount: 0.0,
     address: "",
+    spotPrice: 0,
   },
   outputToken: {
     symbol: "",
     amount: 0.0,
     address: "",
-  },
-  poolBalances: {
-    L49A: {
-      amount: 0,
-      address: "0.0.47646195",
-    },
-    L49B: {
-      amount: 0,
-      address: "0.0.47646196",
-    },
+    spotPrice: 0,
   },
 };
 
@@ -79,19 +67,6 @@ function poolReducer(state: PoolState, action: PoolActions) {
         },
       };
     }
-    // case ActionType.GET_POOL_LIQUIDITY_STARTED: {
-    //   return state;
-    // }
-    // case ActionType.GET_POOL_LIQUIDITY_SUCCESSFUL: {
-    //   const { poolBalances } = action;
-    //   return {
-    //     ...state,
-    //     poolBalances
-    //   };
-    // }
-    // case ActionType.GET_POOL_LIQUIDITY_FAILED: {
-    //   return state;
-    // }
     default:
       throw new Error();
   }
