@@ -1,11 +1,10 @@
 import React, { ChangeEvent, useCallback, useEffect, useReducer } from "react";
-import { Box, Center, HStack, VStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
+import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
-import { ContractId, TokenId } from "@hashgraph/sdk";
-import { TokenAmountInput, TokenSelector } from "../../../components";
+import { ContractId } from "@hashgraph/sdk";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer } from "./reducers";
-import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
+import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../components/TokenInput";
 
 const Pool = (): JSX.Element => {
@@ -22,7 +21,6 @@ const Pool = (): JSX.Element => {
   }, [walletData]);
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
-  const { inputToken, outputToken } = poolState;
 
   /**
    * Helper function that will dispatch action to update details about tokens in either input depending on
@@ -56,6 +54,20 @@ const Pool = (): JSX.Element => {
   }, [poolState, sendAddLiquidityTransaction]);
 
   /**
+   * Returns the connected wallet's balance of a given token. Used for the
+   * balance display in each token input field
+   * @param tokenSymbol token symbol of token to get balance of
+   * @returns balance of specified token in connected wallet
+   */
+  const getBalanceByTokenSymbol = useCallback(
+    (tokenSymbol: string): number => {
+      const tokenBalances = walletData?.pairedAccountBalance?.tokens;
+      const tokenId = tokenSymbolToAccountID.get(tokenSymbol);
+      return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance;
+    },
+    [walletData, tokenSymbolToAccountID]
+  );
+  /**
    * Whenever there is a change in the selected token in either input field or change in
    * spot prices, retrieve the spot price and dispatch action to update state slices for
    * spot price for each token accordingly
@@ -74,6 +86,28 @@ const Pool = (): JSX.Element => {
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "spotPrice", payload: secondTokenSpotPrice });
     }
   }, [poolState.inputToken.symbol, poolState.outputToken.symbol, spotPrices]);
+
+  /**
+   * Whenever there is a change in token selection or wallet balances, retrieve the wallet balance
+   * for the selected token(s)
+   * // TODO: check on when wallet balance is updated. is not triggering effect after making a transaction
+   */
+  useEffect(() => {
+    if (poolState.inputToken.symbol) {
+      const firstTokenBalance = getBalanceByTokenSymbol(poolState.inputToken.symbol);
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "balance", payload: firstTokenBalance });
+    }
+    if (poolState.outputToken.symbol) {
+      const secondTokenBalance = getBalanceByTokenSymbol(poolState.outputToken.symbol);
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "balance", payload: secondTokenBalance });
+    }
+  }, [
+    dispatch,
+    // getBalanceByTokenSymbol,   // for some reason keeping this in the dependency array causes infinite loop
+    poolState.inputToken.symbol,
+    poolState.outputToken.symbol,
+    walletData.pairedAccountBalance,
+  ]);
 
   /**
    * Called when the first input field's amount is changed. Calls handlePoolInputsChange to update the amount
@@ -104,11 +138,8 @@ const Pool = (): JSX.Element => {
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "symbol");
       handlePoolInputsChange(tokenSymbolToAccountID.get(event.target.value), ActionType.UPDATE_INPUT_TOKEN, "address");
-      if (poolState.outputToken.spotPrice) {
-        console.log("hihihihihihih", poolState.outputToken.spotPrice);
-      }
     },
-    [handlePoolInputsChange, poolState, tokenSymbolToAccountID]
+    [handlePoolInputsChange, tokenSymbolToAccountID]
   );
 
   /**
@@ -142,47 +173,26 @@ const Pool = (): JSX.Element => {
   );
 
   /**
-   * Dispatches event to switch the token inputs. Called when the switch token button is clicked
-   */
-  const swapTokens = useCallback(() => {
-    dispatch({ type: ActionType.SWITCH_INPUT_AND_OUTPUT_TOKEN });
-  }, [dispatch]);
-
-  /**
    * Calculates half or max of the user's balance for a given token and calls handlePoolInputsChange to update
    * those values in the store and input field. Called when the Half or Max button on either token input is clicked
    * @param field which input field the calculation should be performed for for (inputToken | outputToken)
    * @param _portion indicates whether to calculate half or max of the balance
    */
   const getPortionOfBalance = (field: "inputToken" | "outputToken", _portion: "half" | "max") => {
-    const selectedToken = field === "inputToken" ? poolState.inputToken.symbol : poolState.outputToken.symbol;
-    const tokenBalance = getBalanceByTokenSymbol(selectedToken);
-    // TODO: remove Math.floor when we are able to handle fractional values
-    const portion = _portion === "half" ? Math.floor(tokenBalance / 2) : Math.floor(tokenBalance);
-    handlePoolInputsChange(
-      portion.toString(),
-      field === "inputToken" ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
-      "amount"
-    );
+    if (
+      (poolState.inputToken.symbol && poolState.inputToken.balance) ||
+      (poolState.outputToken.symbol && poolState.outputToken.balance)
+    ) {
+      const tokenBalance = field === "inputToken" ? poolState.inputToken.balance : poolState.outputToken.balance;
+      // TODO: remove Math.floor when we are able to handle fractional values
+      const portion = _portion === "half" ? Math.floor((tokenBalance || 0) / 2) : Math.floor(tokenBalance || 0);
+      handlePoolInputsChange(
+        portion.toString(),
+        field === "inputToken" ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
+        "amount"
+      );
+    }
   };
-
-  /**
-   * Returns the connected wallet's balance of a given token. Used for the
-   * balance display in each token input field
-   * @param tokenSymbol token symbol of token to get balance of
-   * @returns balance of specified token in connected wallet
-   */
-  const getBalanceByTokenSymbol = useCallback(
-    (tokenSymbol: string): number => {
-      console.log(tokenSymbol);
-      const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-      console.log(walletData.pairedAccountBalance.tokens);
-      console.log(tokenBalances);
-      const tokenId = tokenSymbolToAccountID.get(tokenSymbol);
-      return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance;
-    },
-    [walletData, tokenSymbolToAccountID]
-  );
 
   /**
    * Returns the Pool Exchange Ratio display
@@ -221,7 +231,7 @@ const Pool = (): JSX.Element => {
           title="First Token"
           tokenAmount={poolState.inputToken.amount}
           tokenSymbol={poolState.inputToken.symbol}
-          tokenBalance={getBalanceByTokenSymbol(inputToken?.symbol ?? "")}
+          tokenBalance={poolState.inputToken.balance}
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleInputAmountChange}
           onTokenSymbolChange={handleInputSymbolChange}
@@ -229,24 +239,12 @@ const Pool = (): JSX.Element => {
           onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
         />
-        {/* <Flex>  // TODO: check on UX for this confirm it is not needed
-          <Spacer />
-          <IconButton
-            data-testid="switch-token-inputs-button"
-            aria-label="Switch the token amount and symbol input values."
-            icon={<UpDownIcon w={6} h={6} />}
-            onClick={swapTokens}
-            isRound={true}
-            variant="switch-token-inputs"
-          />
-          <Spacer />
-        </Flex> */}
         <TokenInput
           data-testid="swap-output"
           title="Second Token"
           tokenAmount={poolState.outputToken.amount}
           tokenSymbol={poolState.outputToken.symbol}
-          tokenBalance={getBalanceByTokenSymbol(outputToken?.symbol ?? "")}
+          tokenBalance={poolState.outputToken.balance}
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleOutputAmountChange}
           onTokenSymbolChange={handleOutputSymbolChange}

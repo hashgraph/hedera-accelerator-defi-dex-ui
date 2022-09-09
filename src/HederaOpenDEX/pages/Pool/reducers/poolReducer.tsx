@@ -6,12 +6,14 @@ export interface PoolState {
     amount: number;
     address: string;
     spotPrice: number;
+    balance: number | undefined;
   };
   outputToken: {
     symbol: string;
     amount: number;
     address: string;
     spotPrice: number;
+    balance: number | undefined;
   };
 }
 
@@ -21,12 +23,14 @@ const initialPoolState: PoolState = {
     amount: 0.0,
     address: "",
     spotPrice: 0,
+    balance: undefined,
   },
   outputToken: {
     symbol: "",
     amount: 0.0,
     address: "",
     spotPrice: 0,
+    balance: undefined,
   },
 };
 
