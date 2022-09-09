@@ -6,6 +6,7 @@ import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
 export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
+  isHalfAndMaxButtonsVisible?: boolean;
   title: string;
   tokenAmount: number;
   tokenSymbol: string | undefined;
@@ -13,8 +14,8 @@ export interface TokenInputProps {
   walletConnectionStatus: WalletConnectionStatus;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onMaxButtonClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onHalfButtonClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
+  onHalfButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
 /**
@@ -28,6 +29,7 @@ const TokenInput = (props: TokenInputProps) => {
   const {
     title,
     isDisabled = false,
+    isHalfAndMaxButtonsVisible = false,
     tokenAmount,
     tokenSymbol,
     tokenBalance,
@@ -47,6 +49,21 @@ const TokenInput = (props: TokenInputProps) => {
     }
     return tokenBalance;
   }, [walletConnectionStatus, tokenSymbol, tokenBalance]);
+
+  const getHalfAndMaxButtonDisplays = useCallback(() => {
+    if (isHalfAndMaxButtonsVisible) {
+      return (
+        <>
+          <Button padding="0" variant="xs-text" onClick={onHalfButtonClick}>
+            Half
+          </Button>
+          <Button padding="0" variant="xs-text" onClick={onMaxButtonClick}>
+            Max
+          </Button>
+        </>
+      );
+    }
+  }, [isHalfAndMaxButtonsVisible, onHalfButtonClick, onMaxButtonClick]);
 
   return (
     <>
@@ -72,12 +89,7 @@ const TokenInput = (props: TokenInputProps) => {
           <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.75rem" fontWeight="bold">
             Balance: {showTokenBalance()}
           </Text>
-          <Button padding="0" variant="xs-text" onClick={onHalfButtonClick}>
-            Half
-          </Button>
-          <Button padding="0" variant="xs-text" onClick={onMaxButtonClick}>
-            Max
-          </Button>
+          {getHalfAndMaxButtonDisplays()}
         </Flex>
       </Box>
     </>

@@ -3,7 +3,8 @@ name: Production:Pull Request CI / CD
 on: 
  pull_request:
    branches: [main]
-
+   types: [opened, reopened, synchronize , edited]
+   
 jobs:
   build-test-prod:
     runs-on: ubuntu-latest
