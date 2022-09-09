@@ -5,7 +5,8 @@ import { useHashConnectContext } from "../../../context";
 import { ContractId, TokenId } from "@hashgraph/sdk";
 import { TokenAmountInput, TokenSelector } from "../../../components";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer } from "./reducers";
-import { UpDownIcon } from "@chakra-ui/icons";
+import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
+import { TokenInput } from "../../../components/TokenInput";
 
 const Pool = (): JSX.Element => {
   const tokenSymbolToAccountID = new Map<string, string>([
@@ -13,7 +14,7 @@ const Pool = (): JSX.Element => {
     ["L49B", "0.0.47646196"],
   ]);
   const { getLABTokens } = useHederaService(); // TODO: remove
-  const { walletData, sendAddLiquidityTransaction, spotPrices } = useHashConnectContext();
+  const { walletData, sendAddLiquidityTransaction, spotPrices, connectionStatus } = useHashConnectContext();
 
   useCallback(() => {
     const tokenBalances = walletData?.pairedAccountBalance?.tokens;
@@ -203,126 +204,99 @@ const Pool = (): JSX.Element => {
   return (
     <HStack>
       <Box data-testid="pool-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
-        <Heading
-          as="p"
-          size="sm"
-          color="black"
-          paddingLeft="5px"
-          paddingTop="0.5rem"
-          paddingBottom="0.5rem"
-          marginBottom="1rem"
+        <Flex>
+          <Heading as="h4" size="lg">
+            Add Liquidity
+          </Heading>
+          <Spacer />
+          <IconButton
+            data-testid="settings-button"
+            aria-label="Open and close settings modal."
+            icon={<SettingsIcon w={6} h={6} />}
+            variant="settings"
+          />
+        </Flex>
+        <TokenInput
+          data-testid="swap-input"
+          title="First Token"
+          tokenAmount={poolState.inputToken.amount}
+          tokenSymbol={poolState.inputToken.symbol}
+          tokenBalance={getBalanceByTokenSymbol(inputToken?.symbol ?? "")}
+          walletConnectionStatus={connectionStatus}
+          onTokenAmountChange={handleInputAmountChange}
+          onTokenSymbolChange={handleInputSymbolChange}
+          isHalfAndMaxButtonsVisible={true}
+          onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
+          onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
+        />
+        {/* <Flex>  // TODO: check on UX for this confirm it is not needed
+          <Spacer />
+          <IconButton
+            data-testid="switch-token-inputs-button"
+            aria-label="Switch the token amount and symbol input values."
+            icon={<UpDownIcon w={6} h={6} />}
+            onClick={swapTokens}
+            isRound={true}
+            variant="switch-token-inputs"
+          />
+          <Spacer />
+        </Flex> */}
+        <TokenInput
+          data-testid="swap-output"
+          title="Second Token"
+          tokenAmount={poolState.outputToken.amount}
+          tokenSymbol={poolState.outputToken.symbol}
+          tokenBalance={getBalanceByTokenSymbol(outputToken?.symbol ?? "")}
+          walletConnectionStatus={connectionStatus}
+          onTokenAmountChange={handleOutputAmountChange}
+          onTokenSymbolChange={handleOutputSymbolChange}
+          isHalfAndMaxButtonsVisible={true}
+          onMaxButtonClick={() => getPortionOfBalance("outputToken", "max")}
+          onHalfButtonClick={() => getPortionOfBalance("outputToken", "half")}
+        />
+        <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
+          <Flex flexDirection={"column"}>
+            <Text fontSize="xs" padding="0.1rem">
+              Transaction Fee
+            </Text>
+            <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
+              0.0%
+            </Text>
+          </Flex>
+          <Flex flexDirection={"column"}>
+            <Text fontSize="xs" padding="0.1rem">
+              Share of Pool
+            </Text>
+            <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
+              {"<0.1%"}
+            </Text>
+          </Flex>
+          <Flex flexDirection={"column"}>
+            <Text fontSize="xs" padding="0.1rem">
+              Pool Exchange Ratio
+            </Text>
+            <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
+              {getExchangeRatio()}
+            </Text>
+          </Flex>
+        </Flex>
+        <Button
+          onClick={onAddLiquidityClick}
+          data-testid="add-liqidity-button"
+          size="lg"
+          height="48px"
+          width="100%"
+          border="2px"
+          marginTop="0.5rem"
+          marginBottom="0.5rem"
+          bg="black"
+          color="white"
+          fontSize="16px"
+          fontWeight="500"
         >
-          Pool
-        </Heading>
-        <Center>
-          <VStack>
-            <Box border="1px solid black" borderRadius="5px" backgroundColor="#F2F2F2">
-              <Flex>
-                <Box flex="5">
-                  <TokenAmountInput
-                    data-testid="swap-input"
-                    value={poolState?.inputToken?.amount}
-                    onChangeHandler={handleInputAmountChange}
-                    variant="token-amount-input"
-                  />
-                </Box>
-                <Box flex="4">
-                  <TokenSelector value={inputToken?.symbol} onChangeHandler={handleInputSymbolChange} />
-                </Box>
-              </Flex>
-              <Flex backgroundColor="#F2F2F2" alignItems={"center"}>
-                <Text fontSize="xs" padding="0.25rem" fontWeight="bold">
-                  Balance: {getBalanceByTokenSymbol(inputToken?.symbol ?? "") || "Connect to View"}
-                </Text>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance("inputToken", "half")}>
-                  Half
-                </Button>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance("inputToken", "max")}>
-                  Max
-                </Button>
-              </Flex>
-            </Box>
-            <Flex>
-              <Spacer />
-              <IconButton
-                data-testid="switch-token-inputs-button"
-                aria-label="Switch the token amount and symbol input values."
-                icon={<UpDownIcon w={6} h={6} />}
-                onClick={swapTokens}
-                isRound={true}
-                variant="switch-token-inputs"
-              />
-              <Spacer />
-            </Flex>
-            <Box border="1px solid black" borderRadius="5px" backgroundColor="#F2F2F2">
-              <Flex>
-                <Box flex="5">
-                  <TokenAmountInput
-                    data-testid="swap-output"
-                    value={poolState?.outputToken?.amount}
-                    onChangeHandler={handleOutputAmountChange}
-                    variant="token-amount-input"
-                  />
-                </Box>
-                <Box flex="4">
-                  <TokenSelector value={outputToken?.symbol} onChangeHandler={handleOutputSymbolChange} />
-                </Box>
-              </Flex>
-              <Flex backgroundColor="#F2F2F2" alignItems={"center"}>
-                <Text fontSize="xs" padding="0.25rem" fontWeight="bold">
-                  Balance: {getBalanceByTokenSymbol(outputToken?.symbol ?? "") || "Connect to View"}
-                </Text>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance("outputToken", "half")}>
-                  Half
-                </Button>
-                <Button variant="xs-text" onClick={() => getPortionOfBalance("outputToken", "max")}>
-                  Max
-                </Button>
-              </Flex>
-            </Box>
-            <Flex justifyContent={"space-between"} width={"100%"}>
-              <Flex flexDirection={"column"}>
-                <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  Transaction Fee
-                </Text>
-                <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  0.0
-                </Text>
-              </Flex>
-              <Flex flexDirection={"column"}>
-                <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  Share of Pool
-                </Text>
-                <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  {"<0.1%"}
-                </Text>
-              </Flex>
-              <Flex flexDirection={"column"}>
-                <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  Pool Exchange Ratio
-                </Text>
-                <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                  {getExchangeRatio()}
-                </Text>
-              </Flex>
-            </Flex>
-            <Button
-              onClick={onAddLiquidityClick}
-              data-testid="add-liqidity-button"
-              size="lg"
-              height="48px"
-              width="100%"
-              border="2px"
-              marginTop="0.5rem"
-              marginBottom="0.5rem"
-              bg="black"
-              color="white"
-              fontSize="16px"
-              fontWeight="500"
-            >
-              {"Add to Pool"}
-            </Button>
-            {/*   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed 
+          {"Add to Pool"}
+        </Button>
+        {/*   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed 
             <Button
               onClick={sendLABTokensToConnectedWallet}
               data-testid="get-L49A-tokens-button"
@@ -340,9 +314,7 @@ const Pool = (): JSX.Element => {
               {"Send 100 L49A and L49B To Wallet"}
             </Button> */}
 
-            <Text></Text>
-          </VStack>
-        </Center>
+        <Text></Text>
       </Box>
     </HStack>
   );
