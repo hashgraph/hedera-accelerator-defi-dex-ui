@@ -3,9 +3,10 @@ import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@c
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
 import { ContractId } from "@hashgraph/sdk";
-import { ActionType, initialPoolState, initPoolReducer, poolReducer } from "./reducers";
+import { ActionType, initialPoolState, initPoolReducer, poolReducer, PoolState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../components/TokenInput";
+import { usePrevious } from "../../../hooks/usePrevious/usePrevious";
 
 const Pool = (): JSX.Element => {
   const tokenSymbolToAccountID = new Map<string, string>([
@@ -21,6 +22,7 @@ const Pool = (): JSX.Element => {
   }, [walletData]);
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
+  const previousPoolState: PoolState | undefined = usePrevious(poolState);
 
   /**
    * Helper function that will dispatch action to update details about tokens in either input depending on
@@ -108,6 +110,38 @@ const Pool = (): JSX.Element => {
     poolState.outputToken.symbol,
     walletData.pairedAccountBalance,
   ]);
+
+  /**
+   * When spot price changes (ie selected token is changed) calculate the other field/token's value
+   */
+  useEffect(() => {
+    if (
+      poolState.inputToken.spotPrice &&
+      previousPoolState &&
+      poolState.outputToken.amount !== previousPoolState["inputToken"]["amount"]
+    ) {
+      console.log("first useEffect, input amount", poolState.inputToken.amount);
+      const outputPrice = poolState.inputToken.amount * poolState.inputToken.spotPrice;
+      console.log("result output", outputPrice);
+      handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+    }
+  }, [poolState.inputToken.spotPrice, handlePoolInputsChange]);
+
+  /**
+   * When spot price changes (ie selected token is changed) calculate the other field/token's value
+   */
+  useEffect(() => {
+    if (
+      poolState.outputToken.spotPrice &&
+      previousPoolState &&
+      poolState.outputToken.amount !== previousPoolState["outputToken"]["amount"]
+    ) {
+      console.log("second useEffect, output amount", poolState.outputToken.amount);
+      const inputPrice = poolState.outputToken.amount * poolState.outputToken.spotPrice;
+      console.log("result input", inputPrice);
+      handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+    }
+  }, [poolState.outputToken.spotPrice, handlePoolInputsChange]);
 
   /**
    * Called when the first input field's amount is changed. Calls handlePoolInputsChange to update the amount
