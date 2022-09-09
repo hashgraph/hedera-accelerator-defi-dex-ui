@@ -19,45 +19,28 @@ function initSwapReducer(initialSwapState: SwapState) {
   return initialSwapState;
 }
 
-function swapReducer(state: SwapState, action: SwapAction) {
+function swapReducer(draft: SwapState, action: SwapAction) {
   switch (action.type) {
     case ActionType.SET_TOKEN_TO_TRADE: {
       const { field, payload } = action;
-      return {
-        ...state,
-        tokenToTrade: {
-          ...state.tokenToTrade,
-          [field]: payload,
-        },
-      };
+      draft.tokenToTrade = { ...draft.tokenToTrade, [field]: payload };
+      break;
     }
     case ActionType.SET_TOKEN_TO_RECEIVE: {
       const { field, payload } = action;
-      return {
-        ...state,
-        tokenToReceive: {
-          ...state.tokenToReceive,
-          [field]: payload,
-        },
-      };
+      draft.tokenToReceive = { ...draft.tokenToReceive, [field]: payload };
+      break;
     }
-    case ActionType.SWITCH_TOKEN_TO_TRADE_AND_RECIEVE: {
-      return {
-        ...state,
-        tokenToTrade: {
-          ...state.tokenToReceive,
-        },
-        tokenToReceive: {
-          ...state.tokenToTrade,
-        },
-      };
+    case ActionType.SWITCH_TOKEN_TO_TRADE_AND_RECEIVE: {
+      const previousTokenToTrade = { ...draft.tokenToTrade };
+      draft.tokenToTrade = { ...draft.tokenToReceive };
+      draft.tokenToReceive = { ...previousTokenToTrade };
+      break;
     }
     case ActionType.SET_SPOT_PRICE: {
       const { payload } = action;
-      return {
-        ...state,
-        spotPrice: payload,
-      };
+      draft.spotPrice = payload;
+      break;
     }
     default:
       throw new Error();

@@ -22,16 +22,6 @@ export interface AddLiquidityDetails {
   signer: HashConnectSigner;
 }
 
-export interface AddLiquidityDetails {
-  firstTokenAddress: string;
-  firstTokenQuantity: BigNumber;
-  secondTokenAddress: string;
-  secondTokenQuantity: BigNumber;
-  addLiquidityContractAddress: ContractId;
-  walletAddress: string;
-  signer: HashConnectSigner;
-}
-
 export const createClient = () => {
   const myAccountId = "0.0.34833380";
   const privateKey1 = "302e020100300506032b657004220420411127f31025a5";
@@ -87,8 +77,8 @@ const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
     walletAddress,
     signer,
   } = addLiquidityDetails
-    ? addLiquidityDetails
-    : {
+      ? addLiquidityDetails
+      : {
         firstTokenAddress: null,
         firstTokenQuantity: null,
         secondTokenAddress: null,
@@ -324,5 +314,4 @@ export {
   getContributorTokenShare,
   getTokenBalance,
   getSpotPrice,
-  pairCurrentPosition,
 };

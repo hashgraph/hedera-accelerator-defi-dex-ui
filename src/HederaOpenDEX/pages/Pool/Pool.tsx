@@ -6,14 +6,13 @@ import { ContractId, TokenId } from "@hashgraph/sdk";
 import { TokenAmountInput, TokenSelector } from "../../../components";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer } from "./reducers";
 import { UpDownIcon } from "@chakra-ui/icons";
-import { pairCurrentPosition } from "../../../hooks/useHederaService/swapContract";
 
 const Pool = (): JSX.Element => {
   const tokenSymbolToAccountID = new Map<string, string>([
     ["L49A", "0.0.47646195"],
     ["L49B", "0.0.47646196"],
   ]);
-  const { getLABTokens } = useHederaService();  // TODO: remove
+  const { getLABTokens } = useHederaService(); // TODO: remove
   const { walletData, sendAddLiquidityTransaction, spotPrices } = useHashConnectContext();
 
   useCallback(() => {

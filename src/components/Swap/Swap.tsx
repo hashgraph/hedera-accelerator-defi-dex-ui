@@ -1,11 +1,11 @@
-import { ChangeEvent, MouseEvent, useCallback, useEffect, useReducer } from "react";
+import { ChangeEvent, MouseEvent, useCallback, useEffect } from "react";
+import { useImmerReducer } from "use-immer";
 import { ChakraProvider, Box, Heading, Flex, Spacer, Text } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
 import { WalletConnectionStatus, Networks } from "../../hooks/useHashConnect";
 import { HederaOpenDexTheme } from "../../HederaOpenDEX/styles";
 import { swapReducer, initialSwapState, initSwapReducer } from "./reducers";
-import { ActionType } from "./actions/actionTypes";
 import {
   setTokenToTradeAmount,
   setTokenToTradeSymbol,
@@ -13,19 +13,18 @@ import {
   setTokenToReceiveAmount,
   setTokenToReceiveSymbol,
   setTokenToReceiveBalance,
+  swapTokenToTradeAndReceive,
   setSpotPrice,
 } from "./actions/swapActions";
 import { Button, IconButton, SwapConfirmation } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
-import { halfOf } from "./utils";
+import { halfOf, getTokenExchangeAmount } from "./utils";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks/useHashConnect";
-
-import { useHashConnectContext } from "../../context";
 export interface SwapProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;
-  // connectToWallet: () => void;
+  connectToWallet: () => void;
   clearWalletPairings: () => void;
   fetchSpotPrices: () => void;
   connectionStatus: WalletConnectionStatus;
@@ -37,11 +36,9 @@ export interface SwapProps {
 }
 
 const Swap = (props: SwapProps) => {
-  const { title, spotPrices, walletData, connectionStatus, sendSwapTransaction } = props;
-  const [swapState, dispatch] = useReducer(swapReducer, initialSwapState, initSwapReducer);
+  const { title, spotPrices, walletData, connectionStatus, connectToWallet, sendSwapTransaction } = props;
+  const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice } = swapState;
-
-  const { connectToWallet } = useHashConnectContext();
 
   const getTokenBalance = useCallback(
     (tokenSymbol: string): number => {
@@ -56,17 +53,26 @@ const Swap = (props: SwapProps) => {
     [walletData]
   );
 
+  const updateExchangeRate = useCallback(
+    ({ tokenToTradeSymbol = tokenToTrade.symbol, tokenToReceiveSymbol = tokenToReceive.symbol }) => {
+      const route = `${tokenToTradeSymbol}=>${tokenToReceiveSymbol}`;
+      if (spotPrices !== undefined && spotPrices instanceof Map && spotPrices.has(route)) {
+        const newSpotPrice = spotPrices.get(route) ?? 0.0;
+        dispatch(setSpotPrice(newSpotPrice));
+      } else {
+        dispatch(setSpotPrice(undefined));
+      }
+    },
+    [dispatch, spotPrices, tokenToTrade.symbol, tokenToReceive.symbol]
+  );
+
   /** Update token to receive amount any time the token symbols, token to trade amount, or spot price is updated. */
   useEffect(() => {
-    let tokenToTradeRecieveAmount;
     if (spotPrice !== undefined) {
-      tokenToTradeRecieveAmount = Number((tokenToTrade.amount * spotPrice).toPrecision(8));
-    } else {
-      tokenToTradeRecieveAmount = 0;
-      console.warn("[Swap - useEffect] Spot Price is undefined");
+      const tokenToReceiveAmount = getTokenExchangeAmount(tokenToTrade.amount, spotPrice);
+      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount));
     }
-    dispatch(setTokenToReceiveAmount(tokenToTradeRecieveAmount));
-  }, [spotPrice, tokenToTrade.amount, tokenToTrade.symbol, tokenToReceive.symbol]);
+  }, [dispatch, spotPrice, tokenToTrade.amount]);
 
   /** Update balances any time the token symbols or the cached paired account balances change. */
   useEffect(() => {
@@ -78,42 +84,15 @@ const Swap = (props: SwapProps) => {
       const tokenToReceiveBalance = getTokenBalance(tokenToReceive.symbol);
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
     }
-  }, [getTokenBalance, tokenToTrade.symbol, tokenToReceive.symbol, walletData?.pairedAccountBalance]);
-
-  const updateExchangeRate = useCallback(
-    ({ tokenToTradeSymbol = tokenToTrade.symbol, tokenToReceiveSymbol = tokenToReceive.symbol }) => {
-      const route = `${tokenToTradeSymbol}=>${tokenToReceiveSymbol}`;
-      console.warn("route", route);
-      console.warn("spotPrices", spotPrices);
-      if (spotPrices !== undefined && spotPrices instanceof Map && spotPrices.has(route)) {
-        const newSpotPrice = spotPrices.get(route) ?? 0.0;
-        console.log("route", route);
-        console.log("spotPrices", spotPrices);
-        console.log("newSpotPrice, spotPrice", newSpotPrice, spotPrice);
-        dispatch(setSpotPrice(newSpotPrice));
-      } else {
-        dispatch(setSpotPrice(undefined));
-      }
-    },
-    [dispatch, spotPrices, spotPrice, tokenToTrade.symbol, tokenToReceive.symbol]
-  );
+  }, [dispatch, getTokenBalance, tokenToTrade.symbol, tokenToReceive.symbol, walletData?.pairedAccountBalance]);
 
   const handleTokenToTradeAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeAmount = Number(inputElement.value);
       dispatch(setTokenToTradeAmount(tokenToTradeAmount));
-      let tokenToTradeRecieveAmount;
-      if (spotPrice !== undefined) {
-        tokenToTradeRecieveAmount = Number((tokenToTradeAmount * spotPrice).toPrecision(8));
-      } else {
-        tokenToTradeRecieveAmount = 0;
-        console.warn("[handleTokenToTradeAmountChange] Spot Price is undefined");
-      }
-      dispatch(setTokenToReceiveAmount(tokenToTradeRecieveAmount));
-      updateExchangeRate({});
     },
-    [dispatch, updateExchangeRate, spotPrice]
+    [dispatch]
   );
 
   const handleTokenToTradeSymbolChange = useCallback(
@@ -150,7 +129,7 @@ const Swap = (props: SwapProps) => {
   );
 
   const swapTokens = useCallback(() => {
-    dispatch({ type: ActionType.SWITCH_TOKEN_TO_TRADE_AND_RECIEVE });
+    dispatch(swapTokenToTradeAndReceive());
     updateExchangeRate({ tokenToTradeSymbol: tokenToReceive.symbol, tokenToReceiveSymbol: tokenToTrade.symbol });
   }, [dispatch, updateExchangeRate, tokenToReceive.symbol, tokenToTrade.symbol]);
 
@@ -163,19 +142,7 @@ const Swap = (props: SwapProps) => {
       const amountToTrade = formula === formulaTypes.MAX ? tokenToTrade.balance : halfOf(tokenToTrade.balance);
       dispatch(setTokenToTradeAmount(amountToTrade));
     },
-    [tokenToTrade.balance]
-  );
-
-  const setTokenToReceiveAmountWithFormula = useCallback(
-    (formula: formulaTypes = formulaTypes.MAX) => {
-      if (tokenToReceive.balance === undefined) {
-        console.warn("Token To Receive balance is null");
-        return;
-      }
-      const amountToRecieve = formula === formulaTypes.MAX ? tokenToReceive.balance : halfOf(tokenToReceive.balance);
-      dispatch(setTokenToReceiveAmount(amountToRecieve));
-    },
-    [tokenToReceive.balance]
+    [dispatch, tokenToTrade.balance]
   );
 
   const handleTokenToTradeMaxButtonClick = useCallback(
@@ -190,20 +157,6 @@ const Swap = (props: SwapProps) => {
       setTokenToTradeAmountWithFormula(formulaTypes.HALF);
     },
     [setTokenToTradeAmountWithFormula]
-  );
-
-  const handleTokenToReceiveMaxButtonClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      setTokenToReceiveAmountWithFormula(formulaTypes.MAX);
-    },
-    [setTokenToReceiveAmountWithFormula]
-  );
-
-  const handleTokenToReceiveHalfButtonClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      setTokenToReceiveAmountWithFormula(formulaTypes.HALF);
-    },
-    [setTokenToReceiveAmountWithFormula]
   );
 
   const getExchangeRateDisplay = useCallback(() => {
@@ -241,6 +194,7 @@ const Swap = (props: SwapProps) => {
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleTokenToTradeAmountChange}
           onTokenSymbolChange={handleTokenToTradeSymbolChange}
+          isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
         />
@@ -266,8 +220,6 @@ const Swap = (props: SwapProps) => {
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
-          onMaxButtonClick={handleTokenToReceiveMaxButtonClick}
-          onHalfButtonClick={handleTokenToReceiveHalfButtonClick}
         />
         <Flex paddingTop="1rem">
           <Box flex="2" paddingRight="1rem">
@@ -297,7 +249,6 @@ const Swap = (props: SwapProps) => {
           )}
         </Flex>
       </Box>
-      {/* </VStack> */}
     </ChakraProvider>
   );
 };
