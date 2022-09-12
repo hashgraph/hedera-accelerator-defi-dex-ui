@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useReducer } from "react";
+import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
 import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
 import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
@@ -18,7 +18,6 @@ const Pool = (): JSX.Element => {
 
   useCallback(() => {
     const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-    console.log("tokenBalances", tokenBalances);
   }, [walletData]);
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
@@ -79,9 +78,6 @@ const Pool = (): JSX.Element => {
     const secondTokenSymbol = poolState.outputToken.symbol;
 
     if (firstTokenSymbol && secondTokenSymbol) {
-      console.log("setting spot price");
-      console.log("spot price A", spotPrices?.get("L49A=>L49B"));
-      console.log("spot price B", spotPrices?.get("L49B=>L49A"));
       const firstTokenSpotPrice = spotPrices?.get(`${firstTokenSymbol}=>${secondTokenSymbol}`) || 0;
       const secondTokenSpotPrice = spotPrices?.get(`${secondTokenSymbol}=>${firstTokenSymbol}`) || 0;
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "spotPrice", payload: firstTokenSpotPrice });
@@ -121,9 +117,11 @@ const Pool = (): JSX.Element => {
       poolState.outputToken.amount !== previousPoolState["inputToken"]["amount"]
     ) {
       console.log("first useEffect, input amount", poolState.inputToken.amount);
-      const outputPrice = poolState.inputToken.amount * poolState.inputToken.spotPrice;
+      const outputPrice = +(poolState.inputToken.amount * poolState.inputToken.spotPrice).toFixed(8);
       console.log("result output", outputPrice);
-      handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+      // handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: outputPrice });
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice });
     }
   }, [poolState.inputToken.spotPrice, handlePoolInputsChange]);
 
@@ -137,9 +135,11 @@ const Pool = (): JSX.Element => {
       poolState.outputToken.amount !== previousPoolState["outputToken"]["amount"]
     ) {
       console.log("second useEffect, output amount", poolState.outputToken.amount);
-      const inputPrice = poolState.outputToken.amount * poolState.outputToken.spotPrice;
+      const inputPrice = +(poolState.outputToken.amount * poolState.outputToken.spotPrice).toFixed(8);
       console.log("result input", inputPrice);
-      handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+      // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
     }
   }, [poolState.outputToken.spotPrice, handlePoolInputsChange]);
 
@@ -151,14 +151,17 @@ const Pool = (): JSX.Element => {
    */
   const handleInputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      console.log("input changed, current spot price", poolState.inputToken.spotPrice);
-      handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "amount");
+      console.log("input changed", +event.target.value);
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: +event.target.value });
+      // handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "amount");
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: +(+event.target.value).toFixed(8) });
       // use spot price to calculate output field
-      // TODO: a;fjk
       if (poolState.inputToken.spotPrice) {
-        const outputPrice = +event.target.value * poolState.inputToken.spotPrice;
+        const outputPrice = +(+event.target.value * poolState.inputToken.spotPrice).toFixed(8);
         console.log(outputPrice);
-        handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+        // handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: outputPrice });
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice });
       }
     },
     [handlePoolInputsChange, poolState]
@@ -184,11 +187,20 @@ const Pool = (): JSX.Element => {
    */
   const handleOutputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+      console.log("setting input display", +event.target.value);
+      // handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "amount");
+      dispatch({
+        type: ActionType.UPDATE_OUTPUT_TOKEN,
+        field: "displayedAmount",
+        payload: +event.target.value,
+      });
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: +(+event.target.value).toFixed(8) });
       // use spot price to calculate input field
       if (poolState.outputToken.spotPrice) {
-        const inputPrice = +event.target.value * poolState.outputToken.spotPrice;
-        handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        const inputPrice = +(+event.target.value * poolState.outputToken.spotPrice).toString();
+        // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
       }
     },
     [handlePoolInputsChange, poolState]
@@ -225,6 +237,22 @@ const Pool = (): JSX.Element => {
         field === "inputToken" ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
         "amount"
       );
+      handlePoolInputsChange(
+        portion.toString(),
+        field === "inputToken" ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
+        "displayedAmount"
+      );
+      if (field === "inputToken" && poolState.inputToken.spotPrice) {
+        const inputPrice = +(portion * poolState.inputToken.spotPrice).toString();
+        // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: inputPrice });
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
+      } else if (field === "outputToken" && poolState.outputToken.spotPrice) {
+        const inputPrice = +(portion * poolState.outputToken.spotPrice).toString();
+        // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
+      }
     }
   };
 
@@ -263,7 +291,7 @@ const Pool = (): JSX.Element => {
         <TokenInput
           data-testid="swap-input"
           title="First Token"
-          tokenAmount={poolState.inputToken.amount}
+          tokenAmount={poolState.inputToken.displayedAmount}
           tokenSymbol={poolState.inputToken.symbol}
           tokenBalance={poolState.inputToken.balance}
           walletConnectionStatus={connectionStatus}
@@ -276,7 +304,7 @@ const Pool = (): JSX.Element => {
         <TokenInput
           data-testid="swap-output"
           title="Second Token"
-          tokenAmount={poolState.outputToken.amount}
+          tokenAmount={poolState.outputToken.displayedAmount}
           tokenSymbol={poolState.outputToken.symbol}
           tokenBalance={poolState.outputToken.balance}
           walletConnectionStatus={connectionStatus}

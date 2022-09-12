@@ -4,6 +4,7 @@ export interface PoolState {
   inputToken: {
     symbol: string;
     amount: number;
+    displayedAmount: number;
     address: string;
     spotPrice: number;
     balance: number | undefined;
@@ -11,6 +12,7 @@ export interface PoolState {
   outputToken: {
     symbol: string;
     amount: number;
+    displayedAmount: number;
     address: string;
     spotPrice: number;
     balance: number | undefined;
@@ -21,6 +23,7 @@ const initialPoolState: PoolState = {
   inputToken: {
     symbol: "",
     amount: 0.0,
+    displayedAmount: 0.0,
     address: "",
     spotPrice: 0,
     balance: undefined,
@@ -28,6 +31,7 @@ const initialPoolState: PoolState = {
   outputToken: {
     symbol: "",
     amount: 0.0,
+    displayedAmount: 0.0,
     address: "",
     spotPrice: 0,
     balance: undefined,
