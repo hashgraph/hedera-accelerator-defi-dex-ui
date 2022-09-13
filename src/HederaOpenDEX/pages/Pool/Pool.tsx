@@ -116,14 +116,11 @@ const Pool = (): JSX.Element => {
       previousPoolState &&
       poolState.outputToken.amount !== previousPoolState["inputToken"]["amount"]
     ) {
-      console.log("first useEffect, input amount", poolState.inputToken.amount);
       const outputPrice = +(poolState.inputToken.amount * poolState.inputToken.spotPrice).toFixed(8);
-      console.log("result output", outputPrice);
-      // handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: outputPrice });
-      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice });
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice.toString() });
     }
-  }, [poolState.inputToken.spotPrice, handlePoolInputsChange]);
+  }, [poolState.inputToken.spotPrice]);
 
   /**
    * When spot price changes (ie selected token is changed) calculate the other field/token's value
@@ -134,14 +131,11 @@ const Pool = (): JSX.Element => {
       previousPoolState &&
       poolState.outputToken.amount !== previousPoolState["outputToken"]["amount"]
     ) {
-      console.log("second useEffect, output amount", poolState.outputToken.amount);
       const inputPrice = +(poolState.outputToken.amount * poolState.outputToken.spotPrice).toFixed(8);
-      console.log("result input", inputPrice);
-      // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
-      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
     }
-  }, [poolState.outputToken.spotPrice, handlePoolInputsChange]);
+  }, [poolState.outputToken.spotPrice]);
 
   /**
    * Called when the first input field's amount is changed. Calls handlePoolInputsChange to update the amount
@@ -151,20 +145,16 @@ const Pool = (): JSX.Element => {
    */
   const handleInputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      console.log("input changed", +event.target.value);
-      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: +event.target.value });
-      // handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "amount");
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: event.target.value });
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: +(+event.target.value).toFixed(8) });
       // use spot price to calculate output field
       if (poolState.inputToken.spotPrice) {
         const outputPrice = +(+event.target.value * poolState.inputToken.spotPrice).toFixed(8);
-        console.log(outputPrice);
-        // handlePoolInputsChange(outputPrice.toString(), ActionType.UPDATE_OUTPUT_TOKEN, "amount");
         dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: outputPrice });
-        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice });
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice.toString() });
       }
     },
-    [handlePoolInputsChange, poolState]
+    [poolState]
   );
 
   /**
@@ -187,23 +177,20 @@ const Pool = (): JSX.Element => {
    */
   const handleOutputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      console.log("setting input display", +event.target.value);
-      // handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "amount");
       dispatch({
         type: ActionType.UPDATE_OUTPUT_TOKEN,
         field: "displayedAmount",
-        payload: +event.target.value,
+        payload: event.target.value,
       });
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: +(+event.target.value).toFixed(8) });
       // use spot price to calculate input field
       if (poolState.outputToken.spotPrice) {
-        const inputPrice = +(+event.target.value * poolState.outputToken.spotPrice).toString();
-        // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        const inputPrice = +(+event.target.value * poolState.outputToken.spotPrice).toFixed(8);
         dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
-        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
       }
     },
-    [handlePoolInputsChange, poolState]
+    [poolState]
   );
 
   /**
@@ -243,15 +230,13 @@ const Pool = (): JSX.Element => {
         "displayedAmount"
       );
       if (field === "inputToken" && poolState.inputToken.spotPrice) {
-        const inputPrice = +(portion * poolState.inputToken.spotPrice).toString();
-        // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        const inputPrice = portion * poolState.inputToken.spotPrice;
         dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: inputPrice });
-        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
       } else if (field === "outputToken" && poolState.outputToken.spotPrice) {
-        const inputPrice = +(portion * poolState.outputToken.spotPrice).toString();
-        // handlePoolInputsChange(inputPrice.toString(), ActionType.UPDATE_INPUT_TOKEN, "amount");
+        const inputPrice = portion * poolState.outputToken.spotPrice;
         dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
-        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice });
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
       }
     }
   };
