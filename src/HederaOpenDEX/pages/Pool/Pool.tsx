@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
 import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
-// import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
+import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
 import { ContractId } from "@hashgraph/sdk";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer, PoolState } from "./reducers";
@@ -10,7 +10,7 @@ import { usePrevious } from "../../../hooks/usePrevious/usePrevious";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../../hooks";
 
 const Pool = (): JSX.Element => {
-  // const { getLABTokens } = useHederaService(); // TODO: remove
+  const { getLABTokens } = useHederaService(); // TODO: remove
   const { walletData, sendAddLiquidityTransaction, spotPrices, connectionStatus } = useHashConnectContext();
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
@@ -257,9 +257,9 @@ const Pool = (): JSX.Element => {
   }, [poolState]);
 
   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
-  // const sendLABTokensToConnectedWallet = useCallback(() => {
-  //   getLABTokens(walletData?.pairedAccounts[0]);
-  // }, [getLABTokens, walletData?.pairedAccounts]);
+  const sendLABTokensToConnectedWallet = useCallback(() => {
+    getLABTokens(walletData?.pairedAccounts[0]);
+  }, [getLABTokens, walletData?.pairedAccounts]);
 
   return (
     <HStack>
@@ -344,23 +344,23 @@ const Pool = (): JSX.Element => {
         >
           {"Add to Pool"}
         </Button>
-        {/*   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed 
-            <Button
-              onClick={sendLABTokensToConnectedWallet}
-              data-testid="get-L49A-tokens-button"
-              size="lg"
-              height="48px"
-              width="100%"
-              border="2px"
-              marginTop="0.5rem"
-              marginBottom="0.5rem"
-              bg="black"
-              color="white"
-              fontSize="16px"
-              fontWeight="500"
-            >
-              {"Send 100 L49A and L49B To Wallet"}
-            </Button> */}
+        {/* // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed  */}
+        <Button
+          onClick={sendLABTokensToConnectedWallet}
+          data-testid="get-L49A-tokens-button"
+          size="lg"
+          height="48px"
+          width="100%"
+          border="2px"
+          marginTop="0.5rem"
+          marginBottom="0.5rem"
+          bg="black"
+          color="white"
+          fontSize="16px"
+          fontWeight="500"
+        >
+          {"Send 100 L49A and L49B To Wallet"}
+        </Button>
 
         <Text></Text>
       </Box>
