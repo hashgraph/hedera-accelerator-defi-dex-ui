@@ -8,7 +8,7 @@ export interface TokenInputProps {
   isDisabled?: boolean;
   isHalfAndMaxButtonsVisible?: boolean;
   title: string;
-  tokenAmount: number;
+  tokenAmount: number | string;
   tokenSymbol: string | undefined;
   tokenBalance: number | undefined;
   walletConnectionStatus: WalletConnectionStatus;

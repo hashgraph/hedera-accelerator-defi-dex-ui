@@ -20,6 +20,9 @@ export enum ActionType {
   SEND_SWAP_TRANSACTION_TO_WALLET_STARTED = "SEND_SWAP_TRANSACTION_TO_WALLET_STARTED",
   SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED = "SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED",
   SEND_SWAP_TRANSACTION_TO_WALLET_FAILED = "SEND_SWAP_TRANSACTION_TO_WALLET_FAILED",
+  SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED = "SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED",
+  SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED = "SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED",
+  SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
   CLEAR_WALLET_PAIRINGS = "CLEAR_WALLET_PAIRINGS",
   ADD_INSTALLED_EXTENSION = "ADD_INSTALLED_EXTENSION",
   WALLET_PAIRING_APPROVED = "WALLET_PAIRING_APPROVED",
@@ -123,6 +126,19 @@ interface SendSwapTransactionToWalletFailed {
   payload: string;
 }
 
+interface SendAddLiquidityTransactionToWalletStarted {
+  type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED;
+}
+
+interface SendAddLiquidityTransactionToWalletSucceeded {
+  type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED;
+}
+
+interface SendAddLiquidityTransactionToWalletFailed {
+  type: ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED;
+  errorMessage: string;
+}
+
 interface IClearWalletPairings {
   type: ActionType.CLEAR_WALLET_PAIRINGS;
   field: "walletData";
@@ -169,6 +185,9 @@ export type HashConnectAction =
   | SendSwapTransactionToWalletStarted
   | SendSwapTransactionToWalletSucceeded
   | SendSwapTransactionToWalletFailed
+  | SendAddLiquidityTransactionToWalletStarted
+  | SendAddLiquidityTransactionToWalletSucceeded
+  | SendAddLiquidityTransactionToWalletFailed
   | IClearWalletPairings
   | AddInstalledExtension
   | WalletPairingApproved

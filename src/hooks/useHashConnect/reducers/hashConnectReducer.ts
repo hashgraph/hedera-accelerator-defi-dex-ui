@@ -148,6 +148,19 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
         errorMessage: payload,
       };
     }
+    case ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED: {
+      return state;
+    }
+    case ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED: {
+      return state;
+    }
+    case ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED: {
+      const { errorMessage } = action;
+      return {
+        ...state,
+        errorMessage,
+      };
+    }
     case ActionType.CLEAR_WALLET_PAIRINGS: {
       const { field } = action;
       return {

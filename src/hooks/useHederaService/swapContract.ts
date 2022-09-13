@@ -1,6 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import {
   AccountId,
+  ContractId,
   PrivateKey,
   TokenId,
   ContractExecuteTransaction,
@@ -8,7 +9,18 @@ import {
   Client,
   TransferTransaction,
 } from "@hashgraph/sdk";
+import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { SWAP_CONTRACT_ID, L49A_TOKEN_ID, L49B_TOKEN_ID, TREASURY_ID, TREASURY_KEY } from "../useHashConnect/constants";
+
+export interface AddLiquidityDetails {
+  firstTokenAddress: string;
+  firstTokenQuantity: BigNumber;
+  secondTokenAddress: string;
+  secondTokenQuantity: BigNumber;
+  addLiquidityContractAddress: ContractId;
+  walletAddress: string;
+  signer: HashConnectSigner;
+}
 
 export const createClient = () => {
   const myAccountId = "0.0.34833380";
@@ -55,28 +67,66 @@ const createLiquidityPool = async () => {
   await pairCurrentPosition();
 };
 
-const addLiquidity = async () => {
-  const tokenAQty = new BigNumber(10);
-  const tokenBQty = new BigNumber(10);
-  console.log(`Adding ${tokenAQty} units of token A and ${tokenBQty} units of token B to the pool.`);
-  const addLiquidityTx = await new ContractExecuteTransaction()
-    .setContractId(contractId)
-    .setGas(2000000)
+const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
+  const {
+    firstTokenAddress,
+    firstTokenQuantity,
+    secondTokenAddress,
+    secondTokenQuantity,
+    addLiquidityContractAddress,
+    walletAddress,
+    signer,
+  } = addLiquidityDetails
+    ? addLiquidityDetails
+    : {
+        firstTokenAddress: null,
+        firstTokenQuantity: null,
+        secondTokenAddress: null,
+        secondTokenQuantity: null,
+        addLiquidityContractAddress: null,
+        walletAddress: null,
+        signer: null,
+      };
+
+  // TODO: remove fallbacks if no signer and not all details are provided
+  const firstTokenAddr = firstTokenAddress ? firstTokenAddress : tokenA;
+  const secondTokenAddr = secondTokenAddress ? secondTokenAddress : tokenB;
+  const firstTokenQty = firstTokenQuantity ? firstTokenQuantity : new BigNumber(10);
+  const secondTokenQty = secondTokenQuantity ? secondTokenQuantity : new BigNumber(10);
+  const addLiquidityContractId = addLiquidityContractAddress ? addLiquidityContractAddress : contractId;
+  const fromAddress = walletAddress ? walletAddress : treasure;
+
+  console.log(`Adding ${firstTokenQty} units of token A and ${secondTokenQty} units of token B to the pool.`);
+
+  const addLiquidityTxParams = new ContractExecuteTransaction()
+    .setContractId(addLiquidityContractId)
+    .setGas(9000000)
     .setFunction(
       "addLiquidity",
       new ContractFunctionParameters()
-        .addAddress(treasure)
-        .addAddress(tokenA)
-        .addAddress(tokenB)
-        .addInt64(tokenAQty)
-        .addInt64(tokenBQty)
+        .addAddress(fromAddress)
+        .addAddress(firstTokenAddr)
+        .addAddress(secondTokenAddr)
+        .addInt64(firstTokenQty)
+        .addInt64(secondTokenQty)
     )
-    .freezeWith(client)
-    .sign(treasureKey);
-  const addLiquidityTxRes = await addLiquidityTx.execute(client);
-  const transferTokenRx = await addLiquidityTxRes.getReceipt(client);
+    .setNodeAccountIds([new AccountId(3)]);
 
-  console.log(`Liquidity added status: ${transferTokenRx.status}`);
+  if (signer) {
+    const addLiquidityTxWalletSigned = await addLiquidityTxParams.freezeWithSigner(signer);
+    const addLiquidityTxWalletSignedRes = await addLiquidityTxWalletSigned.executeWithSigner(signer);
+    console.log(addLiquidityTxWalletSignedRes);
+
+    // TODO: for some reason this gives the error: addLiquidityTxWalletSignedRes.getReceiptWithSigner is not a function
+    // const addLiquidityTxWalletSignedReceipt = await addLiquidityTxWalletSignedRes.getReceiptWithSigner(signer)
+    // console.log(`Liquidity added status: ${addLiquidityTxWalletSignedReceipt.status}`);
+  } else {
+    const addLiquidityTx = await addLiquidityTxParams.freezeWith(client).sign(treasureKey);
+    const addLiquidityTxRes = await addLiquidityTx.execute(client);
+    const transferTokenRx = await addLiquidityTxRes.getReceipt(client);
+    console.log(`Liquidity added status: ${transferTokenRx.status}`);
+  }
+
   await pairCurrentPosition();
 };
 
