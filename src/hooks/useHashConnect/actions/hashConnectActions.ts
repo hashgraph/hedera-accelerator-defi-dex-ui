@@ -309,8 +309,9 @@ const sendAddLiquidityTransactionToWallet = (payload: any) => {
 
     const firstTokenAddress = TokenId.fromString(firstTokenAddr).toSolidityAddress();
     const secondTokenAddress = TokenId.fromString(secondTokenAddr).toSolidityAddress();
-    const firstTokenQuantity = new BigNumber(firstTokenQty);
-    const secondTokenQuantity = new BigNumber(secondTokenQty);
+    // TODO: currently can only support whole numbers - remove the floor function when decimal values supported
+    const firstTokenQuantity = new BigNumber(Math.floor(firstTokenQty));
+    const secondTokenQuantity = new BigNumber(Math.floor(secondTokenQty));
     const addLiquidityContractAddress = ContractId.fromString(addLiquidityContractAddr);
 
     const { walletData } = hashConnectState;
