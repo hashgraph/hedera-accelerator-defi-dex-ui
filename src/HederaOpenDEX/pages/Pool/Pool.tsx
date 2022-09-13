@@ -217,8 +217,7 @@ const Pool = (): JSX.Element => {
       (poolState.outputToken.symbol && poolState.outputToken.balance)
     ) {
       const tokenBalance = field === "inputToken" ? poolState.inputToken.balance : poolState.outputToken.balance;
-      // TODO: remove Math.floor when we are able to handle fractional values
-      const portion = _portion === "half" ? Math.floor((tokenBalance || 0) / 2) : Math.floor(tokenBalance || 0);
+      const portion = _portion === "half" ? (tokenBalance || 0) / 2 : tokenBalance || 0;
       handlePoolInputsChange(
         portion.toString(),
         field === "inputToken" ? ActionType.UPDATE_INPUT_TOKEN : ActionType.UPDATE_OUTPUT_TOKEN,
@@ -230,13 +229,13 @@ const Pool = (): JSX.Element => {
         "displayedAmount"
       );
       if (field === "inputToken" && poolState.inputToken.spotPrice) {
-        const inputPrice = portion * poolState.inputToken.spotPrice;
-        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: inputPrice });
-        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
+        const outputPrice = portion * poolState.inputToken.spotPrice;
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: outputPrice });
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice.toFixed(8) });
       } else if (field === "outputToken" && poolState.outputToken.spotPrice) {
         const inputPrice = portion * poolState.outputToken.spotPrice;
         dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
-        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toFixed(8) });
       }
     }
   };
