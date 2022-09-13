@@ -1,24 +1,17 @@
 import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
 import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
-import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
+// import { useHederaService } from "../../../hooks/useHederaService/useHederaService";
 import { useHashConnectContext } from "../../../context";
 import { ContractId } from "@hashgraph/sdk";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer, PoolState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../components/TokenInput";
 import { usePrevious } from "../../../hooks/usePrevious/usePrevious";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../../hooks";
 
 const Pool = (): JSX.Element => {
-  const tokenSymbolToAccountID = new Map<string, string>([
-    ["L49A", "0.0.47646195"],
-    ["L49B", "0.0.47646196"],
-  ]);
-  const { getLABTokens } = useHederaService(); // TODO: remove
+  // const { getLABTokens } = useHederaService(); // TODO: remove
   const { walletData, sendAddLiquidityTransaction, spotPrices, connectionStatus } = useHashConnectContext();
-
-  useCallback(() => {
-    const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-  }, [walletData]);
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
   const previousPoolState: PoolState | undefined = usePrevious(poolState);
@@ -26,11 +19,11 @@ const Pool = (): JSX.Element => {
   /**
    * Helper function that will dispatch action to update details about tokens in either input depending on
    * which params are passed to it
-   * @param event either the HTML event from the form field (input, dropdown/select) that was interacted with
+   * @param event - either the HTML event from the form field (input, dropdown/select) that was interacted with
    *              or a string that contains the desired value to be sent in the payload of the action
-   * @param actionType action type corresponding to which token's store slice should be updated
+   * @param actionType - action type corresponding to which token's store slice should be updated
    *                   (UPDATED_INPUT_TOKEN or UPDATED_OUTPUT_TOKEN)
-   * @param field the specific field within the specified token's store slice that should be updated
+   * @param field - the specific field within the specified token's store slice that should be updated
    */
   const handlePoolInputsChange = useCallback(
     (event: ChangeEvent<HTMLInputElement> | string | undefined, actionType: ActionType, field: string) => {
@@ -57,16 +50,16 @@ const Pool = (): JSX.Element => {
   /**
    * Returns the connected wallet's balance of a given token. Used for the
    * balance display in each token input field
-   * @param tokenSymbol token symbol of token to get balance of
+   * @param tokenSymbol - token symbol of token to get balance of
    * @returns balance of specified token in connected wallet
    */
   const getBalanceByTokenSymbol = useCallback(
     (tokenSymbol: string): number => {
       const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-      const tokenId = tokenSymbolToAccountID.get(tokenSymbol);
+      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
       return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance;
     },
-    [walletData, tokenSymbolToAccountID]
+    [walletData]
   );
   /**
    * Whenever there is a change in the selected token in either input field or change in
@@ -105,6 +98,7 @@ const Pool = (): JSX.Element => {
     poolState.inputToken.symbol,
     poolState.outputToken.symbol,
     walletData.pairedAccountBalance,
+    getBalanceByTokenSymbol,
   ]);
 
   /**
@@ -120,6 +114,7 @@ const Pool = (): JSX.Element => {
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: outputPrice });
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: outputPrice.toString() });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolState.inputToken.spotPrice]);
 
   /**
@@ -135,13 +130,14 @@ const Pool = (): JSX.Element => {
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "amount", payload: inputPrice });
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "displayedAmount", payload: inputPrice.toString() });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolState.outputToken.spotPrice]);
 
   /**
    * Called when the first input field's amount is changed. Calls handlePoolInputsChange to update the amount
    * of the corresponding token in the state, and also calculates the other token's corresponding amount based
    * on spot price (if applicable), and calls handlePoolInputsChange to update that amount as well
-   * @param event event passed in from the input field being changed
+   * @param event - event passed in from the input field being changed
    */
   const handleInputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -164,16 +160,20 @@ const Pool = (): JSX.Element => {
   const handleInputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "symbol");
-      handlePoolInputsChange(tokenSymbolToAccountID.get(event.target.value), ActionType.UPDATE_INPUT_TOKEN, "address");
+      handlePoolInputsChange(
+        TOKEN_SYMBOL_TO_ACCOUNT_ID.get(event.target.value),
+        ActionType.UPDATE_INPUT_TOKEN,
+        "address"
+      );
     },
-    [handlePoolInputsChange, tokenSymbolToAccountID]
+    [handlePoolInputsChange]
   );
 
   /**
    * Called when the second input field's amount is changed. Calls handlePoolInputsChange to update the amount
    * of the corresponding token in the state, and also calculates the other token's corresponding amount based
    * on spot price (if applicable), and calls handlePoolInputsChange to update that amount as well
-   * @param event event passed in from the input field being changed
+   * @param event - event passed in from the input field being changed
    */
   const handleOutputAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -200,16 +200,20 @@ const Pool = (): JSX.Element => {
   const handleOutputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "symbol");
-      handlePoolInputsChange(tokenSymbolToAccountID.get(event.target.value), ActionType.UPDATE_OUTPUT_TOKEN, "address");
+      handlePoolInputsChange(
+        TOKEN_SYMBOL_TO_ACCOUNT_ID.get(event.target.value),
+        ActionType.UPDATE_OUTPUT_TOKEN,
+        "address"
+      );
     },
-    [handlePoolInputsChange, tokenSymbolToAccountID]
+    [handlePoolInputsChange]
   );
 
   /**
    * Calculates half or max of the user's balance for a given token and calls handlePoolInputsChange to update
    * those values in the store and input field. Called when the Half or Max button on either token input is clicked
-   * @param field which input field the calculation should be performed for for (inputToken | outputToken)
-   * @param _portion indicates whether to calculate half or max of the balance
+   * @param field - which input field the calculation should be performed for for (inputToken | outputToken)
+   * @param _portion - indicates whether to calculate half or max of the balance
    */
   const getPortionOfBalance = (field: "inputToken" | "outputToken", _portion: "half" | "max") => {
     if (
@@ -253,9 +257,9 @@ const Pool = (): JSX.Element => {
   }, [poolState]);
 
   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
-  const sendLABTokensToConnectedWallet = useCallback(() => {
-    getLABTokens(walletData?.pairedAccounts[0]);
-  }, [getLABTokens, walletData?.pairedAccounts]);
+  // const sendLABTokensToConnectedWallet = useCallback(() => {
+  //   getLABTokens(walletData?.pairedAccounts[0]);
+  // }, [getLABTokens, walletData?.pairedAccounts]);
 
   return (
     <HStack>
