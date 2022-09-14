@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BigNumber } from "bignumber.js";
 
-import { get100LABTokens, swapTokenA, swapTokenB, addLiquidity, getTokenBalance } from "./swapContract";
+import { swapTokenA, swapTokenB, addLiquidity, getTokenBalance } from "./swapContract";
 
 export interface TokenBalance {
   tokenA?: BigNumber;
@@ -14,7 +14,6 @@ export interface HederaServiceContextProps {
   swapTokenAWithB: () => void;
   swapTokenBWithA: () => void;
   addLiquidityToPool: () => void;
-  getLABTokens: (targetAccoundId: string) => void;
 }
 
 const HederaServiceContext = React.createContext<HederaServiceContextProps>({
@@ -23,7 +22,6 @@ const HederaServiceContext = React.createContext<HederaServiceContextProps>({
   swapTokenAWithB: () => null,
   swapTokenBWithA: () => null,
   addLiquidityToPool: () => null,
-  getLABTokens: () => null,
 });
 
 export interface HederaServiceProviderProps {
@@ -59,11 +57,6 @@ const HederaServiceProvider = ({ children }: HederaServiceProviderProps) => {
     console.log(`addLiquidity received...${balane}`);
   };
 
-  const getLABTokens = async (targetAccoundId: string) => {
-    console.log("Sending transaction for LAB token transfer...");
-    await get100LABTokens(targetAccoundId);
-  };
-
   return (
     <HederaServiceContext.Provider
       value={{
@@ -72,7 +65,6 @@ const HederaServiceProvider = ({ children }: HederaServiceProviderProps) => {
         swapTokenAWithB,
         swapTokenBWithA,
         addLiquidityToPool,
-        getLABTokens,
       }}
     >
       {children}
