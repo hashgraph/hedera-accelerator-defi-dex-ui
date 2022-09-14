@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BigNumber } from "bignumber.js";
 
-import { get100LABTokens, swapTokenA, swapTokenB, addLiquidity, getTokenBalance } from "./swapContract";
+import { swapTokenA, swapTokenB, addLiquidity, getTokenBalance } from "./swapContract";
 
 export interface TokenBalance {
   tokenA?: BigNumber;
