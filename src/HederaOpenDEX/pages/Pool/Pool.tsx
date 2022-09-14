@@ -10,8 +10,8 @@ import { usePrevious } from "../../../hooks/usePrevious/usePrevious";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../../hooks";
 
 const Pool = (): JSX.Element => {
-  const { getLABTokens } = useHederaService(); // TODO: remove
-  const { walletData, sendAddLiquidityTransaction, spotPrices, connectionStatus } = useHashConnectContext();
+  const { walletData, sendAddLiquidityTransaction, spotPrices, connectionStatus, sendLabTokensToWallet } =
+    useHashConnectContext();
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
   const previousPoolState: PoolState | undefined = usePrevious(poolState);
@@ -258,8 +258,8 @@ const Pool = (): JSX.Element => {
 
   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
   const sendLABTokensToConnectedWallet = useCallback(() => {
-    getLABTokens(walletData?.pairedAccounts[0]);
-  }, [getLABTokens, walletData?.pairedAccounts]);
+    sendLabTokensToWallet(walletData?.pairedAccounts[0]);
+  }, [walletData?.pairedAccounts]);
 
   return (
     <HStack>
@@ -361,8 +361,6 @@ const Pool = (): JSX.Element => {
         >
           {"Send 100 L49A and L49B To Wallet"}
         </Button>
-
-        <Text></Text>
       </Box>
     </HStack>
   );
