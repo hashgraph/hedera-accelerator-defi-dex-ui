@@ -8,9 +8,17 @@ import {
   ContractFunctionParameters,
   Client,
   TransferTransaction,
+  TokenAssociateTransaction,
 } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
-import { SWAP_CONTRACT_ID, L49A_TOKEN_ID, L49B_TOKEN_ID, TREASURY_ID, TREASURY_KEY } from "../useHashConnect/constants";
+import {
+  SWAP_CONTRACT_ID,
+  L49A_TOKEN_ID,
+  L49B_TOKEN_ID,
+  TREASURY_ID,
+  TREASURY_KEY,
+  TOKEN_SYMBOL_TO_ACCOUNT_ID,
+} from "../useHashConnect/constants";
 
 export interface AddLiquidityDetails {
   firstTokenAddress: string;
@@ -210,12 +218,46 @@ const swapTokenB = async () => {
   await pairCurrentPosition();
 };
 
-const get100LABTokens = async (receivingAccoundId: string) => {
+const get100LABTokens = async (
+  receivingAccoundId: string,
+  hashconnect: any,
+  hashConnectState: any,
+  network: string
+) => {
   const tokenQuantity = 100;
   const L49ATokenId = TokenId.fromString("0.0.47646195");
   const L49BTokenId = TokenId.fromString("0.0.47646196");
   const swapContractAccountId = AccountId.fromString("0.0.47645191");
   const targetAccountId = AccountId.fromString(receivingAccoundId);
+
+  const { walletData } = hashConnectState;
+  const signingAccount = walletData.pairedAccounts[0];
+  const provider = hashconnect.getProvider(network, walletData.topicID, signingAccount);
+  const signer = hashconnect.getSigner(provider);
+
+  const associatedTokenIds = walletData.pairedAccountBalance.tokens.map((token: any) => token.tokenId);
+  const tokensToAssociate = [TOKEN_SYMBOL_TO_ACCOUNT_ID.get("L49A"), TOKEN_SYMBOL_TO_ACCOUNT_ID.get("L49B")].reduce(
+    (_tokensToAssociate: string[], tokenId: string | undefined) => {
+      if (!associatedTokenIds.includes(tokenId)) {
+        _tokensToAssociate.push(tokenId || "");
+      }
+      return _tokensToAssociate;
+    },
+    []
+  );
+
+  if (tokensToAssociate.length > 0) {
+    const tokenAssociateTx = new TokenAssociateTransaction()
+      .setAccountId(receivingAccoundId)
+      .setTokenIds(tokensToAssociate);
+
+    console.log("Associating L49A and L49B with connected wallet");
+
+    const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
+    const tokenAssociateRes = await tokenAssociateSignedTx.executeWithSigner(signer);
+
+    console.log("Associate L49A and L49B transaction result:", tokenAssociateRes);
+  }
 
   console.log(`Moving ${tokenQuantity} units of L49A and L49B from the Swap contract to Wallet.`);
 
@@ -238,7 +280,7 @@ const get100LABTokens = async (receivingAccoundId: string) => {
   //Obtain the transaction consensus status
   const transactionStatus = receipt.status;
 
-  console.log("The transaction consensus status " + transactionStatus.toString());
+  console.log("The transfer transaction consensus status " + transactionStatus.toString());
 };
 
 const pairCurrentPosition = async () => {
