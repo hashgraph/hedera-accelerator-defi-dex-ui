@@ -6,11 +6,13 @@ const initialSwapState: SwapState = {
     symbol: "HBAR",
     amount: 0.0,
     balance: undefined,
+    poolLiquidity: undefined,
   },
   tokenToReceive: {
     symbol: undefined,
     amount: 0.0,
     balance: undefined,
+    poolLiquidity: undefined,
   },
   spotPrice: undefined,
 };

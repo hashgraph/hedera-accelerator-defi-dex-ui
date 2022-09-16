@@ -9,6 +9,7 @@ import {
   sendSwapTransactionToWallet,
   sendAddLiquidityTransactionToWallet,
   fetchSpotPrices,
+  getPoolLiquidity,
 } from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
@@ -80,6 +81,8 @@ const useHashConnect = ({
     sendSwapTransaction: (payload: any) =>
       dispatch(sendSwapTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     fetchSpotPrices: () => dispatch(fetchSpotPrices()),
+    getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) =>
+      dispatch(getPoolLiquidity(tokenToTrade, tokenToReceive)),
     sendAddLiquidityTransaction: (payload: any) =>
       dispatch(sendAddLiquidityTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     clearWalletPairings,

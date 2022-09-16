@@ -241,17 +241,20 @@ const get100LABTokens = async (receivingAccoundId: string) => {
   console.log("The transaction consensus status " + transactionStatus.toString());
 };
 
-const pairCurrentPosition = async () => {
+// TODO: will need to pass in contractId in future when there are more pools
+const pairCurrentPosition = async (_contractId: string = contractId) => {
   const getPairQty = new ContractExecuteTransaction()
-    .setContractId(contractId)
+    .setContractId(_contractId)
     .setGas(1000000)
     .setFunction("getPairQty")
     .freezeWith(client);
   const getPairQtyTx = await getPairQty.execute(client);
   const response = await getPairQtyTx.getRecord(client);
-  const tokenAQty = response.contractFunctionResult?.getInt64(0);
-  const tokenBQty = response.contractFunctionResult?.getInt64(1);
+  const tokenAQty = response.contractFunctionResult?.getInt64(0).toNumber();
+  const tokenBQty = response.contractFunctionResult?.getInt64(1).toNumber();
   console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B are present in the pool. \n`);
+  // TODO: dont hardcodethis, will have to be dynamic
+  return { L49A: tokenAQty, L49B: tokenBQty };
 };
 
 const getContributorTokenShare = async () => {
@@ -314,4 +317,5 @@ export {
   getContributorTokenShare,
   getTokenBalance,
   getSpotPrice,
+  pairCurrentPosition,
 };
