@@ -3,11 +3,13 @@ export interface SwapState {
     symbol: string | undefined;
     amount: number;
     balance: number | undefined;
+    poolLiquidity: number | undefined;
   };
   tokenToReceive: {
     symbol: string | undefined;
     amount: number;
     balance: number | undefined;
+    poolLiquidity: number | undefined;
   };
   spotPrice: number | undefined;
 }

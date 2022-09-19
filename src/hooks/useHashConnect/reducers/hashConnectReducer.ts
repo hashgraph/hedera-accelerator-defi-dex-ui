@@ -7,6 +7,7 @@ import { WalletConnectionStatus } from "../types";
 export interface HashConnectState {
   errorMessage: string | null;
   spotPrices: Map<string, number | undefined> | undefined;
+  poolLiquidity: Map<string, number | undefined> | undefined;
   walletConnectionStatus: WalletConnectionStatus;
   installedExtensions: HashConnectTypes.WalletMetadata[];
   walletData: {
@@ -24,6 +25,7 @@ export interface HashConnectState {
 const initialHashConnectState: HashConnectState = {
   errorMessage: null,
   spotPrices: undefined,
+  poolLiquidity: undefined,
   walletConnectionStatus: WalletConnectionStatus.INITIALIZING,
   installedExtensions: [],
   walletData: {
@@ -129,6 +131,23 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
       };
     }
     case ActionType.FETCH_SPOT_PRICES_FAILED: {
+      const { payload } = action;
+      return {
+        ...state,
+        errorMessage: payload,
+      };
+    }
+    case ActionType.FETCH_POOL_LIQUIDITY_STARTED: {
+      return state;
+    }
+    case ActionType.FETCH_POOL_LIQUIDITY_SUCCEEDED: {
+      const { payload } = action;
+      return {
+        ...state,
+        poolLiquidity: payload,
+      };
+    }
+    case ActionType.FETCH_POOL_LIQUIDITY_FAILED: {
       const { payload } = action;
       return {
         ...state,

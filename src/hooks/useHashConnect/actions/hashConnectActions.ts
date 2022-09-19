@@ -2,7 +2,7 @@ import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, Toke
 import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
 import { getErrorMessage } from "../utils";
-import { addLiquidity } from "../../useHederaService/swapContract";
+import { addLiquidity, pairCurrentPosition } from "../../useHederaService/swapContract";
 import { SWAP_CONTRACT_ID } from "../constants";
 import { getSpotPrice } from "../../useHederaService/swapContract";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../";
@@ -101,6 +101,26 @@ const fetchSpotPricesSucceeded = (payload: any): HashConnectAction => {
 };
 
 const fetchSpotPricesFailed = (payload: string): HashConnectAction => {
+  return {
+    type: ActionType.FETCH_SPOT_PRICES_FAILED,
+    payload,
+  };
+};
+
+const fetchPoolLiquidityStarted = (): HashConnectAction => {
+  return {
+    type: ActionType.FETCH_POOL_LIQUIDITY_STARTED,
+  };
+};
+
+const fetchPoolLiquiditySucceeded = (payload: any): HashConnectAction => {
+  return {
+    type: ActionType.FETCH_POOL_LIQUIDITY_SUCCEEDED,
+    payload,
+  };
+};
+
+const fetchPoolLiquidityFailed = (payload: string): HashConnectAction => {
   return {
     type: ActionType.FETCH_SPOT_PRICES_FAILED,
     payload,
@@ -368,6 +388,25 @@ const fetchSpotPrices = () => {
   };
 };
 
+// TODO: need to pass in contract address of pool (to pass to pairCurrentPosition)
+const getPoolLiquidity = (tokenToTrade: string, tokenToReceive: string) => {
+  return async (dispatch: any) => {
+    console.log(`Getting pool liquidity for ${tokenToTrade} and ${tokenToReceive}`);
+    dispatch(fetchPoolLiquidityStarted());
+    try {
+      const poolLiquidity = new Map<string, number | undefined>();
+      const rawPoolLiquidity = await pairCurrentPosition();
+      Object.keys(rawPoolLiquidity).forEach((tokenSymbol) => {
+        poolLiquidity.set(tokenSymbol, rawPoolLiquidity[tokenSymbol as keyof typeof rawPoolLiquidity]);
+      });
+      dispatch(fetchPoolLiquiditySucceeded(poolLiquidity));
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      dispatch(fetchPoolLiquidityFailed(errorMessage));
+    }
+  };
+};
+
 export {
   sendSwapTransactionToWallet,
   sendAddLiquidityTransactionToWallet,
@@ -376,4 +415,5 @@ export {
   pairWithSelectedWalletExtension,
   fetchAccountBalance,
   fetchSpotPrices,
+  getPoolLiquidity,
 };

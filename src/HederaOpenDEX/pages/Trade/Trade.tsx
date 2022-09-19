@@ -13,6 +13,8 @@ const Trade = () => {
     spotPrices,
     sendSwapTransaction,
     fetchSpotPrices,
+    getPoolLiquidity,
+    poolLiquidity,
   } = useHashConnectContext();
   return (
     <HStack>
@@ -26,6 +28,8 @@ const Trade = () => {
             clearWalletPairings={clearWalletPairings}
             fetchSpotPrices={fetchSpotPrices}
             spotPrices={spotPrices}
+            getPoolLiquidity={getPoolLiquidity}
+            poolLiquidity={poolLiquidity}
             walletData={walletData}
             network={network}
             installedExtensions={installedExtensions}

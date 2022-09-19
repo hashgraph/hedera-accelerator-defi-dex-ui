@@ -15,11 +15,13 @@ import {
   setTokenToReceiveBalance,
   swapTokenToTradeAndReceive,
   setSpotPrice,
+  setTokenToTradePoolLiquidity,
+  setTokenToReceivePoolLiquidity,
 } from "./actions/swapActions";
 import { Button, IconButton, SwapConfirmation } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
-import { halfOf, getTokenExchangeAmount } from "./utils";
+import { halfOf } from "./utils";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks/useHashConnect";
 export interface SwapProps {
   title: string;
@@ -27,8 +29,10 @@ export interface SwapProps {
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   fetchSpotPrices: () => void;
+  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
   connectionStatus: WalletConnectionStatus;
   spotPrices: Map<string, number | undefined> | undefined;
+  poolLiquidity: Map<string, number | undefined> | undefined;
   walletData: any | null;
   network: Networks;
   metaData?: HashConnectTypes.AppMetadata;
@@ -36,9 +40,72 @@ export interface SwapProps {
 }
 
 const Swap = (props: SwapProps) => {
-  const { title, spotPrices, walletData, connectionStatus, connectToWallet, sendSwapTransaction } = props;
+  const {
+    title,
+    spotPrices,
+    walletData,
+    connectionStatus,
+    connectToWallet,
+    sendSwapTransaction,
+    poolLiquidity,
+    getPoolLiquidity,
+  } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice } = swapState;
+
+  // TODO: probably want to use usePrevious instead so we dont need this. right now, without this on symbol change it
+  //         updates spot price which then causes logic to run to calculate tokenToReceive amount but it uses the old
+  //        liquidity value of whichever token was just selected previously
+  useEffect(() => {
+    if (swapState.tokenToTrade.amount && swapState.tokenToTrade.symbol !== swapState.tokenToReceive.symbol) {
+      const tokenToReceiveAmount = getReceivedAmount(tokenToTrade.amount);
+      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swapState.tokenToTrade.poolLiquidity, swapState.tokenToReceive.poolLiquidity]);
+
+  /**
+   * Whenever poolLiquidity is updated (ie new pair selected) update
+   * poolLiquidity for each token in swapState accordingly
+   */
+  useEffect(() => {
+    if (poolLiquidity !== undefined && poolLiquidity instanceof Map) {
+      const tokenToTradeSymbol = swapState.tokenToTrade.symbol || "";
+      const tokenToReceiveSymbol = swapState.tokenToReceive.symbol || "";
+      dispatch(setTokenToTradePoolLiquidity(poolLiquidity.get(tokenToTradeSymbol)));
+      dispatch(setTokenToReceivePoolLiquidity(poolLiquidity.get(tokenToReceiveSymbol)));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poolLiquidity, dispatch]);
+
+  /**
+   * Gets price impact based on liquidity values in pool
+   * before and after proposed swap
+   */
+  const priceImpact = useCallback(() => {
+    if (
+      swapState.tokenToTrade.poolLiquidity &&
+      swapState.tokenToReceive.poolLiquidity &&
+      swapState.tokenToTrade.amount &&
+      swapState.tokenToReceive.amount &&
+      swapState.tokenToTrade.symbol !== swapState.tokenToReceive.symbol
+    ) {
+      const amountReceived = getReceivedAmount(swapState.tokenToTrade.amount) || 1;
+      const newSpotPrice = amountReceived / swapState.tokenToTrade.amount;
+      const _priceImpact = ((swapState.spotPrice || 1) / newSpotPrice - 1) * 100;
+      return `${_priceImpact.toFixed(2)}%`;
+    } else {
+      return "--";
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    swapState.tokenToTrade.poolLiquidity,
+    swapState.tokenToReceive.poolLiquidity,
+    swapState.tokenToTrade.amount,
+    swapState.tokenToReceive.amount,
+    swapState.tokenToTrade.symbol,
+    swapState.tokenToReceive.symbol,
+  ]);
 
   const getTokenBalance = useCallback(
     (tokenSymbol: string): number => {
@@ -66,12 +133,39 @@ const Swap = (props: SwapProps) => {
     [dispatch, spotPrices, tokenToTrade.symbol, tokenToReceive.symbol]
   );
 
+  /**
+   * Calculates the token to receive amount based on the tokenToTradeAmount input.
+   * Follows the x*y=K formula where x and y are the amounts of each token's liquidity.
+   * K remains constant after a transaction, so it is safe to assume (post trade)
+   * newX*newY = K. Therefore, taking the tokenToTradeAmount and adding it to the current
+   * liquidity of the tokenToTrade in the pool, we get "newX". Taking k/newX, we can compute
+   * newY. We then subtract the newY from the current liquidty of Y to get the tokenToReceive amount
+   */
+  const getReceivedAmount = useCallback(
+    (tokenToTradeAmount: number) => {
+      if (tokenToTrade.poolLiquidity && tokenToReceive.poolLiquidity) {
+        // TODO: pull k from contract?
+        const k = tokenToTrade.poolLiquidity * tokenToReceive.poolLiquidity;
+        const postSwapTokenToTradeLiquidity = tokenToTrade?.poolLiquidity + tokenToTradeAmount;
+        const postSwapTokenToReceiveLiquidity = k / postSwapTokenToTradeLiquidity;
+        const amountToReceive = tokenToReceive.poolLiquidity - postSwapTokenToReceiveLiquidity;
+        return +amountToReceive; // TODO: check this decimal value
+      } else {
+        return undefined;
+      }
+    },
+    [tokenToTrade.poolLiquidity, tokenToReceive.poolLiquidity]
+  );
+
   /** Update token to receive amount any time the token symbols, token to trade amount, or spot price is updated. */
   useEffect(() => {
     if (spotPrice !== undefined) {
-      const tokenToReceiveAmount = getTokenExchangeAmount(tokenToTrade.amount, spotPrice);
-      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount));
+      // TODO: check on if we should keep getTokenExcchangeAmount
+      // const tokenToReceiveAmount = getTokenExchangeAmount(tokenToTrade.amount, spotPrice);
+      const tokenToReceiveAmount = getReceivedAmount(tokenToTrade.amount);
+      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, spotPrice, tokenToTrade.amount]);
 
   /** Update balances any time the token symbols or the cached paired account balances change. */
@@ -79,11 +173,25 @@ const Swap = (props: SwapProps) => {
     if (tokenToTrade.symbol !== undefined) {
       const tokenToTradeBalance = getTokenBalance(tokenToTrade.symbol);
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
+      if (poolLiquidity !== undefined && poolLiquidity instanceof Map) {
+        dispatch(setTokenToTradePoolLiquidity(poolLiquidity?.get(tokenToTrade.symbol)));
+      }
     }
     if (tokenToReceive.symbol !== undefined) {
       const tokenToReceiveBalance = getTokenBalance(tokenToReceive.symbol);
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
+      if (poolLiquidity !== undefined && poolLiquidity instanceof Map) {
+        dispatch(setTokenToReceivePoolLiquidity(poolLiquidity?.get(tokenToReceive.symbol)));
+      }
     }
+
+    // get pool liquidity for selected symbols
+    // TODO: revisit this approach
+    if (tokenToTrade.symbol && tokenToReceive.symbol) {
+      // TODO: should we use usePrevious here to only make this call when the selected token has changed?
+      getPoolLiquidity(tokenToTrade.symbol, tokenToReceive.symbol);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, getTokenBalance, tokenToTrade.symbol, tokenToReceive.symbol, walletData?.pairedAccountBalance]);
 
   const handleTokenToTradeAmountChange = useCallback(
@@ -231,7 +339,7 @@ const Swap = (props: SwapProps) => {
           <Box flex="2">
             <Text fontSize="xs">Price Impact</Text>
             <Text fontSize="xs" fontWeight="bold">
-              --
+              {priceImpact()}
             </Text>
           </Box>
           <Box flex="4">
