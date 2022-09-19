@@ -15,6 +15,7 @@ import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 import { WalletConnectionStatus } from "./types";
+import { get100LABTokens } from "../useHederaService/swapContract";
 
 const hashconnect = new HashConnect(true);
 export interface UseHashConnectProps {
@@ -86,6 +87,8 @@ const useHashConnect = ({
     sendAddLiquidityTransaction: (payload: any) =>
       dispatch(sendAddLiquidityTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
     clearWalletPairings,
+    sendLabTokensToWallet: (receivingAccountId: string) =>
+      get100LABTokens(receivingAccountId, hashconnect, hashConnectState, network),
   };
 };
 export { useHashConnect };

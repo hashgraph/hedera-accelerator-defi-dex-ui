@@ -28,6 +28,7 @@ export interface HashConnectContextProps {
   poolLiquidity: Map<string, number | undefined> | undefined;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
+  sendLabTokensToWallet: (payload: any) => void;
 }
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
@@ -43,6 +44,7 @@ const HashConnectContext = React.createContext<HashConnectContextProps>({
   spotPrices: undefined,
   poolLiquidity: undefined,
   installedExtensions: null,
+  sendLabTokensToWallet: () => Promise.resolve(),
 });
 
 export interface HashConnectProviderProps {
@@ -71,6 +73,7 @@ const HashConnectProvider = ({
     fetchSpotPrices,
     sendAddLiquidityTransaction,
     getPoolLiquidity,
+    sendLabTokensToWallet,
   } = useHashConnect({
     hashConnectState,
     dispatch,
@@ -94,6 +97,7 @@ const HashConnectProvider = ({
         walletData: hashConnectState.walletData,
         network,
         installedExtensions: hashConnectState.installedExtensions,
+        sendLabTokensToWallet,
       }}
     >
       {children}
