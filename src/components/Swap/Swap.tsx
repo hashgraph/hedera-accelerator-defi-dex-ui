@@ -21,7 +21,7 @@ import {
 import { Button, IconButton, SwapConfirmation } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
-import { halfOf, getTokenExchangeAmount } from "./utils";
+import { halfOf } from "./utils";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks/useHashConnect";
 export interface SwapProps {
   title: string;
