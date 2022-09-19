@@ -28,6 +28,9 @@ export enum ActionType {
   WALLET_PAIRING_APPROVED = "WALLET_PAIRING_APPROVED",
   RECEIVED_CONNECTION_STATUS_CHANGED = "RECEIVED_CONNECTION_STATUS_CHANGED",
   LOCAL_CONNECTION_STATUS_CHANGED = "LOCAL_CONNECTION_STATUS_CHANGED",
+  FETCH_POOL_LIQUIDITY_STARTED = "FETCH_POOL_LIQUIDITY_STARTED",
+  FETCH_POOL_LIQUIDITY_SUCCEEDED = "FETCH_POOL_LIQUIDITY_SUCCEEDED",
+  FETCH_POOL_LIQUIDITY_FAILED = "FETCH_POOL_LIQUIDITY_FAILED",
 }
 
 type AsyncAction = (dispatch: (action: any) => any) => void;
@@ -165,6 +168,22 @@ interface ReceivedConnectionStatusChanged {
   payload: ConnectionStatus;
 }
 
+/** FETCH_POOL_LIQUIDITY Action Types */
+
+interface FetchPoolLiquidityStarted {
+  type: ActionType.FETCH_POOL_LIQUIDITY_STARTED;
+}
+
+interface FetchPoolLiquiditySucceeded {
+  type: ActionType.FETCH_POOL_LIQUIDITY_SUCCEEDED;
+  payload: any; // PoolLiquidityJson;
+}
+
+interface FetchPoolLiquidityFailed {
+  type: ActionType.FETCH_POOL_LIQUIDITY_FAILED;
+  payload: string;
+}
+
 export type HashConnectAction =
   | AsyncAction
   | InitializeWalletConnectionStarted
@@ -182,6 +201,9 @@ export type HashConnectAction =
   | FetchSpotPricesStarted
   | FetchSpotPricesSucceeded
   | FetchSpotPricesFailed
+  | FetchPoolLiquidityStarted
+  | FetchPoolLiquiditySucceeded
+  | FetchPoolLiquidityFailed
   | SendSwapTransactionToWalletStarted
   | SendSwapTransactionToWalletSucceeded
   | SendSwapTransactionToWalletFailed

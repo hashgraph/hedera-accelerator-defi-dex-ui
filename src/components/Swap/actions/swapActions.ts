@@ -14,6 +14,10 @@ const setTokenToTradeBalance = (balance: number | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_TRADE, field: "balance", payload: balance };
 };
 
+const setTokenToTradePoolLiquidity = (amount: number | undefined): SwapAction => {
+  return { type: ActionType.SET_TOKEN_TO_TRADE, field: "poolLiquidity", payload: amount };
+};
+
 /** SET TOKEN TO RECEIVE ACTION CREATORS */
 
 const setTokenToReceiveAmount = (amount: number): SwapAction => {
@@ -26,6 +30,10 @@ const setTokenToReceiveSymbol = (symbol: string | undefined): SwapAction => {
 
 const setTokenToReceiveBalance = (balance: number | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "balance", payload: balance };
+};
+
+const setTokenToReceivePoolLiquidity = (amount: number | undefined): SwapAction => {
+  return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "poolLiquidity", payload: amount };
 };
 
 /** SET TOKEN TO RECEIVE ACTION CREATORS */
@@ -44,9 +52,11 @@ export {
   setTokenToTradeAmount,
   setTokenToTradeSymbol,
   setTokenToTradeBalance,
+  setTokenToTradePoolLiquidity,
   setTokenToReceiveAmount,
   setTokenToReceiveSymbol,
   setTokenToReceiveBalance,
+  setTokenToReceivePoolLiquidity,
   swapTokenToTradeAndReceive,
   setSpotPrice,
 };

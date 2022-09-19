@@ -8,7 +8,9 @@ export const mockSwapProps: SwapProps = {
   connectToWallet: () => null,
   clearWalletPairings: () => null,
   fetchSpotPrices: () => null,
+  getPoolLiquidity: () => null,
   spotPrices: undefined,
+  poolLiquidity: undefined,
   walletData: null,
   network: "testnet",
   metaData: {

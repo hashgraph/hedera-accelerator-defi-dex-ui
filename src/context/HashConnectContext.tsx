@@ -20,10 +20,12 @@ export interface HashConnectContextProps {
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   fetchSpotPrices: () => void;
+  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
   connectionStatus: WalletConnectionStatus;
   walletData: any | null;
   network: Networks;
   spotPrices: Map<string, number | undefined> | undefined;
+  poolLiquidity: Map<string, number | undefined> | undefined;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
   sendLabTokensToWallet: (payload: any) => void;
@@ -35,10 +37,12 @@ const HashConnectContext = React.createContext<HashConnectContextProps>({
   connectToWallet: () => null,
   clearWalletPairings: () => null,
   fetchSpotPrices: () => null,
+  getPoolLiquidity: () => null,
   connectionStatus: WalletConnectionStatus.INITIALIZING,
   walletData: null,
   network: "testnet",
   spotPrices: undefined,
+  poolLiquidity: undefined,
   installedExtensions: null,
   sendLabTokensToWallet: () => Promise.resolve(),
 });
@@ -68,6 +72,7 @@ const HashConnectProvider = ({
     sendSwapTransaction,
     fetchSpotPrices,
     sendAddLiquidityTransaction,
+    getPoolLiquidity,
     sendLabTokensToWallet,
   } = useHashConnect({
     hashConnectState,
@@ -86,6 +91,8 @@ const HashConnectProvider = ({
         clearWalletPairings,
         fetchSpotPrices,
         spotPrices: hashConnectState.spotPrices,
+        getPoolLiquidity,
+        poolLiquidity: hashConnectState.poolLiquidity,
         connectionStatus: hashConnectState.walletConnectionStatus,
         walletData: hashConnectState.walletData,
         network,
