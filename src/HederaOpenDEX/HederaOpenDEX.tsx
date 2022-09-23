@@ -1,11 +1,77 @@
 import React from "react";
 import { ChakraProvider, Container } from "@chakra-ui/react";
-import { Trade, Pool } from "./pages";
+import { Trade, Pool, Pools } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import { HederaOpenDexTheme } from "./styles";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 const menuOptions = ["Swap", "Pool"];
+
+// TODO: remove mocks
+const mockPoolsProps = {
+  allPoolsColHeaders: [
+    { headerName: "Pool", colWidth: 158 },
+    { headerName: "Fee", colWidth: 61 },
+    { headerName: "TVL", colWidth: 136 },
+    { headerName: "Volume 24H", colWidth: 136 },
+    { headerName: "Volume 7D", colWidth: 136 },
+    { headerName: "Actions", colWidth: 203 },
+  ],
+  allPools: [
+    {
+      Pool: "HBAR/USDT",
+      Fee: "0.05%",
+      TVL: "$123,456",
+      "Volume 24H": "$23,456",
+      "Volume 7D": "$78,901",
+    },
+    {
+      Pool: "HBAR/USDT",
+      Fee: "0.05%",
+      TVL: "$123,456",
+      "Volume 24H": "$23,456",
+      "Volume 7D": "$78,901",
+    },
+    {
+      Pool: "HBAR/USDT",
+      Fee: "0.05%",
+      TVL: "$123,456",
+      "Volume 24H": "$23,456",
+      "Volume 7D": "$78,901",
+    },
+  ],
+  userPoolsColHeaders: [
+    { headerName: "Pool", colWidth: 158 },
+    { headerName: "Fee", colWidth: 61 },
+    { headerName: "Liquidity", colWidth: 136 },
+    { headerName: "% of the Pool", colWidth: 118 },
+    { headerName: "Unclaimed Fees", colWidth: 131 },
+    { headerName: "Actions", colWidth: 226 },
+  ],
+  userPools: [
+    {
+      Pool: "HBAR/USDT",
+      Fee: "0.05%",
+      Liquidity: "$123,456",
+      "% of the Pool": "<1%",
+      "Unclaimed Fees": "$4.56",
+    },
+    {
+      Pool: "HBAR/USDT",
+      Fee: "0.05%",
+      Liquidity: "$123,456",
+      "% of the Pool": "<1%",
+      "Unclaimed Fees": "$91.23",
+    },
+    {
+      Pool: "HBAR/USDT",
+      Fee: "0.05%",
+      Liquidity: "$123,456",
+      "% of the Pool": "100%",
+      "Unclaimed Fees": "$0.89",
+    },
+  ],
+};
 
 const HederaOpenDEX = () => {
   return (
@@ -16,7 +82,8 @@ const HederaOpenDEX = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/swap" />} />
             <Route path="/swap" element={<Trade />} />
-            <Route path="/pool" element={<Pool />} />
+            <Route path="/pool" element={<Pools {...mockPoolsProps} />} />
+            <Route path="/pool/add-liquidity" element={<Pool />} />
           </Routes>
         </Router>
       </Container>
