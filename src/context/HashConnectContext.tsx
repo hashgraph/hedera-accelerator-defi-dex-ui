@@ -1,6 +1,8 @@
 import React, { Reducer, useContext } from "react";
-import useEnhancedReducer from "@rest-hooks/use-enhanced-reducer";
 import { HashConnectTypes } from "hashconnect";
+import useEnhancedReducer, { Middleware } from "@rest-hooks/use-enhanced-reducer";
+import combineReducers from "react-combine-reducers";
+
 import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
 import {
@@ -11,10 +13,25 @@ import {
   HashConnectState,
   thunkMiddleware,
 } from "../hooks/useHashConnect";
+import {
+  useMirrorNode,
+  mirrorNodeReducer,
+  initialMirrorNodeState,
+  MirrorNodeState,
+  MirrorNodeAction,
+} from "../hooks/useMirrorNode";
 import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes";
 import { loggerMiddleware } from "../middleware";
+import produce from "immer";
+
+export interface Store {
+  hashConnect: HashConnectState;
+  mirrorNode: MirrorNodeState;
+}
 
 export interface HashConnectContextProps {
+  hashConnect: HashConnectState;
+  mirrorNode: MirrorNodeState;
   sendSwapTransaction: (payload: any) => void;
   sendAddLiquidityTransaction: (payload: any) => void;
   connectToWallet: () => void;
@@ -53,7 +70,19 @@ export interface HashConnectProviderProps {
   network?: Networks;
   debug?: boolean;
 }
-const init = initHashConnectReducer(initialHashConnectState);
+
+export type Actions = HashConnectAction & MirrorNodeAction;
+
+export type RootReducer = (state: Store, action: Actions) => Store;
+
+/*
+ * Wraps reducers with Immer produce for immutable updates.
+ * The HashConnect reducer has not yet been updated to immutabley change draft state with the immer pattern.
+ */
+const [rootReducer, initialStore] = combineReducers<RootReducer>({
+  hashConnect: [hashConnectReducer, initHashConnectReducer(initialHashConnectState)],
+  mirrorNode: [produce(mirrorNodeReducer), initialMirrorNodeState],
+});
 
 const HashConnectProvider = ({
   children,
@@ -61,20 +90,12 @@ const HashConnectProvider = ({
   network = "testnet",
   debug = false,
 }: HashConnectProviderProps): JSX.Element => {
-  const [hashConnectState, dispatch] = useEnhancedReducer<Reducer<HashConnectState, HashConnectAction>>(
-    hashConnectReducer,
-    init,
-    [loggerMiddleware, thunkMiddleware]
-  );
-  const {
-    connectToWallet,
-    clearWalletPairings,
-    sendSwapTransaction,
-    fetchSpotPrices,
-    sendAddLiquidityTransaction,
-    getPoolLiquidity,
-    sendLabTokensToWallet,
-  } = useHashConnect({
+  const [store, dispatch] = useEnhancedReducer<RootReducer>(rootReducer, initialStore, [
+    loggerMiddleware,
+    thunkMiddleware,
+  ]);
+
+  const hashConnectFunctions = useHashConnect({
     hashConnectState,
     dispatch,
     network,
@@ -82,15 +103,16 @@ const HashConnectProvider = ({
     debug,
   });
 
+  const mirrorNodeFunctions = useMirrorNode({ dispatch, network });
+
   return (
     <HashConnectContext.Provider
       value={{
-        sendSwapTransaction,
-        sendAddLiquidityTransaction,
-        connectToWallet,
-        clearWalletPairings,
-        fetchSpotPrices,
-        spotPrices: hashConnectState.spotPrices,
+        ...store,
+        ...hashConnectFunctions,
+        ...mirrorNodeFunctions,
+
+        spotPrices: store.hashConnectState.spotPrices,
         getPoolLiquidity,
         poolLiquidity: hashConnectState.poolLiquidity,
         connectionStatus: hashConnectState.walletConnectionStatus,

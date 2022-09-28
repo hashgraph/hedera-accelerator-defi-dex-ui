@@ -1,7 +1,7 @@
 import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
-import { getErrorMessage } from "../utils";
+import { getErrorMessage } from "../../utils";
 import { addLiquidity, pairCurrentPosition } from "../../useHederaService/swapContract";
 import { SWAP_CONTRACT_ID } from "../constants";
 import { getSpotPrice } from "../../useHederaService/swapContract";
