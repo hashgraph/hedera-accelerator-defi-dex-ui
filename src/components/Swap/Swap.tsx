@@ -1,6 +1,6 @@
-import { ChangeEvent, MouseEvent, useCallback, useEffect } from "react";
+import { ChangeEvent, MouseEvent, useCallback, useEffect, useState } from "react";
 import { useImmerReducer } from "use-immer";
-import { ChakraProvider, Box, Heading, Flex, Spacer, Text } from "@chakra-ui/react";
+import { ChakraProvider, Box, Heading, Flex, Spacer, Text, Collapse } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
 import { WalletConnectionStatus, Networks } from "../../hooks/useHashConnect";
@@ -18,7 +18,7 @@ import {
   setTokenToTradePoolLiquidity,
   setTokenToReceivePoolLiquidity,
 } from "./actions/swapActions";
-import { Button, IconButton, SwapConfirmation } from "../base";
+import { Button, IconButton, SwapConfirmation, SwapSettingsInput, SwapSettingsInputProps } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
@@ -52,6 +52,49 @@ const Swap = (props: SwapProps) => {
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice } = swapState;
+
+  // TODO: check if we want to use a local state for slippage and transactionDeadline
+  //       or if we want to add to SwapState
+  const [localSwapState, setLocalSwapState] = useState({
+    settingsOpen: false,
+    slippage: "2.0",
+    transactionDeadline: "3",
+  });
+
+  const onSlippageInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setLocalSwapState({ ...localSwapState, slippage: event.target.value });
+    },
+    [localSwapState]
+  );
+
+  const onTransactionDeadlineInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setLocalSwapState({ ...localSwapState, transactionDeadline: event.target.value });
+    },
+    [localSwapState]
+  );
+
+  const swapSettingsProps = useCallback((): { [key: string]: SwapSettingsInputProps } => {
+    return {
+      slippage: {
+        label: "Slippage",
+        popoverText: `Slippage refers to the difference between the expected 
+    price of a trade and the price at which the trade is executed.`,
+        inputUnit: "%",
+        onInputChange: onSlippageInputChange,
+        value: localSwapState.slippage,
+      },
+      transactionDeadline: {
+        label: "Transaction Deadline",
+        popoverText: `If your transaction is not completed within the deadline, it will revert and your coins
+    (less the fee) will be returned to you.`,
+        inputUnit: "min",
+        onInputChange: onTransactionDeadlineInputChange,
+        value: localSwapState.transactionDeadline,
+      },
+    };
+  }, [localSwapState, onSlippageInputChange, onTransactionDeadlineInputChange]);
 
   // TODO: probably want to use usePrevious instead so we dont need this. right now, without this on symbol change it
   //         updates spot price which then causes logic to run to calculate tokenToReceive amount but it uses the old
@@ -281,18 +324,37 @@ const Swap = (props: SwapProps) => {
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
       <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
-        <Flex>
+        <Flex alignItems={"center"} marginBottom={"8px"}>
           <Heading as="h4" size="lg">
             {title}
           </Heading>
           <Spacer />
-          <IconButton
+          <Button
+            leftIcon={<SettingsIcon w={5} h={5} color={"#000000"} />}
+            padding={"6px 12px"}
+            backgroundColor={"#F2F2F2"}
+            border={"1px solid #000000"}
+            height={"32px"}
             data-testid="settings-button"
             aria-label="Open and close settings modal."
-            icon={<SettingsIcon w={6} h={6} />}
-            variant="settings"
-          />
+            onClick={() => setLocalSwapState({ ...localSwapState, settingsOpen: !localSwapState.settingsOpen })}
+          >
+            <Text color={"#4D4D4D"}>{(+localSwapState.slippage).toFixed(1)}%</Text>
+          </Button>
         </Flex>
+        <Collapse in={localSwapState.settingsOpen} animateOpacity>
+          <Flex
+            width={"100%"}
+            padding={"8px"}
+            marginBottom={"8px"}
+            borderRadius={"8px"}
+            backgroundColor={"#F2F2F2"}
+            justifyContent={"space-between"}
+          >
+            <SwapSettingsInput {...swapSettingsProps().slippage} />
+            <SwapSettingsInput {...swapSettingsProps().transactionDeadline} />
+          </Flex>
+        </Collapse>
         <TokenInput
           data-testid="token-to-trade-component"
           title="Token To Trade"
