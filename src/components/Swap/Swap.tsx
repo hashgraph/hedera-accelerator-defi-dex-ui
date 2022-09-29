@@ -61,13 +61,19 @@ const Swap = (props: SwapProps) => {
     transactionDeadline: "3",
   });
 
-  const onSlippageInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setLocalSwapState({ ...localSwapState, settingsOpen: true, slippage: event.target.value });
-  }, []);
+  const onSlippageInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setLocalSwapState({ ...localSwapState, slippage: event.target.value });
+    },
+    [localSwapState]
+  );
 
-  const onTransactionDeadlineInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setLocalSwapState({ ...localSwapState, settingsOpen: true, transactionDeadline: event.target.value });
-  }, []);
+  const onTransactionDeadlineInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setLocalSwapState({ ...localSwapState, transactionDeadline: event.target.value });
+    },
+    [localSwapState]
+  );
 
   const swapSettingsProps = useCallback((): { [key: string]: SwapSettingsInputProps } => {
     return {
