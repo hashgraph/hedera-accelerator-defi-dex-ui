@@ -70,11 +70,6 @@ const Swap = (props: SwapProps) => {
 
   const [localSwapState, setLocalSwapState] = useState({
     settingsOpen: false,
-    showSuccessMessage: false,
-    tokenToTradeAmount: 0,
-    tokenToTradeSymbol: "",
-    tokenToReceiveAmount: 0,
-    tokenToReceiveSymbol: "",
   });
 
   const onSlippageInputChange = useCallback(
