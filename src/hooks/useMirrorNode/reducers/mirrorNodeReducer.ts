@@ -35,7 +35,7 @@ function mirrorNodeReducer(draft: MirrorNodeState, action: MirrorNodeAction) {
   switch (action.type) {
     case ActionType.FETCH_POOL_VOLUME_METRICS_STARTED: {
       draft.status = "fetching";
-      break;
+      return draft;
     }
     case ActionType.FETCH_POOL_VOLUME_METRICS_SUCCEEDED: {
       const { payload } = action;
@@ -43,16 +43,14 @@ function mirrorNodeReducer(draft: MirrorNodeState, action: MirrorNodeAction) {
       draft.status = "success";
       draft.allPoolsMetrics = { ...allPoolsMetrics };
       draft.userPoolsMetrics = { ...userPoolsMetrics };
-      break;
+      return draft;
     }
     case ActionType.FETCH_POOL_VOLUME_METRICS_FAILED: {
       const { payload } = action;
       draft.status = "error";
       draft.errorMessage = payload;
-      break;
+      return draft;
     }
-    default:
-      throw new Error();
   }
 }
 

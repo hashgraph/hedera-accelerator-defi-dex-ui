@@ -165,6 +165,10 @@ const sendAddLiquidityTransactionToWalletFailed = (errorMessage: string): HashCo
   };
 };
 
+const clearWalletPairings = (): HashConnectAction => {
+  return { type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" };
+};
+
 const initializeWalletConnection = (payload: any) => {
   return async (dispatch: any) => {
     dispatch(initializeWalletConnectionStarted());
@@ -416,4 +420,5 @@ export {
   fetchAccountBalance,
   fetchSpotPrices,
   getPoolLiquidity,
+  clearWalletPairings,
 };

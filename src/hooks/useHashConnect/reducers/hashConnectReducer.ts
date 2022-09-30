@@ -224,8 +224,6 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
     case ActionType.LOCAL_CONNECTION_STATUS_CHANGED: {
       return state;
     }
-    default:
-      throw new Error();
   }
 }
 

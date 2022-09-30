@@ -1,6 +1,5 @@
 import { useEffect, useCallback, Dispatch } from "react";
 import { HashConnect, HashConnectTypes } from "hashconnect";
-import { ActionType, HashConnectAction } from "./actions/actionsTypes";
 import {
   initializeWalletConnection,
   pairWithConnectedWallet,
@@ -10,21 +9,44 @@ import {
   sendAddLiquidityTransactionToWallet,
   fetchSpotPrices,
   getPoolLiquidity,
+  clearWalletPairings,
 } from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 import { WalletConnectionStatus } from "./types";
 import { get100LABTokens } from "../useHederaService/swapContract";
+import { DEXActions } from "../../context/HashConnectContext";
 
 const hashconnect = new HashConnect(true);
 export interface UseHashConnectProps {
   hashConnectState: HashConnectState;
-  dispatch: Dispatch<HashConnectAction>;
+  /* TODO: Dispatch Type should be updated to match HashConnect action types */
+  dispatch: Dispatch<DEXActions>;
   network: string;
   dexMetaData: HashConnectTypes.AppMetadata;
   debug: boolean;
 }
+
+export interface UseHashConnectDispatchers {
+  sendSwapTransaction: (payload: any) => void;
+  sendAddLiquidityTransaction: (payload: any) => void;
+  connectToWallet: () => void;
+  removeWalletPairings: () => void;
+  fetchSpotPrices: () => void;
+  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
+  sendLabTokensToWallet: (payload: any) => void;
+}
+
+export const initialHashConnectDispatchers = {
+  sendSwapTransaction: () => Promise.resolve(),
+  sendAddLiquidityTransaction: () => Promise.resolve(),
+  connectToWallet: () => null,
+  removeWalletPairings: () => null,
+  fetchSpotPrices: () => null,
+  getPoolLiquidity: () => null,
+  sendLabTokensToWallet: () => Promise.resolve(),
+};
 
 const useHashConnect = ({
   hashConnectState,
@@ -32,18 +54,18 @@ const useHashConnect = ({
   network = "testnet",
   dexMetaData,
   debug,
-}: UseHashConnectProps) => {
+}: UseHashConnectProps): UseHashConnectDispatchers => {
   const { walletConnectionStatus, installedExtensions } = hashConnectState;
-  useHashConnectEvents(hashconnect, hashConnectState, dispatch, debug);
+  useHashConnectEvents(hashconnect, dispatch, debug);
 
   const saveToLocalStorage = useCallback(() => {
     const hashconnectDataJSON = JSON.stringify(hashConnectState);
     localStorage.setItem(HASHCONNECT_LOCAL_DATA_KEY, hashconnectDataJSON);
   }, [hashConnectState]);
 
-  const clearWalletPairings = useCallback(() => {
+  const removeWalletPairings = useCallback(() => {
     localStorage.removeItem("hashconnectData");
-    dispatch({ type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" });
+    dispatch(clearWalletPairings());
   }, [dispatch]);
 
   useEffect(() => {
@@ -86,7 +108,7 @@ const useHashConnect = ({
       dispatch(getPoolLiquidity(tokenToTrade, tokenToReceive)),
     sendAddLiquidityTransaction: (payload: any) =>
       dispatch(sendAddLiquidityTransactionToWallet({ ...payload, hashconnect, hashConnectState, network })),
-    clearWalletPairings,
+    removeWalletPairings,
     sendLabTokensToWallet: (receivingAccountId: string) =>
       get100LABTokens(receivingAccountId, hashconnect, hashConnectState, network),
   };
