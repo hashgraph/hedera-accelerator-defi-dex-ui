@@ -11,6 +11,10 @@ export interface SwapState {
     balance: number | undefined;
     poolLiquidity: number | undefined;
   };
+  swapSettings: {
+    slippage: string;
+    transactionDeadline: string;
+  };
   spotPrice: number | undefined;
 }
 

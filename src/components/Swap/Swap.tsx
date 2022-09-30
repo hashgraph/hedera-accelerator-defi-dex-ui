@@ -17,6 +17,8 @@ import {
   setSpotPrice,
   setTokenToTradePoolLiquidity,
   setTokenToReceivePoolLiquidity,
+  setSlippageSetting,
+  setTransactionDeadlineSetting,
 } from "./actions/swapActions";
 import { Button, IconButton, SwapConfirmation, SwapSettingsInput, SwapSettingsInputProps } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
@@ -51,28 +53,24 @@ const Swap = (props: SwapProps) => {
     getPoolLiquidity,
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
-  const { tokenToTrade, tokenToReceive, spotPrice } = swapState;
+  const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
 
-  // TODO: check if we want to use a local state for slippage and transactionDeadline
-  //       or if we want to add to SwapState
   const [localSwapState, setLocalSwapState] = useState({
     settingsOpen: false,
-    slippage: "2.0",
-    transactionDeadline: "3",
   });
 
   const onSlippageInputChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setLocalSwapState({ ...localSwapState, slippage: event.target.value });
+      dispatch(setSlippageSetting(event.target.value));
     },
-    [localSwapState]
+    [dispatch]
   );
 
   const onTransactionDeadlineInputChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setLocalSwapState({ ...localSwapState, transactionDeadline: event.target.value });
+      dispatch(setTransactionDeadlineSetting(event.target.value));
     },
-    [localSwapState]
+    [dispatch]
   );
 
   const swapSettingsProps = useCallback((): { [key: string]: SwapSettingsInputProps } => {
@@ -83,7 +81,7 @@ const Swap = (props: SwapProps) => {
     price of a trade and the price at which the trade is executed.`,
         inputUnit: "%",
         onInputChange: onSlippageInputChange,
-        value: localSwapState.slippage,
+        value: swapSettings.slippage,
       },
       transactionDeadline: {
         label: "Transaction Deadline",
@@ -91,10 +89,10 @@ const Swap = (props: SwapProps) => {
     (less the fee) will be returned to you.`,
         inputUnit: "min",
         onInputChange: onTransactionDeadlineInputChange,
-        value: localSwapState.transactionDeadline,
+        value: swapSettings.transactionDeadline,
       },
     };
-  }, [localSwapState, onSlippageInputChange, onTransactionDeadlineInputChange]);
+  }, [swapSettings, onSlippageInputChange, onTransactionDeadlineInputChange]);
 
   // TODO: probably want to use usePrevious instead so we dont need this. right now, without this on symbol change it
   //         updates spot price which then causes logic to run to calculate tokenToReceive amount but it uses the old
@@ -339,7 +337,7 @@ const Swap = (props: SwapProps) => {
             aria-label="Open and close settings modal."
             onClick={() => setLocalSwapState({ ...localSwapState, settingsOpen: !localSwapState.settingsOpen })}
           >
-            <Text color={"#4D4D4D"}>{(+localSwapState.slippage).toFixed(1)}%</Text>
+            <Text color={"#4D4D4D"}>{(+swapSettings.slippage).toFixed(1)}%</Text>
           </Button>
         </Flex>
         <Collapse in={localSwapState.settingsOpen} animateOpacity>
