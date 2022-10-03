@@ -1,8 +1,6 @@
-import React, { useContext } from "react";
+import React, { Reducer, useContext } from "react";
 import { HashConnectTypes } from "hashconnect";
 import useEnhancedReducer from "@rest-hooks/use-enhanced-reducer";
-import combineReducers from "react-combine-reducers";
-
 import { Networks } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
 import {
@@ -15,18 +13,9 @@ import {
   UseHashConnectDispatchers,
   initialHashConnectDispatchers,
 } from "../hooks/useHashConnect";
-import {
-  useMirrorNode,
-  mirrorNodeReducer,
-  initialMirrorNodeState,
-  MirrorNodeState,
-  MirrorNodeAction,
-  UseMirrorNodeDispatchers,
-  initialMirrorNodeDispatchers,
-} from "../hooks/useMirrorNode";
 import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes";
 import { loggerMiddleware } from "../middleware";
-import produce from "immer";
+import { MirrorNodeState, initialMirrorNodeState, useMirrorNode } from "../hooks/useMirrorNode";
 
 export interface DEXStore {
   hashConnectState: HashConnectState;
@@ -34,8 +23,7 @@ export interface DEXStore {
 }
 
 export type HashConnectContextProps = DEXStore &
-  UseHashConnectDispatchers &
-  UseMirrorNodeDispatchers & {
+  UseHashConnectDispatchers & {
     network: Networks;
   };
 
@@ -46,22 +34,9 @@ export interface HashConnectProviderProps {
   debug?: boolean;
 }
 
-export type DEXActions = HashConnectAction | MirrorNodeAction;
-
-export type RootReducer = (state: DEXStore, action: DEXActions) => DEXStore;
-
-/*
- * Wraps reducers with Immer produce for immutable updates.
- * The HashConnect reducer has not yet been updated to immutabley change draft state with the immer pattern.
- */
-const [rootReducer, initialStore] = combineReducers<RootReducer>({
-  hashConnectState: [hashConnectReducer, initHashConnectReducer(initialHashConnectState)],
-  mirrorNodeState: [produce(mirrorNodeReducer), initialMirrorNodeState],
-});
-
 const HashConnectContext = React.createContext<HashConnectContextProps>({
-  ...initialStore,
-  ...initialMirrorNodeDispatchers,
+  hashConnectState: { ...initHashConnectReducer(initialHashConnectState) },
+  mirrorNodeState: { ...initialMirrorNodeState },
   ...initialHashConnectDispatchers,
   network: "testnet",
 });
@@ -72,23 +47,25 @@ const HashConnectProvider = ({
   network = "testnet",
   debug = false,
 }: HashConnectProviderProps): JSX.Element => {
-  const [store, dispatch] = useEnhancedReducer<RootReducer>(rootReducer, initialStore, [
-    loggerMiddleware,
-    thunkMiddleware,
-  ]);
+  const [hashConnectState, dispatch] = useEnhancedReducer<Reducer<HashConnectState, HashConnectAction>>(
+    hashConnectReducer,
+    initHashConnectReducer(initialHashConnectState),
+    [loggerMiddleware, thunkMiddleware]
+  );
+  const mirrorNodeState = useMirrorNode();
 
   return (
     <HashConnectContext.Provider
       value={{
-        ...store,
+        hashConnectState,
         ...useHashConnect({
-          hashConnectState: store.hashConnectState,
+          hashConnectState,
           dispatch,
           network,
           dexMetaData,
           debug,
         }),
-        ...useMirrorNode({ dispatch, network }),
+        mirrorNodeState,
         network,
       }}
     >

@@ -2,6 +2,7 @@ import { Button, Container, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Link,
 import { Link as RouterLink } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
+import { useHashConnectContext } from "../../../context";
 
 export interface BasePoolDetails {
   Pool: string; // TODO: type this (will need token symbol filename and potentially other details)
@@ -28,7 +29,15 @@ export interface PoolsProps {
 }
 
 const Pools = (props: PoolsProps): JSX.Element => {
+  const { mirrorNodeState } = useHashConnectContext();
+  const { fetchPoolVolumeMetrics } = mirrorNodeState;
+  console.log(mirrorNodeState);
+
   const [state, setState] = useState(props);
+
+  useEffect(() => {
+    fetchPoolVolumeMetrics();
+  }, [fetchPoolVolumeMetrics]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values

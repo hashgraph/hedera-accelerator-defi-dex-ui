@@ -16,13 +16,13 @@ import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
 import { WalletConnectionStatus } from "./types";
 import { get100LABTokens } from "../useHederaService/swapContract";
-import { DEXActions } from "../../context/HashConnectContext";
+import { HashConnectAction } from "./actions/actionsTypes";
 
 const hashconnect = new HashConnect(true);
 export interface UseHashConnectProps {
   hashConnectState: HashConnectState;
   /* TODO: Dispatch Type should be updated to match HashConnect action types */
-  dispatch: Dispatch<DEXActions>;
+  dispatch: Dispatch<HashConnectAction>;
   network: string;
   dexMetaData: HashConnectTypes.AppMetadata;
   debug: boolean;
