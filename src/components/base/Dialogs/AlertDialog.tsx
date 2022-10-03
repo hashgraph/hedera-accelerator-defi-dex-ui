@@ -50,7 +50,7 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
 
   const swapData = useCallback((): { [key: string]: any } => {
     const { tokenToTrade, tokenToReceive, swapSettings, spotPrice } = swapState;
-    const minReceivedKey = `Minimum received after slippage (${+swapSettings.slippage / 100}%)`;
+    const minReceivedKey = `Minimum received after slippage (${+swapSettings.slippage}%)`;
     return {
       pairDetails: {
         Trade: `${tokenToTrade.amount} ${tokenToTrade.symbol}`,
