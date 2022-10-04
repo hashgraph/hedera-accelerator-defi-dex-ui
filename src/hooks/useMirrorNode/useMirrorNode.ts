@@ -16,10 +16,17 @@ const initialMirrorNodeState: MirrorNodeState = {
   fetchAllPoolMetrics: () => Promise.resolve(),
 };
 
+// TODO: This should be replaced with a mirror call to fetch all pairs associated with the primary swap/pool contract.
 const getTokenPairs = (): TokenPair[] => [
   { tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID }, tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID } },
 ];
 
+/**
+ * A hook that provides access to functions that fetch transaction and account
+ * information from a Hedera managed mirror node.
+ * @returns - The state of the mirror node data as well as functions that can be used to fetch
+ * the latest mirror node network data.
+ */
 const useMirrorNode = create<MirrorNodeState>()(
   devtools(
     immer((set) => ({
