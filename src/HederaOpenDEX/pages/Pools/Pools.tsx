@@ -3,6 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
 import { useHashConnectContext } from "../../../context";
+import { PoolState, UserPoolState } from "../../../hooks/useMirrorNode/types";
 
 export interface BasePoolDetails {
   Pool: string; // TODO: type this (will need token symbol filename and potentially other details)
@@ -30,14 +31,13 @@ export interface PoolsProps {
 
 const Pools = (props: PoolsProps): JSX.Element => {
   const { mirrorNodeState } = useHashConnectContext();
-  const { fetchPoolVolumeMetrics } = mirrorNodeState;
-  console.log(mirrorNodeState);
+  const { fetchAllPoolMetrics } = mirrorNodeState;
 
   const [state, setState] = useState(props);
 
   useEffect(() => {
-    fetchPoolVolumeMetrics();
-  }, [fetchPoolVolumeMetrics]);
+    fetchAllPoolMetrics();
+  }, [fetchAllPoolMetrics]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -69,11 +69,17 @@ const Pools = (props: PoolsProps): JSX.Element => {
     return totalUnclaimedFees || 0;
   }, [state]);
 
-  const getAllPoolsRowData = useCallback(() => formatPoolsRowData(state.allPools), [state]);
+  const getAllPoolsRowData = useCallback(
+    () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics),
+    [mirrorNodeState.allPoolsMetrics]
+  );
 
   const getUserPoolsRowData = useCallback(() => formatPoolsRowData(state.userPools, true), [state]);
 
-  const formatPoolsRowData = (rowData: PoolDetails[] | UserPoolDetails[] | undefined, userPool = false) => {
+  const formatPoolsRowData = (
+    rowData: PoolState[] | UserPoolState[] | PoolDetails[] | UserPoolDetails[] | undefined,
+    userPool = false
+  ) => {
     return rowData
       ? [
           ...rowData.map((row) => ({

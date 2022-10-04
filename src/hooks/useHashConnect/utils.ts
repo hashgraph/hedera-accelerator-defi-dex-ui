@@ -1,5 +1,5 @@
 import { HashConnectState } from "./reducers/hashConnectReducer";
-import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
+import { HASHCONNECT_LOCAL_DATA_KEY } from "../constants";
 
 const getLocalHashconnectData = (): HashConnectState | null => {
   const localHashconnectData = localStorage.getItem(HASHCONNECT_LOCAL_DATA_KEY);

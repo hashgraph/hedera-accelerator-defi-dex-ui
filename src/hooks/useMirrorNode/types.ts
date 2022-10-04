@@ -5,6 +5,7 @@ enum ActionType {
 }
 
 interface PoolState {
+  name: string;
   fee: number;
   totalVolumeLocked: number;
   past24HoursVolume: number;
@@ -12,6 +13,7 @@ interface PoolState {
 }
 
 interface UserPoolState {
+  name: string;
   fee: number;
   liquidity: number;
   percentOfPool: number;
@@ -19,13 +21,24 @@ interface UserPoolState {
 }
 
 interface MirrorNodeState {
-  allPoolsMetrics: Map<string, PoolState>;
-  userPoolsMetrics: Map<string, UserPoolState>;
+  allPoolsMetrics: PoolState[];
+  userPoolsMetrics: UserPoolState[];
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
   poolVolumeMetrics: number | null;
-  fetchPoolVolumeMetrics: () => Promise<void>;
+  fetchAllPoolMetrics: () => Promise<void>;
+}
+
+interface TokenPair {
+  tokenA: {
+    symbol: string;
+    accountId: string;
+  };
+  tokenB: {
+    symbol: string;
+    accountId: string;
+  };
 }
 
 export { ActionType };
-export type { PoolState, UserPoolState, MirrorNodeState };
+export type { PoolState, UserPoolState, MirrorNodeState, TokenPair };

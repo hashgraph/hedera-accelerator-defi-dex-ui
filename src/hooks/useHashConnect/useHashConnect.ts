@@ -13,7 +13,7 @@ import {
 } from "./actions/hashConnectActions";
 import { HashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
-import { HASHCONNECT_LOCAL_DATA_KEY } from "./constants";
+import { HASHCONNECT_LOCAL_DATA_KEY } from "../constants";
 import { WalletConnectionStatus } from "./types";
 import { get100LABTokens } from "../useHederaService/swapContract";
 import { HashConnectAction } from "./actions/actionsTypes";

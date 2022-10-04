@@ -3,9 +3,8 @@ import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
 import { getErrorMessage } from "../../utils";
 import { addLiquidity, pairCurrentPosition } from "../../useHederaService/swapContract";
-import { SWAP_CONTRACT_ID } from "../constants";
 import { getSpotPrice } from "../../useHederaService/swapContract";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../";
+import { SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../constants";
 
 const initializeWalletConnectionStarted = (payload?: any): HashConnectAction => {
   return {
