@@ -1,7 +1,35 @@
 import axios from "axios";
+import { isNil } from "ramda";
+import { L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
+import { TokenPair } from "./types";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
+const GREATER_THAN = "gte";
+
+/** */
+const fetchAccountTransactions = async (accountId: string, timestamp?: string) => {
+  const params = {
+    "account.id": accountId,
+    order: "asc",
+    transactiontype: "CRYPTOTRANSFER",
+    result: "success",
+    type: "credit",
+  };
+  if (!isNil(timestamp)) {
+    Object.assign(params, { timestamp: `${GREATER_THAN}:${timestamp}` });
+  }
+  return await axios.get(`${TESTNET_URL}/api/v1/transactions`, {
+    params,
+  });
+};
+
+// TODO: This should be replaced with a mirror call to fetch all pairs associated with the primary swap/pool contract.
+const fetchTokenPairs = async (): Promise<TokenPair[]> => {
+  return await Promise.resolve([
+    { tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID }, tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID } },
+  ]);
+};
 
 /**
  * Fetches the HBAR balance and a list of token balances on the Hedera
@@ -14,8 +42,6 @@ const fetchAccountBalances = async (accountId: string) => {
     params: {
       "account.id": accountId,
       order: "asc",
-      // limit
-      // timestamp
     },
   });
 };
@@ -30,10 +56,8 @@ const fetchTokenBalances = async (tokenId: string) => {
   return await axios.get(`${TESTNET_URL}/api/v1/tokens/${tokenId}/balances`, {
     params: {
       order: "asc",
-      // limit
-      // timestamp
     },
   });
 };
 
-export { fetchTokenBalances, fetchAccountBalances };
+export { fetchAccountTransactions, fetchTokenPairs, fetchTokenBalances, fetchAccountBalances };

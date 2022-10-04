@@ -1,11 +1,11 @@
 import { immer } from "zustand/middleware/immer";
 import create from "zustand";
 import { devtools } from "zustand/middleware";
-import { fetchAccountBalances } from "./services";
+import { fetchAccountBalances, fetchAccountTransactions, fetchTokenPairs } from "./services";
 import { getErrorMessage } from "../utils";
-import { calculatePoolVolumeMetrics } from "./utils";
-import { ActionType, MirrorNodeState, TokenPair } from "./types";
-import { L49A_TOKEN_ID, L49B_TOKEN_ID, SWAP_CONTRACT_ID } from "../constants";
+import { ActionType, MirrorNodeState } from "./types";
+import { SWAP_CONTRACT_ID } from "../constants";
+import { calculatePoolVolumeMetrics, getTimestamp24HoursAgo, getTimestamp7DaysAgo } from "./utils";
 
 const initialMirrorNodeState: MirrorNodeState = {
   allPoolsMetrics: [],
@@ -15,11 +15,6 @@ const initialMirrorNodeState: MirrorNodeState = {
   poolVolumeMetrics: null,
   fetchAllPoolMetrics: () => Promise.resolve(),
 };
-
-// TODO: This should be replaced with a mirror call to fetch all pairs associated with the primary swap/pool contract.
-const getTokenPairs = (): TokenPair[] => [
-  { tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID }, tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID } },
-];
 
 /**
  * A hook that provides access to functions that fetch transaction and account
@@ -38,10 +33,19 @@ const useMirrorNode = create<MirrorNodeState>()(
       fetchAllPoolMetrics: async () => {
         set({ status: "fetching" }, false, ActionType.FETCH_POOL_VOLUME_METRICS_STARTED);
         try {
-          const response = await fetchAccountBalances(SWAP_CONTRACT_ID);
-          const tokenPairs = getTokenPairs();
+          const accountBalances = await fetchAccountBalances(SWAP_CONTRACT_ID);
+          const timestamp24HoursAgo = getTimestamp24HoursAgo();
+          const timestamp7DaysAgo = getTimestamp7DaysAgo();
+          const last24Transactions = await fetchAccountTransactions(SWAP_CONTRACT_ID, timestamp24HoursAgo);
+          const last7DTransactions = await fetchAccountTransactions(SWAP_CONTRACT_ID, timestamp7DaysAgo);
+          const tokenPairs = await fetchTokenPairs();
           const allPoolsMetrics = tokenPairs.map((tokenPair) => {
-            return calculatePoolVolumeMetrics(response.data.balances, tokenPair);
+            return calculatePoolVolumeMetrics({
+              accountBalances: accountBalances.data.balances,
+              last24Transactions: last24Transactions.data.transactions,
+              last7DTransactions: last7DTransactions.data.transactions,
+              tokenPair,
+            });
           });
           set({ status: "success", allPoolsMetrics }, false, ActionType.FETCH_POOL_VOLUME_METRICS_SUCCEEDED);
         } catch (error) {
