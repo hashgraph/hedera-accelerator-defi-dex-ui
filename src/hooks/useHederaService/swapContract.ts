@@ -18,7 +18,7 @@ import {
   TREASURY_ID,
   TREASURY_KEY,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
-} from "../useHashConnect/constants";
+} from "../constants";
 
 export interface AddLiquidityDetails {
   firstTokenAddress: string;
