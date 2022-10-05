@@ -9,14 +9,13 @@ const menuOptions = ["Swap", "Pool"];
 // TODO: remove mocks
 const mockPoolsProps = {
   allPoolsColHeaders: [
-    { headerName: "name", colWidth: 158 },
-    { headerName: "fee", colWidth: 61 },
-    { headerName: "totalVolumeLocked", colWidth: 136 },
-    { headerName: "past24HoursVolume", colWidth: 136 },
-    { headerName: "past7daysVolume", colWidth: 136 },
-    { headerName: "Actions", colWidth: 203 },
+    { headerName: "Pool", field: "name", colWidth: 158 },
+    { headerName: "Fee", field: "fee", colWidth: 61 },
+    { headerName: "TVL", field: "totalVolumeLocked", colWidth: 136 },
+    { headerName: "Volume 24H", field: "past24HoursVolume", colWidth: 136 },
+    { headerName: "Volume 7D", field: "past7daysVolume", colWidth: 136 },
+    { headerName: "Actions", field: "actions", colWidth: 203 },
   ],
-  allPools: [],
   userPoolsColHeaders: [
     { headerName: "Pool", colWidth: 158 },
     { headerName: "Fee", colWidth: 61 },

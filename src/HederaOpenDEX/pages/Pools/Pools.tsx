@@ -4,13 +4,19 @@ import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
 import { useHashConnectContext } from "../../../context";
 import { PoolState, UserPoolState } from "../../../hooks/useMirrorNode/types";
+import { formatPoolMetrics } from "./utils";
+import { isEmpty } from "ramda";
+export interface BasePoolDetails {
+  Pool: string; // TODO: type this (will need token symbol filename and potentially other details)
+  Fee: string;
+}
 
-export interface FormattedUserPoolDetails {
+export interface FormattedPoolDetails {
   name: string;
   fee: string;
-  liquidity: string;
-  percentOfPool: string;
-  unclaimedFees: string;
+  totalVolumeLocked: string;
+  past24HoursVolume: string;
+  past7daysVolume: string;
   actions?: JSX.Element;
 }
 
@@ -23,28 +29,11 @@ export interface FormattedPoolDetails {
   actions?: JSX.Element;
 }
 
-const allPoolsColHeaders: DataTableColumnConfig[] = [
-  { headerName: "Pool", field: "name", colWidth: 158 },
-  { headerName: "Fee", field: "fee", colWidth: 61 },
-  { headerName: "TVL", field: "totalVolumeLocked", colWidth: 136 },
-  { headerName: "Volume 24H", field: "past24HoursVolume", colWidth: 136 },
-  { headerName: "Volume 7D", field: "past7daysVolume", colWidth: 136 },
-  { headerName: "Actions", field: "actions", colWidth: 203 },
-];
-
-const userPoolsColHeaders: DataTableColumnConfig[] = [
-  { headerName: "Pool", field: "name", colWidth: 158 },
-  { headerName: "Fee", field: "fee", colWidth: 61 },
-  { headerName: "Liquidity", field: "liquidity", colWidth: 136 },
-  { headerName: "% of the Pool", field: "percentOfPool", colWidth: 118 },
-  { headerName: "Unclaimed Fees", field: "unclaimedFees", colWidth: 131 },
-  { headerName: "Actions", field: "actions", colWidth: 226 },
-];
-
-const Pools = (): JSX.Element => {
-  const { hashConnectState, mirrorNodeState } = useHashConnectContext();
-  const walletAccountId = hashConnectState.walletData.pairedAccounts[0];
-  const { fetchAllPoolMetrics, fetchUserPoolMetrics } = mirrorNodeState;
+export interface PoolsProps {
+  allPoolsColHeaders: DataTableColumnConfig[];
+  userPools: UserPoolDetails[] | undefined;
+  userPoolsColHeaders: DataTableColumnConfig[];
+}
 
 const Pools = (props: PoolsProps): JSX.Element => {
   const { mirrorNodeState } = useHashConnectContext();
@@ -98,7 +87,7 @@ const Pools = (props: PoolsProps): JSX.Element => {
   }, [mirrorNodeState.userPoolsMetrics]);
 
   const getAllPoolsRowData = useCallback(
-    () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics),
+    () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics.map(formatPoolMetrics)),
     [mirrorNodeState.allPoolsMetrics]
   );
 
@@ -108,7 +97,7 @@ const Pools = (props: PoolsProps): JSX.Element => {
   );
 
   const formatPoolsRowData = (
-    rowData: PoolState[] | UserPoolState[] | PoolDetails[] | UserPoolDetails[] | undefined,
+    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | UserPoolDetails[] | undefined,
     userPool = false
   ) => {
     return rowData
