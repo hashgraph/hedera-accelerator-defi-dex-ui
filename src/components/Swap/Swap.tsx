@@ -36,7 +36,6 @@ import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks";
-import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 export interface SwapProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;

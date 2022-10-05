@@ -4,8 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
 import { useHashConnectContext } from "../../../context";
 import { PoolState, UserPoolState } from "../../../hooks/useMirrorNode/types";
-import { formatPoolMetrics, formatUserPoolMetrics } from "./utils";
-import { isEmpty } from "ramda";
 
 export interface FormattedUserPoolDetails {
   name: string;
@@ -48,15 +46,15 @@ const Pools = (): JSX.Element => {
   const walletAccountId = hashConnectState.walletData.pairedAccounts[0];
   const { fetchAllPoolMetrics, fetchUserPoolMetrics } = mirrorNodeState;
 
-  const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
+const Pools = (props: PoolsProps): JSX.Element => {
+  const { mirrorNodeState } = useHashConnectContext();
+  const { fetchAllPoolMetrics } = mirrorNodeState;
+
+  const [state, setState] = useState(props);
 
   useEffect(() => {
-    const fetchPoolMetrics = async () => {
-      await fetchAllPoolMetrics();
-      await fetchUserPoolMetrics(walletAccountId);
-    };
-    fetchPoolMetrics();
-  }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
+    fetchAllPoolMetrics();
+  }, [fetchAllPoolMetrics]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -100,7 +98,7 @@ const Pools = (): JSX.Element => {
   }, [mirrorNodeState.userPoolsMetrics]);
 
   const getAllPoolsRowData = useCallback(
-    () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics.map(formatPoolMetrics)),
+    () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics),
     [mirrorNodeState.allPoolsMetrics]
   );
 
@@ -110,7 +108,7 @@ const Pools = (): JSX.Element => {
   );
 
   const formatPoolsRowData = (
-    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | FormattedUserPoolDetails[] | undefined,
+    rowData: PoolState[] | UserPoolState[] | PoolDetails[] | UserPoolDetails[] | undefined,
     userPool = false
   ) => {
     return rowData

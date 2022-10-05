@@ -5,6 +5,7 @@ import { useHashConnectContext } from "../../../context";
 const Trade = () => {
   const {
     hashConnectState,
+    mirrorNodeState,
     connectToWallet,
     sendSwapTransaction,
     fetchSpotPrices,
@@ -19,7 +20,6 @@ const Trade = () => {
     installedExtensions,
     spotPrices,
     poolLiquidity,
-    transactionState,
   } = hashConnectState;
 
   return (

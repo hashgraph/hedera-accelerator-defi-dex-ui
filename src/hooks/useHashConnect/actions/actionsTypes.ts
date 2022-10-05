@@ -222,5 +222,4 @@ export type HashConnectAction =
   | WalletPairingApproved
   | ReceivedConnectionStatusChanged
   | LocalConnectionStatusChanged
-  | SetTransactionWaitingToBeSigned
   | ClearWalletPairings;

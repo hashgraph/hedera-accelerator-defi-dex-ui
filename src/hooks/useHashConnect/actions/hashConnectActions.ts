@@ -172,13 +172,6 @@ const sendAddLiquidityTransactionToWalletFailed = (errorMessage: string): HashCo
   };
 };
 
-const setTransactionWaitingToBeSigned = (payload: boolean): HashConnectAction => {
-  return {
-    type: ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED,
-    payload,
-  };
-};
-
 const clearWalletPairings = (): HashConnectAction => {
   return { type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" };
 };

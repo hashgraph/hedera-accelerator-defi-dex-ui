@@ -17,7 +17,6 @@ import { HASHCONNECT_LOCAL_DATA_KEY } from "../constants";
 import { WalletConnectionStatus } from "./types";
 import { get100LABTokens } from "../useHederaService/swapContract";
 import { HashConnectAction } from "./actions/actionsTypes";
-import { pick } from "ramda";
 
 const hashconnect = new HashConnect(true);
 export interface UseHashConnectProps {
