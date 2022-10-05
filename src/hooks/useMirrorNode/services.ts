@@ -4,7 +4,7 @@ import { L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
 import { TokenPair } from "./types";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
-const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
+// const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
 const GREATER_THAN = "gte";
 
 /** */

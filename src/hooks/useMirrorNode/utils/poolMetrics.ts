@@ -56,9 +56,9 @@ const calculateVolume = (tokenAccountId: string, contractTransactions: MirrorNod
 };
 
 // TODO
-const calculatePercentOfPool = () => {
-  return 0;
-};
+// const calculatePercentOfPool = () => {
+//   return 0;
+// };
 
 interface CalculatePoolMetricsParams {
   accountBalances: any;
