@@ -14,7 +14,6 @@ const fetchAccountTransactions = async (accountId: string, timestamp?: string) =
     order: "asc",
     transactiontype: "CRYPTOTRANSFER",
     result: "success",
-    type: "credit",
   };
   if (!isNil(timestamp)) {
     Object.assign(params, { timestamp: `${GREATER_THAN}:${timestamp}` });

@@ -47,8 +47,8 @@ const calculateVolume = (tokenAccountId: string, contractTransactions: MirrorNod
   const tokenTransfers = contractTransactions.flatMap((contractTransaction) => contractTransaction.token_transfers);
   const volume = tokenTransfers.reduce((tokenTransactionVolume: number, tokenTransfer: MirrorNodeTokenTransfer) => {
     const { token_id, amount } = tokenTransfer;
-    if (token_id === tokenAccountId && amount > 0) {
-      return tokenTransactionVolume + amount;
+    if (token_id === tokenAccountId) {
+      return tokenTransactionVolume + Math.abs(amount);
     }
     return tokenTransactionVolume;
   }, 0);
@@ -67,7 +67,7 @@ interface CalculatePoolMetricsParams {
   tokenPair: TokenPair;
 }
 
-export const calculatePoolVolumeMetrics = ({
+const calculatePoolMetrics = ({
   accountBalances,
   last24Transactions,
   last7DTransactions,
@@ -86,3 +86,5 @@ export const calculatePoolVolumeMetrics = ({
     past7daysVolume: calculateVolume(tokenA.accountId, last7DTransactions),
   };
 };
+
+export { calculatePoolMetrics };

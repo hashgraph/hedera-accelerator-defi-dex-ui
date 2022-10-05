@@ -5,14 +5,13 @@ import { fetchAccountBalances, fetchAccountTransactions, fetchTokenPairs } from 
 import { getErrorMessage } from "../utils";
 import { ActionType, MirrorNodeState } from "./types";
 import { SWAP_CONTRACT_ID } from "../constants";
-import { calculatePoolVolumeMetrics, getTimestamp24HoursAgo, getTimestamp7DaysAgo } from "./utils";
+import { calculatePoolMetrics, getTimestamp24HoursAgo, getTimestamp7DaysAgo } from "./utils";
 
 const initialMirrorNodeState: MirrorNodeState = {
   allPoolsMetrics: [],
   userPoolsMetrics: [],
   status: "init",
   errorMessage: null,
-  poolVolumeMetrics: null,
   fetchAllPoolMetrics: () => Promise.resolve(),
 };
 
@@ -29,9 +28,8 @@ const useMirrorNode = create<MirrorNodeState>()(
       userPoolsMetrics: [],
       status: "init",
       errorMessage: null,
-      poolVolumeMetrics: null,
       fetchAllPoolMetrics: async () => {
-        set({ status: "fetching" }, false, ActionType.FETCH_POOL_VOLUME_METRICS_STARTED);
+        set({ status: "fetching" }, false, ActionType.FETCH_POOL_METRICS_STARTED);
         try {
           const accountBalances = await fetchAccountBalances(SWAP_CONTRACT_ID);
           const timestamp24HoursAgo = getTimestamp24HoursAgo();
@@ -40,17 +38,17 @@ const useMirrorNode = create<MirrorNodeState>()(
           const last7DTransactions = await fetchAccountTransactions(SWAP_CONTRACT_ID, timestamp7DaysAgo);
           const tokenPairs = await fetchTokenPairs();
           const allPoolsMetrics = tokenPairs.map((tokenPair) => {
-            return calculatePoolVolumeMetrics({
+            return calculatePoolMetrics({
               accountBalances: accountBalances.data.balances,
               last24Transactions: last24Transactions.data.transactions,
               last7DTransactions: last7DTransactions.data.transactions,
               tokenPair,
             });
           });
-          set({ status: "success", allPoolsMetrics }, false, ActionType.FETCH_POOL_VOLUME_METRICS_SUCCEEDED);
+          set({ status: "success", allPoolsMetrics }, false, ActionType.FETCH_POOL_METRICS_SUCCEEDED);
         } catch (error) {
           const errorMessage = getErrorMessage(error);
-          set({ status: "error", errorMessage }, false, ActionType.FETCH_POOL_VOLUME_METRICS_STARTED);
+          set({ status: "error", errorMessage }, false, ActionType.FETCH_POOL_METRICS_STARTED);
         }
       },
     }))

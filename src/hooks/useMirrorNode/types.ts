@@ -1,7 +1,7 @@
 enum ActionType {
-  FETCH_POOL_VOLUME_METRICS_STARTED = "useMirrorNode/FETCH_POOL_METRICS_STARTED",
-  FETCH_POOL_VOLUME_METRICS_SUCCEEDED = "useMirrorNode/FETCH_POOL_METRICS_SUCCEEDED",
-  FETCH_POOL_VOLUME_METRICS_FAILED = "useMirrorNode/FETCH_POOL_METRICS_FAILED",
+  FETCH_POOL_METRICS_STARTED = "useMirrorNode/FETCH_POOL_METRICS_STARTED",
+  FETCH_POOL_METRICS_SUCCEEDED = "useMirrorNode/FETCH_POOL_METRICS_SUCCEEDED",
+  FETCH_POOL_METRICS_FAILED = "useMirrorNode/FETCH_POOL_METRICS_FAILED",
 }
 
 interface PoolState {
@@ -25,7 +25,6 @@ interface MirrorNodeState {
   userPoolsMetrics: UserPoolState[];
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
-  poolVolumeMetrics: number | null;
   fetchAllPoolMetrics: () => Promise<void>;
 }
 
