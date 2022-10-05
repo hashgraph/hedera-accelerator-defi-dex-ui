@@ -7,10 +7,11 @@ import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../components/TokenInput";
 import { usePrevious } from "../../../hooks/usePrevious/usePrevious";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../../hooks";
+import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 
 const Pool = (): JSX.Element => {
-  const { walletData, sendAddLiquidityTransaction, spotPrices, connectionStatus, sendLabTokensToWallet } =
-    useHashConnectContext();
+  const { hashConnectState, sendAddLiquidityTransaction, sendLabTokensToWallet } = useHashConnectContext();
+  const { walletData, walletConnectionStatus: connectionStatus, spotPrices } = hashConnectState;
 
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
   const previousPoolState: PoolState | undefined = usePrevious(poolState);
@@ -53,10 +54,12 @@ const Pool = (): JSX.Element => {
    * @returns balance of specified token in connected wallet
    */
   const getBalanceByTokenSymbol = useCallback(
-    (tokenSymbol: string): number => {
+    (tokenSymbol: string): string => {
+      const defaultBalance = "0.0";
       const tokenBalances = walletData?.pairedAccountBalance?.tokens;
       const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
-      return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance;
+      const tokenData = tokenBalances?.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId);
+      return tokenData?.balance ?? defaultBalance;
     },
     [walletData]
   );

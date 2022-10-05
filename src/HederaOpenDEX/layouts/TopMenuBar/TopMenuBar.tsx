@@ -25,7 +25,8 @@ export interface TopMenuBarProps {
 }
 
 const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
-  const { walletData, network, connectionStatus, clearWalletPairings } = useHashConnectContext();
+  const { hashConnectState, removeWalletPairings: clearWalletPairings, network } = useHashConnectContext();
+  const { walletData, walletConnectionStatus: connectionStatus } = hashConnectState;
 
   return (
     <Menu>

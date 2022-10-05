@@ -5,9 +5,11 @@ export enum ActionType {
   SET_TOKEN_TO_RECEIVE = "SET_TOKEN_TO_RECEIVE",
   SWITCH_TOKEN_TO_TRADE_AND_RECEIVE = "SWITCH_TOKEN_TO_TRADE_AND_RECEIVE",
   SET_SPOT_PRICE = "SET_SPOT_PRICE",
+  SET_SWAP_SETTINGS = "SET_SWAP_SETTINGS",
 }
 
 type TokenInputProperties = keyof typeof initialSwapState.tokenToTrade;
+type SwapSettingsProperties = keyof typeof initialSwapState.swapSettings;
 
 interface SetTokenToTrade {
   type: ActionType.SET_TOKEN_TO_TRADE;
@@ -30,4 +32,15 @@ interface SetSpotPrice {
   payload: number | undefined;
 }
 
-export type SwapAction = SetTokenToTrade | SetTokenToReceive | SwitchTokenToTradeAndReceiveTokens | SetSpotPrice;
+interface SetSwapSettings {
+  type: ActionType.SET_SWAP_SETTINGS;
+  field: SwapSettingsProperties;
+  payload: string;
+}
+
+export type SwapAction =
+  | SetTokenToTrade
+  | SetTokenToReceive
+  | SwitchTokenToTradeAndReceiveTokens
+  | SetSpotPrice
+  | SetSwapSettings;

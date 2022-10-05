@@ -4,18 +4,23 @@ import { useHashConnectContext } from "../../../context";
 
 const Trade = () => {
   const {
+    hashConnectState,
     connectToWallet,
-    clearWalletPairings,
-    walletData,
-    network,
-    connectionStatus,
-    installedExtensions,
-    spotPrices,
     sendSwapTransaction,
     fetchSpotPrices,
     getPoolLiquidity,
-    poolLiquidity,
+    removeWalletPairings: clearWalletPairings,
+    network,
   } = useHashConnectContext();
+
+  const {
+    walletData,
+    walletConnectionStatus: connectionStatus,
+    installedExtensions,
+    spotPrices,
+    poolLiquidity,
+  } = hashConnectState;
+
   return (
     <HStack>
       <Box margin="1rem">
