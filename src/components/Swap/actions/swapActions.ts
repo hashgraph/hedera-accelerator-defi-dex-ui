@@ -48,6 +48,16 @@ const setSpotPrice = (spotPrice: number | undefined): SwapAction => {
   return { type: ActionType.SET_SPOT_PRICE, payload: spotPrice };
 };
 
+/** SET SWAP SETTINGS ACTION CREATORS */
+
+const setSlippageSetting = (slippage: string): SwapAction => {
+  return { type: ActionType.SET_SWAP_SETTINGS, field: "slippage", payload: slippage };
+};
+
+const setTransactionDeadlineSetting = (transactionDeadline: string): SwapAction => {
+  return { type: ActionType.SET_SWAP_SETTINGS, field: "transactionDeadline", payload: transactionDeadline };
+};
+
 export {
   setTokenToTradeAmount,
   setTokenToTradeSymbol,
@@ -59,4 +69,6 @@ export {
   setTokenToReceivePoolLiquidity,
   swapTokenToTradeAndReceive,
   setSpotPrice,
+  setSlippageSetting,
+  setTransactionDeadlineSetting,
 };

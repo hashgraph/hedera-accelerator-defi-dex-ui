@@ -14,6 +14,10 @@ const initialSwapState: SwapState = {
     balance: undefined,
     poolLiquidity: undefined,
   },
+  swapSettings: {
+    slippage: "2.0",
+    transactionDeadline: "5",
+  },
   spotPrice: undefined,
 };
 
@@ -42,6 +46,11 @@ function swapReducer(draft: SwapState, action: SwapAction) {
     case ActionType.SET_SPOT_PRICE: {
       const { payload } = action;
       draft.spotPrice = payload;
+      break;
+    }
+    case ActionType.SET_SWAP_SETTINGS: {
+      const { field, payload } = action;
+      draft.swapSettings = { ...draft.swapSettings, [field]: payload };
       break;
     }
     default:
