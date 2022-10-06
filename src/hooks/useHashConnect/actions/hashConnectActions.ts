@@ -165,6 +165,13 @@ const sendAddLiquidityTransactionToWalletFailed = (errorMessage: string): HashCo
   };
 };
 
+const setTransactionWaitingToBeSigned = (payload: boolean): HashConnectAction => {
+  return {
+    type: ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED,
+    payload,
+  };
+};
+
 const initializeWalletConnection = (payload: any) => {
   return async (dispatch: any) => {
     dispatch(initializeWalletConnectionStarted());
@@ -303,8 +310,19 @@ const sendSwapTransactionToWallet = (payload: any) => {
         .setNodeAccountIds([new AccountId(3)])
         .freezeWithSigner(signer);
 
+      // Sometimes (on first run throught it seems) the AcknowledgeMessageEvent from hashpack does not fire
+      // so we need to manually dispatch the action here indicating that transaction is waiting to be signed
+      dispatch(setTransactionWaitingToBeSigned(true));
+
       const result = await swapTransaction.executeWithSigner(signer);
-      dispatch(sendSwapTransactionToWalletSucceeded());
+      // Transaction execution is complete after the async call in the line above
+
+      dispatch(setTransactionWaitingToBeSigned(false));
+      dispatch(
+        result
+          ? sendSwapTransactionToWalletSucceeded()
+          : sendSwapTransactionToWalletFailed("Transaction Execution Failed")
+      );
       /* TODO: Results will be saved in context state and displayed in the UI */
       console.log(result);
     } catch (error) {

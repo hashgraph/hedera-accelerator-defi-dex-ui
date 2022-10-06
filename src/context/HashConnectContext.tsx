@@ -29,6 +29,7 @@ export interface HashConnectContextProps {
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
   sendLabTokensToWallet: (payload: any) => void;
+  transactionWaitingToBeSigned: boolean;
 }
 
 const HashConnectContext = React.createContext<HashConnectContextProps>({
@@ -45,6 +46,7 @@ const HashConnectContext = React.createContext<HashConnectContextProps>({
   poolLiquidity: undefined,
   installedExtensions: null,
   sendLabTokensToWallet: () => Promise.resolve(),
+  transactionWaitingToBeSigned: false,
 });
 
 export interface HashConnectProviderProps {
@@ -98,6 +100,7 @@ const HashConnectProvider = ({
         network,
         installedExtensions: hashConnectState.installedExtensions,
         sendLabTokensToWallet,
+        transactionWaitingToBeSigned: hashConnectState.transactionWaitingToBeSigned,
       }}
     >
       {children}

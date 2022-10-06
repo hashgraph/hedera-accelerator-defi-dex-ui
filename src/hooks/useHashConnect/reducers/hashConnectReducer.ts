@@ -20,6 +20,7 @@ export interface HashConnectState {
     pairedAccountBalance: AccountBalanceJson | null;
     pairedAccounts: string[];
   };
+  transactionWaitingToBeSigned: boolean;
 }
 
 const initialHashConnectState: HashConnectState = {
@@ -38,6 +39,7 @@ const initialHashConnectState: HashConnectState = {
     pairedAccountBalance: null,
     pairedAccounts: [],
   },
+  transactionWaitingToBeSigned: false,
 };
 
 function initHashConnectReducer(initialHashConnectState: HashConnectState) {
@@ -223,6 +225,13 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
     }
     case ActionType.LOCAL_CONNECTION_STATUS_CHANGED: {
       return state;
+    }
+    case ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED: {
+      const { payload } = action;
+      return {
+        ...state,
+        transactionWaitingToBeSigned: payload,
+      };
     }
     default:
       throw new Error();

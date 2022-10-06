@@ -31,6 +31,7 @@ export enum ActionType {
   FETCH_POOL_LIQUIDITY_STARTED = "FETCH_POOL_LIQUIDITY_STARTED",
   FETCH_POOL_LIQUIDITY_SUCCEEDED = "FETCH_POOL_LIQUIDITY_SUCCEEDED",
   FETCH_POOL_LIQUIDITY_FAILED = "FETCH_POOL_LIQUIDITY_FAILED",
+  SET_TRANSACTION_WAITING_TO_BE_SIGNED = "SET_TRANSACTION_WAITING_TO_BE_SIGNED",
 }
 
 type AsyncAction = (dispatch: (action: any) => any) => void;
@@ -184,6 +185,11 @@ interface FetchPoolLiquidityFailed {
   payload: string;
 }
 
+interface SetTransactionWaitingToBeSigned {
+  type: ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED;
+  payload: boolean;
+}
+
 export type HashConnectAction =
   | AsyncAction
   | InitializeWalletConnectionStarted
@@ -214,4 +220,5 @@ export type HashConnectAction =
   | AddInstalledExtension
   | WalletPairingApproved
   | ReceivedConnectionStatusChanged
-  | LocalConnectionStatusChanged;
+  | LocalConnectionStatusChanged
+  | SetTransactionWaitingToBeSigned;
