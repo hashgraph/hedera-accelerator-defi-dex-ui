@@ -43,11 +43,17 @@ const calculateTotalValueLockedForPool = ({
   }
 };
 
-const calculateVolume = (tokenAccountId: string, contractTransactions: MirrorNodeTransaction[]) => {
-  const tokenTransfers = contractTransactions.flatMap((contractTransaction) => contractTransaction.token_transfers);
-  const volume = tokenTransfers.reduce((tokenTransactionVolume: number, tokenTransfer: MirrorNodeTokenTransfer) => {
-    const { token_id, amount } = tokenTransfer;
-    if (token_id === tokenAccountId) {
+interface CalculateVolumeParams {
+  poolAccountId: string;
+  tokenAccountId: string;
+  accountTransactions: MirrorNodeTransaction[];
+}
+
+const calculateVolume = ({ poolAccountId, tokenAccountId, accountTransactions }: CalculateVolumeParams) => {
+  const allTokenTransfers = accountTransactions.flatMap((accountTransaction) => accountTransaction.token_transfers);
+  const volume = allTokenTransfers.reduce((tokenTransactionVolume: number, tokenTransfer: MirrorNodeTokenTransfer) => {
+    const { token_id, account, amount } = tokenTransfer;
+    if (account === poolAccountId && token_id === tokenAccountId) {
       return tokenTransactionVolume + Math.abs(amount);
     }
     return tokenTransactionVolume;
@@ -61,6 +67,7 @@ const calculateVolume = (tokenAccountId: string, contractTransactions: MirrorNod
 // };
 
 interface CalculatePoolMetricsParams {
+  poolAccountId: string;
   accountBalances: any;
   last24Transactions: MirrorNodeTransaction[];
   last7DTransactions: MirrorNodeTransaction[];
@@ -68,22 +75,34 @@ interface CalculatePoolMetricsParams {
 }
 
 const calculatePoolMetrics = ({
+  poolAccountId,
   accountBalances,
   last24Transactions,
   last7DTransactions,
   tokenPair,
 }: CalculatePoolMetricsParams): PoolState => {
   const { tokenA, tokenB } = tokenPair;
+  const totalVolumeLocked = calculateTotalValueLockedForPool({
+    accountBalances,
+    tokenAAccountId: tokenA.accountId,
+    tokenBAccountId: tokenB.accountId,
+  });
+  const past24HoursVolume = calculateVolume({
+    poolAccountId,
+    tokenAccountId: tokenA.accountId,
+    accountTransactions: last24Transactions,
+  });
+  const past7daysVolume = calculateVolume({
+    poolAccountId,
+    tokenAccountId: tokenA.accountId,
+    accountTransactions: last7DTransactions,
+  });
   return {
     name: `${tokenA.symbol}/${tokenB.symbol}`,
     fee: 0.05,
-    totalVolumeLocked: calculateTotalValueLockedForPool({
-      accountBalances,
-      tokenAAccountId: tokenA.accountId,
-      tokenBAccountId: tokenB.accountId,
-    }),
-    past24HoursVolume: calculateVolume(tokenA.accountId, last24Transactions),
-    past7daysVolume: calculateVolume(tokenA.accountId, last7DTransactions),
+    totalVolumeLocked,
+    past24HoursVolume,
+    past7daysVolume,
   };
 };
 

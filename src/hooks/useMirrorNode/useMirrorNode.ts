@@ -39,6 +39,7 @@ const useMirrorNode = create<MirrorNodeState>()(
           const tokenPairs = await fetchTokenPairs();
           const allPoolsMetrics = tokenPairs.map((tokenPair) => {
             return calculatePoolMetrics({
+              poolAccountId: SWAP_CONTRACT_ID,
               accountBalances: accountBalances.data.balances,
               last24Transactions: last24Transactions.data.transactions,
               last7DTransactions: last7DTransactions.data.transactions,

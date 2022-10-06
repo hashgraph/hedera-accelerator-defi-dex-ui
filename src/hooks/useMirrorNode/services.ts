@@ -11,9 +11,10 @@ const GREATER_THAN = "gte";
 const fetchAccountTransactions = async (accountId: string, timestamp?: string) => {
   const params = {
     "account.id": accountId,
-    order: "asc",
+    order: "desc",
     transactiontype: "CRYPTOTRANSFER",
     result: "success",
+    limit: 100,
   };
   if (!isNil(timestamp)) {
     Object.assign(params, { timestamp: `${GREATER_THAN}:${timestamp}` });
