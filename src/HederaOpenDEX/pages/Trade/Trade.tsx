@@ -15,6 +15,7 @@ const Trade = () => {
     fetchSpotPrices,
     getPoolLiquidity,
     poolLiquidity,
+    transactionWaitingToBeSigned,
   } = useHashConnectContext();
   return (
     <HStack>
@@ -33,6 +34,7 @@ const Trade = () => {
             walletData={walletData}
             network={network}
             installedExtensions={installedExtensions}
+            transactionWaitingToBeSigned={transactionWaitingToBeSigned}
           />
         </Center>
       </Box>

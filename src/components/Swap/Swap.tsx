@@ -20,7 +20,14 @@ import {
   setSlippageSetting,
   setTransactionDeadlineSetting,
 } from "./actions/swapActions";
-import { Button, IconButton, SwapConfirmation, SwapSettingsInput, SwapSettingsInputProps } from "../base";
+import {
+  Button,
+  IconButton,
+  SwapConfirmation,
+  SwapConfirmationStep,
+  SwapSettingsInput,
+  SwapSettingsInputProps,
+} from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
@@ -39,6 +46,7 @@ export interface SwapProps {
   network: Networks;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
+  transactionWaitingToBeSigned: boolean;
 }
 
 const Swap = (props: SwapProps) => {
@@ -51,6 +59,7 @@ const Swap = (props: SwapProps) => {
     sendSwapTransaction,
     poolLiquidity,
     getPoolLiquidity,
+    transactionWaitingToBeSigned,
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
@@ -319,6 +328,12 @@ const Swap = (props: SwapProps) => {
     );
   }, [spotPrice, tokenToTrade.symbol, tokenToReceive.symbol]);
 
+  const getSwapConfirmationStep = useCallback(() => {
+    // TODO: we aren't able to tell when the transaction is actually being processed (after signing)
+    //       but if and when we are need to add logic for that SwapConfirmationStep
+    return transactionWaitingToBeSigned ? SwapConfirmationStep.SIGN : SwapConfirmationStep.CONFIRM;
+  }, [transactionWaitingToBeSigned]);
+
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
       <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
@@ -409,7 +424,11 @@ const Swap = (props: SwapProps) => {
         </Flex>
         <Flex direction="column" grow="1">
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
-            <SwapConfirmation sendSwapTransaction={sendSwapTransaction} swapState={swapState} />
+            <SwapConfirmation
+              sendSwapTransaction={sendSwapTransaction}
+              swapState={swapState}
+              confirmationStep={getSwapConfirmationStep()}
+            />
           ) : (
             <Button data-testid="connect-wallet-button" marginTop="0.5rem" onClick={connectToWallet}>
               Connect Wallet
