@@ -2,7 +2,10 @@ import { Button, Container, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Link,
 import { Link as RouterLink } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
-
+import { useHashConnectContext } from "../../../context";
+import { PoolState, UserPoolState } from "../../../hooks/useMirrorNode/types";
+import { formatPoolMetrics } from "./utils";
+import { isEmpty } from "ramda";
 export interface BasePoolDetails {
   Pool: string; // TODO: type this (will need token symbol filename and potentially other details)
   Fee: string;
@@ -14,21 +17,30 @@ export interface UserPoolDetails extends BasePoolDetails {
   "Unclaimed Fees"?: string;
 }
 
-export interface PoolDetails extends BasePoolDetails {
-  TVL: string;
-  "Volume 24H": string;
-  "Volume 7D": string;
+export interface FormattedPoolDetails {
+  name: string;
+  fee: string;
+  totalVolumeLocked: string;
+  past24HoursVolume: string;
+  past7daysVolume: string;
+  actions?: JSX.Element;
 }
 
 export interface PoolsProps {
-  allPools: PoolDetails[] | undefined;
   allPoolsColHeaders: DataTableColumnConfig[];
   userPools: UserPoolDetails[] | undefined;
   userPoolsColHeaders: DataTableColumnConfig[];
 }
 
 const Pools = (props: PoolsProps): JSX.Element => {
+  const { mirrorNodeState } = useHashConnectContext();
+  const { fetchAllPoolMetrics } = mirrorNodeState;
+
   const [state, setState] = useState(props);
+
+  useEffect(() => {
+    fetchAllPoolMetrics();
+  }, [fetchAllPoolMetrics]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -60,18 +72,24 @@ const Pools = (props: PoolsProps): JSX.Element => {
     return totalUnclaimedFees || 0;
   }, [state]);
 
-  const getAllPoolsRowData = useCallback(() => formatPoolsRowData(state.allPools), [state]);
+  const getAllPoolsRowData = useCallback(
+    () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics.map(formatPoolMetrics)),
+    [mirrorNodeState.allPoolsMetrics]
+  );
 
   const getUserPoolsRowData = useCallback(() => formatPoolsRowData(state.userPools, true), [state]);
 
-  const formatPoolsRowData = (rowData: PoolDetails[] | UserPoolDetails[] | undefined, userPool = false) => {
+  const formatPoolsRowData = (
+    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | UserPoolDetails[] | undefined,
+    userPool = false
+  ) => {
     return rowData
       ? [
           ...rowData.map((row) => ({
             ...row,
             // TODO: links should bring user to corresponding page for the specific pair
             // do we want to make Actions something optional (pass in whether to show it as a prop)?
-            Actions: (
+            actions: (
               <>
                 <Link
                   textDecoration={"underline"}
@@ -96,7 +114,7 @@ const Pools = (props: PoolsProps): JSX.Element => {
     <Tabs display={"flex"} flexDirection={"column"}>
       <TabList display={"flex"} justifyContent={"space-between"} alignItems={"center"} padding={"0"} margin={"0 16px"}>
         <Flex>
-          {state.allPools ? (
+          {!isEmpty(mirrorNodeState.allPoolsMetrics) ? (
             <Tab fontSize={"32px"} padding={"0 0 8px 0"} marginRight={"32px"}>
               Pools
             </Tab>

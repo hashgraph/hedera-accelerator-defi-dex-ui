@@ -233,8 +233,6 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
         transactionWaitingToBeSigned: payload,
       };
     }
-    default:
-      throw new Error();
   }
 }
 

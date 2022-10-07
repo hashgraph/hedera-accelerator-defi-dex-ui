@@ -13,6 +13,7 @@ export interface DataTableProps {
 
 export interface DataTableColumnConfig {
   headerName: string;
+  field?: string;
   colWidth: number;
 }
 
@@ -38,7 +39,7 @@ const DataTable = (props: DataTableProps) => {
                   padding={"6px"}
                   borderRight={i === props.colHeaders.length - 1 ? "none" : "1px solid #B1B1B1"}
                 >
-                  {row[colConfig.headerName] ? row[colConfig.headerName] : "-"}
+                  {colConfig?.field && row[colConfig.field] ? row[colConfig.field] : "-"}
                 </Td>
               ))}
             </Tr>

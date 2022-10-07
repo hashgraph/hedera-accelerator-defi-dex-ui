@@ -1,11 +1,10 @@
 import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
-import { getErrorMessage } from "../utils";
+import { getErrorMessage } from "../../utils";
 import { addLiquidity, pairCurrentPosition } from "../../useHederaService/swapContract";
-import { SWAP_CONTRACT_ID } from "../constants";
 import { getSpotPrice } from "../../useHederaService/swapContract";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../";
+import { SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../constants";
 
 const initializeWalletConnectionStarted = (payload?: any): HashConnectAction => {
   return {
@@ -170,6 +169,10 @@ const setTransactionWaitingToBeSigned = (payload: boolean): HashConnectAction =>
     type: ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED,
     payload,
   };
+};
+
+const clearWalletPairings = (): HashConnectAction => {
+  return { type: ActionType.CLEAR_WALLET_PAIRINGS, field: "walletData" };
 };
 
 const initializeWalletConnection = (payload: any) => {
@@ -434,4 +437,5 @@ export {
   fetchAccountBalance,
   fetchSpotPrices,
   getPoolLiquidity,
+  clearWalletPairings,
 };

@@ -143,7 +143,7 @@ interface SendAddLiquidityTransactionToWalletFailed {
   errorMessage: string;
 }
 
-interface IClearWalletPairings {
+interface ClearWalletPairings {
   type: ActionType.CLEAR_WALLET_PAIRINGS;
   field: "walletData";
 }
@@ -216,9 +216,9 @@ export type HashConnectAction =
   | SendAddLiquidityTransactionToWalletStarted
   | SendAddLiquidityTransactionToWalletSucceeded
   | SendAddLiquidityTransactionToWalletFailed
-  | IClearWalletPairings
   | AddInstalledExtension
   | WalletPairingApproved
   | ReceivedConnectionStatusChanged
   | LocalConnectionStatusChanged
-  | SetTransactionWaitingToBeSigned;
+  | SetTransactionWaitingToBeSigned
+  | ClearWalletPairings;

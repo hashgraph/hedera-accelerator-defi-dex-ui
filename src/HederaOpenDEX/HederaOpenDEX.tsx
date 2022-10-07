@@ -10,35 +10,12 @@ const menuOptions = ["Swap", "Pool"];
 // TODO: remove mocks
 const mockPoolsProps = {
   allPoolsColHeaders: [
-    { headerName: "Pool", colWidth: 158 },
-    { headerName: "Fee", colWidth: 61 },
-    { headerName: "TVL", colWidth: 136 },
-    { headerName: "Volume 24H", colWidth: 136 },
-    { headerName: "Volume 7D", colWidth: 136 },
-    { headerName: "Actions", colWidth: 203 },
-  ],
-  allPools: [
-    {
-      Pool: "HBAR/USDT",
-      Fee: "0.05%",
-      TVL: "$123,456",
-      "Volume 24H": "$23,456",
-      "Volume 7D": "$78,901",
-    },
-    {
-      Pool: "HBAR/USDT",
-      Fee: "0.05%",
-      TVL: "$123,456",
-      "Volume 24H": "$23,456",
-      "Volume 7D": "$78,901",
-    },
-    {
-      Pool: "HBAR/USDT",
-      Fee: "0.05%",
-      TVL: "$123,456",
-      "Volume 24H": "$23,456",
-      "Volume 7D": "$78,901",
-    },
+    { headerName: "Pool", field: "name", colWidth: 158 },
+    { headerName: "Fee", field: "fee", colWidth: 61 },
+    { headerName: "TVL", field: "totalVolumeLocked", colWidth: 136 },
+    { headerName: "Volume 24H", field: "past24HoursVolume", colWidth: 136 },
+    { headerName: "Volume 7D", field: "past7daysVolume", colWidth: 136 },
+    { headerName: "Actions", field: "actions", colWidth: 203 },
   ],
   userPoolsColHeaders: [
     { headerName: "Pool", colWidth: 158 },

@@ -1,7 +1,7 @@
 import React, { Reducer, useContext } from "react";
-import useEnhancedReducer from "@rest-hooks/use-enhanced-reducer";
 import { HashConnectTypes } from "hashconnect";
-import { Networks, WalletConnectionStatus } from "../hooks/useHashConnect/types";
+import useEnhancedReducer from "@rest-hooks/use-enhanced-reducer";
+import { Networks } from "../hooks/useHashConnect/types";
 import { DEFAULT_APP_METADATA } from "./constants";
 import {
   useHashConnect,
@@ -10,44 +10,22 @@ import {
   initHashConnectReducer,
   HashConnectState,
   thunkMiddleware,
+  UseHashConnectDispatchers,
+  initialHashConnectDispatchers,
 } from "../hooks/useHashConnect";
 import { HashConnectAction } from "../hooks/useHashConnect/actions/actionsTypes";
 import { loggerMiddleware } from "../middleware";
+import { MirrorNodeState, initialMirrorNodeState, useMirrorNode } from "../hooks/useMirrorNode";
 
-export interface HashConnectContextProps {
-  sendSwapTransaction: (payload: any) => void;
-  sendAddLiquidityTransaction: (payload: any) => void;
-  connectToWallet: () => void;
-  clearWalletPairings: () => void;
-  fetchSpotPrices: () => void;
-  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
-  connectionStatus: WalletConnectionStatus;
-  walletData: any | null;
-  network: Networks;
-  spotPrices: Map<string, number | undefined> | undefined;
-  poolLiquidity: Map<string, number | undefined> | undefined;
-  metaData?: HashConnectTypes.AppMetadata;
-  installedExtensions: HashConnectTypes.WalletMetadata[] | null;
-  sendLabTokensToWallet: (payload: any) => void;
-  transactionWaitingToBeSigned: boolean;
+export interface DEXStore {
+  hashConnectState: HashConnectState;
+  mirrorNodeState: MirrorNodeState;
 }
 
-const HashConnectContext = React.createContext<HashConnectContextProps>({
-  sendSwapTransaction: () => Promise.resolve(),
-  sendAddLiquidityTransaction: () => Promise.resolve(),
-  connectToWallet: () => null,
-  clearWalletPairings: () => null,
-  fetchSpotPrices: () => null,
-  getPoolLiquidity: () => null,
-  connectionStatus: WalletConnectionStatus.INITIALIZING,
-  walletData: null,
-  network: "testnet",
-  spotPrices: undefined,
-  poolLiquidity: undefined,
-  installedExtensions: null,
-  sendLabTokensToWallet: () => Promise.resolve(),
-  transactionWaitingToBeSigned: false,
-});
+export type HashConnectContextProps = DEXStore &
+  UseHashConnectDispatchers & {
+    network: Networks;
+  };
 
 export interface HashConnectProviderProps {
   children?: React.ReactNode;
@@ -55,7 +33,13 @@ export interface HashConnectProviderProps {
   network?: Networks;
   debug?: boolean;
 }
-const init = initHashConnectReducer(initialHashConnectState);
+
+const HashConnectContext = React.createContext<HashConnectContextProps>({
+  hashConnectState: { ...initHashConnectReducer(initialHashConnectState) },
+  mirrorNodeState: { ...initialMirrorNodeState },
+  ...initialHashConnectDispatchers,
+  network: "testnet",
+});
 
 const HashConnectProvider = ({
   children,
@@ -65,42 +49,24 @@ const HashConnectProvider = ({
 }: HashConnectProviderProps): JSX.Element => {
   const [hashConnectState, dispatch] = useEnhancedReducer<Reducer<HashConnectState, HashConnectAction>>(
     hashConnectReducer,
-    init,
+    initHashConnectReducer(initialHashConnectState),
     [loggerMiddleware, thunkMiddleware]
   );
-  const {
-    connectToWallet,
-    clearWalletPairings,
-    sendSwapTransaction,
-    fetchSpotPrices,
-    sendAddLiquidityTransaction,
-    getPoolLiquidity,
-    sendLabTokensToWallet,
-  } = useHashConnect({
-    hashConnectState,
-    dispatch,
-    network,
-    dexMetaData,
-    debug,
-  });
+  const mirrorNodeState = useMirrorNode();
 
   return (
     <HashConnectContext.Provider
       value={{
-        sendSwapTransaction,
-        sendAddLiquidityTransaction,
-        connectToWallet,
-        clearWalletPairings,
-        fetchSpotPrices,
-        spotPrices: hashConnectState.spotPrices,
-        getPoolLiquidity,
-        poolLiquidity: hashConnectState.poolLiquidity,
-        connectionStatus: hashConnectState.walletConnectionStatus,
-        walletData: hashConnectState.walletData,
+        hashConnectState,
+        ...useHashConnect({
+          hashConnectState,
+          dispatch,
+          network,
+          dexMetaData,
+          debug,
+        }),
+        mirrorNodeState,
         network,
-        installedExtensions: hashConnectState.installedExtensions,
-        sendLabTokensToWallet,
-        transactionWaitingToBeSigned: hashConnectState.transactionWaitingToBeSigned,
       }}
     >
       {children}

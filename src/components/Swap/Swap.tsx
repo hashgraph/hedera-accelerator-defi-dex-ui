@@ -31,7 +31,7 @@ import {
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks/useHashConnect";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../hooks";
 export interface SwapProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;

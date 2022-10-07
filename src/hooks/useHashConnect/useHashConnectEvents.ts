@@ -1,13 +1,12 @@
 import { useEffect, useCallback, Dispatch } from "react";
 import { HashConnect, HashConnectTypes, MessageTypes } from "hashconnect";
-import { ActionType, HashConnectAction } from "./actions/actionsTypes";
-import { HashConnectState } from "./reducers/hashConnectReducer";
+import { ActionType } from "./actions/actionsTypes";
 import { ConnectionStatus } from "./types";
 
 const useHashConnectEvents = (
   hashconnect: HashConnect,
-  hashConnectState: HashConnectState,
-  dispatch: Dispatch<HashConnectAction>,
+  /* TODO: Dispatch Type should be updated to match HashConnect event action types */
+  dispatch: Dispatch<any>,
   debug: boolean
 ) => {
   const handleFoundExtensionEvent = useCallback(
