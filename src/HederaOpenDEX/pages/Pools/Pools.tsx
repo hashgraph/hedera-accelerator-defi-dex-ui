@@ -4,19 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
 import { useHashConnectContext } from "../../../context";
 import { PoolState, UserPoolState } from "../../../hooks/useMirrorNode/types";
-import { formatPoolMetrics } from "./utils";
+import { formatPoolMetrics, formatUserPoolMetrics } from "./utils";
 import { isEmpty } from "ramda";
-export interface BasePoolDetails {
-  Pool: string; // TODO: type this (will need token symbol filename and potentially other details)
-  Fee: string;
-}
 
-export interface UserPoolDetails extends BasePoolDetails {
-  Liquidity: string;
-  "% of the Pool": string;
-  "Unclaimed Fees"?: string;
+export interface FormattedUserPoolDetails {
+  name: string;
+  fee: string;
+  liquidity: string;
+  percentOfPool: string;
+  unclaimedFees: string;
+  actions?: JSX.Element;
 }
-
 export interface FormattedPoolDetails {
   name: string;
   fee: string;
@@ -26,17 +24,29 @@ export interface FormattedPoolDetails {
   actions?: JSX.Element;
 }
 
-export interface PoolsProps {
-  allPoolsColHeaders: DataTableColumnConfig[];
-  userPools: UserPoolDetails[] | undefined;
-  userPoolsColHeaders: DataTableColumnConfig[];
-}
+const allPoolsColHeaders: DataTableColumnConfig[] = [
+  { headerName: "Pool", field: "name", colWidth: 158 },
+  { headerName: "Fee", field: "fee", colWidth: 61 },
+  { headerName: "TVL", field: "totalVolumeLocked", colWidth: 136 },
+  { headerName: "Volume 24H", field: "past24HoursVolume", colWidth: 136 },
+  { headerName: "Volume 7D", field: "past7daysVolume", colWidth: 136 },
+  { headerName: "Actions", field: "actions", colWidth: 203 },
+];
 
-const Pools = (props: PoolsProps): JSX.Element => {
+const userPoolsColHeaders: DataTableColumnConfig[] = [
+  { headerName: "Pool", field: "name", colWidth: 158 },
+  { headerName: "Fee", field: "fee", colWidth: 61 },
+  { headerName: "Liquidity", field: "liquidity", colWidth: 136 },
+  { headerName: "% of the Pool", field: "percentOfPool", colWidth: 118 },
+  { headerName: "Unclaimed Fees", field: "unclaimedFees", colWidth: 131 },
+  { headerName: "Actions", field: "actions", colWidth: 226 },
+];
+
+const Pools = (): JSX.Element => {
   const { mirrorNodeState } = useHashConnectContext();
   const { fetchAllPoolMetrics } = mirrorNodeState;
 
-  const [state, setState] = useState(props);
+  const [state, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   useEffect(() => {
     fetchAllPoolMetrics();
@@ -65,22 +75,25 @@ const Pools = (props: PoolsProps): JSX.Element => {
     colConfig.map((col) => ({ ...col, colWidth: (col.colWidth / currentTotalWidth) * targetTotalWidth }));
 
   const unclaimedFeeTotal = useCallback(() => {
-    const totalUnclaimedFees = state.userPools?.reduce(
-      (unclaimedFeeTotal, pool) => (unclaimedFeeTotal += +(pool["Unclaimed Fees"]?.substring(1) || 0)),
+    const totalUnclaimedFees = mirrorNodeState.userPoolsMetrics?.reduce(
+      (unclaimedFeeTotal, pool) => (unclaimedFeeTotal += +(pool.unclaimedFees || 0)),
       0
     );
     return totalUnclaimedFees || 0;
-  }, [state]);
+  }, [mirrorNodeState.userPoolsMetrics]);
 
   const getAllPoolsRowData = useCallback(
     () => formatPoolsRowData(mirrorNodeState.allPoolsMetrics.map(formatPoolMetrics)),
     [mirrorNodeState.allPoolsMetrics]
   );
 
-  const getUserPoolsRowData = useCallback(() => formatPoolsRowData(state.userPools, true), [state]);
+  const getUserPoolsRowData = useCallback(
+    () => formatPoolsRowData(mirrorNodeState.userPoolsMetrics.map(formatUserPoolMetrics), true),
+    [mirrorNodeState.userPoolsMetrics]
+  );
 
   const formatPoolsRowData = (
-    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | UserPoolDetails[] | undefined,
+    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | FormattedUserPoolDetails[] | undefined,
     userPool = false
   ) => {
     return rowData
@@ -121,7 +134,7 @@ const Pools = (props: PoolsProps): JSX.Element => {
           ) : (
             ""
           )}
-          {state.userPools ? (
+          {mirrorNodeState.userPoolsMetrics ? (
             <Tab fontSize={"32px"} padding={"0 0 8px 0"}>
               My Pools
             </Tab>
@@ -148,7 +161,7 @@ const Pools = (props: PoolsProps): JSX.Element => {
             >
               <Flex width={"100%"} justifyContent={"space-between"} alignItems={"center"} flexWrap={"wrap"}>
                 <Text>
-                  Total unclaimed fees across {state.userPools?.length} pools:&nbsp;
+                  Total unclaimed fees across {mirrorNodeState.userPoolsMetrics?.length} pools:&nbsp;
                   <span style={{ fontWeight: "bold" }}>${unclaimedFeeTotal()}</span>
                 </Text>
 
