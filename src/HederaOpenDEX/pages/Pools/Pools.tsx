@@ -46,7 +46,7 @@ const Pools = (): JSX.Element => {
   const { mirrorNodeState } = useHashConnectContext();
   const { fetchAllPoolMetrics } = mirrorNodeState;
 
-  const [state, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
+  const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   useEffect(() => {
     fetchAllPoolMetrics();
@@ -55,17 +55,28 @@ const Pools = (): JSX.Element => {
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
   useEffect(() => {
-    const allPoolsTotalColWidth = state.allPoolsColHeaders.reduce((total, col) => (total += col.colWidth), 0);
-    const userPoolsTotalColWidth = state.userPoolsColHeaders.reduce((total, col) => (total += col.colWidth), 0);
+    const allPoolsTotalColWidth = colHeadersState.allPoolsColHeaders.reduce((total, col) => (total += col.colWidth), 0);
+    const userPoolsTotalColWidth = colHeadersState.userPoolsColHeaders.reduce(
+      (total, col) => (total += col.colWidth),
+      0
+    );
     if (allPoolsTotalColWidth > userPoolsTotalColWidth) {
       setState({
-        ...state,
-        userPoolsColHeaders: scaleColWidth(state.userPoolsColHeaders, userPoolsTotalColWidth, allPoolsTotalColWidth),
+        ...colHeadersState,
+        userPoolsColHeaders: scaleColWidth(
+          colHeadersState.userPoolsColHeaders,
+          userPoolsTotalColWidth,
+          allPoolsTotalColWidth
+        ),
       });
     } else if (userPoolsTotalColWidth > allPoolsTotalColWidth) {
       setState({
-        ...state,
-        allPoolsColHeaders: scaleColWidth(state.allPoolsColHeaders, allPoolsTotalColWidth, userPoolsTotalColWidth),
+        ...colHeadersState,
+        allPoolsColHeaders: scaleColWidth(
+          colHeadersState.allPoolsColHeaders,
+          allPoolsTotalColWidth,
+          userPoolsTotalColWidth
+        ),
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,7 +159,7 @@ const Pools = (): JSX.Element => {
       </TabList>
       <TabPanels>
         <TabPanel>
-          <DataTable colHeaders={state.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+          <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
         </TabPanel>
         <TabPanel>
           {unclaimedFeeTotal() > 0 ? (
@@ -173,7 +184,7 @@ const Pools = (): JSX.Element => {
           ) : (
             ""
           )}
-          <DataTable colHeaders={state.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+          <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
         </TabPanel>
       </TabPanels>
     </Tabs>

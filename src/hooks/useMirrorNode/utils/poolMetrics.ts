@@ -54,8 +54,8 @@ const calculateVolume = ({ poolAccountId, tokenAccountId, accountTransactions }:
   const allTokenTransfers = accountTransactions.flatMap((accountTransaction) => accountTransaction.token_transfers);
   const volume = allTokenTransfers.reduce((tokenTransactionVolume: number, tokenTransfer: MirrorNodeTokenTransfer) => {
     const { token_id, account, amount } = tokenTransfer;
-    if (account === poolAccountId && token_id === tokenAccountId) {
-      return tokenTransactionVolume + Math.abs(amount);
+    if (account === poolAccountId && token_id === tokenAccountId && amount >= 0) {
+      return tokenTransactionVolume + amount;
     }
     return tokenTransactionVolume;
   }, 0);
