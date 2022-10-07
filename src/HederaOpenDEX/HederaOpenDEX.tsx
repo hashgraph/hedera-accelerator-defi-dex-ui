@@ -1,4 +1,3 @@
-import React from "react";
 import { ChakraProvider, Container } from "@chakra-ui/react";
 import { Trade, Pool, Pools } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";

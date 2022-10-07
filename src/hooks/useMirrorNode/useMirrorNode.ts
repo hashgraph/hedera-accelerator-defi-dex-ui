@@ -33,7 +33,7 @@ const useMirrorNode = create<MirrorNodeState>()(
         try {
           const poolAccountBalances = await fetchAccountBalances(SWAP_CONTRACT_ID);
           // THIS IS MOCKED: Need to add pair tokens to contract.
-          poolAccountBalances.data.balances
+          poolAccountBalances
             .find((poolAccountBalance: any) => poolAccountBalance.account === SWAP_CONTRACT_ID)
             ?.tokens.push({
               token_id: "0.0.48143347",
@@ -47,9 +47,9 @@ const useMirrorNode = create<MirrorNodeState>()(
           const allPoolsMetrics = poolTokenPairs.map((tokenPair) => {
             return calculatePoolMetrics({
               poolAccountId: SWAP_CONTRACT_ID,
-              poolAccountBalances: poolAccountBalances.data.balances,
-              last24Transactions: last24Transactions.data.transactions,
-              last7DTransactions: last7DTransactions.data.transactions,
+              poolAccountBalances,
+              last24Transactions,
+              last7DTransactions,
               tokenPair,
             });
           });
@@ -58,7 +58,7 @@ const useMirrorNode = create<MirrorNodeState>()(
           const userAccountBalances = await fetchAccountBalances(userAccountId);
           // return if user has pair token in walet
           const userLPTokensList = poolTokenPairs.filter((poolTokenPair) => {
-            const userTokenBalances = userAccountBalances.data.balances.find(
+            const userTokenBalances = userAccountBalances.find(
               (userAccountBalance: any) => userAccountBalance.account === userAccountId // wallet address
             )?.tokens;
             return userTokenBalances.some(
@@ -68,8 +68,8 @@ const useMirrorNode = create<MirrorNodeState>()(
           const userPoolsMetrics = userLPTokensList.map((tokenPair) => {
             return calculateUserPoolMetrics({
               allPoolsMetrics,
-              poolAccountBalances: poolAccountBalances.data.balances,
-              userAccountBalances: userAccountBalances.data.balances,
+              poolAccountBalances,
+              userAccountBalances,
               tokenPair,
             });
           });

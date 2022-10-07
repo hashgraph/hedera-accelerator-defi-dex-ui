@@ -4,8 +4,29 @@ import { A_B_PAIR_TOKEN_ID, L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
 import { TokenPair } from "./types";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
-// const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
+/* TODO: Enable for Mainnet usage.
+const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
+*/
+const testnetMirrorNodeAPI = axios.create({
+  baseURL: TESTNET_URL,
+});
+/* TODO: Enable for Mainnet usage.
+const mainnetMirrorNodeAPI = axios.create({
+  baseURL: MAINNET_URL
+});
+*/
+
 const GREATER_THAN = "gte";
+
+const fetchNextBatch = async (nextUrl: string, field: string, config: any = {}): Promise<any[]> => {
+  const response = await testnetMirrorNodeAPI.get(nextUrl, config);
+  const { links } = response.data;
+  const isMoreData = !isNil(links.next);
+  if (isMoreData) {
+    return [...response.data[field], ...(await fetchNextBatch(links.next, field))];
+  }
+  return response.data[field];
+};
 
 /** */
 const fetchAccountTransactions = async (accountId: string, timestamp?: string) => {
@@ -16,12 +37,12 @@ const fetchAccountTransactions = async (accountId: string, timestamp?: string) =
     result: "success",
     limit: 100,
   };
+
   if (!isNil(timestamp)) {
     Object.assign(params, { timestamp: `${GREATER_THAN}:${timestamp}` });
   }
-  return await axios.get(`${TESTNET_URL}/api/v1/transactions`, {
-    params,
-  });
+
+  return await fetchNextBatch("/api/v1/transactions", "transactions", { params });
 };
 
 // TODO: This should be replaced with a mirror call to fetch all pairs associated with the primary swap/pool contract.
@@ -42,10 +63,11 @@ const fetchTokenPairs = async (): Promise<TokenPair[]> => {
  * @returns - The list of balances for the given account ID.
  */
 const fetchAccountBalances = async (accountId: string) => {
-  return await axios.get(`${TESTNET_URL}/api/v1/balances`, {
+  return await fetchNextBatch(`/api/v1/balances`, "balances", {
     params: {
       "account.id": accountId,
       order: "asc",
+      limit: 100,
     },
   });
 };
@@ -57,7 +79,7 @@ const fetchAccountBalances = async (accountId: string) => {
  * @returns - The list of balances for the given token ID.
  */
 const fetchTokenBalances = async (tokenId: string) => {
-  return await axios.get(`${TESTNET_URL}/api/v1/tokens/${tokenId}/balances`, {
+  return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/balances`, {
     params: {
       order: "asc",
     },
