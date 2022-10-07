@@ -1,6 +1,6 @@
 import axios from "axios";
 import { isNil } from "ramda";
-import { L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
+import { A_B_PAIR_TOKEN_ID, L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
 import { TokenPair } from "./types";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
@@ -27,7 +27,11 @@ const fetchAccountTransactions = async (accountId: string, timestamp?: string) =
 // TODO: This should be replaced with a mirror call to fetch all pairs associated with the primary swap/pool contract.
 const fetchTokenPairs = async (): Promise<TokenPair[]> => {
   return await Promise.resolve([
-    { tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID }, tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID } },
+    {
+      pairToken: { symbol: "A-B", accountId: A_B_PAIR_TOKEN_ID },
+      tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID },
+      tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID },
+    },
   ]);
 };
 

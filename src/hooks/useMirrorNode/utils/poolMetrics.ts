@@ -1,4 +1,4 @@
-import { SWAP_CONTRACT_ID } from "../../constants";
+import { A_B_PAIR_TOKEN_ID, SWAP_CONTRACT_ID } from "../../constants";
 import { isNil } from "ramda";
 import {
   MirrorNodeTransaction,
@@ -6,24 +6,25 @@ import {
   TokenPair,
   MirrorNodeAccountBalance,
   MirrorNodeTokenTransfer,
+  UserPoolState,
 } from "../types";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;
 
 interface CalculateTotalValueLockedForPoolParams {
-  accountBalances: MirrorNodeAccountBalance[];
+  poolAccountBalances: MirrorNodeAccountBalance[];
   tokenAAccountId: string;
   tokenBAccountId: string;
 }
 
 const calculateTotalValueLockedForPool = ({
-  accountBalances,
+  poolAccountBalances,
   tokenAAccountId,
   tokenBAccountId,
 }: CalculateTotalValueLockedForPoolParams): number => {
-  const poolTokenBalances = accountBalances.find(
-    (accountBalance) => accountBalance.account === SWAP_CONTRACT_ID
+  const poolTokenBalances = poolAccountBalances.find(
+    (poolAccountBalance) => poolAccountBalance.account === SWAP_CONTRACT_ID
   )?.tokens;
 
   const tokenAPoolBalance = poolTokenBalances?.find(
@@ -62,13 +63,73 @@ const calculateVolume = ({ poolAccountId, tokenAccountId, accountTransactions }:
 };
 
 // TODO
-// const calculatePercentOfPool = () => {
-//   return 0;
-// };
+const calculateUserPoolLiquidity = (percentOfPool: number, totalVolumeLocked: number): number => {
+  return percentOfPool * totalVolumeLocked;
+};
+
+// TODO
+const calculatePercentOfPool = ({ userAccountBalances, poolAccountBalances, LPAccountId }: any): number => {
+  const poolTokenBalances = poolAccountBalances.find(
+    (poolAccountBalance: any) => poolAccountBalance.account === SWAP_CONTRACT_ID
+  )?.tokens;
+
+  const poolLPTokenBalance = poolTokenBalances?.find(
+    (poolTokenBalance: any) => poolTokenBalance.token_id === LPAccountId
+  )?.balance;
+
+  const userTokenBalances = userAccountBalances.find(
+    (userAccountBalance: any) => userAccountBalance.account === "0.0.34728121" // wallet address
+  )?.tokens;
+
+  const userLPTokenBalance = userTokenBalances?.find(
+    (userTokenBalance: any) => userTokenBalance.token_id === LPAccountId
+  )?.balance;
+
+  if (isNil(poolLPTokenBalance) || isNil(userLPTokenBalance)) {
+    console.error("Cannot find mirror node balance for LP token account ID.");
+    return 0;
+  } else {
+    return userLPTokenBalance / poolLPTokenBalance;
+  }
+};
+
+interface CalculateUserPoolMetricsParams {
+  allPoolsMetrics: PoolState[];
+  poolAccountBalances: any;
+  userAccountBalances: any;
+  tokenPair: TokenPair;
+}
+
+const calculateUserPoolMetrics = ({
+  allPoolsMetrics,
+  poolAccountBalances,
+  userAccountBalances,
+  tokenPair,
+}: CalculateUserPoolMetricsParams): UserPoolState => {
+  const { pairToken, tokenA, tokenB } = tokenPair;
+  const totalVolumeLocked = calculateTotalValueLockedForPool({
+    poolAccountBalances,
+    tokenAAccountId: tokenA.accountId,
+    tokenBAccountId: tokenB.accountId,
+  });
+  const percentOfPool = calculatePercentOfPool({
+    userAccountBalances,
+    poolAccountBalances,
+    LPAccountId: pairToken.accountId,
+  });
+  const userLiquidity = calculateUserPoolLiquidity(percentOfPool, totalVolumeLocked);
+  return {
+    name: `${tokenA.symbol}/${tokenB.symbol}`,
+    fee: 0.05,
+    liquidity: userLiquidity,
+    percentOfPool,
+    unclaimedFees: 0,
+  };
+};
 
 interface CalculatePoolMetricsParams {
   poolAccountId: string;
-  accountBalances: any;
+  poolAccountBalances: any;
   last24Transactions: MirrorNodeTransaction[];
   last7DTransactions: MirrorNodeTransaction[];
   tokenPair: TokenPair;
@@ -76,14 +137,14 @@ interface CalculatePoolMetricsParams {
 
 const calculatePoolMetrics = ({
   poolAccountId,
-  accountBalances,
+  poolAccountBalances,
   last24Transactions,
   last7DTransactions,
   tokenPair,
 }: CalculatePoolMetricsParams): PoolState => {
   const { tokenA, tokenB } = tokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
-    accountBalances,
+    poolAccountBalances,
     tokenAAccountId: tokenA.accountId,
     tokenBAccountId: tokenB.accountId,
   });
@@ -106,4 +167,4 @@ const calculatePoolMetrics = ({
   };
 };
 
-export { calculatePoolMetrics };
+export { calculatePoolMetrics, calculateUserPoolMetrics };

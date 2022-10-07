@@ -4,6 +4,7 @@ enum ActionType {
   FETCH_POOL_METRICS_FAILED = "useMirrorNode/FETCH_POOL_METRICS_FAILED",
 }
 
+/* Add Symbol */
 interface PoolState {
   name: string;
   fee: number;
@@ -28,7 +29,12 @@ interface MirrorNodeState {
   fetchAllPoolMetrics: () => Promise<void>;
 }
 
+// Only for mocking for now
 interface TokenPair {
+  pairToken: {
+    symbol: string;
+    accountId: string;
+  };
   tokenA: {
     symbol: string;
     accountId: string;
