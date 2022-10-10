@@ -43,14 +43,19 @@ const userPoolsColHeaders: DataTableColumnConfig[] = [
 ];
 
 const Pools = (): JSX.Element => {
-  const { mirrorNodeState } = useHashConnectContext();
-  const { fetchAllPoolMetrics } = mirrorNodeState;
+  const { hashConnectState, mirrorNodeState } = useHashConnectContext();
+  const walletAccountId = hashConnectState.walletData.pairedAccounts[0];
+  const { fetchAllPoolMetrics, fetchUserPoolMetrics } = mirrorNodeState;
 
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   useEffect(() => {
-    fetchAllPoolMetrics();
-  }, [fetchAllPoolMetrics]);
+    const fetchPoolMetrics = async () => {
+      await fetchAllPoolMetrics();
+      await fetchUserPoolMetrics(walletAccountId);
+    };
+    fetchPoolMetrics();
+  }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values

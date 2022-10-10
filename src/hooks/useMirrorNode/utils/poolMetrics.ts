@@ -1,39 +1,73 @@
-import { A_B_PAIR_TOKEN_ID, SWAP_CONTRACT_ID } from "../../constants";
 import { isNil } from "ramda";
 import {
   MirrorNodeTransaction,
   PoolState,
   TokenPair,
-  MirrorNodeAccountBalance,
   MirrorNodeTokenTransfer,
   UserPoolState,
+  MirrorNodeTokenBalance,
+  MirrorNodeAccountBalance,
 } from "../types";
+import { getTimestamp24HoursAgo } from "./time";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;
 
+/**
+ * Gathers all transaction data that has a consensus timestamp from the past 24 hours.
+ * @param transactions - A list of Hedera transactions.
+ * @returns A list of Hedera transactions in the transactions list that happened in the past 24 hours.
+ */
+const getTransactionsFromLast24Hours = (transactions: MirrorNodeTransaction[]) => {
+  const timestamp24HoursAgo = getTimestamp24HoursAgo();
+  return transactions.filter(
+    (transaction: MirrorNodeTransaction) => transaction.consensus_timestamp > timestamp24HoursAgo
+  );
+};
+
+/**
+ * Retrieves the balance for a specified token in a list of token balances
+ * @param tokenBalances - A list of token IDs and balances.
+ * @param tokenId - The ID of the token to get the balance for.
+ * @returns The balance for the token with an ID equal to the tokenId.
+ */
+const getTokenBalance = (tokenBalances: MirrorNodeTokenBalance[], tokenId: string) => {
+  return tokenBalances?.find((tokenBalance) => tokenBalance.token_id === tokenId)?.balance;
+};
+
+/**
+ * Retrieves the token balances for a specified account in a list of account balances.
+ * @param accountBalances - A list of account balances.
+ * @param accountId - The ID of the account to get the token balance for.
+ * @returns The token balances for the account equal to the accountId.
+ */
+const getTokenBalances = (accountBalances: MirrorNodeAccountBalance[], accountId: string) => {
+  return accountBalances?.find((accountBalance) => accountBalance.account === accountId)?.tokens ?? [];
+};
+
 interface CalculateTotalValueLockedForPoolParams {
-  poolAccountBalances: MirrorNodeAccountBalance[];
+  /** Token balances for the liquidity pool. */
+  poolTokenBalances: MirrorNodeTokenBalance[];
+  /** Account ID for Token A. */
   tokenAAccountId: string;
+  /** Account ID for Token B. */
   tokenBAccountId: string;
 }
 
-const calculateTotalValueLockedForPool = ({
-  poolAccountBalances,
-  tokenAAccountId,
-  tokenBAccountId,
-}: CalculateTotalValueLockedForPoolParams): number => {
-  const poolTokenBalances = poolAccountBalances.find(
-    (poolAccountBalance) => poolAccountBalance.account === SWAP_CONTRACT_ID
-  )?.tokens;
-
-  const tokenAPoolBalance = poolTokenBalances?.find(
-    (poolTokenBalance) => poolTokenBalance.token_id === tokenAAccountId
-  )?.balance;
-  const tokenBPoolBalance = poolTokenBalances?.find(
-    (poolTokenBalance) => poolTokenBalance.token_id === tokenBAccountId
-  )?.balance;
-
+/**
+ * Calculate the Total Value Locked for a liquidity pool (pTVL).
+ * A = reserve balance of tokenA in pool
+ * B = reserve balance of tokenB in pool
+ * vA = value of 1 tokenA in USD
+ * vB = value of 1 tokenB in USD
+ * pTVL = (A * vA) + (B * vB)
+ * @param params - {@link CalculateTotalValueLockedForPoolParams}
+ * @returns The total value locked for a given pair of tokens.
+ */
+const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPoolParams): number => {
+  const { poolTokenBalances, tokenAAccountId, tokenBAccountId } = params;
+  const tokenAPoolBalance = getTokenBalance(poolTokenBalances, tokenAAccountId);
+  const tokenBPoolBalance = getTokenBalance(poolTokenBalances, tokenBAccountId);
   if (isNil(tokenAPoolBalance) || isNil(tokenBPoolBalance)) {
     console.error("Cannot find mirror node balance for token account ID.");
     return 0;
@@ -67,24 +101,19 @@ const calculateUserPoolLiquidity = (percentOfPool: number, totalVolumeLocked: nu
   return percentOfPool * totalVolumeLocked;
 };
 
-// TODO
-const calculatePercentOfPool = ({ userAccountBalances, poolAccountBalances, LPAccountId }: any): number => {
-  const poolTokenBalances = poolAccountBalances.find(
-    (poolAccountBalance: any) => poolAccountBalance.account === SWAP_CONTRACT_ID
-  )?.tokens;
+interface CalculatePercentOfPoolParams {
+  userTokenBalances: MirrorNodeTokenBalance[];
+  poolTokenBalances: MirrorNodeTokenBalance[];
+  liquidityTokenAccountId: string;
+}
 
-  const poolLPTokenBalance = poolTokenBalances?.find(
-    (poolTokenBalance: any) => poolTokenBalance.token_id === LPAccountId
-  )?.balance;
-
-  const userTokenBalances = userAccountBalances.find(
-    (userAccountBalance: any) => userAccountBalance.account === "0.0.34728121" // wallet address
-  )?.tokens;
-
-  const userLPTokenBalance = userTokenBalances?.find(
-    (userTokenBalance: any) => userTokenBalance.token_id === LPAccountId
-  )?.balance;
-
+const calculatePercentOfPool = ({
+  userTokenBalances,
+  poolTokenBalances,
+  liquidityTokenAccountId,
+}: CalculatePercentOfPoolParams): number => {
+  const poolLPTokenBalance = getTokenBalance(poolTokenBalances, liquidityTokenAccountId);
+  const userLPTokenBalance = getTokenBalance(userTokenBalances, liquidityTokenAccountId);
   if (isNil(poolLPTokenBalance) || isNil(userLPTokenBalance)) {
     console.error("Cannot find mirror node balance for LP token account ID.");
     return 0;
@@ -94,28 +123,26 @@ const calculatePercentOfPool = ({ userAccountBalances, poolAccountBalances, LPAc
 };
 
 interface CalculateUserPoolMetricsParams {
-  allPoolsMetrics: PoolState[];
-  poolAccountBalances: any;
-  userAccountBalances: any;
+  poolTokenBalances: MirrorNodeTokenBalance[];
+  userTokenBalances: MirrorNodeTokenBalance[];
   tokenPair: TokenPair;
 }
 
 const calculateUserPoolMetrics = ({
-  allPoolsMetrics,
-  poolAccountBalances,
-  userAccountBalances,
+  poolTokenBalances,
+  userTokenBalances,
   tokenPair,
 }: CalculateUserPoolMetricsParams): UserPoolState => {
   const { pairToken, tokenA, tokenB } = tokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
-    poolAccountBalances,
+    poolTokenBalances,
     tokenAAccountId: tokenA.accountId,
     tokenBAccountId: tokenB.accountId,
   });
   const percentOfPool = calculatePercentOfPool({
-    userAccountBalances,
-    poolAccountBalances,
-    LPAccountId: pairToken.accountId,
+    userTokenBalances,
+    poolTokenBalances,
+    liquidityTokenAccountId: pairToken.accountId,
   });
   const userLiquidity = calculateUserPoolLiquidity(percentOfPool, totalVolumeLocked);
   return {
@@ -129,7 +156,7 @@ const calculateUserPoolMetrics = ({
 
 interface CalculatePoolMetricsParams {
   poolAccountId: string;
-  poolAccountBalances: any;
+  poolTokenBalances: MirrorNodeTokenBalance[];
   last24Transactions: MirrorNodeTransaction[];
   last7DTransactions: MirrorNodeTransaction[];
   tokenPair: TokenPair;
@@ -137,14 +164,14 @@ interface CalculatePoolMetricsParams {
 
 const calculatePoolMetrics = ({
   poolAccountId,
-  poolAccountBalances,
+  poolTokenBalances,
   last24Transactions,
   last7DTransactions,
   tokenPair,
 }: CalculatePoolMetricsParams): PoolState => {
   const { tokenA, tokenB } = tokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
-    poolAccountBalances,
+    poolTokenBalances,
     tokenAAccountId: tokenA.accountId,
     tokenBAccountId: tokenB.accountId,
   });
@@ -167,4 +194,4 @@ const calculatePoolMetrics = ({
   };
 };
 
-export { calculatePoolMetrics, calculateUserPoolMetrics };
+export { calculatePoolMetrics, calculateUserPoolMetrics, getTokenBalances, getTransactionsFromLast24Hours };
