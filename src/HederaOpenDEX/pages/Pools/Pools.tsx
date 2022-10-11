@@ -4,13 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../components/base/DataTable";
 import { useHashConnectContext } from "../../../context";
 import { PoolState, UserPoolState } from "../../../hooks/useMirrorNode/types";
-import { formatPoolMetrics } from "./utils";
+import { formatPoolMetrics, formatUserPoolMetrics } from "./utils";
 import { isEmpty } from "ramda";
-export interface BasePoolDetails {
-  Pool: string; // TODO: type this (will need token symbol filename and potentially other details)
-  Fee: string;
-}
 
+export interface FormattedUserPoolDetails {
+  name: string;
+  fee: string;
+  liquidity: string;
+  percentOfPool: string;
+  unclaimedFees: string;
+  actions?: JSX.Element;
+}
 export interface FormattedPoolDetails {
   name: string;
   fee: string;
@@ -20,30 +24,38 @@ export interface FormattedPoolDetails {
   actions?: JSX.Element;
 }
 
-export interface FormattedPoolDetails {
-  name: string;
-  fee: string;
-  totalVolumeLocked: string;
-  past24HoursVolume: string;
-  past7daysVolume: string;
-  actions?: JSX.Element;
-}
+const allPoolsColHeaders: DataTableColumnConfig[] = [
+  { headerName: "Pool", field: "name", colWidth: 158 },
+  { headerName: "Fee", field: "fee", colWidth: 61 },
+  { headerName: "TVL", field: "totalVolumeLocked", colWidth: 136 },
+  { headerName: "Volume 24H", field: "past24HoursVolume", colWidth: 136 },
+  { headerName: "Volume 7D", field: "past7daysVolume", colWidth: 136 },
+  { headerName: "Actions", field: "actions", colWidth: 203 },
+];
 
-export interface PoolsProps {
-  allPoolsColHeaders: DataTableColumnConfig[];
-  userPools: UserPoolDetails[] | undefined;
-  userPoolsColHeaders: DataTableColumnConfig[];
-}
+const userPoolsColHeaders: DataTableColumnConfig[] = [
+  { headerName: "Pool", field: "name", colWidth: 158 },
+  { headerName: "Fee", field: "fee", colWidth: 61 },
+  { headerName: "Liquidity", field: "liquidity", colWidth: 136 },
+  { headerName: "% of the Pool", field: "percentOfPool", colWidth: 118 },
+  { headerName: "Unclaimed Fees", field: "unclaimedFees", colWidth: 131 },
+  { headerName: "Actions", field: "actions", colWidth: 226 },
+];
 
-const Pools = (props: PoolsProps): JSX.Element => {
-  const { mirrorNodeState } = useHashConnectContext();
-  const { fetchAllPoolMetrics } = mirrorNodeState;
+const Pools = (): JSX.Element => {
+  const { hashConnectState, mirrorNodeState } = useHashConnectContext();
+  const walletAccountId = hashConnectState.walletData.pairedAccounts[0];
+  const { fetchAllPoolMetrics, fetchUserPoolMetrics } = mirrorNodeState;
 
-  const [state, setState] = useState(props);
+  const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   useEffect(() => {
-    fetchAllPoolMetrics();
-  }, [fetchAllPoolMetrics]);
+    const fetchPoolMetrics = async () => {
+      await fetchAllPoolMetrics();
+      await fetchUserPoolMetrics(walletAccountId);
+    };
+    fetchPoolMetrics();
+  }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -97,7 +109,7 @@ const Pools = (props: PoolsProps): JSX.Element => {
   );
 
   const formatPoolsRowData = (
-    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | UserPoolDetails[] | undefined,
+    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | FormattedUserPoolDetails[] | undefined,
     userPool = false
   ) => {
     return rowData
