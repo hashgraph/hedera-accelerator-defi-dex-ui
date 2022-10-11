@@ -10,6 +10,8 @@ export const L49A_TOKEN_ID = "0.0.47646195";
 
 export const L49B_TOKEN_ID = "0.0.47646196";
 
+export const A_B_PAIR_TOKEN_ID = "0.0.48143347";
+
 export const USDC_TOKEN_ID = "0.0.2276691";
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
