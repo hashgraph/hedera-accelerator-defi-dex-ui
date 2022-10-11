@@ -12,6 +12,7 @@ import {
   getTokenBalances,
   getTransactionsFromLast24Hours,
 } from "./utils";
+import { isNil } from "ramda";
 
 const initialMirrorNodeState: MirrorNodeState = {
   allPoolsMetrics: [],
@@ -81,6 +82,9 @@ const useMirrorNode = create<MirrorNodeState>()(
       fetchUserPoolMetrics: async (userAccountId: string) => {
         set({ status: "fetching" }, false, ActionType.FETCH_USER_POOL_METRICS_STARTED);
         try {
+          if (isNil(userAccountId)) {
+            throw Error("User Account ID must be defined.");
+          }
           const userAccountBalances = await fetchAccountBalances(userAccountId);
           const poolTokenPairs = await fetchTokenPairs();
           const userTokenBalances = getTokenBalances(userAccountBalances, userAccountId);
