@@ -11,7 +11,7 @@ import {
   getPoolLiquidity,
   clearWalletPairings,
 } from "./actions/hashConnectActions";
-import { HashConnectState } from "./reducers/hashConnectReducer";
+import { HashConnectState, initialHashConnectState } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "../constants";
 import { WalletConnectionStatus } from "./types";
@@ -59,7 +59,13 @@ const useHashConnect = ({
   useHashConnectEvents(hashconnect, dispatch, debug);
 
   const saveToLocalStorage = useCallback(() => {
-    const hashconnectDataJSON = JSON.stringify(hashConnectState);
+    const hashconnectDataJSON = JSON.stringify({
+      ...hashConnectState,
+      // do not save non wallet related state fields
+      transactionState: { ...initialHashConnectState.transactionState },
+      spotPrices: initialHashConnectState.spotPrices,
+      poolLiquidity: initialHashConnectState.poolLiquidity,
+    });
     localStorage.setItem(HASHCONNECT_LOCAL_DATA_KEY, hashconnectDataJSON);
   }, [hashConnectState]);
 

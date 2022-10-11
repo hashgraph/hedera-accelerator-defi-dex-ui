@@ -1,5 +1,6 @@
 import { MessageTypes } from "hashconnect";
 import { ConnectionStatus } from "../types";
+import { TransactionResponse } from "@hashgraph/sdk";
 
 export enum ActionType {
   INITIALIZE_WALLET_CONNECTION_STARTED = "INITIALIZE_WALLET_CONNECTION_STARTED",
@@ -123,6 +124,7 @@ interface SendSwapTransactionToWalletStarted {
 
 interface SendSwapTransactionToWalletSucceeded {
   type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED;
+  payload: TransactionResponse;
 }
 
 interface SendSwapTransactionToWalletFailed {

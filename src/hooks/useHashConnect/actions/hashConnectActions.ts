@@ -1,4 +1,11 @@
-import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
+import {
+  ContractExecuteTransaction,
+  ContractFunctionParameters,
+  AccountId,
+  TokenId,
+  ContractId,
+  TransactionResponse,
+} from "@hashgraph/sdk";
 import { BigNumber } from "bignumber.js";
 import { ActionType, HashConnectAction } from "./actionsTypes";
 import { getErrorMessage } from "../../utils";
@@ -132,9 +139,10 @@ const sendSwapTransactionToWalletStarted = (): HashConnectAction => {
   };
 };
 
-const sendSwapTransactionToWalletSucceeded = (): HashConnectAction => {
+const sendSwapTransactionToWalletSucceeded = (payload: TransactionResponse): HashConnectAction => {
   return {
     type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED,
+    payload,
   };
 };
 
@@ -321,11 +329,11 @@ const sendSwapTransactionToWallet = (payload: any) => {
       // Transaction execution is complete after the async call in the line above
 
       dispatch(setTransactionWaitingToBeSigned(false));
-      dispatch(
-        result
-          ? sendSwapTransactionToWalletSucceeded()
-          : sendSwapTransactionToWalletFailed("Transaction Execution Failed")
-      );
+      if (result) {
+        dispatch(sendSwapTransactionToWalletSucceeded(result));
+      } else {
+        throw new Error("Transaction Execution Failed");
+      }
       /* TODO: Results will be saved in context state and displayed in the UI */
       console.log(result);
     } catch (error) {

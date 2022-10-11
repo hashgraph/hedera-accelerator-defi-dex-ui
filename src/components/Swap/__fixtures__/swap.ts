@@ -19,5 +19,9 @@ export const mockSwapProps: SwapProps = {
     icon: "",
   },
   installedExtensions: null,
-  transactionWaitingToBeSigned: false,
+  transactionState: {
+    transactionWaitingToBeSigned: false,
+    successPayload: null,
+    errorMessage: "",
+  },
 };

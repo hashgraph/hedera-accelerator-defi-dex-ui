@@ -1,9 +1,20 @@
 import { ChangeEvent, MouseEvent, useCallback, useEffect, useState } from "react";
 import { useImmerReducer } from "use-immer";
-import { ChakraProvider, Box, Heading, Flex, Spacer, Text, Collapse } from "@chakra-ui/react";
-import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
+import {
+  ChakraProvider,
+  Box,
+  Heading,
+  Flex,
+  Spacer,
+  Text,
+  Collapse,
+  Tag,
+  TagCloseButton,
+  Link,
+} from "@chakra-ui/react";
+import { SettingsIcon, UpDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
-import { WalletConnectionStatus, Networks } from "../../hooks/useHashConnect";
+import { WalletConnectionStatus, Networks, TransactionState } from "../../hooks/useHashConnect";
 import { HederaOpenDexTheme } from "../../HederaOpenDEX/styles";
 import { swapReducer, initialSwapState, initSwapReducer } from "./reducers";
 import {
@@ -46,7 +57,7 @@ export interface SwapProps {
   network: Networks;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
-  transactionWaitingToBeSigned: boolean;
+  transactionState: TransactionState;
 }
 
 const Swap = (props: SwapProps) => {
@@ -59,13 +70,18 @@ const Swap = (props: SwapProps) => {
     sendSwapTransaction,
     poolLiquidity,
     getPoolLiquidity,
-    transactionWaitingToBeSigned,
+    transactionState,
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
 
   const [localSwapState, setLocalSwapState] = useState({
     settingsOpen: false,
+    showSuccessMessage: false,
+    tokenToTradeAmount: 0,
+    tokenToTradeSymbol: "",
+    tokenToReceiveAmount: 0,
+    tokenToReceiveSymbol: "",
   });
 
   const onSlippageInputChange = useCallback(
@@ -331,12 +347,65 @@ const Swap = (props: SwapProps) => {
   const getSwapConfirmationStep = useCallback(() => {
     // TODO: we aren't able to tell when the transaction is actually being processed (after signing)
     //       but if and when we are need to add logic for that SwapConfirmationStep
-    return transactionWaitingToBeSigned ? SwapConfirmationStep.SIGN : SwapConfirmationStep.CONFIRM;
-  }, [transactionWaitingToBeSigned]);
+    const { transactionWaitingToBeSigned, successPayload, errorMessage } = transactionState;
+    return transactionWaitingToBeSigned && !successPayload && !errorMessage
+      ? SwapConfirmationStep.SIGN
+      : !transactionWaitingToBeSigned && !successPayload && errorMessage
+      ? SwapConfirmationStep.ERROR
+      : SwapConfirmationStep.CONFIRM;
+  }, [transactionState]);
+
+  const onSwapButtonClick = useCallback(() => {
+    setLocalSwapState({
+      ...localSwapState,
+      tokenToTradeAmount: swapState.tokenToTrade.amount,
+      tokenToTradeSymbol: swapState.tokenToTrade.symbol ?? "",
+      tokenToReceiveAmount: swapState.tokenToReceive.amount,
+      tokenToReceiveSymbol: swapState.tokenToReceive.symbol ?? "",
+    });
+  }, [localSwapState, swapState]);
+
+  const getHashScanLink = useCallback(() => {
+    const transactionId = transactionState.successPayload?.transactionId.toString();
+    const urlFormattedTimestamp = transactionId?.split("@")[1].replace(".", "-");
+    const formattedTransactionId = `${transactionId?.split("@")[0]}-${urlFormattedTimestamp}`;
+    // format: https://hashscan.io/#/testnet/transaction/0.0.34744739-1665448985-817445871
+    // TODO: set testnet/mainnet based on network
+    return `https://hashscan.io/#/testnet/transaction/${formattedTransactionId}`;
+  }, [transactionState]);
 
   return (
     <ChakraProvider theme={HederaOpenDexTheme}>
       <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+        {transactionState.successPayload &&
+        !transactionState.errorMessage &&
+        !transactionState.transactionWaitingToBeSigned &&
+        localSwapState.showSuccessMessage ? (
+          <Tag width={"100%"} padding={"8px"} marginBottom={"8px"} backgroundColor={"#00e64d33"}>
+            <Flex width={"100%"} flexDirection={"column"}>
+              <Text color={"#000000"}>
+                {`Swapped ${localSwapState.tokenToTradeAmount} ${localSwapState.tokenToTradeSymbol}
+                 for ${localSwapState.tokenToReceiveAmount} ${localSwapState.tokenToReceiveSymbol}`}
+              </Text>
+              <Link
+                width={"fit-content"}
+                display={"flex"}
+                alignItems={"center"}
+                color={"#0180FF"}
+                href={getHashScanLink()}
+                isExternal
+              >
+                <Text textDecoration={"underline"}>View in HashScan</Text> <ExternalLinkIcon />
+              </Link>
+            </Flex>
+            <TagCloseButton
+              color={"#000000"}
+              onClick={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: false })}
+            />
+          </Tag>
+        ) : (
+          ""
+        )}
         <Flex alignItems={"center"} marginBottom={"8px"}>
           <Heading as="h4" size="lg">
             {title}
@@ -428,6 +497,9 @@ const Swap = (props: SwapProps) => {
               sendSwapTransaction={sendSwapTransaction}
               swapState={swapState}
               confirmationStep={getSwapConfirmationStep()}
+              errorMessage={transactionState.errorMessage}
+              onSwapButtonClick={onSwapButtonClick}
+              onClose={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: true })}
             />
           ) : (
             <Button data-testid="connect-wallet-button" marginTop="0.5rem" onClick={connectToWallet}>

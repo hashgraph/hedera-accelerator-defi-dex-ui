@@ -19,7 +19,7 @@ const Trade = () => {
     installedExtensions,
     spotPrices,
     poolLiquidity,
-    transactionWaitingToBeSigned,
+    transactionState,
   } = hashConnectState;
 
   return (
@@ -39,7 +39,7 @@ const Trade = () => {
             walletData={walletData}
             network={network}
             installedExtensions={installedExtensions}
-            transactionWaitingToBeSigned={transactionWaitingToBeSigned}
+            transactionState={transactionState}
           />
         </Center>
       </Box>
