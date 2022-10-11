@@ -55,7 +55,7 @@ interface CalculateTotalValueLockedForPoolParams {
 }
 
 /**
- * Calculate the Total Value Locked for a liquidity pool (pTVL).
+ * Calculates the Total Value Locked for a liquidity pool (pTVL).
  * A = reserve balance of tokenA in pool
  * B = reserve balance of tokenB in pool
  * vA = value of 1 tokenA in USD
@@ -79,12 +79,31 @@ const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPo
 };
 
 interface CalculateVolumeParams {
+  /** Account ID of the liquidity pool. */
   poolAccountId: string;
+  /**
+   * The aggregate amount of tokens credited or debited in the liquidity pool with this token ID
+   * result in the transaction volume for a pool.
+   */
   tokenAccountId: string;
+  /**
+   * Transactions that are associated with a credit or debit in the liquidity pool. The list of
+   * transactions should be filtered to fit the desired consensus timestamp range.
+   * */
   accountTransactions: MirrorNodeTransaction[];
 }
 
-const calculateVolume = ({ poolAccountId, tokenAccountId, accountTransactions }: CalculateVolumeParams) => {
+/**
+ * Calculates the transaction volume of a token with a specified account ID in the given list
+ * of account transactions.
+ * A = for a given pool, the amount of tokenA swapped in a given hour h
+ * vA = the value in USD for 1 tokenA at the end of hour h
+ * Volume at hour h = A * vA
+ * @param params - {@link CalculateVolumeParams}
+ * @returns The transaction volume of the token with tokenAccountId in the accountTransactions.
+ */
+const calculateVolume = (params: CalculateVolumeParams) => {
+  const { poolAccountId, tokenAccountId, accountTransactions } = params;
   const allTokenTransfers = accountTransactions.flatMap((accountTransaction) => accountTransaction.token_transfers);
   const volume = allTokenTransfers.reduce((tokenTransactionVolume: number, tokenTransfer: MirrorNodeTokenTransfer) => {
     const { token_id, account, amount } = tokenTransfer;
@@ -96,22 +115,38 @@ const calculateVolume = ({ poolAccountId, tokenAccountId, accountTransactions }:
   return volume * getValueInUSD();
 };
 
-// TODO
-const calculateUserPoolLiquidity = (percentOfPool: number, totalVolumeLocked: number): number => {
-  return percentOfPool * totalVolumeLocked;
+/**
+ * Calculates the value of an account's portion of a liquidity pool.
+ * m% = Percent of pool
+ * pTVL = Totoal Value Locked for pool
+ * mL = m% * pTVL
+ * @param percentOfPool - The percentage of the pool owned by an account.
+ * @param totalValueLocked - The total value in USD locked in the liquidity pool.
+ * @returns The value of the account's porition of the liquidity pool in USD.
+ */
+const calculateUserPoolLiquidity = (percentOfPool: number, totalValueLocked: number): number => {
+  return percentOfPool * totalValueLocked;
 };
 
 interface CalculatePercentOfPoolParams {
+  /** Token types and balances owned by the user's account. */
   userTokenBalances: MirrorNodeTokenBalance[];
+  /** Token types and balances owned by the liquidity pool account. */
   poolTokenBalances: MirrorNodeTokenBalance[];
+  /** Account ID of the liquidity pool. */
   liquidityTokenAccountId: string;
 }
 
-const calculatePercentOfPool = ({
-  userTokenBalances,
-  poolTokenBalances,
-  liquidityTokenAccountId,
-}: CalculatePercentOfPoolParams): number => {
+/**
+ * Calculates the percentage in decimal format of the pool owned by an account.
+ * mLP = My LP tokens for a pool
+ * aLP = Total LP tokens for a pool
+ * m = mLP/aLP
+ * @param params - {@link CalculatePercentOfPoolParams}
+ * @returns The percentage (decimal) of the pool owned by an account.
+ */
+const calculatePercentOfPool = (params: CalculatePercentOfPoolParams): number => {
+  const { userTokenBalances, poolTokenBalances, liquidityTokenAccountId } = params;
   const poolLPTokenBalance = getTokenBalance(poolTokenBalances, liquidityTokenAccountId);
   const userLPTokenBalance = getTokenBalance(userTokenBalances, liquidityTokenAccountId);
   if (isNil(poolLPTokenBalance) || isNil(userLPTokenBalance)) {
@@ -123,17 +158,22 @@ const calculatePercentOfPool = ({
 };
 
 interface CalculateUserPoolMetricsParams {
+  /** Token balances for the liquidity pool. */
   poolTokenBalances: MirrorNodeTokenBalance[];
+  /** Token balances for the user's account. */
   userTokenBalances: MirrorNodeTokenBalance[];
-  tokenPair: TokenPair;
+  /** A list of liquidity pairs held by a user's account. */
+  userTokenPair: TokenPair;
 }
 
-const calculateUserPoolMetrics = ({
-  poolTokenBalances,
-  userTokenBalances,
-  tokenPair,
-}: CalculateUserPoolMetricsParams): UserPoolState => {
-  const { pairToken, tokenA, tokenB } = tokenPair;
+/**
+ * Calculates metrics related to liquidity pools that a user shares ownership in.
+ * @param params - {@link CalculateUserPoolMetricsParams}
+ * @returns Metrics related to a liquidity pool that a user has a share in.
+ */
+const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserPoolState => {
+  const { poolTokenBalances, userTokenBalances, userTokenPair } = params;
+  const { pairToken, tokenA, tokenB } = userTokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
     tokenAAccountId: tokenA.accountId,
@@ -155,20 +195,25 @@ const calculateUserPoolMetrics = ({
 };
 
 interface CalculatePoolMetricsParams {
+  /** Account ID of a liquidity pool. */
   poolAccountId: string;
+  /** Token balances for the liquidity pool. */
   poolTokenBalances: MirrorNodeTokenBalance[];
+  /** Transactions on the liquidity pool for the previous 24 hours */
   last24Transactions: MirrorNodeTransaction[];
+  /** Transactions on the liquidity pool for the previous 7 days */
   last7DTransactions: MirrorNodeTransaction[];
+  /** A list of liquidity pairs available on the pool contract. */
   tokenPair: TokenPair;
 }
 
-const calculatePoolMetrics = ({
-  poolAccountId,
-  poolTokenBalances,
-  last24Transactions,
-  last7DTransactions,
-  tokenPair,
-}: CalculatePoolMetricsParams): PoolState => {
+/**
+ * Calculates metrics related to a liquidity pool in the DEX.
+ * @param params - {@link CalculatePoolMetricsParams}
+ * @returns Metrics related to a liquidity pool.
+ */
+const calculatePoolMetrics = (params: CalculatePoolMetricsParams): PoolState => {
+  const { poolAccountId, poolTokenBalances, last24Transactions, last7DTransactions, tokenPair } = params;
   const { tokenA, tokenB } = tokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,

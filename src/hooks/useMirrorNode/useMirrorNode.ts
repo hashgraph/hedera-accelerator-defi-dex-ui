@@ -29,7 +29,6 @@ const initialMirrorNodeState: MirrorNodeState = {
  * This should be removed after we can fetch pair tokens from the pool contract.
  * */
 const appendLiquidityTokenBalance = (poolAccountBalances: MirrorNodeAccountBalance[]) => {
-  console.log();
   const mockedLiquidityTokenBalance = {
     token_id: A_B_PAIR_TOKEN_ID,
     balance: 1000,
@@ -95,7 +94,7 @@ const useMirrorNode = create<MirrorNodeState>()(
             return calculateUserPoolMetrics({
               poolTokenBalances: get().poolTokenBalances,
               userTokenBalances,
-              tokenPair: userTokenPair,
+              userTokenPair,
             });
           });
           set(
