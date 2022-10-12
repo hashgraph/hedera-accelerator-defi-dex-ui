@@ -15,6 +15,7 @@ export interface FormattedUserPoolDetails {
   unclaimedFees: string;
   actions?: JSX.Element;
 }
+
 export interface FormattedPoolDetails {
   name: string;
   fee: string;
