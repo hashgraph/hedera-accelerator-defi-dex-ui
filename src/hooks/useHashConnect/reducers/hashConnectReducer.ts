@@ -3,6 +3,7 @@ import { HashConnectTypes } from "hashconnect";
 import { ActionType, HashConnectAction } from "../actions/actionsTypes";
 import { getLocalHashconnectData } from "../utils";
 import { WalletConnectionStatus } from "../types";
+import { omit } from "ramda";
 
 export interface TransactionState {
   transactionWaitingToBeSigned: boolean;
@@ -28,6 +29,8 @@ export interface HashConnectState {
   transactionState: TransactionState;
 }
 
+const hashConnectStateWalletKeys = ["errorMessage", "walletConnectionStatus", "installedExtensions", "walletData"];
+
 const initialHashConnectState: HashConnectState = {
   errorMessage: null,
   spotPrices: undefined,
@@ -52,7 +55,12 @@ const initialHashConnectState: HashConnectState = {
 };
 
 function initHashConnectReducer(initialHashConnectState: HashConnectState) {
-  return getLocalHashconnectData() ?? initialHashConnectState;
+  return getLocalHashconnectData()
+    ? ({
+        ...getLocalHashconnectData(),
+        ...omit(hashConnectStateWalletKeys, initialHashConnectState),
+      } as HashConnectState)
+    : initialHashConnectState;
 }
 
 function hashConnectReducer(state: HashConnectState, action: HashConnectAction): HashConnectState {
@@ -270,4 +278,4 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
   }
 }
 
-export { hashConnectReducer, initHashConnectReducer, initialHashConnectState };
+export { hashConnectReducer, initHashConnectReducer, initialHashConnectState, hashConnectStateWalletKeys };
