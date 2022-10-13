@@ -1,9 +1,15 @@
-import { AccountBalanceJson } from "@hashgraph/sdk";
+import { AccountBalanceJson, TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectTypes } from "hashconnect";
 import { ActionType, HashConnectAction } from "../actions/actionsTypes";
 import { getLocalHashconnectData } from "../utils";
 import { WalletConnectionStatus } from "../types";
+import { omit } from "ramda";
 
+export interface TransactionState {
+  transactionWaitingToBeSigned: boolean;
+  successPayload: TransactionResponse | null;
+  errorMessage: string;
+}
 export interface HashConnectState {
   errorMessage: string | null;
   spotPrices: Map<string, number | undefined> | undefined;
@@ -20,7 +26,10 @@ export interface HashConnectState {
     pairedAccountBalance: AccountBalanceJson | null;
     pairedAccounts: string[];
   };
+  transactionState: TransactionState;
 }
+
+const hashConnectStateWalletKeys = ["errorMessage", "walletConnectionStatus", "installedExtensions", "walletData"];
 
 const initialHashConnectState: HashConnectState = {
   errorMessage: null,
@@ -38,10 +47,20 @@ const initialHashConnectState: HashConnectState = {
     pairedAccountBalance: null,
     pairedAccounts: [],
   },
+  transactionState: {
+    transactionWaitingToBeSigned: false,
+    successPayload: null,
+    errorMessage: "",
+  },
 };
 
 function initHashConnectReducer(initialHashConnectState: HashConnectState) {
-  return getLocalHashconnectData() ?? initialHashConnectState;
+  return getLocalHashconnectData()
+    ? ({
+        ...getLocalHashconnectData(),
+        ...omit(hashConnectStateWalletKeys, initialHashConnectState),
+      } as HashConnectState)
+    : initialHashConnectState;
 }
 
 function hashConnectReducer(state: HashConnectState, action: HashConnectAction): HashConnectState {
@@ -155,16 +174,38 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
       };
     }
     case ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED: {
-      return state;
+      // CLEAR/RESET PREVIOUS TRANSACTION STATE
+      return {
+        ...state,
+        transactionState: {
+          transactionWaitingToBeSigned: false,
+          successPayload: null,
+          errorMessage: "",
+        },
+      };
     }
     case ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED: {
-      return state;
+      const { payload } = action;
+      return {
+        ...state,
+        transactionState: {
+          transactionWaitingToBeSigned: false,
+          successPayload: payload,
+          errorMessage: "",
+        },
+      };
     }
     case ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_FAILED: {
+      // SET ERROR TO THE ONE IN THE TRANSACTION SLICE
       const { payload } = action;
       return {
         ...state,
         errorMessage: payload,
+        transactionState: {
+          transactionWaitingToBeSigned: false,
+          successPayload: null,
+          errorMessage: payload,
+        },
       };
     }
     case ActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED: {
@@ -224,7 +265,17 @@ function hashConnectReducer(state: HashConnectState, action: HashConnectAction):
     case ActionType.LOCAL_CONNECTION_STATUS_CHANGED: {
       return state;
     }
+    case ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED: {
+      const { payload } = action;
+      return {
+        ...state,
+        transactionState: {
+          ...state.transactionState,
+          transactionWaitingToBeSigned: payload,
+        },
+      };
+    }
   }
 }
 
-export { hashConnectReducer, initHashConnectReducer, initialHashConnectState };
+export { hashConnectReducer, initHashConnectReducer, initialHashConnectState, hashConnectStateWalletKeys };
