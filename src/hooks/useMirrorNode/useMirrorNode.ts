@@ -3,17 +3,41 @@ import create from "zustand";
 import { devtools } from "zustand/middleware";
 import { fetchAccountBalances, fetchAccountTransactions, fetchTokenPairs } from "./services";
 import { getErrorMessage } from "../utils";
-import { ActionType, MirrorNodeState } from "./types";
-import { SWAP_CONTRACT_ID } from "../constants";
-import { calculatePoolVolumeMetrics, getTimestamp24HoursAgo, getTimestamp7DaysAgo } from "./utils";
+import { ActionType, MirrorNodeAccountBalance, MirrorNodeState, MirrorNodeTokenBalance } from "./types";
+import { A_B_PAIR_TOKEN_ID, SWAP_CONTRACT_ID } from "../constants";
+import {
+  calculatePoolMetrics,
+  calculateUserPoolMetrics,
+  getTimestamp7DaysAgo,
+  getTokenBalances,
+  getTransactionsFromLast24Hours,
+} from "./utils";
+import { isNil } from "ramda";
 
 const initialMirrorNodeState: MirrorNodeState = {
   allPoolsMetrics: [],
   userPoolsMetrics: [],
+  poolTokenBalances: [],
+  userTokenBalances: [],
   status: "init",
   errorMessage: null,
-  poolVolumeMetrics: null,
   fetchAllPoolMetrics: () => Promise.resolve(),
+  fetchUserPoolMetrics: () => Promise.resolve(),
+};
+
+/**
+ * TODO: This is mocked data that adds a token pair balance to the primary pool balance data.
+ * This should be removed after we can fetch pair tokens from the pool contract.
+ * */
+const appendLiquidityTokenBalance = (poolAccountBalances: MirrorNodeAccountBalance[]) => {
+  const mockedLiquidityTokenBalance = {
+    token_id: A_B_PAIR_TOKEN_ID,
+    balance: 1000,
+  };
+  poolAccountBalances
+    .find((poolAccountBalance: any) => poolAccountBalance.account === SWAP_CONTRACT_ID)
+    ?.tokens.push(mockedLiquidityTokenBalance);
+  return poolAccountBalances;
 };
 
 /**
@@ -24,33 +48,67 @@ const initialMirrorNodeState: MirrorNodeState = {
  */
 const useMirrorNode = create<MirrorNodeState>()(
   devtools(
-    immer((set) => ({
+    immer((set, get) => ({
       allPoolsMetrics: [],
       userPoolsMetrics: [],
+      poolTokenBalances: [],
+      userTokenBalances: [],
       status: "init",
       errorMessage: null,
-      poolVolumeMetrics: null,
       fetchAllPoolMetrics: async () => {
-        set({ status: "fetching" }, false, ActionType.FETCH_POOL_VOLUME_METRICS_STARTED);
+        set({ status: "fetching" }, false, ActionType.FETCH_ALL_POOL_METRICS_STARTED);
         try {
-          const accountBalances = await fetchAccountBalances(SWAP_CONTRACT_ID);
-          const timestamp24HoursAgo = getTimestamp24HoursAgo();
+          const poolAccountBalances = appendLiquidityTokenBalance(await fetchAccountBalances(SWAP_CONTRACT_ID));
+          const poolTokenBalances = getTokenBalances(poolAccountBalances, SWAP_CONTRACT_ID);
           const timestamp7DaysAgo = getTimestamp7DaysAgo();
-          const last24Transactions = await fetchAccountTransactions(SWAP_CONTRACT_ID, timestamp24HoursAgo);
           const last7DTransactions = await fetchAccountTransactions(SWAP_CONTRACT_ID, timestamp7DaysAgo);
-          const tokenPairs = await fetchTokenPairs();
-          const allPoolsMetrics = tokenPairs.map((tokenPair) => {
-            return calculatePoolVolumeMetrics({
-              accountBalances: accountBalances.data.balances,
-              last24Transactions: last24Transactions.data.transactions,
-              last7DTransactions: last7DTransactions.data.transactions,
+          const last24Transactions = getTransactionsFromLast24Hours(last7DTransactions);
+          const poolTokenPairs = await fetchTokenPairs();
+          const allPoolsMetrics = poolTokenPairs.map((tokenPair) => {
+            return calculatePoolMetrics({
+              poolAccountId: SWAP_CONTRACT_ID,
+              poolTokenBalances,
+              last24Transactions,
+              last7DTransactions,
               tokenPair,
             });
           });
-          set({ status: "success", allPoolsMetrics }, false, ActionType.FETCH_POOL_VOLUME_METRICS_SUCCEEDED);
+          set({ status: "success", allPoolsMetrics, poolTokenBalances }, false, ActionType.FETCH_ALL_METRICS_SUCCEEDED);
         } catch (error) {
           const errorMessage = getErrorMessage(error);
-          set({ status: "error", errorMessage }, false, ActionType.FETCH_POOL_VOLUME_METRICS_STARTED);
+          set({ status: "error", errorMessage }, false, ActionType.FETCH_ALL_METRICS_FAILED);
+        }
+      },
+      fetchUserPoolMetrics: async (userAccountId: string) => {
+        set({ status: "fetching" }, false, ActionType.FETCH_USER_POOL_METRICS_STARTED);
+        try {
+          if (isNil(userAccountId)) {
+            throw Error("User Account ID must be defined.");
+          }
+          const userAccountBalances = await fetchAccountBalances(userAccountId);
+          const poolTokenPairs = await fetchTokenPairs();
+          const userTokenBalances = getTokenBalances(userAccountBalances, userAccountId);
+          const userLiquidityPoolTokensList = poolTokenPairs.filter((poolTokenPair) => {
+            return userTokenBalances.some(
+              (userTokenBalance: MirrorNodeTokenBalance) =>
+                userTokenBalance.token_id === poolTokenPair.pairToken.accountId
+            );
+          });
+          const userPoolsMetrics = userLiquidityPoolTokensList.map((userTokenPair) => {
+            return calculateUserPoolMetrics({
+              poolTokenBalances: get().poolTokenBalances,
+              userTokenBalances,
+              userTokenPair,
+            });
+          });
+          set(
+            { status: "success", userPoolsMetrics, userTokenBalances },
+            false,
+            ActionType.FETCH_USER_POOL_METRICS_SUCCEEDED
+          );
+        } catch (error) {
+          const errorMessage = getErrorMessage(error);
+          set({ status: "error", errorMessage }, false, ActionType.FETCH_USER_POOL_METRICS_FAILED);
         }
       },
     }))

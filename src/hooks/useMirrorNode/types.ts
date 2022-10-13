@@ -1,9 +1,13 @@
 enum ActionType {
-  FETCH_POOL_VOLUME_METRICS_STARTED = "useMirrorNode/FETCH_POOL_METRICS_STARTED",
-  FETCH_POOL_VOLUME_METRICS_SUCCEEDED = "useMirrorNode/FETCH_POOL_METRICS_SUCCEEDED",
-  FETCH_POOL_VOLUME_METRICS_FAILED = "useMirrorNode/FETCH_POOL_METRICS_FAILED",
+  FETCH_ALL_POOL_METRICS_STARTED = "useMirrorNode/FETCH_ALL_POOL_METRICS_STARTED",
+  FETCH_ALL_METRICS_SUCCEEDED = "useMirrorNode/FETCH_ALL_POOL_METRICS_SUCCEEDED",
+  FETCH_ALL_METRICS_FAILED = "useMirrorNode/FETCH_ALL_POOL_METRICS_FAILED",
+  FETCH_USER_POOL_METRICS_STARTED = "useMirrorNode/FETCH_USER_POOL_METRICS_STARTED",
+  FETCH_USER_POOL_METRICS_SUCCEEDED = "useMirrorNode/FETCH_USER_POOL_METRICS_SUCCEEDED",
+  FETCH_USER_POOL_METRICS_FAILED = "useMirrorNode/FETCH_USER_POOL_METRICS_FAILED",
 }
 
+/* Add Symbol */
 interface PoolState {
   name: string;
   fee: number;
@@ -23,13 +27,20 @@ interface UserPoolState {
 interface MirrorNodeState {
   allPoolsMetrics: PoolState[];
   userPoolsMetrics: UserPoolState[];
+  poolTokenBalances: MirrorNodeTokenBalance[];
+  userTokenBalances: MirrorNodeTokenBalance[];
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
-  poolVolumeMetrics: number | null;
   fetchAllPoolMetrics: () => Promise<void>;
+  fetchUserPoolMetrics: (userAccountId: string) => Promise<void>;
 }
 
+// Only for mocking for now
 interface TokenPair {
+  pairToken: {
+    symbol: string;
+    accountId: string;
+  };
   tokenA: {
     symbol: string;
     accountId: string;
