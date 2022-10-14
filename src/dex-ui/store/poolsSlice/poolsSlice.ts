@@ -107,7 +107,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
         const last24Transactions = getTransactionsFromLast24Hours(last7DTransactions);
         const poolTokenPairs = await MirrorNodeService.fetchTokenPairs();
-        const poolFee = await MirrorNodeService.fetchPoolFee();
+        const poolFee = await HederaService.fetchPoolFee();
+        const poolFeePercent = poolFee?.shiftedBy(-5).toNumber();
         const allPoolsMetrics = poolTokenPairs.map((tokenPair: TokenPair) => {
           return calculatePoolMetrics({
             poolAccountId: SWAP_CONTRACT_ID,
@@ -115,7 +116,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
             last24Transactions,
             last7DTransactions,
             tokenPair,
-            poolFee,
+            poolFee: poolFeePercent,
           });
         });
         set(
@@ -159,11 +160,13 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
               userTokenBalance.token_id === poolTokenPair.pairToken.accountId
           );
         });
+        const poolFee = get().pools.allPoolsMetrics[0].fee;
         const userPoolsMetrics = userLiquidityPoolTokensList.map((userTokenPair: TokenPair) => {
           return calculateUserPoolMetrics({
             poolTokenBalances: get().pools.poolTokenBalances,
             userTokenBalances,
             userTokenPair,
+            fee: poolFee,
           });
         });
         set(

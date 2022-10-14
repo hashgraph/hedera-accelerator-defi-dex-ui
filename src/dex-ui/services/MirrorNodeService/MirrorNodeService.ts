@@ -1,6 +1,6 @@
 import axios from "axios";
 import { isNil, path } from "ramda";
-import { A_B_PAIR_TOKEN_ID, L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
+import { A_B_PAIR_TOKEN_ID, TOKEN_A_SYMBOL, TOKEN_B_SYMBOL, TOKEN_A_ID, TOKEN_B_ID } from "../constants";
 import {
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
@@ -85,31 +85,10 @@ function createMirrorNodeService() {
     return await Promise.resolve([
       {
         pairToken: { symbol: "A-B", accountId: A_B_PAIR_TOKEN_ID },
-        tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID },
-        tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID },
+        tokenA: { symbol: TOKEN_A_SYMBOL, accountId: TOKEN_A_ID },
+        tokenB: { symbol: TOKEN_B_SYMBOL, accountId: TOKEN_B_ID },
       },
     ]);
-  };
-
-  const fetchPoolFee = async (): Promise<number> => {
-    // const swapTransaction = await new ContractExecuteTransaction()
-    //       .setContractId(abstractSwapId)
-    //       .setGas(2000000)
-    //       .setFunction(
-    //         "getFee",
-    //         new ContractFunctionParameters()
-    //           .addAddress(walletAddress)
-    //           .addAddress(tokenToTradeAddress)
-    //           .addAddress(tokenToReceiveAddress)
-    //           .addInt64(tokenToTradeAmount)
-    //           .addInt64(tokenToReceiveAmount)
-    //       )
-    //       .setNodeAccountIds([new AccountId(3)])
-    //       .freezeWithSigner(signer);
-
-    //     const result = await swapTransaction.executeWithSigner(signer);
-    // return await getFee()
-    return await Promise.resolve(0.005);
   };
 
   /**
@@ -161,7 +140,6 @@ function createMirrorNodeService() {
   return {
     fetchAccountTransactions,
     fetchTokenPairs,
-    fetchPoolFee,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,

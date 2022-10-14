@@ -14,6 +14,8 @@ interface CalculateUserPoolMetricsParams {
   userTokenBalances: MirrorNodeTokenBalance[];
   /** A list of liquidity pairs held by a user's account. */
   userTokenPair: TokenPair;
+  /** The percent (decimal) fee for executing transactions on the pool contract. */
+  fee: number | undefined;
 }
 
 /**
@@ -22,7 +24,7 @@ interface CalculateUserPoolMetricsParams {
  * @returns Metrics related to a liquidity pool that a user has a share in.
  */
 const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserPoolState => {
-  const { poolTokenBalances, userTokenBalances, userTokenPair } = params;
+  const { poolTokenBalances, userTokenBalances, userTokenPair, fee } = params;
   const { pairToken, tokenA, tokenB } = userTokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
@@ -37,7 +39,7 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
   const userLiquidity = calculateUserPoolLiquidity(percentOfPool, totalVolumeLocked);
   return {
     name: `${tokenA.symbol}/${tokenB.symbol}`,
-    fee: 0.05,
+    fee,
     liquidity: userLiquidity,
     percentOfPool,
     unclaimedFees: 0,
@@ -56,7 +58,7 @@ interface CalculatePoolMetricsParams {
   /** A list of liquidity pairs available on the pool contract. */
   tokenPair: TokenPair;
   /** The percent (decimal) fee for executing transactions on the pool contract. */
-  poolFee: number;
+  poolFee: number | undefined;
 }
 
 /**

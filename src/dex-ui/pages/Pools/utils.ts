@@ -9,12 +9,13 @@ import { formatToUSD, formatToPercent } from "../../utils";
  * @returns A formatted version of the liquidity pool data.
  */
 const formatPoolMetrics = (poolState: PoolState): FormattedPoolDetails => {
+  const { name, fee, totalVolumeLocked, past24HoursVolume, past7daysVolume } = poolState;
   return {
-    name: poolState.name,
-    fee: formatToPercent(poolState.fee),
-    totalVolumeLocked: formatToUSD(poolState.totalVolumeLocked),
-    past24HoursVolume: formatToUSD(poolState.past24HoursVolume),
-    past7daysVolume: formatToUSD(poolState.past7daysVolume),
+    name,
+    fee: fee ? formatToPercent(fee) : "-",
+    totalVolumeLocked: formatToUSD(totalVolumeLocked),
+    past24HoursVolume: formatToUSD(past24HoursVolume),
+    past7daysVolume: formatToUSD(past7daysVolume),
   };
 };
 
@@ -25,12 +26,13 @@ const formatPoolMetrics = (poolState: PoolState): FormattedPoolDetails => {
  * @returns A formatted version of the user's liquidity pool data.
  */
 const formatUserPoolMetrics = (userPoolState: UserPoolState): FormattedUserPoolDetails => {
+  const { name, fee, liquidity, percentOfPool, unclaimedFees } = userPoolState;
   return {
-    name: userPoolState.name,
-    fee: formatToPercent(userPoolState.fee),
-    liquidity: formatToUSD(userPoolState.liquidity),
-    percentOfPool: formatToPercent(userPoolState.percentOfPool),
-    unclaimedFees: formatToPercent(userPoolState.unclaimedFees),
+    name,
+    fee: fee ? formatToPercent(fee) : "-",
+    liquidity: formatToUSD(liquidity),
+    percentOfPool: formatToPercent(percentOfPool),
+    unclaimedFees: formatToPercent(unclaimedFees),
   };
 };
 

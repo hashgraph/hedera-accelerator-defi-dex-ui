@@ -16,7 +16,7 @@ enum PoolsActionType {
 /* Add Symbol */
 interface PoolState {
   name: string;
-  fee: number;
+  fee: number | undefined;
   totalVolumeLocked: number;
   past24HoursVolume: number;
   past7daysVolume: number;
@@ -24,7 +24,7 @@ interface PoolState {
 
 interface UserPoolState {
   name: string;
-  fee: number;
+  fee: number | undefined;
   liquidity: number;
   percentOfPool: number;
   unclaimedFees: number;

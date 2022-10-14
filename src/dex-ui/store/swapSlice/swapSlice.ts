@@ -1,6 +1,15 @@
 import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { BigNumber } from "bignumber.js";
-import { WalletService, HederaService, SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../services";
+import {
+  WalletService,
+  HederaService,
+  SWAP_CONTRACT_ID,
+  TOKEN_SYMBOL_TO_ACCOUNT_ID,
+  TOKEN_A_SYMBOL,
+  TOKEN_B_SYMBOL,
+  A_TO_B,
+  B_TO_A,
+} from "../../services";
 import { getErrorMessage } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState } from "./types";
 
@@ -42,8 +51,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           : undefined;
         set(
           ({ swap }) => {
-            swap.spotPrices["L49A=>L49B"] = spotPriceL49AToL49BWithPrecision;
-            swap.spotPrices["L49B=>L49A"] = spotPriceL49BToL49AWithPrecision;
+            swap.spotPrices[A_TO_B] = spotPriceL49AToL49BWithPrecision;
+            swap.spotPrices[B_TO_A] = spotPriceL49BToL49AWithPrecision;
           },
           false,
           SwapActionType.FETCH_SPOT_PRICES_SUCCEEDED
@@ -102,14 +111,23 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
        * Only L49A and L49B swaps are currently supported. The isTokenToTradeL49A and isTokenToTradeL49B booleans
        * were created as a temporary work around to support the current swapToken Swap contract function logic.
        * */
-      const isTokenToTradeL49A = tokenToTrade.symbol === "L49A";
-      const isTokenToTradeL49B = tokenToTrade.symbol === "L49B";
+      const isTokenToTradeL49A = tokenToTrade.symbol === TOKEN_A_SYMBOL;
+      const isTokenToTradeL49B = tokenToTrade.symbol === TOKEN_B_SYMBOL;
 
       const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
       // const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
       const signingAccount = walletData.pairedAccounts[0];
       const abstractSwapId = ContractId.fromString(SWAP_CONTRACT_ID);
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
+
+      console.log(
+        abstractSwapId,
+        signingAccount,
+        isTokenToTradeL49A,
+        tokenToTradeAccountId,
+        isTokenToTradeL49B,
+        tokenToTrade.amount
+      );
       /**
        * Temporarily added ternary logic for tokenToTradeAddress and tokenToReceiveAddress due to current
        * swapToken contract function limitations. The real account IDs for the trading and receiving tokens

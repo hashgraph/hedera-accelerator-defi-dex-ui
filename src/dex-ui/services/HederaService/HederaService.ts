@@ -11,8 +11,10 @@ import {
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
-  L49A_TOKEN_ID,
-  L49B_TOKEN_ID,
+  TOKEN_A_SYMBOL,
+  TOKEN_B_SYMBOL,
+  TOKEN_A_ID,
+  TOKEN_B_ID,
   TREASURY_ID,
   TREASURY_KEY,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
@@ -37,8 +39,8 @@ function createHederaService() {
   };
 
   const client = createClient();
-  let tokenA = TokenId.fromString(L49A_TOKEN_ID).toSolidityAddress();
-  let tokenB = TokenId.fromString(L49B_TOKEN_ID).toSolidityAddress();
+  let tokenA = TokenId.fromString(TOKEN_A_ID).toSolidityAddress();
+  let tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
   const treasure = AccountId.fromString(TREASURY_ID).toSolidityAddress();
   const treasureKey = PrivateKey.fromString(TREASURY_KEY);
   const contractId = SWAP_CONTRACT_ID; // "0.0.47712695";
@@ -218,8 +220,8 @@ function createHederaService() {
     network: string
   ) => {
     const tokenQuantity = 100;
-    const L49ATokenId = TokenId.fromString("0.0.47646195");
-    const L49BTokenId = TokenId.fromString("0.0.47646196");
+    const L49ATokenId = TokenId.fromString(TOKEN_A_ID);
+    const L49BTokenId = TokenId.fromString(TOKEN_B_ID);
     const swapContractAccountId = AccountId.fromString("0.0.47645191");
     const targetAccountId = AccountId.fromString(receivingAccoundId);
 
@@ -229,30 +231,32 @@ function createHederaService() {
     const signer = hashconnect.getSigner(provider);
 
     const associatedTokenIds = walletData.pairedAccountBalance.tokens.map((token: any) => token.tokenId);
-    const tokensToAssociate = [TOKEN_SYMBOL_TO_ACCOUNT_ID.get("L49A"), TOKEN_SYMBOL_TO_ACCOUNT_ID.get("L49B")].reduce(
-      (_tokensToAssociate: string[], tokenId: string | undefined) => {
-        if (!associatedTokenIds.includes(tokenId)) {
-          _tokensToAssociate.push(tokenId || "");
-        }
-        return _tokensToAssociate;
-      },
-      []
-    );
+    const tokensToAssociate = [
+      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(TOKEN_A_SYMBOL),
+      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(TOKEN_B_SYMBOL),
+    ].reduce((_tokensToAssociate: string[], tokenId: string | undefined) => {
+      if (!associatedTokenIds.includes(tokenId)) {
+        _tokensToAssociate.push(tokenId || "");
+      }
+      return _tokensToAssociate;
+    }, []);
 
     if (tokensToAssociate.length > 0) {
       const tokenAssociateTx = new TokenAssociateTransaction()
         .setAccountId(receivingAccoundId)
         .setTokenIds(tokensToAssociate);
 
-      console.log("Associating L49A and L49B with connected wallet");
+      console.log(`Associating ${TOKEN_A_SYMBOL} and Token ${TOKEN_B_SYMBOL} with connected wallet`);
 
       const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
       const tokenAssociateRes = await tokenAssociateSignedTx.executeWithSigner(signer);
 
-      console.log("Associate L49A and L49B transaction result:", tokenAssociateRes);
+      console.log(`Associate ${TOKEN_A_SYMBOL} and Token SymbolB0 transaction result:`, tokenAssociateRes);
     }
 
-    console.log(`Moving ${tokenQuantity} units of L49A and L49B from the Swap contract to Wallet.`);
+    console.log(
+      `Moving ${tokenQuantity} units of ${TOKEN_B_SYMBOL} and Token SymbolB0 from the Swap contract to Wallet.`
+    );
 
     const transaction = new TransferTransaction()
       .addTokenTransfer(L49ATokenId, swapContractAccountId, -tokenQuantity)
@@ -289,7 +293,7 @@ function createHederaService() {
     const tokenBQty = response.contractFunctionResult?.getInt64(1).toNumber();
     console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B are present in the pool. \n`);
     // TODO: dont hardcodethis, will have to be dynamic
-    return { L49A: tokenAQty, L49B: tokenBQty };
+    return { [TOKEN_A_SYMBOL]: tokenAQty, [TOKEN_B_SYMBOL]: tokenBQty };
   };
 
   const getContributorTokenShare = async () => {
@@ -316,6 +320,18 @@ function createHederaService() {
     const response = await getSpotPriceTransaction.getRecord(client);
     const spotPrice = response.contractFunctionResult?.getInt64(0);
     return spotPrice;
+  };
+
+  const fetchPoolFee = async (): Promise<BigNumber | undefined> => {
+    const getPoolFee = new ContractExecuteTransaction()
+      .setContractId(contractId)
+      .setGas(1000000)
+      .setFunction("getFee")
+      .freezeWith(client);
+    const getPoolFeeTransaction = await getPoolFee.execute(client);
+    const response = await getPoolFeeTransaction.getRecord(client);
+    const poolFee = response.contractFunctionResult?.getInt64(0);
+    return poolFee;
   };
 
   const getTokenBalance = async () => {
@@ -345,6 +361,7 @@ function createHederaService() {
     getContributorTokenShare,
     getTokenBalance,
     getSpotPrice,
+    fetchPoolFee,
     pairCurrentPosition,
   };
 }

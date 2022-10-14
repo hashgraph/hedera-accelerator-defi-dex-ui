@@ -361,7 +361,7 @@ const Pool = (): JSX.Element => {
           fontSize="16px"
           fontWeight="500"
         >
-          {"Send 100 L49A and L49B To Wallet"}
+          {"Send 100 A and B To Wallet"}
         </Button>
       </Box>
     </HStack>
