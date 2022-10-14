@@ -1,15 +1,12 @@
-import React from "react";
 import { createRoot } from "react-dom/client";
-import { HederaOpenDEX } from "./HederaOpenDEX/HederaOpenDEX";
-import { HashConnectProvider } from "./context";
-import { HederaServiceProvider } from "./hooks/useHederaService/HederaServiceContext";
+import { DEX } from "./dex-ui";
+import { DEXStoreProvider } from "./dex-ui/context";
+import { DEFAULT_DEX_PROVIDER_PROPS } from "./dex-ui/store";
 
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
 root.render(
-  <HashConnectProvider debug>
-    <HederaServiceProvider>
-      <HederaOpenDEX />
-    </HederaServiceProvider>
-  </HashConnectProvider>
+  <DEXStoreProvider {...DEFAULT_DEX_PROVIDER_PROPS}>
+    <DEX />
+  </DEXStoreProvider>
 );
