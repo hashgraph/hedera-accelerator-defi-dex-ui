@@ -11,12 +11,13 @@ import {
   getPoolLiquidity,
   clearWalletPairings,
 } from "./actions/hashConnectActions";
-import { HashConnectState } from "./reducers/hashConnectReducer";
+import { HashConnectState, hashConnectStateWalletKeys } from "./reducers/hashConnectReducer";
 import { useHashConnectEvents } from "./useHashConnectEvents";
 import { HASHCONNECT_LOCAL_DATA_KEY } from "../constants";
 import { WalletConnectionStatus } from "./types";
 import { get100LABTokens } from "../useHederaService/swapContract";
 import { HashConnectAction } from "./actions/actionsTypes";
+import { pick } from "ramda";
 
 const hashconnect = new HashConnect(true);
 export interface UseHashConnectProps {
@@ -59,7 +60,10 @@ const useHashConnect = ({
   useHashConnectEvents(hashconnect, dispatch, debug);
 
   const saveToLocalStorage = useCallback(() => {
-    const hashconnectDataJSON = JSON.stringify(hashConnectState);
+    const hashconnectDataJSON = JSON.stringify(
+      // do not save non wallet related state fields
+      pick(hashConnectStateWalletKeys, hashConnectState)
+    );
     localStorage.setItem(HASHCONNECT_LOCAL_DATA_KEY, hashconnectDataJSON);
   }, [hashConnectState]);
 

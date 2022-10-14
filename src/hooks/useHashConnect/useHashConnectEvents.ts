@@ -23,9 +23,13 @@ const useHashConnectEvents = (
     [dispatch]
   );
 
-  const handleAcknowledgeMessageEvent = useCallback((acknowledgeData: MessageTypes.Acknowledge) => {
-    console.log("Ack Received", { acknowledgeData });
-  }, []);
+  const handleAcknowledgeMessageEvent = useCallback(
+    (acknowledgeData: MessageTypes.Acknowledge) => {
+      console.log("Ack Received", { acknowledgeData });
+      dispatch({ type: ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED, payload: true });
+    },
+    [dispatch]
+  );
 
   const handleConnectionStatusChange = useCallback(
     (connectionStatus: ConnectionStatus) => {

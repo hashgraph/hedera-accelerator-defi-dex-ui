@@ -1,5 +1,6 @@
 import { MessageTypes } from "hashconnect";
 import { ConnectionStatus } from "../types";
+import { TransactionResponse } from "@hashgraph/sdk";
 
 export enum ActionType {
   INITIALIZE_WALLET_CONNECTION_STARTED = "INITIALIZE_WALLET_CONNECTION_STARTED",
@@ -31,6 +32,7 @@ export enum ActionType {
   FETCH_POOL_LIQUIDITY_STARTED = "FETCH_POOL_LIQUIDITY_STARTED",
   FETCH_POOL_LIQUIDITY_SUCCEEDED = "FETCH_POOL_LIQUIDITY_SUCCEEDED",
   FETCH_POOL_LIQUIDITY_FAILED = "FETCH_POOL_LIQUIDITY_FAILED",
+  SET_TRANSACTION_WAITING_TO_BE_SIGNED = "SET_TRANSACTION_WAITING_TO_BE_SIGNED",
 }
 
 type AsyncAction = (dispatch: (action: any) => any) => void;
@@ -122,6 +124,7 @@ interface SendSwapTransactionToWalletStarted {
 
 interface SendSwapTransactionToWalletSucceeded {
   type: ActionType.SEND_SWAP_TRANSACTION_TO_WALLET_SUCCEEDED;
+  payload: TransactionResponse;
 }
 
 interface SendSwapTransactionToWalletFailed {
@@ -184,6 +187,11 @@ interface FetchPoolLiquidityFailed {
   payload: string;
 }
 
+interface SetTransactionWaitingToBeSigned {
+  type: ActionType.SET_TRANSACTION_WAITING_TO_BE_SIGNED;
+  payload: boolean;
+}
+
 export type HashConnectAction =
   | AsyncAction
   | InitializeWalletConnectionStarted
@@ -214,4 +222,5 @@ export type HashConnectAction =
   | WalletPairingApproved
   | ReceivedConnectionStatusChanged
   | LocalConnectionStatusChanged
+  | SetTransactionWaitingToBeSigned
   | ClearWalletPairings;
