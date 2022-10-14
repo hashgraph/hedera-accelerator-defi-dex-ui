@@ -7,6 +7,7 @@ export function useWalletConnection() {
   const { walletConnectionStatus, installedExtensions, walletData } = wallet;
 
   useEffect(() => {
+    swap.getPrecision();
     wallet.setupHashConnectEvents();
     return () => {
       wallet.destroyHashConnectEvents();
@@ -25,7 +26,6 @@ export function useWalletConnection() {
     } else {
       wallet.pairWithConnectedWallet();
     }
-    swap.fetchSpotPrices();
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -11,6 +11,7 @@ import {
   TagCloseButton,
   Link,
   Tag,
+  Skeleton,
 } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
@@ -18,9 +19,11 @@ import { DEXTheme } from "../../dex-ui/styles";
 import { swapReducer, initialSwapState, initSwapReducer } from "./reducers";
 import {
   setTokenToTradeAmount,
+  setTokenToTradeDisplayAmount,
   setTokenToTradeSymbol,
   setTokenToTradeBalance,
   setTokenToReceiveAmount,
+  setTokenToReceiveDisplayAmount,
   setTokenToReceiveSymbol,
   setTokenToReceiveBalance,
   swapTokenToTradeAndReceive,
@@ -44,22 +47,24 @@ export interface SwapProps {
   sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
-  fetchSpotPrices: () => void;
   getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
   connectionStatus: WalletConnectionStatus;
   spotPrices: Record<string, number | undefined>;
+  fee: string;
   poolLiquidity: Record<string, number | undefined>;
   walletData: any | null;
   network: Networks;
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
   transactionState: TransactionState;
+  isLoaded: boolean;
 }
 
 const Swap = (props: SwapProps) => {
   const {
     title,
     spotPrices,
+    fee,
     walletData,
     connectionStatus,
     connectToWallet,
@@ -67,6 +72,7 @@ const Swap = (props: SwapProps) => {
     poolLiquidity,
     getPoolLiquidity,
     transactionState,
+    isLoaded,
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
@@ -74,9 +80,9 @@ const Swap = (props: SwapProps) => {
   const [localSwapState, setLocalSwapState] = useState({
     settingsOpen: false,
     showSuccessMessage: false,
-    tokenToTradeAmount: 0,
+    tokenToTradeAmount: 0.0,
     tokenToTradeSymbol: "",
-    tokenToReceiveAmount: 0,
+    tokenToReceiveAmount: 0.0,
     tokenToReceiveSymbol: "",
   });
 
@@ -121,7 +127,8 @@ const Swap = (props: SwapProps) => {
   useEffect(() => {
     if (swapState.tokenToTrade.amount && swapState.tokenToTrade.symbol !== swapState.tokenToReceive.symbol) {
       const tokenToReceiveAmount = getReceivedAmount(tokenToTrade.amount);
-      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0));
+      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0.0));
+      dispatch(setTokenToReceiveDisplayAmount(tokenToReceiveAmount ? String(tokenToReceiveAmount) : "0.0"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [swapState.tokenToTrade.poolLiquidity, swapState.tokenToReceive.poolLiquidity]);
@@ -225,7 +232,8 @@ const Swap = (props: SwapProps) => {
       // TODO: check on if we should keep getTokenExcchangeAmount
       // const tokenToReceiveAmount = getTokenExchangeAmount(tokenToTrade.amount, spotPrice);
       const tokenToReceiveAmount = getReceivedAmount(tokenToTrade.amount);
-      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0));
+      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0.0));
+      dispatch(setTokenToReceiveDisplayAmount(tokenToReceiveAmount ? String(tokenToReceiveAmount) : "0.0"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, spotPrice, tokenToTrade.amount]);
@@ -261,6 +269,7 @@ const Swap = (props: SwapProps) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeAmount = Number(inputElement.value);
       dispatch(setTokenToTradeAmount(tokenToTradeAmount));
+      dispatch(setTokenToTradeDisplayAmount(inputElement.value ?? "0.0"));
     },
     [dispatch]
   );
@@ -282,6 +291,7 @@ const Swap = (props: SwapProps) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToReceiveAmount = Number(inputElement.value);
       dispatch(setTokenToReceiveAmount(tokenToReceiveAmount));
+      dispatch(setTokenToReceiveDisplayAmount(inputElement.value ?? "0.0"));
     },
     [dispatch]
   );
@@ -311,6 +321,7 @@ const Swap = (props: SwapProps) => {
       }
       const amountToTrade = formula === formulaTypes.MAX ? tokenToTrade.balance : halfOf(tokenToTrade.balance);
       dispatch(setTokenToTradeAmount(amountToTrade));
+      dispatch(setTokenToTradeDisplayAmount(String(amountToTrade)));
     },
     [dispatch, tokenToTrade.balance]
   );
@@ -436,7 +447,7 @@ const Swap = (props: SwapProps) => {
         <TokenInput
           data-testid="token-to-trade-component"
           title="Token To Trade"
-          tokenAmount={tokenToTrade.amount}
+          tokenAmount={tokenToTrade.displayAmount}
           tokenSymbol={tokenToTrade.symbol}
           tokenBalance={tokenToTrade.balance}
           walletConnectionStatus={connectionStatus}
@@ -462,7 +473,7 @@ const Swap = (props: SwapProps) => {
           data-testid="token-to-receive-component"
           isDisabled={true}
           title="Token To Receive"
-          tokenAmount={tokenToReceive.amount}
+          tokenAmount={tokenToReceive.displayAmount}
           tokenSymbol={tokenToReceive.symbol}
           tokenBalance={tokenToReceive.balance}
           walletConnectionStatus={connectionStatus}
@@ -472,9 +483,11 @@ const Swap = (props: SwapProps) => {
         <Flex paddingTop="1rem">
           <Box flex="2" paddingRight="1rem">
             <Text fontSize="xs">Transaction Fee</Text>
-            <Text fontSize="xs" fontWeight="bold">
-              0.00%
-            </Text>
+            <Skeleton speed={0.4} isLoaded={isLoaded}>
+              <Text fontSize="xs" fontWeight="bold">
+                {fee}
+              </Text>
+            </Skeleton>
           </Box>
           <Box flex="2">
             <Text fontSize="xs">Price Impact</Text>

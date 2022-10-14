@@ -1,3 +1,4 @@
+import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 import { WALLET_LOCAL_DATA_KEY } from "../../services/constants";
 
 const getLocalWalletData = (): any => {
@@ -16,4 +17,14 @@ const getLocalWalletData = (): any => {
   }
 };
 
-export { getLocalWalletData };
+const getFormattedTokenBalances = (tokenBalances: TokenBalanceJson[]) => {
+  return tokenBalances.map((tokenBalanceJson) => {
+    const { tokenId, balance, decimals } = tokenBalanceJson;
+    if (decimals === 0) {
+      return { ...tokenBalanceJson };
+    }
+    return { tokenId, balance: `${Number(balance) / 10 ** decimals}`, decimals };
+  });
+};
+
+export { getLocalWalletData, getFormattedTokenBalances };

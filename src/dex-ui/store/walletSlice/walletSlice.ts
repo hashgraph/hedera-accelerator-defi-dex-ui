@@ -1,4 +1,6 @@
 import { MessageTypes, HashConnectTypes } from "hashconnect";
+import { BigNumber } from "bignumber.js";
+import { TokenBalanceJson } from "@hashgraph/sdk";
 import { getErrorMessage } from "../../utils";
 import {
   WalletSlice,
@@ -8,8 +10,8 @@ import {
   WalletConnectionStatus,
   WalletState,
 } from "./types";
-import { getLocalWalletData } from "./utils";
-import { WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
+import { getFormattedTokenBalances, getLocalWalletData } from "./utils";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID, WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
 import { SwapActionType } from "../swapSlice";
 
 const initialWalletState: WalletState = {
@@ -38,6 +40,15 @@ function initWalletData(initialWalletState: any) {
 const createWalletSlice: WalletSlice = (set, get): WalletStore => {
   return {
     ...initWalletData(initialWalletState),
+    getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => {
+      const defaultDecimals = 0;
+      const { walletData } = get().wallet;
+      const tokenData = walletData?.pairedAccountBalance?.tokens;
+      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const decimals =
+        tokenData?.find((token: TokenBalanceJson) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
+      return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
+    },
     initializeWalletConnection: async () => {
       set(
         ({ wallet }) => {
@@ -136,9 +147,11 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       try {
         const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
         const accountBalance = await WalletService.getAccountBalance(provider, walletData.pairedAccounts[0]);
+        const formattedTokenJsonBalances = getFormattedTokenBalances(accountBalance.tokens);
         set(
           ({ wallet }) => {
             wallet.walletData.pairedAccountBalance = accountBalance;
+            wallet.walletData.pairedAccountBalance.tokens = formattedTokenJsonBalances;
           },
           false,
           WalletActionType.FETCH_ACCOUNT_BALANCE_SUCCEEDED

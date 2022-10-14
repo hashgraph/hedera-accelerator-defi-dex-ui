@@ -1,18 +1,20 @@
-import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
+import { ChangeEvent, useCallback, useEffect, useReducer, useState } from "react";
 import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
-import { ContractId } from "@hashgraph/sdk";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer, PoolState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../dex-ui-components/TokenInput";
 import { useDexContext, usePrevious } from "../../hooks";
 import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 import { SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../services";
+import { mapBigNumberValuesToNumber } from "../Trade/formatters";
+import { formatBigNumberToPercent } from "../../utils";
 
 const Pool = (): JSX.Element => {
   const [wallet, swap, pools] = useDexContext(({ wallet, swap, pools }) => [wallet, swap, pools]);
   const { walletData, walletConnectionStatus: connectionStatus } = wallet;
-  const { spotPrices } = swap;
-
+  const { fee, spotPrices } = swap;
+  const formattedFee = formatBigNumberToPercent(fee);
+  const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
   const previousPoolState: PoolState | undefined = usePrevious(poolState);
 
@@ -39,11 +41,9 @@ const Pool = (): JSX.Element => {
    */
   const onAddLiquidityClick = useCallback(() => {
     pools.sendAddLiquidityTransaction({
-      firstTokenAddr: poolState.inputToken.address,
-      firstTokenQty: poolState.inputToken.amount,
-      secondTokenAddr: poolState.outputToken.address,
-      secondTokenQty: poolState.outputToken.amount,
-      addLiquidityContractAddr: ContractId.fromString(SWAP_CONTRACT_ID),
+      inputToken: poolState.inputToken,
+      outputToken: poolState.outputToken,
+      contractId: SWAP_CONTRACT_ID,
     });
   }, [poolState, pools.sendAddLiquidityTransaction]);
 
@@ -73,8 +73,8 @@ const Pool = (): JSX.Element => {
     const secondTokenSymbol = poolState.outputToken.symbol;
 
     if (firstTokenSymbol && secondTokenSymbol) {
-      const firstTokenSpotPrice = spotPrices?.[`${firstTokenSymbol}=>${secondTokenSymbol}`] || 0;
-      const secondTokenSpotPrice = spotPrices?.[`${secondTokenSymbol}=>${firstTokenSymbol}`] || 0;
+      const firstTokenSpotPrice = formattedSpotPrices?.[`${firstTokenSymbol}=>${secondTokenSymbol}`] || 0;
+      const secondTokenSpotPrice = formattedSpotPrices?.[`${secondTokenSymbol}=>${firstTokenSymbol}`] || 0;
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "spotPrice", payload: firstTokenSpotPrice });
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "spotPrice", payload: secondTokenSpotPrice });
     }
@@ -310,7 +310,7 @@ const Pool = (): JSX.Element => {
               Transaction Fee
             </Text>
             <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-              0.0%
+              {formattedFee}
             </Text>
           </Flex>
           <Flex flexDirection={"column"}>
@@ -361,7 +361,7 @@ const Pool = (): JSX.Element => {
           fontSize="16px"
           fontWeight="500"
         >
-          {"Send 100 L49A and L49B To Wallet"}
+          {"Send 100 A and B To Wallet"}
         </Button>
       </Box>
     </HStack>

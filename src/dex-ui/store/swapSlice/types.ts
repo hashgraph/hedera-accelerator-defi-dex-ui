@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
@@ -12,8 +13,16 @@ enum SwapActionType {
   FETCH_POOL_LIQUIDITY_STARTED = "swap/FETCH_POOL_LIQUIDITY_STARTED",
   FETCH_POOL_LIQUIDITY_SUCCEEDED = "swap/FETCH_POOL_LIQUIDITY_SUCCEEDED",
   FETCH_POOL_LIQUIDITY_FAILED = "swap/FETCH_POOL_LIQUIDITY_FAILED",
-  SIGN_SWAP_TRANSACTION_STARTED = "swap/SIGNING_SWAP_TRANSACTION_STARTED",
-  SIGN_SWAP_TRANSACTION_SUCCEEDED = "swap/SIGNING_SWAP_TRANSACTION_SUCCEEDED",
+  SIGN_SWAP_TRANSACTION_STARTED = "swap/SIGN_SWAP_TRANSACTION_STARTED",
+  SIGN_SWAP_TRANSACTION_SUCCEEDED = "swap/SIGN_SWAP_TRANSACTION_SUCCEEDED",
+  FETCH_SWAP_FEE_STARTED = "swap/FETCH_SWAP_FEE_STARTED",
+  FETCH_SWAP_FEE_SUCCEEDED = "swap/FETCH_SWAP_FEE_SUCCEEDED",
+  FETCH_SWAP_FEE_FAILED = "swap/FETCH_SWAP_FEE_FAILED",
+  FETCH_PRECISION_STARTED = "swap/FETCH_PRECISION_STARTED",
+  FETCH_PRECISION_SUCCEEDED = "swap/FETCH_PRECISION_SUCCEEDED",
+  FETCH_PRECISION_FAILED = "swap/FETCH_PRECISION_FAILED",
+  SET_STATE_TO_LOADING = "swap/SET_STATE_TO_LOADING",
+  SET_STATE_TO_LOADED = "swap/SET_STATE_TO_LOADED",
 }
 
 interface TransactionState {
@@ -22,14 +31,21 @@ interface TransactionState {
   errorMessage: string;
 }
 interface SwapState {
-  spotPrices: Record<string, number | undefined>;
-  poolLiquidity: Record<string, number | undefined>;
+  precision: BigNumber;
+  fee: BigNumber | undefined;
+  spotPrices: Record<string, BigNumber | undefined>;
+  poolLiquidity: Record<string, BigNumber | undefined>;
   transactionState: TransactionState;
   errorMessage: string | null;
+  isLoaded: boolean;
 }
 
 interface SwapActions {
+  getPrecision: () => Promise<void>;
+  setAsLoading: () => void;
+  setAsLoaded: () => void;
   fetchSpotPrices: () => Promise<void>;
+  fetchFee: () => Promise<void>;
   getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => Promise<void>;
   sendSwapTransaction: ({ tokenToTrade, tokenToReceive }: any) => Promise<void>;
 }
