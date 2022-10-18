@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
@@ -22,6 +23,7 @@ interface TransactionState {
   errorMessage: string;
 }
 interface SwapState {
+  precision: number;
   spotPrices: Record<string, number | undefined>;
   poolLiquidity: Record<string, number | undefined>;
   transactionState: TransactionState;
@@ -29,6 +31,8 @@ interface SwapState {
 }
 
 interface SwapActions {
+  getPrecision: () => Promise<void>;
+  withPrecision: (value: number) => BigNumber;
   fetchSpotPrices: () => Promise<void>;
   getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => Promise<void>;
   sendSwapTransaction: ({ tokenToTrade, tokenToReceive }: any) => Promise<void>;

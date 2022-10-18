@@ -7,6 +7,7 @@ export function useWalletConnection() {
   const { walletConnectionStatus, installedExtensions, walletData } = wallet;
 
   useEffect(() => {
+    swap.getPrecision();
     wallet.setupHashConnectEvents();
     return () => {
       wallet.destroyHashConnectEvents();

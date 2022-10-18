@@ -1,13 +1,30 @@
 /** The "hashconnectData" is the string used by the hashconnect lib to modify localStorage */
 export const WALLET_LOCAL_DATA_KEY = "hashconnectData";
 
-// Swap Contract (Pair) Proxy
-export const SWAP_CONTRACT_ID = "0.0.48585472";
+export const ADMIN_ID = "0.0.47710057";
+
+export const ADMIN_KEY =
+  "3030020100300706052b8104000a04220420d38b0ed5f11f8985cd72c8e52c206b512541c6f301ddc9d18bd8b8b25a41a80f";
+
+export const TREASURY_ID = "0.0.47645191";
 
 export const TREASURY_KEY = "308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5";
 
-export const TREASURY_ID = "0.0.48132580";
+export const CONTRACT_NAME = "governorcountingsimpleinternal";
 
+export const TOKEN_USER_ID = "0.0.47540202";
+
+export const TOKEN_USER_KEY =
+  "302e020100300506032b657004220420b69079b0cdebea97ec13c78bf7277d3f4aef35189755b5d11c2dfae40c566aa8";
+
+// Swap Contract (Pair) Proxy
+export const SWAP_CONTRACT_ID = "0.0.48585472";
+
+// export const TREASURY_KEY = "308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5";
+
+// export const TREASURY_ID = "0.0.48132580";
+
+// export const NEW_TREASURY_ID = "0.0.47645191";
 export const TOKEN_A_SYMBOL = "Token SymbolA0";
 export const TOKEN_A_ID = "0.0.48585480";
 

@@ -8,7 +8,7 @@ import {
   WalletConnectionStatus,
   WalletState,
 } from "./types";
-import { getLocalWalletData } from "./utils";
+import { getFormattedTokenBalances, getLocalWalletData } from "./utils";
 import { WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
 import { SwapActionType } from "../swapSlice";
 
@@ -136,9 +136,11 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       try {
         const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
         const accountBalance = await WalletService.getAccountBalance(provider, walletData.pairedAccounts[0]);
+        const formattedTokenJsonBalances = getFormattedTokenBalances(accountBalance.tokens);
         set(
           ({ wallet }) => {
             wallet.walletData.pairedAccountBalance = accountBalance;
+            wallet.walletData.pairedAccountBalance.tokens = formattedTokenJsonBalances;
           },
           false,
           WalletActionType.FETCH_ACCOUNT_BALANCE_SUCCEEDED

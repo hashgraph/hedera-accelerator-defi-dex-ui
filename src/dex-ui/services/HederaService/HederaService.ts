@@ -1,11 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import {
   AccountId,
-  PrivateKey,
   TokenId,
+  ContractId,
   ContractExecuteTransaction,
   ContractFunctionParameters,
-  Client,
   TransferTransaction,
   TokenAssociateTransaction,
 } from "@hashgraph/sdk";
@@ -15,39 +14,59 @@ import {
   TOKEN_B_SYMBOL,
   TOKEN_A_ID,
   TOKEN_B_ID,
-  TREASURY_ID,
-  TREASURY_KEY,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
 import { AddLiquidityDetails } from "./types";
+import { createUserClient, getTreasurer } from "./utils";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
 function createHederaService() {
-  const createClient = () => {
-    const myAccountId = "0.0.34833380";
-    const privateKey1 = "302e020100300506032b657004220420411127f31025a5";
-    const privatekey2 = "f20a32a92f1baf13be0e767d62bffff10db3f5e5599a52da41";
-    const myPrivateKey = privateKey1 + privatekey2;
-    if (myAccountId == null || myPrivateKey == null) {
-      throw new Error("Environment variables myAccountId and myPrivateKey must be present");
-    }
+  const client = createUserClient();
+  const { treasuryId, treasuryKey } = getTreasurer();
+  const tokenA = TokenId.fromString(TOKEN_A_ID).toSolidityAddress();
+  const tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
+  const contractId = ContractId.fromString(SWAP_CONTRACT_ID); // "0.0.47712695";
+  let _precision = 0;
 
-    const client = Client.forTestnet();
-    client.setOperator(myAccountId, myPrivateKey);
-    return client;
+  const initHederaService = async () => {
+    const precision = await fetchPrecision();
+    _precision = precision ?? 0;
   };
 
-  const client = createClient();
-  let tokenA = TokenId.fromString(TOKEN_A_ID).toSolidityAddress();
-  let tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
-  const treasure = AccountId.fromString(TREASURY_ID).toSolidityAddress();
-  const treasureKey = PrivateKey.fromString(TREASURY_KEY);
-  const contractId = SWAP_CONTRACT_ID; // "0.0.47712695";
+  const getPrecision = () => {
+    return _precision;
+  };
+
+  const fetchPrecision = async () => {
+    const getPrecisionValueTx = new ContractExecuteTransaction()
+      .setContractId(contractId)
+      .setGas(1000000)
+      .setFunction("getPrecisionValue", new ContractFunctionParameters())
+      .freezeWith(client);
+    const getPrecisionValueTxRes = await getPrecisionValueTx.execute(client);
+    const response = await getPrecisionValueTxRes.getRecord(client);
+    const precisionLocal = response.contractFunctionResult?.getInt256(0);
+    console.log(`getPrecisionValue ${Number(precisionLocal)}`);
+    return Number(precisionLocal);
+  };
+
+  const withPrecision = (value: number): BigNumber => {
+    if (_precision === undefined) {
+      throw new Error("Precision is undefined");
+    }
+    console.log({
+      value,
+      bigValueBig: new BigNumber(value).multipliedBy(_precision).toNumber(),
+      bigValueNum: new BigNumber(value).multipliedBy(_precision).toNumber(),
+      precision: _precision,
+    });
+    return new BigNumber(value).multipliedBy(_precision);
+  };
 
   const createLiquidityPool = async () => {
-    const tokenAQty = new BigNumber(5);
-    const tokenBQty = new BigNumber(5);
+    const tokenAQty = withPrecision(200);
+    const tokenBQty = withPrecision(220);
     console.log(`Creating a pool of ${tokenAQty} units of token A and ${tokenBQty} units of token B.`);
     const liquidityPool = await new ContractExecuteTransaction()
       .setContractId(contractId)
@@ -55,18 +74,19 @@ function createHederaService() {
       .setFunction(
         "initializeContract",
         new ContractFunctionParameters()
-          .addAddress(treasure)
+          .addAddress(treasuryId.toSolidityAddress())
           .addAddress(tokenA)
           .addAddress(tokenB)
           .addInt64(tokenAQty)
           .addInt64(tokenBQty)
+          .addInt256(new BigNumber(10)) //fee
       )
       .freezeWith(client)
-      .sign(treasureKey);
+      .sign(treasuryKey);
     const liquidityPoolTx = await liquidityPool.execute(client);
     const transferTokenRx = await liquidityPoolTx.getReceipt(client);
     console.log(`Liquidity pool created: ${transferTokenRx.status}`);
-    await pairCurrentPosition();
+    await pairCurrentPosition(contractId);
   };
 
   const addLiquidity = async (addLiquidityDetails?: AddLiquidityDetails) => {
@@ -96,7 +116,7 @@ function createHederaService() {
     const firstTokenQty = firstTokenQuantity ? firstTokenQuantity : new BigNumber(10);
     const secondTokenQty = secondTokenQuantity ? secondTokenQuantity : new BigNumber(10);
     const addLiquidityContractId = addLiquidityContractAddress ? addLiquidityContractAddress : contractId;
-    const fromAddress = walletAddress ? walletAddress : treasure;
+    const fromAddress = walletAddress ? walletAddress : treasuryKey;
 
     console.log(`Adding ${firstTokenQty} units of token A and ${secondTokenQty} units of token B to the pool.`);
 
@@ -106,7 +126,7 @@ function createHederaService() {
       .setFunction(
         "addLiquidity",
         new ContractFunctionParameters()
-          .addAddress(fromAddress)
+          .addAddress(treasuryId.toSolidityAddress())
           .addAddress(firstTokenAddr)
           .addAddress(secondTokenAddr)
           .addInt64(firstTokenQty)
@@ -124,18 +144,18 @@ function createHederaService() {
       // const addLiquidityTxWalletSignedReceipt = await addLiquidityTxWalletSignedRes.getReceiptWithSigner(signer)
       // console.log(`Liquidity added status: ${addLiquidityTxWalletSignedReceipt.status}`);
     } else {
-      const addLiquidityTx = await addLiquidityTxParams.freezeWith(client).sign(treasureKey);
+      const addLiquidityTx = await addLiquidityTxParams.freezeWith(client).sign(treasuryKey);
       const addLiquidityTxRes = await addLiquidityTx.execute(client);
       const transferTokenRx = await addLiquidityTxRes.getReceipt(client);
       console.log(`Liquidity added status: ${transferTokenRx.status}`);
     }
 
-    await pairCurrentPosition();
+    await pairCurrentPosition(contractId);
   };
 
   const removeLiquidity = async () => {
-    const tokenAQty = new BigNumber(3);
-    const tokenBQty = new BigNumber(3);
+    const tokenAQty = withPrecision(3);
+    const tokenBQty = withPrecision(3);
     console.log(`Removing ${tokenAQty} units of token A and ${tokenBQty} units of token B from the pool.`);
     const removeLiquidity = await new ContractExecuteTransaction()
       .setContractId(contractId)
@@ -143,74 +163,101 @@ function createHederaService() {
       .setFunction(
         "removeLiquidity",
         new ContractFunctionParameters()
-          .addAddress(treasure)
+          .addAddress(treasuryId.toSolidityAddress())
           .addAddress(tokenA)
           .addAddress(tokenB)
           .addInt64(tokenAQty)
           .addInt64(tokenBQty)
       )
       .freezeWith(client)
-      .sign(treasureKey);
+      .sign(treasuryKey);
     const removeLiquidityTx = await removeLiquidity.execute(client);
     const transferTokenRx = await removeLiquidityTx.getReceipt(client);
 
     console.log(`Liquidity remove status: ${transferTokenRx.status}`);
-    await pairCurrentPosition();
+    await pairCurrentPosition(contractId);
+  };
+
+  const swapToken = async ({
+    abstractSwapId,
+    walletAddress,
+    tokenToTradeAddress,
+    tokenToReceiveAddress,
+    tokenToTradeAmount,
+    tokenToReceiveAmount,
+  }: any) => {
+    const swapTransaction = await new ContractExecuteTransaction()
+      .setContractId(abstractSwapId)
+      .setGas(2000000)
+      .setFunction(
+        "swapToken",
+        new ContractFunctionParameters()
+          .addAddress(walletAddress)
+          .addAddress(tokenToTradeAddress)
+          .addAddress(tokenToReceiveAddress)
+          .addInt64(tokenToTradeAmount)
+          .addInt64(tokenToReceiveAmount)
+      )
+      .freezeWith(client)
+      .sign(treasuryKey);
+    const swapTokenTx = await swapTransaction.execute(client);
+    const transferTokenRx = await swapTokenTx.getReceipt(client);
+
+    console.log(`Swap status: ${transferTokenRx.status}`);
   };
 
   const swapTokenA = async () => {
-    const tokenAQty = new BigNumber(5);
-    const tokenBQty = new BigNumber(0);
-    // const walletAddress: string = AccountId.fromString("0.0.34728121").toSolidityAddress();
-    console.log(`Swapping a ${tokenAQty} units of token A from the pool.`);
+    const tokenAQty = withPrecision(2);
+    const tokenBQty = withPrecision(0);
+    console.log(` Swapping a ${tokenAQty} units of token A from the pool.`);
     // Need to pass different token B address so that only swap of token A is considered.
-    tokenB = TokenId.fromString("0.0.47646100").toSolidityAddress();
+    const mockTokenB = TokenId.fromString("0.0.47646100");
     const swapToken = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(2000000)
       .setFunction(
         "swapToken",
         new ContractFunctionParameters()
-          .addAddress(treasure)
+          .addAddress(treasuryId.toSolidityAddress())
           .addAddress(tokenA)
-          .addAddress(tokenB)
-          .addInt64(tokenAQty)
-          .addInt64(tokenBQty)
+          .addAddress(mockTokenB.toSolidityAddress())
+          .addInt256(tokenAQty)
+          .addInt256(tokenBQty)
       )
       .freezeWith(client)
-      .sign(treasureKey);
+      .sign(treasuryKey);
     const swapTokenTx = await swapToken.execute(client);
     const transferTokenRx = await swapTokenTx.getReceipt(client);
 
-    console.log(`Swap status: ${transferTokenRx.status}`);
-    await pairCurrentPosition();
+    console.log(` Swap status: ${transferTokenRx.status}`);
+    await pairCurrentPosition(contractId);
   };
 
   const swapTokenB = async () => {
-    const tokenAQty = new BigNumber(0);
-    const tokenBQty = new BigNumber(5);
+    const tokenAQty = withPrecision(0);
+    const tokenBQty = withPrecision(5);
     console.log(`Swapping a ${tokenBQty} units of token B from the pool.`);
     //Need to pass different token A address so that only swap of token B is considered.
-    tokenA = TokenId.fromString("0.0.47646100").toSolidityAddress();
+    const mockTokenA = TokenId.fromString("0.0.47646100").toSolidityAddress();
     const swapToken = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(2000000)
       .setFunction(
         "swapToken",
         new ContractFunctionParameters()
-          .addAddress(treasure)
-          .addAddress(tokenA)
+          .addAddress(contractId.toSolidityAddress())
+          .addAddress(mockTokenA)
           .addAddress(tokenB)
           .addInt64(tokenAQty)
           .addInt64(tokenBQty)
       )
       .freezeWith(client)
-      .sign(treasureKey);
+      .sign(treasuryKey);
     const swapTokenTx = await swapToken.execute(client);
     const transferTokenRx = await swapTokenTx.getReceipt(client);
 
     console.log(`Swap status: ${transferTokenRx.status}`);
-    await pairCurrentPosition();
+    await pairCurrentPosition(contractId);
   };
 
   const get100LABTokens = async (
@@ -219,10 +266,9 @@ function createHederaService() {
     hashConnectState: any,
     network: string
   ) => {
-    const tokenQuantity = 100;
+    const tokenQuantity = withPrecision(100).toNumber();
     const L49ATokenId = TokenId.fromString(TOKEN_A_ID);
     const L49BTokenId = TokenId.fromString(TOKEN_B_ID);
-    const swapContractAccountId = AccountId.fromString("0.0.47645191");
     const targetAccountId = AccountId.fromString(receivingAccoundId);
 
     const { walletData } = hashConnectState;
@@ -259,14 +305,14 @@ function createHederaService() {
     );
 
     const transaction = new TransferTransaction()
-      .addTokenTransfer(L49ATokenId, swapContractAccountId, -tokenQuantity)
+      .addTokenTransfer(L49ATokenId, treasuryId, -tokenQuantity)
       .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
-      .addTokenTransfer(L49BTokenId, swapContractAccountId, -tokenQuantity)
+      .addTokenTransfer(L49BTokenId, treasuryId, -tokenQuantity)
       .addTokenTransfer(L49BTokenId, targetAccountId, tokenQuantity)
       .freezeWith(client);
 
     //Sign with the sender account private key
-    const signTx = await transaction.sign(treasureKey);
+    const signTx = await transaction.sign(treasuryKey);
 
     //Sign with the client operator private key and submit to a Hedera network
     const txResponse = await signTx.execute(client);
@@ -281,7 +327,7 @@ function createHederaService() {
   };
 
   // TODO: will need to pass in contractId in future when there are more pools
-  const pairCurrentPosition = async (_contractId: string = contractId) => {
+  const pairCurrentPosition = async (_contractId: ContractId = contractId) => {
     const getPairQty = new ContractExecuteTransaction()
       .setContractId(_contractId)
       .setGas(1000000)
@@ -300,7 +346,10 @@ function createHederaService() {
     const getContributorTokenShare = new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(1000000)
-      .setFunction("getContributorTokenShare", new ContractFunctionParameters().addAddress(treasure))
+      .setFunction(
+        "getContributorTokenShare",
+        new ContractFunctionParameters().addAddress(treasuryId.toSolidityAddress())
+      )
       .freezeWith(client);
     const getContributorTokenShareTx = await getContributorTokenShare.execute(client);
     const response = await getContributorTokenShareTx.getRecord(client);
@@ -351,9 +400,37 @@ function createHederaService() {
     // );
   };
 
+  const getContractAddress = async () => {
+    const getPoolFee = new ContractExecuteTransaction()
+      .setContractId(contractId)
+      .setGas(1000000)
+      .setFunction("getContractAddress")
+      .freezeWith(client);
+    const getPoolFeeTransaction = await getPoolFee.execute(client);
+    const response = await getPoolFeeTransaction.getRecord(client);
+    const poolFee = AccountId.fromSolidityAddress(response.contractFunctionResult?.getAddress(0) ?? "").toString();
+    console.log(poolFee);
+  };
+
+  const getTokenPairAddress = async () => {
+    const getPoolFee = new ContractExecuteTransaction()
+      .setContractId(contractId)
+      .setGas(1000000)
+      .setFunction("getTokenPairAddress")
+      .freezeWith(client);
+    const getPoolFeeTransaction = await getPoolFee.execute(client);
+    const response = await getPoolFeeTransaction.getRecord(client);
+    const poolFee1 = AccountId.fromSolidityAddress(response.contractFunctionResult?.getAddress(0) ?? "").toString();
+    const poolFee2 = AccountId.fromSolidityAddress(response.contractFunctionResult?.getAddress(1) ?? "").toString();
+    console.log(poolFee1, poolFee2);
+  };
+
   return {
+    initHederaService,
     get100LABTokens,
+    getPrecision,
     createLiquidityPool,
+    swapToken,
     addLiquidity,
     removeLiquidity,
     swapTokenA,
@@ -363,6 +440,8 @@ function createHederaService() {
     getSpotPrice,
     fetchPoolFee,
     pairCurrentPosition,
+    getContractAddress,
+    getTokenPairAddress,
   };
 }
 

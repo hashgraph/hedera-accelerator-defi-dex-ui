@@ -1,5 +1,5 @@
-import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { BigNumber } from "bignumber.js";
+import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import {
   WalletService,
   HederaService,
@@ -14,6 +14,7 @@ import { getErrorMessage } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState } from "./types";
 
 const initialSwapState: SwapState = {
+  precision: HederaService.getPrecision(),
   spotPrices: {},
   poolLiquidity: {},
   errorMessage: null,
@@ -31,6 +32,24 @@ const initialSwapState: SwapState = {
 const createSwapSlice: SwapSlice = (set, get): SwapStore => {
   return {
     ...initialSwapState,
+    getPrecision: async () => {
+      const precision = HederaService.getPrecision();
+      set(
+        ({ swap }) => {
+          swap.precision = precision;
+        },
+        false,
+        "swap/FETCH_PRECISION"
+      );
+    },
+    withPrecision: (value: number): BigNumber => {
+      const { precision } = get().swap;
+      if (precision === undefined) {
+        throw new Error("Precision is undefined");
+      }
+      console.log({ value, bigValue: new BigNumber(value).multipliedBy(precision), precision });
+      return new BigNumber(value).multipliedBy(precision);
+    },
     /**
      * Fetches the spot price for swapping L49A tokens for L49B tokens.
      *
@@ -41,10 +60,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
     fetchSpotPrices: async () => {
       set({}, false, SwapActionType.FETCH_SPOT_PRICES_STARTED);
       try {
-        const precision = 10000000;
+        const { swap } = get();
         const spotPriceL49BToL49A = await HederaService.getSpotPrice();
         const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
-          ? spotPriceL49BToL49A.toNumber() / precision
+          ? swap.withPrecision(spotPriceL49BToL49A.toNumber()).toNumber()
           : undefined;
         const spotPriceL49AToL49BWithPrecision = spotPriceL49BToL49AWithPrecision
           ? 1 / spotPriceL49BToL49AWithPrecision
@@ -104,30 +123,23 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         false,
         SwapActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED
       );
-
-      const { network } = get().context;
-      const { walletData } = get().wallet;
+      const { context, wallet, swap } = get();
+      const { network } = context;
+      const { walletData } = wallet;
+      const { withPrecision } = swap;
       /**
        * Only L49A and L49B swaps are currently supported. The isTokenToTradeL49A and isTokenToTradeL49B booleans
        * were created as a temporary work around to support the current swapToken Swap contract function logic.
        * */
       const isTokenToTradeL49A = tokenToTrade.symbol === TOKEN_A_SYMBOL;
       const isTokenToTradeL49B = tokenToTrade.symbol === TOKEN_B_SYMBOL;
-
+      console.log({ tokenToTrade, tokenToReceive, isTokenToTradeL49A, isTokenToTradeL49B });
       const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
-      // const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
+      const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
       const signingAccount = walletData.pairedAccounts[0];
       const abstractSwapId = ContractId.fromString(SWAP_CONTRACT_ID);
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-
-      console.log(
-        abstractSwapId,
-        signingAccount,
-        isTokenToTradeL49A,
-        tokenToTradeAccountId,
-        isTokenToTradeL49B,
-        tokenToTrade.amount
-      );
+      console.log({ signingAccount, tokenToTradeAccountId, abstractSwapId, walletAddress });
       /**
        * Temporarily added ternary logic for tokenToTradeAddress and tokenToReceiveAddress due to current
        * swapToken contract function limitations. The real account IDs for the trading and receiving tokens
@@ -135,24 +147,42 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
        * */
       // should be: const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
       const tokenToTradeAddress = TokenId.fromString(
-        isTokenToTradeL49A ? tokenToTradeAccountId : "0"
+        isTokenToTradeL49A ? tokenToTradeAccountId : "0.0.47646100"
       ).toSolidityAddress();
       // should be: const tokenToReceiveAddress = TokenId.fromString(tokenToReceiveAccountId).toSolidityAddress();
       const tokenToReceiveAddress = TokenId.fromString(
-        isTokenToTradeL49B ? tokenToTradeAccountId : "0"
+        isTokenToTradeL49B ? tokenToTradeAccountId : "0.0.47646100"
       ).toSolidityAddress();
+      console.log({ tokenToTradeAddress, tokenToReceiveAddress });
       /**
        * Temporarily added ternary logic for tokenToTradeAmount and tokenToReceiveAmount due to current swapToken
        * contract function limitations.
        * */
       // should be: const tokenToTradeAmount = new BigNumber(tokenToTrade.amount)
-      const tokenToTradeAmount = new BigNumber(isTokenToTradeL49A ? tokenToTrade.amount : 0);
+      const tokenToTradeAmount = withPrecision(isTokenToTradeL49A ? tokenToTrade.amount : 0);
       // should be: const tokenToReceiveAmount = new BigNumber(tokenToReceive.amount)
-      const tokenToReceiveAmount = new BigNumber(isTokenToTradeL49B ? tokenToTrade.amount : 0);
+      const tokenToReceiveAmount = withPrecision(isTokenToTradeL49B ? tokenToTrade.amount : 0);
+      console.log({
+        tokenToTradeAmount: tokenToTradeAmount.toNumber(),
+        tokenToReceiveAmount: tokenToReceiveAmount.toNumber(),
+        tokenToTradeAddress,
+        tokenToReceiveAddress,
+      });
       const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
       const signer = WalletService.getSigner(provider);
 
       try {
+        /**
+         * Testing Token Swap using the HederaService with the new Pair Contract
+         */
+        await HederaService.swapTokenA();
+        console.log({
+          walletAddress,
+          tokenToTradeAddress,
+          tokenToReceiveAddress,
+          tokenToTradeAmount,
+          tokenToReceiveAmount,
+        });
         const swapTransaction = await new ContractExecuteTransaction()
           .setContractId(abstractSwapId)
           .setGas(2000000)
@@ -162,8 +192,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
               .addAddress(walletAddress)
               .addAddress(tokenToTradeAddress)
               .addAddress(tokenToReceiveAddress)
-              .addInt64(tokenToTradeAmount)
-              .addInt64(tokenToReceiveAmount)
+              .addInt256(tokenToTradeAmount)
+              .addInt256(tokenToReceiveAmount)
           )
           .setNodeAccountIds([new AccountId(3)])
           .freezeWithSigner(signer);
