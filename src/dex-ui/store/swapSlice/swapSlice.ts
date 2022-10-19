@@ -175,7 +175,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         /**
          * Testing Token Swap using the HederaService with the new Pair Contract
          */
-        await HederaService.swapTokenA();
+        // await HederaService.swapTokenA();
         console.log({
           walletAddress,
           tokenToTradeAddress,
@@ -185,7 +185,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         });
         const swapTransaction = await new ContractExecuteTransaction()
           .setContractId(abstractSwapId)
-          .setGas(2000000)
+          .setGas(9000000)
           .setFunction(
             "swapToken",
             new ContractFunctionParameters()

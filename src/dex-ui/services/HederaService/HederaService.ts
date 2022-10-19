@@ -207,14 +207,14 @@ function createHederaService() {
   };
 
   const swapTokenA = async () => {
-    const tokenAQty = withPrecision(2);
+    const tokenAQty = withPrecision(1);
     const tokenBQty = withPrecision(0);
     console.log(` Swapping a ${tokenAQty} units of token A from the pool.`);
     // Need to pass different token B address so that only swap of token A is considered.
     const mockTokenB = TokenId.fromString("0.0.47646100");
     const swapToken = await new ContractExecuteTransaction()
       .setContractId(contractId)
-      .setGas(2000000)
+      .setGas(9000000)
       .setFunction(
         "swapToken",
         new ContractFunctionParameters()
