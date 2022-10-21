@@ -187,6 +187,32 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
     },
+    sendRemoveLiquidityTransaction: async (lpTokenAmount: number) => {
+      const { network } = get().context;
+      const { walletData } = get().wallet;
+      const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+      const signer = WalletService.getSigner(provider);
+
+      try {
+        set({}, false, PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
+        const result = await HederaService.removeLiquidity(signer, lpTokenAmount);
+        console.log(result);
+        if (result) {
+          set({}, false, PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED);
+        } else {
+          throw new Error("Remove Liquidity Transaction Execution Failed");
+        }
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        set(
+          ({ pools }) => {
+            pools.errorMessage = errorMessage;
+          },
+          false,
+          PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED
+        );
+      }
+    },
     // Temporary - should be removed
     send100LabTokensToWallet: async (receivingAccountId: string) => {
       const hashconnect = WalletService.getHashconnectInstance();

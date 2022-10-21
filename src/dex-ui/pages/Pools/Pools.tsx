@@ -126,7 +126,7 @@ const Pools = (): JSX.Element => {
                   color={"#3078FF"}
                   mr={"1em"}
                   as={RouterLink}
-                  to={userPool ? "/pool/this-doesnt-exist-yet" : "/swap"}
+                  to={userPool ? `/pool/withdraw?pool=${row.name.replace("/", "-")}` : "/swap"}
                 >
                   {userPool ? "Withdraw" : "Swap"}
                 </Link>
