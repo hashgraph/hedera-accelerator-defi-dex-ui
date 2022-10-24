@@ -1,5 +1,7 @@
+import { WarningIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { LoadingDialog } from "../../../dex-ui-components";
 import { WithdrawComponent } from "../../../dex-ui-components/Pool";
 import { useDexContext } from "../../hooks";
 import { TOKEN_ID_TO_TOKEN_SYMBOL } from "../../services";
@@ -13,6 +15,7 @@ const Withdraw = () => {
 
   const [withdrawState, setWithdrawState] = useState({
     noPoolMetricsMessage: "Loading... TODO: replace this?",
+    errorDialogOpen: false,
     withdrawProps: {
       walletConnectionStatus: wallet.walletConnectionStatus,
       poolLiquidityDetails: {
@@ -80,10 +83,28 @@ const Withdraw = () => {
       }
     } else {
       // no pool indicated, so redirect to My Pools page
-      navigate("/pool");
+      navigate("/pool?selectedPools=user");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pools]);
+
+  /**
+   * Effect for listening to the state of withdraw transaction.
+   * When transaction is waiting on signature/in progress we want to show a loading dialog. (handled in template)
+   * When transaction fails we want to show a failure dialog.
+   * When transaction succeeds we want to route the user to the My Pools table with a success message
+   */
+  useEffect(() => {
+    setWithdrawState((state) => ({
+      ...state,
+      errorDialogOpen: pools.withdrawState.status === "error",
+    }));
+
+    if (pools.withdrawState.status === "success") {
+      navigate("/pool?selectedPools=user&withdrawSuccessful=true");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pools.withdrawState]);
 
   /**
    * Returns the user pool metrics for a given LP token, using token symbol/name as reference key
@@ -153,10 +174,10 @@ const Withdraw = () => {
 
   const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      console.log(lpAmount);
-      pools.sendRemoveLiquidityTransaction(lpAmount);
+      const { tokenSymbol, userLpPercentage } = withdrawState.withdrawProps.poolLpDetails;
+      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, userLpPercentage);
     },
-    [pools]
+    [pools, withdrawState]
   );
 
   const onInputAmountChange = useCallback(
@@ -170,12 +191,27 @@ const Withdraw = () => {
   );
 
   return !withdrawState.noPoolMetricsMessage ? (
-    <WithdrawComponent
-      {...withdrawState.withdrawProps}
-      onWithdrawClick={onWithdrawClick}
-      onInputAmountChange={onInputAmountChange}
-      disableWithdrawButton={withdrawState.lpInputAmount === 0}
-    />
+    <>
+      <WithdrawComponent
+        {...withdrawState.withdrawProps}
+        onWithdrawClick={onWithdrawClick}
+        onInputAmountChange={onInputAmountChange}
+        disableWithdrawButton={withdrawState.lpInputAmount === 0}
+      />
+      <LoadingDialog
+        isOpen={pools.withdrawState.status === "in progress"}
+        message={"Please confirm the swap in your wallet to proceed"}
+      />
+      <LoadingDialog
+        isOpen={pools.withdrawState.status === "error" && withdrawState.errorDialogOpen}
+        message={pools.withdrawState.errorMessage ?? ""}
+        icon={<WarningIcon h={10} w={10} />}
+        buttonConfig={{
+          text: "Dismiss",
+          onClick: () => setWithdrawState({ ...withdrawState, errorDialogOpen: false }),
+        }}
+      />
+    </>
   ) : (
     <>{withdrawState.noPoolMetricsMessage}</>
   );

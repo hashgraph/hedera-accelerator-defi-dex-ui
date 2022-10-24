@@ -1,5 +1,18 @@
-import { Button, Container, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Link, Text } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
+import {
+  Button,
+  Container,
+  Flex,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Link,
+  Text,
+  Tag,
+  TagCloseButton,
+} from "@chakra-ui/react";
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
 // import { PoolState, UserPoolState } from "../../services";
@@ -7,6 +20,7 @@ import { formatPoolMetrics, formatUserPoolMetrics } from "./utils";
 import { isEmpty } from "ramda";
 import { useDexContext } from "../../hooks";
 import { PoolState, UserPoolState } from "../../store/poolsSlice";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 export interface FormattedUserPoolDetails {
   name: string;
@@ -49,6 +63,13 @@ const Pools = (): JSX.Element => {
 
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [queryParamState, setQueryParamState] = useState({
+    selectedTab: 0,
+    showSuccessfulWithdrawalMessage: false,
+  });
+
   useEffect(() => {
     const fetchPoolMetrics = async () => {
       await pools.fetchAllPoolMetrics();
@@ -84,6 +105,23 @@ const Pools = (): JSX.Element => {
         ),
       });
     }
+
+    /**
+     * OnInit
+     * -if query param indicates which set of pools to display, jump to that tab
+     * -if coming from a successful withdrawal, display success message with withdraw details
+     *    -NOTE: in the successful withdrawal case, since user is navigating from withdrawal
+     *           page, the pools data will have been fetched already
+     */
+    const selectedPools = searchParams.get("selectedPools");
+    const withdrawSuccessful = searchParams.get("withdrawSuccessful");
+    if (selectedPools === "user") {
+      // My Pools is the second tab, so set selectedTab index to 1
+      setQueryParamState((queryParamState) => ({ ...queryParamState, selectedTab: 1 }));
+    }
+    if (withdrawSuccessful === "true") {
+      setQueryParamState((queryParamState) => ({ ...queryParamState, showSuccessfulWithdrawalMessage: true }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -108,6 +146,27 @@ const Pools = (): JSX.Element => {
     [pools.userPoolsMetrics]
   );
 
+  /**
+   * Navigates to the corresponding URL for the links in Actions column. Deferring
+   * to a method to handle this instead of directly using the "to" prop in the Link
+   * component from chakra ui because in the case of navigating to the withdraw component,
+   * we need to reset the pool state variables for the withdrawal state. Without resetting
+   * the withdraw state variables in pool store, after successful withdrawals the withdraw
+   * component will navigate back to the pools page as there is an effect in Withdraw page
+   * that listens to whether withdrawal transaction was successful and navigates back to Pools
+   * page if field is successful. Therefore without resetting that field it causes a redirect back
+   * @param action - withdraw or swap action link
+   * @param pool - pool to withdraw from in the case of withdraw action link
+   */
+  const actionNavigation = async (action: "withdraw" | "swap", pool?: string) => {
+    if (action === "withdraw") {
+      await pools.resetWithdrawState();
+      navigate(`/pool/withdraw?pool=${(pool || "").replace("/", "-")}`);
+    } else {
+      navigate("/swap");
+    }
+  };
+
   const formatPoolsRowData = (
     rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | FormattedUserPoolDetails[] | undefined,
     userPool = false
@@ -125,7 +184,8 @@ const Pools = (): JSX.Element => {
                   color={"#3078FF"}
                   mr={"1em"}
                   as={RouterLink}
-                  to={userPool ? `/pool/withdraw?pool=${row.name.replace("/", "-")}` : "/swap"}
+                  to={userPool ? "/pool" : "/swap"}
+                  onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
                 >
                   {userPool ? "Withdraw" : "Swap"}
                 </Link>
@@ -139,60 +199,113 @@ const Pools = (): JSX.Element => {
       : [];
   };
 
-  return (
-    <Tabs display={"flex"} flexDirection={"column"}>
-      <TabList display={"flex"} justifyContent={"space-between"} alignItems={"center"} padding={"0"} margin={"0 16px"}>
-        <Flex>
-          {!isEmpty(pools.allPoolsMetrics) ? (
-            <Tab fontSize={"32px"} padding={"0 0 8px 0"} marginRight={"32px"}>
-              Pools
-            </Tab>
-          ) : (
-            ""
-          )}
-          {pools.userPoolsMetrics ? (
-            <Tab fontSize={"32px"} padding={"0 0 8px 0"}>
-              My Pools
-            </Tab>
-          ) : (
-            ""
-          )}
-        </Flex>
-        <Button width={"200px"} marginBottom={"10px"}>
-          Create Pool
-        </Button>
-      </TabList>
-      <TabPanels>
-        <TabPanel>
-          <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
-        </TabPanel>
-        <TabPanel>
-          {unclaimedFeeTotal() > 0 ? (
-            <Container
-              padding={"12px"}
-              margin={"0 0 16px 0"}
-              width={"100%"}
-              maxWidth={"100%"}
-              backgroundColor={"#D9D9D9"}
-            >
-              <Flex width={"100%"} justifyContent={"space-between"} alignItems={"center"} flexWrap={"wrap"}>
-                <Text>
-                  Total unclaimed fees across {pools.userPoolsMetrics?.length} pools:&nbsp;
-                  <span style={{ fontWeight: "bold" }}>${unclaimedFeeTotal()}</span>
-                </Text>
+  const getHashScanLink = useCallback(() => {
+    const transactionId = pools.withdrawState.successPayload?.transactionResponse.transactionId.toString();
+    const urlFormattedTimestamp = transactionId?.split("@")[1].replace(".", "-");
+    const formattedTransactionId = `${transactionId?.split("@")[0]}-${urlFormattedTimestamp}`;
+    // format: https://hashscan.io/#/testnet/transaction/0.0.34744739-1665448985-817445871
+    // TODO: set testnet/mainnet based on network
+    return `https://hashscan.io/#/testnet/transaction/${formattedTransactionId}`;
+  }, [pools.withdrawState.successPayload]);
 
-                <Button size={"sm"} height={"32px"}>
-                  Claim Fees
-                </Button>
-              </Flex>
-            </Container>
-          ) : (
-            ""
-          )}
-          <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+  return (
+    <>
+      <Tabs
+        display={"flex"}
+        flexDirection={"column"}
+        index={queryParamState.selectedTab}
+        onChange={(index) => setQueryParamState({ ...queryParamState, selectedTab: index })}
+      >
+        {pools.withdrawState.status === "success" && queryParamState.showSuccessfulWithdrawalMessage ? (
+          <Tag width={"calc(100%) - 32px"} padding={"8px"} margin={"16px"} backgroundColor={"#00e64d33"}>
+            <Flex width={"100%"} flexWrap={"wrap"}>
+              <Text color={"#000000"}>
+                {`Withdrew ${pools.withdrawState.successPayload?.lpTokenAmount} LP Tokens from 
+                ${pools.withdrawState.successPayload?.lpTokenSymbol} 
+                ${pools.withdrawState.successPayload?.userPercentOfPool}% Pool.`}
+                &nbsp;
+              </Text>
+              {
+                // TODO: make link to HashScan its own component (also being used in Swap component)}
+              }
+              <Link
+                width={"fit-content"}
+                display={"flex"}
+                alignItems={"center"}
+                color={"#0180FF"}
+                href={getHashScanLink()}
+                isExternal
+              >
+                <Text textDecoration={"underline"}>View in HashScan</Text> <ExternalLinkIcon />
+              </Link>
+            </Flex>
+            <TagCloseButton
+              color={"#000000"}
+              onClick={() => setQueryParamState({ ...queryParamState, showSuccessfulWithdrawalMessage: false })}
+            />
+          </Tag>
+        ) : (
+          ""
+        )}
+        <TabList
+          display={"flex"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+          padding={"0"}
+          margin={"0 16px"}
+        >
+          <Flex>
+            {!isEmpty(pools.allPoolsMetrics) ? (
+              <Tab fontSize={"32px"} padding={"0 0 8px 0"} marginRight={"32px"}>
+                Pools
+              </Tab>
+            ) : (
+              ""
+            )}
+            {pools.userPoolsMetrics ? (
+              <Tab fontSize={"32px"} padding={"0 0 8px 0"}>
+                My Pools
+              </Tab>
+            ) : (
+              ""
+            )}
+          </Flex>
+          <Button width={"200px"} marginBottom={"10px"}>
+            Create Pool
+          </Button>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+          </TabPanel>
+          <TabPanel>
+            {unclaimedFeeTotal() > 0 ? (
+              <Container
+                padding={"12px"}
+                margin={"0 0 16px 0"}
+                width={"100%"}
+                maxWidth={"100%"}
+                backgroundColor={"#D9D9D9"}
+              >
+                <Flex width={"100%"} justifyContent={"space-between"} alignItems={"center"} flexWrap={"wrap"}>
+                  <Text>
+                    Total unclaimed fees across {pools.userPoolsMetrics?.length} pools:&nbsp;
+                    <span style={{ fontWeight: "bold" }}>${unclaimedFeeTotal()}</span>
+                  </Text>
+
+                  <Button size={"sm"} height={"32px"}>
+                    Claim Fees
+                  </Button>
+                </Flex>
+              </Container>
+            ) : (
+              ""
+            )}
+            <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </>
   );
 };
 

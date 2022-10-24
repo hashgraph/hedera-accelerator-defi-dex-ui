@@ -1,5 +1,6 @@
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
+import { TransactionResponse } from "@hashgraph/sdk";
 
 enum PoolsActionType {
   FETCH_ALL_POOL_METRICS_STARTED = "pools/FETCH_ALL_POOL_METRICS_STARTED",
@@ -14,6 +15,7 @@ enum PoolsActionType {
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED",
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED",
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
+  RESET_WITHDRAW_STATE = "pools/RESET_WITHDRAW_STATE",
 }
 
 /* Add Symbol */
@@ -39,6 +41,16 @@ interface TokenBalance {
   balance: number;
 }
 
+interface WithdrawState {
+  status: "init" | "in progress" | "success" | "error";
+  successPayload: {
+    lpTokenSymbol: string;
+    lpTokenAmount: number;
+    userPercentOfPool: number;
+    transactionResponse: TransactionResponse;
+  } | null;
+  errorMessage: string;
+}
 interface PoolsState {
   allPoolsMetrics: PoolState[];
   userPoolsMetrics: UserPoolState[];
@@ -46,6 +58,7 @@ interface PoolsState {
   userTokenBalances: TokenBalance[];
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
+  withdrawState: WithdrawState;
 }
 
 interface PoolsActions {
@@ -58,7 +71,12 @@ interface PoolsActions {
   }: any) => Promise<void>;
   fetchAllPoolMetrics: () => Promise<void>;
   fetchUserPoolMetrics: (userAccountId: string) => Promise<void>;
-  sendRemoveLiquidityTransaction: (lpTokenAmount: number) => Promise<void>;
+  sendRemoveLiquidityTransaction: (
+    lpTokenSymbol: string,
+    lpTokenAmount: number,
+    userPercentOfPool: number
+  ) => Promise<void>;
+  resetWithdrawState: () => Promise<void>;
   // Temporary - should be removed
   send100LabTokensToWallet: (receivingAccountId: string) => Promise<void>;
 }

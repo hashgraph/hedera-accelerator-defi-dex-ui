@@ -24,20 +24,21 @@ const DataTable = (props: DataTableProps) => {
         <Thead>
           <Tr backgroundColor={"#808080"}>
             {props.colHeaders.map((colHeader, i) => (
-              <Th color={"white"} borderRight={"1px solid #B1B1B1"} padding={"6px"} whiteSpace={"initial"}>
+              <Th color={"white"} borderRight={"1px solid #B1B1B1"} padding={"6px"} whiteSpace={"initial"} key={i}>
                 {colHeader.headerName}
               </Th>
             ))}
           </Tr>
         </Thead>
         <Tbody>
-          {props.rowData?.map((row) => (
-            <Tr borderBottom={"1px solid #B1B1B1"}>
+          {props.rowData?.map((row, i) => (
+            <Tr borderBottom={"1px solid #B1B1B1"} key={i}>
               {props.colHeaders.map((colConfig, i) => (
                 <Td
                   width={`${colConfig.colWidth}px`}
                   padding={"6px"}
                   borderRight={i === props.colHeaders.length - 1 ? "none" : "1px solid #B1B1B1"}
+                  key={i}
                 >
                   {colConfig?.field && row[colConfig.field] ? row[colConfig.field] : "-"}
                 </Td>
