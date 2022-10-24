@@ -178,13 +178,6 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     },
     handleAcknowledgeMessageEvent: (acknowledgeData: MessageTypes.Acknowledge) => {
       console.log("Ack Received", { acknowledgeData });
-      set(
-        ({ swap }) => {
-          swap.transactionState.transactionWaitingToBeSigned = true;
-        },
-        false,
-        SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
-      );
     },
     handleConnectionStatusChange: (connectionStatus: ConnectionStatus) => {
       console.log("Connection Status Changed", { connectionStatus });

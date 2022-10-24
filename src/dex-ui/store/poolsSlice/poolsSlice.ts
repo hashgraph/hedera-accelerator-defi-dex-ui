@@ -34,6 +34,11 @@ const initialPoolsStore: PoolsState = {
   userTokenBalances: [],
   status: "init",
   errorMessage: null,
+  withdrawState: {
+    status: "init",
+    successPayload: null,
+    errorMessage: "",
+  },
 };
 
 /**
@@ -187,18 +192,45 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
     },
-    sendRemoveLiquidityTransaction: async (lpTokenAmount: number) => {
+    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, userPercentOfPool: number) => {
       const { network } = get().context;
       const { walletData } = get().wallet;
       const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
       const signer = WalletService.getSigner(provider);
 
       try {
-        set({}, false, PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
+        set(
+          ({ pools }) => {
+            pools.withdrawState = {
+              status: "in progress",
+              successPayload: null,
+              errorMessage: "",
+            };
+            pools.errorMessage = "";
+          },
+          false,
+          PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
+        );
         const result = await HederaService.removeLiquidity(signer, lpTokenAmount);
         console.log(result);
         if (result) {
-          set({}, false, PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED);
+          set(
+            ({ pools }) => {
+              pools.withdrawState = {
+                status: "success",
+                successPayload: {
+                  lpTokenSymbol,
+                  lpTokenAmount,
+                  userPercentOfPool,
+                  transactionResponse: result,
+                },
+                errorMessage: "",
+              };
+              pools.errorMessage = "";
+            },
+            false,
+            PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED
+          );
         } else {
           throw new Error("Remove Liquidity Transaction Execution Failed");
         }
@@ -206,12 +238,31 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const errorMessage = getErrorMessage(error);
         set(
           ({ pools }) => {
+            pools.withdrawState = {
+              status: "error",
+              successPayload: null,
+              errorMessage: errorMessage,
+            };
             pools.errorMessage = errorMessage;
           },
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED
         );
       }
+    },
+    resetWithdrawState: async () => {
+      set(
+        ({ pools }) => {
+          pools.withdrawState = {
+            status: "init",
+            successPayload: null,
+            errorMessage: "",
+          };
+          pools.errorMessage = "";
+        },
+        false,
+        PoolsActionType.RESET_WITHDRAW_STATE
+      );
     },
     // Temporary - should be removed
     send100LabTokensToWallet: async (receivingAccountId: string) => {
