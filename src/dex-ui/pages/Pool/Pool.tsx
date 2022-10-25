@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useReducer, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
 import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer, PoolState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
@@ -45,6 +45,8 @@ const Pool = (): JSX.Element => {
       outputToken: poolState.outputToken,
       contractId: SWAP_CONTRACT_ID,
     });
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolState, pools.sendAddLiquidityTransaction]);
 
   /**
@@ -78,6 +80,8 @@ const Pool = (): JSX.Element => {
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "spotPrice", payload: firstTokenSpotPrice });
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "spotPrice", payload: secondTokenSpotPrice });
     }
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolState.inputToken.symbol, poolState.outputToken.symbol, spotPrices]);
 
   /**
@@ -261,6 +265,8 @@ const Pool = (): JSX.Element => {
   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
   const sendLABTokensToConnectedWallet = useCallback(() => {
     pools.send100LabTokensToWallet(walletData?.pairedAccounts[0]);
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletData?.pairedAccounts, pools.send100LabTokensToWallet]);
 
   return (

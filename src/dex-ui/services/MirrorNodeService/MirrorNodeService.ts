@@ -100,6 +100,11 @@ function createMirrorNodeService() {
     ]);
   };
 
+  /**
+   * Fetches information related to a specific token.
+   * @param tokenId  - The ID of the token account to return data for.
+   * @returns Attributes associated with the provided token ID.
+   */
   const fetchTokenData = async (tokenId: string): Promise<MirrorNodeTokenByIdResponse> => {
     return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}`);
   };
@@ -121,15 +126,11 @@ function createMirrorNodeService() {
   };
 
   /**
-   * UPDATE THIS TSDOC
-   *
-   *
-   *
-   *
    * Fetches the HBAR balance and a list of token balances on the Hedera
-   * network for the given account ID.
+   * network for the given account ID. Fetches the decimal precision value for
+   * each token ID and formats the balances with the correct decimal positions.
    * @param accountId - The ID of the account to return token balances for.
-   * @returns The list of balances for the given account ID.
+   * @returns The list of balances (in decimal format) for the given account ID.
    */
   const fetchAccountTokenBalances = async (accountId: string): Promise<MirrorNodeTokenBalance[]> => {
     const accountBalances = await fetchAccountBalances(accountId);
@@ -147,6 +148,7 @@ function createMirrorNodeService() {
       })
     );
   };
+
   /**
    * Fetches the list of token balances given a token ID. This represents
    * the Token supply distribution across the network

@@ -18,6 +18,11 @@ const getLocalWalletData = (): any => {
   }
 };
 
+/**
+ * Applies the decimal precision to token balances read from a local wallet.
+ * @param tokenBalances - Token balances read from a local wallet.
+ * @returns Token balances with decimal (BigNumber) balances.
+ */
 const getFormattedTokenBalances = (tokenBalances: TokenBalanceJson[]) => {
   return tokenBalances.map((tokenBalanceJson) => {
     const { tokenId, balance, decimals } = tokenBalanceJson;

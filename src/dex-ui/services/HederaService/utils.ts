@@ -10,43 +10,43 @@ const treasuryKey = PrivateKey.fromString(TREASURY_KEY);
 const userId = AccountId.fromString(TOKEN_USER_ID);
 const userKey = PrivateKey.fromString(TOKEN_USER_KEY);
 
-export const getAdmin = () => {
+const getAdmin = () => {
   return {
     adminId,
     adminKey,
   };
 };
 
-export const getTreasurer = () => {
+const getTreasurer = () => {
   return {
     treasuryId,
     treasuryKey,
   };
 };
 
-export const getUser = () => {
+const getUser = () => {
   return {
     userId,
     userKey,
   };
 };
 
-// export const getOperator = () => [userId, userKey];
-
-export const createClient = (accountId: AccountId, privateKey: PrivateKey): Client => {
+const createClient = (accountId: AccountId, privateKey: PrivateKey): Client => {
   const client = Client.forTestnet();
   client.setOperator(accountId, privateKey);
   return client;
 };
 
-export const createAdminClient = (): Client => {
+const createAdminClient = (): Client => {
   return createClient(adminId, adminKey);
 };
 
-export const createTreasuryClient = (): Client => {
+const createTreasuryClient = (): Client => {
   return createClient(treasuryId, treasuryKey);
 };
 
-export const createUserClient = (): Client => {
+const createUserClient = (): Client => {
   return createClient(userId, userKey);
 };
+
+export { getAdmin, getTreasurer, getUser, createClient, createAdminClient, createTreasuryClient, createUserClient };

@@ -164,7 +164,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const isTokenToTradeL49A = tokenToTrade.symbol === TOKEN_A_SYMBOL;
       const isTokenToTradeL49B = tokenToTrade.symbol === TOKEN_B_SYMBOL;
       const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
-      const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
+      // const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
       const signingAccount = walletData.pairedAccounts[0];
       const abstractSwapId = ContractId.fromString(SWAP_CONTRACT_ID);
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();

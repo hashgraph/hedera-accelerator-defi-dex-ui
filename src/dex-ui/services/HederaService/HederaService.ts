@@ -100,7 +100,6 @@ function createHederaService() {
     const firstTokenQty = firstTokenQuantity ? firstTokenQuantity : new BigNumber(10);
     const secondTokenQty = secondTokenQuantity ? secondTokenQuantity : new BigNumber(10);
     const addLiquidityContractId = addLiquidityContractAddress ? addLiquidityContractAddress : contractId;
-    const fromAddress = walletAddress ? walletAddress : treasuryKey;
 
     console.log(`Adding ${firstTokenQty} units of token A and ${secondTokenQty} units of token B to the pool.`);
 
