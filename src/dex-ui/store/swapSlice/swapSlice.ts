@@ -14,7 +14,7 @@ import { getErrorMessage } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState } from "./types";
 
 const initialSwapState: SwapState = {
-  precision: HederaService.getPrecision(),
+  precision: undefined,
   fee: undefined,
   spotPrices: {},
   poolLiquidity: {},
@@ -34,27 +34,15 @@ const initialSwapState: SwapState = {
 const createSwapSlice: SwapSlice = (set, get): SwapStore => {
   return {
     ...initialSwapState,
-    getPrecision: async () => {
-      set({}, false, SwapActionType.FETCH_PRECISION_STARTED);
-      try {
-        const precision = HederaService.getPrecision();
-        set(
-          ({ swap }) => {
-            swap.precision = precision;
-          },
-          false,
-          SwapActionType.FETCH_PRECISION_SUCCEEDED
-        );
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        set(
-          ({ swap }) => {
-            swap.errorMessage = errorMessage;
-          },
-          false,
-          SwapActionType.FETCH_PRECISION_FAILED
-        );
-      }
+    getPrecision: () => {
+      const precision = HederaService.getPrecision();
+      set(
+        ({ swap }) => {
+          swap.precision = precision;
+        },
+        false,
+        SwapActionType.SET_PRECISION
+      );
     },
     /**
      * Fetches the spot price for swapping L49A tokens for L49B tokens.
@@ -68,6 +56,9 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       try {
         const { swap } = get();
         const { precision } = swap;
+        if (precision === undefined) {
+          throw Error("Precision not found");
+        }
         const spotPriceL49BToL49A = await HederaService.getSpotPrice();
         const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
         const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
@@ -124,6 +115,9 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
         const rawPoolLiquidity = await HederaService.pairCurrentPosition();
         Object.keys(rawPoolLiquidity).forEach((tokenSymbol) => {
+          if (swap.precision === undefined) {
+            throw Error("Precision not found");
+          }
           const amount = rawPoolLiquidity[tokenSymbol as keyof typeof rawPoolLiquidity];
           poolLiquidity.set(tokenSymbol, amount?.dividedBy(swap.precision.times(10)));
         });

@@ -9,7 +9,16 @@ const Trade = () => {
   const [context, wallet, swap] = useDexContext(({ context, wallet, swap }) => [context, wallet, swap]);
   const { network } = context;
   const { walletData, walletConnectionStatus: connectionStatus, installedExtensions } = wallet;
-  const { spotPrices, poolLiquidity, transactionState, setAsLoading, setAsLoaded, fetchFee, fetchSpotPrices } = swap;
+  const {
+    spotPrices,
+    poolLiquidity,
+    transactionState,
+    setAsLoading,
+    setAsLoaded,
+    fetchFee,
+    fetchSpotPrices,
+    getPrecision,
+  } = swap;
 
   const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
   const formattedPoolLiquidity = mapBigNumberValuesToNumber(poolLiquidity);
@@ -17,10 +26,11 @@ const Trade = () => {
 
   const fetchSwapData = useCallback(async () => {
     setAsLoading();
+    getPrecision();
     await fetchFee();
     await fetchSpotPrices();
     setAsLoaded();
-  }, [setAsLoading, fetchFee, fetchSpotPrices, setAsLoaded]);
+  }, [setAsLoading, getPrecision, fetchFee, fetchSpotPrices, setAsLoaded]);
 
   useEffect(() => {
     fetchSwapData();

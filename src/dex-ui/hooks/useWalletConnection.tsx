@@ -6,11 +6,10 @@ import { WalletConnectionStatus } from "../store/walletSlice";
  * Used to setup and manage connections with local Hedera enabled wallets.
  */
 export function useWalletConnection() {
-  const [wallet, swap] = useDexContext(({ wallet, swap }) => [wallet, swap]);
+  const [wallet] = useDexContext(({ wallet }) => [wallet]);
   const { walletConnectionStatus, installedExtensions, walletData } = wallet;
 
   useEffect(() => {
-    swap.getPrecision();
     wallet.setupHashConnectEvents();
     return () => {
       wallet.destroyHashConnectEvents();
