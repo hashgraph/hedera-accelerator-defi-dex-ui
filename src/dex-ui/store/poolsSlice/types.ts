@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 
@@ -13,32 +14,47 @@ enum PoolsActionType {
   SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "pools/SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
 }
 
-/* Add Symbol */
-interface PoolState {
-  name: string;
-  fee: number;
-  totalVolumeLocked: number;
-  past24HoursVolume: number;
-  past7daysVolume: number;
+interface SendAddLiquidityTransactionParams {
+  inputToken: {
+    symbol: string;
+    amount: number;
+    address: string;
+  };
+  outputToken: {
+    symbol: string;
+    amount: number;
+    address: string;
+  };
+  contractId: string;
 }
 
-interface UserPoolState {
+/* Add Symbol */
+interface Pool {
   name: string;
-  fee: number;
-  liquidity: number;
-  percentOfPool: number;
-  unclaimedFees: number;
+  fee: BigNumber | undefined;
+  totalVolumeLocked: BigNumber;
+  past24HoursVolume: BigNumber;
+  past7daysVolume: BigNumber;
+}
+
+interface UserPool {
+  name: string;
+  fee: BigNumber | undefined;
+  liquidity: BigNumber;
+  percentOfPool: BigNumber;
+  unclaimedFees: BigNumber;
 }
 
 interface TokenBalance {
   /** Should update this field to be tokenId */
   token_id: string;
-  balance: number;
+  balance: BigNumber;
+  decimals?: string;
 }
 
 interface PoolsState {
-  allPoolsMetrics: PoolState[];
-  userPoolsMetrics: UserPoolState[];
+  allPoolsMetrics: Pool[];
+  userPoolsMetrics: UserPool[];
   poolTokenBalances: TokenBalance[];
   userTokenBalances: TokenBalance[];
   status: string; // "init" | "fetching" | "success" | "error";
@@ -64,4 +80,4 @@ type PoolsStore = PoolsState & PoolsActions;
 type PoolsSlice = StateCreator<DEXState, [["zustand/devtools", never], ["zustand/immer", never]], [], PoolsStore>;
 
 export { PoolsActionType };
-export type { PoolsSlice, PoolsStore, PoolsState, PoolsActions, UserPoolState, PoolState };
+export type { PoolsSlice, PoolsStore, PoolsState, PoolsActions, UserPool, Pool, SendAddLiquidityTransactionParams };

@@ -1,12 +1,10 @@
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { BigNumber } from "bignumber.js";
 import { getErrorMessage } from "../../utils";
-import { PoolsSlice, PoolsStore, PoolsState, PoolsActionType } from "./types";
+import { PoolsSlice, PoolsStore, PoolsState, PoolsActionType, SendAddLiquidityTransactionParams } from "./types";
 import {
   MirrorNodeService,
   WalletService,
   HederaService,
-  A_B_PAIR_TOKEN_ID,
   MirrorNodeTokenBalance,
   SWAP_CONTRACT_ID,
   TokenPair,
@@ -14,18 +12,6 @@ import {
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours } from "../../utils";
-
-/**
- * TODO: This is mocked data that adds a token pair balance to the primary pool balance data.
- * This should be removed after we can fetch pair tokens from the pool contract.
- * */
-const appendLiquidityTokenBalance = (poolTokenBalances: MirrorNodeTokenBalance[]) => {
-  const mockedTokenBalance = {
-    token_id: A_B_PAIR_TOKEN_ID,
-    balance: 1000,
-  };
-  return poolTokenBalances?.concat(mockedTokenBalance);
-};
 
 const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
@@ -45,21 +31,14 @@ const initialPoolsStore: PoolsState = {
 const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
   return {
     ...initialPoolsStore,
-    sendAddLiquidityTransaction: async ({
-      firstTokenAddr,
-      firstTokenQty,
-      secondTokenAddr,
-      secondTokenQty,
-      addLiquidityContractAddr,
-    }) => {
-      const { walletData } = get().wallet;
+    sendAddLiquidityTransaction: async ({ inputToken, outputToken, contractId }: SendAddLiquidityTransactionParams) => {
+      const { walletData, getTokenAmountWithPrecision } = get().wallet;
       const { network } = get().context;
-      const firstTokenAddress = TokenId.fromString(firstTokenAddr).toSolidityAddress();
-      const secondTokenAddress = TokenId.fromString(secondTokenAddr).toSolidityAddress();
-      // TODO: currently can only support whole numbers - remove the floor function when decimal values supported
-      const firstTokenQuantity = new BigNumber(Math.floor(firstTokenQty));
-      const secondTokenQuantity = new BigNumber(Math.floor(secondTokenQty));
-      const addLiquidityContractAddress = ContractId.fromString(addLiquidityContractAddr);
+      const firstTokenAddress = TokenId.fromString(inputToken.address).toSolidityAddress();
+      const secondTokenAddress = TokenId.fromString(outputToken.address).toSolidityAddress();
+      const firstTokenQuantity = getTokenAmountWithPrecision(inputToken.symbol, inputToken.amount);
+      const secondTokenQuantity = getTokenAmountWithPrecision(outputToken.symbol, outputToken.amount);
+      const addLiquidityContractAddress = ContractId.fromString(contractId);
 
       const signingAccount = walletData.pairedAccounts[0];
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
@@ -97,9 +76,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         PoolsActionType.FETCH_ALL_POOL_METRICS_STARTED
       );
       try {
-        const poolTokenBalances = appendLiquidityTokenBalance(
-          await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID)
-        );
+        const poolTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID);
         const timestamp7DaysAgo = getTimestamp7DaysAgo();
         const last7DTransactions = await MirrorNodeService.fetchAccountTransactions(
           SWAP_CONTRACT_ID,
@@ -107,7 +84,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
         const last24Transactions = getTransactionsFromLast24Hours(last7DTransactions);
         const poolTokenPairs = await MirrorNodeService.fetchTokenPairs();
-        const poolFee = await MirrorNodeService.fetchPoolFee();
+        // TODO: Needs to be updated once fees are unique to each individial pool.
+        const poolFee = await HederaService.fetchFeeWithPrecision();
         const allPoolsMetrics = poolTokenPairs.map((tokenPair: TokenPair) => {
           return calculatePoolMetrics({
             poolAccountId: SWAP_CONTRACT_ID,
@@ -159,11 +137,14 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
               userTokenBalance.token_id === poolTokenPair.pairToken.accountId
           );
         });
+        // TODO: Needs to be updated once fees are unique to each individial pool.
+        const poolFee = get().pools.allPoolsMetrics[0].fee;
         const userPoolsMetrics = userLiquidityPoolTokensList.map((userTokenPair: TokenPair) => {
           return calculateUserPoolMetrics({
             poolTokenBalances: get().pools.poolTokenBalances,
             userTokenBalances,
             userTokenPair,
+            fee: poolFee,
           });
         });
         set(

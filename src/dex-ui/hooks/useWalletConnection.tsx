@@ -2,8 +2,11 @@ import { useEffect } from "react";
 import { useDexContext } from ".";
 import { WalletConnectionStatus } from "../store/walletSlice";
 
+/**
+ * Used to setup and manage connections with local Hedera enabled wallets.
+ */
 export function useWalletConnection() {
-  const [wallet, swap] = useDexContext(({ wallet, swap }) => [wallet, swap]);
+  const [wallet] = useDexContext(({ wallet }) => [wallet]);
   const { walletConnectionStatus, installedExtensions, walletData } = wallet;
 
   useEffect(() => {
@@ -25,7 +28,6 @@ export function useWalletConnection() {
     } else {
       wallet.pairWithConnectedWallet();
     }
-    swap.fetchSpotPrices();
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

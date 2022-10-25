@@ -1,6 +1,24 @@
+import { BigNumber } from "bignumber.js";
 import numeral from "numeral";
 
-const formatToUSD = (number: number) => numeral(number).format("$0,0");
-const formatToPercent = (number: number) => numeral(number).format("0.00%");
+const DEFAULT = "-";
 
-export { formatToUSD, formatToPercent };
+const formatToUSD = (number: number) => (number ? numeral(number).format("$0,0.00") : DEFAULT);
+
+const formatToPercent = (number: number) => (number ? numeral(number).format("0.00%") : DEFAULT);
+
+const formatBigNumberToUSD = (bigNumber: BigNumber | undefined) => {
+  if (bigNumber === undefined) {
+    return DEFAULT;
+  }
+  return formatToUSD(bigNumber.toNumber());
+};
+
+const formatBigNumberToPercent = (bigNumber: BigNumber | undefined) => {
+  if (bigNumber === undefined) {
+    return DEFAULT;
+  }
+  return formatToPercent(bigNumber.toNumber());
+};
+
+export { formatBigNumberToUSD, formatToUSD, formatBigNumberToPercent, formatToPercent };

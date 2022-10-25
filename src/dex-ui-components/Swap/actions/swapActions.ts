@@ -6,6 +6,10 @@ const setTokenToTradeAmount = (amount: number): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_TRADE, field: "amount", payload: amount };
 };
 
+const setTokenToTradeDisplayAmount = (displayAmount: string): SwapAction => {
+  return { type: ActionType.SET_TOKEN_TO_TRADE, field: "displayAmount", payload: displayAmount };
+};
+
 const setTokenToTradeSymbol = (symbol: string | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_TRADE, field: "symbol", payload: symbol };
 };
@@ -22,6 +26,10 @@ const setTokenToTradePoolLiquidity = (amount: number | undefined): SwapAction =>
 
 const setTokenToReceiveAmount = (amount: number): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "amount", payload: amount };
+};
+
+const setTokenToReceiveDisplayAmount = (displayAmount: string): SwapAction => {
+  return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "displayAmount", payload: displayAmount };
 };
 
 const setTokenToReceiveSymbol = (symbol: string | undefined): SwapAction => {
@@ -60,10 +68,12 @@ const setTransactionDeadlineSetting = (transactionDeadline: string): SwapAction 
 
 export {
   setTokenToTradeAmount,
+  setTokenToTradeDisplayAmount,
   setTokenToTradeSymbol,
   setTokenToTradeBalance,
   setTokenToTradePoolLiquidity,
   setTokenToReceiveAmount,
+  setTokenToReceiveDisplayAmount,
   setTokenToReceiveSymbol,
   setTokenToReceiveBalance,
   setTokenToReceivePoolLiquidity,

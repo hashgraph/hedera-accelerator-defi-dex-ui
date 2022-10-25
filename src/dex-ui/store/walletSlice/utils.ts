@@ -1,3 +1,5 @@
+import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
+import { BigNumber } from "bignumber.js";
 import { WALLET_LOCAL_DATA_KEY } from "../../services/constants";
 
 const getLocalWalletData = (): any => {
@@ -16,4 +18,19 @@ const getLocalWalletData = (): any => {
   }
 };
 
-export { getLocalWalletData };
+/**
+ * Applies the decimal precision to token balances read from a local wallet.
+ * @param tokenBalances - Token balances read from a local wallet.
+ * @returns Token balances with decimal (BigNumber) balances.
+ */
+const getFormattedTokenBalances = (tokenBalances: TokenBalanceJson[]) => {
+  return tokenBalances.map((tokenBalanceJson) => {
+    const { tokenId, balance, decimals } = tokenBalanceJson;
+    if (decimals === 0) {
+      return { ...tokenBalanceJson };
+    }
+    return { tokenId, balance: BigNumber(balance).shiftedBy(-decimals).toString(), decimals };
+  });
+};
+
+export { getLocalWalletData, getFormattedTokenBalances };

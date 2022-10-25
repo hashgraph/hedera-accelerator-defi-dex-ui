@@ -51,7 +51,11 @@ function createWalletService() {
     privateKey: string,
     topicID: string
   ) => {
-    await hashconnect.init(DEXMetaData, privateKey);
+    /**
+     * @see {@link initWalletConnection}
+     * */
+    const clonedDexMetaData = { ...DEXMetaData };
+    await hashconnect.init(clonedDexMetaData, privateKey);
     await hashconnect.connect(topicID, DEXMetaData);
   };
 

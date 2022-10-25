@@ -1,7 +1,16 @@
 import axios from "axios";
+import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
-import { A_B_PAIR_TOKEN_ID, L49A_TOKEN_ID, L49B_TOKEN_ID } from "../constants";
 import {
+  A_B_PAIR_TOKEN_ID,
+  TOKEN_A_SYMBOL,
+  TOKEN_B_SYMBOL,
+  TOKEN_A_ID,
+  TOKEN_B_ID,
+  PAIR_TOKEN_SYMBOL,
+} from "../constants";
+import {
+  MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
   MirrorNodeTokenBalance,
@@ -77,39 +86,27 @@ function createMirrorNodeService() {
   };
 
   /**
-   * TODO: This is mocked data and should be replaced with a mirror node call to fetch
+   * TODO: This is mocked data and should be replaced with a Hedera Service call to fetch
    * all pairs associated with the primary swap/pool contract.
    */
   const fetchTokenPairs = async (): Promise<TokenPair[]> => {
-    // getTokenPairAddress()
+    // TODO: getTokenPairAddress()
     return await Promise.resolve([
       {
-        pairToken: { symbol: "A-B", accountId: A_B_PAIR_TOKEN_ID },
-        tokenA: { symbol: "L49A", accountId: L49A_TOKEN_ID },
-        tokenB: { symbol: "L49B", accountId: L49B_TOKEN_ID },
+        pairToken: { symbol: PAIR_TOKEN_SYMBOL, accountId: A_B_PAIR_TOKEN_ID },
+        tokenA: { symbol: TOKEN_A_SYMBOL, accountId: TOKEN_A_ID },
+        tokenB: { symbol: TOKEN_B_SYMBOL, accountId: TOKEN_B_ID },
       },
     ]);
   };
 
-  const fetchPoolFee = async (): Promise<number> => {
-    // const swapTransaction = await new ContractExecuteTransaction()
-    //       .setContractId(abstractSwapId)
-    //       .setGas(2000000)
-    //       .setFunction(
-    //         "getFee",
-    //         new ContractFunctionParameters()
-    //           .addAddress(walletAddress)
-    //           .addAddress(tokenToTradeAddress)
-    //           .addAddress(tokenToReceiveAddress)
-    //           .addInt64(tokenToTradeAmount)
-    //           .addInt64(tokenToReceiveAmount)
-    //       )
-    //       .setNodeAccountIds([new AccountId(3)])
-    //       .freezeWithSigner(signer);
-
-    //     const result = await swapTransaction.executeWithSigner(signer);
-    // return await getFee()
-    return await Promise.resolve(0.005);
+  /**
+   * Fetches information related to a specific token.
+   * @param tokenId  - The ID of the token account to return data for.
+   * @returns Attributes associated with the provided token ID.
+   */
+  const fetchTokenData = async (tokenId: string): Promise<MirrorNodeTokenByIdResponse> => {
+    return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}`);
   };
 
   /**
@@ -129,19 +126,27 @@ function createMirrorNodeService() {
   };
 
   /**
-   * UPDATE THIS TSDOC
-   *
-   *
-   *
-   *
    * Fetches the HBAR balance and a list of token balances on the Hedera
-   * network for the given account ID.
+   * network for the given account ID. Fetches the decimal precision value for
+   * each token ID and formats the balances with the correct decimal positions.
    * @param accountId - The ID of the account to return token balances for.
-   * @returns The list of balances for the given account ID.
+   * @returns The list of balances (in decimal format) for the given account ID.
    */
   const fetchAccountTokenBalances = async (accountId: string): Promise<MirrorNodeTokenBalance[]> => {
     const accountBalances = await fetchAccountBalances(accountId);
-    return accountBalances.flatMap((accountBalance) => accountBalance.tokens);
+    const accountTokens = accountBalances.flatMap((accountBalance) => accountBalance.tokens);
+    return await Promise.all(
+      accountTokens.map(async (token) => {
+        const tokenData = await fetchTokenData(token.token_id);
+        const { decimals } = tokenData.data;
+        const balance = BigNumber(token.balance).shiftedBy(-Number(decimals));
+        return {
+          ...token,
+          balance,
+          decimals: String(decimals),
+        };
+      })
+    );
   };
 
   /**
@@ -161,7 +166,6 @@ function createMirrorNodeService() {
   return {
     fetchAccountTransactions,
     fetchTokenPairs,
-    fetchPoolFee,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
