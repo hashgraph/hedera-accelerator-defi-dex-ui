@@ -1,4 +1,5 @@
 import { HashConnectTypes, MessageTypes } from "hashconnect";
+import { BigNumber } from "bignumber.js";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { DEXState } from "../createDEXStore";
 import { StateCreator } from "zustand";
@@ -52,6 +53,7 @@ interface WalletState {
 }
 
 interface WalletActions {
+  getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => BigNumber;
   connectToWallet: () => void;
   clearWalletPairings: () => void;
   saveWalletDataToLocalStorage: (walletData: any) => void;

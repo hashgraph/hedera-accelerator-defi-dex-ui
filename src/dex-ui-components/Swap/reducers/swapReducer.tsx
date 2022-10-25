@@ -5,12 +5,14 @@ const initialSwapState: SwapState = {
   tokenToTrade: {
     symbol: "HBAR",
     amount: 0.0,
+    displayAmount: "0.0",
     balance: undefined,
     poolLiquidity: undefined,
   },
   tokenToReceive: {
     symbol: undefined,
     amount: 0.0,
+    displayAmount: "0.0",
     balance: undefined,
     poolLiquidity: undefined,
   },

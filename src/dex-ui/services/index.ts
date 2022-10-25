@@ -11,4 +11,8 @@ const MirrorNodeService = createMirrorNodeService();
 const WalletService = createWalletService();
 const HederaService = createHederaService();
 
-export { MirrorNodeService, WalletService, HederaService };
+const initializeServices = async () => {
+  await HederaService.initHederaService();
+};
+
+export { initializeServices, MirrorNodeService, WalletService, HederaService };
