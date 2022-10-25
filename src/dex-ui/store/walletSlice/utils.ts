@@ -1,4 +1,5 @@
 import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
+import { BigNumber } from "bignumber.js";
 import { WALLET_LOCAL_DATA_KEY } from "../../services/constants";
 
 const getLocalWalletData = (): any => {
@@ -23,7 +24,7 @@ const getFormattedTokenBalances = (tokenBalances: TokenBalanceJson[]) => {
     if (decimals === 0) {
       return { ...tokenBalanceJson };
     }
-    return { tokenId, balance: `${Number(balance) / 10 ** decimals}`, decimals };
+    return { tokenId, balance: BigNumber(balance).shiftedBy(-decimals).toString(), decimals };
   });
 };
 
