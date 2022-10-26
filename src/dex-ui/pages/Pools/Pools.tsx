@@ -16,11 +16,11 @@ import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-d
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
 // import { PoolState, UserPoolState } from "../../services";
-import { formatPoolMetrics, formatUserPoolMetrics } from "./utils";
+import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
 import { useDexContext } from "../../hooks";
-import { PoolState, UserPoolState } from "../../store/poolsSlice";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { Pool, UserPool } from "../../store/poolsSlice";
 
 export interface FormattedUserPoolDetails {
   name: string;
@@ -61,7 +61,7 @@ const userPoolsColHeaders: DataTableColumnConfig[] = [
 const Pools = (): JSX.Element => {
   const [wallet, pools] = useDexContext(({ wallet, pools }) => [wallet, pools]);
   const walletAccountId = wallet.walletData.pairedAccounts[0];
-
+  const { fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   const navigate = useNavigate();
@@ -70,14 +70,14 @@ const Pools = (): JSX.Element => {
     selectedTab: 0,
     showSuccessfulWithdrawalMessage: false,
   });
+  const fetchPoolData = useCallback(async () => {
+    await fetchAllPoolMetrics();
+    await fetchUserPoolMetrics(walletAccountId);
+  }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
 
   useEffect(() => {
-    const fetchPoolMetrics = async () => {
-      await pools.fetchAllPoolMetrics();
-      await pools.fetchUserPoolMetrics(walletAccountId);
-    };
-    fetchPoolMetrics();
-  }, [walletAccountId]);
+    fetchPoolData();
+  }, [fetchPoolData, walletAccountId]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -169,34 +169,34 @@ const Pools = (): JSX.Element => {
   };
 
   const formatPoolsRowData = (
-    rowData: PoolState[] | UserPoolState[] | FormattedPoolDetails[] | FormattedUserPoolDetails[] | undefined,
+    rowData: Pool[] | UserPool[] | FormattedPoolDetails[] | FormattedUserPoolDetails[] | undefined,
     userPool = false
   ) => {
     return rowData
       ? [
-          ...rowData.map((row) => ({
-            ...row,
-            // TODO: links should bring user to corresponding page for the specific pair
-            // do we want to make Actions something optional (pass in whether to show it as a prop)?
-            actions: (
-              <>
-                <Link
-                  textDecoration={"underline"}
-                  color={"#3078FF"}
-                  mr={"1em"}
-                  as={RouterLink}
-                  to={userPool ? "/pool" : "/swap"}
-                  onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
-                >
-                  {userPool ? "Withdraw" : "Swap"}
-                </Link>
-                <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pool/add-liquidity"}>
-                  Add Liquidity
-                </Link>
-              </>
-            ),
-          })),
-        ]
+        ...rowData.map((row) => ({
+          ...row,
+          // TODO: links should bring user to corresponding page for the specific pair
+          // do we want to make Actions something optional (pass in whether to show it as a prop)?
+          actions: (
+            <>
+              <Link
+                textDecoration={"underline"}
+                color={"#3078FF"}
+                mr={"1em"}
+                as={RouterLink}
+                to={userPool ? "/pool" : "/swap"}
+                onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
+              >
+                {userPool ? "Withdraw" : "Swap"}
+              </Link>
+              <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pool/add-liquidity"}>
+                Add Liquidity
+              </Link>
+            </>
+          ),
+        })),
+      ]
       : [];
   };
 

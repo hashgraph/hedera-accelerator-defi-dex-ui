@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
 import { WithdrawComponent } from "../../../dex-ui-components/Pool";
 import { useDexContext } from "../../hooks";
-import { TOKEN_ID_TO_TOKEN_SYMBOL } from "../../services";
+import { A_B_PAIR_TOKEN_ID, TOKEN_ID_TO_TOKEN_SYMBOL } from "../../services";
 
 const Withdraw = () => {
   const [pools, wallet] = useDexContext(({ pools, wallet }) => [pools, wallet]);
@@ -134,19 +134,23 @@ const Withdraw = () => {
         const [firstTokenBalance, secondTokenBalance, lpTokenBalance] = poolTokenBalances;
         const firstToken = {
           tokenSymbol: TOKEN_ID_TO_TOKEN_SYMBOL.get(firstTokenBalance.token_id) || "",
-          poolLiquidity: firstTokenBalance.balance,
-          userProvidedLiquidity: (selectedPoolMetrics.liquidity / 100) * firstTokenBalance.balance,
+          poolLiquidity: firstTokenBalance.balance.toNumber(),
+          userProvidedLiquidity: (selectedPoolMetrics.liquidity.toNumber() / 100) *
+            firstTokenBalance.balance.toNumber(),
         };
         const secondToken = {
           tokenSymbol: TOKEN_ID_TO_TOKEN_SYMBOL.get(secondTokenBalance.token_id) || "",
-          poolLiquidity: secondTokenBalance.balance,
-          userProvidedLiquidity: (selectedPoolMetrics.liquidity / 100) * secondTokenBalance.balance,
+          poolLiquidity: secondTokenBalance.balance.toNumber(),
+          userProvidedLiquidity: (selectedPoolMetrics.liquidity.toNumber() / 100) *
+            secondTokenBalance.balance.toNumber(),
         };
+        // TODO: mocking lpTokenBalance fields for now because lpTokenBalance is no longer present in poolTokenBalances
         const poolLpDetails = {
           tokenSymbol: selectedPoolMetrics.name,
-          poolLiquidity: lpTokenBalance.balance,
-          userLpAmount: userTokenBalances.find((bal) => bal.token_id === lpTokenBalance.token_id)?.balance || 0,
-          userLpPercentage: selectedPoolMetrics.liquidity,
+          poolLiquidity: lpTokenBalance ? lpTokenBalance.balance.toNumber() || 0 : 0,
+          userLpAmount: userTokenBalances.find(token => token.token_id === A_B_PAIR_TOKEN_ID)?.balance.toNumber() || 0,
+          // userTokenBalances.find((bal) => bal.token_id === lpTokenBalance.token_id)?.balance.toNumber() || 0,
+          userLpPercentage: selectedPoolMetrics.liquidity.toNumber(),
         };
 
         setWithdrawState({

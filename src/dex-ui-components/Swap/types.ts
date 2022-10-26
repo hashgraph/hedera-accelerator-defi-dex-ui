@@ -2,12 +2,14 @@ export interface SwapState {
   tokenToTrade: {
     symbol: string | undefined;
     amount: number;
+    displayAmount: string;
     balance: number | undefined;
     poolLiquidity: number | undefined;
   };
   tokenToReceive: {
     symbol: string | undefined;
     amount: number;
+    displayAmount: string;
     balance: number | undefined;
     poolLiquidity: number | undefined;
   };

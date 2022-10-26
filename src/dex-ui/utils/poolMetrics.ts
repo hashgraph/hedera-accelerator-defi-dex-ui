@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import { isNil } from "ramda";
 import {
   MirrorNodeTransaction,
@@ -50,17 +51,19 @@ interface CalculateTotalValueLockedForPoolParams {
  * @param params - {@link CalculateTotalValueLockedForPoolParams}
  * @returns The total value locked for a given pair of tokens.
  */
-const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPoolParams): number => {
+const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPoolParams): BigNumber => {
   const { poolTokenBalances, tokenAAccountId, tokenBAccountId } = params;
   const tokenAPoolBalance = getTokenBalance(poolTokenBalances, tokenAAccountId);
   const tokenBPoolBalance = getTokenBalance(poolTokenBalances, tokenBAccountId);
   if (isNil(tokenAPoolBalance) || isNil(tokenBPoolBalance)) {
     console.error("Cannot find mirror node balance for token account ID.");
-    return 0;
+    return BigNumber(0);
   } else {
     const tokenAPoolBalanceInUSD = getValueInUSD();
     const tokenBPoolBalanceInUSD = getValueInUSD();
-    return tokenAPoolBalance * tokenAPoolBalanceInUSD + tokenBPoolBalance * tokenBPoolBalanceInUSD;
+    return BigNumber(tokenAPoolBalanceInUSD)
+      .times(tokenAPoolBalance)
+      .plus(BigNumber(tokenBPoolBalanceInUSD).times(tokenBPoolBalance));
   }
 };
 
@@ -72,6 +75,7 @@ interface CalculateVolumeParams {
    * result in the transaction volume for a pool.
    */
   tokenAccountId: string;
+  tokenDecimals: string;
   /**
    * Transactions that are associated with a credit or debit in the liquidity pool. The list of
    * transactions should be filtered to fit the desired consensus timestamp range.
@@ -88,17 +92,20 @@ interface CalculateVolumeParams {
  * @param params - {@link CalculateVolumeParams}
  * @returns The transaction volume of the token with tokenAccountId in the accountTransactions.
  */
-const calculateVolume = (params: CalculateVolumeParams) => {
-  const { poolAccountId, tokenAccountId, accountTransactions } = params;
+const calculateVolume = (params: CalculateVolumeParams): BigNumber => {
+  const { poolAccountId, tokenAccountId, tokenDecimals, accountTransactions } = params;
   const allTokenTransfers = accountTransactions.flatMap((accountTransaction) => accountTransaction.token_transfers);
-  const volume = allTokenTransfers.reduce((tokenTransactionVolume: number, tokenTransfer: MirrorNodeTokenTransfer) => {
-    const { token_id, account, amount } = tokenTransfer;
-    if (account === poolAccountId && token_id === tokenAccountId) {
-      return tokenTransactionVolume + Math.abs(amount);
-    }
-    return tokenTransactionVolume;
-  }, 0);
-  return volume * getValueInUSD();
+  const volume = allTokenTransfers.reduce(
+    (tokenTransactionVolume: BigNumber, tokenTransfer: MirrorNodeTokenTransfer) => {
+      const { token_id, account, amount } = tokenTransfer;
+      if (account === poolAccountId && token_id === tokenAccountId) {
+        return BigNumber(tokenTransactionVolume).plus(BigNumber(amount).abs());
+      }
+      return tokenTransactionVolume;
+    },
+    BigNumber(0)
+  );
+  return volume.shiftedBy(-Number(tokenDecimals)).times(getValueInUSD());
 };
 
 /**
@@ -110,8 +117,8 @@ const calculateVolume = (params: CalculateVolumeParams) => {
  * @param totalValueLocked - The total value in USD locked in the liquidity pool.
  * @returns The value of the account's porition of the liquidity pool in USD.
  */
-const calculateUserPoolLiquidity = (percentOfPool: number, totalValueLocked: number): number => {
-  return percentOfPool * totalValueLocked;
+const calculateUserPoolLiquidity = (percentOfPool: BigNumber, totalValueLocked: BigNumber): BigNumber => {
+  return percentOfPool.times(totalValueLocked);
 };
 
 interface CalculatePercentOfPoolParams {
@@ -129,17 +136,17 @@ interface CalculatePercentOfPoolParams {
  * aLP = Total LP tokens for a pool
  * m = mLP/aLP
  * @param params - {@link CalculatePercentOfPoolParams}
- * @returns The percentage (decimal) of the pool owned by an account.
+ * @returns The percentage of the pool owned by an account.
  */
-const calculatePercentOfPool = (params: CalculatePercentOfPoolParams): number => {
+const calculatePercentOfPool = (params: CalculatePercentOfPoolParams): BigNumber => {
   const { userTokenBalances, poolTokenBalances, liquidityTokenAccountId } = params;
   const poolLPTokenBalance = getTokenBalance(poolTokenBalances, liquidityTokenAccountId);
   const userLPTokenBalance = getTokenBalance(userTokenBalances, liquidityTokenAccountId);
   if (isNil(poolLPTokenBalance) || isNil(userLPTokenBalance)) {
     console.error("Cannot find mirror node balance for LP token account ID.");
-    return 0;
+    return BigNumber(0);
   } else {
-    return userLPTokenBalance / poolLPTokenBalance;
+    return BigNumber(userLPTokenBalance).div(poolLPTokenBalance);
   }
 };
 
