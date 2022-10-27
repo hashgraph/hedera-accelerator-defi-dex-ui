@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
 import { WithdrawComponent } from "../../../dex-ui-components/Pool";
 import { useDexContext } from "../../hooks";
+import { formatBigNumberToPercent } from "../../utils";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
@@ -37,6 +38,7 @@ const Withdraw = () => {
       },
     },
     lpInputAmount: 0,
+    poolFee: "0%",
   });
 
   useEffect(() => {
@@ -133,6 +135,7 @@ const Withdraw = () => {
         setWithdrawState({
           ...withdrawState,
           noPoolMetricsMessage: "",
+          poolFee: formatBigNumberToPercent(selectedPoolMetrics.fee),
           withdrawProps: {
             ...withdrawState.withdrawProps,
             poolLiquidityDetails: {
@@ -155,8 +158,9 @@ const Withdraw = () => {
 
   const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      const { tokenSymbol, userLpPercentage } = withdrawState.withdrawProps.poolLpDetails;
-      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, userLpPercentage);
+      const { tokenSymbol } = withdrawState.withdrawProps.poolLpDetails;
+      const { poolFee } = withdrawState;
+      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee);
     },
     [pools, withdrawState]
   );

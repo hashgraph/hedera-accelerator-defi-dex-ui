@@ -173,7 +173,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
     },
-    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, userPercentOfPool: string) => {
+    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => {
       const { network } = get().context;
       const { walletData, getTokenAmountWithPrecision } = get().wallet;
       const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
@@ -203,7 +203,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
                 successPayload: {
                   lpTokenSymbol,
                   lpTokenAmount,
-                  userPercentOfPool,
+                  fee,
                   transactionResponse: result,
                 },
                 errorMessage: "",
@@ -235,11 +235,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
     resetWithdrawState: async () => {
       set(
         ({ pools }) => {
-          pools.withdrawState = {
-            status: "init",
-            successPayload: null,
-            errorMessage: "",
-          };
+          pools.withdrawState = initialPoolsStore.withdrawState;
           pools.errorMessage = "";
         },
         false,
