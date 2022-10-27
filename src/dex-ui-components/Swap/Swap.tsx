@@ -385,7 +385,14 @@ const Swap = (props: SwapProps) => {
 
   return (
     <ChakraProvider theme={DEXTheme}>
-      <Box data-testid="swap-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+      <Box
+        data-testid="swap-component"
+        bg="white"
+        borderRadius="15px"
+        width="100%"
+        padding="0.5rem 1rem 1rem 1rem"
+        boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
+      >
         {transactionState.successPayload &&
         !transactionState.errorMessage &&
         !transactionState.transactionWaitingToBeSigned &&
@@ -416,7 +423,7 @@ const Swap = (props: SwapProps) => {
           ""
         )}
         <Flex alignItems={"center"} marginBottom={"8px"}>
-          <Heading as="h4" size="lg">
+          <Heading as="h4" fontWeight="500" size="lg">
             {title}
           </Heading>
           <Spacer />

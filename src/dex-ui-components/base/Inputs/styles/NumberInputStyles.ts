@@ -12,8 +12,8 @@ export const NumberInputStyles: ComponentStyleConfig = {
       ...theme.components.NumberInput.variants.outline(props),
       field: {
         backgroundColor: "white",
-        borderBottom: "1px solid black",
-        borderRight: "1px solid black",
+        borderBottom: "1px solid #E7E9EB",
+        borderRight: "1px solid #E7E9EB",
         borderRadius: "5px 0 0 5px",
       },
     }),

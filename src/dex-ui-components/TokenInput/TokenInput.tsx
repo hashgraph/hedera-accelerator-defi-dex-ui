@@ -74,7 +74,7 @@ const TokenInput = (props: TokenInputProps) => {
       <Text color="#4D4D4D" fontSize="xs">
         {title}
       </Text>
-      <Box border="1px solid black" borderRadius="5px" backgroundColor="#F2F2F2">
+      <Box border="1px solid #E7E9EB" borderRadius="5px" backgroundColor="#F2F2F2">
         <Flex>
           <Box flex="5">
             <TokenAmountInput
@@ -93,7 +93,7 @@ const TokenInput = (props: TokenInputProps) => {
             ""
           )}
         </Flex>
-        <Flex padding="0.25rem 0" alignItems="center" backgroundColor="#F2F2F2">
+        <Flex padding="0.25rem 0" alignItems="center" backgroundColor="rgba(242,242,244,0.6)" borderRadius="5px">
           <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.25rem" fontWeight="bold">
             Balance:
           </Text>

@@ -11,7 +11,7 @@ const DEX = () => {
   useWalletConnection();
   return (
     <ChakraProvider theme={DEXTheme}>
-      <Container color="black" w="100%" minHeight="1600px" maxHeight="100%" maxWidth="100%" bg="#F5F5F5" centerContent>
+      <Container color="black" w="100%" minHeight="1600px" maxHeight="100%" maxWidth="100%" bg="#FFFFFF" centerContent>
         <Router>
           <TopMenuBar menuOptions={menuOptions}></TopMenuBar>
           <Routes>
