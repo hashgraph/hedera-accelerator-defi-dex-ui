@@ -29,15 +29,12 @@ export interface WithdrawProps {
 
 interface LPTokenDetails {
   tokenSymbol: string;
-  tokenId?: string; // TODO: see if we need this
-  poolLiquidity: number;
   userLpAmount: number;
-  userLpPercentage: number;
+  userLpPercentage: string;
 }
 
 interface TokenLiquidityDetails {
   tokenSymbol: string;
-  tokenId?: string; // TODO: see if we need this
   poolLiquidity: number;
   userProvidedLiquidity: number;
 }
@@ -160,7 +157,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
-                    <PoolMetricDisplay label={"Remaining share of pool"} value={`${poolLpDetails.userLpPercentage}%`} />
+                    <PoolMetricDisplay label={"Remaining share of pool"} value={poolLpDetails.userLpPercentage} />
                   </Td>
                 </>
               </Tr>

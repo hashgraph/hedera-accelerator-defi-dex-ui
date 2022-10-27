@@ -174,29 +174,29 @@ const Pools = (): JSX.Element => {
   ) => {
     return rowData
       ? [
-        ...rowData.map((row) => ({
-          ...row,
-          // TODO: links should bring user to corresponding page for the specific pair
-          // do we want to make Actions something optional (pass in whether to show it as a prop)?
-          actions: (
-            <>
-              <Link
-                textDecoration={"underline"}
-                color={"#3078FF"}
-                mr={"1em"}
-                as={RouterLink}
-                to={userPool ? "/pool" : "/swap"}
-                onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
-              >
-                {userPool ? "Withdraw" : "Swap"}
-              </Link>
-              <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pool/add-liquidity"}>
-                Add Liquidity
-              </Link>
-            </>
-          ),
-        })),
-      ]
+          ...rowData.map((row) => ({
+            ...row,
+            // TODO: links should bring user to corresponding page for the specific pair
+            // do we want to make Actions something optional (pass in whether to show it as a prop)?
+            actions: (
+              <>
+                <Link
+                  textDecoration={"underline"}
+                  color={"#3078FF"}
+                  mr={"1em"}
+                  as={RouterLink}
+                  to={userPool ? "/pool" : "/swap"}
+                  onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
+                >
+                  {userPool ? "Withdraw" : "Swap"}
+                </Link>
+                <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pool/add-liquidity"}>
+                  Add Liquidity
+                </Link>
+              </>
+            ),
+          })),
+        ]
       : [];
   };
 
@@ -223,7 +223,7 @@ const Pools = (): JSX.Element => {
               <Text color={"#000000"}>
                 {`Withdrew ${pools.withdrawState.successPayload?.lpTokenAmount} LP Tokens from 
                 ${pools.withdrawState.successPayload?.lpTokenSymbol} 
-                ${pools.withdrawState.successPayload?.userPercentOfPool}% Pool.`}
+                ${pools.withdrawState.successPayload?.userPercentOfPool} Pool.`}
                 &nbsp;
               </Text>
               {

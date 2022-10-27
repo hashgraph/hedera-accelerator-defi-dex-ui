@@ -62,7 +62,7 @@ interface WithdrawState {
   successPayload: {
     lpTokenSymbol: string;
     lpTokenAmount: number;
-    userPercentOfPool: number;
+    userPercentOfPool: string;
     transactionResponse: TransactionResponse;
   } | null;
   errorMessage: string;
@@ -90,7 +90,7 @@ interface PoolsActions {
   sendRemoveLiquidityTransaction: (
     lpTokenSymbol: string,
     lpTokenAmount: number,
-    userPercentOfPool: number
+    userPercentOfPool: string
   ) => Promise<void>;
   resetWithdrawState: () => Promise<void>;
   // Temporary - should be removed

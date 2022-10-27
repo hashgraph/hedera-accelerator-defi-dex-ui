@@ -54,7 +54,7 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
   });
   const userLiquidity = calculateUserPoolLiquidity(percentOfPool, totalVolumeLocked);
   return {
-    name: `${tokenA.symbol}/${tokenB.symbol}`,
+    name: pairToken.symbol,
     fee,
     liquidity: userLiquidity,
     percentOfPool,
@@ -84,7 +84,7 @@ interface CalculatePoolMetricsParams {
  */
 const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
   const { poolAccountId, poolTokenBalances, poolFee, last24Transactions, last7DTransactions, tokenPair } = params;
-  const { tokenA, tokenB } = tokenPair;
+  const { tokenA, tokenB, pairToken } = tokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
     tokenAAccountId: tokenA.accountId,
@@ -105,7 +105,7 @@ const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
     accountTransactions: last7DTransactions,
   });
   return {
-    name: `${tokenA.symbol}/${tokenB.symbol}`,
+    name: pairToken.symbol,
     fee: poolFee,
     totalVolumeLocked,
     past24HoursVolume,
