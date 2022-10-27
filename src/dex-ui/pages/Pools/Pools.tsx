@@ -215,7 +215,7 @@ const Pools = (): JSX.Element => {
               <Text color={"#000000"}>
                 {`Withdrew ${pools.withdrawState.successPayload?.lpTokenAmount} LP Tokens from 
                 ${pools.withdrawState.successPayload?.lpTokenSymbol} 
-                ${pools.withdrawState.successPayload?.userPercentOfPool} Pool.`}
+                ${pools.withdrawState.successPayload?.fee} fee Pool.`}
                 &nbsp;
               </Text>
               {
