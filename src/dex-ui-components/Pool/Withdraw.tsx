@@ -96,14 +96,14 @@ const WithdrawComponent = (props: WithdrawProps) => {
 
   return (
     <HStack>
-      <Box data-testid="pool-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+      <Box data-testid="withdraw-liquidity-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
         <Flex>
           <Heading as="h4" size="lg">
             Withdraw
           </Heading>
           <Spacer />
           <IconButton
-            data-testid="settings-button"
+            data-testid="withdraw-liquidity-settings-button"
             aria-label="Open and close settings modal."
             icon={<SettingsIcon w={6} h={6} />}
             variant="settings"
@@ -166,7 +166,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
         </TableContainer>
         <Button
           onClick={() => onWithdrawClick(+localWithdrawState.lpInputAmount)}
-          data-testid="add-liqidity-button"
+          data-testid="withdraw-liquidity-button"
           size="lg"
           height="48px"
           width="100%"
