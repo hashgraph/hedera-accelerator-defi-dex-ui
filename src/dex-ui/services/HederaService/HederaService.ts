@@ -17,6 +17,7 @@ import {
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
 import { AddLiquidityDetails } from "./types";
+import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
@@ -122,29 +123,18 @@ function createHederaService() {
     console.log(result);
   };
 
-  const removeLiquidity = async () => {
-    const tokenAQty = withPrecision(3);
-    const tokenBQty = withPrecision(3);
-    console.log(`Removing ${tokenAQty} units of token A and ${tokenBQty} units of token B from the pool.`);
+  const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, _contractId = contractId) => {
+    const accountId = signer.getAccountId().toSolidityAddress();
+    console.log(`Removing ${lpTokenAmount} units of LP from the pool.`);
     const removeLiquidity = await new ContractExecuteTransaction()
-      .setContractId(contractId)
+      .setContractId(_contractId)
       .setGas(2000000)
-      .setFunction(
-        "removeLiquidity",
-        new ContractFunctionParameters()
-          .addAddress(treasuryId.toSolidityAddress())
-          .addAddress(tokenA)
-          .addAddress(tokenB)
-          .addInt64(tokenAQty)
-          .addInt64(tokenBQty)
-      )
-      .freezeWith(client)
-      .sign(treasuryKey);
-    const removeLiquidityTx = await removeLiquidity.execute(client);
-    const transferTokenRx = await removeLiquidityTx.getReceipt(client);
+      .setFunction("removeLiquidity", new ContractFunctionParameters().addAddress(accountId).addInt256(lpTokenAmount))
+      .freezeWithSigner(signer);
+    const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
 
-    console.log(`Liquidity remove status: ${transferTokenRx.status}`);
-    await pairCurrentPosition(contractId);
+    console.log(`Liquidity remove Tx: ${removeLiquidityTx}`);
+    return removeLiquidityTx;
   };
 
   const swapToken = async ({

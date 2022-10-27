@@ -2,7 +2,7 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
-import { WalletConnectionStatus } from "../../dex-ui/store/walletSlice";
+import { WalletConnectionStatus } from "../models/wallet.model";
 export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
@@ -12,8 +12,9 @@ export interface TokenInputProps {
   tokenSymbol: string | undefined;
   tokenBalance: number | undefined;
   walletConnectionStatus: WalletConnectionStatus;
+  hideTokenSelector?: boolean;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onTokenSymbolChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
   onHalfButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
@@ -34,6 +35,7 @@ const TokenInput = (props: TokenInputProps) => {
     tokenSymbol,
     tokenBalance,
     walletConnectionStatus,
+    hideTokenSelector,
     onTokenAmountChange,
     onTokenSymbolChange,
     onMaxButtonClick,
@@ -81,9 +83,13 @@ const TokenInput = (props: TokenInputProps) => {
               variant="token-amount-input"
             />
           </Box>
-          <Box flex="4">
-            <TokenSelector value={tokenSymbol} onChangeHandler={onTokenSymbolChange} />
-          </Box>
+          {!hideTokenSelector ? (
+            <Box flex="4">
+              <TokenSelector value={tokenSymbol} onChangeHandler={onTokenSymbolChange} />
+            </Box>
+          ) : (
+            ""
+          )}
         </Flex>
         <Flex padding="0.25rem 0" alignItems="center" backgroundColor="#F2F2F2">
           <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.75rem" fontWeight="bold">

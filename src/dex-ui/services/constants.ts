@@ -37,4 +37,11 @@ export const USDC_TOKEN_ID = "0.0.2276691";
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
   [TOKEN_A_SYMBOL, TOKEN_A_ID],
   [TOKEN_B_SYMBOL, TOKEN_B_ID],
+  [PAIR_TOKEN_SYMBOL, A_B_PAIR_TOKEN_ID],
+]);
+
+export const TOKEN_ID_TO_TOKEN_SYMBOL = new Map<string, string>([
+  [TOKEN_A_ID, TOKEN_A_SYMBOL],
+  [TOKEN_B_ID, TOKEN_B_SYMBOL],
+  [A_B_PAIR_TOKEN_ID, PAIR_TOKEN_SYMBOL],
 ]);

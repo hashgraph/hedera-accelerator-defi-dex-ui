@@ -9,8 +9,8 @@ import {
   WalletState,
 } from "./types";
 import { getFormattedTokenBalances, getLocalWalletData } from "./utils";
-import { WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
-import { SwapActionType } from "../swapSlice";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID, WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
+import BigNumber from "bignumber.js";
 
 const initialWalletState: WalletState = {
   installedExtensions: [],
@@ -150,6 +150,14 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
         set(({ wallet }) => (wallet.errorMessage = errorMessage), false, WalletActionType.FETCH_ACCOUNT_BALANCE_FAILED);
       }
     },
+    getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => {
+      const defaultDecimals = 0;
+      const { walletData } = get().wallet;
+      const tokenData = walletData?.pairedAccountBalance?.tokens;
+      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const decimals = tokenData?.find((token: any) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
+      return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
+    },
     handleFoundExtensionEvent: (walletMetadata: HashConnectTypes.WalletMetadata) => {
       set(
         ({ wallet }) => {
@@ -180,13 +188,6 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     },
     handleAcknowledgeMessageEvent: (acknowledgeData: MessageTypes.Acknowledge) => {
       console.log("Ack Received", { acknowledgeData });
-      set(
-        ({ swap }) => {
-          swap.transactionState.transactionWaitingToBeSigned = true;
-        },
-        false,
-        SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
-      );
     },
     handleConnectionStatusChange: (connectionStatus: ConnectionStatus) => {
       console.log("Connection Status Changed", { connectionStatus });
