@@ -57,8 +57,10 @@ export interface SwapProps {
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
   transactionState: TransactionState;
-  isLoaded: boolean;
+  loading: Array<string>;
 }
+
+const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
 
 const Swap = (props: SwapProps) => {
   const {
@@ -72,7 +74,7 @@ const Swap = (props: SwapProps) => {
     poolLiquidity,
     getPoolLiquidity,
     transactionState,
-    isLoaded,
+    loading,
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
@@ -456,6 +458,7 @@ const Swap = (props: SwapProps) => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
+          isLoading={isLoading(loading, "walletData")}
         />
         <Flex>
           <Spacer />
@@ -479,25 +482,30 @@ const Swap = (props: SwapProps) => {
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
+          isLoading={isLoading(loading, "walletData")}
         />
         <Flex paddingTop="1rem">
           <Box flex="2" paddingRight="1rem">
             <Text fontSize="xs">Transaction Fee</Text>
-            <Skeleton speed={0.4} isLoaded={isLoaded}>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!loading.includes("fee")}>
               <Text fontSize="xs" fontWeight="bold">
                 {fee}
               </Text>
             </Skeleton>
           </Box>
-          <Box flex="2">
+          <Box flex="2" paddingRight="1rem">
             <Text fontSize="xs">Price Impact</Text>
-            <Text fontSize="xs" fontWeight="bold">
-              {priceImpact()}
-            </Text>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!loading.includes("spotPrices")}>
+              <Text fontSize="xs" fontWeight="bold">
+                {priceImpact()}
+              </Text>
+            </Skeleton>
           </Box>
           <Box flex="4">
             <Text fontSize="xs">Swap Exchange Rate</Text>
-            <Text fontSize="xs">{getExchangeRateDisplay()}</Text>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!loading.includes("spotPrices")}>
+              <Text fontSize="xs">{getExchangeRateDisplay()}</Text>
+            </Skeleton>
           </Box>
         </Flex>
         <Flex direction="column" grow="1">

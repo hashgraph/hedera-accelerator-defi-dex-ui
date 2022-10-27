@@ -1,40 +1,19 @@
 import { Box, Center, HStack } from "@chakra-ui/react";
-import { useEffect, useCallback } from "react";
 import { Swap } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
-import { mapBigNumberValuesToNumber } from "./formatters";
-import { formatBigNumberToPercent } from "../../utils";
+import { formatSwapPageData } from "./formatters";
+import { useSwapPage } from "./hooks";
 
 const Trade = () => {
-  const [context, wallet, swap] = useDexContext(({ context, wallet, swap }) => [context, wallet, swap]);
-  const { network } = context;
-  const { walletData, walletConnectionStatus: connectionStatus, installedExtensions } = wallet;
-  const {
+  const [context, app, wallet, swap] = useDexContext(({ context, wallet, app, swap }) => [context, app, wallet, swap]);
+  const { fee, spotPrices, poolLiquidity } = swap;
+  const { formattedSpotPrices, formattedPoolLiquidity, formattedFee } = formatSwapPageData({
     spotPrices,
     poolLiquidity,
-    transactionState,
-    setAsLoading,
-    setAsLoaded,
-    fetchFee,
-    fetchSpotPrices,
-    getPrecision,
-  } = swap;
+    fee,
+  });
 
-  const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
-  const formattedPoolLiquidity = mapBigNumberValuesToNumber(poolLiquidity);
-  const formattedFee = formatBigNumberToPercent(swap.fee);
-
-  const fetchSwapData = useCallback(async () => {
-    setAsLoading();
-    getPrecision();
-    await fetchFee();
-    await fetchSpotPrices();
-    setAsLoaded();
-  }, [setAsLoading, getPrecision, fetchFee, fetchSpotPrices, setAsLoaded]);
-
-  useEffect(() => {
-    fetchSwapData();
-  }, [fetchSwapData]);
+  useSwapPage();
 
   return (
     <HStack>
@@ -43,18 +22,18 @@ const Trade = () => {
           <Swap
             title="Swap"
             sendSwapTransaction={swap.sendSwapTransaction}
-            connectionStatus={connectionStatus}
+            connectionStatus={wallet.walletConnectionStatus}
             connectToWallet={wallet.connectToWallet}
             clearWalletPairings={wallet.clearWalletPairings}
             spotPrices={formattedSpotPrices}
             fee={formattedFee}
             getPoolLiquidity={swap.getPoolLiquidity}
             poolLiquidity={formattedPoolLiquidity}
-            walletData={walletData}
-            network={network}
-            installedExtensions={installedExtensions}
-            transactionState={transactionState}
-            isLoaded={swap.isLoaded}
+            walletData={wallet.walletData}
+            network={context.network}
+            installedExtensions={wallet.installedExtensions}
+            transactionState={swap.transactionState}
+            loading={Array.from(app.featuresLoading)}
           />
         </Center>
       </Box>

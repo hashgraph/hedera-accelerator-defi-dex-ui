@@ -24,7 +24,6 @@ const initialSwapState: SwapState = {
     successPayload: null,
     errorMessage: "",
   },
-  isLoaded: false,
 };
 
 /**
@@ -52,9 +51,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
      * function to support token symbol parameters.
      */
     fetchSpotPrices: async () => {
+      const { swap, app } = get();
+      app.setFeaturesAsLoading(["spotPrices"]);
       set({}, false, SwapActionType.FETCH_SPOT_PRICES_STARTED);
       try {
-        const { swap } = get();
         const { precision } = swap;
         if (precision === undefined) {
           throw Error("Precision not found");
@@ -83,8 +83,11 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           SwapActionType.FETCH_SPOT_PRICES_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["spotPrices"]);
     },
     fetchFee: async () => {
+      const { app } = get();
+      app.setFeaturesAsLoading(["fee"]);
       set({}, false, SwapActionType.FETCH_SWAP_FEE_STARTED);
       try {
         const fee = await HederaService.fetchFeeWithPrecision();
@@ -105,11 +108,13 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           SwapActionType.FETCH_SWAP_FEE_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["fee"]);
     },
     // TODO: need to pass in contract address of pool (to pass to pairCurrentPosition)
     getPoolLiquidity: async (tokenToTrade: string, tokenToReceive: string) => {
       console.log(`Getting pool liquidity for ${tokenToTrade} and ${tokenToReceive}`);
-      const { swap } = get();
+      const { swap, app } = get();
+      app.setFeaturesAsLoading(["poolLiquidity"]);
       set({}, false, SwapActionType.FETCH_POOL_LIQUIDITY_STARTED);
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
@@ -138,8 +143,11 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           SwapActionType.FETCH_SPOT_PRICES_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["poolLiquidity"]);
     },
     sendSwapTransaction: async ({ tokenToTrade, tokenToReceive }) => {
+      const { context, wallet, app } = get();
+      app.setFeaturesAsLoading(["transactionState"]);
       set(
         ({ swap }) => {
           swap.transactionState = initialSwapState.transactionState;
@@ -147,7 +155,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         false,
         SwapActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED
       );
-      const { context, wallet } = get();
+
       const { network } = context;
       const { walletData } = wallet;
 
@@ -251,24 +259,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           SwapActionType.SEND_SWAP_TRANSACTION_TO_WALLET_FAILED
         );
       }
-    },
-    setAsLoading: () => {
-      set(
-        ({ swap }) => {
-          swap.isLoaded = false;
-        },
-        false,
-        SwapActionType.SET_STATE_TO_LOADING
-      );
-    },
-    setAsLoaded: () => {
-      set(
-        ({ swap }) => {
-          swap.isLoaded = true;
-        },
-        false,
-        SwapActionType.SET_STATE_TO_LOADED
-      );
+      app.setFeaturesAsLoaded(["transactionState"]);
     },
   };
 };

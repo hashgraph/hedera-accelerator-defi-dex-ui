@@ -19,8 +19,6 @@ enum SwapActionType {
   FETCH_SWAP_FEE_SUCCEEDED = "swap/FETCH_SWAP_FEE_SUCCEEDED",
   FETCH_SWAP_FEE_FAILED = "swap/FETCH_SWAP_FEE_FAILED",
   SET_PRECISION = "swap/SET_PRECISION",
-  SET_STATE_TO_LOADING = "swap/SET_STATE_TO_LOADING",
-  SET_STATE_TO_LOADED = "swap/SET_STATE_TO_LOADED",
 }
 
 interface TransactionState {
@@ -35,13 +33,10 @@ interface SwapState {
   poolLiquidity: Record<string, BigNumber | undefined>;
   transactionState: TransactionState;
   errorMessage: string | null;
-  isLoaded: boolean;
 }
 
 interface SwapActions {
   getPrecision: () => void;
-  setAsLoading: () => void;
-  setAsLoaded: () => void;
   fetchSpotPrices: () => Promise<void>;
   fetchFee: () => Promise<void>;
   getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => Promise<void>;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
   Menu,
@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverHeader,
   Link,
+  Skeleton,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useDexContext } from "../../hooks";
@@ -24,7 +25,7 @@ export interface TopMenuBarProps {
 }
 
 const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
-  const [context, wallet] = useDexContext(({ context, wallet }) => [context, wallet]);
+  const { app, context, wallet } = useDexContext(({ app, context, wallet }) => ({ app, context, wallet }));
   const { network } = context;
   const { walletData, walletConnectionStatus: connectionStatus } = wallet;
 
@@ -54,9 +55,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                 <Box w="100%" marginRight="20px">
                   <HStack>
                     <Text marginRight="5px">Balance:</Text>
-                    <Text fontWeight="bold" color="white">
-                      {walletData?.pairedAccountBalance?.hbars ?? "-"}
-                    </Text>
+                    <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("walletData")}>
+                      <Text fontWeight="bold" color="white">
+                        {walletData?.pairedAccountBalance?.hbars ?? "-"}
+                      </Text>
+                    </Skeleton>
                   </HStack>
                 </Box>
                 <Box w="100%">
@@ -81,9 +84,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                 <Text size="md" padding="0.4rem 0">
                   wallet type: <b style={{ color: "black" }}>{walletData?.pairedWalletData?.name || "-"}</b>
                 </Text>
-                <Text size="md" padding="0.4rem 0">
-                  balance: <b style={{ color: "black" }}>{walletData?.pairedAccountBalance?.hbars ?? "-"}</b>
-                </Text>
+                <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("walletData")}>
+                  <Text size="md" padding="0.4rem 0">
+                    balance: <b style={{ color: "black" }}>{walletData?.pairedAccountBalance?.hbars ?? "-"}</b>
+                  </Text>
+                </Skeleton>
                 <Link
                   color="#0180FF"
                   href={`https://hashscan.io/#/testnet/account/${walletData?.pairedAccounts?.[0]}`}

@@ -73,6 +73,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       }
     },
     fetchAllPoolMetrics: async () => {
+      const { app } = get();
       set(
         ({ pools }) => {
           pools.status = "fetching";
@@ -80,6 +81,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         false,
         PoolsActionType.FETCH_ALL_POOL_METRICS_STARTED
       );
+      app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
         const poolTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID);
         const timestamp7DaysAgo = getTimestamp7DaysAgo();
@@ -121,8 +123,10 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           PoolsActionType.FETCH_ALL_METRICS_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["allPoolsMetrics"]);
     },
     fetchUserPoolMetrics: async (userAccountId: string) => {
+      const { app } = get();
       set(
         ({ pools }) => {
           pools.status = "fetching";
@@ -130,6 +134,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         false,
         PoolsActionType.FETCH_USER_POOL_METRICS_STARTED
       );
+      app.setFeaturesAsLoading(["userPoolsMetrics"]);
       try {
         if (isNil(userAccountId)) {
           throw Error("User Account ID must be defined.");
@@ -172,6 +177,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           PoolsActionType.FETCH_USER_POOL_METRICS_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["userPoolsMetrics"]);
     },
     sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => {
       const { network } = get().context;

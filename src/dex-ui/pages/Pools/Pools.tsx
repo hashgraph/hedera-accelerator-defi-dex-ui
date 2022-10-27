@@ -11,11 +11,11 @@ import {
   Text,
   Tag,
   TagCloseButton,
+  Skeleton,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
-// import { PoolState, UserPoolState } from "../../services";
 import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
 import { useDexContext } from "../../hooks";
@@ -59,7 +59,7 @@ const userPoolsColHeaders: DataTableColumnConfig[] = [
 ];
 
 const Pools = (): JSX.Element => {
-  const [wallet, pools] = useDexContext(({ wallet, pools }) => [wallet, pools]);
+  const { app, wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
   const walletAccountId = wallet.walletData.pairedAccounts[0];
   const { fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
@@ -70,14 +70,15 @@ const Pools = (): JSX.Element => {
     selectedTab: 0,
     showSuccessfulWithdrawalMessage: false,
   });
-  const fetchPoolData = useCallback(async () => {
+
+  const fetchPoolDataOnLoad = useCallback(async () => {
     await fetchAllPoolMetrics();
     await fetchUserPoolMetrics(walletAccountId);
   }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
 
   useEffect(() => {
-    fetchPoolData();
-  }, [fetchPoolData, walletAccountId]);
+    fetchPoolDataOnLoad();
+  }, [fetchPoolDataOnLoad, walletAccountId]);
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -277,7 +278,9 @@ const Pools = (): JSX.Element => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("allPoolsMetrics")}>
+              <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+            </Skeleton>
           </TabPanel>
           <TabPanel>
             {unclaimedFeeTotal() > 0 ? (
@@ -302,7 +305,9 @@ const Pools = (): JSX.Element => {
             ) : (
               ""
             )}
-            <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("userPoolsMetrics")}>
+              <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+            </Skeleton>
           </TabPanel>
         </TabPanels>
       </Tabs>

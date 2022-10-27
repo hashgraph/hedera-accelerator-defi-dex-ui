@@ -1,6 +1,7 @@
 import { immer } from "zustand/middleware/immer";
 import { createStore } from "zustand";
 import { devtools } from "zustand/middleware";
+import { createAppSlice, AppStore } from "./appSlice";
 import { createWalletSlice, WalletStore } from "./walletSlice";
 import { createSwapSlice, SwapStore } from "./swapSlice";
 import { createPoolsSlice, PoolsStore } from "./poolsSlice";
@@ -9,6 +10,7 @@ import { DEFAULT_APP_METADATA } from "../context/constants";
 
 interface DEXState {
   context: DEXProviderProps;
+  app: AppStore;
   wallet: WalletStore;
   swap: SwapStore;
   pools: PoolsStore;
@@ -27,6 +29,7 @@ const createDEXStore = (intialContext: DEXProviderProps) => {
     devtools(
       immer((...params) => ({
         context: { ...DEFAULT_DEX_PROVIDER_PROPS, ...intialContext },
+        app: { ...createAppSlice(...params) },
         wallet: { ...createWalletSlice(...params) },
         swap: { ...createSwapSlice(...params) },
         pools: { ...createPoolsSlice(...params) },

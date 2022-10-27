@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Skeleton, Text } from "@chakra-ui/react";
 import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
@@ -7,6 +7,7 @@ export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
   isHalfAndMaxButtonsVisible?: boolean;
+  isLoading?: boolean;
   title: string;
   tokenAmount: number | string;
   tokenSymbol: string | undefined;
@@ -31,6 +32,7 @@ const TokenInput = (props: TokenInputProps) => {
     title,
     isDisabled = false,
     isHalfAndMaxButtonsVisible = false,
+    isLoading = false,
     tokenAmount,
     tokenSymbol,
     tokenBalance,
@@ -92,9 +94,14 @@ const TokenInput = (props: TokenInputProps) => {
           )}
         </Flex>
         <Flex padding="0.25rem 0" alignItems="center" backgroundColor="#F2F2F2">
-          <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.75rem" fontWeight="bold">
-            Balance: {showTokenBalance()}
+          <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.25rem" fontWeight="bold">
+            Balance:
           </Text>
+          <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
+            <Text fontSize="xs" paddingRight="0.75rem" fontWeight="bold">
+              {showTokenBalance()}
+            </Text>
+          </Skeleton>
           {getHalfAndMaxButtonDisplays()}
         </Flex>
       </Box>
