@@ -173,11 +173,12 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
     },
-    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, userPercentOfPool: number) => {
+    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, userPercentOfPool: string) => {
       const { network } = get().context;
-      const { walletData } = get().wallet;
+      const { walletData, getTokenAmountWithPrecision } = get().wallet;
       const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
       const signer = WalletService.getSigner(provider);
+      const lpTokenAmountBigNumber = getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
 
       try {
         set(
@@ -192,7 +193,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
-        const result = await HederaService.removeLiquidity(signer, lpTokenAmount);
+        const result = await HederaService.removeLiquidity(signer, lpTokenAmountBigNumber);
         console.log(result);
         if (result) {
           set(
