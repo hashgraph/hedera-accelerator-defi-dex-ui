@@ -1,23 +1,29 @@
 import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
-import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
-import { ActionType, initialPoolState, initPoolReducer, poolReducer, PoolState } from "./reducers";
+import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer, Skeleton } from "@chakra-ui/react";
+import { ActionType, initialPoolState, initPoolReducer, poolReducer, AddLiquidityState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../dex-ui-components/TokenInput";
 import { useDexContext, usePrevious } from "../../hooks";
 import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 import { SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../services";
-import { mapBigNumberValuesToNumber } from "../Trade/formatters";
+import { mapBigNumberValuesToNumber } from "../Swap/formatters";
 import { formatBigNumberToPercent } from "../../utils";
+import { useSwapData } from "../../hooks/useSwapData";
+import { REFRESH_INTERVAL } from "../../hooks/constants";
 
-const Pool = (): JSX.Element => {
-  const [wallet, swap, pools] = useDexContext(({ wallet, swap, pools }) => [wallet, swap, pools]);
+/** TODO: Move to a shared util file */
+const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
+
+const AddLiquidity = (): JSX.Element => {
+  const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
   const { walletData, walletConnectionStatus: connectionStatus } = wallet;
   const { fee, spotPrices } = swap;
   const formattedFee = formatBigNumberToPercent(fee);
   const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
-  const previousPoolState: PoolState | undefined = usePrevious(poolState);
+  const previousPoolState: AddLiquidityState | undefined = usePrevious(poolState);
 
+  useSwapData(REFRESH_INTERVAL);
   /**
    * Helper function that will dispatch action to update details about tokens in either input depending on
    * which params are passed to it
@@ -271,7 +277,14 @@ const Pool = (): JSX.Element => {
 
   return (
     <HStack>
-      <Box data-testid="pool-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+      <Box
+        data-testid="pool-component"
+        bg="white"
+        borderRadius="15px"
+        width="100%"
+        padding="0.5rem 1rem 1rem 1rem"
+        boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
+      >
         <Flex>
           <Heading as="h4" size="lg">
             Add Liquidity
@@ -285,7 +298,7 @@ const Pool = (): JSX.Element => {
           />
         </Flex>
         <TokenInput
-          data-testid="swap-input"
+          data-testid="add-liquidity-input"
           title="First Token"
           tokenAmount={poolState.inputToken.displayedAmount}
           tokenSymbol={poolState.inputToken.symbol}
@@ -296,9 +309,10 @@ const Pool = (): JSX.Element => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
+          isLoading={isLoading(Array.from(app.featuresLoading), "walletData")}
         />
         <TokenInput
-          data-testid="swap-output"
+          data-testid="add-liquidity-output"
           title="Second Token"
           tokenAmount={poolState.outputToken.displayedAmount}
           tokenSymbol={poolState.outputToken.symbol}
@@ -309,15 +323,18 @@ const Pool = (): JSX.Element => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("outputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("outputToken", "half")}
+          isLoading={isLoading(Array.from(app.featuresLoading), "walletData")}
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>
             <Text fontSize="xs" padding="0.1rem">
               Transaction Fee
             </Text>
-            <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-              {formattedFee}
-            </Text>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("fee")}>
+              <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
+                {formattedFee}
+              </Text>
+            </Skeleton>
           </Flex>
           <Flex flexDirection={"column"}>
             <Text fontSize="xs" padding="0.1rem">
@@ -331,9 +348,11 @@ const Pool = (): JSX.Element => {
             <Text fontSize="xs" padding="0.1rem">
               Pool Exchange Ratio
             </Text>
-            <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-              {getExchangeRatio()}
-            </Text>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("spotPrices")}>
+              <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
+                {getExchangeRatio()}
+              </Text>
+            </Skeleton>
           </Flex>
         </Flex>
         <Button
@@ -374,4 +393,4 @@ const Pool = (): JSX.Element => {
   );
 };
 
-export { Pool };
+export { AddLiquidity };

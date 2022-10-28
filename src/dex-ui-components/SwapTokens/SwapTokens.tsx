@@ -42,7 +42,7 @@ import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks, WalletConnectionStatus } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
 
-export interface SwapProps {
+export interface SwapTokensProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
@@ -60,9 +60,10 @@ export interface SwapProps {
   loading: Array<string>;
 }
 
+/** TODO: Move to a shared util file */
 const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
 
-const Swap = (props: SwapProps) => {
+const SwapTokens = (props: SwapTokensProps) => {
   const {
     title,
     spotPrices,
@@ -536,4 +537,4 @@ const Swap = (props: SwapProps) => {
   );
 };
 
-export { Swap };
+export { SwapTokens };

@@ -96,7 +96,14 @@ const WithdrawComponent = (props: WithdrawProps) => {
 
   return (
     <HStack>
-      <Box data-testid="withdraw-liquidity-component" bg="white" borderRadius="24px" width="100%" padding="1rem">
+      <Box
+        data-testid="withdraw-liquidity-component"
+        bg="white"
+        borderRadius="15px"
+        width="100%"
+        padding="0.5rem 1rem 1rem 1rem"
+        boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
+      >
         <Flex>
           <Heading as="h4" size="lg">
             Withdraw
@@ -172,7 +179,6 @@ const WithdrawComponent = (props: WithdrawProps) => {
           width="100%"
           border="2px"
           marginTop="0.5rem"
-          marginBottom="0.5rem"
           bg="black"
           color="white"
           fontSize="16px"

@@ -70,7 +70,8 @@ const Withdraw = () => {
       } else if (pools.status === "fetching") {
         setWithdrawState({
           ...withdrawState,
-          noPoolMetricsMessage: "Loading... TODO: replace this?",
+          // TODO: replace this?
+          noPoolMetricsMessage: "Loading...",
         });
       } else {
         if (pools.userPoolsMetrics.length > 0) {

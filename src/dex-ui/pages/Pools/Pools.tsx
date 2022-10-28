@@ -18,7 +18,7 @@ import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
 import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
-import { useDexContext } from "../../hooks";
+import { useDexContext, usePoolsData } from "../../hooks";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Pool, UserPool } from "../../store/poolsSlice";
 
@@ -59,9 +59,7 @@ const userPoolsColHeaders: DataTableColumnConfig[] = [
 ];
 
 const Pools = (): JSX.Element => {
-  const { app, wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
-  const walletAccountId = wallet.walletData.pairedAccounts[0];
-  const { fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
+  const { app, pools } = useDexContext(({ app, pools }) => ({ app, pools }));
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   const navigate = useNavigate();
@@ -71,14 +69,7 @@ const Pools = (): JSX.Element => {
     showSuccessfulWithdrawalMessage: false,
   });
 
-  const fetchPoolDataOnLoad = useCallback(async () => {
-    await fetchAllPoolMetrics();
-    await fetchUserPoolMetrics(walletAccountId);
-  }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
-
-  useEffect(() => {
-    fetchPoolDataOnLoad();
-  }, [fetchPoolDataOnLoad, walletAccountId]);
+  usePoolsData();
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values

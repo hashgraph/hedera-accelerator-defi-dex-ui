@@ -1,10 +1,11 @@
 import { Box, Center, HStack } from "@chakra-ui/react";
-import { Swap } from "../../../dex-ui-components";
+import { SwapTokens } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
 import { formatSwapPageData } from "./formatters";
-import { useSwapPage } from "./hooks";
+import { useSwapData } from "../../hooks/useSwapData";
+import { REFRESH_INTERVAL } from "../../hooks/constants";
 
-const Trade = () => {
+const Swap = () => {
   const [context, app, wallet, swap] = useDexContext(({ context, wallet, app, swap }) => [context, app, wallet, swap]);
   const { fee, spotPrices, poolLiquidity } = swap;
   const { formattedSpotPrices, formattedPoolLiquidity, formattedFee } = formatSwapPageData({
@@ -13,13 +14,13 @@ const Trade = () => {
     fee,
   });
 
-  useSwapPage();
+  useSwapData(REFRESH_INTERVAL);
 
   return (
     <HStack>
       <Box margin="1rem">
         <Center>
-          <Swap
+          <SwapTokens
             title="Swap"
             sendSwapTransaction={swap.sendSwapTransaction}
             connectionStatus={wallet.walletConnectionStatus}
@@ -41,4 +42,4 @@ const Trade = () => {
   );
 };
 
-export { Trade };
+export { Swap };
