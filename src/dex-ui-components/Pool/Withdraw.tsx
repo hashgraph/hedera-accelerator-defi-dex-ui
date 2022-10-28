@@ -15,6 +15,7 @@ import {
   Td,
 } from "@chakra-ui/react";
 import { ChangeEvent, useState, useCallback } from "react";
+import { MetricLabel } from "..";
 import { WalletConnectionStatus } from "../models/wallet.model";
 import { TokenInput } from "../TokenInput";
 
@@ -25,6 +26,7 @@ export interface WithdrawProps {
   onWithdrawClick: (lpAmount: number) => void;
   onInputAmountChange?: (lpAmount: number) => void;
   disableWithdrawButton?: boolean;
+  loading: Array<string>;
 }
 
 interface LPTokenDetails {
@@ -44,25 +46,8 @@ interface PoolLiquidityDetails {
   secondToken: TokenLiquidityDetails;
 }
 
-interface PoolMetricDisplayProps {
-  label: string;
-  value: string;
-}
-
-const PoolMetricDisplay = (props: PoolMetricDisplayProps) => {
-  const { label, value } = props;
-
-  return (
-    <Flex flexDirection={"column"}>
-      <Text fontSize={"10px"} lineHeight={"12px"}>
-        {label}
-      </Text>
-      <Text fontSize={"14px"} lineHeight={"17px"}>
-        {value}
-      </Text>
-    </Flex>
-  );
-};
+/** TODO: Move to a shared util file */
+const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
 
 const WithdrawComponent = (props: WithdrawProps) => {
   const {
@@ -72,6 +57,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
     onWithdrawClick,
     onInputAmountChange,
     disableWithdrawButton,
+    loading,
   } = props;
 
   const [localWithdrawState, setLocalWithdrawState] = useState({
@@ -129,6 +115,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
           hideTokenSelector={true}
           onMaxButtonClick={() => getPortionOfBalance("max")}
           onHalfButtonClick={() => getPortionOfBalance("half")}
+          isLoading={isLoading(loading, "walletData")}
         />
         <TableContainer>
           <Table variant={"unstyled"}>
@@ -136,15 +123,17 @@ const WithdrawComponent = (props: WithdrawProps) => {
               <Tr>
                 <>
                   <Td padding={"12px 40px 0 0"}>
-                    <PoolMetricDisplay
+                    <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.firstToken.poolLiquidity}`}
+                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
-                    <PoolMetricDisplay
+                    <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.firstToken.userProvidedLiquidity}`}
+                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
                     />
                   </Td>
                 </>
@@ -152,19 +141,25 @@ const WithdrawComponent = (props: WithdrawProps) => {
               <Tr>
                 <>
                   <Td padding={"12px 40px 0 0"}>
-                    <PoolMetricDisplay
+                    <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.secondToken.poolLiquidity}`}
+                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
-                    <PoolMetricDisplay
+                    <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.secondToken.userProvidedLiquidity}`}
+                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
-                    <PoolMetricDisplay label={"Remaining share of pool"} value={poolLpDetails.userLpPercentage} />
+                    <MetricLabel
+                      label={"Remaining share of pool"}
+                      value={poolLpDetails.userLpPercentage}
+                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
+                    />
                   </Td>
                 </>
               </Tr>
