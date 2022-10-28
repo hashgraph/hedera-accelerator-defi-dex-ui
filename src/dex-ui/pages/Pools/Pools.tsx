@@ -65,8 +65,7 @@ const Pools = (): JSX.Element => {
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [queryParamState, setQueryParamState] = useState({
+  const [poolsParamsState, setPoolsParamsState] = useState({
     selectedTab: 0,
     showSuccessfulWithdrawalMessage: false,
   });
@@ -109,20 +108,15 @@ const Pools = (): JSX.Element => {
 
     /**
      * OnInit
-     * -if query param indicates which set of pools to display, jump to that tab
-     * -if coming from a successful withdrawal, display success message with withdraw details
+     * -if pools slice indicates which set of pools to display, jump to that tab
+     * -if coming from a successful withdrawal (indicated in pools slice), display success message with withdraw details
      *    -NOTE: in the successful withdrawal case, since user is navigating from withdrawal
      *           page, the pools data will have been fetched already
      */
-    const selectedPools = searchParams.get("selectedPools");
-    const withdrawSuccessful = searchParams.get("withdrawSuccessful");
-    if (selectedPools === "user") {
-      // My Pools is the second tab, so set selectedTab index to 1
-      setQueryParamState((queryParamState) => ({ ...queryParamState, selectedTab: 1 }));
-    }
-    if (withdrawSuccessful === "true") {
-      setQueryParamState((queryParamState) => ({ ...queryParamState, showSuccessfulWithdrawalMessage: true }));
-    }
+    setPoolsParamsState({
+      showSuccessfulWithdrawalMessage: pools.poolsPageState.withdrawSuccessful,
+      selectedTab: pools.poolsPageState.selectedPoolsTabIndex,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -214,10 +208,10 @@ const Pools = (): JSX.Element => {
       <Tabs
         display={"flex"}
         flexDirection={"column"}
-        index={queryParamState.selectedTab}
-        onChange={(index) => setQueryParamState({ ...queryParamState, selectedTab: index })}
+        index={poolsParamsState.selectedTab}
+        onChange={(index) => setPoolsParamsState({ ...poolsParamsState, selectedTab: index })}
       >
-        {pools.withdrawState.status === "success" && queryParamState.showSuccessfulWithdrawalMessage ? (
+        {pools.withdrawState.status === "success" && poolsParamsState.showSuccessfulWithdrawalMessage ? (
           <Tag width={"calc(100%) - 32px"} padding={"8px"} margin={"16px"} backgroundColor={"#00e64d33"}>
             <Flex width={"100%"} flexWrap={"wrap"}>
               <Text color={"#000000"}>
@@ -242,7 +236,7 @@ const Pools = (): JSX.Element => {
             </Flex>
             <TagCloseButton
               color={"#000000"}
-              onClick={() => setQueryParamState({ ...queryParamState, showSuccessfulWithdrawalMessage: false })}
+              onClick={() => setPoolsParamsState({ ...poolsParamsState, showSuccessfulWithdrawalMessage: false })}
             />
           </Tag>
         ) : (
