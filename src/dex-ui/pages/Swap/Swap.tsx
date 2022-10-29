@@ -34,7 +34,7 @@ const Swap = () => {
             network={context.network}
             installedExtensions={wallet.installedExtensions}
             transactionState={swap.transactionState}
-            loading={Array.from(app.featuresLoading)}
+            isFeatureLoading={app.isFeatureLoading}
           />
         </Center>
       </Box>

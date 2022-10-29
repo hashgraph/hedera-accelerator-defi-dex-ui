@@ -1,1 +1,1 @@
-export const REFRESH_INTERVAL = 12000;
+export const REFRESH_INTERVAL = 20000;

@@ -161,7 +161,7 @@ const Withdraw = () => {
         onWithdrawClick={onWithdrawClick}
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
-        loading={Array.from(app.featuresLoading)}
+        isFeatureLoading={app.isFeatureLoading}
       />
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}

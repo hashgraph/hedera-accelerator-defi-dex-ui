@@ -41,6 +41,7 @@ import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../TokenInput/constants";
 import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks, WalletConnectionStatus } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
+import { AppFeatures } from "../../dex-ui/store/appSlice";
 
 export interface SwapTokensProps {
   title: string;
@@ -57,11 +58,8 @@ export interface SwapTokensProps {
   metaData?: HashConnectTypes.AppMetadata;
   installedExtensions: HashConnectTypes.WalletMetadata[] | null;
   transactionState: TransactionState;
-  loading: Array<string>;
+  isFeatureLoading: <T extends AppFeatures>(feature: T) => boolean;
 }
-
-/** TODO: Move to a shared util file */
-const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
 
 const SwapTokens = (props: SwapTokensProps) => {
   const {
@@ -75,7 +73,7 @@ const SwapTokens = (props: SwapTokensProps) => {
     poolLiquidity,
     getPoolLiquidity,
     transactionState,
-    loading,
+    isFeatureLoading,
   } = props;
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
@@ -391,6 +389,7 @@ const SwapTokens = (props: SwapTokensProps) => {
         bg="white"
         borderRadius="15px"
         width="100%"
+        minWidth="496px"
         padding="0.5rem 1rem 1rem 1rem"
         boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
       >
@@ -466,7 +465,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
-          isLoading={isLoading(loading, "walletData")}
+          isLoading={isFeatureLoading("walletData")}
         />
         <Flex>
           <Spacer />
@@ -490,12 +489,12 @@ const SwapTokens = (props: SwapTokensProps) => {
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
-          isLoading={isLoading(loading, "walletData")}
+          isLoading={isFeatureLoading("walletData")}
         />
         <Flex paddingTop="1rem">
           <Box flex="2" paddingRight="1rem">
             <Text fontSize="xs">Transaction Fee</Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!loading.includes("fee")}>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isFeatureLoading("fee")}>
               <Text fontSize="xs" fontWeight="bold">
                 {fee}
               </Text>
@@ -503,7 +502,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           </Box>
           <Box flex="2" paddingRight="1rem">
             <Text fontSize="xs">Price Impact</Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!loading.includes("spotPrices")}>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isFeatureLoading("spotPrices")}>
               <Text fontSize="xs" fontWeight="bold">
                 {priceImpact()}
               </Text>
@@ -511,7 +510,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           </Box>
           <Box flex="4">
             <Text fontSize="xs">Swap Exchange Rate</Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!loading.includes("spotPrices")}>
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isFeatureLoading("spotPrices")}>
               <Text fontSize="xs">{getExchangeRateDisplay()}</Text>
             </Skeleton>
           </Box>

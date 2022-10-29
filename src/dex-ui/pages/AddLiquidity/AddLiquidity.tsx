@@ -11,9 +11,6 @@ import { formatBigNumberToPercent } from "../../utils";
 import { useSwapData } from "../../hooks/useSwapData";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
 
-/** TODO: Move to a shared util file */
-const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
-
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
   const { walletData, walletConnectionStatus: connectionStatus } = wallet;
@@ -282,6 +279,7 @@ const AddLiquidity = (): JSX.Element => {
         bg="white"
         borderRadius="15px"
         width="100%"
+        minWidth="496px"
         padding="0.5rem 1rem 1rem 1rem"
         boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
       >
@@ -309,7 +307,7 @@ const AddLiquidity = (): JSX.Element => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
-          isLoading={isLoading(Array.from(app.featuresLoading), "walletData")}
+          isLoading={app.isFeatureLoading("walletData")}
         />
         <TokenInput
           data-testid="add-liquidity-output"
@@ -323,7 +321,7 @@ const AddLiquidity = (): JSX.Element => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("outputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("outputToken", "half")}
-          isLoading={isLoading(Array.from(app.featuresLoading), "walletData")}
+          isLoading={app.isFeatureLoading("walletData")}
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>

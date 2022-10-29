@@ -180,8 +180,10 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       app.setFeaturesAsLoaded(["userPoolsMetrics"]);
     },
     sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => {
-      const { network } = get().context;
-      const { walletData, getTokenAmountWithPrecision } = get().wallet;
+      const { context, app, wallet } = get();
+      const { network } = context;
+      app.setFeaturesAsLoading(["withdrawState"]);
+      const { walletData, getTokenAmountWithPrecision } = wallet;
       const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
       const signer = WalletService.getSigner(provider);
       const lpTokenAmountBigNumber = getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
@@ -237,6 +239,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["withdrawState"]);
     },
     resetWithdrawState: async () => {
       set(

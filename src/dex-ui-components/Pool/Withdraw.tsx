@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ChangeEvent, useState, useCallback } from "react";
 import { MetricLabel } from "..";
+import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { WalletConnectionStatus } from "../models/wallet.model";
 import { TokenInput } from "../TokenInput";
 
@@ -26,7 +27,7 @@ export interface WithdrawProps {
   onWithdrawClick: (lpAmount: number) => void;
   onInputAmountChange?: (lpAmount: number) => void;
   disableWithdrawButton?: boolean;
-  loading: Array<string>;
+  isFeatureLoading: <T extends AppFeatures>(feature: T) => boolean;
 }
 
 interface LPTokenDetails {
@@ -46,9 +47,6 @@ interface PoolLiquidityDetails {
   secondToken: TokenLiquidityDetails;
 }
 
-/** TODO: Move to a shared util file */
-const isLoading = (loading: Array<string>, feature: string) => loading.includes(feature);
-
 const WithdrawComponent = (props: WithdrawProps) => {
   const {
     walletConnectionStatus,
@@ -57,7 +55,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
     onWithdrawClick,
     onInputAmountChange,
     disableWithdrawButton,
-    loading,
+    isFeatureLoading,
   } = props;
 
   const [localWithdrawState, setLocalWithdrawState] = useState({
@@ -87,6 +85,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
         bg="white"
         borderRadius="15px"
         width="100%"
+        minWidth="496px"
         padding="0.5rem 1rem 1rem 1rem"
         boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
       >
@@ -115,7 +114,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
           hideTokenSelector={true}
           onMaxButtonClick={() => getPortionOfBalance("max")}
           onHalfButtonClick={() => getPortionOfBalance("half")}
-          isLoading={isLoading(loading, "walletData")}
+          isLoading={isFeatureLoading("walletData")}
         />
         <TableContainer>
           <Table variant={"unstyled"}>
@@ -126,14 +125,14 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.firstToken.poolLiquidity}`}
-                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.firstToken.userProvidedLiquidity}`}
-                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                 </>
@@ -144,21 +143,21 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.secondToken.poolLiquidity}`}
-                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.secondToken.userProvidedLiquidity}`}
-                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={"Remaining share of pool"}
                       value={poolLpDetails.userLpPercentage}
-                      isLoading={loading.includes("allPoolsMetrics") || loading.includes("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                 </>
@@ -179,6 +178,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
           fontSize="16px"
           fontWeight="500"
           disabled={disableWithdrawButton}
+          _hover={{ opacity: "0.4" }}
         >
           {"Withdraw"}
         </Button>
