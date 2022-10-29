@@ -30,6 +30,8 @@ export const useSwapData = (refreshInterval = 0) => {
 
   const fetchSwapDataOnEvent = useCallback(async () => {
     await Promise.allSettled([wallet.fetchAccountBalance(), fetchSpotPrices()]);
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**

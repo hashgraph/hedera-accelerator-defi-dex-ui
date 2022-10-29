@@ -131,11 +131,15 @@ const Pools = (): JSX.Element => {
 
   const getAllPoolsRowData = useCallback(
     () => formatPoolsRowData(pools.allPoolsMetrics.map(formatPoolMetrics)),
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [pools.allPoolsMetrics]
   );
 
   const getUserPoolsRowData = useCallback(
     () => formatPoolsRowData(pools.userPoolsMetrics.map(formatUserPoolMetrics), true),
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [pools.userPoolsMetrics]
   );
 

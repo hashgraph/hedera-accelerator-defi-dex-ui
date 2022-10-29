@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
   Menu,
