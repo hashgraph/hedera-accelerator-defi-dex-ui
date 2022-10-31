@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Flex, Divider } from "@chakra-ui/react";
-import { SwapState } from "./types";
+import { SwapTokensState } from "./types";
 import { WarningIcon } from "@chakra-ui/icons";
 import { LoadingDialog } from "../base/Dialogs/LoadingDialog";
 import { AlertDialogComponent } from "../base";
@@ -13,7 +13,7 @@ export enum SwapConfirmationStep {
 }
 interface SwapConfirmationProps {
   sendSwapTransaction: (payload: any) => void;
-  swapState: SwapState;
+  swapState: SwapTokensState;
   confirmationStep: SwapConfirmationStep;
   errorMessage?: string;
   onErrorMessageDismiss?: () => void | undefined; // fired when error dialog is closed (SwapConfirmationStep.ERROR)

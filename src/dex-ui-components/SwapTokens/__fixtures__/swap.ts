@@ -1,7 +1,7 @@
-import { SwapProps } from "..";
+import { SwapTokensProps } from "..";
 import { WalletConnectionStatus } from "../../../dex-ui/store/walletSlice";
 
-export const mockSwapProps: SwapProps = {
+export const mockSwapProps: SwapTokensProps = {
   title: "Swap",
   sendSwapTransaction: () => Promise.resolve(),
   connectionStatus: WalletConnectionStatus.INITIALIZING,
@@ -24,5 +24,5 @@ export const mockSwapProps: SwapProps = {
     successPayload: null,
     errorMessage: "",
   },
-  isLoaded: true,
+  isFeatureLoading: () => false,
 };

@@ -1,5 +1,6 @@
 import { mapObjIndexed } from "ramda";
 import BigNumber from "bignumber.js";
+import { formatBigNumberToPercent } from "../../utils";
 
 /**
  * Converts the BigNumber type values in a key:value Object to a number type. Used to
@@ -13,4 +14,12 @@ const mapBigNumberValuesToNumber = (
   return mapObjIndexed((record) => record?.toNumber(), records);
 };
 
-export { mapBigNumberValuesToNumber };
+const formatSwapPageData = ({ spotPrices, poolLiquidity, fee }: any) => {
+  return {
+    formattedSpotPrices: mapBigNumberValuesToNumber(spotPrices),
+    formattedPoolLiquidity: mapBigNumberValuesToNumber(poolLiquidity),
+    formattedFee: formatBigNumberToPercent(fee),
+  };
+};
+
+export { formatSwapPageData, mapBigNumberValuesToNumber };

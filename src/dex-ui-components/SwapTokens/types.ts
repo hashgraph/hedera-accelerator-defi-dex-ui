@@ -1,4 +1,4 @@
-export interface SwapState {
+export interface SwapTokensState {
   tokenToTrade: {
     symbol: string | undefined;
     amount: number;

@@ -1,6 +1,6 @@
-import { ActionType, PoolActions } from "./actionTypes";
+import { ActionType, AddLiquidityActions } from "./actionTypes";
 
-export interface PoolState {
+export interface AddLiquidityState {
   inputToken: {
     symbol: string;
     amount: number;
@@ -19,7 +19,7 @@ export interface PoolState {
   };
 }
 
-const initialPoolState: PoolState = {
+const initialPoolState: AddLiquidityState = {
   inputToken: {
     symbol: "",
     amount: 0.0,
@@ -38,11 +38,11 @@ const initialPoolState: PoolState = {
   },
 };
 
-function initPoolReducer(initialPoolState: PoolState) {
+function initPoolReducer(initialPoolState: AddLiquidityState) {
   return initialPoolState;
 }
 
-function poolReducer(state: PoolState, action: PoolActions) {
+function poolReducer(state: AddLiquidityState, action: AddLiquidityActions) {
   switch (action.type) {
     case ActionType.UPDATE_INPUT_TOKEN: {
       const { field, payload } = action;

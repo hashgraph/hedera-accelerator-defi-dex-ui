@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDexContext } from ".";
 import { WalletConnectionStatus } from "../store/walletSlice";
 
@@ -7,7 +7,11 @@ import { WalletConnectionStatus } from "../store/walletSlice";
  */
 export function useWalletConnection() {
   const [wallet] = useDexContext(({ wallet }) => [wallet]);
-  const { walletConnectionStatus, installedExtensions, walletData } = wallet;
+  const { walletConnectionStatus, installedExtensions, walletData, fetchAccountBalance } = wallet;
+
+  const fetchWalletDataOnLoad = useCallback(async () => {
+    await fetchAccountBalance();
+  }, [fetchAccountBalance]);
 
   useEffect(() => {
     wallet.setupHashConnectEvents();
@@ -34,7 +38,7 @@ export function useWalletConnection() {
 
   useEffect(() => {
     if (walletConnectionStatus === WalletConnectionStatus.PAIRED) {
-      wallet.fetchAccountBalance();
+      fetchWalletDataOnLoad();
     }
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps

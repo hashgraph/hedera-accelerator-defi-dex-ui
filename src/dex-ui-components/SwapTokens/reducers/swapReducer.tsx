@@ -1,7 +1,7 @@
 import { ActionType, SwapAction } from "../actions/actionTypes";
-import { SwapState } from "../types";
+import { SwapTokensState } from "../types";
 
-const initialSwapState: SwapState = {
+const initialSwapState: SwapTokensState = {
   tokenToTrade: {
     symbol: "HBAR",
     amount: 0.0,
@@ -23,11 +23,11 @@ const initialSwapState: SwapState = {
   spotPrice: undefined,
 };
 
-function initSwapReducer(initialSwapState: SwapState) {
+function initSwapReducer(initialSwapState: SwapTokensState) {
   return initialSwapState;
 }
 
-function swapReducer(draft: SwapState, action: SwapAction) {
+function swapReducer(draft: SwapTokensState, action: SwapAction) {
   switch (action.type) {
     case ActionType.SET_TOKEN_TO_TRADE: {
       const { field, payload } = action;
