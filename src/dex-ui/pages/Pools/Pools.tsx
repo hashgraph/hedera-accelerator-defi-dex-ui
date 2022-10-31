@@ -12,7 +12,7 @@ import {
   Tag,
   TagCloseButton,
 } from "@chakra-ui/react";
-import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
 // import { PoolState, UserPoolState } from "../../services";
@@ -58,6 +58,11 @@ const userPoolsColHeaders: DataTableColumnConfig[] = [
   { headerName: "Actions", field: "actions", colWidth: 226 },
 ];
 
+export interface PoolsLocationProps {
+  withdrawSuccessful: boolean;
+  selectedTab: number;
+}
+
 const Pools = (): JSX.Element => {
   const [wallet, pools] = useDexContext(({ wallet, pools }) => [wallet, pools]);
   const walletAccountId = wallet.walletData.pairedAccounts[0];
@@ -65,6 +70,7 @@ const Pools = (): JSX.Element => {
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
   const navigate = useNavigate();
+  const locationState = useLocation().state as PoolsLocationProps;
   const [poolsParamsState, setPoolsParamsState] = useState({
     selectedTab: 0,
     showSuccessfulWithdrawalMessage: false,
@@ -108,15 +114,18 @@ const Pools = (): JSX.Element => {
 
     /**
      * OnInit
-     * -if pools slice indicates which set of pools to display, jump to that tab
-     * -if coming from a successful withdrawal (indicated in pools slice), display success message with withdraw details
+     * -if location state indicates which set of pools to display, jump to that tab
+     * -if coming from a successful withdrawal (indicated in location state),
+     *  display success message with withdraw details
      *    -NOTE: in the successful withdrawal case, since user is navigating from withdrawal
      *           page, the pools data will have been fetched already
      */
-    setPoolsParamsState({
-      showSuccessfulWithdrawalMessage: pools.poolsPageState.withdrawSuccessful,
-      selectedTab: pools.poolsPageState.selectedPoolsTabIndex,
-    });
+    if (locationState) {
+      setPoolsParamsState({
+        showSuccessfulWithdrawalMessage: !!locationState.withdrawSuccessful,
+        selectedTab: locationState.selectedTab ? locationState.selectedTab : 0,
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

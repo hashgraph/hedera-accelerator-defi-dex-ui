@@ -25,10 +25,6 @@ const initialPoolsStore: PoolsState = {
     successPayload: null,
     errorMessage: "",
   },
-  poolsPageState: {
-    selectedPoolsTabIndex: 0,
-    withdrawSuccessful: false,
-  },
 };
 
 /**
@@ -192,10 +188,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
               successPayload: null,
               errorMessage: "",
             };
-            pools.poolsPageState = {
-              selectedPoolsTabIndex: 1, // My Pools tab
-              withdrawSuccessful: true,
-            };
             pools.errorMessage = "";
           },
           false,
@@ -244,23 +236,10 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       set(
         ({ pools }) => {
           pools.withdrawState = initialPoolsStore.withdrawState;
-          pools.poolsPageState = initialPoolsStore.poolsPageState;
           pools.errorMessage = "";
         },
         false,
-        PoolsActionType.RESET_WITHDRAW_AND_POOLS_PAGE_STATE
-      );
-    },
-    navigateToPoolsPage: async (tabIndex?: number) => {
-      set(
-        ({ pools }) => {
-          pools.poolsPageState = {
-            ...pools.poolsPageState,
-            selectedPoolsTabIndex: tabIndex ? tabIndex : 0,
-          };
-        },
-        false,
-        PoolsActionType.NAVIGATE_TO_POOLS_PAGE
+        PoolsActionType.RESET_WITHDRAW_STATE
       );
     },
     // Temporary - should be removed

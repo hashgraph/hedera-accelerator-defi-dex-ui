@@ -5,6 +5,7 @@ import { LoadingDialog } from "../../../dex-ui-components";
 import { WithdrawComponent } from "../../../dex-ui-components/Pool";
 import { useDexContext } from "../../hooks";
 import { formatBigNumberToPercent } from "../../utils";
+import { PoolsLocationProps } from "../Pools";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
@@ -84,11 +85,7 @@ const Withdraw = () => {
       }
     } else {
       // no pool indicated, so redirect to My Pools page
-      const navigateToUserPools = async () => {
-        await pools.navigateToPoolsPage(1);
-        navigate("/pool");
-      };
-      navigateToUserPools();
+      navigate("/pool", { state: { withdrawSuccessful: false, selectedTab: 1 } as PoolsLocationProps });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pools.status]);
@@ -106,7 +103,7 @@ const Withdraw = () => {
     }));
 
     if (pools.withdrawState.status === "success") {
-      navigate("/pool");
+      navigate("/pool", { state: { withdrawSuccessful: true, selectedTab: 1 } as PoolsLocationProps });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pools.withdrawState]);
