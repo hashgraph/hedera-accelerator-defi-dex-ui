@@ -7,7 +7,7 @@ export const TOKEN_B_ID = "0.0.48660646";
 
 // LP Token Proxy
 export const PAIR_TOKEN_SYMBOL = "L49";
-export const A_B_PAIR_TOKEN_ID = "0.0.48679313";
+export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
 
 export const USDC_TOKEN_ID = "0.0.2276691";
 
