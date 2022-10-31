@@ -11,14 +11,15 @@ import {
   Text,
   Tag,
   TagCloseButton,
+  Skeleton,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
-// import { PoolState, UserPoolState } from "../../services";
 import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
-import { useDexContext } from "../../hooks";
+import { useDexContext, usePoolsData } from "../../hooks";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Pool, UserPool } from "../../store/poolsSlice";
 
 export interface FormattedUserPoolDetails {
@@ -57,19 +58,17 @@ const userPoolsColHeaders: DataTableColumnConfig[] = [
 ];
 
 const Pools = (): JSX.Element => {
-  const [wallet, pools] = useDexContext(({ wallet, pools }) => [wallet, pools]);
-  const walletAccountId = wallet.walletData.pairedAccounts[0];
-  const { fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
+  const { app, pools } = useDexContext(({ app, pools }) => ({ app, pools }));
   const [colHeadersState, setState] = useState({ allPoolsColHeaders, userPoolsColHeaders });
 
-  const fetchPoolData = useCallback(async () => {
-    await fetchAllPoolMetrics();
-    await fetchUserPoolMetrics(walletAccountId);
-  }, [fetchAllPoolMetrics, fetchUserPoolMetrics, walletAccountId]);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [queryParamState, setQueryParamState] = useState({
+    selectedTab: 0,
+    showSuccessfulWithdrawalMessage: false,
+  });
 
-  useEffect(() => {
-    fetchPoolData();
-  }, [fetchPoolData, walletAccountId]);
+  usePoolsData();
 
   // Scales column width differences
   // TODO: check if we will need this, should be up to consumer of component to send proper values
@@ -131,11 +130,15 @@ const Pools = (): JSX.Element => {
 
   const getAllPoolsRowData = useCallback(
     () => formatPoolsRowData(pools.allPoolsMetrics.map(formatPoolMetrics)),
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [pools.allPoolsMetrics]
   );
 
   const getUserPoolsRowData = useCallback(
     () => formatPoolsRowData(pools.userPoolsMetrics.map(formatUserPoolMetrics), true),
+    // Todo: Fixed hook dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [pools.userPoolsMetrics]
   );
 
@@ -269,7 +272,9 @@ const Pools = (): JSX.Element => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("allPoolsMetrics")}>
+              <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+            </Skeleton>
           </TabPanel>
           <TabPanel>
             {unclaimedFeeTotal() > 0 ? (
@@ -294,7 +299,9 @@ const Pools = (): JSX.Element => {
             ) : (
               ""
             )}
-            <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("userPoolsMetrics")}>
+              <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+            </Skeleton>
           </TabPanel>
         </TabPanels>
       </Tabs>

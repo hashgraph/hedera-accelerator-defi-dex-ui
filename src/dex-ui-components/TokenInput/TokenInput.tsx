@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Skeleton, Text } from "@chakra-ui/react";
 import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
@@ -7,6 +7,7 @@ export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
   isHalfAndMaxButtonsVisible?: boolean;
+  isLoading?: boolean;
   title: string;
   tokenAmount: number | string;
   tokenSymbol: string | undefined;
@@ -31,6 +32,7 @@ const TokenInput = (props: TokenInputProps) => {
     title,
     isDisabled = false,
     isHalfAndMaxButtonsVisible = false,
+    isLoading = false,
     tokenAmount,
     tokenSymbol,
     tokenBalance,
@@ -72,7 +74,7 @@ const TokenInput = (props: TokenInputProps) => {
       <Text color="#4D4D4D" fontSize="xs">
         {title}
       </Text>
-      <Box border="1px solid black" borderRadius="5px" backgroundColor="#F2F2F2">
+      <Box border="1px solid #E7E9EB" borderRadius="5px" backgroundColor="#F2F2F2">
         <Flex>
           <Box flex="5">
             <TokenAmountInput
@@ -91,10 +93,15 @@ const TokenInput = (props: TokenInputProps) => {
             ""
           )}
         </Flex>
-        <Flex padding="0.25rem 0" alignItems="center" backgroundColor="#F2F2F2">
-          <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.75rem" fontWeight="bold">
-            Balance: {showTokenBalance()}
+        <Flex padding="0.25rem 0" alignItems="center" backgroundColor="rgba(242,242,244,0.6)" borderRadius="5px">
+          <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.25rem" fontWeight="bold">
+            Balance:
           </Text>
+          <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
+            <Text fontSize="xs" paddingRight="0.75rem" fontWeight="bold">
+              {showTokenBalance()}
+            </Text>
+          </Skeleton>
           {getHalfAndMaxButtonDisplays()}
         </Flex>
       </Box>

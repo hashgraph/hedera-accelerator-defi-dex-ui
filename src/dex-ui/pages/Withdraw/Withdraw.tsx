@@ -3,19 +3,20 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
 import { WithdrawComponent } from "../../../dex-ui-components/Pool";
-import { useDexContext } from "../../hooks";
+import { useDexContext, usePoolsData } from "../../hooks";
+import { REFRESH_INTERVAL } from "../../hooks/constants";
 import { formatBigNumberToPercent } from "../../utils";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
-  const [pools, wallet] = useDexContext(({ pools, wallet }) => [pools, wallet]);
-  const walletAccountId = wallet.walletData.pairedAccounts[0];
-
+  const { app, pools, wallet } = useDexContext(({ app, pools, wallet }) => ({ app, pools, wallet }));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  usePoolsData(REFRESH_INTERVAL);
+
   const [withdrawState, setWithdrawState] = useState({
-    noPoolMetricsMessage: "Loading... TODO: replace this?",
+    noPoolMetricsMessage: "",
     errorDialogOpen: false,
     withdrawProps: {
       walletConnectionStatus: wallet.walletConnectionStatus,
@@ -57,30 +58,8 @@ const Withdraw = () => {
     // in order to prevent issues with the URL. Replacing back here
     const queryParam = searchParams.get("pool")?.replace("-", "/");
     if (queryParam) {
-      if (pools.status === "init" || pools.status === "error") {
-        // fetch the user pool metrics if they haven't already
-        const fetchUserPoolMetrics = async () => {
-          await pools.fetchAllPoolMetrics();
-          await pools.fetchUserPoolMetrics(walletAccountId);
-          // console.log('fetching', pools);
-          // setWithdrawComponentProps(queryParam);
-          // TODO: investigate async behavior
-        };
-        setTimeout(fetchUserPoolMetrics, 0);
-      } else if (pools.status === "fetching") {
-        setWithdrawState({
-          ...withdrawState,
-          noPoolMetricsMessage: "Loading... TODO: replace this?",
-        });
-      } else {
-        if (pools.userPoolsMetrics.length > 0) {
-          setWithdrawComponentProps(queryParam);
-        } else {
-          setWithdrawState({
-            ...withdrawState,
-            noPoolMetricsMessage: "User has no pools",
-          });
-        }
+      if (pools.userPoolsMetrics.length > 0) {
+        setWithdrawComponentProps(queryParam);
       }
     } else {
       // no pool indicated, so redirect to My Pools page
@@ -182,6 +161,7 @@ const Withdraw = () => {
         onWithdrawClick={onWithdrawClick}
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
+        isFeatureLoading={app.isFeatureLoading}
       />
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}

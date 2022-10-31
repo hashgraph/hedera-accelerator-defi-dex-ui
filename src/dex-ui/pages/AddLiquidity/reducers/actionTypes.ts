@@ -20,4 +20,4 @@ interface SwitchTokens {
   type: ActionType.SWITCH_INPUT_AND_OUTPUT_TOKEN;
 }
 
-export type PoolActions = UpdateInputToken | UpdateOutputToken | SwitchTokens;
+export type AddLiquidityActions = UpdateInputToken | UpdateOutputToken | SwitchTokens;

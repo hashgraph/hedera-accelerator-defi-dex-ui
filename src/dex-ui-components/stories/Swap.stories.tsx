@@ -1,18 +1,18 @@
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { Swap } from "..";
+import { SwapTokens } from "..";
 
 export default {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: "Swap",
-  component: Swap,
+  title: "SwapTokens",
+  component: SwapTokens,
   parameters: {
     docs: {
-      page: "Swap",
+      page: "SwapTokens",
     },
   },
-} as ComponentMeta<typeof Swap>;
+} as ComponentMeta<typeof SwapTokens>;
 
-export const Basic: ComponentStory<typeof Swap> = (args) => <Swap {...args} />;
+export const Basic: ComponentStory<typeof SwapTokens> = (args) => <SwapTokens {...args} />;

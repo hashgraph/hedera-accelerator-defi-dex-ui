@@ -1,4 +1,4 @@
-export * from "./Trade";
-export * from "./Pool";
+export * from "./Swap";
+export * from "./AddLiquidity";
 export * from "./Pools";
 export * from "./Withdraw";

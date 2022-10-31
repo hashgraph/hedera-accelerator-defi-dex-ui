@@ -1,4 +1,5 @@
 import { MessageTypes, HashConnectTypes } from "hashconnect";
+import { BigNumber } from "bignumber.js";
 import { getErrorMessage } from "../../utils";
 import {
   WalletSlice,
@@ -9,8 +10,7 @@ import {
   WalletState,
 } from "./types";
 import { getFormattedTokenBalances, getLocalWalletData } from "./utils";
-import { WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
-import { SwapActionType } from "../swapSlice";
+import { TOKEN_SYMBOL_TO_ACCOUNT_ID, WalletService, WALLET_LOCAL_DATA_KEY } from "../../services";
 
 const initialWalletState: WalletState = {
   installedExtensions: [],
@@ -38,6 +38,14 @@ function initWalletData(initialWalletState: any) {
 const createWalletSlice: WalletSlice = (set, get): WalletStore => {
   return {
     ...initWalletData(initialWalletState),
+    getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => {
+      const defaultDecimals = 0;
+      const { walletData } = get().wallet;
+      const tokenData = walletData?.pairedAccountBalance?.tokens;
+      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const decimals = tokenData?.find((token: any) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
+      return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
+    },
     initializeWalletConnection: async () => {
       set(
         ({ wallet }) => {
@@ -131,8 +139,10 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     },
     fetchAccountBalance: async () => {
       set({}, false, WalletActionType.FETCH_ACCOUNT_BALANCE_STARTED);
-      const { network } = get().context;
-      const { walletData } = get().wallet;
+      const { context, app, wallet } = get();
+      const { network } = context;
+      const { walletData } = wallet;
+      app.setFeaturesAsLoading(["walletData"]);
       try {
         const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
         const accountBalance = await WalletService.getAccountBalance(provider, walletData.pairedAccounts[0]);
@@ -147,8 +157,15 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
         );
       } catch (error) {
         const errorMessage = getErrorMessage(error);
-        set(({ wallet }) => (wallet.errorMessage = errorMessage), false, WalletActionType.FETCH_ACCOUNT_BALANCE_FAILED);
+        set(
+          ({ wallet }) => {
+            wallet.errorMessage = errorMessage;
+          },
+          false,
+          WalletActionType.FETCH_ACCOUNT_BALANCE_FAILED
+        );
       }
+      app.setFeaturesAsLoaded(["walletData"]);
     },
     handleFoundExtensionEvent: (walletMetadata: HashConnectTypes.WalletMetadata) => {
       set(
