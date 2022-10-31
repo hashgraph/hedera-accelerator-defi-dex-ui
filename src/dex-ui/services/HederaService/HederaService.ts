@@ -17,6 +17,7 @@ import {
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
 import { AddLiquidityDetails } from "./types";
+import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
@@ -132,8 +133,8 @@ function createHederaService() {
       .freezeWithSigner(signer);
     const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
 
-    console.log(`Liquidity remove status: ${transferTokenRx.status}`);
-    await pairCurrentPosition(contractId);
+    console.log(`Liquidity remove Tx: ${removeLiquidityTx}`);
+    return removeLiquidityTx;
   };
 
   const swapToken = async ({
