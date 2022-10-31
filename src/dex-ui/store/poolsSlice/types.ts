@@ -16,7 +16,8 @@ enum PoolsActionType {
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED",
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED",
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
-  RESET_WITHDRAW_STATE = "pools/RESET_WITHDRAW_STATE",
+  RESET_WITHDRAW_AND_POOLS_PAGE_STATE = "pools/RESET_WITHDRAW_AND_POOLS_PAGE_STATE",
+  NAVIGATE_TO_POOLS_PAGE = "pools/NAVIGATE_TO_POOLS_PAGE",
 }
 
 interface SendAddLiquidityTransactionParams {
@@ -67,6 +68,12 @@ interface WithdrawState {
   } | null;
   errorMessage: string;
 }
+
+interface PoolsPageState {
+  selectedPoolsTabIndex: number;
+  withdrawSuccessful: boolean;
+}
+
 interface PoolsState {
   allPoolsMetrics: Pool[];
   userPoolsMetrics: UserPool[];
@@ -75,6 +82,7 @@ interface PoolsState {
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
   withdrawState: WithdrawState;
+  poolsPageState: PoolsPageState;
 }
 
 interface PoolsActions {
@@ -89,6 +97,7 @@ interface PoolsActions {
   fetchUserPoolMetrics: (userAccountId: string) => Promise<void>;
   sendRemoveLiquidityTransaction: (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => Promise<void>;
   resetWithdrawState: () => Promise<void>;
+  navigateToPoolsPage: (tabIndex?: number) => Promise<void>;
   // Temporary - should be removed
   send100LabTokensToWallet: (receivingAccountId: string) => Promise<void>;
 }

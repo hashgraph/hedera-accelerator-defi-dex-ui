@@ -63,10 +63,14 @@ const Withdraw = () => {
       }
     } else {
       // no pool indicated, so redirect to My Pools page
-      navigate("/pool?selectedPools=user");
+      const navigateToUserPools = async () => {
+        await pools.navigateToPoolsPage(1);
+        navigate("/pool");
+      };
+      navigateToUserPools();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools]);
+  }, [pools.status]);
 
   /**
    * Effect for listening to the state of withdraw transaction.
@@ -81,7 +85,7 @@ const Withdraw = () => {
     }));
 
     if (pools.withdrawState.status === "success") {
-      navigate("/pool?selectedPools=user&withdrawSuccessful=true");
+      navigate("/pool");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pools.withdrawState]);
