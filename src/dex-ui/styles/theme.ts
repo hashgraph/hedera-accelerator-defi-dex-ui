@@ -1,9 +1,11 @@
 import { extendTheme } from "@chakra-ui/react";
-import { ButtonStyles, NumberInputStyles } from "../../dex-ui-components/base";
+import { TextStyles, ButtonStyles, NumberInputStyles, CardStyles } from "../../dex-ui-components/base";
 
 export const DEXTheme = extendTheme({
+  textStyles: TextStyles,
   components: {
     Button: ButtonStyles,
     NumberInput: NumberInputStyles,
+    Card: CardStyles,
   },
 });

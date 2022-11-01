@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
-import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer, Skeleton } from "@chakra-ui/react";
+import { Box, HStack, Button, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer, AddLiquidityState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../dex-ui-components/TokenInput";
@@ -10,6 +10,7 @@ import { mapBigNumberValuesToNumber } from "../Swap/formatters";
 import { formatBigNumberToPercent } from "../../utils";
 import { useSwapData } from "../../hooks/useSwapData";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
+import { MetricLabel } from "../../../dex-ui-components";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
@@ -325,32 +326,17 @@ const AddLiquidity = (): JSX.Element => {
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>
-            <Text fontSize="xs" padding="0.1rem">
-              Transaction Fee
-            </Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("fee")}>
-              <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                {formattedFee}
-              </Text>
-            </Skeleton>
+            <MetricLabel label="Transaction Fee" value={formattedFee} isLoading={app.isFeatureLoading("fee")} />
           </Flex>
           <Flex flexDirection={"column"}>
-            <Text fontSize="xs" padding="0.1rem">
-              Share of Pool
-            </Text>
-            <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-              {"<0.1%"}
-            </Text>
+            <MetricLabel label="Share of Pool" value={"<0.1%"} />
           </Flex>
           <Flex flexDirection={"column"}>
-            <Text fontSize="xs" padding="0.1rem">
-              Pool Exchange Ratio
-            </Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("spotPrices")}>
-              <Text fontSize="xs" padding="0.1rem" fontWeight="bold">
-                {getExchangeRatio()}
-              </Text>
-            </Skeleton>
+            <MetricLabel
+              label="Pool Exchange Ratio"
+              value={getExchangeRatio()}
+              isLoading={app.isFeatureLoading("spotPrices")}
+            />
           </Flex>
         </Flex>
         <Button

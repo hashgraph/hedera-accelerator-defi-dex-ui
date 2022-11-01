@@ -11,7 +11,6 @@ import {
   TagCloseButton,
   Link,
   Tag,
-  Skeleton,
 } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
@@ -33,7 +32,7 @@ import {
   setSlippageSetting,
   setTransactionDeadlineSetting,
 } from "./actions/swapActions";
-import { Button, IconButton, SwapSettingsInput, SwapSettingsInputProps } from "../base";
+import { Button, IconButton, MetricLabel, SwapSettingsInput, SwapSettingsInputProps } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
@@ -343,13 +342,9 @@ const SwapTokens = (props: SwapTokensProps) => {
 
   const getExchangeRateDisplay = useCallback(() => {
     if (spotPrice === undefined) {
-      return <b>--</b>;
+      return "--";
     }
-    return (
-      <>
-        <b>1</b> {`${tokenToTrade.symbol} =`} <b>{`${spotPrice?.toFixed(5)} ${tokenToReceive.symbol}`}</b>
-      </>
-    );
+    return `1 ${tokenToTrade.symbol} = ${spotPrice?.toFixed(5)} ${tokenToReceive.symbol}`;
   }, [spotPrice, tokenToTrade.symbol, tokenToReceive.symbol]);
 
   const getSwapConfirmationStep = useCallback(() => {
@@ -493,26 +488,17 @@ const SwapTokens = (props: SwapTokensProps) => {
         />
         <Flex paddingTop="1rem">
           <Box flex="2" paddingRight="1rem">
-            <Text fontSize="xs">Transaction Fee</Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isFeatureLoading("fee")}>
-              <Text fontSize="xs" fontWeight="bold">
-                {fee}
-              </Text>
-            </Skeleton>
+            <MetricLabel label="Transaction Fee" value={fee} isLoading={isFeatureLoading("fee")} />
           </Box>
           <Box flex="2" paddingRight="1rem">
-            <Text fontSize="xs">Price Impact</Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isFeatureLoading("spotPrices")}>
-              <Text fontSize="xs" fontWeight="bold">
-                {priceImpact()}
-              </Text>
-            </Skeleton>
+            <MetricLabel label="Price Impact" value={priceImpact()} isLoading={isFeatureLoading("spotPrices")} />
           </Box>
           <Box flex="4">
-            <Text fontSize="xs">Swap Exchange Rate</Text>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isFeatureLoading("spotPrices")}>
-              <Text fontSize="xs">{getExchangeRateDisplay()}</Text>
-            </Skeleton>
+            <MetricLabel
+              label="Swap Exchange Rate"
+              value={getExchangeRateDisplay()}
+              isLoading={isFeatureLoading("spotPrices")}
+            />
           </Box>
         </Flex>
         <Flex direction="column" grow="1">

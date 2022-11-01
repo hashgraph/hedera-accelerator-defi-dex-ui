@@ -58,10 +58,10 @@ const TokenInput = (props: TokenInputProps) => {
     if (isHalfAndMaxButtonsVisible) {
       return (
         <>
-          <Button padding="0" variant="xs-text" onClick={onHalfButtonClick}>
+          <Button variant="xs-text" textStyle="link" textDecorationLine="none" onClick={onHalfButtonClick}>
             Half
           </Button>
-          <Button padding="0" variant="xs-text" onClick={onMaxButtonClick}>
+          <Button variant="xs-text" textStyle="link" textDecorationLine="none" onClick={onMaxButtonClick}>
             Max
           </Button>
         </>
@@ -94,11 +94,11 @@ const TokenInput = (props: TokenInputProps) => {
           )}
         </Flex>
         <Flex padding="0.25rem 0" alignItems="center" backgroundColor="rgba(242,242,244,0.6)" borderRadius="5px">
-          <Text fontSize="xs" paddingLeft="0.5rem" paddingRight="0.25rem" fontWeight="bold">
+          <Text textStyle="b4-medium" paddingLeft="0.5rem" paddingRight="0.25rem">
             Balance:
           </Text>
           <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
-            <Text fontSize="xs" paddingRight="0.75rem" fontWeight="bold">
+            <Text textStyle="b4-medium" paddingRight="0.75rem">
               {showTokenBalance()}
             </Text>
           </Skeleton>

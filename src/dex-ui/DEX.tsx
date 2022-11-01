@@ -1,26 +1,34 @@
-import { ChakraProvider, Container } from "@chakra-ui/react";
-import { Swap, AddLiquidity, Pools, Withdraw } from "./pages";
+import { ChakraProvider, Container, Flex } from "@chakra-ui/react";
+import { Swap, AddLiquidity, Pools, Withdraw, Governance, CreateProposal, SelectProposalType } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import { DEXTheme } from "./styles";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useWalletConnection } from "./hooks";
 
-const menuOptions = ["Swap", "Pool"];
+const menuOptions = ["Swap", "Pools", "Governance"];
 
 const DEX = () => {
   useWalletConnection();
   return (
     <ChakraProvider theme={DEXTheme}>
-      <Container color="black" w="100%" minHeight="1600px" maxHeight="100%" maxWidth="100%" bg="#FFFFFF" centerContent>
+      <Container color="black" w="100%" maxHeight="100%" maxWidth="100%" bg="#FFFFFF" marginBottom="5rem" centerContent>
         <Router>
           <TopMenuBar menuOptions={menuOptions}></TopMenuBar>
-          <Routes>
-            <Route path="/" element={<Navigate to="/swap" />} />
-            <Route path="/swap" element={<Swap />} />
-            <Route path="/pool" element={<Pools />} />
-            <Route path="/pool/add-liquidity" element={<AddLiquidity />} />
-            <Route path="/pool/withdraw" element={<Withdraw />} />
-          </Routes>
+          <Flex width="66rem" justifyContent="center">
+            <Routes>
+              <Route path="/" element={<Navigate to="/swap" />} />
+              <Route path="/swap" element={<Swap />} />
+              <Route path="/pools" element={<Pools />} />
+              <Route path="/pools/add-liquidity" element={<AddLiquidity />} />
+              <Route path="/pools/withdraw" element={<Withdraw />} />
+              <Route path="/governance" element={<Governance />} />
+              <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
+              <Route path="/governance/select-proposal-type/new-token" element={<CreateProposal />} />
+              <Route path="/governance/select-proposal-type/text" element={<CreateProposal />} />
+              <Route path="/governance/select-proposal-type/token-transfer" element={<CreateProposal />} />
+              <Route path="/governance/select-proposal-type/contract-upgrade" element={<CreateProposal />} />
+            </Routes>
+          </Flex>
         </Router>
       </Container>
     </ChakraProvider>
