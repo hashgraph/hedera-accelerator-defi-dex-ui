@@ -51,28 +51,28 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
 
   return (
     <Menu>
-      <Flex padding="2rem 1rem" marginBottom="4rem" w="100%">
-        <Box flex="1">
-          <Heading flex="1" as="h1" size="md" fontWeight="900" padding="0.4rem 0">
+      <Flex padding="2rem 1rem" w="100%" alignItems="center">
+        <Box flex="1.5">
+          <Text flex="1" textStyle="h5" padding="0.4rem 0">
             Hedera Open DEX
-          </Heading>
+          </Text>
         </Box>
         <Box flex="1">
           <Center>
-            <HStack spacing="24px">
-              {props.menuOptions.map((menuOption) => {
-                return (
+            {props.menuOptions.map((menuOption) => {
+              return (
+                <Box flex="1">
                   <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
-                    <MenuItem w="auto" fontWeight="500" _hover={{ bg: "gray.600" }}>
-                      {menuOption}
+                    <MenuItem justifyContent="center" _hover={{ bg: "gray.200" }}>
+                      <Text textStyle="b2-bold">{menuOption}</Text>
                     </MenuItem>
                   </RouterLink>
-                );
-              })}
-            </HStack>
+                </Box>
+              );
+            })}
           </Center>
         </Box>
-        <Box flex="1">
+        <Box flex="1.5">
           <Box
             textAlign="right"
             float="right"
@@ -83,16 +83,16 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           >
             <Grid templateColumns="repeat(2, 1fr)">
               <Skeleton padding="0.5em 1em" speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("walletData")}>
-                <Text fontWeight="bold" color="black">
-                  {walletData?.pairedAccountBalance?.hbars ?? "- ℏ"}
-                </Text>
+                <Flex justifyContent="center" alignItems="center">
+                  <Text textStyle="b2-bold">{walletData?.pairedAccountBalance?.hbars ?? "- ℏ"}</Text>
+                </Flex>
               </Skeleton>
               <Popover>
                 <PopoverTrigger>
-                  <Button bg="black" color="white" size="sm" padding="0.5em 1em">
+                  <Button bg="black" color="white" padding="0.5em 1em">
                     <HStack>
                       <Circle size="1em" bg={getConnectionStatusColor()} />
-                      <Text fontWeight="bold" color="white">
+                      <Text textStyle="b2-bold" color="white">
                         {walletData.pairedAccounts[0] ?? "Not Paired"}
                       </Text>
                     </HStack>
@@ -122,9 +122,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                     >
                       <ExternalLinkIcon mx="1px" /> View on Hashscan
                     </Link>
-                    <Button onClick={wallet.clearWalletPairings} variant="secondary">
-                      Disconnect From Wallet
-                    </Button>
+                    <Button onClick={wallet.clearWalletPairings}>Disconnect From Wallet</Button>
                   </VStack>
                 </PopoverContent>
               </Popover>

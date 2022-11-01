@@ -1,11 +1,11 @@
 import { ChakraProvider, Container } from "@chakra-ui/react";
-import { Swap, AddLiquidity, Pools, Withdraw } from "./pages";
+import { Swap, AddLiquidity, Pools, Withdraw, Governance } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import { DEXTheme } from "./styles";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useWalletConnection } from "./hooks";
 
-const menuOptions = ["Swap", "Pool"];
+const menuOptions = ["Swap", "Pools", "Governance"];
 
 const DEX = () => {
   useWalletConnection();
@@ -17,9 +17,10 @@ const DEX = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/swap" />} />
             <Route path="/swap" element={<Swap />} />
-            <Route path="/pool" element={<Pools />} />
-            <Route path="/pool/add-liquidity" element={<AddLiquidity />} />
-            <Route path="/pool/withdraw" element={<Withdraw />} />
+            <Route path="/pools" element={<Pools />} />
+            <Route path="/pools/add-liquidity" element={<AddLiquidity />} />
+            <Route path="/pools/withdraw" element={<Withdraw />} />
+            <Route path="/governance" element={<Governance />} />
           </Routes>
         </Router>
       </Container>

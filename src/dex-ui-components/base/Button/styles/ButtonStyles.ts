@@ -1,5 +1,15 @@
 import { theme, ComponentStyleConfig } from "@chakra-ui/react";
 
+const primary = {
+  bg: "black",
+  color: "white",
+  height: "44px",
+  padding: "16px",
+  borderRadius: "8px",
+  fontWeight: "bold",
+  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+};
+
 /**
  * Base Chakra UI styles and variants for the Hedera DEX Button and IconButton components.
  */
@@ -7,12 +17,11 @@ export const ButtonStyles: ComponentStyleConfig = {
   baseStyle: {},
   variants: {
     primary: {
-      bg: "black",
-      color: "white",
-      height: "44px",
-      padding: "16px",
-      borderRadius: "8px",
-      fontWeight: "bold",
+      ...primary,
+    },
+    "new-proposal": {
+      ...primary,
+      minWidth: "250px",
     },
     "switch-token-inputs": (props) => ({
       ...theme.components.Button.variants?.outline(props),
@@ -33,10 +42,10 @@ export const ButtonStyles: ComponentStyleConfig = {
       height: "fit-content",
       width: "fit-content",
       bg: "transparent",
-      color: "#31A9BD",
       textDecoration: "none",
       fontWeight: "bold",
-      fontSize: "xs",
+      fontSize: "12px",
+      padding: "0",
     },
   },
   defaultProps: {

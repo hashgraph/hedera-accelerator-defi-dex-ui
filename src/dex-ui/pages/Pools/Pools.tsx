@@ -158,7 +158,7 @@ const Pools = (): JSX.Element => {
   const actionNavigation = async (action: "withdraw" | "swap", pool?: string) => {
     if (action === "withdraw") {
       await pools.resetWithdrawState();
-      navigate(`/pool/withdraw?pool=${(pool || "").replace("/", "-")}`);
+      navigate(`/pools/withdraw?pool=${(pool || "").replace("/", "-")}`);
     } else {
       navigate("/swap");
     }
@@ -181,12 +181,12 @@ const Pools = (): JSX.Element => {
                   color={"#3078FF"}
                   mr={"1em"}
                   as={RouterLink}
-                  to={userPool ? "/pool" : "/swap"}
+                  to={userPool ? "/pools" : "/swap"}
                   onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
                 >
                   {userPool ? "Withdraw" : "Swap"}
                 </Link>
-                <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pool/add-liquidity"}>
+                <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pools/add-liquidity"}>
                   Add Liquidity
                 </Link>
               </>
