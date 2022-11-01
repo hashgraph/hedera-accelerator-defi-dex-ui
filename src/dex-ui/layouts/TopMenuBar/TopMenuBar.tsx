@@ -7,7 +7,6 @@ import {
   VStack,
   Grid,
   Box,
-  Heading,
   Text,
   Center,
   Popover,

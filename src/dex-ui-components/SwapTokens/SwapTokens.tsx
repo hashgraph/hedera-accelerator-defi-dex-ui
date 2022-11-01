@@ -11,7 +11,6 @@ import {
   TagCloseButton,
   Link,
   Tag,
-  Skeleton,
 } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";

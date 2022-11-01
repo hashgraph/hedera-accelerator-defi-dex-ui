@@ -78,6 +78,15 @@ export const TextStyles = {
     /* Black */
     color: "black",
   },
+  "b2-medium": {
+    // fontFamily: "Inter",
+    // fontStyle: "normal",
+    fontWeight: "400",
+    fontSize: "16px",
+    lineHeight: "19px",
+    /* Warm Dark Grey */
+    color: "#808080",
+  },
   b2: {
     // fontFamily: "Inter",
     // fontStyle: "normal",

@@ -1,5 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useReducer } from "react";
-import { Box, HStack, Button, Text, Heading, Flex, IconButton, Spacer, Skeleton } from "@chakra-ui/react";
+import { Box, HStack, Button, Heading, Flex, IconButton, Spacer } from "@chakra-ui/react";
 import { ActionType, initialPoolState, initPoolReducer, poolReducer, AddLiquidityState } from "./reducers";
 import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../dex-ui-components/TokenInput";

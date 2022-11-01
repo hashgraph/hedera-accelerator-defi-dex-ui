@@ -1,4 +1,4 @@
-import { Box, useStyleConfig } from "@chakra-ui/react";
+import { Button, useStyleConfig } from "@chakra-ui/react";
 
 export function Card(props: any) {
   const { variant, children, ...rest } = props;
@@ -7,8 +7,8 @@ export function Card(props: any) {
 
   // Pass the computed styles into the `__css` prop
   return (
-    <Box __css={styles} {...rest}>
+    <Button __css={styles} {...rest}>
       {children}
-    </Box>
+    </Button>
   );
 }

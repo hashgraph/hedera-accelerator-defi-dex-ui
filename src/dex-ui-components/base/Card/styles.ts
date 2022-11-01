@@ -7,6 +7,9 @@ import { ComponentStyleConfig } from "@chakra-ui/react";
 export const CardStyles: ComponentStyleConfig = {
   baseStyle: {
     height: "max-content",
+    bg: "white",
+    boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
+    borderRadius: "8px",
   },
   sizes: {},
   variants: {
