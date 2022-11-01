@@ -1,5 +1,6 @@
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
+import { GovernanceState } from "../governanceSlice";
 import { PoolsState } from "../poolsSlice";
 import { SwapState } from "../swapSlice";
 import { WalletState } from "../walletSlice";
@@ -9,7 +10,7 @@ enum AppActionType {
   SET_FEATURES_AS_LOADED = "app/SET_FEATURES_AS_LOADED",
 }
 
-type AppFeatures = keyof WalletState | keyof SwapState | keyof PoolsState;
+type AppFeatures = keyof WalletState | keyof SwapState | keyof PoolsState | keyof GovernanceState;
 
 interface AppState {
   featuresLoading: Set<AppFeatures>;

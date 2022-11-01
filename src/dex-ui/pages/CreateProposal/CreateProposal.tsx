@@ -1,10 +1,12 @@
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, Spacer, Text, VStack } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
+import { useDexContext } from "../../hooks";
 import { AddNewToken } from "./AddNewToken";
 
 // interface CreateProposalProps {}
 
 export const CreateProposal = (props: any) => {
+  const { governance } = useDexContext(({ governance }) => ({ governance }));
   return (
     <VStack alignItems="left" width="100%">
       <Breadcrumb flex="1">
@@ -26,7 +28,13 @@ export const CreateProposal = (props: any) => {
           <Flex flexDirection="row" justifyContent="end" gap="10px">
             <Button variant="seconday">Cancel</Button>
             <Button>Preview</Button>
-            <Button>Publish</Button>
+            <Button
+              onClick={() => {
+                governance.sendCreateNewTokenProposalTransaction();
+              }}
+            >
+              Publish
+            </Button>
           </Flex>
         </Box>
       </Flex>

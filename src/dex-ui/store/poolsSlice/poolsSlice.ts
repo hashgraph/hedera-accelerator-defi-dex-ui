@@ -28,10 +28,7 @@ const initialPoolsStore: PoolsState = {
 };
 
 /**
- * A hook that provides access to functions that fetch transaction and account
- * information from a Hedera managed mirror node.
- * @returns - The state of the mirror node data as well as functions that can be used to fetch
- * the latest mirror node network data.
+ * @returns
  */
 const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
   return {

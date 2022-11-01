@@ -16,7 +16,7 @@ import {
   TOKEN_B_ID,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
-import { AddLiquidityDetails } from "./types";
+import { AddLiquidityDetails, CreateProposalParams } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
 
@@ -217,6 +217,33 @@ function createHederaService() {
 
     console.log(`Swap status: ${transferTokenRx.status}`);
     await pairCurrentPosition(contractId);
+  };
+
+  const createProposal = async ({ targets, fees, calls, description }: CreateProposalParams) => {
+    console.log(`\nCreating proposal `);
+
+    const createProposalParams = new ContractFunctionParameters()
+      .addAddressArray(targets)
+      .addUint256Array(fees)
+      .addBytesArray(calls)
+      .addString(description);
+
+    const createProposalTransaction = new ContractExecuteTransaction()
+      .setContractId(ContractId.fromString("0.0.48634267"))
+      .setFunction("propose", createProposalParams)
+      .setGas(900000)
+      .freezeWith(client);
+
+    const executedTransaction = await createProposalTransaction.execute(client);
+
+    const record = await executedTransaction.getRecord(client);
+    const receipt = await executedTransaction.getReceipt(client);
+
+    const status = receipt.status;
+    const proposalId = record.contractFunctionResult?.getUint256(0);
+    console.log(`Proposal tx status ${status} with proposal id ${proposalId}`);
+
+    return proposalId;
   };
 
   const get100LABTokens = async (
@@ -421,6 +448,7 @@ function createHederaService() {
     removeLiquidity,
     swapTokenA,
     swapTokenB,
+    createProposal,
     getContributorTokenShare,
     getTokenBalances,
     getSpotPrice,

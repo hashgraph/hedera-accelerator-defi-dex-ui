@@ -2,7 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { ContractId } from "@hashgraph/sdk";
 
-export interface AddLiquidityDetails {
+interface AddLiquidityDetails {
   firstTokenAddress: string;
   firstTokenQuantity: BigNumber;
   secondTokenAddress: string;
@@ -11,3 +11,12 @@ export interface AddLiquidityDetails {
   walletAddress: string;
   signer: HashConnectSigner;
 }
+
+interface CreateProposalParams {
+  targets: Array<string>;
+  fees: Array<number>;
+  calls: Array<Uint8Array>;
+  description: string;
+}
+
+export type { AddLiquidityDetails, CreateProposalParams };
