@@ -4,33 +4,33 @@ export function AddNewToken(props: any) {
   return (
     <VStack alignItems="left" gap="10px">
       <FormControl>
-        <Input placeholder="Proposal Title" />
+        <Input variant="form-input" placeholder="Proposal Title" />
       </FormControl>
       <FormControl>
-        <Input placeholder="Description" />
+        <Input variant="form-input" placeholder="Description" />
       </FormControl>
       <FormControl>
-        <Input placeholder="Link to Discussion (Optional)" />
+        <Input variant="form-input" placeholder="Link to Discussion (Optional)" />
       </FormControl>
       <HStack>
         <FormControl>
-          <Input placeholder="Token Name" />
+          <Input variant="form-input" placeholder="Token Name" />
         </FormControl>
         <FormControl>
-          <Input placeholder="Token Symbol" />
+          <Input variant="form-input" placeholder="Token Symbol" />
         </FormControl>
       </HStack>
       <FormControl>
-        <Input placeholder="Link to Token Icon" />
+        <Input variant="form-input" placeholder="Link to Token Icon" />
       </FormControl>
       <FormControl>
-        <Input placeholder="Token Backing Organization" />
+        <Input variant="form-input" placeholder="Token Backing Organization" />
       </FormControl>
       <FormControl>
-        <Input placeholder="Link to Audit Report" />
+        <Input variant="form-input" placeholder="Link to Audit Report" />
       </FormControl>
       <FormControl>
-        <Input placeholder="Lorem ipsum long form question field" />
+        <Input variant="form-input" placeholder="Lorem ipsum long form question field" />
       </FormControl>
     </VStack>
   );

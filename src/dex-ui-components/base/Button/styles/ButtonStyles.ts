@@ -19,6 +19,14 @@ export const ButtonStyles: ComponentStyleConfig = {
     primary: {
       ...primary,
     },
+    secondary: {
+      bg: "white",
+      height: "44px",
+      border: "1px solid #E7E9EB",
+      boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.05)",
+      borderRadius: "8px",
+    },
+    cancel: {},
     "new-proposal": {
       ...primary,
       minWidth: "250px",

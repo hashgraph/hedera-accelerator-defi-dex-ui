@@ -124,7 +124,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         const fees = [0];
         const associateToken = new Uint8Array([255]); //await associateTokenPublicCallData(tokenId);
         const calls = [associateToken];
-        const description = "Create token proposal 3";
+        const description = "Create token proposal 5";
         HederaService.createProposal({ targets, fees, calls, description });
         set(
           ({ governance }) => {

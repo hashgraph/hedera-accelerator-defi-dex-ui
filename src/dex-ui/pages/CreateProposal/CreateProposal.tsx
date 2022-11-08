@@ -22,13 +22,17 @@ export const CreateProposal = (props: any) => {
       <Flex flexDirection="column" alignItems="center">
         <Box width="600px">
           <Text textStyle="h3">Add New Token</Text>
-          <Spacer padding="0.5rem" />
+          <Spacer padding="1rem" />
           <AddNewToken />
-          <Spacer padding="0.5rem" />
+          <Spacer padding="1.5rem" />
           <Flex flexDirection="row" justifyContent="end" gap="10px">
-            <Button variant="seconday">Cancel</Button>
-            <Button>Preview</Button>
+            <Button variant="secondary" padding="10px 27px" height="40px">
+              Preview
+            </Button>
             <Button
+              variant="primary"
+              padding="10px 27px"
+              height="40px"
               onClick={() => {
                 governance.sendCreateNewTokenProposalTransaction();
               }}
