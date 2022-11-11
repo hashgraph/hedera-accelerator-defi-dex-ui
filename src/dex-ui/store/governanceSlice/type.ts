@@ -25,11 +25,15 @@ enum GovernanceActionType {
   SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED",
+  CLEAR_PROPOSAL_TRANSACTION_STATE = "governance/CLEAR_PROPOSAL_TRANSACTION_STATE",
 }
 
 interface ProposalTransacationState {
   status: "init" | "in progress" | "success" | "error";
   successPayload: {
+    proposal: {
+      title: string;
+    };
     transactionResponse: TransactionResponse;
   } | null;
   errorMessage: string;
@@ -41,9 +45,13 @@ interface GovernanceState {
   proposalTransacationState: ProposalTransacationState;
 }
 
+interface sendCreateNewTokenProposalParams {
+  title: string;
+}
 interface GovernanceActions {
   fetchProposals: () => Promise<void>;
-  sendCreateNewTokenProposalTransaction: () => Promise<void>;
+  sendCreateNewTokenProposalTransaction: ({ title }: sendCreateNewTokenProposalParams) => Promise<void>;
+  clearProposalTransactionState: () => void;
 }
 
 type GovernanceStore = GovernanceState & GovernanceActions;

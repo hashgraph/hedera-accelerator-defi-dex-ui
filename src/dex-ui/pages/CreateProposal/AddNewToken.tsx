@@ -1,10 +1,17 @@
 import { FormControl, HStack, Input, VStack } from "@chakra-ui/react";
+import { ChangeEvent } from "react";
 
-export function AddNewToken(props: any) {
+interface NewTokenProps {
+  title: string;
+  handleTitleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}
+
+export function AddNewToken(props: NewTokenProps) {
+  const { title, handleTitleChange } = props;
   return (
     <VStack alignItems="left" gap="10px">
       <FormControl>
-        <Input variant="form-input" placeholder="Proposal Title" />
+        <Input value={title} onChange={handleTitleChange} variant="form-input" placeholder="Proposal Title" />
       </FormControl>
       <FormControl>
         <Input variant="form-input" placeholder="Description" />

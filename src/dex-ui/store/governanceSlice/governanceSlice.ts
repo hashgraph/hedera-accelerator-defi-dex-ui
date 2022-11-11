@@ -1,5 +1,5 @@
-import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { HederaService } from "../../services";
+import { AccountId, ContractId } from "@hashgraph/sdk";
+import { HederaService, WalletService } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { GovernanceActionType, GovernanceSlice, GovernanceState, GovernanceStore, Proposal } from "./type";
 
@@ -113,36 +113,85 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       }
       app.setFeaturesAsLoaded(["proposals"]);
     },
-    sendCreateNewTokenProposalTransaction: async () => {
-      const { context, wallet, app } = get();
-      set({}, false, GovernanceActionType.SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED);
+    sendCreateNewTokenProposalTransaction: async ({ title }) => {
+      const { context, wallet } = get();
+      const { walletData } = wallet;
+      const { network } = context;
+      set(
+        ({ governance }) => {
+          governance.proposalTransacationState = {
+            ...initialGovernanceStore.proposalTransacationState,
+            status: "in progress",
+          };
+          governance.errorMessage = initialGovernanceStore.errorMessage;
+        },
+        false,
+        GovernanceActionType.SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED
+      );
+      const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+      const signer = WalletService.getSigner(provider);
+      /**
+       * All data except for the proposal title is mocked for now. The proposal execution
+       * logic should be computed on the Hedera network in a Smart Contract - not on the front-end.
+       * */
+      const mockContractAddress = ContractId.fromString("0.0.48585457").toSolidityAddress();
+      const targets = [mockContractAddress];
+      const fees = [0];
+      const associateToken = new Uint8Array([255]);
+      const calls = [associateToken];
       try {
-        const tokenId = TokenId.fromString("0.0.48602743");
-
-        const BASE_CONTRACT_ADDRESS = ContractId.fromString("0.0.48585457").toSolidityAddress();
-        const targets = [BASE_CONTRACT_ADDRESS];
-        const fees = [0];
-        const associateToken = new Uint8Array([255]); //await associateTokenPublicCallData(tokenId);
-        const calls = [associateToken];
-        const description = "Create token proposal 5";
-        HederaService.createProposal({ targets, fees, calls, description });
-        set(
-          ({ governance }) => {
-            governance.proposals = mockProposalData;
-          },
-          false,
-          GovernanceActionType.SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED
-        );
+        const result = await HederaService.createProposal({
+          targets,
+          fees,
+          calls,
+          description: title,
+          signer,
+        });
+        if (result !== undefined) {
+          set(
+            ({ governance }) => {
+              governance.proposalTransacationState = {
+                status: "success",
+                successPayload: {
+                  proposal: { title },
+                  transactionResponse: result,
+                },
+                errorMessage: "",
+              };
+              governance.errorMessage = initialGovernanceStore.errorMessage;
+              governance.proposals = mockProposalData;
+            },
+            false,
+            GovernanceActionType.SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED
+          );
+        } else {
+          throw new Error(`Create new proposal execution failed`);
+        }
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         set(
           ({ governance }) => {
+            governance.proposalTransacationState = {
+              status: "error",
+              successPayload: null,
+              errorMessage: errorMessage,
+            };
             governance.errorMessage = errorMessage;
           },
           false,
           GovernanceActionType.SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED
         );
       }
+    },
+    clearProposalTransactionState: () => {
+      set(
+        ({ governance }) => {
+          governance.proposalTransacationState = initialGovernanceStore.proposalTransacationState;
+          governance.errorMessage = initialGovernanceStore.errorMessage;
+        },
+        false,
+        GovernanceActionType.CLEAR_PROPOSAL_TRANSACTION_STATE
+      );
     },
   };
 };

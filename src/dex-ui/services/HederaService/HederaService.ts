@@ -10,6 +10,7 @@ import {
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
+  GOVERNANCE_PROXY_ID,
   TOKEN_A_SYMBOL,
   TOKEN_B_SYMBOL,
   TOKEN_A_ID,
@@ -165,85 +166,22 @@ function createHederaService() {
     console.log(`Swap status: ${transferTokenRx.status}`);
   };
 
-  const swapTokenA = async () => {
-    const tokenAQty = withPrecision(1);
-    const tokenBQty = withPrecision(0);
-    console.log(` Swapping a ${tokenAQty} units of token A from the pool.`);
-    // Need to pass different token B address so that only swap of token A is considered.
-    const mockTokenB = TokenId.fromString("0.0.47646100");
-    const swapToken = await new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(9000000)
-      .setFunction(
-        "swapToken",
-        new ContractFunctionParameters()
-          .addAddress(treasuryId.toSolidityAddress())
-          .addAddress(tokenA)
-          .addAddress(mockTokenB.toSolidityAddress())
-          .addInt256(tokenAQty)
-          .addInt256(tokenBQty)
-      )
-      .freezeWith(client)
-      .sign(treasuryKey);
-    const swapTokenTx = await swapToken.execute(client);
-    const transferTokenRx = await swapTokenTx.getReceipt(client);
-
-    console.log(` Swap status: ${transferTokenRx.status}`);
-    await pairCurrentPosition(contractId);
-  };
-
-  const swapTokenB = async () => {
-    const tokenAQty = withPrecision(0);
-    const tokenBQty = withPrecision(5);
-    console.log(`Swapping a ${tokenBQty} units of token B from the pool.`);
-    //Need to pass different token A address so that only swap of token B is considered.
-    const mockTokenA = TokenId.fromString("0.0.47646100").toSolidityAddress();
-    const swapToken = await new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(2000000)
-      .setFunction(
-        "swapToken",
-        new ContractFunctionParameters()
-          .addAddress(contractId.toSolidityAddress())
-          .addAddress(mockTokenA)
-          .addAddress(tokenB)
-          .addInt64(tokenAQty)
-          .addInt64(tokenBQty)
-      )
-      .freezeWith(client)
-      .sign(treasuryKey);
-    const swapTokenTx = await swapToken.execute(client);
-    const transferTokenRx = await swapTokenTx.getReceipt(client);
-
-    console.log(`Swap status: ${transferTokenRx.status}`);
-    await pairCurrentPosition(contractId);
-  };
-
-  const createProposal = async ({ targets, fees, calls, description }: CreateProposalParams) => {
-    console.log(`\nCreating proposal `);
-
+  const createProposal = async ({ targets, fees, calls, description, signer }: CreateProposalParams) => {
     const createProposalParams = new ContractFunctionParameters()
       .addAddressArray(targets)
       .addUint256Array(fees)
       .addBytesArray(calls)
       .addString(description);
 
-    const createProposalTransaction = new ContractExecuteTransaction()
-      .setContractId(ContractId.fromString("0.0.48634267"))
+    const createProposalTransaction = await new ContractExecuteTransaction()
+      .setContractId(ContractId.fromString(GOVERNANCE_PROXY_ID))
       .setFunction("propose", createProposalParams)
       .setGas(900000)
-      .freezeWith(client);
+      .setNodeAccountIds([new AccountId(3)])
+      .freezeWithSigner(signer);
 
-    const executedTransaction = await createProposalTransaction.execute(client);
-
-    const record = await executedTransaction.getRecord(client);
-    const receipt = await executedTransaction.getReceipt(client);
-
-    const status = receipt.status;
-    const proposalId = record.contractFunctionResult?.getUint256(0);
-    console.log(`Proposal tx status ${status} with proposal id ${proposalId}`);
-
-    return proposalId;
+    const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
+    return proposalTransactionResponse;
   };
 
   const get100LABTokens = async (
@@ -446,8 +384,6 @@ function createHederaService() {
     swapToken,
     addLiquidity,
     removeLiquidity,
-    swapTokenA,
-    swapTokenB,
     createProposal,
     getContributorTokenShare,
     getTokenBalances,

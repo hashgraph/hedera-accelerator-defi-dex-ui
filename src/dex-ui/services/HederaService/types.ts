@@ -17,6 +17,7 @@ interface CreateProposalParams {
   fees: Array<number>;
   calls: Array<Uint8Array>;
   description: string;
+  signer: HashConnectSigner;
 }
 
 export type { AddLiquidityDetails, CreateProposalParams };

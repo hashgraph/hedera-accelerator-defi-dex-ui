@@ -9,18 +9,18 @@ import {
   Tabs,
   Link,
   Text,
-  Tag,
-  TagCloseButton,
   Skeleton,
+  Spacer,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
+import { NotficationTypes, Notification } from "../../../dex-ui-components";
 import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
 import { useDexContext, usePoolsData } from "../../hooks";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Pool, UserPool } from "../../store/poolsSlice";
+import { createHashScanLink } from "../../utils";
 
 export interface FormattedUserPoolDetails {
   name: string;
@@ -199,15 +199,6 @@ const Pools = (): JSX.Element => {
       : [];
   };
 
-  const getHashScanLink = useCallback(() => {
-    const transactionId = pools.withdrawState.successPayload?.transactionResponse.transactionId.toString();
-    const urlFormattedTimestamp = transactionId?.split("@")[1].replace(".", "-");
-    const formattedTransactionId = `${transactionId?.split("@")[0]}-${urlFormattedTimestamp}`;
-    // format: https://hashscan.io/#/testnet/transaction/0.0.34744739-1665448985-817445871
-    // TODO: set testnet/mainnet based on network
-    return `https://hashscan.io/#/testnet/transaction/${formattedTransactionId}`;
-  }, [pools.withdrawState.successPayload]);
-
   return (
     <>
       <Tabs
@@ -217,35 +208,26 @@ const Pools = (): JSX.Element => {
         onChange={(index) => setPoolsParamsState({ ...poolsParamsState, selectedTab: index })}
       >
         {pools.withdrawState.status === "success" && poolsParamsState.showSuccessfulWithdrawalMessage ? (
-          <Tag width={"calc(100%) - 32px"} padding={"8px"} margin={"16px"} backgroundColor={"#00e64d33"}>
-            <Flex width={"100%"} flexWrap={"wrap"}>
-              <Text color={"#000000"}>
-                {`Withdrew ${pools.withdrawState.successPayload?.lpTokenAmount} LP Tokens from 
-                ${pools.withdrawState.successPayload?.lpTokenSymbol} 
-                ${pools.withdrawState.successPayload?.fee} fee Pool.`}
-                &nbsp;
-              </Text>
-              {
-                // TODO: make link to HashScan its own component (also being used in Swap component)}
+          <>
+            <Notification
+              type={NotficationTypes.SUCCESS}
+              message={`Withdrew ${pools.withdrawState.successPayload?.lpTokenAmount} LP Tokens from 
+        ${pools.withdrawState.successPayload?.lpTokenSymbol} 
+        ${pools.withdrawState.successPayload?.fee} fee Pool.`}
+              isLinkShown={true}
+              linkText="View in HashScan"
+              linkRef={createHashScanLink(
+                pools.withdrawState.successPayload?.transactionResponse.transactionId.toString()
+              )}
+              isCloseButtonShown={true}
+              handleClickClose={() =>
+                setPoolsParamsState({ ...poolsParamsState, showSuccessfulWithdrawalMessage: false })
               }
-              <Link
-                width={"fit-content"}
-                display={"flex"}
-                alignItems={"center"}
-                color={"#0180FF"}
-                href={getHashScanLink()}
-                isExternal
-              >
-                <Text textDecoration={"underline"}>View in HashScan</Text> <ExternalLinkIcon />
-              </Link>
-            </Flex>
-            <TagCloseButton
-              color={"#000000"}
-              onClick={() => setPoolsParamsState({ ...poolsParamsState, showSuccessfulWithdrawalMessage: false })}
             />
-          </Tag>
+            <Spacer margin="0.25rem 0rem" />
+          </>
         ) : (
-          ""
+          <></>
         )}
         <TabList
           display={"flex"}

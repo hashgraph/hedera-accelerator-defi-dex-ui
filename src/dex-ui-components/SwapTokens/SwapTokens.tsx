@@ -32,7 +32,15 @@ import {
   setSlippageSetting,
   setTransactionDeadlineSetting,
 } from "./actions/swapActions";
-import { Button, IconButton, MetricLabel, SwapSettingsInput, SwapSettingsInputProps } from "../base";
+import {
+  Button,
+  IconButton,
+  MetricLabel,
+  NotficationTypes,
+  Notification,
+  SwapSettingsInput,
+  SwapSettingsInputProps,
+} from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
@@ -41,6 +49,7 @@ import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks, WalletConnectionStatus } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
+import { createHashScanLink } from "../../dex-ui/utils";
 
 export interface SwapTokensProps {
   title: string;
@@ -368,23 +377,13 @@ const SwapTokens = (props: SwapTokensProps) => {
     });
   }, [localSwapState, swapState]);
 
-  const getHashScanLink = useCallback(() => {
-    const transactionId = transactionState.successPayload?.transactionId.toString();
-    const urlFormattedTimestamp = transactionId?.split("@")[1].replace(".", "-");
-    const formattedTransactionId = `${transactionId?.split("@")[0]}-${urlFormattedTimestamp}`;
-    // format: https://hashscan.io/#/testnet/transaction/0.0.34744739-1665448985-817445871
-    // TODO: set testnet/mainnet based on network
-    return `https://hashscan.io/#/testnet/transaction/${formattedTransactionId}`;
-  }, [transactionState]);
-
   return (
     <ChakraProvider theme={DEXTheme}>
       <Box
         data-testid="swap-component"
         bg="white"
         borderRadius="15px"
-        width="100%"
-        minWidth="496px"
+        width="400px"
         padding="0.5rem 1rem 1rem 1rem"
         boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
       >
@@ -392,30 +391,25 @@ const SwapTokens = (props: SwapTokensProps) => {
         !transactionState.errorMessage &&
         !transactionState.transactionWaitingToBeSigned &&
         localSwapState.showSuccessMessage ? (
-          <Tag width={"100%"} padding={"8px"} marginBottom={"8px"} backgroundColor={"#00e64d33"}>
-            <Flex width={"100%"} flexDirection={"column"}>
-              <Text color={"#000000"}>
-                {`Swapped ${localSwapState.tokenToTradeAmount} ${localSwapState.tokenToTradeSymbol}
-                 for ${localSwapState.tokenToReceiveAmount} ${localSwapState.tokenToReceiveSymbol}`}
-              </Text>
-              <Link
-                width={"fit-content"}
-                display={"flex"}
-                alignItems={"center"}
-                color={"#0180FF"}
-                href={getHashScanLink()}
-                isExternal
-              >
-                <Text textDecoration={"underline"}>View in HashScan</Text> <ExternalLinkIcon />
-              </Link>
-            </Flex>
-            <TagCloseButton
-              color={"#000000"}
-              onClick={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: false })}
+          <>
+            <Spacer margin="0.25rem 0rem" />
+            <Notification
+              type={NotficationTypes.SUCCESS}
+              textStyle={"b3"}
+              message={`Swapped ${Number(localSwapState.tokenToTradeAmount.toFixed(6))} ${
+                localSwapState.tokenToTradeSymbol
+              }
+          for ${Number(localSwapState.tokenToReceiveAmount.toFixed(6))} ${localSwapState.tokenToReceiveSymbol}`}
+              isLinkShown={true}
+              linkText="View in HashScan"
+              linkRef={createHashScanLink(transactionState.successPayload?.transactionId.toString())}
+              isCloseButtonShown={true}
+              handleClickClose={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: false })}
             />
-          </Tag>
+            <Spacer margin="0.5rem 0rem" />
+          </>
         ) : (
-          ""
+          <></>
         )}
         <Flex alignItems={"center"} marginBottom={"8px"}>
           <Heading as="h4" fontWeight="500" size="lg">

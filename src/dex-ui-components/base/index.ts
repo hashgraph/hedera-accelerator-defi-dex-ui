@@ -6,3 +6,4 @@ export * from "./Dialogs";
 export * from "./Labels";
 export * from "./Card";
 export * from "./RadioCard";
+export * from "./Notification";

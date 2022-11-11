@@ -98,7 +98,7 @@ export const SelectProposalType = (props: any) => {
           Continue
         </Button>
         <Spacer padding="0.25rem" />
-        <Button variant="secondary" width="437px">
+        <Button variant="cancel" width="437px" onClick={() => navigate(`/governance`)}>
           Cancel
         </Button>
       </Center>

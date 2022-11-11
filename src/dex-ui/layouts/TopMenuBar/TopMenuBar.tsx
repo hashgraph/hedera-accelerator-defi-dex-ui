@@ -18,6 +18,8 @@ import {
   Skeleton,
   Circle,
   Flex,
+  Spacer,
+  Tag,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useDexContext } from "../../hooks";
@@ -50,17 +52,20 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
 
   return (
     <Menu>
-      <Flex padding="2rem 1rem" w="100%" alignItems="center">
+      <Flex padding="2rem 1rem" marginBottom="3rem" w="100%" alignItems="center">
         <Box flex="1.5">
-          <Text flex="1" textStyle="h5" padding="0.4rem 0">
-            Hedera Open DEX
-          </Text>
+          <HStack spacing="0.5rem">
+            <Text textStyle="h5">Hedera Open DEX</Text>
+            <Tag textStyle="b4" size="sm">
+              Pre-Alpha
+            </Tag>
+          </HStack>
         </Box>
         <Box flex="1">
           <Center>
-            {props.menuOptions.map((menuOption) => {
+            {props.menuOptions.map((menuOption, index) => {
               return (
-                <Box flex="1">
+                <Box flex="1" key={index}>
                   <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
                     <MenuItem justifyContent="center" _hover={{ bg: "gray.200" }}>
                       <Text textStyle="b2-bold">{menuOption}</Text>
@@ -72,20 +77,18 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           </Center>
         </Box>
         <Box flex="1.5">
-          <Box
-            textAlign="right"
-            float="right"
-            borderRadius="8px"
-            backgroundColor="#F2F2F4"
-            minWidth="350px"
-            width="fit-content"
-          >
+          <Box textAlign="right" float="right" borderRadius="8px" backgroundColor="#F2F2F4" width="fit-content">
             <Grid templateColumns="repeat(2, 1fr)">
-              <Skeleton padding="0.5em 1em" speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("walletData")}>
-                <Flex justifyContent="center" alignItems="center">
+              <Flex justifyContent="center" alignItems="center">
+                <Skeleton
+                  padding="0.5em 1em"
+                  speed={0.4}
+                  fadeDuration={0}
+                  isLoaded={!app.isFeatureLoading("walletData")}
+                >
                   <Text textStyle="b2-bold">{walletData?.pairedAccountBalance?.hbars ?? "- ℏ"}</Text>
-                </Flex>
-              </Skeleton>
+                </Skeleton>
+              </Flex>
               <Popover>
                 <PopoverTrigger>
                   <Button bg="black" color="white" padding="0.5em 1em">
