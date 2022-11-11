@@ -1,5 +1,4 @@
-import { RepeatIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalBody, ModalContent, ModalOverlay, Text } from "@chakra-ui/react";
+import { Button, Modal, ModalBody, ModalContent, ModalOverlay, Spacer, Spinner, Text } from "@chakra-ui/react";
 
 interface ButtonConfig {
   text: string;
@@ -14,6 +13,9 @@ interface LoadingDialogProps {
   buttonConfig?: ButtonConfig;
 }
 
+/**
+ * TODO: Add TSDocs
+ */
 const LoadingDialog = (props: LoadingDialogProps) => {
   const { message, isOpen, onClose, width, icon, buttonConfig } = props;
   return (
@@ -26,25 +28,40 @@ const LoadingDialog = (props: LoadingDialogProps) => {
         onClose={onClose ? onClose : () => null}
       >
         <ModalOverlay />
-        <ModalContent width={width ? `${width}px` : "317px"}>
+        <ModalContent
+          width={width ? `${width}px` : "317px"}
+          boxShadow="0px 4px 15px rgba(0, 0, 0, 0.15)"
+          borderRadius="5px"
+        >
           <ModalBody
             width={"100%"}
             display={"flex"}
             flexDirection={"column"}
             justifyContent={"center"}
             alignItems={"center"}
-            padding={"24px 8px"}
+            padding={"1.5rem 0.75rem 0rem"}
           >
-            <>{icon ? icon : <RepeatIcon h={10} w={10} />}</>
-            <Text marginTop={"24px"} fontSize={"18px"} lineHeight={"22px"} textAlign="center">
+            <>
+              {icon ? (
+                icon
+              ) : (
+                <Spinner color="#31A9BD" thickness="4px" speed="0.65s" emptyColor="gray.200" h={10} w={10} />
+              )}
+            </>
+            <Spacer margin="12px" />
+            <Text textStyle="b1" textAlign="center">
               {message}
             </Text>
+            <Spacer margin="8px" />
             {buttonConfig ? (
-              <Button marginTop={"16px"} onClick={buttonConfig.onClick}>
-                {buttonConfig.text}
-              </Button>
+              <>
+                <Button variant="primary" width="256px" onClick={buttonConfig.onClick}>
+                  {buttonConfig.text}
+                </Button>
+                <Spacer margin="8px" />
+              </>
             ) : (
-              ""
+              <></>
             )}
           </ModalBody>
         </ModalContent>

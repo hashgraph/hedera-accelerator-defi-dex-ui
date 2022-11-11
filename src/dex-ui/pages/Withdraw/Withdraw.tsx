@@ -64,7 +64,7 @@ const Withdraw = () => {
       }
     } else {
       // no pool indicated, so redirect to My Pools page
-      navigate("/pool", { state: { withdrawSuccessful: false, selectedTab: 1 } as PoolsLocationProps });
+      navigate("/pools", { state: { withdrawSuccessful: false, selectedTab: 1 } as PoolsLocationProps });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pools]);
@@ -82,7 +82,7 @@ const Withdraw = () => {
     }));
 
     if (pools.withdrawState.status === "success") {
-      navigate("/pool", { state: { withdrawSuccessful: true, selectedTab: 1 } as PoolsLocationProps });
+      navigate("/pools", { state: { withdrawSuccessful: true, selectedTab: 1 } as PoolsLocationProps });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pools.withdrawState]);
