@@ -1,7 +1,15 @@
 import { AccountId, ContractId } from "@hashgraph/sdk";
 import { HederaService, WalletService } from "../../services";
 import { getErrorMessage } from "../../utils";
-import { GovernanceActionType, GovernanceSlice, GovernanceState, GovernanceStore, Proposal } from "./type";
+import { TransactionStatus } from "../appSlice";
+import {
+  GovernanceActionType,
+  GovernanceSlice,
+  GovernanceState,
+  GovernanceStore,
+  Proposal,
+  ProposalStatus,
+} from "./type";
 
 /** TODO: Replace will real data */
 const mockProposalData: Proposal[] = [
@@ -10,7 +18,7 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: "Active",
+    status: ProposalStatus.ACTIVE,
     timeRemaining: "12d 4 hrs",
     voteCount: {
       yes: 123,
@@ -23,7 +31,7 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: "Active",
+    status: ProposalStatus.ACTIVE,
     timeRemaining: "12d 4 hrs",
     voteCount: {
       yes: 123,
@@ -36,7 +44,7 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: "Active",
+    status: ProposalStatus.ACTIVE,
     timeRemaining: "12d 4 hrs",
     voteCount: {
       yes: 123,
@@ -49,7 +57,7 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
     adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: "Passed",
+    status: ProposalStatus.PASSED,
     timeRemaining: "12d 4 hrs",
     voteCount: {
       yes: 123,
@@ -62,7 +70,7 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: "Failed",
+    status: ProposalStatus.FAILED,
     timeRemaining: "6d 4 hrs",
     voteCount: {
       yes: 232,
@@ -76,7 +84,7 @@ const initialGovernanceStore: GovernanceState = {
   proposals: [],
   errorMessage: null,
   proposalTransacationState: {
-    status: "init",
+    status: TransactionStatus.INIT,
     successPayload: null,
     errorMessage: "",
   },
@@ -121,7 +129,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         ({ governance }) => {
           governance.proposalTransacationState = {
             ...initialGovernanceStore.proposalTransacationState,
-            status: "in progress",
+            status: TransactionStatus.IN_PROGRESS,
           };
           governance.errorMessage = initialGovernanceStore.errorMessage;
         },
@@ -151,7 +159,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
           set(
             ({ governance }) => {
               governance.proposalTransacationState = {
-                status: "success",
+                status: TransactionStatus.SUCCESS,
                 successPayload: {
                   proposal: { title },
                   transactionResponse: result,
@@ -172,7 +180,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         set(
           ({ governance }) => {
             governance.proposalTransacationState = {
-              status: "error",
+              status: TransactionStatus.ERROR,
               successPayload: null,
               errorMessage: errorMessage,
             };

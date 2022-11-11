@@ -1,18 +1,7 @@
 import { ChangeEvent, MouseEvent, useCallback, useEffect, useState } from "react";
 import { useImmerReducer } from "use-immer";
-import {
-  ChakraProvider,
-  Box,
-  Heading,
-  Flex,
-  Spacer,
-  Text,
-  Collapse,
-  TagCloseButton,
-  Link,
-  Tag,
-} from "@chakra-ui/react";
-import { SettingsIcon, UpDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { ChakraProvider, Box, Heading, Flex, Spacer, Text, Collapse } from "@chakra-ui/react";
+import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
 import { DEXTheme } from "../../dex-ui/styles";
 import { swapReducer, initialSwapState, initSwapReducer } from "./reducers";

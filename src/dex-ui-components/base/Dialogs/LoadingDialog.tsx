@@ -1,5 +1,4 @@
-import { RepeatIcon } from "@chakra-ui/icons";
-import { Button, Modal, ModalBody, ModalContent, ModalOverlay, Spacer, Text } from "@chakra-ui/react";
+import { Button, Modal, ModalBody, ModalContent, ModalOverlay, Spacer, Spinner, Text } from "@chakra-ui/react";
 
 interface ButtonConfig {
   text: string;
@@ -14,6 +13,9 @@ interface LoadingDialogProps {
   buttonConfig?: ButtonConfig;
 }
 
+/**
+ * TODO: Add TSDocs
+ */
 const LoadingDialog = (props: LoadingDialogProps) => {
   const { message, isOpen, onClose, width, icon, buttonConfig } = props;
   return (
@@ -39,7 +41,13 @@ const LoadingDialog = (props: LoadingDialogProps) => {
             alignItems={"center"}
             padding={"1.5rem 0.75rem 0rem"}
           >
-            <>{icon ? icon : <RepeatIcon color="#31A9BD" h={10} w={10} />}</>
+            <>
+              {icon ? (
+                icon
+              ) : (
+                <Spinner color="#31A9BD" thickness="4px" speed="0.65s" emptyColor="gray.200" h={10} w={10} />
+              )}
+            </>
             <Spacer margin="12px" />
             <Text textStyle="b1" textAlign="center">
               {message}

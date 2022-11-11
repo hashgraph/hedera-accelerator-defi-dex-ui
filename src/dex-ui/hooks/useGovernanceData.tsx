@@ -13,7 +13,7 @@ export const useGovernanceData = () => {
   }, [fetchProposals]);
 
   /**
-   * Fetches all pool data on first load and change of wallet account ID.
+   * Fetches all governance data on first load.
    */
   useEffect(() => {
     fetchGovernanceDataOnLoad();

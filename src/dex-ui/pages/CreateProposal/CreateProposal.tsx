@@ -4,6 +4,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
+import { TransactionStatus } from "../../store/appSlice";
 import { AddNewToken } from "./AddNewToken";
 
 export interface CreateProposalLocationProps {
@@ -18,7 +19,7 @@ export const CreateProposal = (props: any) => {
 
   /**
    * Temporarily managing form values with standard React state.
-   * This should be replaced with Formik.
+   * This should be replaced with Formik in the future.
    * */
   const [title, setTitle] = useState("");
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -26,13 +27,12 @@ export const CreateProposal = (props: any) => {
   };
 
   /**
-   * Hook for listening to the state of new proposal transaction. When a transaction
-   * - is waiting to be signed, a loading dialog is displayed.
-   * - fails, a failure dialog is displayed.
-   * - succeeds, the user is routed the governance page with a success message.
+   * When a new proposal transaction is successful, the user will be redirected to the governance
+   * page. Location props are passed to the governance page to populate the transaction
+   * success message.
    */
   useEffect(() => {
-    if (governance.proposalTransacationState.status === "success") {
+    if (governance.proposalTransacationState.status === TransactionStatus.SUCCESS) {
       const { successPayload } = governance.proposalTransacationState;
       const createProposalLocationProps = {
         state: {
@@ -44,6 +44,7 @@ export const CreateProposal = (props: any) => {
       navigate("/governance", createProposalLocationProps);
       governance.clearProposalTransactionState();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [governance.proposalTransacationState.status]);
 
   return (
@@ -84,11 +85,11 @@ export const CreateProposal = (props: any) => {
         </Flex>
       </VStack>
       <LoadingDialog
-        isOpen={governance.proposalTransacationState.status === "in progress"}
+        isOpen={governance.proposalTransacationState.status === TransactionStatus.IN_PROGRESS}
         message={"Please confirm the proposal creation transaction in your wallet to proceed."}
       />
       <LoadingDialog
-        isOpen={governance.proposalTransacationState.status === "error"}
+        isOpen={governance.proposalTransacationState.status === TransactionStatus.ERROR}
         message={governance.proposalTransacationState.errorMessage ?? ""}
         icon={<WarningIcon color="#EF5C5C" h={10} w={10} />}
         buttonConfig={{

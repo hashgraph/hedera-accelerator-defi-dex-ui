@@ -1,9 +1,20 @@
 import { TransactionResponse, AccountId } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
+import { TransactionStatus } from "../appSlice";
 
-type VotingStatus = "Review" | "Active" | "Queued to Execute" | "Executed";
-type ProposalStatus = "Active" | "Passed" | "Failed";
+enum VotingStatus {
+  REVIEW = "Review",
+  ACTIVE = "Active",
+  QUEUED = "Queued to Execute",
+  EXECUTED = "Executed",
+}
+
+enum ProposalStatus {
+  ACTIVE = "Active",
+  PASSED = "Passed",
+  FAILED = "Failed",
+}
 
 interface Proposal {
   title: string;
@@ -29,7 +40,7 @@ enum GovernanceActionType {
 }
 
 interface ProposalTransacationState {
-  status: "init" | "in progress" | "success" | "error";
+  status: TransactionStatus;
   successPayload: {
     proposal: {
       title: string;
@@ -63,13 +74,5 @@ type GovernanceSlice = StateCreator<
   GovernanceStore
 >;
 
-export { GovernanceActionType };
-export type {
-  GovernanceSlice,
-  GovernanceStore,
-  GovernanceState,
-  GovernanceActions,
-  Proposal,
-  VotingStatus,
-  ProposalStatus,
-};
+export { GovernanceActionType, VotingStatus, ProposalStatus };
+export type { GovernanceSlice, GovernanceStore, GovernanceState, GovernanceActions, Proposal };

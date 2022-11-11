@@ -18,7 +18,6 @@ import {
   Skeleton,
   Circle,
   Flex,
-  Spacer,
   Tag,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";

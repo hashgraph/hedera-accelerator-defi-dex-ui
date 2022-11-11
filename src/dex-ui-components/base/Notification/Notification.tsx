@@ -1,5 +1,5 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { Tag, Text, Flex, Link, TagCloseButton, Box, HStack } from "@chakra-ui/react";
+import { Tag, Text, Flex, Link, TagCloseButton, Box } from "@chakra-ui/react";
 import { useCallback } from "react";
 
 export enum NotficationTypes {
@@ -19,6 +19,10 @@ interface NotificationProps {
   handleClickClose?: () => void;
 }
 
+/**
+ * A component used to communicate to a user a state that affects a system, feature or page.
+ * TODO: Add TSDocs
+ */
 export const Notification = (props: NotificationProps) => {
   const {
     type = NotficationTypes.WARNING,
@@ -43,6 +47,7 @@ export const Notification = (props: NotificationProps) => {
     }
   }, [type]);
 
+  /** The Alert component is most likely prefered over using Tag for this components. */
   return (
     <Tag width="100%" padding="0.5rem" backgroundColor={getNotificationColors()?.bg} borderRadius="5px">
       <Flex flexWrap="wrap" width="100%">

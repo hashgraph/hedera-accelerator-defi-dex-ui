@@ -1,4 +1,4 @@
-import { Box, Center, HStack, Spacer } from "@chakra-ui/react";
+import { Box, Center, HStack } from "@chakra-ui/react";
 import { SwapTokens } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
 import { formatSwapPageData } from "./formatters";

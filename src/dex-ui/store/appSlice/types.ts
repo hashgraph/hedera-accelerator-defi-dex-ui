@@ -5,6 +5,13 @@ import { PoolsState } from "../poolsSlice";
 import { SwapState } from "../swapSlice";
 import { WalletState } from "../walletSlice";
 
+enum TransactionStatus {
+  INIT = "init",
+  IN_PROGRESS = "in progress",
+  SUCCESS = "success",
+  ERROR = "error",
+}
+
 enum AppActionType {
   SET_FEATURES_AS_LOADING = "app/SET_FEATURES_AS_LOADING",
   SET_FEATURES_AS_LOADED = "app/SET_FEATURES_AS_LOADED",
@@ -26,5 +33,5 @@ type AppStore = AppState & AppActions;
 
 type AppSlice = StateCreator<DEXState, [["zustand/devtools", never], ["zustand/immer", never]], [], AppStore>;
 
-export { AppActionType };
+export { AppActionType, TransactionStatus };
 export type { AppSlice, AppStore, AppState, AppActions, AppFeatures };
