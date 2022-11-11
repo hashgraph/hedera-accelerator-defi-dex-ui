@@ -1,89 +1,46 @@
-import { AccountId } from "@hashgraph/sdk";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Text, Button, Flex, Spacer, VStack } from "@chakra-ui/react";
 import { ProposalCard } from "./ProposalCard";
-import { Proposal } from "./types";
-
-/** TODO: Replace will real data */
-const mockProposalData: Proposal[] = [
-  {
-    title: "New Token Proposal 1",
-    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
-      adipiscing elit Phasellus congue, sapien eu...`,
-    author: AccountId.fromString("0.0.34728121"),
-    status: "Active",
-    timeRemaining: "12d 4 hrs",
-    voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
-    },
-  },
-  {
-    title: "New Token Proposal 2",
-    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
-      adipiscing elit Phasellus congue, sapien eu...`,
-    author: AccountId.fromString("0.0.34728121"),
-    status: "Active",
-    timeRemaining: "12d 4 hrs",
-    voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
-    },
-  },
-  {
-    title: "New Token Proposal 5",
-    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
-      adipiscing elit Phasellus congue, sapien eu...`,
-    author: AccountId.fromString("0.0.34728121"),
-    status: "Active",
-    timeRemaining: "12d 4 hrs",
-    voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
-    },
-  },
-  {
-    title: "New Token Proposal 3",
-    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
-    adipiscing elit Phasellus congue, sapien eu...`,
-    author: AccountId.fromString("0.0.34728121"),
-    status: "Passed",
-    timeRemaining: "12d 4 hrs",
-    voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
-    },
-  },
-  {
-    title: "New Token Proposal 4",
-    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
-      adipiscing elit Phasellus congue, sapien eu...`,
-    author: AccountId.fromString("0.0.34728121"),
-    status: "Failed",
-    timeRemaining: "6d 4 hrs",
-    voteCount: {
-      yes: 232,
-      no: 212,
-      abstain: 2203,
-    },
-  },
-];
+import { useDexContext } from "../../hooks";
+import { useGovernanceData } from "../../hooks/useGovernanceData";
+import { useState } from "react";
+import { Notification, NotficationTypes } from "../../../dex-ui-components";
+import { CreateProposalLocationProps } from "../CreateProposal";
+import { createHashScanLink } from "../../utils";
 
 export const Governance = (): JSX.Element => {
+  const { governance } = useDexContext(({ governance }) => ({ governance }));
+  useGovernanceData();
   const navigate = useNavigate();
+  const locationState = useLocation().state as CreateProposalLocationProps;
+  const [shouldShowNotification, setShouldShowNotification] = useState<boolean>(
+    locationState?.isProposalCreationSuccessful ?? false
+  );
 
   return (
     <Flex flexDirection="column" width="100%">
+      {shouldShowNotification ? (
+        <>
+          <Notification
+            type={NotficationTypes.SUCCESS}
+            message={`You have created ${locationState.proposalTitle}`}
+            isLinkShown={true}
+            linkText="View in HashScan"
+            linkRef={createHashScanLink(locationState.proposalTransactionId)}
+            isCloseButtonShown={true}
+            handleClickClose={() => setShouldShowNotification(false)}
+          />
+          <Spacer margin="0.25rem 0rem" />
+        </>
+      ) : (
+        <></>
+      )}
       <Text textStyle="h2">Governance</Text>
       <Spacer margin="1rem" />
       <Text textStyle="h3">Active Proposals</Text>
       <Spacer margin="0.5rem" />
       <VStack>
-        {mockProposalData
+        {governance.proposals
           .filter((proposal) => proposal.status === "Active")
           .map((proposal, index) => (
             <ProposalCard proposal={proposal} key={index} />
@@ -104,7 +61,7 @@ export const Governance = (): JSX.Element => {
       </Flex>
       <Spacer margin="0.5rem" />
       <VStack>
-        {mockProposalData.map((proposal, index) => (
+        {governance.proposals.map((proposal, index) => (
           <ProposalCard proposal={proposal} key={index} />
         ))}
       </VStack>

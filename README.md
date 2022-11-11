@@ -2,6 +2,7 @@
 <h1>
   Hedera DEX UI Accelerator 
 </h1>
+<p>Live App: <b><a href="https://defi-ui.hedera.com">defi-dex</a></b></p>
 <p>Status: <b>POC</b></p>
 <p align="center" style="font-size: 1.2rem;">A DEX (Decentralized Exchange) UI accelerator that operates on the Hedera network. The DEX UI utilizes React primitives from the <a href="https://github.com/hashgraph/hedera-accelerator-defi-dex-ui-components">hedera-accelerator-defi-dex-ui-components</a> UI component library.</p>
 

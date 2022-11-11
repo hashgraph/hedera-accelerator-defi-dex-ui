@@ -15,4 +15,13 @@ export default {
   },
 } as ComponentMeta<typeof Button>;
 
-export const Basic: ComponentStory<typeof Button> = (args) => <Button {...args}>Connect</Button>;
+const Template: ComponentStory<typeof Button> = (args: any) => <Button {...args}>Button</Button>;
+
+export const Primary: ComponentStory<typeof Button> = Template.bind({});
+Primary.args = { variant: "primary" };
+
+export const Secondary: ComponentStory<typeof Button> = Template.bind({});
+Secondary.args = { variant: "Secondary" };
+
+export const Tertiary: ComponentStory<typeof Button> = Template.bind({});
+Tertiary.args = { variant: "tertiary" };

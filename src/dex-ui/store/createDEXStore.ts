@@ -7,6 +7,7 @@ import { createSwapSlice, SwapStore } from "./swapSlice";
 import { createPoolsSlice, PoolsStore } from "./poolsSlice";
 import { DEXProviderProps } from "../context";
 import { DEFAULT_APP_METADATA } from "../context/constants";
+import { createGovernanceSlice, GovernanceStore } from "./governanceSlice";
 
 interface DEXState {
   context: DEXProviderProps;
@@ -14,6 +15,7 @@ interface DEXState {
   wallet: WalletStore;
   swap: SwapStore;
   pools: PoolsStore;
+  governance: GovernanceStore;
 }
 
 type DEXStore = ReturnType<typeof createDEXStore>;
@@ -33,6 +35,7 @@ const createDEXStore = (intialContext: DEXProviderProps) => {
         wallet: { ...createWalletSlice(...params) },
         swap: { ...createSwapSlice(...params) },
         pools: { ...createPoolsSlice(...params) },
+        governance: { ...createGovernanceSlice(...params) },
       }))
     )
   );

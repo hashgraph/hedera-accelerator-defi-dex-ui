@@ -1,0 +1,20 @@
+<!-- Notification.stories.mdx -->
+
+import { Meta, Story, Canvas } from "@storybook/addon-docs";
+
+import { Notification } from "..";
+
+<Meta title="Notification" component={Notification} />
+
+export const Template = (args) => <Notification {...args}>Button</Notification>;
+
+# Notification
+
+With `MDX`, we can define a story for `Notification` right in the middle of our
+Markdown documentation.
+
+<Canvas>
+  <Story name="notification">
+    <Notification />
+  </Story>
+</Canvas>
