@@ -27,9 +27,9 @@ export const CreateProposal = (props: any) => {
     setTitle(event.target.value);
   };
   /**
-     * Temporarily saving the values for new AddNewTextComponent.
-     * This should be replaced with Formik in the future.
-     * */
+   * Temporarily saving the values for new AddNewTextComponent.
+   * This should be replaced with Formik in the future.
+   * */
   const [value, setValue] = useState("");
   const handleValueChange = (event: string) => {
     setValue(event);
