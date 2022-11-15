@@ -67,8 +67,8 @@ export const CreateProposal = (props: CreateProposalProps) => {
       const { successPayload } = governance.proposalTransacationState;
       const createProposalLocationProps = {
         state: {
-          proposalTitle: successPayload?.proposal.title,
-          proposalTransactionId: successPayload?.transactionResponse.transactionId.toString(),
+          proposalTitle: successPayload.proposal?.title,
+          proposalTransactionId: successPayload.transactionResponse?.transactionId.toString(),
           isProposalCreationSuccessful: true,
         } as CreateProposalLocationProps,
       };
@@ -81,6 +81,7 @@ export const CreateProposal = (props: CreateProposalProps) => {
   return (
     <>
       <VStack alignItems="left" width="100%">
+        {/* turn into component */}
         <Breadcrumb flex="1">
           <BreadcrumbItem>
             <BreadcrumbLink as={ReachLink} to="/governance/select-proposal-type">

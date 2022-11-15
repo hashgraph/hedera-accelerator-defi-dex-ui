@@ -51,11 +51,18 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
 
   return (
     <Menu>
-      <Flex padding="2rem 1rem" marginBottom="3rem" w="100%" alignItems="center">
+      <Flex
+        padding="2rem 1rem"
+        marginBottom="3rem"
+        w="100%"
+        height="84px"
+        alignItems="center"
+        borderBottom="0.25px solid #DBDEDF"
+      >
         <Box flex="1.5">
           <HStack spacing="0.5rem">
-            <Text textStyle="h5">Hedera Open DEX</Text>
-            <Tag textStyle="b4" size="sm">
+            <Text textStyle="h3">Hedera Open DEX</Text>
+            <Tag textStyle="b3" size="sm">
               Pre-Alpha
             </Tag>
           </HStack>
@@ -67,7 +74,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                 <Box flex="1" key={index}>
                   <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
                     <MenuItem justifyContent="center" _hover={{ bg: "gray.200" }}>
-                      <Text textStyle="b2-bold">{menuOption}</Text>
+                      <Text textStyle="h3">{menuOption}</Text>
                     </MenuItem>
                   </RouterLink>
                 </Box>
@@ -76,7 +83,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           </Center>
         </Box>
         <Box flex="1.5">
-          <Box textAlign="right" float="right" borderRadius="8px" backgroundColor="#F2F2F4" width="fit-content">
+          <Box textAlign="right" float="right" borderRadius="8px" width="fit-content">
             <Grid templateColumns="repeat(2, 1fr)">
               <Flex justifyContent="center" alignItems="center">
                 <Skeleton
@@ -85,7 +92,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                   fadeDuration={0}
                   isLoaded={!app.isFeatureLoading("walletData")}
                 >
-                  <Text textStyle="b2-bold">{walletData?.pairedAccountBalance?.hbars ?? "- ℏ"}</Text>
+                  <Text textStyle="h3">{walletData?.pairedAccountBalance?.hbars ?? "- ℏ"}</Text>
                 </Skeleton>
               </Flex>
               <Popover>
@@ -93,7 +100,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                   <Button bg="black" color="white" padding="0.5em 1em">
                     <HStack>
                       <Circle size="1em" bg={getConnectionStatusColor()} />
-                      <Text textStyle="b2-bold" color="white">
+                      <Text textStyle="h3" color="white">
                         {walletData.pairedAccounts[0] ?? "Not Paired"}
                       </Text>
                     </HStack>

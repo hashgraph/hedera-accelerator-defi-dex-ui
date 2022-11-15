@@ -7,19 +7,30 @@ import { FormattedProposal } from "./types";
  * @param proposal - The proposal data to be formatted.
  * @returns A formatted version of the proposal data.
  */
-export const formatProposals = (proposal: Proposal): FormattedProposal => {
-  const { title, author, description, status, timeRemaining, state, voteCount } = proposal;
+export const formatProposal = (proposal: Proposal): FormattedProposal => {
+  const { id, title, author, description, status, timeRemaining, state, votes } = proposal;
+  const [yes, no, abstain, quorum, max] = [
+    votes.yes?.toNumber(),
+    votes.no?.toNumber(),
+    votes.abstain?.toNumber(),
+    votes.quorum?.toNumber(),
+    votes.max?.toNumber(),
+  ];
   return {
+    id: id.toString(),
     title,
     author: author.toString(),
     description,
     status,
     timeRemaining: timeRemaining ? formatDuration(timeRemaining) : undefined,
     state,
-    voteCount: {
-      yes: voteCount.yes?.toNumber(),
-      no: voteCount.no?.toNumber(),
-      abstain: voteCount.abstain?.toNumber(),
+    votes: {
+      yes,
+      no,
+      abstain,
+      quorum,
+      remaining: Number(max) - (Number(yes) + Number(no) + Number(abstain)),
+      max,
     },
   };
 };

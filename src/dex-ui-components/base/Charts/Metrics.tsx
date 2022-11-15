@@ -1,27 +1,32 @@
-import { chakra, Circle, Flex, HStack, Text } from "@chakra-ui/react";
+import { chakra, Circle, Flex, Grid, GridItem, Text, VStack } from "@chakra-ui/react";
 
 interface Metric {
-  /** The label prop can be re-used for the next UI iteration. */
-  label?: string;
+  label: string;
   value: number;
   color: string;
 }
 
 interface MetricsProps {
   data: Metric[];
+  rows: number;
 }
 
 const MetricsBase = (props: MetricsProps) => {
-  const { data } = props;
+  const { data, rows } = props;
   return (
-    <Flex>
+    <Grid templateColumns={`repeat(${data.length}, 1fr)`} gap="4">
       {data.map((metric, index) => (
-        <HStack flex="1" key={index}>
-          <Circle size="1em" bg={metric.color} />
-          <Text>{metric.value}</Text>
-        </HStack>
+        <GridItem key={index} colSpan={rows}>
+          <Flex gap="2">
+            <Circle size="1em" bg={metric.color} />
+            <VStack alignItems="left">
+              <Text textStyle="h4">{metric.label}</Text>
+              <Text textStyle="h2">{metric.value}</Text>
+            </VStack>
+          </Flex>
+        </GridItem>
       ))}
-    </Flex>
+    </Grid>
   );
 };
 

@@ -79,11 +79,11 @@ export const SelectProposalType = (props: any) => {
             return (
               <RadioCard key={index} {...radio} flex="1" padding="0.75rem">
                 <Center flexDirection="column">
-                  <Text textStyle="h4">{option.type}</Text>
+                  <Text textStyle="h3">{option.type}</Text>
                   <Spacer padding="0.5rem" />
                   <Circle size="3em" bg={option.iconColor} />
                   <Spacer padding="0.5rem" />
-                  <Text textStyle="b2-medium">{option.description}</Text>
+                  <Text textStyle="b2">{option.description}</Text>
                   <Spacer padding="0.25rem" />
                 </Center>
               </RadioCard>

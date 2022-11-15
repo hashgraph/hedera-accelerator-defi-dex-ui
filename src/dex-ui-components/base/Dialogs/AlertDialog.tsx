@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { cloneElement, useEffect, useRef } from "react";
 import {
+  chakra,
   Button,
-  AlertDialog,
+  AlertDialog as ChakraAlertDialog,
   AlertDialogOverlay,
   AlertDialogContent,
   AlertDialogHeader,
@@ -12,10 +13,14 @@ import {
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 
-interface AlertDialogComponentProps {
+interface AlertDialogProps {
   title: string;
-  children: React.ReactNode;
+  body?: React.ReactNode;
+  footer?: React.ReactElement;
+  children?: React.ReactNode;
+  openDialogButtonStyles?: any;
   openDialogButtonText: string; // trigger to open dialog
+  isOpenDialogButtonDisabled?: boolean;
   alertDialogOpen?: boolean; // use this to programtically open/close dialog
   onAlertDialogOpen?: () => void;
   onAlertDialogClose?: () => void;
@@ -24,9 +29,9 @@ interface AlertDialogComponentProps {
 }
 
 /**
- * <AlertDialogComponent>
+ * <AlertDialog>
  *  Content to be displayed in dialog body
- * </AlertDialogComponent>
+ * </AlertDialog>
  *
  * Usage note:
  * This component has built in functionality to open the AlertDialog on click of the trigger and to close
@@ -37,19 +42,19 @@ interface AlertDialogComponentProps {
  * (onAlertDialogOpen, onAlertdialogClose) for when the dialog is opened and closed, which should help with
  * dynamic state management of opening and closing
  */
-const AlertDialogComponent = (props: AlertDialogComponentProps) => {
+const AlertDialogBase = (props: AlertDialogProps) => {
   const {
     title,
-    children,
+    body,
+    footer,
+    openDialogButtonStyles,
     openDialogButtonText,
+    isOpenDialogButtonDisabled,
     alertDialogOpen,
     onAlertDialogOpen,
     onAlertDialogClose,
-    modalButtonText,
-    onModalButtonClick,
   } = props;
   const cancelRef = useRef<any>();
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   useEffect(() => {
     // For programatically opening/closing dialog
@@ -78,10 +83,10 @@ const AlertDialogComponent = (props: AlertDialogComponentProps) => {
 
   return (
     <>
-      <Button onClick={openDialog} marginTop="0.5rem">
+      <Button sx={openDialogButtonStyles} isDisabled={isOpenDialogButtonDisabled} textStyle="h3" onClick={openDialog}>
         {openDialogButtonText}
       </Button>
-      <AlertDialog
+      <ChakraAlertDialog
         motionPreset="slideInBottom"
         leastDestructiveRef={cancelRef}
         onClose={onClose}
@@ -89,27 +94,24 @@ const AlertDialogComponent = (props: AlertDialogComponentProps) => {
         isCentered
       >
         <AlertDialogOverlay />
-        <AlertDialogContent width={"370px"}>
-          <AlertDialogHeader padding={"16px"} display={"flex"} justifyContent={"space-between"} alignItems={"center"}>
-            <Text fontSize={"24px"} lineHeight={"29px"} fontWeight={"400"}>
-              {title}
-            </Text>
-            <CloseIcon w={4} h={4} onClick={closeDialog} cursor={"pointer"} />
+        <AlertDialogContent
+          width="370px"
+          gap="20px"
+          padding="20px"
+          boxShadow="0px 4px 15px rgba(0, 0, 0, 0.15)"
+          borderRadius="2px"
+        >
+          <AlertDialogHeader padding="0" display="flex" justifyContent="space-between" alignItems="center">
+            <Text textStyle="h3">{title}</Text>
+            <CloseIcon textStyle="h3" w="3" h="3" onClick={closeDialog} cursor="pointer" />
           </AlertDialogHeader>
-          <AlertDialogBody padding={"0 16px"}>{children}</AlertDialogBody>
-          <AlertDialogFooter padding={"16px"}>
-            {modalButtonText ? (
-              <Button width={"100%"} ref={cancelRef} onClick={onModalButtonClick}>
-                {modalButtonText}
-              </Button>
-            ) : (
-              ""
-            )}
-          </AlertDialogFooter>
+          <AlertDialogBody padding="0">{body}</AlertDialogBody>
+          <AlertDialogFooter padding="0">{footer ? cloneElement(footer, { ref: cancelRef }) : <></>}</AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </ChakraAlertDialog>
     </>
   );
 };
 
-export { AlertDialogComponent };
+const AlertDialog = chakra(AlertDialogBase);
+export { AlertDialog };

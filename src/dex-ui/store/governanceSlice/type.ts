@@ -10,6 +10,9 @@ enum ProposalStatus {
   Failed = "Failed",
 }
 
+/**
+ * The current Governor contract only utilizes three states: Active, Defeated, and Executed.
+ */
 enum ContractProposalState {
   Pending,
   Active,
@@ -33,16 +36,19 @@ enum ProposalState {
 }
 
 interface Proposal {
+  id: BigNumber;
   title: string | undefined;
   author: AccountId;
   description: string;
   status: ProposalStatus | undefined;
   timeRemaining: BigNumber | undefined;
   state: ProposalState | undefined;
-  voteCount: {
+  votes: {
     yes: BigNumber | undefined;
     no: BigNumber | undefined;
     abstain: BigNumber | undefined;
+    quorum: BigNumber | undefined;
+    max: BigNumber | undefined;
   };
 }
 
@@ -53,17 +59,21 @@ enum GovernanceActionType {
   SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED",
+  SEND_VOTE_STARTED = "governance/SEND_VOTE_STARTED",
+  SEND_VOTE_SUCCEEDED = "governance/SEND_VOTE_SUCCEEDED",
+  SEND_VOTE_FAILED = "governance/SEND_VOTE_FAILED",
+  SIGN_TRANSACTION = "governance/SIGN_TRANSACTION",
   CLEAR_PROPOSAL_TRANSACTION_STATE = "governance/CLEAR_PROPOSAL_TRANSACTION_STATE",
 }
 
 interface ProposalTransacationState {
   status: TransactionStatus;
   successPayload: {
-    proposal: {
+    proposal?: {
       title: string;
     };
-    transactionResponse: TransactionResponse;
-  } | null;
+    transactionResponse: TransactionResponse | null;
+  };
   errorMessage: string;
 }
 
@@ -77,6 +87,8 @@ interface sendCreateNewTokenProposalParams {
   title: string;
 }
 interface GovernanceActions {
+  castVote: (proposalId: string, voteType: number) => Promise<void>;
+  fetchProposal: (proposalId: string) => Proposal | undefined;
   fetchProposals: () => Promise<void>;
   sendCreateNewTokenProposalTransaction: ({ title }: sendCreateNewTokenProposalParams) => Promise<void>;
   clearProposalTransactionState: () => void;

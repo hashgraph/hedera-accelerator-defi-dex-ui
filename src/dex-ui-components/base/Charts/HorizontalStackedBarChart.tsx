@@ -1,4 +1,5 @@
-import { chakra, Box, Flex } from "@chakra-ui/react";
+import { chakra, Text, Box, Flex } from "@chakra-ui/react";
+import { Color } from "../../themes";
 
 interface HorizontalStackedBar {
   value: number;
@@ -7,11 +8,12 @@ interface HorizontalStackedBar {
 
 interface HorizontalSStackedBarChartProps {
   data: HorizontalStackedBar[];
-  height?: string;
+  quorum?: number;
+  height?: number;
 }
 
 const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => {
-  const { data, height = "15px" } = props;
+  const { data, quorum, height = 12 } = props;
 
   const getTotalValue = (): number => {
     return data.reduce((total: number, bar: HorizontalStackedBar) => {
@@ -24,7 +26,21 @@ const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => 
   };
 
   return (
-    <Flex borderRadius="20px" overflow="hidden" height={height}>
+    <Flex position="relative" borderRadius="20px" height={`${height}px`}>
+      <Flex
+        position="absolute"
+        left={`${quorum}%`}
+        direction="column"
+        alignItems="center"
+        transform="translateY(-22px)"
+      >
+        <Box bg={Color.Black_01} padding="0.125rem 0.25rem">
+          <Text textStyle="h4" color={Color.White_01}>
+            {quorum}%
+          </Text>
+        </Box>
+        <Box width="0" border={`1px solid ${Color.Black_01}`} height={`${height + 5}px`} />
+      </Flex>
       {data.map((bar: HorizontalStackedBar, index) => {
         return <Box width={computeBarWidthPercent(bar.value)} bg={bar.bg} key={index}></Box>;
       })}
