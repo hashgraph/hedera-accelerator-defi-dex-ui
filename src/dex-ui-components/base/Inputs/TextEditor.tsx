@@ -1,6 +1,6 @@
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { chakra } from '@chakra-ui/react'
+import { chakra } from "@chakra-ui/react";
 import { customTextEditorStyles } from "./styles/TextEditorStyles";
 interface NewTokenProps {
   placeholder: string;
