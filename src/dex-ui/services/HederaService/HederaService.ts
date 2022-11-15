@@ -1,4 +1,5 @@
 import { BigNumber } from "bignumber.js";
+import Web3 from "web3";
 import {
   AccountId,
   TokenId,
@@ -20,6 +21,7 @@ import {
 import { AddLiquidityDetails, CreateProposalParams } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
+import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -166,6 +168,49 @@ function createHederaService() {
     console.log(`Swap status: ${transferTokenRx.status}`);
   };
 
+  /**
+   * Decodes event contents using the ABI definition of the event
+   * @param eventName - the name of the event
+   * @param log - log data as a Hex string
+   * @param topics - an array of event topics
+   */
+  const decodeEvent = (eventName: any, log: any, topics: any) => {
+    const web3 = new Web3();
+
+    const abi = govenorAbi.abi;
+    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
+    console.log(eventAbi);
+    if (eventAbi?.inputs === undefined) {
+      return undefined;
+    }
+    const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, log, topics);
+    return decodedLog;
+  };
+
+  const getEventsFromRecord = (record: any, eventName: string): Promise<Array<any>> => {
+    console.log(`\nGetting event(s) `);
+
+    // the events from the function call are in record.contractFunctionResult.logs.data
+    // let's parse the logs using web3.js
+    // there may be several log entries
+    return record.map((log: any) => {
+      // convert the log.data (uint8Array) to a string
+      const logStringHex = "0x".concat(Buffer.from(log.data).toString("hex"));
+
+      // get topics from log
+      const logTopics: Array<string> = [];
+      log.topics.forEach((topic: string) => {
+        logTopics.push("0x".concat(Buffer.from(topic).toString("hex")));
+      });
+
+      // decode the event data
+      const event = decodeEvent(eventName, logStringHex, logTopics.slice(1));
+
+      // output the from address stored in the event
+      return event;
+    });
+  };
+
   const createProposal = async ({ targets, fees, calls, description, signer }: CreateProposalParams) => {
     const createProposalParams = new ContractFunctionParameters()
       .addAddressArray(targets)
@@ -182,6 +227,37 @@ function createHederaService() {
 
     const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
     return proposalTransactionResponse;
+  };
+
+  const getProposalState = async (proposalId: any) => {
+    const contractCallParams = new ContractFunctionParameters().addUint256(proposalId);
+    const proposalStateContractCall = new ContractExecuteTransaction()
+      .setContractId(ContractId.fromString(GOVERNANCE_PROXY_ID))
+      .setGas(1000000)
+      .setFunction("state", contractCallParams)
+      .freezeWith(client);
+
+    const response = await proposalStateContractCall.execute(client);
+    const record = await response.getRecord(client);
+    const proposalStatus = record.contractFunctionResult?.getUint256(0);
+    console.log("contract message: " + proposalStatus);
+    return proposalStatus;
+  };
+
+  const getProposalVotes = async (proposalId: any) => {
+    const contractCallParams = new ContractFunctionParameters().addUint256(proposalId);
+    const proposalVotesContractCall = new ContractExecuteTransaction()
+      .setContractId(ContractId.fromString(GOVERNANCE_PROXY_ID))
+      .setGas(1000000)
+      .setFunction("proposalVotes", contractCallParams)
+      .freezeWith(client);
+    const response = await proposalVotesContractCall.execute(client);
+    const record = await response.getRecord(client);
+    const againstVotes = record.contractFunctionResult?.getInt256(0);
+    const forVotes = record.contractFunctionResult?.getInt256(1);
+    const abstainVotes = record.contractFunctionResult?.getInt256(2);
+    console.log("contract message: " + { againstVotes, forVotes, abstainVotes });
+    return { againstVotes, forVotes, abstainVotes };
   };
 
   const get100LABTokens = async (
@@ -290,7 +366,9 @@ function createHederaService() {
       .setFunction("getSpotPrice")
       .freezeWith(client);
     const getSpotPriceTransaction = await getSpotPrice.execute(client);
+    console.log(getSpotPriceTransaction);
     const response = await getSpotPriceTransaction.getRecord(client);
+    console.log(response);
     const spotPrice = response.contractFunctionResult?.getInt64(0);
     return spotPrice;
   };
@@ -385,6 +463,8 @@ function createHederaService() {
     addLiquidity,
     removeLiquidity,
     createProposal,
+    getProposalState,
+    getProposalVotes,
     getContributorTokenShare,
     getTokenBalances,
     getSpotPrice,

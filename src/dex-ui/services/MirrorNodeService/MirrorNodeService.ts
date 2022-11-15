@@ -1,4 +1,5 @@
 import axios from "axios";
+import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
 import {
@@ -17,6 +18,7 @@ import {
   MirrorNodeTransaction,
   TokenPair,
 } from "./types";
+import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -163,12 +165,82 @@ function createMirrorNodeService() {
     });
   };
 
+  /**
+   * Decodes event contents using the ABI definition of the event
+   * @param eventName - the name of the event
+   * @param log - log data as a Hex string
+   * @param topics - an array of event topics
+   */
+  const decodeEvent = (eventName: any, log: any, topics: any) => {
+    const web3 = new Web3();
+    const abi = govenorAbi.abi;
+    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
+    if (eventAbi?.inputs === undefined) {
+      return undefined;
+    }
+    try {
+      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, log, topics);
+      return decodedLog;
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
+  };
+
+  const fetchAllProposals = async (contractId: string): Promise<any> => {
+    /*
+     const response = await fetchNextBatch<{ logs: [] }>(
+      `/api/v1/contracts/${contractId.toString()}/results/logs`,
+      "logs",
+      {
+        params: {
+          order: "desc",
+        },
+      }
+    );
+    */
+
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+      params: {
+        order: "desc",
+        limit: 3,
+      },
+    });
+
+    console.log(response);
+    const proposalsCreated = response.data.logs
+      .map((log: any) => {
+        return decodeEvent("ProposalCreated", log.data, log.topics.slice(1));
+      })
+      .filter((proposal: any) => proposal !== undefined)
+      .map((proposal: any) => ({ ...proposal, status: "Active" }));
+
+    const proposalsExecuted = response.data.logs
+      .map((log: any) => {
+        return decodeEvent("ProposalExecuted", log.data, log.topics.slice(1));
+      })
+      .filter((proposal: any) => proposal !== undefined)
+      .map((proposal: any) => ({ ...proposal, status: "Passed" }));
+
+    const proposalsCanceled = response.data.logs
+      .map((log: any) => {
+        return decodeEvent("ProposalCanceled", log.data, log.topics.slice(1));
+      })
+      .filter((proposal: any) => proposal !== undefined)
+      .map((proposal: any) => ({ ...proposal, status: "Failed" }));
+
+    const proposals = [...proposalsCreated, ...proposalsExecuted, ...proposalsCanceled];
+    console.log(proposals);
+    return proposals;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenPairs,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
+    fetchAllProposals,
   };
 }
 

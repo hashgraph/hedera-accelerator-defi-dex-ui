@@ -1,25 +1,43 @@
+import { GOVERNANCE_PROXY_ID } from "./../../services/constants";
 import { AccountId, ContractId } from "@hashgraph/sdk";
-import { HederaService, WalletService } from "../../services";
+import { HederaService, WalletService, MirrorNodeService } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { TransactionStatus } from "../appSlice";
 import {
+  ContractProposalState,
   GovernanceActionType,
   GovernanceSlice,
   GovernanceState,
   GovernanceStore,
   Proposal,
+  ProposalState,
   ProposalStatus,
 } from "./type";
 
 /** TODO: Replace will real data */
 const mockProposalData: Proposal[] = [
   {
+    title: "New Token Proposal 8",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+      adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Active,
+    timeRemaining: "12d 4 hrs",
+    state: ProposalState[ProposalState.Pending],
+    voteCount: {
+      yes: 123,
+      no: 462,
+      abstain: 3000,
+    },
+  },
+  {
     title: "New Token Proposal 1",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.ACTIVE,
+    status: ProposalStatus.Active,
     timeRemaining: "12d 4 hrs",
+    state: ProposalState.Succeeded,
     voteCount: {
       yes: 123,
       no: 462,
@@ -31,8 +49,9 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.ACTIVE,
+    status: ProposalStatus.Active,
     timeRemaining: "12d 4 hrs",
+    state: ProposalState.Active,
     voteCount: {
       yes: 123,
       no: 462,
@@ -44,8 +63,37 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.ACTIVE,
+    status: ProposalStatus.Passed,
     timeRemaining: "12d 4 hrs",
+    state: ProposalState.Queued,
+    voteCount: {
+      yes: 123,
+      no: 462,
+      abstain: 3000,
+    },
+  },
+  {
+    title: "New Token Proposal 6",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+      adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Passed,
+    timeRemaining: "12d 4 hrs",
+    state: ProposalState.Executed,
+    voteCount: {
+      yes: 123,
+      no: 462,
+      abstain: 3000,
+    },
+  },
+  {
+    title: "New Token Proposal 9",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+      adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Passed,
+    timeRemaining: "12d 4 hrs",
+    state: ProposalState.Succeeded,
     voteCount: {
       yes: 123,
       no: 462,
@@ -57,8 +105,9 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
     adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.PASSED,
+    status: ProposalStatus.Failed,
     timeRemaining: "12d 4 hrs",
+    state: ProposalState.Defeated,
     voteCount: {
       yes: 123,
       no: 462,
@@ -70,8 +119,23 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.FAILED,
+    status: ProposalStatus.Failed,
     timeRemaining: "6d 4 hrs",
+    state: ProposalState.Canceled,
+    voteCount: {
+      yes: 232,
+      no: 212,
+      abstain: 2203,
+    },
+  },
+  {
+    title: "New Token Proposal 7",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+        adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Failed,
+    timeRemaining: "6d 4 hrs",
+    state: ProposalState.Expired,
     voteCount: {
       yes: 232,
       no: 212,
@@ -102,9 +166,35 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       app.setFeaturesAsLoading(["proposals"]);
       set({}, false, GovernanceActionType.FETCH_PROPOSALS_STARTED);
       try {
+        const proposals = await MirrorNodeService.fetchAllProposals(GOVERNANCE_PROXY_ID);
+        const formattedProposal = await Promise.all(
+          proposals.map(async (proposal: any) => {
+            const { proposalId, description, proposer } = proposal;
+            const state = await HederaService.getProposalState(proposalId);
+            const votes = await HederaService.getProposalVotes(proposalId);
+            const proposalState = state
+              ? (ContractProposalState[state?.toNumber()] as keyof typeof ContractProposalState)
+              : undefined;
+            return {
+              title: description,
+              description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+            adipiscing elit Phasellus congue, sapien eu...`,
+              author: proposer ? AccountId.fromSolidityAddress(proposer) : AccountId.fromString("0.0.34728121"),
+              status: proposal.status,
+              timeRemaining: "12d 4 hrs",
+              state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
+              voteCount: {
+                yes: votes.forVotes?.toNumber(),
+                no: votes.againstVotes?.toNumber(),
+                abstain: votes.abstainVotes?.toNumber(),
+              },
+            };
+          })
+        );
+        console.log(formattedProposal.concat(mockProposalData));
         set(
           ({ governance }) => {
-            governance.proposals = mockProposalData;
+            governance.proposals = formattedProposal.concat(mockProposalData);
           },
           false,
           GovernanceActionType.FETCH_PROPOSALS_SUCCEEDED

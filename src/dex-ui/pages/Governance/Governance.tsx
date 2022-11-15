@@ -37,18 +37,8 @@ export const Governance = (): JSX.Element => {
       )}
       <Text textStyle="h2">Governance</Text>
       <Spacer margin="1rem" />
-      <Text textStyle="h3">Active Proposals</Text>
-      <Spacer margin="0.5rem" />
-      <VStack>
-        {governance.proposals
-          .filter((proposal) => proposal.status === "Active")
-          .map((proposal, index) => (
-            <ProposalCard proposal={proposal} key={index} />
-          ))}
-      </VStack>
-      <Spacer margin="1rem" />
       <Flex direction="row" alignItems="center">
-        <Text textStyle="h3">All Proposals</Text>
+        <Text textStyle="h3">Active Proposals</Text>
         <Spacer />
         <Button
           variant="new-proposal"
@@ -61,9 +51,23 @@ export const Governance = (): JSX.Element => {
       </Flex>
       <Spacer margin="0.5rem" />
       <VStack>
-        {governance.proposals.map((proposal, index) => (
-          <ProposalCard proposal={proposal} key={index} />
-        ))}
+        {governance.proposals
+          .filter((proposal) => proposal.status === "Active")
+          .map((proposal, index) => (
+            <ProposalCard proposal={proposal} key={index} />
+          ))}
+      </VStack>
+      <Spacer margin="1rem" />
+
+      <Text textStyle="h3">All Proposals</Text>
+
+      <Spacer margin="0.5rem" />
+      <VStack>
+        {governance.proposals
+          .filter((proposal) => proposal.status === "Passed" || proposal.status === "Failed")
+          .map((proposal, index) => (
+            <ProposalCard proposal={proposal} key={index} />
+          ))}
       </VStack>
     </Flex>
   );

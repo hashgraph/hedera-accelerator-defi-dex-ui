@@ -1,7 +1,5 @@
 import { AccountId } from "@hashgraph/sdk";
-
-type VotingStatus = "Review" | "Active" | "Queued to Execute" | "Executed";
-type ProposalStatus = "Active" | "Passed" | "Failed";
+import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
 
 interface Proposal {
   title: string;
@@ -9,6 +7,7 @@ interface Proposal {
   description: string;
   status: ProposalStatus;
   timeRemaining: string;
+  state: ProposalState;
   voteCount: {
     yes: number;
     no: number;
@@ -16,4 +15,4 @@ interface Proposal {
   };
 }
 
-export type { Proposal, VotingStatus, ProposalStatus };
+export type { Proposal, ProposalStatus };

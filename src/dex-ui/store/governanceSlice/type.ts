@@ -3,17 +3,32 @@ import { StateCreator } from "zustand";
 import { DEXState } from "..";
 import { TransactionStatus } from "../appSlice";
 
-enum VotingStatus {
-  REVIEW = "Review",
-  ACTIVE = "Active",
-  QUEUED = "Queued to Execute",
-  EXECUTED = "Executed",
+enum ProposalStatus {
+  Active = "Active",
+  Passed = "Passed",
+  Failed = "Failed",
 }
 
-enum ProposalStatus {
-  ACTIVE = "Active",
-  PASSED = "Passed",
-  FAILED = "Failed",
+enum ContractProposalState {
+  Pending,
+  Active,
+  Canceled,
+  Defeated,
+  Succeeded,
+  Queued,
+  Expired,
+  Executed,
+}
+
+enum ProposalState {
+  Pending = "Pending",
+  Active = "Active",
+  Canceled = "Canceled",
+  Defeated = "Defeated",
+  Succeeded = "Succeeded",
+  Queued = "Queued",
+  Expired = "Expired",
+  Executed = "Executed",
 }
 
 interface Proposal {
@@ -22,6 +37,7 @@ interface Proposal {
   description: string;
   status: ProposalStatus;
   timeRemaining: string;
+  state: ProposalState;
   voteCount: {
     yes: number;
     no: number;
@@ -74,5 +90,5 @@ type GovernanceSlice = StateCreator<
   GovernanceStore
 >;
 
-export { GovernanceActionType, VotingStatus, ProposalStatus };
+export { GovernanceActionType, ContractProposalState, ProposalState, ProposalStatus };
 export type { GovernanceSlice, GovernanceStore, GovernanceState, GovernanceActions, Proposal };
