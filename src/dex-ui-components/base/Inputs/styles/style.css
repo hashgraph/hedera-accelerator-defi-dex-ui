@@ -27,10 +27,9 @@
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
-  padding: 5px;
 }
 
-.quill > .ql-container > .ql-editor.ql-blank::before {
+.quill>.ql-container>.ql-editor.ql-blank::before {
   font-size: 16px;
   line-height: 19px;
   font-weight: 400;
