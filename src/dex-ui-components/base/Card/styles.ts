@@ -14,9 +14,10 @@ export const CardStyles: ComponentStyleConfig = {
   sizes: {},
   variants: {
     "proposal-card": {
-      bg: "white",
+      bg: "#FFFFFF",
       boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
-      borderRadius: "8px",
+      border: "0.25px solid #DBDEDF",
+      borderRadius: "0px",
       width: "100%",
     },
   },

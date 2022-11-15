@@ -37,8 +37,8 @@ export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
 export const USDC_TOKEN_ID = "0.0.2276691";
 
 export const GOVERNOR_PROXY_CONTRACT = {
-  StringId: "0.0.48634267",
-  ContractId: ContractId.fromString("0.0.48634267"),
+  StringId: "0.0.48954588",
+  ContractId: ContractId.fromString("0.0.48954588"),
 };
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([

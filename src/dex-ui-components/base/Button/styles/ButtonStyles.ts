@@ -1,12 +1,12 @@
 import { theme, ComponentStyleConfig } from "@chakra-ui/react";
+import { Color } from "../../../themes";
 
 const primary = {
-  bg: "black",
+  bg: Color.Teal_01,
   color: "white",
   height: "44px",
   padding: "16px",
-  borderRadius: "8px",
-  fontWeight: "bold",
+  borderRadius: "2px",
   boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
 };
 
@@ -20,11 +20,11 @@ export const ButtonStyles: ComponentStyleConfig = {
       ...primary,
     },
     secondary: {
-      bg: "white",
+      bg: Color.White_01,
       height: "44px",
-      border: "1px solid #E7E9EB",
-      boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.05)",
-      borderRadius: "8px",
+      border: `0.25pxpx solid ${Color.Grey_01}`,
+      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
+      borderRadius: "2px",
     },
     cancel: {},
     "new-proposal": {

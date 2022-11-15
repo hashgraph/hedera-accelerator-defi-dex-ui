@@ -6,6 +6,8 @@ enum GovernorContractFunctions {
   CreateProposal = "propose",
   GetState = "state",
   GetProposalVotes = "proposalVotes",
+  GetQuorum = "quorum",
+  CastVote = "castVote",
 }
 
 enum PairContractFunctions {

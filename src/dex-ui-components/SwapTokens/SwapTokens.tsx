@@ -3,7 +3,7 @@ import { useImmerReducer } from "use-immer";
 import { ChakraProvider, Box, Heading, Flex, Spacer, Text, Collapse } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
-import { DEXTheme } from "../../dex-ui/styles";
+import { DEXTheme } from "../../dex-ui/DEX";
 import { swapReducer, initialSwapState, initSwapReducer } from "./reducers";
 import {
   setTokenToTradeAmount,
@@ -376,30 +376,6 @@ const SwapTokens = (props: SwapTokensProps) => {
         padding="0.5rem 1rem 1rem 1rem"
         boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
       >
-        {transactionState.successPayload &&
-        !transactionState.errorMessage &&
-        !transactionState.transactionWaitingToBeSigned &&
-        localSwapState.showSuccessMessage ? (
-          <>
-            <Spacer margin="0.25rem 0rem" />
-            <Notification
-              type={NotficationTypes.SUCCESS}
-              textStyle={"b3"}
-              message={`Swapped ${Number(localSwapState.tokenToTradeAmount.toFixed(6))} ${
-                localSwapState.tokenToTradeSymbol
-              }
-          for ${Number(localSwapState.tokenToReceiveAmount.toFixed(6))} ${localSwapState.tokenToReceiveSymbol}`}
-              isLinkShown={true}
-              linkText="View in HashScan"
-              linkRef={createHashScanLink(transactionState.successPayload?.transactionId.toString())}
-              isCloseButtonShown={true}
-              handleClickClose={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: false })}
-            />
-            <Spacer margin="0.5rem 0rem" />
-          </>
-        ) : (
-          <></>
-        )}
         <Flex alignItems={"center"} marginBottom={"8px"}>
           <Heading as="h4" fontWeight="500" size="lg">
             {title}
@@ -431,6 +407,30 @@ const SwapTokens = (props: SwapTokensProps) => {
             <SwapSettingsInput {...swapSettingsProps().transactionDeadline} />
           </Flex>
         </Collapse>
+        {transactionState.successPayload &&
+        !transactionState.errorMessage &&
+        !transactionState.transactionWaitingToBeSigned &&
+        localSwapState.showSuccessMessage ? (
+          <>
+            <Spacer margin="0.25rem 0rem" />
+            <Notification
+              type={NotficationTypes.SUCCESS}
+              textStyle={"b3"}
+              message={`Swapped ${Number(localSwapState.tokenToTradeAmount.toFixed(6))} ${
+                localSwapState.tokenToTradeSymbol
+              }
+          for ${Number(localSwapState.tokenToReceiveAmount.toFixed(6))} ${localSwapState.tokenToReceiveSymbol}`}
+              isLinkShown={true}
+              linkText="View in HashScan"
+              linkRef={createHashScanLink(transactionState.successPayload?.transactionId.toString())}
+              isCloseButtonShown={true}
+              handleClickClose={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: false })}
+            />
+            <Spacer margin="0.5rem 0rem" />
+          </>
+        ) : (
+          <></>
+        )}
         <TokenInput
           data-testid="token-to-trade-component"
           title="Token To Trade"
@@ -484,7 +484,7 @@ const SwapTokens = (props: SwapTokensProps) => {
             />
           </Box>
         </Flex>
-        <Flex direction="column" grow="1">
+        <Flex direction="column" grow="1" paddingTop="1.25rem">
           {connectionStatus === WalletConnectionStatus.PAIRED ? (
             <SwapConfirmation
               sendSwapTransaction={sendSwapTransaction}
