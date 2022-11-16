@@ -6,7 +6,7 @@ import { LoadingDialog } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
 import { TransactionStatus } from "../../store/appSlice";
 import { AddNewText } from "./AddNewText";
-import { AddNewToken } from "./AddNewToken";
+// import { AddNewToken } from "./AddNewToken";
 
 export interface CreateProposalLocationProps {
   proposalTitle: string | undefined;
