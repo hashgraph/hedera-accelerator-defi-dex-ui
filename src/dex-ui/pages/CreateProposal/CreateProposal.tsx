@@ -1,22 +1,39 @@
 import { WarningIcon } from "@chakra-ui/icons";
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Flex, Spacer, Text, VStack } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
+import { Link as ReachLink, useNavigate, useLocation } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
 import { TransactionStatus } from "../../store/appSlice";
 import { AddNewText } from "./AddNewText";
-// import { AddNewToken } from "./AddNewToken";
+import { AddNewToken } from "./AddNewToken";
 
 export interface CreateProposalLocationProps {
   proposalTitle: string | undefined;
   proposalTransactionId: string | undefined;
   isProposalCreationSuccessful: boolean;
 }
+export interface ProposalLocationProps {
+  proposalType: string
+}
+
+const getTitle = (title: string) => {
+  switch (title) {
+    case "new-token":
+      return "Add New Token";
+    case "text":
+      return "Text Proposal";
+    case "token-transfer":
+      return "Token Transfer";
+    case "contract-upgrade":
+      return "Contract Updrage";
+  }
+}
 
 export const CreateProposal = (props: any) => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
   const navigate = useNavigate();
+  const { proposalType } = useLocation().state as ProposalLocationProps;
 
   /**
    * Temporarily managing form values with standard React state.
@@ -30,6 +47,7 @@ export const CreateProposal = (props: any) => {
    * Temporarily saving the values for new AddNewTextComponent.
    * This should be replaced with Formik in the future.
    * */
+  //TODO: to be changed later to store values in stores rather in hook
   const [value, setValue] = useState("");
   const handleValueChange = (event: string) => {
     setValue(event);
@@ -71,10 +89,10 @@ export const CreateProposal = (props: any) => {
         </Text>
         <Flex flexDirection="column" alignItems="center">
           <Box width="600px">
-            <Text textStyle="h3">Add New Token</Text>
+            <Text textStyle="h3">{getTitle(proposalType)}</Text>
             <Spacer padding="1rem" />
-            {/* <AddNewToken title={title} handleTitleChange={handleTitleChange} /> */}
-            <AddNewText value={value} handleTitleChange={handleValueChange} />
+            {proposalType === "new-token" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
+            {proposalType === "text" ? <AddNewText value={value} handleTitleChange={handleValueChange} /> : null}
             <Spacer padding="1.5rem" />
             <Flex flexDirection="row" justifyContent="end" gap="10px">
               <Button variant="secondary" padding="10px 27px" height="40px">
