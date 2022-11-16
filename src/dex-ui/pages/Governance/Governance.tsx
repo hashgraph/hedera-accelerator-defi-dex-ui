@@ -7,11 +7,15 @@ import { useState } from "react";
 import { Notification, NotficationTypes } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
+import { formatProposals } from "./formatter";
+import { ProposalStatus } from "../../store/governanceSlice";
 
 export const Governance = (): JSX.Element => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
+  const formattedProposals = governance.proposals.map(formatProposals);
   useGovernanceData();
   const navigate = useNavigate();
+
   const locationState = useLocation().state as CreateProposalLocationProps;
   const [shouldShowNotification, setShouldShowNotification] = useState<boolean>(
     locationState?.isProposalCreationSuccessful ?? false
@@ -51,8 +55,8 @@ export const Governance = (): JSX.Element => {
       </Flex>
       <Spacer margin="0.5rem" />
       <VStack>
-        {governance.proposals
-          .filter((proposal) => proposal.status === "Active")
+        {formattedProposals
+          .filter((proposal) => proposal.status === ProposalStatus.Active)
           .map((proposal, index) => (
             <ProposalCard proposal={proposal} key={index} />
           ))}
@@ -63,8 +67,8 @@ export const Governance = (): JSX.Element => {
 
       <Spacer margin="0.5rem" />
       <VStack>
-        {governance.proposals
-          .filter((proposal) => proposal.status === "Passed" || proposal.status === "Failed")
+        {formattedProposals
+          .filter((proposal) => proposal.status === ProposalStatus.Passed || proposal.status === ProposalStatus.Failed)
           .map((proposal, index) => (
             <ProposalCard proposal={proposal} key={index} />
           ))}

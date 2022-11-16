@@ -2,17 +2,17 @@ import { Text, Badge, Box, Flex, HStack, Spacer, VStack, Center, Circle } from "
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../../dex-ui-components";
 import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
-import { Proposal } from "./types";
+import { FormattedProposal } from "./types";
 
 interface ProposalCardProps {
-  proposal: Proposal;
+  proposal: FormattedProposal;
 }
 
 export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal } = props;
   const navigate = useNavigate();
 
-  const getStatusColor = (status: ProposalStatus) => {
+  const getStatusColor = (status: ProposalStatus | undefined) => {
     if (status === ProposalStatus.Active) {
       return { bg: "rgba(109, 195, 209, 0.2)", color: "#31A9BD" };
     }
@@ -26,7 +26,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
     return { bg: "", color: "" };
   };
 
-  const getStateColor = (state: ProposalState) => {
+  const getStateColor = (state: ProposalState | undefined) => {
     if (state === ProposalState.Executed || state === ProposalState.Succeeded) {
       return { bg: "#E8F6DF", color: "#49A600" };
     }

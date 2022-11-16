@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 import { TransactionResponse, AccountId } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
@@ -32,16 +33,16 @@ enum ProposalState {
 }
 
 interface Proposal {
-  title: string;
+  title: string | undefined;
   author: AccountId;
   description: string;
-  status: ProposalStatus;
+  status: ProposalStatus | undefined;
   timeRemaining: string;
-  state: ProposalState;
+  state: ProposalState | undefined;
   voteCount: {
-    yes: number;
-    no: number;
-    abstain: number;
+    yes: BigNumber | undefined;
+    no: BigNumber | undefined;
+    abstain: BigNumber | undefined;
   };
 }
 

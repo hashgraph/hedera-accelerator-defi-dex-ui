@@ -1,3 +1,5 @@
+import { ContractId } from "@hashgraph/sdk";
+
 /** The "hashconnectData" is the string used by the hashconnect lib to modify localStorage */
 export const WALLET_LOCAL_DATA_KEY = "hashconnectData";
 
@@ -34,7 +36,10 @@ export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
 
 export const USDC_TOKEN_ID = "0.0.2276691";
 
-export const GOVERNANCE_PROXY_ID = "0.0.48634267";
+export const GOVERNOR_PROXY_CONTRACT = {
+  StringId: "0.0.48634267",
+  ContractId: ContractId.fromString("0.0.48634267"),
+};
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
   [TOKEN_A_SYMBOL, TOKEN_A_ID],

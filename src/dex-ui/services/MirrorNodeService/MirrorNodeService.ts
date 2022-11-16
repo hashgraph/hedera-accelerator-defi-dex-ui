@@ -17,6 +17,8 @@ import {
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
   TokenPair,
+  MirrorNodeProposalEventLog,
+  MirrorNodeDecodedProposalEvent,
 } from "./types";
 import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
@@ -171,7 +173,7 @@ function createMirrorNodeService() {
    * @param log - log data as a Hex string
    * @param topics - an array of event topics
    */
-  const decodeEvent = (eventName: any, log: any, topics: any) => {
+  const decodeEvent = (eventName: string, logData: string, topics: string[]) => {
     const web3 = new Web3();
     const abi = govenorAbi.abi;
     const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
@@ -179,7 +181,7 @@ function createMirrorNodeService() {
       return undefined;
     }
     try {
-      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, log, topics);
+      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, logData, topics);
       return decodedLog;
     } catch (error) {
       console.error(error);
@@ -187,7 +189,7 @@ function createMirrorNodeService() {
     }
   };
 
-  const fetchAllProposals = async (contractId: string): Promise<any> => {
+  const fetchAllProposals = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
     /*
      const response = await fetchNextBatch<{ logs: [] }>(
       `/api/v1/contracts/${contractId.toString()}/results/logs`,
@@ -203,33 +205,19 @@ function createMirrorNodeService() {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
-        limit: 3,
+        limit: 5,
       },
     });
-
     console.log(response);
-    const proposalsCreated = response.data.logs
-      .map((log: any) => {
-        return decodeEvent("ProposalCreated", log.data, log.topics.slice(1));
+    const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
+      .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+        return [
+          decodeEvent("ProposalCreated", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+        ];
       })
-      .filter((proposal: any) => proposal !== undefined)
-      .map((proposal: any) => ({ ...proposal, status: "Active" }));
-
-    const proposalsExecuted = response.data.logs
-      .map((log: any) => {
-        return decodeEvent("ProposalExecuted", log.data, log.topics.slice(1));
-      })
-      .filter((proposal: any) => proposal !== undefined)
-      .map((proposal: any) => ({ ...proposal, status: "Passed" }));
-
-    const proposalsCanceled = response.data.logs
-      .map((log: any) => {
-        return decodeEvent("ProposalCanceled", log.data, log.topics.slice(1));
-      })
-      .filter((proposal: any) => proposal !== undefined)
-      .map((proposal: any) => ({ ...proposal, status: "Failed" }));
-
-    const proposals = [...proposalsCreated, ...proposalsExecuted, ...proposalsCanceled];
+      .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
     console.log(proposals);
     return proposals;
   };

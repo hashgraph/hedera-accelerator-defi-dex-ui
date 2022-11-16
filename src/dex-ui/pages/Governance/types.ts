@@ -1,18 +1,17 @@
-import { AccountId } from "@hashgraph/sdk";
 import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
 
-interface Proposal {
-  title: string;
-  author: AccountId;
+interface FormattedProposal {
+  title: string | undefined;
+  author: string;
   description: string;
-  status: ProposalStatus;
+  status: ProposalStatus | undefined;
   timeRemaining: string;
-  state: ProposalState;
+  state: ProposalState | undefined;
   voteCount: {
-    yes: number;
-    no: number;
-    abstain: number;
+    yes: number | undefined;
+    no: number | undefined;
+    abstain: number | undefined;
   };
 }
 
-export type { Proposal, ProposalStatus };
+export type { FormattedProposal, ProposalStatus };

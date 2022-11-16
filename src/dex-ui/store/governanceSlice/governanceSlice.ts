@@ -1,6 +1,7 @@
-import { GOVERNANCE_PROXY_ID } from "./../../services/constants";
+import { GOVERNOR_PROXY_CONTRACT } from "./../../services/constants";
+import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId } from "@hashgraph/sdk";
-import { HederaService, WalletService, MirrorNodeService } from "../../services";
+import { HederaService, WalletService, MirrorNodeService, MirrorNodeDecodedProposalEvent } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { TransactionStatus } from "../appSlice";
 import {
@@ -13,6 +14,7 @@ import {
   ProposalState,
   ProposalStatus,
 } from "./type";
+import { getStatus } from "./utils";
 
 /** TODO: Replace will real data */
 const mockProposalData: Proposal[] = [
@@ -23,11 +25,11 @@ const mockProposalData: Proposal[] = [
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Active,
     timeRemaining: "12d 4 hrs",
-    state: ProposalState[ProposalState.Pending],
+    state: ProposalState.Pending,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -37,11 +39,11 @@ const mockProposalData: Proposal[] = [
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Active,
     timeRemaining: "12d 4 hrs",
-    state: ProposalState.Succeeded,
+    state: ProposalState.Active,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(13),
+      no: new BigNumber(23),
+      abstain: new BigNumber(112),
     },
   },
   {
@@ -53,9 +55,9 @@ const mockProposalData: Proposal[] = [
     timeRemaining: "12d 4 hrs",
     state: ProposalState.Active,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -63,13 +65,13 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.Passed,
+    status: ProposalStatus.Active,
     timeRemaining: "12d 4 hrs",
     state: ProposalState.Queued,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -81,9 +83,9 @@ const mockProposalData: Proposal[] = [
     timeRemaining: "12d 4 hrs",
     state: ProposalState.Executed,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -95,9 +97,9 @@ const mockProposalData: Proposal[] = [
     timeRemaining: "12d 4 hrs",
     state: ProposalState.Succeeded,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -109,9 +111,9 @@ const mockProposalData: Proposal[] = [
     timeRemaining: "12d 4 hrs",
     state: ProposalState.Defeated,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -123,9 +125,9 @@ const mockProposalData: Proposal[] = [
     timeRemaining: "6d 4 hrs",
     state: ProposalState.Canceled,
     voteCount: {
-      yes: 232,
-      no: 212,
-      abstain: 2203,
+      yes: new BigNumber(232),
+      no: new BigNumber(212),
+      abstain: new BigNumber(2203),
     },
   },
   {
@@ -137,9 +139,9 @@ const mockProposalData: Proposal[] = [
     timeRemaining: "6d 4 hrs",
     state: ProposalState.Expired,
     voteCount: {
-      yes: 232,
-      no: 212,
-      abstain: 2203,
+      yes: new BigNumber(232),
+      no: new BigNumber(212),
+      abstain: new BigNumber(2203),
     },
   },
 ];
@@ -166,10 +168,10 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       app.setFeaturesAsLoading(["proposals"]);
       set({}, false, GovernanceActionType.FETCH_PROPOSALS_STARTED);
       try {
-        const proposals = await MirrorNodeService.fetchAllProposals(GOVERNANCE_PROXY_ID);
-        const formattedProposal = await Promise.all(
-          proposals.map(async (proposal: any) => {
-            const { proposalId, description, proposer } = proposal;
+        const proposalEvents = await MirrorNodeService.fetchAllProposals(GOVERNOR_PROXY_CONTRACT.StringId);
+        const proposals = await Promise.all(
+          proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent): Promise<Proposal> => {
+            const { proposalId, description, proposer } = proposalEvent;
             const state = await HederaService.getProposalState(proposalId);
             const votes = await HederaService.getProposalVotes(proposalId);
             const proposalState = state
@@ -180,21 +182,21 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
               description: `Preview of the description lorem ipsum dolor sit amit consectetur 
             adipiscing elit Phasellus congue, sapien eu...`,
               author: proposer ? AccountId.fromSolidityAddress(proposer) : AccountId.fromString("0.0.34728121"),
-              status: proposal.status,
-              timeRemaining: "12d 4 hrs",
+              status: getStatus(proposalState),
+              timeRemaining: "12d 4 hrs", // convert to timestamp
               state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
               voteCount: {
-                yes: votes.forVotes?.toNumber(),
-                no: votes.againstVotes?.toNumber(),
-                abstain: votes.abstainVotes?.toNumber(),
+                yes: votes.forVotes,
+                no: votes.againstVotes,
+                abstain: votes.abstainVotes,
               },
             };
           })
         );
-        console.log(formattedProposal.concat(mockProposalData));
+        console.log(proposals.concat(mockProposalData));
         set(
           ({ governance }) => {
-            governance.proposals = formattedProposal.concat(mockProposalData);
+            governance.proposals = proposals.concat(mockProposalData);
           },
           false,
           GovernanceActionType.FETCH_PROPOSALS_SUCCEEDED

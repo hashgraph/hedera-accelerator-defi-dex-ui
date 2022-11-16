@@ -1,5 +1,4 @@
 import { BigNumber } from "bignumber.js";
-import Web3 from "web3";
 import {
   AccountId,
   TokenId,
@@ -8,20 +7,20 @@ import {
   ContractFunctionParameters,
   TransferTransaction,
   TokenAssociateTransaction,
+  TransactionResponse,
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
-  GOVERNANCE_PROXY_ID,
+  GOVERNOR_PROXY_CONTRACT,
   TOKEN_A_SYMBOL,
   TOKEN_B_SYMBOL,
   TOKEN_A_ID,
   TOKEN_B_ID,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
-import { AddLiquidityDetails, CreateProposalParams } from "./types";
+import { AddLiquidityDetails, GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
-import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -167,91 +166,63 @@ function createHederaService() {
 
     console.log(`Swap status: ${transferTokenRx.status}`);
   };
+  interface CreateProposalParams {
+    targets: Array<string>;
+    fees: Array<number>;
+    calls: Array<Uint8Array>;
+    description: string;
+    signer: HashConnectSigner;
+  }
 
-  /**
-   * Decodes event contents using the ABI definition of the event
-   * @param eventName - the name of the event
-   * @param log - log data as a Hex string
-   * @param topics - an array of event topics
-   */
-  const decodeEvent = (eventName: any, log: any, topics: any) => {
-    const web3 = new Web3();
-
-    const abi = govenorAbi.abi;
-    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
-    console.log(eventAbi);
-    if (eventAbi?.inputs === undefined) {
-      return undefined;
-    }
-    const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, log, topics);
-    return decodedLog;
-  };
-
-  const getEventsFromRecord = (record: any, eventName: string): Promise<Array<any>> => {
-    console.log(`\nGetting event(s) `);
-
-    // the events from the function call are in record.contractFunctionResult.logs.data
-    // let's parse the logs using web3.js
-    // there may be several log entries
-    return record.map((log: any) => {
-      // convert the log.data (uint8Array) to a string
-      const logStringHex = "0x".concat(Buffer.from(log.data).toString("hex"));
-
-      // get topics from log
-      const logTopics: Array<string> = [];
-      log.topics.forEach((topic: string) => {
-        logTopics.push("0x".concat(Buffer.from(topic).toString("hex")));
-      });
-
-      // decode the event data
-      const event = decodeEvent(eventName, logStringHex, logTopics.slice(1));
-
-      // output the from address stored in the event
-      return event;
-    });
-  };
-
-  const createProposal = async ({ targets, fees, calls, description, signer }: CreateProposalParams) => {
-    const createProposalParams = new ContractFunctionParameters()
+  const createProposal = async ({
+    targets,
+    fees,
+    calls,
+    description,
+    signer,
+  }: CreateProposalParams): Promise<TransactionResponse> => {
+    const contractCallParams = new ContractFunctionParameters()
       .addAddressArray(targets)
       .addUint256Array(fees)
       .addBytesArray(calls)
       .addString(description);
-
     const createProposalTransaction = await new ContractExecuteTransaction()
-      .setContractId(ContractId.fromString(GOVERNANCE_PROXY_ID))
-      .setFunction("propose", createProposalParams)
+      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
+      .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
       .setGas(900000)
       .setNodeAccountIds([new AccountId(3)])
       .freezeWithSigner(signer);
-
     const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
     return proposalTransactionResponse;
   };
 
-  const getProposalState = async (proposalId: any) => {
+  const getProposalState = async (proposalId: BigNumber): Promise<BigNumber | undefined> => {
     const contractCallParams = new ContractFunctionParameters().addUint256(proposalId);
-    const proposalStateContractCall = new ContractExecuteTransaction()
-      .setContractId(ContractId.fromString(GOVERNANCE_PROXY_ID))
+    const proposalStateQuery = new ContractExecuteTransaction()
+      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
       .setGas(1000000)
-      .setFunction("state", contractCallParams)
+      .setFunction(GovernorContractFunctions.GetState, contractCallParams)
       .freezeWith(client);
-
-    const response = await proposalStateContractCall.execute(client);
+    const response = await proposalStateQuery.execute(client);
     const record = await response.getRecord(client);
     const proposalStatus = record.contractFunctionResult?.getUint256(0);
     console.log("contract message: " + proposalStatus);
     return proposalStatus;
   };
+  interface ProposalVotes {
+    againstVotes: BigNumber | undefined;
+    forVotes: BigNumber | undefined;
+    abstainVotes: BigNumber | undefined;
+  }
 
-  const getProposalVotes = async (proposalId: any) => {
+  const getProposalVotes = async (proposalId: BigNumber): Promise<ProposalVotes> => {
     const contractCallParams = new ContractFunctionParameters().addUint256(proposalId);
-    const proposalVotesContractCall = new ContractExecuteTransaction()
-      .setContractId(ContractId.fromString(GOVERNANCE_PROXY_ID))
+    const proposalVotesQuery = new ContractExecuteTransaction()
+      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
       .setGas(1000000)
-      .setFunction("proposalVotes", contractCallParams)
+      .setFunction(GovernorContractFunctions.GetProposalVotes, contractCallParams)
       .freezeWith(client);
-    const response = await proposalVotesContractCall.execute(client);
+    const response = await proposalVotesQuery.execute(client);
     const record = await response.getRecord(client);
     const againstVotes = record.contractFunctionResult?.getInt256(0);
     const forVotes = record.contractFunctionResult?.getInt256(1);

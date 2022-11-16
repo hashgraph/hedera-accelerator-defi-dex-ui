@@ -69,6 +69,23 @@ interface MirrorNodeTransaction {
   token_transfers: MirrorNodeTokenTransfer[];
 }
 
+interface MirrorNodeProposalEventLog {
+  data: string;
+  topics: string[];
+}
+
+interface MirrorNodeDecodedProposalEvent {
+  proposalId: BigNumber;
+  proposer?: string;
+  targets?: string[];
+  values?: BigNumber[];
+  signatures?: string[];
+  calldatas?: BigNumber[];
+  startBlock?: BigNumber;
+  endBlock?: BigNumber;
+  description?: string;
+}
+
 export type {
   MirrorNodeTokenByIdResponse,
   MirrorNodeTokenBalance,
@@ -76,5 +93,7 @@ export type {
   MirrorNodeBalanceResponse,
   MirrorNodeAccountBalance,
   MirrorNodeTokenTransfer,
+  MirrorNodeProposalEventLog,
+  MirrorNodeDecodedProposalEvent,
   TokenPair,
 };
