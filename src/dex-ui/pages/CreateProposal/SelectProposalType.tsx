@@ -94,7 +94,11 @@ export const SelectProposalType = (props: any) => {
         <Button
           width="437px"
           //  eslint-disable-next-line max-len
-          onClick={() => navigate(`/governance/select-proposal-type/${selectedProposalType.current}`, { state: { proposalType: selectedProposalType.current } })}
+          onClick={() =>
+            navigate(`/governance/select-proposal-type/${selectedProposalType.current}`, {
+              state: { proposalType: selectedProposalType.current },
+            })
+          }
         >
           Continue
         </Button>

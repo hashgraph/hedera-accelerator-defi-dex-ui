@@ -14,7 +14,7 @@ export interface CreateProposalLocationProps {
   isProposalCreationSuccessful: boolean;
 }
 export interface ProposalLocationProps {
-  proposalType: string
+  proposalType: string;
 }
 
 const getTitle = (title: string) => {
@@ -28,7 +28,7 @@ const getTitle = (title: string) => {
     case "contract-upgrade":
       return "Contract Updrage";
   }
-}
+};
 
 export const CreateProposal = (props: any) => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
