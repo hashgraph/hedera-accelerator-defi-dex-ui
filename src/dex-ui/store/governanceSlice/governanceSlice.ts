@@ -29,7 +29,7 @@ const mockProposalData: Proposal[] = [
     voteCount: {
       yes: new BigNumber(123),
       no: new BigNumber(462),
-      abstain: new BigNumber(3000),
+      abstain: new BigNumber(300),
     },
   },
   {
@@ -57,7 +57,7 @@ const mockProposalData: Proposal[] = [
     voteCount: {
       yes: new BigNumber(123),
       no: new BigNumber(462),
-      abstain: new BigNumber(3000),
+      abstain: new BigNumber(300),
     },
   },
   {
@@ -182,7 +182,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
               description: `Preview of the description lorem ipsum dolor sit amit consectetur 
             adipiscing elit Phasellus congue, sapien eu...`,
               author: proposer ? AccountId.fromSolidityAddress(proposer) : AccountId.fromString("0.0.34728121"),
-              status: getStatus(proposalState),
+              status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
               timeRemaining: "12d 4 hrs", // convert to timestamp
               state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
               voteCount: {

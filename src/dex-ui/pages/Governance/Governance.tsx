@@ -62,9 +62,7 @@ export const Governance = (): JSX.Element => {
           ))}
       </VStack>
       <Spacer margin="1rem" />
-
       <Text textStyle="h3">All Proposals</Text>
-
       <Spacer margin="0.5rem" />
       <VStack>
         {formattedProposals

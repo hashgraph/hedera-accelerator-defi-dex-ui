@@ -1,6 +1,6 @@
-import { Text, Badge, Box, Flex, HStack, Spacer, VStack, Center, Circle } from "@chakra-ui/react";
+import { Text, Badge, Box, Flex, Spacer, VStack, Center } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "../../../dex-ui-components";
+import { Card, HorizontalStackBarChart, Metrics } from "../../../dex-ui-components";
 import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
 import { FormattedProposal } from "./types";
 
@@ -74,20 +74,27 @@ export const ProposalCard = (props: ProposalCardProps) => {
         <Spacer flex="0.5" />
         <Box flex="4" marginRight="1rem">
           {proposal.state === ProposalState.Active ? (
-            <Flex>
-              <HStack flex="1">
-                <Circle size="1em" bg="#C0DBAB" />
-                <Text>{proposal.voteCount.yes}</Text>
-              </HStack>
-              <HStack flex="1">
-                <Circle size="1em" bg="#F6B2AC" />
-                <Text>{proposal.voteCount.no}</Text>
-              </HStack>
-              <HStack flex="1">
-                <Circle size="1em" bg="#D1CED1" />
-                <Text>{proposal.voteCount.abstain}</Text>
-              </HStack>
-            </Flex>
+            <VStack spacing={2} align="stretch">
+              <Metrics
+                flex="1"
+                data={[
+                  { value: proposal.voteCount.yes ?? 0, color: "#79B54B" },
+                  { value: proposal.voteCount.no ?? 0, color: "#EE2B00" },
+                  { value: proposal.voteCount.abstain ?? 0, color: "#000AFF" },
+                  { value: proposal.voteCount.abstain ?? 0, color: "#DBDEDF" },
+                ]}
+              />
+              <Spacer flex="10" />
+              <HorizontalStackBarChart
+                flex="1"
+                data={[
+                  { value: proposal.voteCount.yes ?? 0, bg: "#79B54B" },
+                  { value: proposal.voteCount.no ?? 0, bg: "#EE2B00" },
+                  { value: proposal.voteCount.abstain ?? 0, bg: "#000AFF" },
+                  { value: proposal.voteCount.abstain ?? 0, bg: "#DBDEDF" },
+                ]}
+              />
+            </VStack>
           ) : (
             <Badge
               float="right"
