@@ -41,7 +41,7 @@ type MirrorNodeServiceType = ReturnType<typeof createMirrorNodeService>;
 /**
  * A hook that provides access to functions that fetch transaction and account
  * information from a Hedera managed mirror node.
- * @returns - The state of the mirror node data as well as functions that can be used to fetch
+ * @returns The state of the mirror node data as well as functions that can be used to fetch
  * the latest mirror node network data.
  */
 function createMirrorNodeService() {
@@ -168,10 +168,10 @@ function createMirrorNodeService() {
   };
 
   /**
-   * Decodes event contents using the ABI definition of the event
-   * @param eventName - the name of the event
-   * @param log - log data as a Hex string
-   * @param topics - an array of event topics
+   * Decodes event contents using the ABI definition of the event.
+   * @param eventName - the name of the event.
+   * @param logData - log data as a Hex string.
+   * @param topics - an array of event topics.
    */
   const decodeEvent = (eventName: string, logData: string, topics: string[]) => {
     const web3 = new Web3();
@@ -189,6 +189,13 @@ function createMirrorNodeService() {
     }
   };
 
+  /**
+   * Fetches all proposal events emitted by a smart contract. The "ProposalCreated",
+   * "ProposalExecuted", and "ProposalCanceled" are fetched. These events provide data
+   * regarding the contract proposals.
+   * @param contractId - The id of the contract to fetch events from.
+   * @returns An array of proposal event data.
+   */
   const fetchAllProposals = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
     /*
      Currently, each proposal requires multiple additional calls to the smart contract
@@ -207,14 +214,12 @@ function createMirrorNodeService() {
       }
     );
     */
-
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
         limit: 1,
       },
     });
-    console.log(response);
     const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
       .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
         return [
@@ -224,10 +229,14 @@ function createMirrorNodeService() {
         ];
       })
       .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
-    console.log(proposals);
     return proposals;
   };
 
+  /**
+   * Fetchs information about a specific blockNumber.
+   * @param blockNumber - The block number to query.
+   * @returns Information about the block.
+   */
   const fetchBlock = async (blockNumber: string) => {
     const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
     return block.data;

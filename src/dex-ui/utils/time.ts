@@ -20,7 +20,7 @@ const getCurrentUnixTimestamp = () => new Date().getTime() / MILLISECONDS_IN_A_S
 /**
  * Converts a time duration into the format '\{days\}d \{hours\}h'.
  * @param duration - A length of time in seconds.
- * @returns - Time duration in the format '\{days\}d \{hours\}h'.
+ * @returns Time duration in the format '\{days\}d \{hours\}h'.
  */
 const formatDuration = (duration: BigNumber) => {
   const days = duration.div(HOURS_IN_A_DAY * MINUTES_IN_AN_HOUR * SECONDS_IN_A_MINUTE);
