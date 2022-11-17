@@ -22,7 +22,6 @@ export const ProposalCard = (props: ProposalCardProps) => {
     if (status === ProposalStatus.Failed) {
       return { bg: "#F2F2F4", color: "rgba(0, 0, 0, 0.7)" };
     }
-
     return { bg: "", color: "" };
   };
 
@@ -53,7 +52,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
             <Badge padding="0.25rem 1rem" background={status.bg} color={status.color} borderRadius="50px">
               {proposal.status}
             </Badge>
-            <Text>{proposal.timeRemaining}</Text>
+            <Text>{proposal.status === ProposalStatus.Active ? proposal.timeRemaining : "-"}</Text>
           </VStack>
         </Center>
         <Spacer flex="0.5" />
@@ -81,6 +80,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                   { value: proposal.voteCount.yes ?? 0, color: "#79B54B" },
                   { value: proposal.voteCount.no ?? 0, color: "#EE2B00" },
                   { value: proposal.voteCount.abstain ?? 0, color: "#000AFF" },
+                  /** TODO: Determine how to abtain total possible votes */
                   { value: proposal.voteCount.abstain ?? 0, color: "#DBDEDF" },
                 ]}
               />
@@ -91,6 +91,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                   { value: proposal.voteCount.yes ?? 0, bg: "#79B54B" },
                   { value: proposal.voteCount.no ?? 0, bg: "#EE2B00" },
                   { value: proposal.voteCount.abstain ?? 0, bg: "#000AFF" },
+                  /** TODO: Determine how to abtain total possible votes */
                   { value: proposal.voteCount.abstain ?? 0, bg: "#DBDEDF" },
                 ]}
               />

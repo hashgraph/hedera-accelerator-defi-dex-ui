@@ -8,6 +8,7 @@ import {
   TransferTransaction,
   TokenAssociateTransaction,
   TransactionResponse,
+  ContractCallQuery,
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
@@ -18,7 +19,7 @@ import {
   TOKEN_B_ID,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
-import { AddLiquidityDetails, GovernorContractFunctions } from "./types";
+import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
 
@@ -41,17 +42,22 @@ function createHederaService() {
     return _precision;
   };
 
+  const queryContract = async (
+    contractId: ContractId,
+    functionName: string,
+    queryParams?: ContractFunctionParameters
+  ) => {
+    const gas = 50000;
+    const query = new ContractCallQuery().setContractId(contractId).setGas(gas).setFunction(functionName, queryParams);
+    const queryPayment = await query.getCost(client);
+    query.setMaxQueryPayment(queryPayment);
+    return await query.execute(client);
+  };
+
   const fetchPrecision = async (): Promise<BigNumber | undefined> => {
-    const getPrecisionValueTx = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getPrecisionValue", new ContractFunctionParameters())
-      .freezeWith(client);
-    const getPrecisionValueTxRes = await getPrecisionValueTx.execute(client);
-    const response = await getPrecisionValueTxRes.getRecord(client);
-    const precisionLocal = response.contractFunctionResult?.getInt256(0);
-    console.log(`getPrecisionValue ${Number(precisionLocal)}`);
-    return precisionLocal;
+    const result = await queryContract(contractId, PairContractFunctions.GetPrecision);
+    const precision = result?.getInt256(0);
+    return precision;
   };
 
   const withPrecision = (value: number): BigNumber => {
@@ -196,38 +202,33 @@ function createHederaService() {
     return proposalTransactionResponse;
   };
 
-  const getProposalState = async (proposalId: BigNumber): Promise<BigNumber | undefined> => {
-    const contractCallParams = new ContractFunctionParameters().addUint256(proposalId);
-    const proposalStateQuery = new ContractExecuteTransaction()
-      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
-      .setGas(1000000)
-      .setFunction(GovernorContractFunctions.GetState, contractCallParams)
-      .freezeWith(client);
-    const response = await proposalStateQuery.execute(client);
-    const record = await response.getRecord(client);
-    const proposalStatus = record.contractFunctionResult?.getUint256(0);
-    console.log("contract message: " + proposalStatus);
+  const fetchProposalState = async (proposalId: BigNumber): Promise<BigNumber | undefined> => {
+    const queryParams = new ContractFunctionParameters().addUint256(proposalId);
+    const result = await queryContract(
+      GOVERNOR_PROXY_CONTRACT.ContractId,
+      GovernorContractFunctions.GetState,
+      queryParams
+    );
+    const proposalStatus = result?.getUint256(0);
     return proposalStatus;
   };
+
   interface ProposalVotes {
     againstVotes: BigNumber | undefined;
     forVotes: BigNumber | undefined;
     abstainVotes: BigNumber | undefined;
   }
 
-  const getProposalVotes = async (proposalId: BigNumber): Promise<ProposalVotes> => {
-    const contractCallParams = new ContractFunctionParameters().addUint256(proposalId);
-    const proposalVotesQuery = new ContractExecuteTransaction()
-      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
-      .setGas(1000000)
-      .setFunction(GovernorContractFunctions.GetProposalVotes, contractCallParams)
-      .freezeWith(client);
-    const response = await proposalVotesQuery.execute(client);
-    const record = await response.getRecord(client);
-    const againstVotes = record.contractFunctionResult?.getInt256(0);
-    const forVotes = record.contractFunctionResult?.getInt256(1);
-    const abstainVotes = record.contractFunctionResult?.getInt256(2);
-    console.log("contract message: " + { againstVotes, forVotes, abstainVotes });
+  const fetchProposalVotes = async (proposalId: BigNumber): Promise<ProposalVotes> => {
+    const queryParams = new ContractFunctionParameters().addUint256(proposalId);
+    const result = await queryContract(
+      GOVERNOR_PROXY_CONTRACT.ContractId,
+      GovernorContractFunctions.GetProposalVotes,
+      queryParams
+    );
+    const againstVotes = result?.getInt256(0);
+    const forVotes = result?.getInt256(1);
+    const abstainVotes = result?.getInt256(2);
     return { againstVotes, forVotes, abstainVotes };
   };
 
@@ -299,52 +300,31 @@ function createHederaService() {
 
   // TODO: will need to pass in contractId in future when there are more pools
   const pairCurrentPosition = async (_contractId: ContractId = contractId) => {
-    const getPairQty = new ContractExecuteTransaction()
-      .setContractId(_contractId)
-      .setGas(1000000)
-      .setFunction("getPairQty")
-      .freezeWith(client);
-    const getPairQtyTx = await getPairQty.execute(client);
-    const response = await getPairQtyTx.getRecord(client);
-    const tokenAQty = response.contractFunctionResult?.getInt256(0);
-    const tokenBQty = response.contractFunctionResult?.getInt256(1);
-    console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B are present in the pool. \n`);
+    const result = await queryContract(_contractId, PairContractFunctions.GetPoolBalances);
+    const tokenAQty = result?.getInt256(0);
+    const tokenBQty = result?.getInt256(1);
     // TODO: dont hardcodethis, will have to be dynamic
     return { [TOKEN_A_SYMBOL]: tokenAQty, [TOKEN_B_SYMBOL]: tokenBQty };
   };
 
-  const getContributorTokenShare = async () => {
-    const getContributorTokenShare = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction(
-        "getContributorTokenShare",
-        new ContractFunctionParameters().addAddress(treasuryId.toSolidityAddress())
-      )
-      .freezeWith(client);
-    const getContributorTokenShareTx = await getContributorTokenShare.execute(client);
-    const response = await getContributorTokenShareTx.getRecord(client);
-    const tokenAQty = response.contractFunctionResult?.getInt64(0);
-    const tokenBQty = response.contractFunctionResult?.getInt64(1);
-    return `${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`;
-    console.log(`${tokenAQty} units of token A and ${tokenBQty} units of token B contributed by treasure.`);
+  const getContributorTokenShare = async (): Promise<{
+    tokenAQty: BigNumber;
+    tokenBQty: BigNumber;
+  }> => {
+    const queryParams = new ContractFunctionParameters().addAddress(treasuryId.toSolidityAddress());
+    const result = await queryContract(contractId, PairContractFunctions.GetLiquidityProviderTokenAmounts, queryParams);
+    const tokenAQty = result?.getInt64(0);
+    const tokenBQty = result?.getInt64(1);
+    return { tokenAQty, tokenBQty };
   };
 
-  const getSpotPrice = async () => {
-    const getSpotPrice = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getSpotPrice")
-      .freezeWith(client);
-    const getSpotPriceTransaction = await getSpotPrice.execute(client);
-    console.log(getSpotPriceTransaction);
-    const response = await getSpotPriceTransaction.getRecord(client);
-    console.log(response);
-    const spotPrice = response.contractFunctionResult?.getInt64(0);
+  const getSpotPrice = async (): Promise<BigNumber> => {
+    const result = await queryContract(contractId, PairContractFunctions.GetSpotPrice);
+    const spotPrice = result?.getInt64(0);
     return spotPrice;
   };
 
-  const fetchFeeWithPrecision = async () => {
+  const fetchFeeWithPrecision = async (): Promise<BigNumber | undefined> => {
     const fee = await fetchFee();
     const feePrecision = await fetchFeePrecision();
     if (feePrecision === undefined) {
@@ -354,27 +334,15 @@ function createHederaService() {
   };
 
   const fetchFee = async (): Promise<BigNumber | undefined> => {
-    const getFee = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getFee")
-      .freezeWith(client);
-    const getPoolFeeTransaction = await getFee.execute(client);
-    const response = await getPoolFeeTransaction.getRecord(client);
-    const fee = response.contractFunctionResult?.getInt256(0);
+    const result = await queryContract(contractId, PairContractFunctions.GetFee);
+    const fee = result?.getInt256(0);
     const feePrecision = await fetchFeePrecision();
     return fee?.div(feePrecision?.toNumber() ?? 1);
   };
 
   const fetchFeePrecision = async (): Promise<BigNumber | undefined> => {
-    const getFeePrecision = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getFeePrecision")
-      .freezeWith(client);
-    const getFeePrecisionTransaction = await getFeePrecision.execute(client);
-    const response = await getFeePrecisionTransaction.getRecord(client);
-    const feePrecision = response.contractFunctionResult?.getInt256(0);
+    const result = await queryContract(contractId, PairContractFunctions.GetFeePrecision);
+    const feePrecision = result?.getInt256(0);
     return feePrecision;
   };
 
@@ -382,47 +350,26 @@ function createHederaService() {
     amountOfTokenA: BigNumber | undefined;
     amountOfTokenB: BigNumber | undefined;
   }> => {
-    const getTokenBalance = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getPairQty")
-      .freezeWith(client);
-    const getTokenBalanceTx = await getTokenBalance.execute(client);
-    const response = await getTokenBalanceTx.getRecord(client);
-    const amountOfTokenA = response.contractFunctionResult?.getInt256(0);
-    const amountOfTokenB = response.contractFunctionResult?.getInt256(1);
+    const result = await queryContract(contractId, PairContractFunctions.GetPoolBalances);
+    const amountOfTokenA = result?.getInt256(0);
+    const amountOfTokenB = result?.getInt256(1);
     return { amountOfTokenA, amountOfTokenB };
   };
 
-  const getContractAddress = async () => {
-    const getContractAddress = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getContractAddress")
-      .freezeWith(client);
-    const getContractAddressTransaction = await getContractAddress.execute(client);
-    const response = await getContractAddressTransaction.getRecord(client);
-    const contractAddress = AccountId.fromSolidityAddress(
-      response.contractFunctionResult?.getAddress(0) ?? ""
-    ).toString();
-    console.log(contractAddress);
+  const getContractAddress = async (): Promise<string> => {
+    const result = await queryContract(contractId, PairContractFunctions.GetContractAddress);
+    const contractAddress = AccountId.fromSolidityAddress(result?.getAddress(0) ?? "").toString();
+    return contractAddress;
   };
 
-  const getTokenPairAddress = async () => {
-    const getTokenPairAddress = new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(1000000)
-      .setFunction("getTokenPairAddress")
-      .freezeWith(client);
-    const getTokenPairAddressTransaction = await getTokenPairAddress.execute(client);
-    const response = await getTokenPairAddressTransaction.getRecord(client);
-    const tokenAAddress = AccountId.fromSolidityAddress(
-      response.contractFunctionResult?.getAddress(0) ?? ""
-    ).toString();
-    const tokenBAddress = AccountId.fromSolidityAddress(
-      response.contractFunctionResult?.getAddress(1) ?? ""
-    ).toString();
-    console.log(tokenAAddress, tokenBAddress);
+  const getTokenPairAddress = async (): Promise<{
+    tokenAAddress: string;
+    tokenBAddress: string;
+  }> => {
+    const result = await queryContract(contractId, PairContractFunctions.GetTokenAddresses);
+    const tokenAAddress = AccountId.fromSolidityAddress(result?.getAddress(0) ?? "").toString();
+    const tokenBAddress = AccountId.fromSolidityAddress(result?.getAddress(1) ?? "").toString();
+    return { tokenAAddress, tokenBAddress };
   };
 
   return {
@@ -434,8 +381,8 @@ function createHederaService() {
     addLiquidity,
     removeLiquidity,
     createProposal,
-    getProposalState,
-    getProposalVotes,
+    fetchProposalState,
+    fetchProposalVotes,
     getContributorTokenShare,
     getTokenBalances,
     getSpotPrice,

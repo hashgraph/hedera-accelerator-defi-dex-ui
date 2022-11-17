@@ -2,7 +2,7 @@ import { GOVERNOR_PROXY_CONTRACT } from "./../../services/constants";
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId } from "@hashgraph/sdk";
 import { HederaService, WalletService, MirrorNodeService, MirrorNodeDecodedProposalEvent } from "../../services";
-import { getErrorMessage } from "../../utils";
+import { getErrorMessage, getCurrentUnixTimestamp } from "../../utils";
 import { TransactionStatus } from "../appSlice";
 import {
   ContractProposalState,
@@ -15,6 +15,7 @@ import {
   ProposalStatus,
 } from "./type";
 import { getStatus } from "./utils";
+import { isNil } from "ramda";
 
 /** TODO: Replace will real data */
 const mockProposalData: Proposal[] = [
@@ -24,7 +25,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Active,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: BigNumber(86400),
     state: ProposalState.Pending,
     voteCount: {
       yes: new BigNumber(123),
@@ -38,7 +39,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Active,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: BigNumber(16400),
     state: ProposalState.Active,
     voteCount: {
       yes: new BigNumber(13),
@@ -52,7 +53,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Active,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: BigNumber(66400),
     state: ProposalState.Active,
     voteCount: {
       yes: new BigNumber(123),
@@ -66,7 +67,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Active,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: BigNumber(166400),
     state: ProposalState.Queued,
     voteCount: {
       yes: new BigNumber(123),
@@ -80,7 +81,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Passed,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: new BigNumber(0),
     state: ProposalState.Executed,
     voteCount: {
       yes: new BigNumber(123),
@@ -94,7 +95,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Passed,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: new BigNumber(0),
     state: ProposalState.Succeeded,
     voteCount: {
       yes: new BigNumber(123),
@@ -108,7 +109,7 @@ const mockProposalData: Proposal[] = [
     adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Failed,
-    timeRemaining: "12d 4 hrs",
+    timeRemaining: new BigNumber(0),
     state: ProposalState.Defeated,
     voteCount: {
       yes: new BigNumber(123),
@@ -122,7 +123,7 @@ const mockProposalData: Proposal[] = [
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Failed,
-    timeRemaining: "6d 4 hrs",
+    timeRemaining: new BigNumber(0),
     state: ProposalState.Canceled,
     voteCount: {
       yes: new BigNumber(232),
@@ -136,7 +137,7 @@ const mockProposalData: Proposal[] = [
         adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
     status: ProposalStatus.Failed,
-    timeRemaining: "6d 4 hrs",
+    timeRemaining: new BigNumber(0),
     state: ProposalState.Expired,
     voteCount: {
       yes: new BigNumber(232),
@@ -169,11 +170,16 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       set({}, false, GovernanceActionType.FETCH_PROPOSALS_STARTED);
       try {
         const proposalEvents = await MirrorNodeService.fetchAllProposals(GOVERNOR_PROXY_CONTRACT.StringId);
+        const getTimeRemaining = async (endBlock: BigNumber): Promise<BigNumber> => {
+          const endTime = await MirrorNodeService.fetchBlock(endBlock.toString());
+          const timeRemaining = BigNumber(endTime.timestamp.to).minus(BigNumber(getCurrentUnixTimestamp()));
+          return timeRemaining.gt(0) ? timeRemaining : BigNumber(0);
+        };
         const proposals = await Promise.all(
           proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent): Promise<Proposal> => {
-            const { proposalId, description, proposer } = proposalEvent;
-            const state = await HederaService.getProposalState(proposalId);
-            const votes = await HederaService.getProposalVotes(proposalId);
+            const { proposalId, description, proposer, endBlock } = proposalEvent;
+            const state = await HederaService.fetchProposalState(proposalId);
+            const votes = await HederaService.fetchProposalVotes(proposalId);
             const proposalState = state
               ? (ContractProposalState[state?.toNumber()] as keyof typeof ContractProposalState)
               : undefined;
@@ -183,7 +189,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
             adipiscing elit Phasellus congue, sapien eu...`,
               author: proposer ? AccountId.fromSolidityAddress(proposer) : AccountId.fromString("0.0.34728121"),
               status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
-              timeRemaining: "12d 4 hrs", // convert to timestamp
+              timeRemaining: !isNil(endBlock) ? await getTimeRemaining(endBlock) : undefined,
               state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
               voteCount: {
                 yes: votes.forVotes,
@@ -193,7 +199,6 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
             };
           })
         );
-        console.log(proposals.concat(mockProposalData));
         set(
           ({ governance }) => {
             governance.proposals = proposals.concat(mockProposalData);

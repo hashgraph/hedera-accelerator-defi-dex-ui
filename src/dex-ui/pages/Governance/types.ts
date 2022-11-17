@@ -5,7 +5,7 @@ interface FormattedProposal {
   author: string;
   description: string;
   status: ProposalStatus | undefined;
-  timeRemaining: string;
+  timeRemaining: string | undefined;
   state: ProposalState | undefined;
   voteCount: {
     yes: number | undefined;

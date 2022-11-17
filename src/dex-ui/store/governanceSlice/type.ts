@@ -37,7 +37,7 @@ interface Proposal {
   author: AccountId;
   description: string;
   status: ProposalStatus | undefined;
-  timeRemaining: string;
+  timeRemaining: BigNumber | undefined;
   state: ProposalState | undefined;
   voteCount: {
     yes: BigNumber | undefined;

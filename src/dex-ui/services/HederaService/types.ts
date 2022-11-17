@@ -8,6 +8,17 @@ enum GovernorContractFunctions {
   GetProposalVotes = "proposalVotes",
 }
 
+enum PairContractFunctions {
+  GetLiquidityProviderTokenAmounts = "getContributorTokenShare",
+  GetSpotPrice = "getSpotPrice",
+  GetFee = "getFee",
+  GetFeePrecision = "getFeePrecision",
+  GetPrecision = "getPrecisionValue",
+  GetPoolBalances = "getPairQty",
+  GetContractAddress = "getContractAddress",
+  GetTokenAddresses = "getTokenPairAddress",
+}
+
 interface AddLiquidityDetails {
   firstTokenAddress: string;
   firstTokenQuantity: BigNumber;
@@ -18,5 +29,5 @@ interface AddLiquidityDetails {
   signer: HashConnectSigner;
 }
 
-export { GovernorContractFunctions };
+export { GovernorContractFunctions, PairContractFunctions };
 export type { AddLiquidityDetails };

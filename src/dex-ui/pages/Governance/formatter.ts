@@ -1,4 +1,5 @@
 import { Proposal } from "../../store/governanceSlice";
+import { formatDuration } from "../../utils";
 import { FormattedProposal } from "./types";
 
 /**
@@ -13,7 +14,7 @@ export const formatProposals = (proposal: Proposal): FormattedProposal => {
     author: author.toString(),
     description,
     status,
-    timeRemaining,
+    timeRemaining: timeRemaining ? formatDuration(timeRemaining) : undefined,
     state,
     voteCount: {
       yes: voteCount.yes?.toNumber(),

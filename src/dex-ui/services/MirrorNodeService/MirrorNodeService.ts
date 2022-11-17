@@ -191,6 +191,12 @@ function createMirrorNodeService() {
 
   const fetchAllProposals = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
     /*
+     Currently, each proposal requires multiple additional calls to the smart contract
+     to get all of the desired data for the UI. This is an expensive action that costs a large
+     amount of hbar. We are only fetching the latest proposal for the time being to reduce
+     the query overhead. A solution is being built on the smart contract to enable a single
+     query to get all proposal data.
+
      const response = await fetchNextBatch<{ logs: [] }>(
       `/api/v1/contracts/${contractId.toString()}/results/logs`,
       "logs",
@@ -205,7 +211,7 @@ function createMirrorNodeService() {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
-        limit: 5,
+        limit: 1,
       },
     });
     console.log(response);
@@ -222,6 +228,11 @@ function createMirrorNodeService() {
     return proposals;
   };
 
+  const fetchBlock = async (blockNumber: string) => {
+    const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
+    return block.data;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenPairs,
@@ -229,6 +240,7 @@ function createMirrorNodeService() {
     fetchTokenBalances,
     fetchAccountBalances,
     fetchAllProposals,
+    fetchBlock,
   };
 }
 
