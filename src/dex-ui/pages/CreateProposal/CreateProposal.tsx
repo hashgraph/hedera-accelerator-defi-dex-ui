@@ -93,9 +93,15 @@ export const CreateProposal = (props: any) => {
             <Spacer padding="1rem" />
             {proposalType === "new-token" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
             {/* eslint-disable max-len */}
-            {proposalType === "text" ? <AddNewText title={title} value={value} handleTitleChange={handleValueChange} /> : null}
-            {proposalType === "contract-upgrade" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
-            {proposalType === "token-transfer" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
+            {proposalType === "text" ? (
+              <AddNewText title={title} value={value} handleTitleChange={handleValueChange} />
+            ) : null}
+            {proposalType === "contract-upgrade" ? (
+              <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            ) : null}
+            {proposalType === "token-transfer" ? (
+              <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            ) : null}
             {/* eslint-enable max-len */}
             <Spacer padding="1.5rem" />
             <Flex flexDirection="row" justifyContent="end" gap="10px">

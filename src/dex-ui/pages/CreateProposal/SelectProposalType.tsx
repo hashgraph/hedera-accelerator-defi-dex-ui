@@ -93,9 +93,7 @@ export const SelectProposalType = (props: any) => {
         <Spacer padding="3rem" />
         <Button
           width="437px"
-          onClick={() =>
-            navigate(`/governance/select-proposal-type/${selectedProposalType.current}`)
-          }
+          onClick={() => navigate(`/governance/select-proposal-type/${selectedProposalType.current}`)}
         >
           Continue
         </Button>
