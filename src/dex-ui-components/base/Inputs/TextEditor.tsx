@@ -4,8 +4,8 @@ import { chakra } from "@chakra-ui/react";
 import { customTextEditorStyles } from "./styles/TextEditorStyles";
 interface NewTokenProps {
   placeholder: string;
-  value: string;
-  handleTitleChange: (event: string) => void;
+  textEditorValue: string;
+  handleTextValueChange: (event: string) => void;
 }
 
 const formats = [
@@ -48,12 +48,12 @@ const modules = {
 const ChakraTextEditor = chakra(ReactQuill);
 
 function TextEditor(props: NewTokenProps) {
-  const { placeholder, value, handleTitleChange } = props;
+  const { placeholder, textEditorValue, handleTextValueChange } = props;
   return (
     <ChakraTextEditor
       theme="snow"
-      value={value}
-      onChange={handleTitleChange}
+      value={textEditorValue}
+      onChange={handleTextValueChange}
       placeholder={placeholder}
       modules={modules}
       formats={formats}

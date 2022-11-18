@@ -1,20 +1,23 @@
 import { FormControl, Input, VStack } from "@chakra-ui/react";
 import { TextEditor } from "../../../dex-ui-components/base/Inputs/TextEditor";
+import { ChangeEvent } from "react";
 interface NewTextProps {
-  value: string;
+  textEditorValue: string;
   title: string;
-  handleTitleChange: (event: string) => void;
+  handleTitleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleTextValueChange: (event: string) => void;
 }
 
 function AddNewText(props: NewTextProps) {
-  const { value, title, handleTitleChange } = props;
+  const { textEditorValue, title, handleTitleChange, handleTextValueChange } = props;
   return (
     <VStack alignItems="left" gap="10px">
       <FormControl>
-        <Input value={title} variant="form-input" placeholder="Proposal Title" />
+        <Input value={title} variant="form-input" placeholder="Proposal Title" onChange={handleTitleChange} />
       </FormControl>
       <FormControl>
-        <TextEditor placeholder="Description" value={value} handleTitleChange={handleTitleChange} />
+        {/* eslint-disable-next-line max-len */}
+        <TextEditor placeholder="Description" textEditorValue={textEditorValue} handleTextValueChange={handleTextValueChange} />
       </FormControl>
       <FormControl>
         <Input variant="form-input" placeholder="Link to Discussion (optional)" />

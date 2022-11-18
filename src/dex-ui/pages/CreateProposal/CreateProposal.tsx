@@ -48,9 +48,9 @@ export const CreateProposal = (props: any) => {
    * This should be replaced with Formik in the future.
    * */
   //TODO: to be changed later to store values in stores rather in hook
-  const [value, setValue] = useState("");
-  const handleValueChange = (event: string) => {
-    setValue(event);
+  const [textEditorValue, setTextEditorValue] = useState("");
+  const handleTextValueChange = (textEditorValue: string) => {
+    setTextEditorValue(textEditorValue);
   };
 
   /**
@@ -94,7 +94,7 @@ export const CreateProposal = (props: any) => {
             {proposalType === "new-token" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
             {/* eslint-disable max-len */}
             {proposalType === "text" ? (
-              <AddNewText title={title} value={value} handleTitleChange={handleValueChange} />
+              <AddNewText title={title} textEditorValue={textEditorValue} handleTitleChange={handleTitleChange} handleTextValueChange={handleTextValueChange} />
             ) : null}
             {proposalType === "contract-upgrade" ? (
               <AddNewToken title={title} handleTitleChange={handleTitleChange} />
