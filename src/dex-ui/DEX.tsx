@@ -25,7 +25,6 @@ const DEX = () => {
                 <Route path="/pools/withdraw" element={<Withdraw />} />
                 <Route path="/governance" element={<Governance />} />
                 <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
-                {/* eslint-disable max-len */}
                 <Route
                   path="/governance/select-proposal-type/new-token"
                   element={<CreateProposal proposalType="new-token" />}
@@ -39,7 +38,6 @@ const DEX = () => {
                   path="/governance/select-proposal-type/contract-upgrade"
                   element={<CreateProposal proposalType="contract-upgrade" />}
                 />
-                {/* eslint-enable max-len */}
               </Routes>
             </Flex>
           </ScrollToTop>

@@ -95,7 +95,6 @@ export const CreateProposal = (props: CreateProposalProps) => {
           <Box width="600px">
             <Text textStyle="h3">{getTitle(proposalType)}</Text>
             <Spacer padding="1rem" />
-            {/* eslint-disable max-len */}
             {proposalType === ProposalType.NEW_TOKEN ? (
               <AddNewToken title={title} handleTitleChange={handleTitleChange} />
             ) : null}
@@ -113,7 +112,6 @@ export const CreateProposal = (props: CreateProposalProps) => {
             {proposalType === ProposalType.TOKEN_TRANSFER ? (
               <AddNewToken title={title} handleTitleChange={handleTitleChange} />
             ) : null}
-            {/* eslint-enable max-len */}
             <Spacer padding="1.5rem" />
             <Flex flexDirection="row" justifyContent="end" gap="10px">
               <Button variant="secondary" padding="10px 27px" height="40px">
