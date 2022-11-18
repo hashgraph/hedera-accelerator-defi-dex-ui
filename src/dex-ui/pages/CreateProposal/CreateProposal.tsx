@@ -94,7 +94,12 @@ export const CreateProposal = (props: any) => {
             {proposalType === "new-token" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
             {/* eslint-disable max-len */}
             {proposalType === "text" ? (
-              <AddNewText title={title} textEditorValue={textEditorValue} handleTitleChange={handleTitleChange} handleTextValueChange={handleTextValueChange} />
+              <AddNewText
+                title={title}
+                textEditorValue={textEditorValue}
+                handleTitleChange={handleTitleChange}
+                handleTextValueChange={handleTextValueChange}
+              />
             ) : null}
             {proposalType === "contract-upgrade" ? (
               <AddNewToken title={title} handleTitleChange={handleTitleChange} />

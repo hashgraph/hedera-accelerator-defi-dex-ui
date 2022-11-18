@@ -17,7 +17,11 @@ function AddNewText(props: NewTextProps) {
       </FormControl>
       <FormControl>
         {/* eslint-disable-next-line max-len */}
-        <TextEditor placeholder="Description" textEditorValue={textEditorValue} handleTextValueChange={handleTextValueChange} />
+        <TextEditor
+          placeholder="Description"
+          textEditorValue={textEditorValue}
+          handleTextValueChange={handleTextValueChange}
+        />
       </FormControl>
       <FormControl>
         <Input variant="form-input" placeholder="Link to Discussion (optional)" />
