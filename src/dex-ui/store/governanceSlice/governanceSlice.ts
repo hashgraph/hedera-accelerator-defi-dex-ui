@@ -1,29 +1,50 @@
+import { GOVERNOR_PROXY_CONTRACT } from "./../../services/constants";
+import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId } from "@hashgraph/sdk";
-import { HederaService, WalletService } from "../../services";
-import { getErrorMessage } from "../../utils";
+import { HederaService, WalletService, MirrorNodeService, MirrorNodeDecodedProposalEvent } from "../../services";
+import { getErrorMessage, getCurrentUnixTimestamp } from "../../utils";
 import { TransactionStatus } from "../appSlice";
 import {
+  ContractProposalState,
   GovernanceActionType,
   GovernanceSlice,
   GovernanceState,
   GovernanceStore,
   Proposal,
+  ProposalState,
   ProposalStatus,
 } from "./type";
+import { getStatus } from "./utils";
+import { isNil } from "ramda";
 
 /** TODO: Replace will real data */
 const mockProposalData: Proposal[] = [
+  {
+    title: "New Token Proposal 8",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+      adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Active,
+    timeRemaining: BigNumber(86400),
+    state: ProposalState.Pending,
+    voteCount: {
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(300),
+    },
+  },
   {
     title: "New Token Proposal 1",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.ACTIVE,
-    timeRemaining: "12d 4 hrs",
+    status: ProposalStatus.Active,
+    timeRemaining: BigNumber(16400),
+    state: ProposalState.Active,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(13),
+      no: new BigNumber(23),
+      abstain: new BigNumber(112),
     },
   },
   {
@@ -31,12 +52,13 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.ACTIVE,
-    timeRemaining: "12d 4 hrs",
+    status: ProposalStatus.Active,
+    timeRemaining: BigNumber(66400),
+    state: ProposalState.Active,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(300),
     },
   },
   {
@@ -44,12 +66,41 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.ACTIVE,
-    timeRemaining: "12d 4 hrs",
+    status: ProposalStatus.Active,
+    timeRemaining: BigNumber(166400),
+    state: ProposalState.Queued,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
+    },
+  },
+  {
+    title: "New Token Proposal 6",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+      adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Passed,
+    timeRemaining: new BigNumber(0),
+    state: ProposalState.Executed,
+    voteCount: {
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
+    },
+  },
+  {
+    title: "New Token Proposal 9",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+      adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Passed,
+    timeRemaining: new BigNumber(0),
+    state: ProposalState.Succeeded,
+    voteCount: {
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -57,12 +108,13 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
     adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.PASSED,
-    timeRemaining: "12d 4 hrs",
+    status: ProposalStatus.Failed,
+    timeRemaining: new BigNumber(0),
+    state: ProposalState.Defeated,
     voteCount: {
-      yes: 123,
-      no: 462,
-      abstain: 3000,
+      yes: new BigNumber(123),
+      no: new BigNumber(462),
+      abstain: new BigNumber(3000),
     },
   },
   {
@@ -70,12 +122,27 @@ const mockProposalData: Proposal[] = [
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
     author: AccountId.fromString("0.0.34728121"),
-    status: ProposalStatus.FAILED,
-    timeRemaining: "6d 4 hrs",
+    status: ProposalStatus.Failed,
+    timeRemaining: new BigNumber(0),
+    state: ProposalState.Canceled,
     voteCount: {
-      yes: 232,
-      no: 212,
-      abstain: 2203,
+      yes: new BigNumber(232),
+      no: new BigNumber(212),
+      abstain: new BigNumber(2203),
+    },
+  },
+  {
+    title: "New Token Proposal 7",
+    description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+        adipiscing elit Phasellus congue, sapien eu...`,
+    author: AccountId.fromString("0.0.34728121"),
+    status: ProposalStatus.Failed,
+    timeRemaining: new BigNumber(0),
+    state: ProposalState.Expired,
+    voteCount: {
+      yes: new BigNumber(232),
+      no: new BigNumber(212),
+      abstain: new BigNumber(2203),
     },
   },
 ];
@@ -102,9 +169,39 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       app.setFeaturesAsLoading(["proposals"]);
       set({}, false, GovernanceActionType.FETCH_PROPOSALS_STARTED);
       try {
+        const proposalEvents = await MirrorNodeService.fetchAllProposals(GOVERNOR_PROXY_CONTRACT.StringId);
+        const getTimeRemaining = async (endBlock: BigNumber): Promise<BigNumber> => {
+          const endTime = await MirrorNodeService.fetchBlock(endBlock.toString());
+          const timeRemaining = BigNumber(endTime.timestamp.to).minus(BigNumber(getCurrentUnixTimestamp()));
+          return timeRemaining.gt(0) ? timeRemaining : BigNumber(0);
+        };
+        const proposals = await Promise.all(
+          proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent): Promise<Proposal> => {
+            const { proposalId, description, proposer, endBlock } = proposalEvent;
+            const state = await HederaService.fetchProposalState(proposalId);
+            const votes = await HederaService.fetchProposalVotes(proposalId);
+            const proposalState = state
+              ? (ContractProposalState[state?.toNumber()] as keyof typeof ContractProposalState)
+              : undefined;
+            return {
+              title: description,
+              description: `Preview of the description lorem ipsum dolor sit amit consectetur 
+            adipiscing elit Phasellus congue, sapien eu...`,
+              author: proposer ? AccountId.fromSolidityAddress(proposer) : AccountId.fromString("0.0.34728121"),
+              status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
+              timeRemaining: !isNil(endBlock) ? await getTimeRemaining(endBlock) : undefined,
+              state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
+              voteCount: {
+                yes: votes.forVotes,
+                no: votes.againstVotes,
+                abstain: votes.abstainVotes,
+              },
+            };
+          })
+        );
         set(
           ({ governance }) => {
-            governance.proposals = mockProposalData;
+            governance.proposals = proposals.concat(mockProposalData);
           },
           false,
           GovernanceActionType.FETCH_PROPOSALS_SUCCEEDED
