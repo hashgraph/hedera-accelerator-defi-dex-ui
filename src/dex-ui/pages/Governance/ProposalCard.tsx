@@ -45,7 +45,11 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const state = getStateColor(proposal.state);
 
   return (
-    <Card variant="proposal-card" padding="0.75rem 0.25rem" onClick={() => navigate("/governance/proposal-details")}>
+    <Card
+      variant="proposal-card"
+      padding="0.75rem 0.25rem"
+      onClick={() => navigate("/governance/proposal-details", { state: { ...proposal } })}
+    >
       <Flex>
         <Center flex="2">
           <VStack>

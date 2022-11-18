@@ -7,12 +7,12 @@ import { useState } from "react";
 import { Notification, NotficationTypes } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
-import { formatProposals } from "./formatter";
+import { formatProposal } from "./formatter";
 import { ProposalStatus } from "../../store/governanceSlice";
 
 export const Governance = (): JSX.Element => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
-  const formattedProposals = governance.proposals.map(formatProposals);
+  const formattedProposals = governance.proposals.map(formatProposal);
   useGovernanceData();
   const navigate = useNavigate();
 

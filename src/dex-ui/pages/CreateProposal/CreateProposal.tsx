@@ -81,6 +81,7 @@ export const CreateProposal = (props: CreateProposalProps) => {
   return (
     <>
       <VStack alignItems="left" width="100%">
+        {/* turn into component */}
         <Breadcrumb flex="1">
           <BreadcrumbItem>
             <BreadcrumbLink as={ReachLink} to="/governance/select-proposal-type">

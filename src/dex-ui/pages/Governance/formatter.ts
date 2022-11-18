@@ -7,7 +7,7 @@ import { FormattedProposal } from "./types";
  * @param proposal - The proposal data to be formatted.
  * @returns A formatted version of the proposal data.
  */
-export const formatProposals = (proposal: Proposal): FormattedProposal => {
+export const formatProposal = (proposal: Proposal): FormattedProposal => {
   const { title, author, description, status, timeRemaining, state, voteCount } = proposal;
   return {
     title,
