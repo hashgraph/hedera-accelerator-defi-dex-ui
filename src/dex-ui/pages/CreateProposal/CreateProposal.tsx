@@ -7,33 +7,37 @@ import { useDexContext } from "../../hooks";
 import { TransactionStatus } from "../../store/appSlice";
 import { AddNewText } from "./AddNewText";
 import { AddNewToken } from "./AddNewToken";
+import * as ProposalType from "./constants";
 export interface CreateProposalLocationProps {
   proposalTitle: string | undefined;
   proposalTransactionId: string | undefined;
   isProposalCreationSuccessful: boolean;
 }
+interface CreateProposalProps {
+  proposalType: string;
+}
 
 const getTitle = (title: string) => {
   switch (title) {
-    case "new-token":
+    case ProposalType.NEW_TOKEN:
       return "Add New Token";
-    case "text":
+    case ProposalType.TEXT:
       return "Text Proposal";
-    case "token-transfer":
+    case ProposalType.TOKEN_TRANSFER:
       return "Token Transfer";
-    case "contract-upgrade":
+    case ProposalType.CONTRACT_UPGRADE:
       return "Contract Updrage";
   }
 };
 
-export const CreateProposal = (props: any) => {
+export const CreateProposal = (props: CreateProposalProps) => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
   const navigate = useNavigate();
   /**
    * Fetching the last form type from the URL and use the string to load the form
    * In case the user bookmarks the URL
    * */
-  const proposalType = window.location.href.split("/").pop() ?? "new-token";
+  const { proposalType } = props;
 
   /**
    * Temporarily managing form values with standard React state.
@@ -91,9 +95,9 @@ export const CreateProposal = (props: any) => {
           <Box width="600px">
             <Text textStyle="h3">{getTitle(proposalType)}</Text>
             <Spacer padding="1rem" />
-            {proposalType === "new-token" ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
             {/* eslint-disable max-len */}
-            {proposalType === "text" ? (
+            {proposalType === ProposalType.NEW_TOKEN ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
+            {proposalType === ProposalType.TEXT ? (
               <AddNewText
                 title={title}
                 textEditorValue={textEditorValue}
@@ -101,10 +105,10 @@ export const CreateProposal = (props: any) => {
                 handleTextValueChange={handleTextValueChange}
               />
             ) : null}
-            {proposalType === "contract-upgrade" ? (
+            {proposalType === ProposalType.CONTRACT_UPGRADE ? (
               <AddNewToken title={title} handleTitleChange={handleTitleChange} />
             ) : null}
-            {proposalType === "token-transfer" ? (
+            {proposalType === ProposalType.TOKEN_TRANSFER ? (
               <AddNewToken title={title} handleTitleChange={handleTitleChange} />
             ) : null}
             {/* eslint-enable max-len */}
