@@ -28,7 +28,7 @@ const SwapSettingsInput = (props: SwapSettingsInputProps) => {
       <Flex display="flex" alignItems={"center"}>
         <Text fontSize={"xs"}>{props.label}&nbsp;</Text>
         <Popover>
-          {({ isOpen, onClose }) => (
+          {({ isOpen, onClose }: any) => (
             <>
               <PopoverTrigger>
                 <InfoIcon boxSize={3} color="#0000008A" cursor={"pointer"} />

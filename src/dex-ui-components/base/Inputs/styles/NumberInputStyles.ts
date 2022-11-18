@@ -9,7 +9,7 @@ export const NumberInputStyles: ComponentStyleConfig = {
   sizes: {},
   variants: {
     "token-amount-input": (props) => ({
-      ...theme.components.NumberInput.variants.outline(props),
+      ...theme.components.NumberInput.variants?.outline(props),
       field: {
         backgroundColor: "white",
         borderBottom: "1px solid #E7E9EB",

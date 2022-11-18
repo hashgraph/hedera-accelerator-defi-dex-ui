@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Spacer, VStack } from "@chakra-ui/react";
+import { Text, Button, Flex, Spacer } from "@chakra-ui/react";
 import { ProposalCard } from "./ProposalCard";
 import { useDexContext } from "../../hooks";
 import { useGovernanceData } from "../../hooks/useGovernanceData";
@@ -54,23 +54,29 @@ export const Governance = (): JSX.Element => {
         </Button>
       </Flex>
       <Spacer margin="0.5rem" />
-      <VStack>
+      <Flex direction="column">
         {formattedProposals
           .filter((proposal) => proposal.status === ProposalStatus.Active)
           .map((proposal, index) => (
-            <ProposalCard proposal={proposal} key={index} />
+            <>
+              <ProposalCard proposal={proposal} key={index} />
+              <Spacer margin="0.3rem" />
+            </>
           ))}
-      </VStack>
+      </Flex>
       <Spacer margin="1rem" />
       <Text textStyle="h3">All Proposals</Text>
       <Spacer margin="0.5rem" />
-      <VStack>
+      <Flex direction="column">
         {formattedProposals
           .filter((proposal) => proposal.status === ProposalStatus.Passed || proposal.status === ProposalStatus.Failed)
           .map((proposal, index) => (
-            <ProposalCard proposal={proposal} key={index} />
+            <>
+              <ProposalCard proposal={proposal} key={index} />
+              <Spacer margin="0.3rem" />
+            </>
           ))}
-      </VStack>
+      </Flex>
     </Flex>
   );
 };
