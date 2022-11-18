@@ -1,31 +1,48 @@
+import { BigNumber } from "bignumber.js";
 import { TransactionResponse, AccountId } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 import { TransactionStatus } from "../appSlice";
 
-enum VotingStatus {
-  REVIEW = "Review",
-  ACTIVE = "Active",
-  QUEUED = "Queued to Execute",
-  EXECUTED = "Executed",
+enum ProposalStatus {
+  Active = "Active",
+  Passed = "Passed",
+  Failed = "Failed",
 }
 
-enum ProposalStatus {
-  ACTIVE = "Active",
-  PASSED = "Passed",
-  FAILED = "Failed",
+enum ContractProposalState {
+  Pending,
+  Active,
+  Canceled,
+  Defeated,
+  Succeeded,
+  Queued,
+  Expired,
+  Executed,
+}
+
+enum ProposalState {
+  Pending = "Pending",
+  Active = "Active",
+  Canceled = "Canceled",
+  Defeated = "Defeated",
+  Succeeded = "Succeeded",
+  Queued = "Queued",
+  Expired = "Expired",
+  Executed = "Executed",
 }
 
 interface Proposal {
-  title: string;
+  title: string | undefined;
   author: AccountId;
   description: string;
-  status: ProposalStatus;
-  timeRemaining: string;
+  status: ProposalStatus | undefined;
+  timeRemaining: BigNumber | undefined;
+  state: ProposalState | undefined;
   voteCount: {
-    yes: number;
-    no: number;
-    abstain: number;
+    yes: BigNumber | undefined;
+    no: BigNumber | undefined;
+    abstain: BigNumber | undefined;
   };
 }
 
@@ -74,5 +91,5 @@ type GovernanceSlice = StateCreator<
   GovernanceStore
 >;
 
-export { GovernanceActionType, VotingStatus, ProposalStatus };
+export { GovernanceActionType, ContractProposalState, ProposalState, ProposalStatus };
 export type { GovernanceSlice, GovernanceStore, GovernanceState, GovernanceActions, Proposal };

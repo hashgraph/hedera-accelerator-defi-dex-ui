@@ -5,17 +5,39 @@ import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
 import { TransactionStatus } from "../../store/appSlice";
+import { AddNewText } from "./AddNewText";
 import { AddNewToken } from "./AddNewToken";
-
+import * as ProposalType from "./constants";
 export interface CreateProposalLocationProps {
   proposalTitle: string | undefined;
   proposalTransactionId: string | undefined;
   isProposalCreationSuccessful: boolean;
 }
+interface CreateProposalProps {
+  proposalType: string;
+}
 
-export const CreateProposal = (props: any) => {
+const getTitle = (title: string) => {
+  switch (title) {
+    case ProposalType.NEW_TOKEN:
+      return "Add New Token";
+    case ProposalType.TEXT:
+      return "Text Proposal";
+    case ProposalType.TOKEN_TRANSFER:
+      return "Token Transfer";
+    case ProposalType.CONTRACT_UPGRADE:
+      return "Contract Updrage";
+  }
+};
+
+export const CreateProposal = (props: CreateProposalProps) => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
   const navigate = useNavigate();
+  /**
+   * Fetching the last form type from the URL and use the string to load the form
+   * In case the user bookmarks the URL
+   * */
+  const { proposalType } = props;
 
   /**
    * Temporarily managing form values with standard React state.
@@ -24,6 +46,15 @@ export const CreateProposal = (props: any) => {
   const [title, setTitle] = useState("");
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
+  };
+  /**
+   * Temporarily saving the values for new AddNewTextComponent.
+   * This should be replaced with Formik in the future.
+   * */
+  //TODO: to be changed later to store values in stores rather in hook
+  const [textEditorValue, setTextEditorValue] = useState("");
+  const handleTextValueChange = (textEditorValue: string) => {
+    setTextEditorValue(textEditorValue);
   };
 
   /**
@@ -62,9 +93,25 @@ export const CreateProposal = (props: any) => {
         </Text>
         <Flex flexDirection="column" alignItems="center">
           <Box width="600px">
-            <Text textStyle="h3">Add New Token</Text>
+            <Text textStyle="h3">{getTitle(proposalType)}</Text>
             <Spacer padding="1rem" />
-            <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            {proposalType === ProposalType.NEW_TOKEN ? (
+              <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            ) : null}
+            {proposalType === ProposalType.TEXT ? (
+              <AddNewText
+                title={title}
+                textEditorValue={textEditorValue}
+                handleTitleChange={handleTitleChange}
+                handleTextValueChange={handleTextValueChange}
+              />
+            ) : null}
+            {proposalType === ProposalType.CONTRACT_UPGRADE ? (
+              <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            ) : null}
+            {proposalType === ProposalType.TOKEN_TRANSFER ? (
+              <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            ) : null}
             <Spacer padding="1.5rem" />
             <Flex flexDirection="row" justifyContent="end" gap="10px">
               <Button variant="secondary" padding="10px 27px" height="40px">

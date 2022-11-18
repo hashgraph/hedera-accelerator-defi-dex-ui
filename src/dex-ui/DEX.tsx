@@ -1,5 +1,14 @@
 import { ChakraProvider, Container, Flex } from "@chakra-ui/react";
-import { Swap, AddLiquidity, Pools, Withdraw, Governance, CreateProposal, SelectProposalType } from "./pages";
+import {
+  Swap,
+  AddLiquidity,
+  Pools,
+  Withdraw,
+  Governance,
+  ProposalDetails,
+  CreateProposal,
+  SelectProposalType,
+} from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import { DEXTheme } from "./styles";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
@@ -24,11 +33,21 @@ const DEX = () => {
                 <Route path="/pools/add-liquidity" element={<AddLiquidity />} />
                 <Route path="/pools/withdraw" element={<Withdraw />} />
                 <Route path="/governance" element={<Governance />} />
+                <Route path="/governance/proposal-details" element={<ProposalDetails />} />
                 <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
-                <Route path="/governance/select-proposal-type/new-token" element={<CreateProposal />} />
-                <Route path="/governance/select-proposal-type/text" element={<CreateProposal />} />
-                <Route path="/governance/select-proposal-type/token-transfer" element={<CreateProposal />} />
-                <Route path="/governance/select-proposal-type/contract-upgrade" element={<CreateProposal />} />
+                <Route
+                  path="/governance/select-proposal-type/new-token"
+                  element={<CreateProposal proposalType="new-token" />}
+                />
+                <Route path="/governance/select-proposal-type/text" element={<CreateProposal proposalType="text" />} />
+                <Route
+                  path="/governance/select-proposal-type/token-transfer"
+                  element={<CreateProposal proposalType="token-transfer" />}
+                />
+                <Route
+                  path="/governance/select-proposal-type/contract-upgrade"
+                  element={<CreateProposal proposalType="contract-upgrade" />}
+                />
               </Routes>
             </Flex>
           </ScrollToTop>

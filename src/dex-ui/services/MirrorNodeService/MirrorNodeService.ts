@@ -1,4 +1,5 @@
 import axios from "axios";
+import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
 import {
@@ -16,7 +17,10 @@ import {
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
   TokenPair,
+  MirrorNodeProposalEventLog,
+  MirrorNodeDecodedProposalEvent,
 } from "./types";
+import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -37,7 +41,7 @@ type MirrorNodeServiceType = ReturnType<typeof createMirrorNodeService>;
 /**
  * A hook that provides access to functions that fetch transaction and account
  * information from a Hedera managed mirror node.
- * @returns - The state of the mirror node data as well as functions that can be used to fetch
+ * @returns The state of the mirror node data as well as functions that can be used to fetch
  * the latest mirror node network data.
  */
 function createMirrorNodeService() {
@@ -163,12 +167,89 @@ function createMirrorNodeService() {
     });
   };
 
+  /**
+   * Decodes event contents using the ABI definition of the event.
+   * @param eventName - the name of the event.
+   * @param logData - log data as a Hex string.
+   * @param topics - an array of event topics.
+   */
+  const decodeEvent = (eventName: string, logData: string, topics: string[]) => {
+    const web3 = new Web3();
+    const abi = govenorAbi.abi;
+    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
+    if (eventAbi?.inputs === undefined) {
+      return undefined;
+    }
+    try {
+      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, logData, topics);
+      return decodedLog;
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
+  };
+
+  /**
+   * Fetches all proposal events emitted by a smart contract. The "ProposalCreated",
+   * "ProposalExecuted", and "ProposalCanceled" are fetched. These events provide data
+   * regarding the contract proposals.
+   * @param contractId - The id of the contract to fetch events from.
+   * @returns An array of proposal event data.
+   */
+  const fetchAllProposals = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
+    /*
+     Currently, each proposal requires multiple additional calls to the smart contract
+     to get all of the desired data for the UI. This is an expensive action that costs a large
+     amount of hbar. We are only fetching the latest proposal for the time being to reduce
+     the query overhead. A solution is being built on the smart contract to enable a single
+     query to get all proposal data.
+
+     const response = await fetchNextBatch<{ logs: [] }>(
+      `/api/v1/contracts/${contractId.toString()}/results/logs`,
+      "logs",
+      {
+        params: {
+          order: "desc",
+        },
+      }
+    );
+    */
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+      params: {
+        order: "desc",
+        limit: 1,
+      },
+    });
+    const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
+      .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+        return [
+          decodeEvent("ProposalCreated", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+        ];
+      })
+      .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
+    return proposals;
+  };
+
+  /**
+   * Fetchs information about a specific blockNumber.
+   * @param blockNumber - The block number to query.
+   * @returns Information about the block.
+   */
+  const fetchBlock = async (blockNumber: string) => {
+    const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
+    return block.data;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenPairs,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
+    fetchAllProposals,
+    fetchBlock,
   };
 }
 

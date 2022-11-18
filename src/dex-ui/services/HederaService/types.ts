@@ -2,6 +2,23 @@ import { BigNumber } from "bignumber.js";
 import { HashConnectSigner } from "hashconnect/dist/provider/signer";
 import { ContractId } from "@hashgraph/sdk";
 
+enum GovernorContractFunctions {
+  CreateProposal = "propose",
+  GetState = "state",
+  GetProposalVotes = "proposalVotes",
+}
+
+enum PairContractFunctions {
+  GetLiquidityProviderTokenAmounts = "getContributorTokenShare",
+  GetSpotPrice = "getSpotPrice",
+  GetFee = "getFee",
+  GetFeePrecision = "getFeePrecision",
+  GetPrecision = "getPrecisionValue",
+  GetPoolBalances = "getPairQty",
+  GetContractAddress = "getContractAddress",
+  GetTokenAddresses = "getTokenPairAddress",
+}
+
 interface AddLiquidityDetails {
   firstTokenAddress: string;
   firstTokenQuantity: BigNumber;
@@ -12,12 +29,5 @@ interface AddLiquidityDetails {
   signer: HashConnectSigner;
 }
 
-interface CreateProposalParams {
-  targets: Array<string>;
-  fees: Array<number>;
-  calls: Array<Uint8Array>;
-  description: string;
-  signer: HashConnectSigner;
-}
-
-export type { AddLiquidityDetails, CreateProposalParams };
+export { GovernorContractFunctions, PairContractFunctions };
+export type { AddLiquidityDetails };

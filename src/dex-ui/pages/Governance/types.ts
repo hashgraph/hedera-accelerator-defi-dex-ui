@@ -1,19 +1,17 @@
-import { AccountId } from "@hashgraph/sdk";
+import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
 
-type VotingStatus = "Review" | "Active" | "Queued to Execute" | "Executed";
-type ProposalStatus = "Active" | "Passed" | "Failed";
-
-interface Proposal {
-  title: string;
-  author: AccountId;
+interface FormattedProposal {
+  title: string | undefined;
+  author: string;
   description: string;
-  status: ProposalStatus;
-  timeRemaining: string;
+  status: ProposalStatus | undefined;
+  timeRemaining: string | undefined;
+  state: ProposalState | undefined;
   voteCount: {
-    yes: number;
-    no: number;
-    abstain: number;
+    yes: number | undefined;
+    no: number | undefined;
+    abstain: number | undefined;
   };
 }
 
-export type { Proposal, VotingStatus, ProposalStatus };
+export type { FormattedProposal, ProposalStatus };

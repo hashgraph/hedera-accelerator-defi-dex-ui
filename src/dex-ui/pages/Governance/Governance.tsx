@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Spacer, VStack } from "@chakra-ui/react";
+import { Text, Button, Flex, Spacer } from "@chakra-ui/react";
 import { ProposalCard } from "./ProposalCard";
 import { useDexContext } from "../../hooks";
 import { useGovernanceData } from "../../hooks/useGovernanceData";
@@ -7,11 +7,15 @@ import { useState } from "react";
 import { Notification, NotficationTypes } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
+import { formatProposals } from "./formatter";
+import { ProposalStatus } from "../../store/governanceSlice";
 
 export const Governance = (): JSX.Element => {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
+  const formattedProposals = governance.proposals.map(formatProposals);
   useGovernanceData();
   const navigate = useNavigate();
+
   const locationState = useLocation().state as CreateProposalLocationProps;
   const [shouldShowNotification, setShouldShowNotification] = useState<boolean>(
     locationState?.isProposalCreationSuccessful ?? false
@@ -37,18 +41,8 @@ export const Governance = (): JSX.Element => {
       )}
       <Text textStyle="h2">Governance</Text>
       <Spacer margin="1rem" />
-      <Text textStyle="h3">Active Proposals</Text>
-      <Spacer margin="0.5rem" />
-      <VStack>
-        {governance.proposals
-          .filter((proposal) => proposal.status === "Active")
-          .map((proposal, index) => (
-            <ProposalCard proposal={proposal} key={index} />
-          ))}
-      </VStack>
-      <Spacer margin="1rem" />
       <Flex direction="row" alignItems="center">
-        <Text textStyle="h3">All Proposals</Text>
+        <Text textStyle="h3">Active Proposals</Text>
         <Spacer />
         <Button
           variant="new-proposal"
@@ -60,11 +54,29 @@ export const Governance = (): JSX.Element => {
         </Button>
       </Flex>
       <Spacer margin="0.5rem" />
-      <VStack>
-        {governance.proposals.map((proposal, index) => (
-          <ProposalCard proposal={proposal} key={index} />
-        ))}
-      </VStack>
+      <Flex direction="column">
+        {formattedProposals
+          .filter((proposal) => proposal.status === ProposalStatus.Active)
+          .map((proposal, index) => (
+            <>
+              <ProposalCard proposal={proposal} key={index} />
+              <Spacer margin="0.3rem" />
+            </>
+          ))}
+      </Flex>
+      <Spacer margin="1rem" />
+      <Text textStyle="h3">All Proposals</Text>
+      <Spacer margin="0.5rem" />
+      <Flex direction="column">
+        {formattedProposals
+          .filter((proposal) => proposal.status === ProposalStatus.Passed || proposal.status === ProposalStatus.Failed)
+          .map((proposal, index) => (
+            <>
+              <ProposalCard proposal={proposal} key={index} />
+              <Spacer margin="0.3rem" />
+            </>
+          ))}
+      </Flex>
     </Flex>
   );
 };
