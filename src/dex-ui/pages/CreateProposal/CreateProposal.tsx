@@ -96,7 +96,9 @@ export const CreateProposal = (props: CreateProposalProps) => {
             <Text textStyle="h3">{getTitle(proposalType)}</Text>
             <Spacer padding="1rem" />
             {/* eslint-disable max-len */}
-            {proposalType === ProposalType.NEW_TOKEN ? <AddNewToken title={title} handleTitleChange={handleTitleChange} /> : null}
+            {proposalType === ProposalType.NEW_TOKEN ? (
+              <AddNewToken title={title} handleTitleChange={handleTitleChange} />
+            ) : null}
             {proposalType === ProposalType.TEXT ? (
               <AddNewText
                 title={title}

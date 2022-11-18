@@ -26,10 +26,19 @@ const DEX = () => {
                 <Route path="/governance" element={<Governance />} />
                 <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
                 {/* eslint-disable max-len */}
-                <Route path="/governance/select-proposal-type/new-token" element={<CreateProposal proposalType="new-token" />} />
+                <Route
+                  path="/governance/select-proposal-type/new-token"
+                  element={<CreateProposal proposalType="new-token" />}
+                />
                 <Route path="/governance/select-proposal-type/text" element={<CreateProposal proposalType="text" />} />
-                <Route path="/governance/select-proposal-type/token-transfer" element={<CreateProposal proposalType="token-transfer" />} />
-                <Route path="/governance/select-proposal-type/contract-upgrade" element={<CreateProposal proposalType="contract-upgrade" />} />
+                <Route
+                  path="/governance/select-proposal-type/token-transfer"
+                  element={<CreateProposal proposalType="token-transfer" />}
+                />
+                <Route
+                  path="/governance/select-proposal-type/contract-upgrade"
+                  element={<CreateProposal proposalType="contract-upgrade" />}
+                />
                 {/* eslint-enable max-len */}
               </Routes>
             </Flex>
