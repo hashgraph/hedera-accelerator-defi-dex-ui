@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { Link as ReachLink, useLocation } from "react-router-dom";
 import { HorizontalStackBarChart, Metrics } from "../../../dex-ui-components";
+import { useDexContext } from "../../hooks";
 import { Proposal } from "../../store/governanceSlice";
 import { formatProposal } from "../Governance/formatter";
 import { FormattedProposal } from "../Governance/types";
@@ -26,10 +27,12 @@ import { FormattedProposal } from "../Governance/types";
 export const ProposalDetails = () => {
   const locationState = useLocation();
   const state = locationState.state as FormattedProposal;
-  // const formattedProposals = formatProposal(state);
+  const { governance } = useDexContext(({ governance }) => ({ governance }));
+  // const formattedProposals = formatProposal(governance.proposals);
+
   return (
     <>
-      <Grid templateColumns="repeat(4, 1fr)" gap={4} minHeight="500px">
+      <Grid templateColumns="repeat(4, 1fr)" gap="4" minHeight="500px">
         <GridItem colSpan={3}>
           <Flex direction="column" gap={10} height="100%">
             <Breadcrumb>
@@ -59,12 +62,12 @@ export const ProposalDetails = () => {
               </Flex>
             </Box>
             <Box flexGrow="1">
-              <Text textStyle="h5">Description</Text>
+              <Text textStyle="h3">Description</Text>
               <Spacer padding="0.25rem" />
               <Text textStyle="b2">{state.description}</Text>
             </Box>
             <Flex gap="4" direction="column">
-              <Text textStyle="h5">Vote on Proposal</Text>
+              <Text textStyle="h3">Vote on Proposal</Text>
               <Flex gap="4">
                 <Button flex="1">Vote Yes</Button>
                 <Button flex="1">Vote No</Button>

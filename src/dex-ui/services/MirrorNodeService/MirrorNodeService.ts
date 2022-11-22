@@ -222,6 +222,7 @@ function createMirrorNodeService() {
     });
     const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
       .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+        console.log(proposalEventLog);
         return [
           decodeEvent("ProposalCreated", proposalEventLog.data, proposalEventLog.topics.slice(1)),
           decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),

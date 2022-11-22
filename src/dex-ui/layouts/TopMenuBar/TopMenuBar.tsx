@@ -51,11 +51,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
 
   return (
     <Menu>
-      <Flex padding="2rem 1rem" marginBottom="3rem" w="100%" alignItems="center">
+      <Flex padding="2rem 1rem" w="100%" alignItems="center">
         <Box flex="1.5">
           <HStack spacing="0.5rem">
-            <Text textStyle="h5">Hedera Open DEX</Text>
-            <Tag textStyle="b4" size="sm">
+            <Text textStyle="h4">Hedera Open DEX</Text>
+            <Tag textStyle="b3" size="sm">
               Pre-Alpha
             </Tag>
           </HStack>
@@ -67,7 +67,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                 <Box flex="1" key={index}>
                   <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
                     <MenuItem justifyContent="center" _hover={{ bg: "gray.200" }}>
-                      <Text textStyle="b2-bold">{menuOption}</Text>
+                      <Text textStyle="h3">{menuOption}</Text>
                     </MenuItem>
                   </RouterLink>
                 </Box>

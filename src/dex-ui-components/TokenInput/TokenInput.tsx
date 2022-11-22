@@ -94,13 +94,9 @@ const TokenInput = (props: TokenInputProps) => {
           )}
         </Flex>
         <Flex padding="0.25rem 0" alignItems="center" backgroundColor="rgba(242,242,244,0.6)" borderRadius="5px">
-          <Text textStyle="b4-medium" paddingLeft="0.5rem" paddingRight="0.25rem">
-            Balance:
-          </Text>
+          <Text textStyle="b3">&nbsp; Balance: &nbsp;</Text>
           <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
-            <Text textStyle="b4-medium" paddingRight="0.75rem">
-              {showTokenBalance()}
-            </Text>
+            <Text textStyle="b3">{showTokenBalance()}</Text>
           </Skeleton>
           {getHalfAndMaxButtonDisplays()}
         </Flex>

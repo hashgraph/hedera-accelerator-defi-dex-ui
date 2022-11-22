@@ -24,9 +24,9 @@ const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => 
   };
 
   return (
-    <Flex borderRadius="20px" overflow="hidden" height={height}>
+    <Flex justifyItems="center" alignItems="center" borderRadius="20px" overflow="hidden" height={height}>
       {data.map((bar: HorizontalStackedBar, index) => {
-        return <Box width={computeBarWidthPercent(bar.value)} bg={bar.bg} key={index}></Box>;
+        return <Box height={height} width={computeBarWidthPercent(bar.value)} bg={bar.bg} key={index}></Box>;
       })}
     </Flex>
   );

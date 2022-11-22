@@ -3,7 +3,7 @@ import { useImmerReducer } from "use-immer";
 import { ChakraProvider, Box, Heading, Flex, Spacer, Text, Collapse } from "@chakra-ui/react";
 import { SettingsIcon, UpDownIcon } from "@chakra-ui/icons";
 import { HashConnectTypes } from "hashconnect";
-import { DEXTheme } from "../../dex-ui/styles";
+import { DEXTheme } from "../../dex-ui/DEX";
 import { swapReducer, initialSwapState, initSwapReducer } from "./reducers";
 import {
   setTokenToTradeAmount,

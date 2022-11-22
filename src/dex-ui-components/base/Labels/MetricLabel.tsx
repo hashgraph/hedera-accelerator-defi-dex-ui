@@ -11,7 +11,7 @@ export const MetricLabel = (props: MetricLabelProps) => {
 
   return (
     <Flex flexDirection="column">
-      <Text textStyle="b5">{label}</Text>
+      <Text textStyle="h4">{label}</Text>
       <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
         <Text textStyle="b3">{value}</Text>
       </Skeleton>

@@ -1,4 +1,4 @@
-import { ChakraProvider, Container, Flex } from "@chakra-ui/react";
+import { ChakraProvider, Container, extendTheme, Flex } from "@chakra-ui/react";
 import {
   Swap,
   AddLiquidity,
@@ -10,12 +10,21 @@ import {
   SelectProposalType,
 } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
-import { DEXTheme } from "./styles";
+import { ButtonStyles, CardStyles, InputStyles, NumberInputStyles, TextStyles } from "../dex-ui-components";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useWalletConnection } from "./hooks";
 import { ScrollToTop } from "./utils";
 
 const menuOptions = ["Swap", "Pools", "Governance"];
+export const DEXTheme = extendTheme({
+  textStyles: TextStyles,
+  components: {
+    Button: ButtonStyles,
+    NumberInput: NumberInputStyles,
+    Input: InputStyles,
+    Card: CardStyles,
+  },
+});
 
 const DEX = () => {
   useWalletConnection();
