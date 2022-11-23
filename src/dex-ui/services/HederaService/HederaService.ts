@@ -465,11 +465,8 @@ function createHederaService() {
     pairCurrentPosition,
     getContractAddress,
     getTokenPairAddress,
-<<<<<<< HEAD
     castVote,
-=======
     getTokenPairs,
->>>>>>> a86a069 (Added new method to fetch token pairs from contract directly)
   };
 }
 
