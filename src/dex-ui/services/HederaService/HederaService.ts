@@ -43,7 +43,7 @@ function createHederaService() {
   };
 
   const getTokenPairs = async () => {
-    const result = await queryContract(factoryId, "getFirstPair", new ContractFunctionParameters());
+    const result = await queryContract(factoryId, PairContractFunctions.GetTokenPair);
     const evmAddress = result?.getAddress(0) ?? "";
     if (!evmAddress) return;
     try {

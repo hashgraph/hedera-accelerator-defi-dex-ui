@@ -19,6 +19,7 @@ enum PairContractFunctions {
   GetPoolBalances = "getPairQty",
   GetContractAddress = "getContractAddress",
   GetTokenAddresses = "getTokenPairAddress",
+  GetTokenPair = "getFirstPair",
 }
 
 interface AddLiquidityDetails {
