@@ -19,6 +19,7 @@ import {
   TokenPair,
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
+  MirrorNodeTokenPairResponse,
 } from "./types";
 import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
@@ -102,6 +103,15 @@ function createMirrorNodeService() {
         tokenB: { symbol: TOKEN_B_SYMBOL, accountId: TOKEN_B_ID },
       },
     ]);
+  };
+
+  /**
+   * Fetches information related to a specific pair pair token.
+   * @param pairAddress  - The ID / Addresss of the pair token account to return data for.
+   * @returns Attributes associated with the provided token ID.
+   */
+  const fetchTokenPairsContract = async (pairAddress: string): Promise<MirrorNodeTokenPairResponse> => {
+    return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
   };
 
   /**
@@ -254,6 +264,7 @@ function createMirrorNodeService() {
     fetchAccountBalances,
     fetchAllProposals,
     fetchBlock,
+    fetchTokenPairsContract,
   };
 }
 

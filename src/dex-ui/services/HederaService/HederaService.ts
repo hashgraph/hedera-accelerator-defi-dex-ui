@@ -9,6 +9,7 @@ import {
   TokenAssociateTransaction,
   TransactionResponse,
   ContractCallQuery,
+  TokenInfoQuery,
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
@@ -18,10 +19,12 @@ import {
   TOKEN_A_ID,
   TOKEN_B_ID,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
+  FACTORY_CONTRACT_ID,
 } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
+import { MirrorNodeService } from "..";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -31,11 +34,55 @@ function createHederaService() {
   const tokenA = TokenId.fromString(TOKEN_A_ID).toSolidityAddress();
   const tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
   const contractId = ContractId.fromString(SWAP_CONTRACT_ID); // "0.0.47712695";
+  const factoryId = ContractId.fromString(FACTORY_CONTRACT_ID); //
   let _precision = BigNumber(0);
 
   const initHederaService = async () => {
     const precision = await fetchPrecision();
     _precision = precision ?? BigNumber(0);
+  };
+
+  const getTokenPairs = async () => {
+    const result = await queryContract(factoryId, "getFirstPair", new ContractFunctionParameters());
+    const evmAddress = result?.getAddress(0) ?? "";
+    if (evmAddress === null || evmAddress === undefined || evmAddress === "") return;
+    try {
+      const {
+        data: { contract_id },
+      } = await MirrorNodeService.fetchTokenPairsContract(evmAddress);
+      const id = ContractId.fromString(contract_id); //0.0.48946274
+      const { tokenAAddress, tokenBAddress } = await getTokenPairAddress(id);
+
+      const tokenAInfo = await new TokenInfoQuery().setTokenId(tokenAAddress).execute(client);
+
+      const tokenBInfo = await new TokenInfoQuery().setTokenId(tokenBAddress).execute(client);
+
+      // TODO: To be Saved in Store
+      const tokenAInfoDetails = {
+        tokenId: tokenAInfo.tokenId,
+        tokenType: tokenAInfo.tokenType,
+        tokenName: tokenAInfo.name,
+        tokenSupply: tokenAInfo.totalSupply,
+        tokenMaxSpply: tokenAInfo.maxSupply,
+        tokenSymbol: tokenAInfo.symbol,
+      };
+
+      // TODO: To be Saved in Store
+      const tokenBInfoDetails = {
+        tokenId: tokenBInfo.tokenId,
+        tokenType: tokenBInfo.tokenType,
+        tokenName: tokenBInfo.name,
+        tokenSupply: tokenBInfo.totalSupply,
+        tokenMaxSpply: tokenBInfo.maxSupply,
+        tokenSymbol: tokenBInfo.symbol,
+      };
+
+      // TODO: To be removed
+      console.info(`- Token A Info: ${tokenAInfoDetails.tokenName} and ${tokenAInfoDetails.tokenSupply}`);
+      console.info(`- Token B Info: ${tokenBInfoDetails.tokenName} and ${tokenBInfoDetails.tokenSupply}`);
+    } catch (error) {
+      console.log("Error while fetching...", error);
+    }
   };
 
   const getPrecision = () => {
@@ -385,7 +432,9 @@ function createHederaService() {
     return contractAddress;
   };
 
-  const getTokenPairAddress = async (): Promise<{
+  const getTokenPairAddress = async (
+    contractId: ContractId
+  ): Promise<{
     tokenAAddress: string;
     tokenBAddress: string;
   }> => {
@@ -416,7 +465,11 @@ function createHederaService() {
     pairCurrentPosition,
     getContractAddress,
     getTokenPairAddress,
+<<<<<<< HEAD
     castVote,
+=======
+    getTokenPairs,
+>>>>>>> a86a069 (Added new method to fetch token pairs from contract directly)
   };
 }
 

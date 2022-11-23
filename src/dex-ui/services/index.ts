@@ -13,6 +13,8 @@ const HederaService = createHederaService();
 
 const initializeServices = async () => {
   await HederaService.initHederaService();
+  //TODO: To be replaced from here
+  await HederaService.getTokenPairs();
 };
 
 export { initializeServices, MirrorNodeService, WalletService, HederaService };

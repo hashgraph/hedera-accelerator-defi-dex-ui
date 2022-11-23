@@ -19,6 +19,8 @@ export const TOKEN_USER_ID = "0.0.47540202";
 export const TOKEN_USER_KEY =
   "302e020100300506032b657004220420b69079b0cdebea97ec13c78bf7277d3f4aef35189755b5d11c2dfae40c566aa8";
 
+// Factory Contract Proxy
+export const FACTORY_CONTRACT_ID = "0.0.48945943";
 // Swap Contract (Pair) Proxy
 export const SWAP_CONTRACT_ID = "0.0.48660596";
 

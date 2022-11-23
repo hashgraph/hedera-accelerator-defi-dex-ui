@@ -26,6 +26,10 @@ interface MirrorNodeTokenByIdResponse {
   data: { decimals: number; symbol: string; token_id: string };
 }
 
+interface MirrorNodeTokenPairResponse {
+  data: { contract_id: string };
+}
+
 interface MirrorNodeTokenBalance {
   token_id: string;
   balance: BigNumber;
@@ -96,4 +100,5 @@ export type {
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
   TokenPair,
+  MirrorNodeTokenPairResponse,
 };
