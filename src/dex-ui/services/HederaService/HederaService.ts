@@ -45,11 +45,11 @@ function createHederaService() {
   const getTokenPairs = async () => {
     const result = await queryContract(factoryId, "getFirstPair", new ContractFunctionParameters());
     const evmAddress = result?.getAddress(0) ?? "";
-    if (evmAddress === null || evmAddress === undefined || evmAddress === "") return;
+    if (!evmAddress) return;
     try {
       const {
         data: { contract_id },
-      } = await MirrorNodeService.fetchTokenPairsContract(evmAddress);
+      } = await MirrorNodeService.fetchContract(evmAddress);
       const id = ContractId.fromString(contract_id); //0.0.48946274
       const { tokenAAddress, tokenBAddress } = await getTokenPairAddress(id);
 

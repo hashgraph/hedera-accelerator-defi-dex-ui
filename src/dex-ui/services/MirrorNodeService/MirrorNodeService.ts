@@ -110,7 +110,7 @@ function createMirrorNodeService() {
    * @param pairAddress  - The ID / Addresss of the pair token account to return data for.
    * @returns Attributes associated with the provided token ID.
    */
-  const fetchTokenPairsContract = async (pairAddress: string): Promise<MirrorNodeTokenPairResponse> => {
+  const fetchContract = async (pairAddress: string): Promise<MirrorNodeTokenPairResponse> => {
     return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
   };
 
@@ -264,7 +264,7 @@ function createMirrorNodeService() {
     fetchAccountBalances,
     fetchAllProposals,
     fetchBlock,
-    fetchTokenPairsContract,
+    fetchContract,
   };
 }
 
