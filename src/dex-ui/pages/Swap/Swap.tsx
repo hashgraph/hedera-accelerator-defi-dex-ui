@@ -24,6 +24,7 @@ const Swap = () => {
             title="Swap"
             sendSwapTransaction={swap.sendSwapTransaction}
             connectionStatus={wallet.hashConnectConnectionState}
+            tokenPairs={swap.tokenPairs}
             connectToWallet={wallet.connectToWallet}
             spotPrices={formattedSpotPrices}
             fee={formattedFee}

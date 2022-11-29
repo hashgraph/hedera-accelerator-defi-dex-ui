@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { ContractId } from "@hashgraph/sdk";
+import { ContractId, TokenId, TokenType } from "@hashgraph/sdk";
 
 enum GovernorContractFunctions {
   CreateProposal = "propose",
@@ -31,6 +31,15 @@ interface AddLiquidityDetails {
   walletAddress: string;
   signer: HashConnectSigner;
 }
+interface TokenPairs {
+  symbol: string;
+  tokenId: TokenId;
+  tokenType: TokenType | null;
+  tokenName: string;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+  pairContractId: string;
+}
 
 export { GovernorContractFunctions, PairContractFunctions };
-export type { AddLiquidityDetails };
+export type { AddLiquidityDetails, TokenPairs };

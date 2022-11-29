@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { TransactionResponse } from "@hashgraph/sdk";
+import { TransactionResponse, TokenId, TokenType } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 
@@ -19,8 +19,16 @@ enum SwapActionType {
   FETCH_SWAP_FEE_SUCCEEDED = "swap/FETCH_SWAP_FEE_SUCCEEDED",
   FETCH_SWAP_FEE_FAILED = "swap/FETCH_SWAP_FEE_FAILED",
   SET_PRECISION = "swap/SET_PRECISION",
+  SET_TOKEN_PAIRS = "swap/SET_TOKEN_PAIRS",
 }
-
+interface TokenPair {
+  symbol: string;
+  tokenId: TokenId;
+  tokenType: TokenType | null;
+  tokenName: string;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+}
 interface TransactionState {
   transactionWaitingToBeSigned: boolean;
   successPayload: TransactionResponse | null;
@@ -33,6 +41,7 @@ interface SwapState {
   poolLiquidity: Record<string, BigNumber | undefined>;
   transactionState: TransactionState;
   errorMessage: string | null;
+  tokenPairs: TokenPair[] | null;
 }
 
 interface SwapActions {
@@ -41,6 +50,7 @@ interface SwapActions {
   fetchFee: () => Promise<void>;
   getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => Promise<void>;
   sendSwapTransaction: ({ tokenToTrade, tokenToReceive }: any) => Promise<void>;
+  fetchTokenPairs: () => Promise<void>;
 }
 
 type SwapStore = SwapState & SwapActions;

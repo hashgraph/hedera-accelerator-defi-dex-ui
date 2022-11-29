@@ -24,12 +24,14 @@ const initialSwapState: SwapState = {
     successPayload: null,
     errorMessage: "",
   },
+  tokenPairs: null,
 };
 
 /**
  *
  * @returns
  */
+
 const createSwapSlice: SwapSlice = (set, get): SwapStore => {
   return {
     ...initialSwapState,
@@ -41,6 +43,16 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         },
         false,
         SwapActionType.SET_PRECISION
+      );
+    },
+    fetchTokenPairs: async () => {
+      const pairs = await HederaService.getTokenPairs();
+      set(
+        ({ swap }) => {
+          swap.tokenPairs = pairs;
+        },
+        false,
+        SwapActionType.SET_TOKEN_PAIRS
       );
     },
     /**
@@ -118,7 +130,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       set({}, false, SwapActionType.FETCH_POOL_LIQUIDITY_STARTED);
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
-        const rawPoolLiquidity = await HederaService.pairCurrentPosition();
+        // TODO: In below Contract call we are directly returining the hard coded
+        // Token A and Token B in real scenario how will we know which is token A and which is token B
+        const rawPoolLiquidity = await HederaService.pairCurrentPosition(ContractId.fromString("0.0.48946274"));
+        console.log("Roshan", poolLiquidity);
         Object.keys(rawPoolLiquidity).forEach((tokenSymbol) => {
           if (swap.precision === undefined) {
             throw Error("Precision not found");

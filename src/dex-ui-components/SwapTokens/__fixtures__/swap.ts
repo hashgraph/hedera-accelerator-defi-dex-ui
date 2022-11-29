@@ -24,4 +24,5 @@ export const mockSwapProps: SwapTokensProps = {
     errorMessage: "",
   },
   isFeatureLoading: () => false,
+  tokenPairs: [],
 };

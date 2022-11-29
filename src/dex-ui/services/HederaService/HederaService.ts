@@ -21,7 +21,7 @@ import {
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
   FACTORY_CONTRACT_ID,
 } from "../constants";
-import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
+import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions, TokenPairs } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
 import { MirrorNodeService } from "..";
@@ -42,46 +42,51 @@ function createHederaService() {
     _precision = precision ?? BigNumber(0);
   };
 
-  const getTokenPairs = async () => {
+  const getTokenPairs = async (): Promise<TokenPairs[] | null> => {
     const result = await queryContract(factoryId, PairContractFunctions.GetTokenPair);
-    const evmAddress = result?.getAddress(0) ?? "";
-    if (!evmAddress) return;
+    const evmAddress = result?.getAddress(0) ?? ""; //TODO: This should e an array of address
+    if (!evmAddress) return null;
     try {
       const {
         data: { contract_id },
-      } = await MirrorNodeService.fetchContract(evmAddress);
+      } = await MirrorNodeService.fetchContract(evmAddress); // TODO: API will be called in loop
       const id = ContractId.fromString(contract_id); //0.0.48946274
-      const { tokenAAddress, tokenBAddress } = await getTokenPairAddress(id);
+      const { tokenAAddress, tokenBAddress } = await getTokenPairAddress(id); // TODO: contract to be caled in loop
 
       const tokenAInfo = await new TokenInfoQuery().setTokenId(tokenAAddress).execute(client);
-
       const tokenBInfo = await new TokenInfoQuery().setTokenId(tokenBAddress).execute(client);
 
       // TODO: To be Saved in Store
-      const tokenAInfoDetails = {
+      const tokenAInfoDetails: TokenPairs = {
         tokenId: tokenAInfo.tokenId,
         tokenType: tokenAInfo.tokenType,
         tokenName: tokenAInfo.name,
-        tokenSupply: tokenAInfo.totalSupply,
-        tokenMaxSpply: tokenAInfo.maxSupply,
-        tokenSymbol: tokenAInfo.symbol,
+        totalSupply: tokenAInfo.totalSupply,
+        maxSupply: tokenAInfo.maxSupply,
+        symbol: tokenAInfo.symbol,
+        pairContractId: contract_id,
       };
 
       // TODO: To be Saved in Store
-      const tokenBInfoDetails = {
+      const tokenBInfoDetails: TokenPairs = {
         tokenId: tokenBInfo.tokenId,
         tokenType: tokenBInfo.tokenType,
         tokenName: tokenBInfo.name,
-        tokenSupply: tokenBInfo.totalSupply,
-        tokenMaxSpply: tokenBInfo.maxSupply,
-        tokenSymbol: tokenBInfo.symbol,
+        totalSupply: tokenBInfo.totalSupply,
+        maxSupply: tokenBInfo.maxSupply,
+        symbol: tokenBInfo.symbol,
+        pairContractId: contract_id,
       };
 
+      const tokenPairs: TokenPairs[] = [tokenAInfoDetails, tokenBInfoDetails];
       // TODO: To be removed
-      console.info(`- Token A Info: ${tokenAInfoDetails.tokenName} and ${tokenAInfoDetails.tokenSupply}`);
-      console.info(`- Token B Info: ${tokenBInfoDetails.tokenName} and ${tokenBInfoDetails.tokenSupply}`);
+      console.info(`- Roshan Token A Info: ${tokenAInfoDetails.tokenName} and ${tokenAInfoDetails.totalSupply}`);
+      console.info(`- Roshan Token B Info: ${tokenBInfoDetails.tokenName} and ${tokenBInfoDetails.totalSupply}`);
+
+      return tokenPairs;
     } catch (error) {
       console.log("Error while fetching...", error);
+      return null;
     }
   };
 
@@ -373,6 +378,7 @@ function createHederaService() {
     const result = await queryContract(_contractId, PairContractFunctions.GetPoolBalances);
     const tokenAQty = result?.getInt256(0);
     const tokenBQty = result?.getInt256(1);
+    console.log("Roshan A", tokenAQty, tokenBQty);
     // TODO: dont hardcodethis, will have to be dynamic
     return { [TOKEN_A_SYMBOL]: tokenAQty, [TOKEN_B_SYMBOL]: tokenBQty };
   };

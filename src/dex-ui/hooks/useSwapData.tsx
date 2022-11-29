@@ -17,12 +17,14 @@ export const useSwapData = (refreshInterval = 0) => {
     swap,
   }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0];
-  const { transactionState, fetchFee, fetchSpotPrices, getPrecision } = swap;
+  const { transactionState, fetchFee, fetchSpotPrices, getPrecision, fetchTokenPairs } = swap;
 
   const fetchSwapDataOnLoad = useCallback(async () => {
     getPrecision();
+    // Get Token pairs (called from store)
     await Promise.allSettled([fetchFee(), fetchSpotPrices()]);
-  }, [getPrecision, fetchFee, fetchSpotPrices]);
+    await Promise.allSettled([fetchTokenPairs()]);
+  }, [getPrecision, fetchFee, fetchSpotPrices, fetchTokenPairs]);
 
   const fetchSwapDataOnInterval = useCallback(async () => {
     await fetchSpotPrices();

@@ -40,7 +40,16 @@ import { TransactionState } from "../../dex-ui/store/swapSlice";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { createHashScanLink } from "../../dex-ui/utils";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { TokenId, TokenType } from "@hashgraph/sdk";
 
+interface TokenPairs {
+  symbol: string;
+  tokenId: TokenId;
+  tokenType: TokenType | null;
+  tokenName: string;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+}
 export interface SwapTokensProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;
@@ -56,6 +65,7 @@ export interface SwapTokensProps {
   installedExtensions: HashConnectTypes.WalletMetadata | null;
   transactionState: TransactionState;
   isFeatureLoading: <T extends AppFeatures>(feature: T) => boolean;
+  tokenPairs?: TokenPairs[] | null;
 }
 
 const SwapTokens = (props: SwapTokensProps) => {
@@ -71,6 +81,7 @@ const SwapTokens = (props: SwapTokensProps) => {
     getPoolLiquidity,
     transactionState,
     isFeatureLoading,
+    tokenPairs,
   } = props;
 
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
@@ -442,6 +453,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           onTokenAmountChange={handleTokenToTradeAmountChange}
           onTokenSymbolChange={handleTokenToTradeSymbolChange}
           isHalfAndMaxButtonsVisible={true}
+          tokenPairs={tokenPairs}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
           isLoading={isFeatureLoading("pairedAccountBalance")}
@@ -466,6 +478,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           tokenSymbol={tokenToReceive.symbol}
           tokenBalance={tokenToReceive.balance}
           walletConnectionStatus={connectionStatus}
+          tokenPairs={tokenPairs}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
           isLoading={isFeatureLoading("pairedAccountBalance")}
