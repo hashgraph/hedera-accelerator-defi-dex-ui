@@ -79,9 +79,6 @@ function createHederaService() {
       };
 
       const tokenPairs: TokenPairs[] = [tokenAInfoDetails, tokenBInfoDetails];
-      // TODO: To be removed
-      console.info(`- Roshan Token A Info: ${tokenAInfoDetails.tokenName} and ${tokenAInfoDetails.totalSupply}`);
-      console.info(`- Roshan Token B Info: ${tokenBInfoDetails.tokenName} and ${tokenBInfoDetails.totalSupply}`);
 
       return tokenPairs;
     } catch (error) {
@@ -378,7 +375,6 @@ function createHederaService() {
     const result = await queryContract(_contractId, PairContractFunctions.GetPoolBalances);
     const tokenAQty = result?.getInt256(0);
     const tokenBQty = result?.getInt256(1);
-    console.log("Roshan A", tokenAQty, tokenBQty);
     // TODO: dont hardcodethis, will have to be dynamic
     return { [TOKEN_A_SYMBOL]: tokenAQty, [TOKEN_B_SYMBOL]: tokenBQty };
   };
