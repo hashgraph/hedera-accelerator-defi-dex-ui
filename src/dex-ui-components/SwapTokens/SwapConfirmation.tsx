@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { Flex, Divider } from "@chakra-ui/react";
+import { Text, Flex, Spacer } from "@chakra-ui/react";
 import { SwapTokensState } from "./types";
 import { WarningIcon } from "@chakra-ui/icons";
-import { LoadingDialog } from "../base/Dialogs/LoadingDialog";
-import { AlertDialogComponent } from "../base";
+import { AlertDialog, LoadingDialog, Button } from "../base";
+import { Color } from "../themes";
 
 export enum SwapConfirmationStep {
   CONFIRM, // Initial step/state
@@ -87,69 +87,96 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
    */
   const swapData = useCallback((): { [key: string]: any } => {
     const { tokenToTrade, tokenToReceive, swapSettings, spotPrice } = swapState;
-    const minReceivedKey = `Minimum received after slippage (${+swapSettings.slippage}%)`;
     return {
+      minReceivedLabel: `Minimum received after slippage (${+swapSettings.slippage}%)`,
       pairDetails: {
-        Trade: `${tokenToTrade.amount} ${tokenToTrade.symbol}`,
-        Receive: `${tokenToReceive.amount.toFixed(5)} ${tokenToReceive.symbol}`,
+        trade: `${tokenToTrade.amount} ${tokenToTrade.symbol}`,
+        receive: `${tokenToReceive.amount.toFixed(5)} ${tokenToReceive.symbol}`,
       },
       swapSettings: {
-        "Exchange Rate": `1 ${tokenToTrade.symbol} = ${spotPrice?.toFixed(5)} ${tokenToReceive.symbol}`,
-        "Transaction Fee": "0.01 HBAR", // TODO: update this with actual transaction fee
-        "Gas Fee": "0.01 HBAR", // TODO: update this with actual gas fee
-        [minReceivedKey]: getMinReceivedAfterSlippage(),
+        exchangeRate: `1 ${tokenToTrade.symbol} = ${spotPrice?.toFixed(5)} ${tokenToReceive.symbol}`,
+        transactionFee: "0.01 HBAR", // TODO: update this with actual transaction fee
+        gasFee: "0.01 HBAR", // TODO: update this with actual gas fee
+        minReceivedAfterSlippage: getMinReceivedAfterSlippage(),
       },
     };
   }, [swapState, getMinReceivedAfterSlippage]);
 
+  const SwapConfirmationModalBody = () => {
+    const { minReceivedLabel, pairDetails, swapSettings } = swapData();
+    return (
+      <Flex flexDirection="column">
+        <Flex paddingBottom="0.25rem">
+          <Text flex="1" textStyle="b1">
+            Receive
+          </Text>
+          <Text flex="3" textStyle="b1" textAlign="right">
+            {pairDetails.receive}
+          </Text>
+        </Flex>
+        <Flex>
+          <Text flex="1" textStyle="b1">
+            Trade
+          </Text>
+          <Text flex="3" textStyle="b1" textAlign="right">
+            {pairDetails.trade}
+          </Text>
+        </Flex>
+        <Spacer padding="0.667rem" />
+        <Flex flexDirection="column" gap="0.5rem">
+          <Flex>
+            <Text flex="1" textStyle="b3" color={Color.Grey_02}>
+              Exchange Rate
+            </Text>
+            <Text flex="2" textStyle="b3" textAlign="right">
+              {swapSettings.exchangeRate}
+            </Text>
+          </Flex>
+          <Flex>
+            <Text flex="1" textStyle="b3" color={Color.Grey_02}>
+              Transaction Fee
+            </Text>
+            <Text flex="2" textStyle="b3" textAlign="right">
+              {swapSettings.transactionFee}
+            </Text>
+          </Flex>
+          <Flex>
+            <Text flex="1" textStyle="b3" color={Color.Grey_02}>
+              Gas Fee
+            </Text>
+            <Text flex="2" textStyle="b3" textAlign="right">
+              {swapSettings.gasFee}
+            </Text>
+          </Flex>
+          <Flex>
+            <Text flex="1" textStyle="b3" color={Color.Grey_02}>
+              {minReceivedLabel}
+            </Text>
+            <Text flex="2" textStyle="b3" textAlign="right" verticalAlign="bottom">
+              {swapSettings.minReceivedAfterSlippage}
+            </Text>
+          </Flex>
+        </Flex>
+      </Flex>
+    );
+  };
+
   return (
     <>
-      {/* Swap settings/Confirmation Dialog */}
-      <AlertDialogComponent
-        title="Swap"
-        openDialogButtonText={"Swap"}
-        modalButtonText={"Confirm Swap"}
-        onModalButtonClick={handleSwapTransaction}
+      <AlertDialog
+        title="Confirm Swap"
+        openDialogButtonText={"Confirm Swap"}
+        openDialogButtonStyles={{ flex: "1" }}
+        body={SwapConfirmationModalBody()}
+        footer={
+          <Button flex="1" onClick={handleSwapTransaction}>
+            Swap
+          </Button>
+        }
         alertDialogOpen={dialogsOpenState.alertDialog}
         onAlertDialogOpen={onSwapClick}
         onAlertDialogClose={() => setDialogsOpenState({ ...dialogsOpenState, alertDialog: false })}
-      >
-        <dl>
-          <Flex flexDirection={"column"} width={"100%"}>
-            {Object.keys(swapData().pairDetails).map((key: string, i: number) => {
-              return (
-                <Flex
-                  justifyContent={"space-between"}
-                  width={"100%"}
-                  marginBottom={i === 0 ? "4px" : "8px"}
-                  fontSize={"18px"}
-                  lineHeight={"22px"}
-                  key={i}
-                >
-                  <dt style={{ width: "50%" }}>{key}</dt>
-                  <dd style={{ width: "50%", textAlign: "right" }}>{swapData().pairDetails[key]}</dd>
-                </Flex>
-              );
-            })}
-            <Divider borderColor={"#000000"} marginBottom={"8px"} />
-            {Object.keys(swapData().swapSettings).map((key: string, i: number) => {
-              return (
-                <Flex
-                  justifyContent={"space-between"}
-                  width={"100%"}
-                  marginBottom={"8px"}
-                  fontSize={"14px"}
-                  lineHeight={"17px"}
-                  key={i}
-                >
-                  <dt style={{ width: "50%" }}>{key}</dt>
-                  <dd style={{ width: "50%", textAlign: "right" }}>{swapData().swapSettings[key]}</dd>
-                </Flex>
-              );
-            })}
-          </Flex>
-        </dl>
-      </AlertDialogComponent>
+      />
       {confirmationStep === SwapConfirmationStep.SIGN ? (
         // Sign transaction dialog
         <LoadingDialog

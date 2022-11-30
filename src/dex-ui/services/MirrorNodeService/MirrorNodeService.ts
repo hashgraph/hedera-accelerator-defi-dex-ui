@@ -217,15 +217,19 @@ function createMirrorNodeService() {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
-        limit: 1,
+        limit: 3,
       },
     });
     const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
       .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+        console.log(proposalEventLog);
+        if (proposalEventLog.data === "0x") {
+          return undefined;
+        }
         return [
           decodeEvent("ProposalCreated", proposalEventLog.data, proposalEventLog.topics.slice(1)),
-          decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
-          decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          // decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          // decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
         ];
       })
       .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);

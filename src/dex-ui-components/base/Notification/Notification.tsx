@@ -1,6 +1,7 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Tag, Text, Flex, Link, TagCloseButton, Box } from "@chakra-ui/react";
 import { useCallback } from "react";
+import { Color } from "../../themes";
 
 export enum NotficationTypes {
   SUCCESS = "success",
@@ -37,13 +38,13 @@ export const Notification = (props: NotificationProps) => {
 
   const getNotificationColors = useCallback(() => {
     if (type === NotficationTypes.SUCCESS) {
-      return { bg: "#C4F2D3", text: "#23714B" };
+      return { bg: Color.Green_01_Opaque, text: Color.Black_01 };
     }
     if (type === NotficationTypes.WARNING) {
-      return { bg: "#FFF3CB", text: "#9F6000" };
+      return { bg: Color.Yellow__01_Opaque, text: Color.Black_01 };
     }
     if (type === NotficationTypes.ERROR) {
-      return { bg: "#FFD1D1", text: "#FF1A1A" };
+      return { bg: Color.Red_01_Opaque, text: Color.Black_01 };
     }
   }, [type]);
 
@@ -56,7 +57,9 @@ export const Notification = (props: NotificationProps) => {
         </Text>
         {isLinkShown ? (
           <Link width="fit-content" display="flex" alignItems="center" color="#0180FF" href={linkRef} isExternal>
-            <Text textDecoration="underline">{linkText}</Text>
+            <Text variant="link" textDecoration="underline">
+              {linkText}
+            </Text>
             <ExternalLinkIcon margin="0rem 0.125rem" />
           </Link>
         ) : (
