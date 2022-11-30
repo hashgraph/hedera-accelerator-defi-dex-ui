@@ -291,7 +291,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         }, []);
         set(
           ({ governance }) => {
-            governance.proposals = fulfilledProposals.concat(mockProposalData);
+            governance.proposals = fulfilledProposals;
           },
           false,
           GovernanceActionType.FETCH_PROPOSALS_SUCCEEDED
