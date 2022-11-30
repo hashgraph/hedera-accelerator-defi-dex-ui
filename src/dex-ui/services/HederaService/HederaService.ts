@@ -52,30 +52,31 @@ function createHederaService() {
       } = await MirrorNodeService.fetchContract(evmAddress); // TODO: API will be called in loop
       const id = ContractId.fromString(contract_id); //0.0.48946274
       const { tokenAAddress, tokenBAddress } = await getTokenPairAddress(id); // TODO: contract to be caled in loop
-
       const tokenAInfo = await new TokenInfoQuery().setTokenId(tokenAAddress).execute(client);
       const tokenBInfo = await new TokenInfoQuery().setTokenId(tokenBAddress).execute(client);
 
       // TODO: To be Saved in Store
       const tokenAInfoDetails: TokenPairs = {
-        tokenId: tokenAInfo.tokenId,
-        tokenType: tokenAInfo.tokenType,
         tokenName: tokenAInfo.name,
         totalSupply: tokenAInfo.totalSupply,
         maxSupply: tokenAInfo.maxSupply,
         symbol: tokenAInfo.symbol,
-        pairContractId: contract_id,
+        tokenMeta: {
+          pairContractId: contract_id,
+          tokenId: tokenAAddress
+        }
       };
 
       // TODO: To be Saved in Store
       const tokenBInfoDetails: TokenPairs = {
-        tokenId: tokenBInfo.tokenId,
-        tokenType: tokenBInfo.tokenType,
         tokenName: tokenBInfo.name,
         totalSupply: tokenBInfo.totalSupply,
         maxSupply: tokenBInfo.maxSupply,
         symbol: tokenBInfo.symbol,
-        pairContractId: contract_id,
+        tokenMeta: {
+          pairContractId: contract_id,
+          tokenId: tokenBAddress
+        }
       };
 
       const tokenPairs: TokenPairs[] = [tokenAInfoDetails, tokenBInfoDetails];
@@ -375,8 +376,7 @@ function createHederaService() {
     const result = await queryContract(_contractId, PairContractFunctions.GetPoolBalances);
     const tokenAQty = result?.getInt256(0);
     const tokenBQty = result?.getInt256(1);
-    // TODO: dont hardcodethis, will have to be dynamic
-    return { [TOKEN_A_SYMBOL]: tokenAQty, [TOKEN_B_SYMBOL]: tokenBQty };
+    return { tokenAQty, tokenBQty };
   };
 
   const getContributorTokenShare = async (): Promise<{

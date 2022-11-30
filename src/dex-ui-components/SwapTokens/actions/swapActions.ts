@@ -14,6 +14,10 @@ const setTokenToTradeSymbol = (symbol: string | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_TRADE, field: "symbol", payload: symbol };
 };
 
+const setTokenToTradeMeta = (tokenMeta: object | undefined): SwapAction => {
+  return { type: ActionType.SET_TOKEN_TO_TRADE, field: "tokenMeta", payload: tokenMeta };
+};
+
 const setTokenToTradeBalance = (balance: number | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_TRADE, field: "balance", payload: balance };
 };
@@ -42,6 +46,10 @@ const setTokenToReceiveBalance = (balance: number | undefined): SwapAction => {
 
 const setTokenToReceivePoolLiquidity = (amount: number | undefined): SwapAction => {
   return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "poolLiquidity", payload: amount };
+};
+
+const setTokenToReceiveMeta = (tokenMeta: object | undefined): SwapAction => {
+  return { type: ActionType.SET_TOKEN_TO_RECEIVE, field: "tokenMeta", payload: tokenMeta };
 };
 
 /** SET TOKEN TO RECEIVE ACTION CREATORS */
@@ -81,4 +89,6 @@ export {
   setSpotPrice,
   setSlippageSetting,
   setTransactionDeadlineSetting,
+  setTokenToTradeMeta,
+  setTokenToReceiveMeta
 };

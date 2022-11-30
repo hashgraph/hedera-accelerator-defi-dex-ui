@@ -3,15 +3,15 @@ import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { TokenId, TokenType } from "@hashgraph/sdk";
-
 interface TokenPairs {
-  symbol: string;
-  tokenId: TokenId;
-  tokenType: TokenType | null;
-  tokenName: string;
+  symbol: string | undefined;
+  tokenName: string | undefined;
   totalSupply: Long | null;
   maxSupply: Long | null;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  };
 }
 
 export interface TokenInputProps {

@@ -11,7 +11,7 @@ import {
   B_TO_A,
 } from "../../services";
 import { getErrorMessage } from "../../utils";
-import { SwapActionType, SwapSlice, SwapStore, SwapState } from "./types";
+import { SwapActionType, SwapSlice, SwapStore, SwapState, TokenPair } from "./types";
 
 const initialSwapState: SwapState = {
   precision: undefined,
@@ -46,14 +46,26 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       );
     },
     fetchTokenPairs: async () => {
-      const pairs = await HederaService.getTokenPairs();
-      set(
-        ({ swap }) => {
-          swap.tokenPairs = pairs;
-        },
-        false,
-        SwapActionType.SET_TOKEN_PAIRS
-      );
+      set({}, false, SwapActionType.FETCH_TOKEN_PAIRS_STARTED);
+      try {
+        const pairs = await HederaService.getTokenPairs();
+        set(
+          ({ swap }) => {
+            swap.tokenPairs = pairs;
+          },
+          false,
+          SwapActionType.FETCH_TOKEN_PAIRS_SUCCEEDED
+        );
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        set(
+          ({ swap }) => {
+            swap.errorMessage = errorMessage;
+          },
+          false,
+          SwapActionType.FETCH_TOKEN_PAIRS_FAILED
+        );
+      }
     },
     /**
      * Fetches the spot price for swapping L49A tokens for L49B tokens.
@@ -123,22 +135,47 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       app.setFeaturesAsLoaded(["fee"]);
     },
     // TODO: need to pass in contract address of pool (to pass to pairCurrentPosition)
-    getPoolLiquidity: async (tokenToTrade: string, tokenToReceive: string) => {
-      console.log(`Getting pool liquidity for ${tokenToTrade} and ${tokenToReceive}`);
+    getPoolLiquidity: async (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => {
+      console.log(`Getting pool liquidity
+       ${JSON.stringify(tokenToTrade, null, 2)} and 
+       ${JSON.stringify(tokenToReceive, null, 2)}`);
       const { swap, app } = get();
+
+      if (tokenToReceive.tokenMeta.pairContractId !== tokenToTrade.tokenMeta.pairContractId) {
+        swap.errorMessage = "Swap Tokens not available for selected tokens";
+        return;
+      }
+
       app.setFeaturesAsLoading(["poolLiquidity"]);
       set({}, false, SwapActionType.FETCH_POOL_LIQUIDITY_STARTED);
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
         // TODO: In below Contract call we are directly returining the hard coded
         // Token A and Token B in real scenario how will we know which is token A and which is token B
-        const rawPoolLiquidity = await HederaService.pairCurrentPosition(ContractId.fromString("0.0.48946274"));
-        console.log("Roshan", poolLiquidity);
-        Object.keys(rawPoolLiquidity).forEach((tokenSymbol) => {
+        const pairId = ContractId.fromString(tokenToTrade.tokenMeta.pairContractId ?? "");
+        const { tokenAAddress } = await HederaService.getTokenPairAddress(
+          ContractId.fromString(tokenToTrade.tokenMeta.pairContractId ?? "")
+        );
+        const rawPoolLiquidity = await HederaService.pairCurrentPosition(pairId);
+
+        let tokens: { [x: string]: BigNumber } = {};
+        if (tokenAAddress === tokenToTrade.tokenMeta.tokenId) {
+          tokens = {
+            [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenAQty,
+            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenBQty
+          }
+        } else {
+          tokens = {
+            [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenBQty,
+            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenAQty
+          }
+        }
+
+        Object.keys(tokens).forEach((tokenSymbol) => {
           if (swap.precision === undefined) {
             throw Error("Precision not found");
           }
-          const amount = rawPoolLiquidity[tokenSymbol as keyof typeof rawPoolLiquidity];
+          const amount = tokens[tokenSymbol];
           poolLiquidity.set(tokenSymbol, amount?.dividedBy(swap.precision.times(10)));
         });
         set(

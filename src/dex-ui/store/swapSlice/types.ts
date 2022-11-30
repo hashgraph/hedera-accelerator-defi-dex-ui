@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { TransactionResponse, TokenId, TokenType } from "@hashgraph/sdk";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 
@@ -20,14 +20,19 @@ enum SwapActionType {
   FETCH_SWAP_FEE_FAILED = "swap/FETCH_SWAP_FEE_FAILED",
   SET_PRECISION = "swap/SET_PRECISION",
   SET_TOKEN_PAIRS = "swap/SET_TOKEN_PAIRS",
+  FETCH_TOKEN_PAIRS_STARTED = "swap/FETCH_TOKEN_PAIRS_STARTED",
+  FETCH_TOKEN_PAIRS_SUCCEEDED = "swap/FETCH_TOKEN_PAIRS_SUCCEEDED",
+  FETCH_TOKEN_PAIRS_FAILED = "swap/FETCH_TOKEN_PAIRS_FAILED"
 }
 interface TokenPair {
-  symbol: string;
-  tokenId: TokenId;
-  tokenType: TokenType | null;
-  tokenName: string;
+  symbol: string | undefined;
+  tokenName: string | undefined;
   totalSupply: Long | null;
   maxSupply: Long | null;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  }
 }
 interface TransactionState {
   transactionWaitingToBeSigned: boolean;
@@ -48,7 +53,7 @@ interface SwapActions {
   getPrecision: () => void;
   fetchSpotPrices: () => Promise<void>;
   fetchFee: () => Promise<void>;
-  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => Promise<void>;
+  getPoolLiquidity: (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => Promise<void>;
   sendSwapTransaction: ({ tokenToTrade, tokenToReceive }: any) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
 }
@@ -58,4 +63,4 @@ type SwapStore = SwapState & SwapActions;
 type SwapSlice = StateCreator<DEXState, [["zustand/devtools", never], ["zustand/immer", never]], [], SwapStore>;
 
 export { SwapActionType };
-export type { SwapSlice, SwapStore, SwapState, SwapActions, TransactionState };
+export type { SwapSlice, SwapStore, SwapState, SwapActions, TransactionState, TokenPair };

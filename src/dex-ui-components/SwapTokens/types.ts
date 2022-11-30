@@ -5,6 +5,13 @@ export interface SwapTokensState {
     displayAmount: string;
     balance: number | undefined;
     poolLiquidity: number | undefined;
+    tokenName: string | undefined;
+    totalSupply: Long | null;
+    maxSupply: Long | null;
+    tokenMeta: {
+      pairContractId: string | undefined;
+      tokenId: string | undefined;
+    }
   };
   tokenToReceive: {
     symbol: string | undefined;
@@ -12,6 +19,13 @@ export interface SwapTokensState {
     displayAmount: string;
     balance: number | undefined;
     poolLiquidity: number | undefined;
+    tokenName: string | undefined;
+    totalSupply: Long | null;
+    maxSupply: Long | null;
+    tokenMeta: {
+      pairContractId: string | undefined;
+      tokenId: string | undefined;
+    }
   };
   swapSettings: {
     slippage: string;

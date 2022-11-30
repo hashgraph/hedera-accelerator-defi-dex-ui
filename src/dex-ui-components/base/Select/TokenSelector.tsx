@@ -11,7 +11,7 @@ const TokenSelector = (props: any) => {
       {tokenPairs !== null &&
         tokenPairs.map((token: any) => {
           return (
-            <option key={token.tokenId} value={token.symbol}>
+            <option key={token.tokenMeta.tokenId} value={token.symbol}>
               {token.symbol}
             </option>
           );

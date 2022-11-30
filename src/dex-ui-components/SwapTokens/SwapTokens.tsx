@@ -9,6 +9,8 @@ import {
   setTokenToTradeAmount,
   setTokenToTradeDisplayAmount,
   setTokenToTradeSymbol,
+  setTokenToTradeMeta,
+  setTokenToReceiveMeta,
   setTokenToTradeBalance,
   setTokenToReceiveAmount,
   setTokenToReceiveDisplayAmount,
@@ -40,22 +42,23 @@ import { TransactionState } from "../../dex-ui/store/swapSlice";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { createHashScanLink } from "../../dex-ui/utils";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { TokenId, TokenType } from "@hashgraph/sdk";
 
 interface TokenPairs {
-  symbol: string;
-  tokenId: TokenId;
-  tokenType: TokenType | null;
-  tokenName: string;
+  symbol: string | undefined;
+  tokenName: string | undefined;
   totalSupply: Long | null;
   maxSupply: Long | null;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  };
 }
 export interface SwapTokensProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
-  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
   connectionStatus: HashConnectConnectionState;
+  getPoolLiquidity: (tokenToTrade: TokenPairs, tokenToReceive: TokenPairs) => void;
   spotPrices: Record<string, number | undefined>;
   fee: string;
   poolLiquidity: Record<string, number | undefined>;
@@ -269,7 +272,7 @@ const SwapTokens = (props: SwapTokensProps) => {
     // TODO: revisit this approach
     if (tokenToTrade.symbol && tokenToReceive.symbol) {
       // TODO: should we use usePrevious here to only make this call when the selected token has changed?
-      getPoolLiquidity(tokenToTrade.symbol, tokenToReceive.symbol);
+      getPoolLiquidity(tokenToTrade, tokenToReceive);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, getTokenBalance, tokenToTrade.symbol, tokenToReceive.symbol, walletData?.pairedAccountBalance]);
@@ -288,12 +291,14 @@ const SwapTokens = (props: SwapTokensProps) => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeSymbol = inputElement.value;
+      const filterToken = tokenPairs?.filter((token) => token.symbol === inputElement.value)[0];
       dispatch(setTokenToTradeSymbol(tokenToTradeSymbol));
+      dispatch(setTokenToTradeMeta(filterToken?.tokenMeta));
       const tokenToTradeBalance = getTokenBalance(tokenToTradeSymbol);
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
       updateExchangeRate({ tokenToTradeSymbol });
     },
-    [dispatch, getTokenBalance, updateExchangeRate]
+    [dispatch, getTokenBalance, updateExchangeRate, tokenPairs]
   );
 
   const handleTokenToReceiveAmountChange = useCallback(
@@ -311,11 +316,13 @@ const SwapTokens = (props: SwapTokensProps) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToReceiveSymbol = inputElement.value;
       dispatch(setTokenToReceiveSymbol(tokenToReceiveSymbol));
+      const filterToken = tokenPairs?.filter((token) => token.symbol === tokenToReceiveSymbol)[0];
+      dispatch(setTokenToReceiveMeta(filterToken?.tokenMeta));
       const tokenToReceiveBalance = getTokenBalance(tokenToReceiveSymbol);
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
       updateExchangeRate({ tokenToReceiveSymbol });
     },
-    [dispatch, updateExchangeRate, getTokenBalance]
+    [dispatch, updateExchangeRate, getTokenBalance, tokenPairs]
   );
 
   const swapTokens = useCallback(() => {

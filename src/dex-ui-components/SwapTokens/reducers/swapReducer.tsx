@@ -8,6 +8,13 @@ const initialSwapState: SwapTokensState = {
     displayAmount: "0.0",
     balance: undefined,
     poolLiquidity: undefined,
+    tokenName: "HBAR",
+    totalSupply: null,
+    maxSupply: null,
+    tokenMeta: {
+      pairContractId: undefined,
+      tokenId: undefined,
+    }
   },
   tokenToReceive: {
     symbol: undefined,
@@ -15,6 +22,13 @@ const initialSwapState: SwapTokensState = {
     displayAmount: "0.0",
     balance: undefined,
     poolLiquidity: undefined,
+    tokenName: undefined,
+    totalSupply: null,
+    maxSupply: null,
+    tokenMeta: {
+      pairContractId: undefined,
+      tokenId: undefined,
+    }
   },
   swapSettings: {
     slippage: "2.0",
