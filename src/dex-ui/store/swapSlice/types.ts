@@ -22,7 +22,7 @@ enum SwapActionType {
   SET_TOKEN_PAIRS = "swap/SET_TOKEN_PAIRS",
   FETCH_TOKEN_PAIRS_STARTED = "swap/FETCH_TOKEN_PAIRS_STARTED",
   FETCH_TOKEN_PAIRS_SUCCEEDED = "swap/FETCH_TOKEN_PAIRS_SUCCEEDED",
-  FETCH_TOKEN_PAIRS_FAILED = "swap/FETCH_TOKEN_PAIRS_FAILED"
+  FETCH_TOKEN_PAIRS_FAILED = "swap/FETCH_TOKEN_PAIRS_FAILED",
 }
 interface TokenPair {
   symbol: string | undefined;
@@ -32,7 +32,7 @@ interface TokenPair {
   tokenMeta: {
     pairContractId: string | undefined;
     tokenId: string | undefined;
-  }
+  };
 }
 interface TransactionState {
   transactionWaitingToBeSigned: boolean;

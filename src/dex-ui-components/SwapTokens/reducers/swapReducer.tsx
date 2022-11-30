@@ -14,7 +14,7 @@ const initialSwapState: SwapTokensState = {
     tokenMeta: {
       pairContractId: undefined,
       tokenId: undefined,
-    }
+    },
   },
   tokenToReceive: {
     symbol: undefined,
@@ -28,7 +28,7 @@ const initialSwapState: SwapTokensState = {
     tokenMeta: {
       pairContractId: undefined,
       tokenId: undefined,
-    }
+    },
   },
   swapSettings: {
     slippage: "2.0",

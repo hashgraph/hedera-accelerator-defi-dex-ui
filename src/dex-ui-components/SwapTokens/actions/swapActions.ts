@@ -90,5 +90,5 @@ export {
   setSlippageSetting,
   setTransactionDeadlineSetting,
   setTokenToTradeMeta,
-  setTokenToReceiveMeta
+  setTokenToReceiveMeta,
 };

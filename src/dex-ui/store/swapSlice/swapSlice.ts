@@ -162,13 +162,13 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         if (tokenAAddress === tokenToTrade.tokenMeta.tokenId) {
           tokens = {
             [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenAQty,
-            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenBQty
-          }
+            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenBQty,
+          };
         } else {
           tokens = {
             [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenBQty,
-            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenAQty
-          }
+            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenAQty,
+          };
         }
 
         Object.keys(tokens).forEach((tokenSymbol) => {

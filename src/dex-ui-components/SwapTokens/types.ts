@@ -11,7 +11,7 @@ export interface SwapTokensState {
     tokenMeta: {
       pairContractId: string | undefined;
       tokenId: string | undefined;
-    }
+    };
   };
   tokenToReceive: {
     symbol: string | undefined;
@@ -25,7 +25,7 @@ export interface SwapTokensState {
     tokenMeta: {
       pairContractId: string | undefined;
       tokenId: string | undefined;
-    }
+    };
   };
   swapSettings: {
     slippage: string;

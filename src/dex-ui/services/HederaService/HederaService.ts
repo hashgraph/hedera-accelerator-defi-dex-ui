@@ -63,8 +63,8 @@ function createHederaService() {
         symbol: tokenAInfo.symbol,
         tokenMeta: {
           pairContractId: contract_id,
-          tokenId: tokenAAddress
-        }
+          tokenId: tokenAAddress,
+        },
       };
 
       // TODO: To be Saved in Store
@@ -75,8 +75,8 @@ function createHederaService() {
         symbol: tokenBInfo.symbol,
         tokenMeta: {
           pairContractId: contract_id,
-          tokenId: tokenBAddress
-        }
+          tokenId: tokenBAddress,
+        },
       };
 
       const tokenPairs: TokenPairs[] = [tokenAInfoDetails, tokenBInfoDetails];
