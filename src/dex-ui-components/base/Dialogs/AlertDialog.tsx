@@ -15,16 +15,17 @@ import { CloseIcon } from "@chakra-ui/icons";
 
 interface AlertDialogProps {
   title: string;
-  body?: React.ReactNode;
+  openModalComponent?: React.ReactElement;
+  body?: React.ReactElement;
   footer?: React.ReactElement;
   children?: React.ReactNode;
   openDialogButtonStyles?: any;
-  openDialogButtonText: string; // trigger to open dialog
+  openDialogButtonText?: string;
   isOpenDialogButtonDisabled?: boolean;
-  alertDialogOpen?: boolean; // use this to programtically open/close dialog
+  alertDialogOpen?: boolean;
   onAlertDialogOpen?: () => void;
   onAlertDialogClose?: () => void;
-  modalButtonText?: string; // button at bottom of modal
+  modalButtonText?: string;
   onModalButtonClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -45,6 +46,7 @@ interface AlertDialogProps {
 const AlertDialogBase = (props: AlertDialogProps) => {
   const {
     title,
+    openModalComponent,
     body,
     footer,
     openDialogButtonStyles,
@@ -83,13 +85,18 @@ const AlertDialogBase = (props: AlertDialogProps) => {
 
   return (
     <>
-      <Button sx={openDialogButtonStyles} isDisabled={isOpenDialogButtonDisabled} textStyle="h3" onClick={openDialog}>
-        {openDialogButtonText}
-      </Button>
+      {openModalComponent ? (
+        cloneElement(openModalComponent, { onClick: openDialog })
+      ) : (
+        <Button sx={openDialogButtonStyles} isDisabled={isOpenDialogButtonDisabled} textStyle="h3" onClick={openDialog}>
+          {openDialogButtonText}
+        </Button>
+      )}
       <ChakraAlertDialog
         motionPreset="slideInBottom"
         leastDestructiveRef={cancelRef}
         onClose={onClose}
+        onOverlayClick={closeDialog}
         isOpen={isOpen}
         isCentered
       >

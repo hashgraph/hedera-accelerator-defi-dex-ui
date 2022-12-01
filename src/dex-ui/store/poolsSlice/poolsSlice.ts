@@ -34,17 +34,17 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
   return {
     ...initialPoolsStore,
     sendAddLiquidityTransaction: async ({ inputToken, outputToken, contractId }: SendAddLiquidityTransactionParams) => {
-      const { walletData, getTokenAmountWithPrecision } = get().wallet;
+      const { wallet } = get();
       const { network } = get().context;
       const firstTokenAddress = TokenId.fromString(inputToken.address).toSolidityAddress();
       const secondTokenAddress = TokenId.fromString(outputToken.address).toSolidityAddress();
-      const firstTokenQuantity = getTokenAmountWithPrecision(inputToken.symbol, inputToken.amount);
-      const secondTokenQuantity = getTokenAmountWithPrecision(outputToken.symbol, outputToken.amount);
+      const firstTokenQuantity = wallet.getTokenAmountWithPrecision(inputToken.symbol, inputToken.amount);
+      const secondTokenQuantity = wallet.getTokenAmountWithPrecision(outputToken.symbol, outputToken.amount);
       const addLiquidityContractAddress = ContractId.fromString(contractId);
 
-      const signingAccount = walletData.pairedAccounts[0];
+      const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-      const provider = WalletService.getProvider(network, walletData.topicID, signingAccount);
+      const provider = WalletService.getProvider(network, wallet.topicID, signingAccount);
       const signer = WalletService.getSigner(provider);
       try {
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
@@ -180,10 +180,9 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const { context, app, wallet } = get();
       const { network } = context;
       app.setFeaturesAsLoading(["withdrawState"]);
-      const { walletData, getTokenAmountWithPrecision } = wallet;
-      const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+      const provider = WalletService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
       const signer = WalletService.getSigner(provider);
-      const lpTokenAmountBigNumber = getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
+      const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
 
       try {
         set(

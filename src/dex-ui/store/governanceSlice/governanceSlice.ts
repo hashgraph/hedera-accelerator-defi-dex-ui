@@ -196,8 +196,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
   return {
     ...initialGovernanceStore,
     castVote: async (proposalId: string, voteType: number) => {
-      const { walletData } = get().wallet;
-      const { network } = get().context;
+      const { context, wallet } = get();
       set(
         ({ governance }) => {
           governance.proposalTransacationState = initialGovernanceStore.proposalTransacationState;
@@ -205,8 +204,8 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         false,
         GovernanceActionType.SEND_VOTE_STARTED
       );
-      const signingAccount = walletData.pairedAccounts[0];
-      const provider = WalletService.getProvider(network, walletData.topicID, signingAccount);
+      const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
+      const provider = WalletService.getProvider(context.network, wallet.topicID, signingAccount);
       const signer = WalletService.getSigner(provider);
       try {
         set(
@@ -310,7 +309,6 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
     },
     sendCreateNewTokenProposalTransaction: async ({ title }) => {
       const { context, wallet } = get();
-      const { walletData } = wallet;
       const { network } = context;
       set(
         ({ governance }) => {
@@ -323,7 +321,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         false,
         GovernanceActionType.SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED
       );
-      const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+      const provider = WalletService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
       const signer = WalletService.getSigner(provider);
       /**
        * All data except for the proposal title is mocked for now. The proposal execution

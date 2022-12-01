@@ -20,7 +20,7 @@ import {
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
 } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
-import { HashConnectSigner } from "hashconnect/dist/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
