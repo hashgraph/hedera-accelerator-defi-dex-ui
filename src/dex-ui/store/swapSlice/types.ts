@@ -29,9 +29,9 @@ interface NewTokenPair {
   tokenA: TokenPair;
   tokenB: TokenPair;
   pairToken: {
-    symbol: string | undefined
-    accountId: string | undefined
-  }
+    symbol: string | undefined;
+    accountId: string | undefined;
+  };
 }
 interface TokenPair {
   amount: number;

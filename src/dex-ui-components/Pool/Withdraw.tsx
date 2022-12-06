@@ -25,7 +25,7 @@ export interface WithdrawProps {
   walletConnectionStatus: HashConnectConnectionState;
   poolLpDetails: LPTokenDetails;
   poolLiquidityDetails: PoolLiquidityDetails;
-  tokenPairs: NewTokenPair[] | null
+  tokenPairs: NewTokenPair[] | null;
   onWithdrawClick: (lpAmount: number) => void;
   onInputAmountChange?: (lpAmount: number) => void;
   disableWithdrawButton?: boolean;

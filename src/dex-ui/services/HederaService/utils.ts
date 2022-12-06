@@ -58,10 +58,15 @@ const getAddressArray = (contractFunctionResult: ContractFunctionResult) => {
     result.push(contractFunctionResult.getAddress(i + 2));
   }
   return result;
-}
+};
 
 export {
-  getAdmin, getTreasurer, getUser, createClient, createAdminClient, createTreasuryClient,
+  getAdmin,
+  getTreasurer,
+  getUser,
+  createClient,
+  createAdminClient,
+  createTreasuryClient,
   createUserClient,
-  getAddressArray
+  getAddressArray,
 };

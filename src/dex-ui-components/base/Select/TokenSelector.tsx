@@ -8,14 +8,10 @@ const TokenSelector = (props: any) => {
         tokenPairs.map((token: any) => {
           return (
             <>
-              <option
-                key={token.tokenA.symbol}
-                value={token.tokenA.symbol}>
+              <option key={token.tokenA.symbol} value={token.tokenA.symbol}>
                 {token.tokenA.symbol}
               </option>
-              <option
-                key={token.tokenA.symbol}
-                value={token.tokenB.symbol}>
+              <option key={token.tokenA.symbol} value={token.tokenB.symbol}>
                 {token.tokenB.symbol}
               </option>
             </>

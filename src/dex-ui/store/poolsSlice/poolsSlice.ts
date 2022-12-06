@@ -33,9 +33,9 @@ interface NewTokenPair {
   tokenA: TokenPairs;
   tokenB: TokenPairs;
   pairToken: {
-    symbol: string | undefined
-    accountId: string | undefined
-  }
+    symbol: string | undefined;
+    accountId: string | undefined;
+  };
 }
 interface TokenPairs {
   amount: number;
@@ -109,18 +109,17 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const poolBalanceUrlRequest: Array<Promise<any>> = [];
         const urlRequest: Array<Promise<any>> = [];
         let copyPoolMetrices: Pool[] | undefined = [];
-        poolTokenPairs?.map(tokenPair => poolBalanceUrlRequest.push(
-          MirrorNodeService.fetchAccountTokenBalances(tokenPair.pairToken.accountId ?? "")
-        ));
+        poolTokenPairs?.map((tokenPair) =>
+          poolBalanceUrlRequest.push(MirrorNodeService.fetchAccountTokenBalances(tokenPair.pairToken.accountId ?? ""))
+        );
         const poolTokenBalances: Array<MirrorNodeTokenBalance> = await Promise.all(poolBalanceUrlRequest);
         const newCopy1: Array<MirrorNodeTokenBalance[]> = await Promise.all(poolBalanceUrlRequest);
         // const poolTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID);
         const timestamp7DaysAgo = getTimestamp7DaysAgo();
 
-        poolTokenPairs?.map(obj => urlRequest.push(MirrorNodeService.fetchAccountTransactions(
-          obj.pairToken.accountId ?? "",
-          timestamp7DaysAgo
-        )));
+        poolTokenPairs?.map((obj) =>
+          urlRequest.push(MirrorNodeService.fetchAccountTransactions(obj.pairToken.accountId ?? "", timestamp7DaysAgo))
+        );
         const copylast7DTransactions: Array<Array<MirrorNodeTransaction>> = await Promise.all(urlRequest);
         const poolFee = await HederaService.fetchFeeWithPrecision();
 
@@ -131,14 +130,17 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           const last7DTransactions = copylast7DTransactions[i];
           const newCopy = newCopy1[i];
           // const poolTokenBalances = copyPoolTokenBalances[i];
-          copyPoolMetrices = [...copyPoolMetrices, calculatePoolMetrics({
-            poolAccountId: tokenPair.pairToken.accountId ?? "",
-            newCopy,
-            last24Transactions,
-            last7DTransactions,
-            tokenPair,
-            poolFee,
-          })];
+          copyPoolMetrices = [
+            ...copyPoolMetrices,
+            calculatePoolMetrics({
+              poolAccountId: tokenPair.pairToken.accountId ?? "",
+              newCopy,
+              last24Transactions,
+              last7DTransactions,
+              tokenPair,
+              poolFee,
+            }),
+          ];
         }
 
         const allPoolsMetrics = copyPoolMetrices;

@@ -16,7 +16,7 @@ export interface AddLiquidityState {
     tokenMeta: {
       pairContractId: string | undefined;
       tokenId: string | undefined;
-    },
+    };
   };
   outputToken: {
     poolLiquidity: number | undefined;
@@ -33,7 +33,7 @@ export interface AddLiquidityState {
     tokenMeta: {
       pairContractId: string | undefined;
       tokenId: string | undefined;
-    },
+    };
   };
 }
 
