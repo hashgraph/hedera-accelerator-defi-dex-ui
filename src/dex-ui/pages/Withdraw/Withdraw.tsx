@@ -10,7 +10,7 @@ import { PoolsLocationProps } from "../Pools";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
-  const { app, pools, wallet } = useDexContext(({ app, pools, wallet }) => ({ app, pools, wallet }));
+  const { app, pools, wallet, swap } = useDexContext(({ app, pools, wallet, swap }) => ({ app, pools, wallet, swap }));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -21,6 +21,7 @@ const Withdraw = () => {
     errorDialogOpen: false,
     withdrawProps: {
       walletConnectionStatus: wallet.hashConnectConnectionState,
+      tokenPairs: swap.tokenPairs,
       poolLiquidityDetails: {
         firstToken: {
           tokenSymbol: "",

@@ -17,6 +17,7 @@ import {
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ChangeEvent, useState, useCallback } from "react";
 import { MetricLabel } from "..";
+import { NewTokenPair } from "../../dex-ui/services";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { TokenInput } from "../TokenInput";
 
@@ -24,6 +25,7 @@ export interface WithdrawProps {
   walletConnectionStatus: HashConnectConnectionState;
   poolLpDetails: LPTokenDetails;
   poolLiquidityDetails: PoolLiquidityDetails;
+  tokenPairs: NewTokenPair[] | null
   onWithdrawClick: (lpAmount: number) => void;
   onInputAmountChange?: (lpAmount: number) => void;
   disableWithdrawButton?: boolean;
@@ -55,6 +57,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
     onWithdrawClick,
     onInputAmountChange,
     disableWithdrawButton,
+    tokenPairs,
     isFeatureLoading,
   } = props;
 
@@ -108,6 +111,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
           tokenAmount={localWithdrawState.lpInputAmount}
           tokenSymbol={poolLpDetails.tokenSymbol}
           tokenBalance={poolLpDetails.userLpAmount}
+          tokenPairs={tokenPairs}
           walletConnectionStatus={walletConnectionStatus}
           onTokenAmountChange={handleInputAmountChange}
           isHalfAndMaxButtonsVisible={true}

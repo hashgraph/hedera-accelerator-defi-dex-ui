@@ -7,11 +7,13 @@ import {
   HederaService,
   MirrorNodeTokenBalance,
   SWAP_CONTRACT_ID,
-  TokenPair,
+  MirrorNodeTransaction,
 } from "../../services";
+
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours } from "../../utils";
+import { Pool, UserPool } from "./types";
 
 const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
@@ -26,6 +28,29 @@ const initialPoolsStore: PoolsState = {
     errorMessage: "",
   },
 };
+
+interface NewTokenPair {
+  tokenA: TokenPairs;
+  tokenB: TokenPairs;
+  pairToken: {
+    symbol: string | undefined
+    accountId: string | undefined
+  }
+}
+interface TokenPairs {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
+  symbol: string | undefined;
+  tokenName: string | undefined;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  };
+}
 
 /**
  * @returns
@@ -80,30 +105,57 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       );
       app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
-        const poolTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID);
+        const poolTokenPairs = await HederaService.fetchTokenPairs();
+        const poolBalanceUrlRequest: Array<Promise<any>> = [];
+        const urlRequest: Array<Promise<any>> = [];
+        let copyPoolMetrices: Pool[] | undefined = [];
+        poolTokenPairs?.map(tokenPair => poolBalanceUrlRequest.push(
+          MirrorNodeService.fetchAccountTokenBalances(tokenPair.pairToken.accountId ?? "")
+        ));
+        const poolTokenBalances: Array<MirrorNodeTokenBalance> = await Promise.all(poolBalanceUrlRequest);
+        const newCopy1: Array<MirrorNodeTokenBalance[]> = await Promise.all(poolBalanceUrlRequest);
+        // const poolTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID);
         const timestamp7DaysAgo = getTimestamp7DaysAgo();
-        const last7DTransactions = await MirrorNodeService.fetchAccountTransactions(
-          SWAP_CONTRACT_ID,
+
+        poolTokenPairs?.map(obj => urlRequest.push(MirrorNodeService.fetchAccountTransactions(
+          obj.pairToken.accountId ?? "",
           timestamp7DaysAgo
-        );
-        const last24Transactions = getTransactionsFromLast24Hours(last7DTransactions);
-        const poolTokenPairs = await MirrorNodeService.fetchTokenPairs();
-        // TODO: Needs to be updated once fees are unique to each individial pool.
+        )));
+        const copylast7DTransactions: Array<Array<MirrorNodeTransaction>> = await Promise.all(urlRequest);
         const poolFee = await HederaService.fetchFeeWithPrecision();
-        const allPoolsMetrics = poolTokenPairs.map((tokenPair: TokenPair) => {
-          return calculatePoolMetrics({
-            poolAccountId: SWAP_CONTRACT_ID,
-            poolTokenBalances,
+
+        // TODO: Needs to be updated once fees are unique to each individial pool.
+
+        for (const [i, tokenPair] of poolTokenPairs?.entries() ?? []) {
+          const last24Transactions = getTransactionsFromLast24Hours(copylast7DTransactions[i]);
+          const last7DTransactions = copylast7DTransactions[i];
+          const newCopy = newCopy1[i];
+          // const poolTokenBalances = copyPoolTokenBalances[i];
+          copyPoolMetrices = [...copyPoolMetrices, calculatePoolMetrics({
+            poolAccountId: tokenPair.pairToken.accountId ?? "",
+            newCopy,
             last24Transactions,
             last7DTransactions,
             tokenPair,
             poolFee,
-          });
-        });
+          })];
+        }
+
+        const allPoolsMetrics = copyPoolMetrices;
+        // const allPoolsMetrics = poolTokenPairs?.map((tokenPair: NewTokenPair) => {
+        //   return calculatePoolMetrics({
+        //     poolAccountId: tokenPair.pairToken.accountId ?? "",
+        //     poolTokenBalances,
+        //     last24Transactions,
+        //     last7DTransactions,
+        //     tokenPair,
+        //     poolFee,
+        //   });
+        // });
         set(
           ({ pools }) => {
             pools.status = "success";
-            pools.allPoolsMetrics = allPoolsMetrics;
+            pools.allPoolsMetrics = allPoolsMetrics ?? [];
             pools.poolTokenBalances = poolTokenBalances;
           },
           false,
@@ -136,9 +188,9 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         if (isNil(userAccountId)) {
           throw Error("User Account ID must be defined.");
         }
-        const poolTokenPairs = await MirrorNodeService.fetchTokenPairs();
+        const poolTokenPairs = await HederaService.fetchTokenPairs();
         const userTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(userAccountId);
-        const userLiquidityPoolTokensList = poolTokenPairs.filter((poolTokenPair: TokenPair) => {
+        const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: NewTokenPair) => {
           return userTokenBalances.some(
             (userTokenBalance: MirrorNodeTokenBalance) =>
               userTokenBalance.token_id === poolTokenPair.pairToken.accountId
@@ -146,9 +198,9 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         });
         // TODO: Needs to be updated once fees are unique to each individial pool.
         const poolFee = get().pools.allPoolsMetrics[0].fee;
-        const userPoolsMetrics = userLiquidityPoolTokensList.map((userTokenPair: TokenPair) => {
+        const userPoolsMetrics = userLiquidityPoolTokensList?.map((userTokenPair: NewTokenPair) => {
           return calculateUserPoolMetrics({
-            poolTokenBalances: get().pools.poolTokenBalances,
+            newCopy: get().pools.poolTokenBalances,
             userTokenBalances,
             userTokenPair,
             fee: poolFee,
@@ -157,7 +209,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         set(
           ({ pools }) => {
             pools.status = "success";
-            pools.userPoolsMetrics = userPoolsMetrics;
+            pools.userPoolsMetrics = userPoolsMetrics ?? [];
             pools.userTokenBalances = userTokenBalances;
           },
           false,

@@ -21,7 +21,6 @@ export const useSwapData = (refreshInterval = 0) => {
 
   const fetchSwapDataOnLoad = useCallback(async () => {
     getPrecision();
-    // Get Token pairs (called from store)
     await Promise.allSettled([fetchFee(), fetchSpotPrices(), fetchTokenPairs()]);
   }, [getPrecision, fetchFee, fetchSpotPrices, fetchTokenPairs]);
 

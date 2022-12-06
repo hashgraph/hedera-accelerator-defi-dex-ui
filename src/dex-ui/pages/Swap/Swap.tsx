@@ -29,6 +29,7 @@ const Swap = () => {
             spotPrices={formattedSpotPrices}
             fee={formattedFee}
             getPoolLiquidity={swap.getPoolLiquidity}
+            setSelectedAccount={swap.setSelectedAccount}
             poolLiquidity={formattedPoolLiquidity}
             walletData={wallet}
             network={context.network}

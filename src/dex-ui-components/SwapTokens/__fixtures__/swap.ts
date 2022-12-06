@@ -7,6 +7,7 @@ export const mockSwapProps: SwapTokensProps = {
   connectionStatus: HashConnectConnectionState.Disconnected,
   connectToWallet: () => null,
   getPoolLiquidity: () => null,
+  setSelectedAccount: () => null,
   spotPrices: {},
   fee: "0.01",
   poolLiquidity: {},

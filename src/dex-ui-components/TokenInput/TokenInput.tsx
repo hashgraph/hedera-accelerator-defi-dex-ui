@@ -13,6 +13,14 @@ interface TokenPairs {
     tokenId: string | undefined;
   };
 }
+interface NewTokenPairs {
+  tokenA: TokenPairs;
+  tokenB: TokenPairs;
+  pairToken: {
+    symbol: string | undefined;
+    accountId: string | undefined;
+  };
+}
 
 export interface TokenInputProps {
   "data-testid": string;
@@ -25,7 +33,7 @@ export interface TokenInputProps {
   tokenBalance: number | undefined;
   walletConnectionStatus: HashConnectConnectionState;
   hideTokenSelector?: boolean;
-  tokenPairs?: TokenPairs[] | null;
+  tokenPairs: NewTokenPairs[] | null;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;

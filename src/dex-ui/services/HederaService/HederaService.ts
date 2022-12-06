@@ -21,9 +21,15 @@ import {
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
   FACTORY_CONTRACT_ID,
 } from "../constants";
-import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions, TokenPairs } from "./types";
+import {
+  AddLiquidityDetails,
+  GovernorContractFunctions,
+  PairContractFunctions,
+  TokenPairs,
+  NewTokenPair,
+} from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { createUserClient, getTreasurer } from "./utils";
+import { createUserClient, getTreasurer, getAddressArray } from "./utils";
 import { MirrorNodeService } from "..";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
@@ -42,50 +48,77 @@ function createHederaService() {
     _precision = precision ?? BigNumber(0);
   };
 
-  const getTokenPairs = async (): Promise<TokenPairs[] | null> => {
+  const fetchEachToken = (evmAddress: string) => {
+    return new Promise((resolve, reject) => {
+      MirrorNodeService.fetchContract(evmAddress).then((pairData) => {
+        const pairContractId = ContractId.fromString(pairData.data.contract_id);
+        getTokenPairAddress(pairContractId).then((data) => {
+          const { tokenAAddress, tokenBAddress } = data;
+          new TokenInfoQuery()
+            .setTokenId(tokenAAddress)
+            .execute(client)
+            .then((data) => {
+              const tokenAInfo = data;
+              new TokenInfoQuery()
+                .setTokenId(tokenBAddress)
+                .execute(client)
+                .then((data) => {
+                  const tokenBInfo = data;
+                  const tokenAInfoDetails: TokenPairs = {
+                    amount: 0.0,
+                    displayAmount: "",
+                    balance: undefined,
+                    poolLiquidity: undefined,
+                    tokenName: tokenAInfo.name,
+                    totalSupply: tokenAInfo.totalSupply,
+                    maxSupply: tokenAInfo.maxSupply,
+                    symbol: tokenAInfo.symbol,
+                    tokenMeta: {
+                      pairContractId: pairData.data.contract_id,
+                      tokenId: tokenAAddress,
+                    },
+                  };
+
+                  const tokenBInfoDetails: TokenPairs = {
+                    amount: 0.0,
+                    displayAmount: "",
+                    balance: undefined,
+                    poolLiquidity: undefined,
+                    tokenName: tokenBInfo.name,
+                    totalSupply: tokenBInfo.totalSupply,
+                    maxSupply: tokenBInfo.maxSupply,
+                    symbol: tokenBInfo.symbol,
+                    tokenMeta: {
+                      pairContractId: pairData.data.contract_id,
+                      tokenId: tokenBAddress,
+                    },
+                  };
+
+                  const pairToken = {
+                    symbol: "",
+                    accountId: pairData.data.contract_id,
+                  };
+
+                  const updated = {
+                    tokenA: tokenAInfoDetails,
+                    tokenB: tokenBInfoDetails,
+                    pairToken,
+                  };
+                  resolve(updated);
+                });
+            });
+        });
+      });
+    });
+  };
+  const fetchTokenPairs = async (): Promise<NewTokenPair[] | null> => {
     const result = await queryContract(factoryId, PairContractFunctions.GetTokenPair);
-    const evmAddress = result?.getAddress(0) ?? ""; //TODO: This should e an array of address
-    if (!evmAddress) return null;
-    try {
-      const {
-        data: { contract_id },
-      } = await MirrorNodeService.fetchContract(evmAddress); // TODO: API will be called in loop
-      const id = ContractId.fromString(contract_id); //0.0.48946274
-      const { tokenAAddress, tokenBAddress } = await getTokenPairAddress(id); // TODO: contract to be caled in loop
-      const tokenAInfo = await new TokenInfoQuery().setTokenId(tokenAAddress).execute(client);
-      const tokenBInfo = await new TokenInfoQuery().setTokenId(tokenBAddress).execute(client);
-
-      // TODO: To be Saved in Store
-      const tokenAInfoDetails: TokenPairs = {
-        tokenName: tokenAInfo.name,
-        totalSupply: tokenAInfo.totalSupply,
-        maxSupply: tokenAInfo.maxSupply,
-        symbol: tokenAInfo.symbol,
-        tokenMeta: {
-          pairContractId: contract_id,
-          tokenId: tokenAAddress,
-        },
-      };
-
-      // TODO: To be Saved in Store
-      const tokenBInfoDetails: TokenPairs = {
-        tokenName: tokenBInfo.name,
-        totalSupply: tokenBInfo.totalSupply,
-        maxSupply: tokenBInfo.maxSupply,
-        symbol: tokenBInfo.symbol,
-        tokenMeta: {
-          pairContractId: contract_id,
-          tokenId: tokenBAddress,
-        },
-      };
-
-      const tokenPairs: TokenPairs[] = [tokenAInfoDetails, tokenBInfoDetails];
-
-      return tokenPairs;
-    } catch (error) {
-      console.log("Error while fetching...", error);
-      return null;
-    }
+    const modifiedArray = getAddressArray(result);
+    const urlRequest: Array<Promise<any>> = [];
+    modifiedArray.forEach((evmAddress) => {
+      urlRequest.push(fetchEachToken(evmAddress));
+    });
+    return await Promise.all(urlRequest);
   };
 
   const getPrecision = () => {
@@ -390,8 +423,8 @@ function createHederaService() {
     return { tokenAQty, tokenBQty };
   };
 
-  const getSpotPrice = async (): Promise<BigNumber> => {
-    const result = await queryContract(contractId, PairContractFunctions.GetSpotPrice);
+  const getSpotPrice = async (accountId: string | undefined): Promise<BigNumber> => {
+    const result = await queryContract(ContractId.fromString(accountId ?? ""), PairContractFunctions.GetSpotPrice);
     const spotPrice = result?.getInt64(0);
     return spotPrice;
   };
@@ -468,7 +501,7 @@ function createHederaService() {
     getContractAddress,
     getTokenPairAddress,
     castVote,
-    getTokenPairs,
+    fetchTokenPairs,
   };
 }
 

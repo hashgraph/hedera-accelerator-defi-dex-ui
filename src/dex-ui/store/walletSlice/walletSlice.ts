@@ -3,8 +3,8 @@ import { BigNumber } from "bignumber.js";
 import { getErrorMessage } from "../../utils";
 import { WalletSlice, WalletStore, WalletActionType, WalletState } from "./types";
 import { getFormattedTokenBalances } from "./utils";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID, WalletService } from "../../services";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { WalletService } from "../../services";
 
 const initialWalletState: WalletState = {
   availableExtension: null,
@@ -25,10 +25,19 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     ...initialWalletState,
     getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => {
       const defaultDecimals = 0;
-      const { wallet } = get();
+      const { wallet, swap } = get();
+      const { tokenPairs } = swap;
       const tokenData = wallet.pairedAccountBalance?.tokens;
-      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
-      const decimals = tokenData?.find((token: any) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
+      const id = tokenPairs
+        ?.map((token) => {
+          if (token.tokenA.symbol === tokenSymbol) {
+            return token.tokenA.tokenMeta.tokenId;
+          } else if (token.tokenB.symbol === tokenSymbol) {
+            return token.tokenB.tokenMeta.tokenId;
+          }
+        })
+        .filter((entry) => entry !== undefined)[0];
+      const decimals = tokenData?.find((token: any) => token.tokenId === id)?.decimals ?? defaultDecimals;
       return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
     },
     initializeWalletConnection: async () => {

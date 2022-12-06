@@ -11,8 +11,23 @@ export enum SwapConfirmationStep {
   TRANSACTION, // When transaction is signed in hashpack and is now executing (NOTE: currently cannot support)
   ERROR, // When there is an error with the executed transaction (for error dialog)
 }
+
+interface TokenPairs {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
+  symbol: string | undefined;
+  tokenName: string | undefined;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  };
+}
 interface SwapConfirmationProps {
-  sendSwapTransaction: (payload: any) => void;
+  sendSwapTransaction: (tokenToTrade: TokenPairs, tokenToReceive: TokenPairs) => void;
   swapState: SwapTokensState;
   confirmationStep: SwapConfirmationStep;
   errorMessage?: string;
@@ -62,10 +77,7 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
       console.error("Token types must be selected to Swap tokens.");
       return;
     }
-    sendSwapTransaction({
-      tokenToTrade: { ...tokenToTrade },
-      tokenToReceive: { ...tokenToReceive },
-    });
+    sendSwapTransaction(tokenToTrade, tokenToReceive);
     // close AlertDialog with swap settings/confirmation and fire onClose prop
     setDialogsOpenState({ ...dialogsOpenState, alertDialog: false });
     if (props.onClose) props.onClose();

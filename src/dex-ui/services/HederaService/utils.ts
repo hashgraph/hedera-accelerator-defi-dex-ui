@@ -1,4 +1,4 @@
-import { AccountId, PrivateKey, Client } from "@hashgraph/sdk";
+import { AccountId, PrivateKey, Client, ContractFunctionResult } from "@hashgraph/sdk";
 import { ADMIN_ID, ADMIN_KEY, TREASURY_ID, TREASURY_KEY, TOKEN_USER_ID, TOKEN_USER_KEY } from "../constants";
 
 const adminId = AccountId.fromString(ADMIN_ID);
@@ -49,4 +49,19 @@ const createUserClient = (): Client => {
   return createClient(userId, userKey);
 };
 
-export { getAdmin, getTreasurer, getUser, createClient, createAdminClient, createTreasuryClient, createUserClient };
+/// This function is used to iterate over result of ContractFunctionResult which returning array
+/// it return address as string stored after default values.
+const getAddressArray = (contractFunctionResult: ContractFunctionResult) => {
+  const tokenCount = contractFunctionResult.getUint256(1);
+  const result: string[] = [];
+  for (let i = 0; i < Number(tokenCount); i++) {
+    result.push(contractFunctionResult.getAddress(i + 2));
+  }
+  return result;
+}
+
+export {
+  getAdmin, getTreasurer, getUser, createClient, createAdminClient, createTreasuryClient,
+  createUserClient,
+  getAddressArray
+};

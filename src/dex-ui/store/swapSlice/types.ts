@@ -19,12 +19,25 @@ enum SwapActionType {
   FETCH_SWAP_FEE_SUCCEEDED = "swap/FETCH_SWAP_FEE_SUCCEEDED",
   FETCH_SWAP_FEE_FAILED = "swap/FETCH_SWAP_FEE_FAILED",
   SET_PRECISION = "swap/SET_PRECISION",
+  SET_SELECTED_ACCOUNT_ID = "swap/SET_SELECTED_ACCOUNT_ID",
   SET_TOKEN_PAIRS = "swap/SET_TOKEN_PAIRS",
   FETCH_TOKEN_PAIRS_STARTED = "swap/FETCH_TOKEN_PAIRS_STARTED",
   FETCH_TOKEN_PAIRS_SUCCEEDED = "swap/FETCH_TOKEN_PAIRS_SUCCEEDED",
   FETCH_TOKEN_PAIRS_FAILED = "swap/FETCH_TOKEN_PAIRS_FAILED",
 }
+interface NewTokenPair {
+  tokenA: TokenPair;
+  tokenB: TokenPair;
+  pairToken: {
+    symbol: string | undefined
+    accountId: string | undefined
+  }
+}
 interface TokenPair {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
   symbol: string | undefined;
   tokenName: string | undefined;
   totalSupply: Long | null;
@@ -39,6 +52,12 @@ interface TransactionState {
   successPayload: TransactionResponse | null;
   errorMessage: string;
 }
+interface AccountDetails {
+  selectedAccountId: string | null;
+  selectedAToBSymbol: string | null;
+  selectedBToASymbol: string | null;
+}
+
 interface SwapState {
   precision: BigNumber | undefined;
   fee: BigNumber | undefined;
@@ -46,7 +65,8 @@ interface SwapState {
   poolLiquidity: Record<string, BigNumber | undefined>;
   transactionState: TransactionState;
   errorMessage: string | null;
-  tokenPairs: TokenPair[] | null;
+  tokenPairs: NewTokenPair[] | null;
+  selectedAccount: AccountDetails;
 }
 
 interface SwapActions {
@@ -54,8 +74,9 @@ interface SwapActions {
   fetchSpotPrices: () => Promise<void>;
   fetchFee: () => Promise<void>;
   getPoolLiquidity: (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => Promise<void>;
-  sendSwapTransaction: ({ tokenToTrade, tokenToReceive }: any) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
+  setSelectedAccount: (accountId: string, tokenToTradeASymbol: string, tokenToTradeBSymbol: string) => void;
 }
 
 type SwapStore = SwapState & SwapActions;

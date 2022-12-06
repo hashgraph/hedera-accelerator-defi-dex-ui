@@ -5,7 +5,6 @@ import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../dex-ui-components/TokenInput";
 import { useDexContext, usePrevious } from "../../hooks";
 import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
-import { SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../services";
 import { mapBigNumberValuesToNumber } from "../Swap/formatters";
 import { formatBigNumberToPercent } from "../../utils";
 import { useSwapData } from "../../hooks/useSwapData";
@@ -14,7 +13,7 @@ import { MetricLabel } from "../../../dex-ui-components";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
-  const { fee, spotPrices } = swap;
+  const { fee, spotPrices, tokenPairs } = swap;
   const formattedFee = formatBigNumberToPercent(fee);
   const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
@@ -46,7 +45,7 @@ const AddLiquidity = (): JSX.Element => {
     pools.sendAddLiquidityTransaction({
       inputToken: poolState.inputToken,
       outputToken: poolState.outputToken,
-      contractId: SWAP_CONTRACT_ID,
+      contractId: poolState.inputToken.tokenMeta.pairContractId,
     });
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,7 +61,8 @@ const AddLiquidity = (): JSX.Element => {
     (tokenSymbol: string): string => {
       const defaultBalance = "0.0";
       const tokenBalances = wallet?.pairedAccountBalance?.tokens;
-      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const id = getTokenId(tokenSymbol);
+      const tokenId = id;
       const tokenData = tokenBalances?.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId);
       return tokenData?.balance ?? defaultBalance;
     },
@@ -169,14 +169,35 @@ const AddLiquidity = (): JSX.Element => {
   const handleInputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "symbol");
-      handlePoolInputsChange(
-        TOKEN_SYMBOL_TO_ACCOUNT_ID.get(event.target.value),
-        ActionType.UPDATE_INPUT_TOKEN,
-        "address"
-      );
+      handlePoolInputsChange(getTokenId(event.target.value), ActionType.UPDATE_INPUT_TOKEN, "tokenId");
+      handlePoolInputsChange(getPairTokenId(event.target.value), ActionType.UPDATE_INPUT_TOKEN, "tokenMeta");
     },
     [handlePoolInputsChange]
   );
+
+  const getTokenId = (symbol: string) => {
+    return tokenPairs
+      ?.map((token) => {
+        if (token.tokenA.symbol === symbol) {
+          return token.tokenA.tokenMeta.tokenId;
+        } else if (token.tokenB.symbol === symbol) {
+          return token.tokenB.tokenMeta.tokenId;
+        }
+      })
+      .filter((entry) => entry !== undefined)[0];
+  };
+
+  const getPairTokenId = (symbol: string) => {
+    return tokenPairs
+      ?.map((token) => {
+        if (token.tokenA.symbol === symbol) {
+          return token.tokenA.tokenMeta.pairContractId;
+        } else if (token.tokenB.symbol === symbol) {
+          return token.tokenB.tokenMeta.pairContractId;
+        }
+      })
+      .filter((entry) => entry !== undefined)[0];
+  };
 
   /**
    * Called when the second input field's amount is changed. Calls handlePoolInputsChange to update the amount
@@ -209,11 +230,7 @@ const AddLiquidity = (): JSX.Element => {
   const handleOutputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "symbol");
-      handlePoolInputsChange(
-        TOKEN_SYMBOL_TO_ACCOUNT_ID.get(event.target.value),
-        ActionType.UPDATE_OUTPUT_TOKEN,
-        "address"
-      );
+      handlePoolInputsChange(getTokenId(event.target.value), ActionType.UPDATE_OUTPUT_TOKEN, "address");
     },
     [handlePoolInputsChange]
   );
@@ -302,6 +319,7 @@ const AddLiquidity = (): JSX.Element => {
           tokenSymbol={poolState.inputToken.symbol}
           tokenBalance={poolState.inputToken.balance}
           walletConnectionStatus={wallet.hashConnectConnectionState}
+          tokenPairs={swap.tokenPairs}
           onTokenAmountChange={handleInputAmountChange}
           onTokenSymbolChange={handleInputSymbolChange}
           isHalfAndMaxButtonsVisible={true}
@@ -316,6 +334,7 @@ const AddLiquidity = (): JSX.Element => {
           tokenSymbol={poolState.outputToken.symbol}
           tokenBalance={poolState.outputToken.balance}
           walletConnectionStatus={wallet.hashConnectConnectionState}
+          tokenPairs={swap.tokenPairs}
           onTokenAmountChange={handleOutputAmountChange}
           onTokenSymbolChange={handleOutputSymbolChange}
           isHalfAndMaxButtonsVisible={true}

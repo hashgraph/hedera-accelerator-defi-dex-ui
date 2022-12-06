@@ -19,7 +19,7 @@ enum PairContractFunctions {
   GetPoolBalances = "getPairQty",
   GetContractAddress = "getContractAddress",
   GetTokenAddresses = "getTokenPairAddress",
-  GetTokenPair = "getFirstPair",
+  GetTokenPair = "getPairs",
 }
 
 interface AddLiquidityDetails {
@@ -31,7 +31,20 @@ interface AddLiquidityDetails {
   walletAddress: string;
   signer: HashConnectSigner;
 }
+
+interface NewTokenPair {
+  tokenA: TokenPairs;
+  tokenB: TokenPairs;
+  pairToken: {
+    symbol: string | undefined
+    accountId: string | undefined
+  }
+}
 interface TokenPairs {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
   symbol: string | undefined;
   tokenName: string | undefined;
   totalSupply: Long | null;
@@ -43,4 +56,4 @@ interface TokenPairs {
 }
 
 export { GovernorContractFunctions, PairContractFunctions };
-export type { AddLiquidityDetails, TokenPairs };
+export type { AddLiquidityDetails, TokenPairs, NewTokenPair };

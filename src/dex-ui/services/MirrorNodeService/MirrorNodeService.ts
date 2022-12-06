@@ -3,20 +3,11 @@ import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
 import {
-  A_B_PAIR_TOKEN_ID,
-  TOKEN_A_SYMBOL,
-  TOKEN_B_SYMBOL,
-  TOKEN_A_ID,
-  TOKEN_B_ID,
-  PAIR_TOKEN_SYMBOL,
-} from "../constants";
-import {
   MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
-  TokenPair,
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
@@ -88,21 +79,6 @@ function createMirrorNodeService() {
     }
 
     return await fetchNextBatch("/api/v1/transactions", "transactions", { params });
-  };
-
-  /**
-   * TODO: This is mocked data and should be replaced with a Hedera Service call to fetch
-   * all pairs associated with the primary swap/pool contract.
-   */
-  const fetchTokenPairs = async (): Promise<TokenPair[]> => {
-    // TODO: getTokenPairAddress()
-    return await Promise.resolve([
-      {
-        pairToken: { symbol: PAIR_TOKEN_SYMBOL, accountId: A_B_PAIR_TOKEN_ID },
-        tokenA: { symbol: TOKEN_A_SYMBOL, accountId: TOKEN_A_ID },
-        tokenB: { symbol: TOKEN_B_SYMBOL, accountId: TOKEN_B_ID },
-      },
-    ]);
   };
 
   /**
@@ -258,7 +234,6 @@ function createMirrorNodeService() {
 
   return {
     fetchAccountTransactions,
-    fetchTokenPairs,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
