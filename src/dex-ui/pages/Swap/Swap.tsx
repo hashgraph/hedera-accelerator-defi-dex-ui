@@ -23,16 +23,15 @@ const Swap = () => {
           <SwapTokens
             title="Swap"
             sendSwapTransaction={swap.sendSwapTransaction}
-            connectionStatus={wallet.walletConnectionStatus}
+            connectionStatus={wallet.hashConnectConnectionState}
             connectToWallet={wallet.connectToWallet}
-            clearWalletPairings={wallet.clearWalletPairings}
             spotPrices={formattedSpotPrices}
             fee={formattedFee}
             getPoolLiquidity={swap.getPoolLiquidity}
             poolLiquidity={formattedPoolLiquidity}
-            walletData={wallet.walletData}
+            walletData={wallet}
             network={context.network}
-            installedExtensions={wallet.installedExtensions}
+            installedExtensions={wallet.availableExtension}
             transactionState={swap.transactionState}
             isFeatureLoading={app.isFeatureLoading}
           />

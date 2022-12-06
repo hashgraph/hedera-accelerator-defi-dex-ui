@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { HashConnectSigner } from "hashconnect/dist/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { ContractId } from "@hashgraph/sdk";
 
 enum GovernorContractFunctions {

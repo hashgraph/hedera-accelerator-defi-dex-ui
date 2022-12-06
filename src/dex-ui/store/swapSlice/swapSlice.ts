@@ -155,10 +155,6 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         false,
         SwapActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED
       );
-
-      const { network } = context;
-      const { walletData } = wallet;
-
       /**
        * Only L49A and L49B swaps are currently supported. The isTokenToTradeL49A and isTokenToTradeL49B booleans
        * were created as a temporary work around to support the current swapToken Swap contract function logic.
@@ -167,7 +163,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const isTokenToTradeL49B = tokenToTrade.symbol === TOKEN_B_SYMBOL;
       const tokenToTradeAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToTrade.symbol) ?? "";
       // const tokenToReceiveAccountId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenToReceive.symbol) ?? "";
-      const signingAccount = walletData.pairedAccounts[0];
+      const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const abstractSwapId = ContractId.fromString(SWAP_CONTRACT_ID);
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
       /**
@@ -197,7 +193,11 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       // should be: const tokenToReceiveAmount = new BigNumber(tokenToReceive.amount)
       const tokenToReceiveAmount = isTokenToTradeL49B ? tokenToTradeAmountWithPrecision : BigNumber(0);
 
-      const provider = WalletService.getProvider(network, walletData.topicID, walletData.pairedAccounts[0]);
+      const provider = WalletService.getProvider(
+        context.network,
+        wallet.topicID,
+        wallet.savedPairingData?.accountIds[0] ?? ""
+      );
       const signer = WalletService.getSigner(provider);
 
       try {
