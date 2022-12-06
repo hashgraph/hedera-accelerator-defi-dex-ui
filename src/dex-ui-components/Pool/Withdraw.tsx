@@ -14,14 +14,14 @@ import {
   Tr,
   Td,
 } from "@chakra-ui/react";
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ChangeEvent, useState, useCallback } from "react";
 import { MetricLabel } from "..";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
-import { WalletConnectionStatus } from "../models/wallet.model";
 import { TokenInput } from "../TokenInput";
 
 export interface WithdrawProps {
-  walletConnectionStatus: WalletConnectionStatus;
+  walletConnectionStatus: HashConnectConnectionState;
   poolLpDetails: LPTokenDetails;
   poolLiquidityDetails: PoolLiquidityDetails;
   onWithdrawClick: (lpAmount: number) => void;
@@ -114,7 +114,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
           hideTokenSelector={true}
           onMaxButtonClick={() => getPortionOfBalance("max")}
           onHalfButtonClick={() => getPortionOfBalance("half")}
-          isLoading={isFeatureLoading("walletData")}
+          isLoading={isFeatureLoading("pairedAccountBalance")}
         />
         <TableContainer>
           <Table variant={"unstyled"}>

@@ -35,25 +35,25 @@ import { formulaTypes } from "./types";
 import { halfOf } from "./utils";
 import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../TokenInput/constants";
 import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
-import { Networks, WalletConnectionStatus } from "../../dex-ui/store/walletSlice";
+import { Networks } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { createHashScanLink } from "../../dex-ui/utils";
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 
 export interface SwapTokensProps {
   title: string;
   sendSwapTransaction: (payload: any) => void;
   connectToWallet: () => void;
-  clearWalletPairings: () => void;
   getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
-  connectionStatus: WalletConnectionStatus;
+  connectionStatus: HashConnectConnectionState;
   spotPrices: Record<string, number | undefined>;
   fee: string;
   poolLiquidity: Record<string, number | undefined>;
   walletData: any | null;
   network: Networks;
   metaData?: HashConnectTypes.AppMetadata;
-  installedExtensions: HashConnectTypes.WalletMetadata[] | null;
+  installedExtensions: HashConnectTypes.WalletMetadata | null;
   transactionState: TransactionState;
   isFeatureLoading: <T extends AppFeatures>(feature: T) => boolean;
 }
@@ -72,6 +72,7 @@ const SwapTokens = (props: SwapTokensProps) => {
     transactionState,
     isFeatureLoading,
   } = props;
+
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
   const { tokenToTrade, tokenToReceive, spotPrice, swapSettings } = swapState;
 
@@ -443,7 +444,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
-          isLoading={isFeatureLoading("walletData")}
+          isLoading={isFeatureLoading("pairedAccountBalance")}
         />
         <Flex>
           <Spacer />
@@ -467,7 +468,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           walletConnectionStatus={connectionStatus}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
-          isLoading={isFeatureLoading("walletData")}
+          isLoading={isFeatureLoading("pairedAccountBalance")}
         />
         <Flex paddingTop="1rem">
           <Box flex="2" paddingRight="1rem">
@@ -485,7 +486,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           </Box>
         </Flex>
         <Flex direction="column" grow="1" paddingTop="1.25rem">
-          {connectionStatus === WalletConnectionStatus.PAIRED ? (
+          {connectionStatus === HashConnectConnectionState.Paired ? (
             <SwapConfirmation
               sendSwapTransaction={sendSwapTransaction}
               swapState={swapState}

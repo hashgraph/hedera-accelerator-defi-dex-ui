@@ -2,7 +2,7 @@ import { Box, Flex, Skeleton, Text } from "@chakra-ui/react";
 import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
-import { WalletConnectionStatus } from "../models/wallet.model";
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
@@ -12,7 +12,7 @@ export interface TokenInputProps {
   tokenAmount: number | string;
   tokenSymbol: string | undefined;
   tokenBalance: number | undefined;
-  walletConnectionStatus: WalletConnectionStatus;
+  walletConnectionStatus: HashConnectConnectionState;
   hideTokenSelector?: boolean;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -45,7 +45,7 @@ const TokenInput = (props: TokenInputProps) => {
   } = props;
 
   const showTokenBalance = useCallback(() => {
-    if (walletConnectionStatus !== WalletConnectionStatus.PAIRED) {
+    if (walletConnectionStatus !== HashConnectConnectionState.Paired) {
       return CONNECT_TO_VIEW;
     }
     if (tokenSymbol === undefined || tokenSymbol === "") {

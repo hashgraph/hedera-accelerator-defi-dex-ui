@@ -1,4 +1,5 @@
 import { theme, ComponentStyleConfig } from "@chakra-ui/react";
+import { TextStyles } from "../..";
 import { Color } from "../../../themes";
 
 const primary = {
@@ -22,9 +23,17 @@ export const ButtonStyles: ComponentStyleConfig = {
     secondary: {
       bg: Color.White_01,
       height: "44px",
-      border: `0.25pxpx solid ${Color.Grey_01}`,
+      border: `0.25px solid ${Color.Grey_01}`,
       boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
       borderRadius: "2px",
+    },
+    ternary: {
+      bg: Color.Black_01,
+      border: `0.25px solid ${Color.White_01}`,
+      borderRadius: "1px",
+      padding: "0rem 2rem",
+      ...TextStyles.h4,
+      color: Color.White_01,
     },
     cancel: {},
     "new-proposal": {

@@ -20,7 +20,7 @@ const Withdraw = () => {
     noPoolMetricsMessage: "",
     errorDialogOpen: false,
     withdrawProps: {
-      walletConnectionStatus: wallet.walletConnectionStatus,
+      walletConnectionStatus: wallet.hashConnectConnectionState,
       poolLiquidityDetails: {
         firstToken: {
           tokenSymbol: "",

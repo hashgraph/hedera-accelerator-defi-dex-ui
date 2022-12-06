@@ -2596,9 +2596,9 @@
     protobufjs "^6.11.3"
 
 "@hashgraph/sdk@^2.14.2":
-  version "2.18.6"
-  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.18.6.tgz#19077f56eb20a6a18b81aabdba2019067cf9e04f"
-  integrity sha512-t7PEUFNzQZsP8a+fP9i/KijYh3bO13HhnU5EODbtWByeIecQUQ6/cywE29XcLHkcPx+HD1drOlsOs6dujGMl1g==
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/@hashgraph/sdk/-/sdk-2.19.0.tgz#62b73fdb635a1c19911054c195b6439e263bc77d"
+  integrity sha512-EXfk8wRHK9KvDHwrxcOA1LcxBFwamGGBPMJWPfQvo23N3XLh4fWXJu8iv87+Ea6YTmE8VGu3C2rBEjSf9ClcSA==
   dependencies:
     "@ethersproject/rlp" "^5.7.0"
     "@grpc/grpc-js" "^1.7.0"
@@ -9923,21 +9923,22 @@ hash.js@1.1.7, hash.js@^1.0.0, hash.js@^1.0.3, hash.js@^1.1.7:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-hashconnect@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.1.10.tgz#f66e941c2e72c88c8770664c57fac91b8bb4a6c9"
-  integrity sha512-w4lxJLDZk9cJ+x9OXEVZjt4JRY38tVOKkzMrBfyJoWw+Dyx+6GUSgW4k3XUFzqk8p0/ZKlf3ficu8/nPL1FSwQ==
+hashconnect@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/hashconnect/-/hashconnect-0.2.3.tgz#5cd52f000a6c96481b524e87f65e0449847bbb33"
+  integrity sha512-E3MrJi50GPZYpc9FBtXaPC/4B7azhRTt49JCFK2IUIeqhWf91yr2tkSlNkOI9yeeGdo4uziD1WZ4dz8yZ+XLeA==
   dependencies:
     "@hashgraph/sdk" "^2.14.2"
     buffer "^6.0.3"
     crypto-es "^1.2.7"
     crypto-js "^4.1.1"
     i "^0.3.7"
+    isomorphic-ws "^5.0.0"
     protons "^2.0.3"
     simple-crypto-js "^3.0.1"
     ts-typed-events "3.0.0"
     uuid "^8.3.2"
-    ws "^8.5.0"
+    ws "^8.8.1"
 
 hast-to-hyperscript@^9.0.0:
   version "9.0.1"
@@ -10952,6 +10953,11 @@ isomorphic-unfetch@^3.1.0:
   dependencies:
     node-fetch "^2.6.1"
     unfetch "^4.2.0"
+
+isomorphic-ws@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz#e5529148912ecb9b451b46ed44d53dae1ce04bbf"
+  integrity sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==
 
 isstream@~0.1.2:
   version "0.1.2"
@@ -18209,7 +18215,7 @@ ws@^7.4.6:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.9.tgz#54fa7db29f4c7cec68b1ddd3a89de099942bb591"
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
 
-ws@^8.2.3, ws@^8.4.2, ws@^8.5.0:
+ws@^8.2.3, ws@^8.4.2, ws@^8.8.1:
   version "8.11.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.11.0.tgz#6a0d36b8edfd9f96d8b25683db2f8d7de6e8e143"
   integrity sha512-HPG3wQd9sNQoT9xHyNCXoDUa+Xw/VevmY9FoHyQ+g+rrMn4j6FB4np7Z0OhdTgjx6MgQLK7jwSy1YecU1+4Asg==

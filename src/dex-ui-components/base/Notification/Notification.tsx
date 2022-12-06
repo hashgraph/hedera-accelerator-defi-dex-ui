@@ -11,6 +11,7 @@ export enum NotficationTypes {
 
 interface NotificationProps {
   type: NotficationTypes;
+  bg?: string;
   textStyle?: string;
   message: string;
   isLinkShown?: boolean;
@@ -27,6 +28,7 @@ interface NotificationProps {
 export const Notification = (props: NotificationProps) => {
   const {
     type = NotficationTypes.WARNING,
+    bg,
     textStyle = "b2",
     message,
     isLinkShown = false,
@@ -37,6 +39,9 @@ export const Notification = (props: NotificationProps) => {
   } = props;
 
   const getNotificationColors = useCallback(() => {
+    if (bg) {
+      return { bg, text: Color.Black_01 };
+    }
     if (type === NotficationTypes.SUCCESS) {
       return { bg: Color.Green_01_Opaque, text: Color.Black_01 };
     }
@@ -46,11 +51,17 @@ export const Notification = (props: NotificationProps) => {
     if (type === NotficationTypes.ERROR) {
       return { bg: Color.Red_01_Opaque, text: Color.Black_01 };
     }
-  }, [type]);
+  }, [type, bg]);
 
   /** The Alert component is most likely prefered over using Tag for this components. */
   return (
-    <Tag width="100%" padding="0.5rem" backgroundColor={getNotificationColors()?.bg} borderRadius="5px">
+    <Tag
+      width="100%"
+      padding="0.5rem"
+      backgroundColor={getNotificationColors()?.bg}
+      borderRadius="5px"
+      textAlign="left"
+    >
       <Flex flexWrap="wrap" width="100%">
         <Text textStyle={textStyle} color={getNotificationColors()?.text}>
           {message} &nbsp;

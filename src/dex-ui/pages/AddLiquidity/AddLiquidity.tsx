@@ -14,7 +14,6 @@ import { MetricLabel } from "../../../dex-ui-components";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
-  const { walletData, walletConnectionStatus: connectionStatus } = wallet;
   const { fee, spotPrices } = swap;
   const formattedFee = formatBigNumberToPercent(fee);
   const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
@@ -62,12 +61,12 @@ const AddLiquidity = (): JSX.Element => {
   const getBalanceByTokenSymbol = useCallback(
     (tokenSymbol: string): string => {
       const defaultBalance = "0.0";
-      const tokenBalances = walletData?.pairedAccountBalance?.tokens;
+      const tokenBalances = wallet?.pairedAccountBalance?.tokens;
       const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
       const tokenData = tokenBalances?.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId);
       return tokenData?.balance ?? defaultBalance;
     },
-    [walletData]
+    [wallet]
   );
   /**
    * Whenever there is a change in the selected token in either input field or change in
@@ -107,7 +106,7 @@ const AddLiquidity = (): JSX.Element => {
     // getBalanceByTokenSymbol,   // for some reason keeping this in the dependency array causes infinite loop
     poolState.inputToken.symbol,
     poolState.outputToken.symbol,
-    walletData.pairedAccountBalance,
+    wallet.pairedAccountBalance,
     getBalanceByTokenSymbol,
   ]);
 
@@ -268,10 +267,10 @@ const AddLiquidity = (): JSX.Element => {
 
   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
   const sendLABTokensToConnectedWallet = useCallback(() => {
-    pools.send100LabTokensToWallet(walletData?.pairedAccounts[0]);
+    pools.send100LabTokensToWallet(wallet.savedPairingData?.accountIds[0] ?? "");
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletData?.pairedAccounts, pools.send100LabTokensToWallet]);
+  }, [wallet, pools.send100LabTokensToWallet]);
 
   return (
     <HStack>
@@ -302,13 +301,13 @@ const AddLiquidity = (): JSX.Element => {
           tokenAmount={poolState.inputToken.displayedAmount}
           tokenSymbol={poolState.inputToken.symbol}
           tokenBalance={poolState.inputToken.balance}
-          walletConnectionStatus={connectionStatus}
+          walletConnectionStatus={wallet.hashConnectConnectionState}
           onTokenAmountChange={handleInputAmountChange}
           onTokenSymbolChange={handleInputSymbolChange}
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
-          isLoading={app.isFeatureLoading("walletData")}
+          isLoading={app.isFeatureLoading("pairedAccountBalance")}
         />
         <TokenInput
           data-testid="add-liquidity-output"
@@ -316,13 +315,13 @@ const AddLiquidity = (): JSX.Element => {
           tokenAmount={poolState.outputToken.displayedAmount}
           tokenSymbol={poolState.outputToken.symbol}
           tokenBalance={poolState.outputToken.balance}
-          walletConnectionStatus={connectionStatus}
+          walletConnectionStatus={wallet.hashConnectConnectionState}
           onTokenAmountChange={handleOutputAmountChange}
           onTokenSymbolChange={handleOutputSymbolChange}
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("outputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("outputToken", "half")}
-          isLoading={app.isFeatureLoading("walletData")}
+          isLoading={app.isFeatureLoading("pairedAccountBalance")}
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>

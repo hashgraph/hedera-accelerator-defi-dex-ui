@@ -22,7 +22,7 @@
     "@types/quill": "^2.0.9",
     "axios": "^0.27.2",
     "framer-motion": "^6.5.0",
-    "hashconnect": "^0.1.10",
+    "hashconnect": "^0.2.3",
     "immer": "^9.0.15",
     "numeral": "^2.0.6",
     "ramda": "^0.28.0",

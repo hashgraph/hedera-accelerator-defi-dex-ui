@@ -16,7 +16,7 @@ export const useSwapData = (refreshInterval = 0) => {
     wallet,
     swap,
   }));
-  const walletAccountId = wallet.walletData.pairedAccounts[0];
+  const walletAccountId = wallet.savedPairingData?.accountIds[0];
   const { transactionState, fetchFee, fetchSpotPrices, getPrecision } = swap;
 
   const fetchSwapDataOnLoad = useCallback(async () => {
