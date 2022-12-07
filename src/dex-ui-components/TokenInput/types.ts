@@ -1,21 +1,23 @@
-interface TokenPairs {
+interface Token {
   symbol: string | undefined;
   tokenName: string | undefined;
   totalSupply: Long | null;
   maxSupply: Long | null;
   tokenMeta: {
-    pairContractId: string | undefined;
+    pairAccountId: string | undefined;
     tokenId: string | undefined;
   };
 }
 
-interface NewTokenPairs {
-  tokenA: TokenPairs;
-  tokenB: TokenPairs;
+interface TokenPair {
+  tokenA: Token;
+  tokenB: Token;
   pairToken: {
     symbol: string | undefined;
-    accountId: string | undefined;
+    pairLpAccountId: string | undefined;
+    totalSupply?: Long | null;
+    decimals: number;
   };
 }
 
-export type { TokenPairs, NewTokenPairs };
+export type { TokenPair, Token };

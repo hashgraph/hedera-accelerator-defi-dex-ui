@@ -1,10 +1,11 @@
 import { ChangeEvent, cloneElement } from "react";
 import { Select } from "@chakra-ui/react";
-import { TokenPairs } from "../../TokenInput/types";
+import { Token } from "../../TokenInput/types";
 
 interface TokenSelectorProps {
+  /* The unique Account ID of the token */
   value: string | undefined;
-  tokenPairs: TokenPairs[] | null;
+  tokenPairs: Token[] | null;
   onChangeHandler?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -13,13 +14,11 @@ const TokenSelector = (props: TokenSelectorProps) => {
   return cloneElement(
     <Select value={value} placeholder="Select a Token">
       {tokenPairs !== null &&
-        tokenPairs.map((token: TokenPairs) => {
+        tokenPairs.map((token: Token) => {
           return (
-            <>
-              <option key={token.tokenMeta.tokenId} value={token.symbol}>
-                {token.symbol}
-              </option>
-            </>
+            <option key={token.tokenMeta.tokenId} value={token.tokenMeta.tokenId}>
+              {token.symbol}
+            </option>
           );
         })}
     </Select>,

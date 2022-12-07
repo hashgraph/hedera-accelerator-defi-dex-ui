@@ -25,15 +25,17 @@ enum SwapActionType {
   FETCH_TOKEN_PAIRS_SUCCEEDED = "swap/FETCH_TOKEN_PAIRS_SUCCEEDED",
   FETCH_TOKEN_PAIRS_FAILED = "swap/FETCH_TOKEN_PAIRS_FAILED",
 }
-interface NewTokenPair {
-  tokenA: TokenPair;
-  tokenB: TokenPair;
+interface TokenPair {
+  tokenA: Token;
+  tokenB: Token;
   pairToken: {
     symbol: string | undefined;
-    accountId: string | undefined;
+    pairLpAccountId: string | undefined;
+    totalSupply?: Long | null;
+    decimals: number;
   };
 }
-interface TokenPair {
+interface Token {
   amount: number;
   displayAmount: string;
   balance: number | undefined;
@@ -43,7 +45,7 @@ interface TokenPair {
   totalSupply: Long | null;
   maxSupply: Long | null;
   tokenMeta: {
-    pairContractId: string | undefined;
+    pairAccountId: string | undefined;
     tokenId: string | undefined;
   };
 }
@@ -54,8 +56,8 @@ interface TransactionState {
 }
 interface AccountDetails {
   selectedAccountId: string | null;
-  selectedAToBSymbol: string | null;
-  selectedBToASymbol: string | null;
+  selectedAToBRoute: string | null;
+  selectedBToARoute: string | null;
 }
 
 interface SwapState {
@@ -65,16 +67,16 @@ interface SwapState {
   poolLiquidity: Record<string, BigNumber | undefined>;
   transactionState: TransactionState;
   errorMessage: string | null;
-  tokenPairs: NewTokenPair[] | null;
+  tokenPairs: TokenPair[] | null;
   selectedAccount: AccountDetails;
 }
 
 interface SwapActions {
-  getPrecision: () => void;
+  getPrecision: () => Promise<void>;
   fetchSpotPrices: () => Promise<void>;
   fetchFee: () => Promise<void>;
-  getPoolLiquidity: (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => Promise<void>;
-  sendSwapTransaction: (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => Promise<void>;
+  getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: Token) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
   setSelectedAccount: (accountId: string, tokenToTradeASymbol: string, tokenToTradeBSymbol: string) => void;
 }
@@ -84,4 +86,4 @@ type SwapStore = SwapState & SwapActions;
 type SwapSlice = StateCreator<DEXState, [["zustand/devtools", never], ["zustand/immer", never]], [], SwapStore>;
 
 export { SwapActionType };
-export type { SwapSlice, SwapStore, SwapState, SwapActions, TransactionState, TokenPair };
+export type { SwapSlice, SwapStore, SwapState, SwapActions, TransactionState, TokenPair, Token };

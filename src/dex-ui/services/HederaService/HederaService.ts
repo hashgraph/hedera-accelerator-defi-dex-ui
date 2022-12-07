@@ -9,7 +9,6 @@ import {
   TokenAssociateTransaction,
   TransactionResponse,
   ContractCallQuery,
-  TokenInfoQuery,
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
@@ -21,16 +20,9 @@ import {
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
   FACTORY_CONTRACT_ID,
 } from "../constants";
-import {
-  AddLiquidityDetails,
-  GovernorContractFunctions,
-  PairContractFunctions,
-  TokenPairs,
-  NewTokenPair,
-} from "./types";
+import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { createUserClient, getTreasurer, getAddressArray } from "./utils";
-import { MirrorNodeService } from "..";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -44,81 +36,18 @@ function createHederaService() {
   let _precision = BigNumber(0);
 
   const initHederaService = async () => {
-    const precision = await fetchPrecision();
+    const precision = await fetchPrecision(contractId);
     _precision = precision ?? BigNumber(0);
   };
 
-  const fetchEachToken = (evmAddress: string) => {
-    return new Promise((resolve, reject) => {
-      MirrorNodeService.fetchContract(evmAddress).then((pairData) => {
-        const pairContractId = ContractId.fromString(pairData.data.contract_id);
-        getTokenPairAddress(pairContractId).then((data) => {
-          const { tokenAAddress, tokenBAddress } = data;
-          new TokenInfoQuery()
-            .setTokenId(tokenAAddress)
-            .execute(client)
-            .then((data) => {
-              const tokenAInfo = data;
-              new TokenInfoQuery()
-                .setTokenId(tokenBAddress)
-                .execute(client)
-                .then((data) => {
-                  const tokenBInfo = data;
-                  const tokenAInfoDetails: TokenPairs = {
-                    amount: 0.0,
-                    displayAmount: "",
-                    balance: undefined,
-                    poolLiquidity: undefined,
-                    tokenName: tokenAInfo.name,
-                    totalSupply: tokenAInfo.totalSupply,
-                    maxSupply: tokenAInfo.maxSupply,
-                    symbol: tokenAInfo.symbol,
-                    tokenMeta: {
-                      pairContractId: pairData.data.contract_id,
-                      tokenId: tokenAAddress,
-                    },
-                  };
-
-                  const tokenBInfoDetails: TokenPairs = {
-                    amount: 0.0,
-                    displayAmount: "",
-                    balance: undefined,
-                    poolLiquidity: undefined,
-                    tokenName: tokenBInfo.name,
-                    totalSupply: tokenBInfo.totalSupply,
-                    maxSupply: tokenBInfo.maxSupply,
-                    symbol: tokenBInfo.symbol,
-                    tokenMeta: {
-                      pairContractId: pairData.data.contract_id,
-                      tokenId: tokenBAddress,
-                    },
-                  };
-
-                  const pairToken = {
-                    symbol: "",
-                    accountId: pairData.data.contract_id,
-                  };
-
-                  const updated = {
-                    tokenA: tokenAInfoDetails,
-                    tokenB: tokenBInfoDetails,
-                    pairToken,
-                  };
-                  resolve(updated);
-                });
-            });
-        });
-      });
-    });
-  };
-  const fetchTokenPairs = async (): Promise<NewTokenPair[] | null> => {
+  const fetchTokenPairs = async (): Promise<string[] | null> => {
     const result = await queryContract(factoryId, PairContractFunctions.GetTokenPair);
     const modifiedArray = getAddressArray(result);
-    const urlRequest: Array<Promise<any>> = [];
+    const pairEvmAddressess: string[] = [];
     modifiedArray.forEach((evmAddress) => {
-      urlRequest.push(fetchEachToken(evmAddress));
+      pairEvmAddressess.push(evmAddress);
     });
-    return await Promise.all(urlRequest);
+    return pairEvmAddressess;
   };
 
   const getPrecision = () => {
@@ -137,7 +66,7 @@ function createHederaService() {
     return await query.execute(client);
   };
 
-  const fetchPrecision = async (): Promise<BigNumber | undefined> => {
+  const fetchPrecision = async (contractId: ContractId): Promise<BigNumber | undefined> => {
     const result = await queryContract(contractId, PairContractFunctions.GetPrecision);
     const precision = result?.getInt256(0);
     return precision;
@@ -228,33 +157,42 @@ function createHederaService() {
     return removeLiquidityTx;
   };
 
+  interface SwapTokenParams {
+    swapContractId: ContractId;
+    walletAddress: string;
+    tokenToTradeAddress: string;
+    tokenToTradeAmount: BigNumber;
+    signer: HashConnectSigner;
+  }
+
   const swapToken = async ({
-    abstractSwapId,
+    swapContractId,
     walletAddress,
     tokenToTradeAddress,
-    tokenToReceiveAddress,
     tokenToTradeAmount,
-    tokenToReceiveAmount,
-  }: any) => {
-    const swapTransaction = await new ContractExecuteTransaction()
-      .setContractId(abstractSwapId)
+    signer,
+  }: SwapTokenParams): Promise<TransactionResponse> => {
+    console.log({
+      swapContractId,
+      walletAddress,
+      tokenToTradeAddress,
+      tokenToTradeAmount: tokenToTradeAmount.toNumber(),
+      signer,
+    });
+    const contractFunctionParams = new ContractFunctionParameters()
+      .addAddress(walletAddress)
+      .addAddress(tokenToTradeAddress)
+      .addInt256(tokenToTradeAmount);
+    const swapTokenTransaction = await new ContractExecuteTransaction()
+      .setContractId(swapContractId)
+      .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
       .setGas(2000000)
-      .setFunction(
-        "swapToken",
-        new ContractFunctionParameters()
-          .addAddress(walletAddress)
-          .addAddress(tokenToTradeAddress)
-          .addAddress(tokenToReceiveAddress)
-          .addInt256(tokenToTradeAmount)
-          .addInt256(tokenToReceiveAmount)
-      )
-      .freezeWith(client)
-      .sign(treasuryKey);
-    const swapTokenTx = await swapTransaction.execute(client);
-    const transferTokenRx = await swapTokenTx.getReceipt(client);
-
-    console.log(`Swap status: ${transferTokenRx.status}`);
+      .setNodeAccountIds([new AccountId(3)])
+      .freezeWithSigner(signer);
+    const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);
+    return swapTokenResponse;
   };
+
   interface CreateProposalParams {
     targets: Array<string>;
     fees: Array<number>;
@@ -423,30 +361,33 @@ function createHederaService() {
     return { tokenAQty, tokenBQty };
   };
 
-  const getSpotPrice = async (accountId: string | undefined): Promise<BigNumber> => {
-    const result = await queryContract(ContractId.fromString(accountId ?? ""), PairContractFunctions.GetSpotPrice);
-    const spotPrice = result?.getInt64(0);
+  const getSpotPrice = async (pairAccountId: string): Promise<BigNumber> => {
+    const pairContractId = ContractId.fromString(pairAccountId);
+    const result = await queryContract(pairContractId, PairContractFunctions.GetSpotPrice);
+    const spotPrice = result?.getInt256(0);
     return spotPrice;
   };
 
-  const fetchFeeWithPrecision = async (): Promise<BigNumber | undefined> => {
-    const fee = await fetchFee();
-    const feePrecision = await fetchFeePrecision();
+  const fetchFeeWithPrecision = async (pairAccountId: string): Promise<BigNumber | undefined> => {
+    const fee = await fetchFee(pairAccountId);
+    const feePrecision = await fetchFeePrecision(pairAccountId);
     if (feePrecision === undefined) {
       throw new Error("fee precision is undefined");
     }
     return fee?.div(feePrecision.times(10));
   };
 
-  const fetchFee = async (): Promise<BigNumber | undefined> => {
-    const result = await queryContract(contractId, PairContractFunctions.GetFee);
+  const fetchFee = async (pairAccountId: string): Promise<BigNumber | undefined> => {
+    const pairContractId = ContractId.fromString(pairAccountId);
+    const result = await queryContract(pairContractId, PairContractFunctions.GetFee);
     const fee = result?.getInt256(0);
-    const feePrecision = await fetchFeePrecision();
+    const feePrecision = await fetchFeePrecision(pairAccountId);
     return fee?.div(feePrecision?.toNumber() ?? 1);
   };
 
-  const fetchFeePrecision = async (): Promise<BigNumber | undefined> => {
-    const result = await queryContract(contractId, PairContractFunctions.GetFeePrecision);
+  const fetchFeePrecision = async (pairAccountId: string): Promise<BigNumber | undefined> => {
+    const pairContractId = ContractId.fromString(pairAccountId);
+    const result = await queryContract(pairContractId, PairContractFunctions.GetFeePrecision);
     const feePrecision = result?.getInt256(0);
     return feePrecision;
   };
@@ -472,11 +413,13 @@ function createHederaService() {
   ): Promise<{
     tokenAAddress: string;
     tokenBAddress: string;
+    tokenCAddress: string;
   }> => {
     const result = await queryContract(contractId, PairContractFunctions.GetTokenAddresses);
     const tokenAAddress = AccountId.fromSolidityAddress(result?.getAddress(0) ?? "").toString();
     const tokenBAddress = AccountId.fromSolidityAddress(result?.getAddress(1) ?? "").toString();
-    return { tokenAAddress, tokenBAddress };
+    const tokenCAddress = AccountId.fromSolidityAddress(result?.getAddress(2) ?? "").toString();
+    return { tokenAAddress, tokenBAddress, tokenCAddress };
   };
 
   return {
@@ -502,6 +445,7 @@ function createHederaService() {
     getTokenPairAddress,
     castVote,
     fetchTokenPairs,
+    fetchPrecision,
   };
 }
 

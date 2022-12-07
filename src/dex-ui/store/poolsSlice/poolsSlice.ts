@@ -1,25 +1,35 @@
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { getErrorMessage } from "../../utils";
-import { PoolsSlice, PoolsStore, PoolsState, PoolsActionType, SendAddLiquidityTransactionParams } from "./types";
+import { BigNumber } from "bignumber.js";
+import {
+  PoolsSlice,
+  PoolsStore,
+  PoolsState,
+  PoolsActionType,
+  SendAddLiquidityTransactionParams,
+  TokenPair,
+  Token,
+  FetchSpotPriceParams,
+} from "./types";
 import {
   MirrorNodeService,
   WalletService,
   HederaService,
   MirrorNodeTokenBalance,
-  SWAP_CONTRACT_ID,
   MirrorNodeTransaction,
 } from "../../services";
 
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours } from "../../utils";
-import { Pool, UserPool } from "./types";
+import { Pool } from "./types";
 
 const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
   userPoolsMetrics: [],
   poolTokenBalances: [],
   userTokenBalances: [],
+  spotPrices: {},
   status: "init",
   errorMessage: null,
   withdrawState: {
@@ -29,28 +39,77 @@ const initialPoolsStore: PoolsState = {
   },
 };
 
-interface NewTokenPair {
-  tokenA: TokenPairs;
-  tokenB: TokenPairs;
-  pairToken: {
-    symbol: string | undefined;
-    accountId: string | undefined;
-  };
-}
-interface TokenPairs {
-  amount: number;
-  displayAmount: string;
-  balance: number | undefined;
-  poolLiquidity: number | undefined;
-  symbol: string | undefined;
-  tokenName: string | undefined;
-  totalSupply: Long | null;
-  maxSupply: Long | null;
-  tokenMeta: {
-    pairContractId: string | undefined;
-    tokenId: string | undefined;
-  };
-}
+const fetchEachToken = (evmAddress: string) => {
+  return new Promise<TokenPair>((resolve, reject) => {
+    MirrorNodeService.fetchContract(evmAddress)
+      .then((pairData) => {
+        const pairContractId = ContractId.fromString(pairData.data.contract_id);
+        HederaService.getTokenPairAddress(pairContractId)
+          .then((data) => {
+            const { tokenAAddress, tokenBAddress, tokenCAddress } = data;
+            let tokenAInfoDetails: Token;
+            let tokenBInfoDetails: Token;
+            MirrorNodeService.fetchTokenData(tokenAAddress)
+              .then((tokenAInfo) => {
+                const { data } = tokenAInfo;
+                tokenAInfoDetails = {
+                  amount: 0.0,
+                  displayAmount: "",
+                  balance: undefined,
+                  poolLiquidity: undefined,
+                  tokenName: data.name,
+                  totalSupply: data.total_supply,
+                  maxSupply: null,
+                  symbol: data.symbol,
+                  tokenMeta: {
+                    pairAccountId: pairData.data.contract_id,
+                    tokenId: data.token_id,
+                  },
+                };
+                MirrorNodeService.fetchTokenData(tokenBAddress)
+                  .then((tokenBInfo) => {
+                    const { data } = tokenBInfo;
+                    tokenBInfoDetails = {
+                      amount: 0.0,
+                      displayAmount: "",
+                      balance: undefined,
+                      poolLiquidity: undefined,
+                      tokenName: data.name,
+                      totalSupply: data.total_supply,
+                      maxSupply: null,
+                      symbol: data.symbol,
+                      tokenMeta: {
+                        pairAccountId: pairData.data.contract_id,
+                        tokenId: data.token_id,
+                      },
+                    };
+                    MirrorNodeService.fetchTokenData(tokenCAddress)
+                      .then((tokenCInfo) => {
+                        const { data } = tokenCInfo;
+                        const pairToken = {
+                          symbol: data.symbol,
+                          pairLpAccountId: tokenCAddress,
+                          totalSupply: data.total_supply,
+                          decimals: data.decimals,
+                        };
+                        const updated: TokenPair = {
+                          pairToken,
+                          tokenA: tokenAInfoDetails,
+                          tokenB: tokenBInfoDetails,
+                        };
+                        resolve(updated);
+                      })
+                      .catch((error) => reject(error));
+                  })
+                  .catch((error) => reject(error));
+              })
+              .catch((error) => reject(error));
+          })
+          .catch((error) => reject(error));
+      })
+      .catch((error) => reject(error));
+  });
+};
 
 /**
  * @returns
@@ -63,8 +122,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const { network } = get().context;
       const firstTokenAddress = TokenId.fromString(inputToken.address).toSolidityAddress();
       const secondTokenAddress = TokenId.fromString(outputToken.address).toSolidityAddress();
-      const firstTokenQuantity = wallet.getTokenAmountWithPrecision(inputToken.symbol, inputToken.amount);
-      const secondTokenQuantity = wallet.getTokenAmountWithPrecision(outputToken.symbol, outputToken.amount);
+      const firstTokenQuantity = wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
+      const secondTokenQuantity = wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
       const addLiquidityContractAddress = ContractId.fromString(contractId);
 
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
@@ -105,36 +164,46 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       );
       app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
-        const poolTokenPairs = await HederaService.fetchTokenPairs();
-        const poolBalanceUrlRequest: Array<Promise<any>> = [];
-        const urlRequest: Array<Promise<any>> = [];
-        let copyPoolMetrices: Pool[] | undefined = [];
-        poolTokenPairs?.map((tokenPair) =>
-          poolBalanceUrlRequest.push(MirrorNodeService.fetchAccountTokenBalances(tokenPair.pairToken.accountId ?? ""))
+        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const addressessURlRequest: Promise<TokenPair>[] = [];
+        pairsAddresses?.forEach((pairAddress) => {
+          addressessURlRequest.push(fetchEachToken(pairAddress));
+        });
+        const poolTokenPairs = await Promise.all(addressessURlRequest);
+        const poolBalanceUrlRequest: Array<Promise<MirrorNodeTokenBalance[]>> = [];
+        poolTokenPairs?.forEach((pair) =>
+          poolBalanceUrlRequest.push(
+            MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "")
+          )
         );
-        const poolTokenBalances: Array<MirrorNodeTokenBalance> = await Promise.all(poolBalanceUrlRequest);
-        const newCopy1: Array<MirrorNodeTokenBalance[]> = await Promise.all(poolBalanceUrlRequest);
-        // const poolTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(SWAP_CONTRACT_ID);
-        const timestamp7DaysAgo = getTimestamp7DaysAgo();
+        const allPairsPoolTokenBalances = await Promise.all(poolBalanceUrlRequest);
+        // TODO: Need to change it, since now we haave a array of pool token balance for each pair
+        const poolTokenBalances = allPairsPoolTokenBalances.flat(1);
 
-        poolTokenPairs?.map((obj) =>
-          urlRequest.push(MirrorNodeService.fetchAccountTransactions(obj.pairToken.accountId ?? "", timestamp7DaysAgo))
+        const timestamp7DaysAgo = getTimestamp7DaysAgo();
+        const urlRequest: Array<Promise<MirrorNodeTransaction[]>> = [];
+        poolTokenPairs?.forEach((pair) =>
+          urlRequest.push(
+            MirrorNodeService.fetchAccountTransactions(pair.tokenA.tokenMeta.pairAccountId ?? "", timestamp7DaysAgo)
+          )
         );
-        const copylast7DTransactions: Array<Array<MirrorNodeTransaction>> = await Promise.all(urlRequest);
-        const poolFee = await HederaService.fetchFeeWithPrecision();
+
+        // TODO: Assuming the Array order will be same as allPairsPoolTokenBalances
+        const allPairslast7DTransactions: Array<MirrorNodeTransaction[]> = await Promise.all(urlRequest);
 
         // TODO: Needs to be updated once fees are unique to each individial pool.
-
+        let individialPoolMetrices: Pool[] = [];
         for (const [i, tokenPair] of poolTokenPairs?.entries() ?? []) {
-          const last24Transactions = getTransactionsFromLast24Hours(copylast7DTransactions[i]);
-          const last7DTransactions = copylast7DTransactions[i];
-          const newCopy = newCopy1[i];
-          // const poolTokenBalances = copyPoolTokenBalances[i];
-          copyPoolMetrices = [
-            ...copyPoolMetrices,
+          const last24Transactions = getTransactionsFromLast24Hours(allPairslast7DTransactions[i]);
+          const last7DTransactions = allPairslast7DTransactions[i];
+          const poolTokenBalance = allPairsPoolTokenBalances[i];
+          const poolFee = await HederaService.fetchFeeWithPrecision(tokenPair.tokenA.tokenMeta.pairAccountId ?? "");
+
+          individialPoolMetrices = [
+            ...individialPoolMetrices,
             calculatePoolMetrics({
-              poolAccountId: tokenPair.pairToken.accountId ?? "",
-              newCopy,
+              poolAccountId: tokenPair.tokenA.tokenMeta.pairAccountId ?? "",
+              poolTokenBalances: poolTokenBalance,
               last24Transactions,
               last7DTransactions,
               tokenPair,
@@ -142,18 +211,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
             }),
           ];
         }
-
-        const allPoolsMetrics = copyPoolMetrices;
-        // const allPoolsMetrics = poolTokenPairs?.map((tokenPair: NewTokenPair) => {
-        //   return calculatePoolMetrics({
-        //     poolAccountId: tokenPair.pairToken.accountId ?? "",
-        //     poolTokenBalances,
-        //     last24Transactions,
-        //     last7DTransactions,
-        //     tokenPair,
-        //     poolFee,
-        //   });
-        // });
+        const allPoolsMetrics = individialPoolMetrices;
         set(
           ({ pools }) => {
             pools.status = "success";
@@ -163,6 +221,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.FETCH_ALL_METRICS_SUCCEEDED
         );
+        app.setFeaturesAsLoaded(["allPoolsMetrics"]);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         set(
@@ -175,6 +234,44 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
       app.setFeaturesAsLoaded(["allPoolsMetrics"]);
+    },
+    fetchSpotPrices: async ({ inputTokenAddress, outputTokenAddress, contractId }: FetchSpotPriceParams) => {
+      if (!inputTokenAddress || !outputTokenAddress || !contractId) {
+        return;
+      }
+      const { app, swap } = get();
+      set({}, false, PoolsActionType.FETCH_SPOT_PRICES_STARTED);
+      app.setFeaturesAsLoading(["spotPrices"]);
+      try {
+        const { precision } = swap;
+        if (precision === undefined) {
+          throw Error("Precision not found");
+        }
+        const spotPriceL49BToL49A = await HederaService.getSpotPrice(contractId);
+        const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
+        const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
+        const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
+          ? spotPriceL49BToL49A.dividedBy(precision)
+          : undefined;
+        set(
+          ({ pools }) => {
+            pools.spotPrices[`${inputTokenAddress}=>${outputTokenAddress}`] = spotPriceL49AToL49BWithPrecision;
+            pools.spotPrices[`${outputTokenAddress}=>${inputTokenAddress}`] = spotPriceL49BToL49AWithPrecision;
+          },
+          false,
+          PoolsActionType.FETCH_SPOT_PRICES_SUCCEEDED
+        );
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        set(
+          ({ swap }) => {
+            swap.errorMessage = errorMessage;
+          },
+          false,
+          PoolsActionType.FETCH_SPOT_PRICES_FAILED
+        );
+      }
+      app.setFeaturesAsLoaded(["spotPrices"]);
     },
     fetchUserPoolMetrics: async (userAccountId: string) => {
       const { app } = get();
@@ -190,22 +287,28 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         if (isNil(userAccountId)) {
           throw Error("User Account ID must be defined.");
         }
-        const poolTokenPairs = await HederaService.fetchTokenPairs();
+        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const addressessURlRequest: Array<Promise<any>> = [];
+        pairsAddresses?.forEach((pairAddress) => {
+          addressessURlRequest.push(fetchEachToken(pairAddress));
+        });
+        const poolTokenPairs = await Promise.all(addressessURlRequest);
         const userTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(userAccountId);
-        const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: NewTokenPair) => {
+        const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
           return userTokenBalances.some(
             (userTokenBalance: MirrorNodeTokenBalance) =>
-              userTokenBalance.token_id === poolTokenPair.pairToken.accountId
+              userTokenBalance.token_id === poolTokenPair.pairToken.pairLpAccountId
           );
         });
-        // TODO: Needs to be updated once fees are unique to each individial pool.
-        const poolFee = get().pools.allPoolsMetrics[0].fee;
-        const userPoolsMetrics = userLiquidityPoolTokensList?.map((userTokenPair: NewTokenPair) => {
+        const userPoolsMetrics = userLiquidityPoolTokensList?.map((userTokenPair: TokenPair) => {
+          const fee = get().pools.allPoolsMetrics.find((pool) => {
+            return pool.name === `${userTokenPair.tokenA.symbol}${userTokenPair.tokenB.symbol}`;
+          })?.fee;
           return calculateUserPoolMetrics({
-            newCopy: get().pools.poolTokenBalances,
+            poolTokenBalances: get().pools.poolTokenBalances,
             userTokenBalances,
             userTokenPair,
-            fee: poolFee,
+            fee,
           });
         });
         set(

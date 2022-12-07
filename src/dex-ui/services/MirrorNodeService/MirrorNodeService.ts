@@ -134,6 +134,7 @@ function createMirrorNodeService() {
           ...token,
           balance,
           decimals: String(decimals),
+          accountId,
         };
       })
     );
@@ -240,6 +241,7 @@ function createMirrorNodeService() {
     fetchAllProposals,
     fetchBlock,
     fetchContract,
+    fetchTokenData,
   };
 }
 

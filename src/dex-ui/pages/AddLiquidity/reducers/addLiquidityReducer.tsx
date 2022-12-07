@@ -2,36 +2,26 @@ import { ActionType, AddLiquidityActions } from "./actionTypes";
 
 export interface AddLiquidityState {
   inputToken: {
-    poolLiquidity: number | undefined;
-    address: string;
     spotPrice: number;
     symbol: string | undefined;
     amount: number;
     displayAmount: string;
     displayedAmount: string;
     balance: number | undefined;
-    tokenName: string | undefined;
-    totalSupply: Long | null;
-    maxSupply: Long | null;
     tokenMeta: {
-      pairContractId: string | undefined;
+      pairAccountId: string | undefined;
       tokenId: string | undefined;
     };
   };
   outputToken: {
-    poolLiquidity: number | undefined;
-    address: string;
     spotPrice: number;
     symbol: string | undefined;
     amount: number;
     displayAmount: string;
     displayedAmount: string;
     balance: number | undefined;
-    tokenName: string | undefined;
-    totalSupply: Long | null;
-    maxSupply: Long | null;
     tokenMeta: {
-      pairContractId: string | undefined;
+      pairAccountId: string | undefined;
       tokenId: string | undefined;
     };
   };
@@ -43,15 +33,10 @@ const initialPoolState: AddLiquidityState = {
     amount: 0.0,
     displayAmount: "0.0",
     displayedAmount: "0.0",
-    address: "",
     spotPrice: 0,
     balance: undefined,
-    poolLiquidity: undefined,
-    tokenName: undefined,
-    totalSupply: null,
-    maxSupply: null,
     tokenMeta: {
-      pairContractId: undefined,
+      pairAccountId: undefined,
       tokenId: undefined,
     },
   },
@@ -60,15 +45,10 @@ const initialPoolState: AddLiquidityState = {
     amount: 0.0,
     displayAmount: "0.0",
     displayedAmount: "0.0",
-    address: "",
     spotPrice: 0,
     balance: undefined,
-    poolLiquidity: undefined,
-    tokenName: undefined,
-    totalSupply: null,
-    maxSupply: null,
     tokenMeta: {
-      pairContractId: undefined,
+      pairAccountId: undefined,
       tokenId: undefined,
     },
   },

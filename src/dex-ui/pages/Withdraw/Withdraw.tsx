@@ -158,13 +158,13 @@ const Withdraw = () => {
 
   return !withdrawState.noPoolMetricsMessage ? (
     <>
-      <WithdrawComponent
+      {/* <WithdrawComponent
         {...withdrawState.withdrawProps}
         onWithdrawClick={onWithdrawClick}
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
         isFeatureLoading={app.isFeatureLoading}
-      />
+      /> */}
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}
         message={"Please confirm the swap in your wallet to proceed"}

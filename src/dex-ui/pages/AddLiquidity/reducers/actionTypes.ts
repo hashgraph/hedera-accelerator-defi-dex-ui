@@ -7,13 +7,13 @@ export enum ActionType {
 interface UpdateInputToken {
   type: ActionType.UPDATE_INPUT_TOKEN;
   field: string;
-  payload: string | number | object;
+  payload: string | number | object | undefined;
 }
 
 interface UpdateOutputToken {
   type: ActionType.UPDATE_OUTPUT_TOKEN;
   field: string;
-  payload: string | number | object;
+  payload: string | number | object | undefined;
 }
 
 interface SwitchTokens {

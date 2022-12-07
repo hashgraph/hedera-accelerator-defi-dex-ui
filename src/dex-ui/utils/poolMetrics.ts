@@ -5,6 +5,7 @@ import {
   MirrorNodeTokenTransfer,
   MirrorNodeTokenBalance,
 } from "../services/MirrorNodeService/types";
+import { TokenPair } from "../store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
@@ -34,7 +35,7 @@ const getTokenBalance = (tokenBalances: MirrorNodeTokenBalance[], tokenId: strin
 
 interface CalculateTotalValueLockedForPoolParams {
   /** Token balances for the liquidity pool. */
-  newCopy: MirrorNodeTokenBalance[];
+  poolTokenBalances: MirrorNodeTokenBalance[];
   /** Account ID for Token A. */
   tokenAAccountId: string;
   /** Account ID for Token B. */
@@ -52,12 +53,9 @@ interface CalculateTotalValueLockedForPoolParams {
  * @returns The total value locked for a given pair of tokens.
  */
 const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPoolParams): BigNumber => {
-  const { newCopy, tokenAAccountId, tokenBAccountId } = params;
-  console.log("Roshan 1", newCopy);
-  console.log("Roshan 2", tokenAAccountId);
-  const tokenAPoolBalance = getTokenBalance(newCopy, tokenAAccountId);
-  const tokenBPoolBalance = getTokenBalance(newCopy, tokenBAccountId);
-  console.log("Roshan 3", tokenAPoolBalance);
+  const { poolTokenBalances, tokenAAccountId, tokenBAccountId } = params;
+  const tokenAPoolBalance = getTokenBalance(poolTokenBalances, tokenAAccountId);
+  const tokenBPoolBalance = getTokenBalance(poolTokenBalances, tokenBAccountId);
   if (isNil(tokenAPoolBalance) || isNil(tokenBPoolBalance)) {
     console.error("Cannot find mirror node balance for token account ID.");
     return BigNumber(0);
@@ -133,6 +131,11 @@ interface CalculatePercentOfPoolParams {
   liquidityTokenAccountId: string;
 }
 
+interface calculatePercentOfPoolFromTotalSupplyParams {
+  userTokenBalances: MirrorNodeTokenBalance[];
+  tokenPair: TokenPair;
+}
+
 /**
  * Calculates the percentage in decimal format of the pool owned by an account.
  * mLP = My LP tokens for a pool
@@ -153,10 +156,29 @@ const calculatePercentOfPool = (params: CalculatePercentOfPoolParams): BigNumber
   }
 };
 
+const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFromTotalSupplyParams): BigNumber => {
+  const {
+    userTokenBalances,
+    tokenPair: {
+      pairToken: { pairLpAccountId, totalSupply, decimals },
+    },
+  } = params;
+  const userLPTokenBalance = getTokenBalance(userTokenBalances, pairLpAccountId ?? "");
+  if (isNil(userLPTokenBalance)) {
+    console.error("Cannot find mirror node balance for LP token account ID.");
+    return BigNumber(0);
+  } else {
+    const number = totalSupply?.toString() ?? 0;
+    const balance = BigNumber(number).shiftedBy(-Number(decimals));
+    return BigNumber(userLPTokenBalance).div(balance);
+  }
+};
+
 export {
   calculateTotalValueLockedForPool,
   calculateVolume,
   calculatePercentOfPool,
   calculateUserPoolLiquidity,
   getTransactionsFromLast24Hours,
+  calculatePercentOfPoolFromTotalSupply,
 };

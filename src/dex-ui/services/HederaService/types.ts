@@ -20,6 +20,7 @@ enum PairContractFunctions {
   GetContractAddress = "getContractAddress",
   GetTokenAddresses = "getTokenPairAddress",
   GetTokenPair = "getPairs",
+  SwapToken = "swapToken",
 }
 
 interface AddLiquidityDetails {
@@ -32,15 +33,17 @@ interface AddLiquidityDetails {
   signer: HashConnectSigner;
 }
 
-interface NewTokenPair {
-  tokenA: TokenPairs;
-  tokenB: TokenPairs;
+interface TokenPair {
+  tokenA: Token;
+  tokenB: Token;
   pairToken: {
     symbol: string | undefined;
-    accountId: string | undefined;
+    pairLpAccountId: string | undefined;
+    totalSupply?: Long | null;
+    decimals: number;
   };
 }
-interface TokenPairs {
+interface Token {
   amount: number;
   displayAmount: string;
   balance: number | undefined;
@@ -50,10 +53,10 @@ interface TokenPairs {
   totalSupply: Long | null;
   maxSupply: Long | null;
   tokenMeta: {
-    pairContractId: string | undefined;
+    pairAccountId: string | undefined;
     tokenId: string | undefined;
   };
 }
 
 export { GovernorContractFunctions, PairContractFunctions };
-export type { AddLiquidityDetails, TokenPairs, NewTokenPair };
+export type { AddLiquidityDetails, TokenPair, Token };

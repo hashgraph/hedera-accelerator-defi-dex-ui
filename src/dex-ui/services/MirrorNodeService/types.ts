@@ -1,21 +1,5 @@
 import { BigNumber } from "bignumber.js";
 
-// Only for mocking for now
-interface TokenPair {
-  pairToken: {
-    symbol: string;
-    accountId: string;
-  };
-  tokenA: {
-    symbol: string;
-    accountId: string;
-  };
-  tokenB: {
-    symbol: string;
-    accountId: string;
-  };
-}
-
 interface MirrorNodeLinks {
   links: {
     next: string | null;
@@ -23,7 +7,13 @@ interface MirrorNodeLinks {
 }
 
 interface MirrorNodeTokenByIdResponse {
-  data: { decimals: number; symbol: string; token_id: string };
+  data: {
+    name: string | undefined;
+    symbol: string | undefined;
+    token_id: string | undefined;
+    decimals: number;
+    total_supply: Long | null;
+  };
 }
 
 interface MirrorNodeTokenPairResponse {
@@ -32,6 +22,7 @@ interface MirrorNodeTokenPairResponse {
 
 interface MirrorNodeTokenBalance {
   token_id: string;
+  accountId: string;
   balance: BigNumber;
   decimals?: string;
 }
@@ -99,6 +90,5 @@ export type {
   MirrorNodeTokenTransfer,
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
-  TokenPair,
   MirrorNodeTokenPairResponse,
 };

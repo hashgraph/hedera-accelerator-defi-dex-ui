@@ -1,8 +1,8 @@
 import { BigNumber } from "bignumber.js";
-import { ContractExecuteTransaction, ContractFunctionParameters, AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { WalletService, HederaService, FACTORY_CONTRACT_ID, A_TO_B, B_TO_A } from "../../services";
+import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
+import { WalletService, HederaService, MirrorNodeService } from "../../services";
 import { getErrorMessage } from "../../utils";
-import { SwapActionType, SwapSlice, SwapStore, SwapState, TokenPair } from "./types";
+import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
 const initialSwapState: SwapState = {
   precision: undefined,
@@ -12,8 +12,8 @@ const initialSwapState: SwapState = {
   errorMessage: null,
   selectedAccount: {
     selectedAccountId: null,
-    selectedAToBSymbol: null,
-    selectedBToASymbol: null,
+    selectedAToBRoute: null,
+    selectedBToARoute: null,
   },
   transactionState: {
     transactionWaitingToBeSigned: false,
@@ -21,6 +21,78 @@ const initialSwapState: SwapState = {
     errorMessage: "",
   },
   tokenPairs: null,
+};
+
+const fetchEachToken = (evmAddress: string) => {
+  return new Promise<TokenPair>((resolve, reject) => {
+    MirrorNodeService.fetchContract(evmAddress)
+      .then((pairData) => {
+        const pairContractId = ContractId.fromString(pairData.data.contract_id);
+        HederaService.getTokenPairAddress(pairContractId)
+          .then((data) => {
+            const { tokenAAddress, tokenBAddress, tokenCAddress } = data;
+            let tokenAInfoDetails: Token;
+            let tokenBInfoDetails: Token;
+            MirrorNodeService.fetchTokenData(tokenAAddress)
+              .then((tokenAInfo) => {
+                const { data } = tokenAInfo;
+                tokenAInfoDetails = {
+                  amount: 0.0,
+                  displayAmount: "",
+                  balance: undefined,
+                  poolLiquidity: undefined,
+                  tokenName: data.name,
+                  totalSupply: data.total_supply,
+                  maxSupply: null,
+                  symbol: data.symbol,
+                  tokenMeta: {
+                    pairAccountId: pairData.data.contract_id,
+                    tokenId: data.token_id,
+                  },
+                };
+                MirrorNodeService.fetchTokenData(tokenBAddress)
+                  .then((tokenBInfo) => {
+                    const { data } = tokenBInfo;
+                    tokenBInfoDetails = {
+                      amount: 0.0,
+                      displayAmount: "",
+                      balance: undefined,
+                      poolLiquidity: undefined,
+                      tokenName: data.name,
+                      totalSupply: data.total_supply,
+                      maxSupply: null,
+                      symbol: data.symbol,
+                      tokenMeta: {
+                        pairAccountId: pairData.data.contract_id,
+                        tokenId: data.token_id,
+                      },
+                    };
+                    MirrorNodeService.fetchTokenData(tokenCAddress)
+                      .then((tokenCInfo) => {
+                        const { data } = tokenCInfo;
+                        const pairToken = {
+                          symbol: data.symbol,
+                          pairLpAccountId: tokenCAddress,
+                          totalSupply: data.total_supply,
+                          decimals: data.decimals,
+                        };
+                        const updated: TokenPair = {
+                          pairToken,
+                          tokenA: tokenAInfoDetails,
+                          tokenB: tokenBInfoDetails,
+                        };
+                        resolve(updated);
+                      })
+                      .catch((error) => reject(error));
+                  })
+                  .catch((error) => reject(error));
+              })
+              .catch((error) => reject(error));
+          })
+          .catch((error) => reject(error));
+      })
+      .catch((error) => reject(error));
+  });
 };
 
 /**
@@ -31,22 +103,37 @@ const initialSwapState: SwapState = {
 const createSwapSlice: SwapSlice = (set, get): SwapStore => {
   return {
     ...initialSwapState,
-    getPrecision: () => {
-      const precision = HederaService.getPrecision();
-      set(
-        ({ swap }) => {
-          swap.precision = precision;
-        },
-        false,
-        SwapActionType.SET_PRECISION
-      );
+    getPrecision: async () => {
+      const { swap } = get();
+      const { selectedAccountId } = swap.selectedAccount;
+      try {
+        const contractId = ContractId.fromString(selectedAccountId ?? "");
+        const precision = await HederaService.fetchPrecision(contractId);
+        set(
+          ({ swap }) => {
+            swap.precision = precision;
+          },
+          false,
+          SwapActionType.SET_PRECISION
+        );
+      } catch {
+        // TODO: A fix for To get Precision and get The UI working when no account is selected
+        const precision = HederaService.getPrecision();
+        set(
+          ({ swap }) => {
+            swap.precision = precision;
+          },
+          false,
+          SwapActionType.SET_PRECISION
+        );
+      }
     },
-    setSelectedAccount: (accountId: string, tokenToTradeASymbol: string, tokenToTradeBSymbol: string) => {
+    setSelectedAccount: (accountId: string, tokenToTradeAId: string, tokenToTradeBId: string) => {
       set(
         ({ swap }) => {
           swap.selectedAccount.selectedAccountId = accountId;
-          swap.selectedAccount.selectedAToBSymbol = `${tokenToTradeASymbol}=>${tokenToTradeBSymbol}`;
-          swap.selectedAccount.selectedBToASymbol = `${tokenToTradeBSymbol}=>${tokenToTradeASymbol}`;
+          swap.selectedAccount.selectedAToBRoute = `${tokenToTradeAId}=>${tokenToTradeBId}`;
+          swap.selectedAccount.selectedBToARoute = `${tokenToTradeBId}=>${tokenToTradeAId}`;
         },
         false,
         SwapActionType.SET_SELECTED_ACCOUNT_ID
@@ -54,8 +141,15 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
     },
     fetchTokenPairs: async () => {
       set({}, false, SwapActionType.FETCH_TOKEN_PAIRS_STARTED);
+      const { app } = get();
+      app.setFeaturesAsLoading(["tokenPairs"]);
       try {
-        const pairs = await HederaService.fetchTokenPairs();
+        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const urlRequest: Array<Promise<TokenPair>> = [];
+        pairsAddresses?.forEach((address) => {
+          urlRequest.push(fetchEachToken(address));
+        });
+        const pairs = await Promise.all(urlRequest);
         set(
           ({ swap }) => {
             swap.tokenPairs = pairs;
@@ -63,8 +157,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           false,
           SwapActionType.FETCH_TOKEN_PAIRS_SUCCEEDED
         );
+        app.setFeaturesAsLoaded(["tokenPairs"]);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
+        app.setFeaturesAsLoaded(["tokenPairs"]);
         set(
           ({ swap }) => {
             swap.errorMessage = errorMessage;
@@ -83,14 +179,18 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
      */
     fetchSpotPrices: async () => {
       const { swap, app } = get();
-      app.setFeaturesAsLoading(["spotPrices"]);
+      const { selectedAccountId, selectedAToBRoute, selectedBToARoute } = swap.selectedAccount;
+      if (!selectedAccountId || !selectedAToBRoute || !selectedBToARoute) {
+        return;
+      }
       set({}, false, SwapActionType.FETCH_SPOT_PRICES_STARTED);
+      app.setFeaturesAsLoading(["spotPrices"]);
       try {
-        const { precision, selectedAccount } = swap;
-        if (precision === undefined || selectedAccount === null) {
+        const { precision } = swap;
+        if (precision === undefined) {
           throw Error("Precision not found");
         }
-        const spotPriceL49BToL49A = await HederaService.getSpotPrice(swap.selectedAccount.selectedAccountId ?? "");
+        const spotPriceL49BToL49A = await HederaService.getSpotPrice(selectedAccountId);
         const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
         const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
         const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
@@ -98,8 +198,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           : undefined;
         set(
           ({ swap }) => {
-            swap.spotPrices[swap.selectedAccount.selectedAToBSymbol ?? ""] = spotPriceL49AToL49BWithPrecision;
-            swap.spotPrices[swap.selectedAccount.selectedBToASymbol ?? ""] = spotPriceL49BToL49AWithPrecision;
+            swap.spotPrices[selectedAToBRoute] = spotPriceL49AToL49BWithPrecision;
+            swap.spotPrices[selectedBToARoute] = spotPriceL49BToL49AWithPrecision;
           },
           false,
           SwapActionType.FETCH_SPOT_PRICES_SUCCEEDED
@@ -117,11 +217,15 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       app.setFeaturesAsLoaded(["spotPrices"]);
     },
     fetchFee: async () => {
-      const { app } = get();
+      const { app, swap } = get();
+      const { selectedAccountId } = swap.selectedAccount;
+      if (!selectedAccountId) {
+        return;
+      }
       app.setFeaturesAsLoading(["fee"]);
       set({}, false, SwapActionType.FETCH_SWAP_FEE_STARTED);
       try {
-        const fee = await HederaService.fetchFeeWithPrecision();
+        const fee = await HederaService.fetchFeeWithPrecision(selectedAccountId);
         set(
           ({ swap }) => {
             swap.fee = fee;
@@ -142,26 +246,27 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       app.setFeaturesAsLoaded(["fee"]);
     },
     // TODO: need to pass in contract address of pool (to pass to pairCurrentPosition)
-    getPoolLiquidity: async (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => {
+    getPoolLiquidity: async (tokenToTrade: Token, tokenToReceive: Token) => {
       console.log(`Getting pool liquidity
        ${JSON.stringify(tokenToTrade, null, 2)} and 
        ${JSON.stringify(tokenToReceive, null, 2)}`);
       const { swap, app } = get();
 
-      if (tokenToReceive.tokenMeta.pairContractId !== tokenToTrade.tokenMeta.pairContractId) {
+      if (tokenToReceive.tokenMeta.pairAccountId !== tokenToTrade.tokenMeta.pairAccountId) {
         swap.errorMessage = "Swap Tokens not available for selected tokens";
         return;
       }
 
+      /** poolLiquidity should be updated to be tracked by unique account id pairs instead of token symbols */
       app.setFeaturesAsLoading(["poolLiquidity"]);
       set({}, false, SwapActionType.FETCH_POOL_LIQUIDITY_STARTED);
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
         // TODO: In below Contract call we are directly returining the hard coded
         // Token A and Token B in real scenario how will we know which is token A and which is token B
-        const pairId = ContractId.fromString(tokenToReceive.tokenMeta.pairContractId ?? "");
+        const pairId = ContractId.fromString(tokenToReceive.tokenMeta.pairAccountId ?? "");
         const { tokenAAddress } = await HederaService.getTokenPairAddress(
-          ContractId.fromString(tokenToTrade.tokenMeta.pairContractId ?? "")
+          ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "")
         );
         const rawPoolLiquidity = await HederaService.pairCurrentPosition(pairId);
 
@@ -204,8 +309,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
       app.setFeaturesAsLoaded(["poolLiquidity"]);
     },
-    sendSwapTransaction: async (tokenToTrade: TokenPair, tokenToReceive: TokenPair) => {
-      const { context, wallet, app, swap } = get();
+    sendSwapTransaction: async (tokenToTrade: Token) => {
+      const { context, wallet, app } = get();
       app.setFeaturesAsLoading(["transactionState"]);
       set(
         ({ swap }) => {
@@ -214,66 +319,22 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         false,
         SwapActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED
       );
-      /**
-       * Only L49A and L49B swaps are currently supported. The isTokenToTradeL49A and isTokenToTradeL49B booleans
-       * were created as a temporary work around to support the current swapToken Swap contract function logic.
-       * */
-      // const isTokenToTradeL49A = swap.tokenPairs?.indexOf(tokenToTrade);
-      // const isTokenToTradeL49B = swap.tokenPairs?.includes(tokenToReceive);
       const tokenToTradeAccountId = tokenToTrade.tokenMeta.tokenId ?? "";
-      const tokenToReceiveccountId = tokenToTrade.tokenMeta.tokenId ?? "";
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
-      const abstractSwapId = ContractId.fromString(FACTORY_CONTRACT_ID);
+      const swapContractId = ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "");
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-      /**
-       * Temporarily added ternary logic for tokenToTradeAddress and tokenToReceiveAddress due to current
-       * swapToken contract function limitations. The real account IDs for the trading and receiving tokens
-       * should be used instead of "0" in future contract iterations.
-       * */
-      // should be: const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
       const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
-      // should be: const tokenToReceiveAddress = TokenId.fromString(tokenToReceiveAccountId).toSolidityAddress();
-      const tokenToReceiveAddress = TokenId.fromString(tokenToReceiveccountId).toSolidityAddress();
-      /**
-       * Temporarily added ternary logic for tokenToTradeAmount and tokenToReceiveAmount due to current swapToken
-       * contract function limitations.
-       * */
-
-      // should be: const tokenToTradeAmount = new BigNumber(tokenToTrade.amount)
-      const tokenToTradeAmountWithPrecision = wallet.getTokenAmountWithPrecision(
-        tokenToTrade.symbol ?? "",
+      const tokenToTradeAmount = wallet.getTokenAmountWithPrecision(
+        tokenToTrade.tokenMeta.tokenId ?? "",
         tokenToTrade.amount ?? ""
       );
-      const tokenToTradeAmount = tokenToTradeAmountWithPrecision;
-      // should be: const tokenToReceiveAmount = new BigNumber(tokenToReceive.amount)
-      const tokenToReceiveAmount = tokenToTradeAmountWithPrecision;
-
       const provider = WalletService.getProvider(
         context.network,
         wallet.topicID,
         wallet.savedPairingData?.accountIds[0] ?? ""
       );
       const signer = WalletService.getSigner(provider);
-
       try {
-        /**
-         * Testing Token Swap using the HederaService with the new Pair Contract
-         */
-        const swapTransaction = await new ContractExecuteTransaction()
-          .setContractId(abstractSwapId)
-          .setGas(9000000)
-          .setFunction(
-            "swapToken",
-            new ContractFunctionParameters()
-              .addAddress(walletAddress)
-              .addAddress(tokenToTradeAddress)
-              .addAddress(tokenToReceiveAddress)
-              .addInt256(tokenToTradeAmount)
-              .addInt256(tokenToReceiveAmount)
-          )
-          .setNodeAccountIds([new AccountId(3)])
-          .freezeWithSigner(signer);
-
         // Sometimes (on first run throught it seems) the AcknowledgeMessageEvent from hashpack does not fire
         // so we need to manually dispatch the action here indicating that transaction is waiting to be signed
         set(
@@ -283,7 +344,13 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           false,
           SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
         );
-        const result = await swapTransaction.executeWithSigner(signer);
+        const result = await HederaService.swapToken({
+          swapContractId,
+          walletAddress,
+          tokenToTradeAddress,
+          tokenToTradeAmount,
+          signer,
+        });
         set(
           ({ swap }) => {
             swap.transactionState.transactionWaitingToBeSigned = false;
