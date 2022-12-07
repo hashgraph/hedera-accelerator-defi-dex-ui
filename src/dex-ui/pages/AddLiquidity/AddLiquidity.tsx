@@ -10,6 +10,7 @@ import { formatBigNumberToPercent } from "../../utils";
 import { useSwapData } from "../../hooks/useSwapData";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
 import { MetricLabel } from "../../../dex-ui-components";
+import { getTokensByUniqueAccountIds } from "../../../dex-ui-components/SwapTokens/utils";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
@@ -319,7 +320,7 @@ const AddLiquidity = (): JSX.Element => {
           tokenSymbol={poolState.inputToken.symbol}
           tokenBalance={poolState.inputToken.balance}
           walletConnectionStatus={wallet.hashConnectConnectionState}
-          tokenPairs={swap.tokenPairs}
+          tokenPairs={getTokensByUniqueAccountIds(swap.tokenPairs ?? [])}
           onTokenAmountChange={handleInputAmountChange}
           onTokenSymbolChange={handleInputSymbolChange}
           isHalfAndMaxButtonsVisible={true}
@@ -334,7 +335,7 @@ const AddLiquidity = (): JSX.Element => {
           tokenSymbol={poolState.outputToken.symbol}
           tokenBalance={poolState.outputToken.balance}
           walletConnectionStatus={wallet.hashConnectConnectionState}
-          tokenPairs={swap.tokenPairs}
+          tokenPairs={getTokensByUniqueAccountIds(swap.tokenPairs ?? [])}
           onTokenAmountChange={handleOutputAmountChange}
           onTokenSymbolChange={handleOutputSymbolChange}
           isHalfAndMaxButtonsVisible={true}

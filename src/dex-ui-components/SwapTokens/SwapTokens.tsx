@@ -34,7 +34,7 @@ import {
 } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
-import { halfOf } from "./utils";
+import { getPairedTokens, getTokenMeta, getTokensByUniqueAccountIds, halfOf } from "./utils";
 import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
@@ -50,6 +50,7 @@ interface NewTokenPair {
     accountId: string | undefined;
   };
 }
+
 interface TokenPairs {
   amount: number;
   displayAmount: string;
@@ -64,6 +65,7 @@ interface TokenPairs {
     tokenId: string | undefined;
   };
 }
+
 export interface SwapTokensProps {
   title: string;
   sendSwapTransaction: (tokenToTrade: TokenPairs, tokenToReceive: TokenPairs) => void;
@@ -221,15 +223,14 @@ const SwapTokens = (props: SwapTokensProps) => {
       }
       const defaultBalance = 0.0;
       const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-      const id = tokenPairs
-        ?.map((token) => {
-          if (token.tokenA.symbol === tokenSymbol) {
-            return token.tokenA.tokenMeta.tokenId;
-          } else if (token.tokenB.symbol === tokenSymbol) {
-            return token.tokenB.tokenMeta.tokenId;
-          }
-        })
-        .filter((entry) => entry !== undefined)[0];
+      const id = tokenPairs?.find((token) => {
+        if (token.tokenA.symbol === tokenSymbol) {
+          return token.tokenA.tokenMeta.tokenId;
+        } else if (token.tokenB.symbol === tokenSymbol) {
+          return token.tokenB.tokenMeta.tokenId;
+        }
+        return undefined;
+      });
       const tokenId = id;
       return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance ?? defaultBalance;
     },
@@ -335,6 +336,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           if (token.tokenB.symbol === tokenToTradeSymbol) {
             return token.tokenB;
           }
+          return undefined;
         })
         .filter((entry) => entry !== undefined)[0];
       dispatch(setTokenToTradeSymbol(tokenToTradeSymbol));
@@ -360,17 +362,9 @@ const SwapTokens = (props: SwapTokensProps) => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToReceiveSymbol = inputElement.value;
-      const filterToken = tokenPairs
-        ?.map((token) => {
-          if (token.tokenA.symbol === tokenToReceiveSymbol) {
-            return token.tokenA;
-          } else if (token.tokenB.symbol === tokenToReceiveSymbol) {
-            return token.tokenB;
-          }
-        })
-        .filter((entry) => entry !== undefined)[0];
+      const tokenToReceiveMeta = getTokenMeta(tokenToReceiveSymbol, tokenPairs ?? []);
       dispatch(setTokenToReceiveSymbol(tokenToReceiveSymbol));
-      dispatch(setTokenToReceiveMeta(filterToken?.tokenMeta));
+      dispatch(setTokenToReceiveMeta(tokenToReceiveMeta));
       const tokenToReceiveBalance = getTokenBalance(tokenToReceiveSymbol);
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
       updateExchangeRate({ tokenToReceiveSymbol });
@@ -513,7 +507,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           onTokenAmountChange={handleTokenToTradeAmountChange}
           onTokenSymbolChange={handleTokenToTradeSymbolChange}
           isHalfAndMaxButtonsVisible={true}
-          tokenPairs={tokenPairs}
+          tokenPairs={getTokensByUniqueAccountIds(tokenPairs ?? [])}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
           isLoading={isFeatureLoading("pairedAccountBalance")}
@@ -538,7 +532,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           tokenSymbol={tokenToReceive.symbol}
           tokenBalance={tokenToReceive.balance}
           walletConnectionStatus={connectionStatus}
-          tokenPairs={tokenPairs}
+          tokenPairs={getPairedTokens(tokenToTrade.tokenMeta.tokenId ?? "", tokenPairs ?? [])}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
           isLoading={isFeatureLoading("pairedAccountBalance")}

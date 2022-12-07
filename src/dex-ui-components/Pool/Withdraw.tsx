@@ -20,6 +20,7 @@ import { MetricLabel } from "..";
 import { NewTokenPair } from "../../dex-ui/services";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { TokenInput } from "../TokenInput";
+import { getLPTokens } from "./utils";
 
 export interface WithdrawProps {
   walletConnectionStatus: HashConnectConnectionState;
@@ -111,7 +112,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
           tokenAmount={localWithdrawState.lpInputAmount}
           tokenSymbol={poolLpDetails.tokenSymbol}
           tokenBalance={poolLpDetails.userLpAmount}
-          tokenPairs={tokenPairs}
+          tokenPairs={getLPTokens(tokenPairs ?? [])}
           walletConnectionStatus={walletConnectionStatus}
           onTokenAmountChange={handleInputAmountChange}
           isHalfAndMaxButtonsVisible={true}

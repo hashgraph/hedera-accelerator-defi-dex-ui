@@ -3,24 +3,7 @@ import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-interface TokenPairs {
-  symbol: string | undefined;
-  tokenName: string | undefined;
-  totalSupply: Long | null;
-  maxSupply: Long | null;
-  tokenMeta: {
-    pairContractId: string | undefined;
-    tokenId: string | undefined;
-  };
-}
-interface NewTokenPairs {
-  tokenA: TokenPairs;
-  tokenB: TokenPairs;
-  pairToken: {
-    symbol: string | undefined;
-    accountId: string | undefined;
-  };
-}
+import { TokenPairs } from "./types";
 
 export interface TokenInputProps {
   "data-testid": string;
@@ -33,7 +16,7 @@ export interface TokenInputProps {
   tokenBalance: number | undefined;
   walletConnectionStatus: HashConnectConnectionState;
   hideTokenSelector?: boolean;
-  tokenPairs: NewTokenPairs[] | null;
+  tokenPairs: TokenPairs[] | null;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;

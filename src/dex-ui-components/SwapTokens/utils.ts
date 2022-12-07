@@ -1,3 +1,6 @@
+import { uniqBy } from "ramda";
+import { NewTokenPairs, TokenPairs } from "../TokenInput";
+
 /**
  * Returns half of the input amount.
  * @param amount - An amount of a tokens.
@@ -19,4 +22,47 @@ export const getTokenExchangeAmount = (tokenAmount: number, spotPrice: number | 
     console.warn("Spot Price is undefined");
     return 0;
   }
+};
+
+/**
+ *
+ * @param tokenPairs
+ * @returns
+ */
+export const getTokensByUniqueAccountIds = (tokenPairs: NewTokenPairs[]): TokenPairs[] => {
+  const tokens = tokenPairs.flatMap(({ tokenA, tokenB }: NewTokenPairs) => [tokenA, tokenB]);
+  const uniqueTokens = uniqBy((token: TokenPairs) => token.tokenMeta.tokenId, tokens);
+  return uniqueTokens;
+};
+
+/**
+ * @param tokenId
+ * @param tokenPairs
+ */
+export const getPairedTokens = (tokenId: string, tokenPairs: NewTokenPairs[]): TokenPairs[] => {
+  const pairedTokens = tokenPairs.reduce<TokenPairs[]>((pairedTokens, tokenPair) => {
+    const { tokenA, tokenB } = tokenPair;
+    if (tokenA.tokenMeta.tokenId === tokenId) {
+      return [tokenB, ...pairedTokens];
+    }
+    if (tokenB.tokenMeta.tokenId === tokenId) {
+      return [tokenA, ...pairedTokens];
+    }
+    return pairedTokens;
+  }, []);
+  return pairedTokens;
+};
+
+export const getTokenMeta = (tokenSymbol: string, tokenPairs: NewTokenPairs[] = []) => {
+  const filterToken = tokenPairs
+    ?.map((token) => {
+      if (token.tokenA.symbol === tokenSymbol) {
+        return token.tokenA;
+      } else if (token.tokenB.symbol === tokenSymbol) {
+        return token.tokenB;
+      }
+      return undefined;
+    })
+    .filter((entry) => entry !== undefined)[0];
+  return filterToken?.tokenMeta;
 };
