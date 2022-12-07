@@ -3,6 +3,8 @@ import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { TokenPairs } from "./types";
+
 export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
@@ -14,6 +16,7 @@ export interface TokenInputProps {
   tokenBalance: number | undefined;
   walletConnectionStatus: HashConnectConnectionState;
   hideTokenSelector?: boolean;
+  tokenPairs: TokenPairs[] | null;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -38,6 +41,7 @@ const TokenInput = (props: TokenInputProps) => {
     tokenBalance,
     walletConnectionStatus,
     hideTokenSelector,
+    tokenPairs,
     onTokenAmountChange,
     onTokenSymbolChange,
     onMaxButtonClick,
@@ -87,7 +91,7 @@ const TokenInput = (props: TokenInputProps) => {
           </Box>
           {!hideTokenSelector ? (
             <Box flex="4">
-              <TokenSelector value={tokenSymbol} onChangeHandler={onTokenSymbolChange} />
+              <TokenSelector value={tokenSymbol} onChangeHandler={onTokenSymbolChange} tokenPairs={tokenPairs} />
             </Box>
           ) : (
             ""

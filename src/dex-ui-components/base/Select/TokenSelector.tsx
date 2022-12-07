@@ -1,14 +1,29 @@
+import { ChangeEvent, cloneElement } from "react";
 import { Select } from "@chakra-ui/react";
-import { TOKEN_A_SYMBOL, TOKEN_B_SYMBOL } from "../../TokenInput/constants";
+import { TokenPairs } from "../../TokenInput/types";
 
-const TokenSelector = (props: any) => {
-  const { value, onChangeHandler } = props;
-  return (
-    <Select value={value} onChange={onChangeHandler} placeholder="Select a Token">
-      <option value="HBAR">HBAR</option>
-      <option value={TOKEN_A_SYMBOL}>{TOKEN_A_SYMBOL}</option>
-      <option value={TOKEN_B_SYMBOL}>{TOKEN_B_SYMBOL}</option>
-    </Select>
+interface TokenSelectorProps {
+  value: string | undefined;
+  tokenPairs: TokenPairs[] | null;
+  onChangeHandler?: (event: ChangeEvent<HTMLInputElement>) => void;
+}
+
+const TokenSelector = (props: TokenSelectorProps) => {
+  const { value, onChangeHandler, tokenPairs } = props;
+  return cloneElement(
+    <Select value={value} placeholder="Select a Token">
+      {tokenPairs !== null &&
+        tokenPairs.map((token: TokenPairs) => {
+          return (
+            <>
+              <option key={token.tokenMeta.tokenId} value={token.symbol}>
+                {token.symbol}
+              </option>
+            </>
+          );
+        })}
+    </Select>,
+    onChangeHandler ? { onChange: onChangeHandler } : {}
   );
 };
 

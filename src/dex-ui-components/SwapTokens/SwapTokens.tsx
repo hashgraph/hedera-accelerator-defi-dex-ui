@@ -9,6 +9,8 @@ import {
   setTokenToTradeAmount,
   setTokenToTradeDisplayAmount,
   setTokenToTradeSymbol,
+  setTokenToTradeMeta,
+  setTokenToReceiveMeta,
   setTokenToTradeBalance,
   setTokenToReceiveAmount,
   setTokenToReceiveDisplayAmount,
@@ -32,8 +34,7 @@ import {
 } from "../base";
 import { TokenInput } from "../TokenInput/TokenInput";
 import { formulaTypes } from "./types";
-import { halfOf } from "./utils";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../TokenInput/constants";
+import { getPairedTokens, getTokenMeta, getTokensByUniqueAccountIds, halfOf } from "./utils";
 import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
@@ -41,12 +42,37 @@ import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { createHashScanLink } from "../../dex-ui/utils";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 
+interface NewTokenPair {
+  tokenA: TokenPairs;
+  tokenB: TokenPairs;
+  pairToken: {
+    symbol: string | undefined;
+    accountId: string | undefined;
+  };
+}
+
+interface TokenPairs {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
+  symbol: string | undefined;
+  tokenName: string | undefined;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  };
+}
+
 export interface SwapTokensProps {
   title: string;
-  sendSwapTransaction: (payload: any) => void;
+  sendSwapTransaction: (tokenToTrade: TokenPairs, tokenToReceive: TokenPairs) => void;
   connectToWallet: () => void;
-  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => void;
   connectionStatus: HashConnectConnectionState;
+  getPoolLiquidity: (tokenToTrade: TokenPairs, tokenToReceive: TokenPairs) => void;
+  setSelectedAccount: (accountId: string, tokenToTradeASymbol: string, tokenToTradeBSymbol: string) => void;
   spotPrices: Record<string, number | undefined>;
   fee: string;
   poolLiquidity: Record<string, number | undefined>;
@@ -56,6 +82,7 @@ export interface SwapTokensProps {
   installedExtensions: HashConnectTypes.WalletMetadata | null;
   transactionState: TransactionState;
   isFeatureLoading: <T extends AppFeatures>(feature: T) => boolean;
+  tokenPairs: NewTokenPair[] | null;
 }
 
 const SwapTokens = (props: SwapTokensProps) => {
@@ -69,8 +96,10 @@ const SwapTokens = (props: SwapTokensProps) => {
     sendSwapTransaction,
     poolLiquidity,
     getPoolLiquidity,
+    setSelectedAccount,
     transactionState,
     isFeatureLoading,
+    tokenPairs,
   } = props;
 
   const [swapState, dispatch] = useImmerReducer(swapReducer, initialSwapState, initSwapReducer);
@@ -84,7 +113,6 @@ const SwapTokens = (props: SwapTokensProps) => {
     tokenToReceiveAmount: 0.0,
     tokenToReceiveSymbol: "",
   });
-
   const onSlippageInputChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       dispatch(setSlippageSetting(event.target.value));
@@ -132,6 +160,19 @@ const SwapTokens = (props: SwapTokensProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [swapState.tokenToTrade.poolLiquidity, swapState.tokenToReceive.poolLiquidity]);
 
+  useEffect(() => {
+    if (spotPrices !== null) {
+      const tokenToTradeSymbol = swapState.tokenToTrade.symbol || "";
+      const tokenToReceiveSymbol = swapState.tokenToReceive.symbol || "";
+      const route = `${tokenToTradeSymbol}=>${tokenToReceiveSymbol}`;
+      if (spotPrices?.[route] !== undefined) {
+        const newSpotPrice = spotPrices[route] ?? 0.0;
+        dispatch(setSpotPrice(newSpotPrice));
+      } else {
+        dispatch(setSpotPrice(undefined));
+      }
+    }
+  }, [spotPrices, poolLiquidity]);
   /**
    * Whenever poolLiquidity is updated (ie new pair selected) update
    * poolLiquidity for each token in swapState accordingly
@@ -182,7 +223,15 @@ const SwapTokens = (props: SwapTokensProps) => {
       }
       const defaultBalance = 0.0;
       const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const id = tokenPairs?.find((token) => {
+        if (token.tokenA.symbol === tokenSymbol) {
+          return token.tokenA.tokenMeta.tokenId;
+        } else if (token.tokenB.symbol === tokenSymbol) {
+          return token.tokenB.tokenMeta.tokenId;
+        }
+        return undefined;
+      });
+      const tokenId = id;
       return tokenBalances?.find((tokenData: any) => tokenData.tokenId === tokenId)?.balance ?? defaultBalance;
     },
     [walletData]
@@ -235,7 +284,7 @@ const SwapTokens = (props: SwapTokensProps) => {
       dispatch(setTokenToReceiveDisplayAmount(tokenToReceiveAmount ? String(tokenToReceiveAmount) : "0.0"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, spotPrice, tokenToTrade.amount]);
+  }, [dispatch, spotPrice, tokenToTrade.displayAmount]);
 
   /** Update balances any time the token symbols or the cached paired account balances change. */
   useEffect(() => {
@@ -258,7 +307,8 @@ const SwapTokens = (props: SwapTokensProps) => {
     // TODO: revisit this approach
     if (tokenToTrade.symbol && tokenToReceive.symbol) {
       // TODO: should we use usePrevious here to only make this call when the selected token has changed?
-      getPoolLiquidity(tokenToTrade.symbol, tokenToReceive.symbol);
+      getPoolLiquidity(tokenToTrade, tokenToReceive);
+      setSelectedAccount(tokenToReceive.tokenMeta.pairContractId ?? "", tokenToTrade.symbol, tokenToReceive.symbol);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, getTokenBalance, tokenToTrade.symbol, tokenToReceive.symbol, walletData?.pairedAccountBalance]);
@@ -277,12 +327,25 @@ const SwapTokens = (props: SwapTokensProps) => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeSymbol = inputElement.value;
+
+      const filterToken = tokenPairs
+        ?.map((token) => {
+          if (token.tokenA.symbol === tokenToTradeSymbol) {
+            return token.tokenA;
+          }
+          if (token.tokenB.symbol === tokenToTradeSymbol) {
+            return token.tokenB;
+          }
+          return undefined;
+        })
+        .filter((entry) => entry !== undefined)[0];
       dispatch(setTokenToTradeSymbol(tokenToTradeSymbol));
+      dispatch(setTokenToTradeMeta(filterToken?.tokenMeta));
       const tokenToTradeBalance = getTokenBalance(tokenToTradeSymbol);
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
       updateExchangeRate({ tokenToTradeSymbol });
     },
-    [dispatch, getTokenBalance, updateExchangeRate]
+    [dispatch, getTokenBalance, updateExchangeRate, tokenPairs]
   );
 
   const handleTokenToReceiveAmountChange = useCallback(
@@ -299,12 +362,14 @@ const SwapTokens = (props: SwapTokensProps) => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToReceiveSymbol = inputElement.value;
+      const tokenToReceiveMeta = getTokenMeta(tokenToReceiveSymbol, tokenPairs ?? []);
       dispatch(setTokenToReceiveSymbol(tokenToReceiveSymbol));
+      dispatch(setTokenToReceiveMeta(tokenToReceiveMeta));
       const tokenToReceiveBalance = getTokenBalance(tokenToReceiveSymbol);
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
       updateExchangeRate({ tokenToReceiveSymbol });
     },
-    [dispatch, updateExchangeRate, getTokenBalance]
+    [dispatch, updateExchangeRate, getTokenBalance, tokenPairs]
   );
 
   const swapTokens = useCallback(() => {
@@ -442,6 +507,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           onTokenAmountChange={handleTokenToTradeAmountChange}
           onTokenSymbolChange={handleTokenToTradeSymbolChange}
           isHalfAndMaxButtonsVisible={true}
+          tokenPairs={getTokensByUniqueAccountIds(tokenPairs ?? [])}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
           isLoading={isFeatureLoading("pairedAccountBalance")}
@@ -466,6 +532,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           tokenSymbol={tokenToReceive.symbol}
           tokenBalance={tokenToReceive.balance}
           walletConnectionStatus={connectionStatus}
+          tokenPairs={getPairedTokens(tokenToTrade.tokenMeta.tokenId ?? "", tokenPairs ?? [])}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
           isLoading={isFeatureLoading("pairedAccountBalance")}

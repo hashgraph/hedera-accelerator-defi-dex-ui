@@ -34,7 +34,7 @@ const getTokenBalance = (tokenBalances: MirrorNodeTokenBalance[], tokenId: strin
 
 interface CalculateTotalValueLockedForPoolParams {
   /** Token balances for the liquidity pool. */
-  poolTokenBalances: MirrorNodeTokenBalance[];
+  newCopy: MirrorNodeTokenBalance[];
   /** Account ID for Token A. */
   tokenAAccountId: string;
   /** Account ID for Token B. */
@@ -52,9 +52,12 @@ interface CalculateTotalValueLockedForPoolParams {
  * @returns The total value locked for a given pair of tokens.
  */
 const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPoolParams): BigNumber => {
-  const { poolTokenBalances, tokenAAccountId, tokenBAccountId } = params;
-  const tokenAPoolBalance = getTokenBalance(poolTokenBalances, tokenAAccountId);
-  const tokenBPoolBalance = getTokenBalance(poolTokenBalances, tokenBAccountId);
+  const { newCopy, tokenAAccountId, tokenBAccountId } = params;
+  console.log("Roshan 1", newCopy);
+  console.log("Roshan 2", tokenAAccountId);
+  const tokenAPoolBalance = getTokenBalance(newCopy, tokenAAccountId);
+  const tokenBPoolBalance = getTokenBalance(newCopy, tokenBAccountId);
+  console.log("Roshan 3", tokenAPoolBalance);
   if (isNil(tokenAPoolBalance) || isNil(tokenBPoolBalance)) {
     console.error("Cannot find mirror node balance for token account ID.");
     return BigNumber(0);

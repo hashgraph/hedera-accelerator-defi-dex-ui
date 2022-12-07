@@ -3,22 +3,14 @@ import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
 import {
-  A_B_PAIR_TOKEN_ID,
-  TOKEN_A_SYMBOL,
-  TOKEN_B_SYMBOL,
-  TOKEN_A_ID,
-  TOKEN_B_ID,
-  PAIR_TOKEN_SYMBOL,
-} from "../constants";
-import {
   MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
-  TokenPair,
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
+  MirrorNodeTokenPairResponse,
 } from "./types";
 import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
@@ -90,18 +82,12 @@ function createMirrorNodeService() {
   };
 
   /**
-   * TODO: This is mocked data and should be replaced with a Hedera Service call to fetch
-   * all pairs associated with the primary swap/pool contract.
+   * Fetches information related to a specific pair pair token.
+   * @param pairAddress  - The ID / Addresss of the pair token account to return data for.
+   * @returns Attributes associated with the provided token ID.
    */
-  const fetchTokenPairs = async (): Promise<TokenPair[]> => {
-    // TODO: getTokenPairAddress()
-    return await Promise.resolve([
-      {
-        pairToken: { symbol: PAIR_TOKEN_SYMBOL, accountId: A_B_PAIR_TOKEN_ID },
-        tokenA: { symbol: TOKEN_A_SYMBOL, accountId: TOKEN_A_ID },
-        tokenB: { symbol: TOKEN_B_SYMBOL, accountId: TOKEN_B_ID },
-      },
-    ]);
+  const fetchContract = async (pairAddress: string): Promise<MirrorNodeTokenPairResponse> => {
+    return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
   };
 
   /**
@@ -248,12 +234,12 @@ function createMirrorNodeService() {
 
   return {
     fetchAccountTransactions,
-    fetchTokenPairs,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
     fetchAllProposals,
     fetchBlock,
+    fetchContract,
   };
 }
 

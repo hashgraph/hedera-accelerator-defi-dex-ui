@@ -14,13 +14,13 @@ type SwapSettingsProperties = keyof typeof initialSwapState.swapSettings;
 interface SetTokenToTrade {
   type: ActionType.SET_TOKEN_TO_TRADE;
   field: TokenInputProperties;
-  payload: string | number | undefined;
+  payload: string | number | object | undefined;
 }
 
 interface SetTokenToReceive {
   type: ActionType.SET_TOKEN_TO_RECEIVE;
   field: TokenInputProperties;
-  payload: string | number | undefined;
+  payload: string | number | object | undefined;
 }
 
 interface SwitchTokenToTradeAndReceiveTokens {

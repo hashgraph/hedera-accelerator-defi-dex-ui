@@ -2,6 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 import { TransactionResponse } from "@hashgraph/sdk";
+import { NewTokenPair } from "../../services";
 
 enum PoolsActionType {
   FETCH_ALL_POOL_METRICS_STARTED = "pools/FETCH_ALL_POOL_METRICS_STARTED",
@@ -18,7 +19,22 @@ enum PoolsActionType {
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
   RESET_WITHDRAW_STATE = "pools/RESET_WITHDRAW_STATE",
 }
-
+interface Token {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
+  symbol: string | undefined;
+  tokenName: string | undefined;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+  pairContractId: string | undefined;
+  tokenId: string | undefined;
+  tokenMeta: {
+    pairContractId: string | undefined;
+    tokenId: string | undefined;
+  };
+}
 interface SendAddLiquidityTransactionParams {
   inputToken: {
     symbol: string;
