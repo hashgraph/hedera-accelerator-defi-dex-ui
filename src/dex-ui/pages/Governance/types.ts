@@ -1,6 +1,7 @@
 import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
 
 interface FormattedProposal {
+  contractId: string;
   id: string;
   title: string | undefined;
   author: string;

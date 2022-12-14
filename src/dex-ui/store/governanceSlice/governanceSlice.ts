@@ -1,4 +1,4 @@
-import { GOVERNOR_PROXY_CONTRACT } from "./../../services/constants";
+import { GovernorProxyContracts } from "./../../services/constants";
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId } from "@hashgraph/sdk";
 import { HederaService, WalletService, MirrorNodeService, MirrorNodeDecodedProposalEvent } from "../../services";
@@ -23,6 +23,7 @@ const TOTAL_GOD_TOKEN_SUPPLY = BigNumber(100);
 const mockProposalData: Proposal[] = [
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 8",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -40,6 +41,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 1",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -57,6 +59,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 2",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -74,6 +77,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 5",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -91,6 +95,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 6",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -108,6 +113,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 9",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -125,6 +131,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 3",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
     adipiscing elit Phasellus congue, sapien eu...`,
@@ -142,6 +149,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 4",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
       adipiscing elit Phasellus congue, sapien eu...`,
@@ -159,6 +167,7 @@ const mockProposalData: Proposal[] = [
   },
   {
     id: BigNumber(0),
+    contractId: GovernorProxyContracts.CreateTokenStringId,
     title: "New Token Proposal 7",
     description: `Preview of the description lorem ipsum dolor sit amit consectetur 
         adipiscing elit Phasellus congue, sapien eu...`,
@@ -195,7 +204,7 @@ const initialGovernanceStore: GovernanceState = {
 const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
   return {
     ...initialGovernanceStore,
-    castVote: async (proposalId: string, voteType: number) => {
+    castVote: async (contractId: string, proposalId: string, voteType: number) => {
       const { context, wallet } = get();
       set(
         ({ governance }) => {
@@ -207,6 +216,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const provider = WalletService.getProvider(context.network, wallet.topicID, signingAccount);
       const signer = WalletService.getSigner(provider);
+      const preciseProposalId = BigNumber(proposalId);
       try {
         set(
           ({ governance }) => {
@@ -215,7 +225,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
           false,
           GovernanceActionType.SIGN_TRANSACTION
         );
-        const response = await HederaService.castVote({ proposalId, voteType, signer });
+        const response = await HederaService.castVote({ contractId, proposalId: preciseProposalId, voteType, signer });
         if (response) {
           set(
             ({ governance }) => {
@@ -249,7 +259,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       app.setFeaturesAsLoading(["proposals"]);
       set({}, false, GovernanceActionType.FETCH_PROPOSALS_STARTED);
       try {
-        const proposalEvents = await MirrorNodeService.fetchAllProposals(GOVERNOR_PROXY_CONTRACT.StringId);
+        const proposalEvents = await MirrorNodeService.fetchAllProposals(GovernorProxyContracts.TransferTokenStringId);
         const getTimeRemaining = (startBlock: BigNumber, endBlock: BigNumber): BigNumber => {
           /** Each Blocktime is about 12 secs long */
           const duration = BigNumber(endBlock).minus(BigNumber(startBlock)).times(12);
@@ -257,7 +267,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         };
         const proposals = await Promise.allSettled(
           proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent): Promise<Proposal> => {
-            const { proposalId, description, proposer, startBlock, endBlock } = proposalEvent;
+            const { proposalId, contractId, description, proposer, startBlock, endBlock } = proposalEvent;
             const state = await HederaService.fetchProposalState(proposalId);
             const votes = await HederaService.fetchProposalVotes(proposalId);
             const quorum = endBlock ? await HederaService.fetchQuorum(endBlock) : undefined;
@@ -266,6 +276,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
               : undefined;
             return {
               id: proposalId,
+              contractId,
               title: description,
               description: `Preview of the description lorem ipsum dolor sit amit consectetur 
             adipiscing elit Phasellus congue, sapien eu...`,
@@ -306,6 +317,70 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         );
       }
       app.setFeaturesAsLoaded(["proposals"]);
+    },
+    createTransferTokenProposal: async ({ title, accountToTransferTo, tokenToTransfer, amountToTransfer }) => {
+      const { context, wallet } = get();
+      set(
+        ({ governance }) => {
+          governance.proposalTransacationState = {
+            ...initialGovernanceStore.proposalTransacationState,
+            status: TransactionStatus.IN_PROGRESS,
+          };
+          governance.errorMessage = initialGovernanceStore.errorMessage;
+        },
+        false,
+        GovernanceActionType.SEND_TRANSFER_TOKEN_PROPOSAL_STARTED
+      );
+      const provider = WalletService.getProvider(
+        context.network,
+        wallet.topicID,
+        wallet.savedPairingData?.accountIds[0] ?? ""
+      );
+      const signer = WalletService.getSigner(provider);
+      const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision("", amountToTransfer, tokenToTransfer);
+      try {
+        const result = await HederaService.sendCreateTransferTokenProposalTransaction({
+          description: title,
+          accountToTransferTo,
+          tokenToTransfer,
+          amountToTransfer: preciseTransferTokenAmount,
+          signer,
+        });
+        if (result !== undefined) {
+          set(
+            ({ governance }) => {
+              governance.proposalTransacationState = {
+                status: TransactionStatus.SUCCESS,
+                successPayload: {
+                  proposal: { title },
+                  transactionResponse: result,
+                },
+                errorMessage: "",
+              };
+              governance.errorMessage = initialGovernanceStore.errorMessage;
+              governance.proposals = mockProposalData;
+            },
+            false,
+            GovernanceActionType.SEND_TRANSFER_TOKEN_PROPOSAL_SUCCEEDED
+          );
+        } else {
+          throw new Error(`Create transfer token proposal failed`);
+        }
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        set(
+          ({ governance }) => {
+            governance.proposalTransacationState = {
+              status: TransactionStatus.ERROR,
+              successPayload: initialGovernanceStore.proposalTransacationState.successPayload,
+              errorMessage: errorMessage,
+            };
+            governance.errorMessage = errorMessage;
+          },
+          false,
+          GovernanceActionType.SEND_TRANSFER_TOKEN_PROPOSAL_FAILED
+        );
+      }
     },
     sendCreateNewTokenProposalTransaction: async ({ title }) => {
       const { context, wallet } = get();

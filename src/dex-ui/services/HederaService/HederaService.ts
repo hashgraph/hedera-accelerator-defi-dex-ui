@@ -12,7 +12,7 @@ import {
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
-  GOVERNOR_PROXY_CONTRACT,
+  GovernorProxyContracts,
   TOKEN_A_SYMBOL,
   TOKEN_B_SYMBOL,
   TOKEN_A_ID,
@@ -22,6 +22,7 @@ import {
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { createUserClient, getTreasurer } from "./utils";
+import GovernorService from "./GovernorService";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -32,7 +33,6 @@ function createHederaService() {
   const tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
   const contractId = ContractId.fromString(SWAP_CONTRACT_ID); // "0.0.47712695";
   let _precision = BigNumber(0);
-
   const initHederaService = async () => {
     const precision = await fetchPrecision();
     _precision = precision ?? BigNumber(0);
@@ -193,7 +193,7 @@ function createHederaService() {
       .addBytesArray(calls)
       .addString(description);
     const createProposalTransaction = await new ContractExecuteTransaction()
-      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
+      .setContractId(GovernorProxyContracts.TransferTokenContractId)
       .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
       .setGas(900000)
       .setNodeAccountIds([new AccountId(3)])
@@ -202,23 +202,10 @@ function createHederaService() {
     return proposalTransactionResponse;
   };
 
-  const castVote = async ({ proposalId, voteType, signer }: any) => {
-    const contractFunctionParameters = new ContractFunctionParameters().addUint256(proposalId).addUint8(voteType);
-    const castVoteTransaction = await new ContractExecuteTransaction()
-      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
-      .setFunction(GovernorContractFunctions.CastVote, contractFunctionParameters)
-      .setGas(900000)
-      .setNodeAccountIds([new AccountId(3)])
-      .freezeWithSigner(signer);
-
-    const response = await castVoteTransaction.executeWithSigner(signer);
-    return response;
-  };
-
   const fetchProposalState = async (proposalId: BigNumber): Promise<BigNumber | undefined> => {
     const queryParams = new ContractFunctionParameters().addUint256(proposalId);
     const result = await queryContract(
-      GOVERNOR_PROXY_CONTRACT.ContractId,
+      GovernorProxyContracts.TransferTokenContractId,
       GovernorContractFunctions.GetState,
       queryParams
     );
@@ -229,7 +216,7 @@ function createHederaService() {
   const fetchQuorum = async (blockNumber: BigNumber): Promise<BigNumber | undefined> => {
     const queryParams = new ContractFunctionParameters().addUint256(blockNumber);
     const result = await queryContract(
-      GOVERNOR_PROXY_CONTRACT.ContractId,
+      GovernorProxyContracts.TransferTokenContractId,
       GovernorContractFunctions.GetQuorum,
       queryParams
     );
@@ -245,7 +232,7 @@ function createHederaService() {
   const fetchProposalVotes = async (proposalId: BigNumber): Promise<ProposalVotes> => {
     const queryParams = new ContractFunctionParameters().addUint256(proposalId);
     const result = await queryContract(
-      GOVERNOR_PROXY_CONTRACT.ContractId,
+      GovernorProxyContracts.TransferTokenContractId,
       GovernorContractFunctions.GetProposalVotes,
       queryParams
     );
@@ -416,7 +403,7 @@ function createHederaService() {
     pairCurrentPosition,
     getContractAddress,
     getTokenPairAddress,
-    castVote,
+    ...GovernorService,
   };
 }
 

@@ -76,6 +76,7 @@ interface MirrorNodeProposalEventLog {
 
 interface MirrorNodeDecodedProposalEvent {
   proposalId: BigNumber;
+  contractId: string;
   proposer?: string;
   targets?: string[];
   values?: BigNumber[];

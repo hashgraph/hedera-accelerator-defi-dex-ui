@@ -46,7 +46,7 @@ interface WalletState {
 }
 
 interface WalletActions {
-  getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => BigNumber;
+  getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number, tokenId?: string) => BigNumber;
   connectToWallet: () => void;
   disconnectWallet: () => void;
   initializeWalletConnection: () => Promise<void>;

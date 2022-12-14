@@ -1,4 +1,5 @@
 import { ComponentStyleConfig } from "@chakra-ui/react";
+import { Color } from "../../../themes";
 
 /**
  * Base Chakra UI styles and variants for the Hedera DEX Input components
@@ -21,6 +22,10 @@ export const InputStyles: ComponentStyleConfig = {
           lineHeight: "19px",
           fontWeight: "400",
           color: "#C4C4C4",
+        },
+        _invalid: {
+          borderColor: Color.Red_01,
+          boxShadow: `0 0 0 1px ${Color.Red_01}`,
         },
       },
     },
