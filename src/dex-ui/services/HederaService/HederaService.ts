@@ -242,70 +242,39 @@ function createHederaService() {
     return { againstVotes, forVotes, abstainVotes };
   };
 
-  const get100LABTokens = async (
-    receivingAccoundId: string,
-    hashconnect: any,
-    hashConnectState: any,
-    network: string
-  ) => {
+  interface Transfer100GODTokensToWalletParams {
+    accountToTransferTo: string;
+    pairedAccountBalance: { tokens: [] };
+    signer: HashConnectSigner;
+  }
+
+  const transfer100GODTokensToWallet = async ({
+    accountToTransferTo,
+    pairedAccountBalance,
+    signer,
+  }: Transfer100GODTokensToWalletParams) => {
+    const godTokenId = "0.0.49014809";
     const tokenQuantity = withPrecision(100).toNumber();
-    const L49ATokenId = TokenId.fromString(TOKEN_A_ID);
-    const L49BTokenId = TokenId.fromString(TOKEN_B_ID);
-    const targetAccountId = AccountId.fromString(receivingAccoundId);
+    const isGODAssociated = pairedAccountBalance.tokens.some((token: any) => token.tokenId === godTokenId);
+    const GODTokenId = TokenId.fromString(godTokenId);
+    const accountToTransferToId = AccountId.fromString(accountToTransferTo);
 
-    const { walletData } = hashConnectState;
-    const signingAccount = walletData.pairedAccounts[0];
-    const provider = hashconnect.getProvider(network, walletData.topicID, signingAccount);
-    const signer = hashconnect.getSigner(provider);
-
-    const associatedTokenIds = walletData.pairedAccountBalance.tokens.map((token: any) => token.tokenId);
-    const tokensToAssociate = [
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(TOKEN_A_SYMBOL),
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(TOKEN_B_SYMBOL),
-    ].reduce((_tokensToAssociate: string[], tokenId: string | undefined) => {
-      if (!associatedTokenIds.includes(tokenId)) {
-        _tokensToAssociate.push(tokenId || "");
-      }
-      return _tokensToAssociate;
-    }, []);
-
-    if (tokensToAssociate.length > 0) {
-      const tokenAssociateTx = new TokenAssociateTransaction()
-        .setAccountId(receivingAccoundId)
-        .setTokenIds(tokensToAssociate);
-
-      console.log(`Associating ${TOKEN_A_SYMBOL} and Token ${TOKEN_B_SYMBOL} with connected wallet`);
-
-      const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
-      const tokenAssociateRes = await tokenAssociateSignedTx.executeWithSigner(signer);
-
-      console.log(`Associate ${TOKEN_A_SYMBOL} and Token SymbolB0 transaction result:`, tokenAssociateRes);
+    if (!isGODAssociated) {
+      const tokenAssociateTransaction = await new TokenAssociateTransaction()
+        .setAccountId(accountToTransferToId)
+        .setTokenIds([GODTokenId])
+        .freezeWithSigner(signer);
+      await tokenAssociateTransaction.executeWithSigner(signer);
     }
 
-    console.log(
-      `Moving ${tokenQuantity} units of ${TOKEN_B_SYMBOL} and Token SymbolB0 from the Swap contract to Wallet.`
-    );
+    const transferTransaction = await new TransferTransaction()
+      .addTokenTransfer(godTokenId, treasuryId, -tokenQuantity)
+      .addTokenTransfer(godTokenId, accountToTransferTo, tokenQuantity)
+      .freezeWithSigner(signer);
 
-    const transaction = new TransferTransaction()
-      .addTokenTransfer(L49ATokenId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
-      .addTokenTransfer(L49BTokenId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(L49BTokenId, targetAccountId, tokenQuantity)
-      .freezeWith(client);
+    const result = await transferTransaction.executeWithSigner(signer);
 
-    //Sign with the sender account private key
-    const signTx = await transaction.sign(treasuryKey);
-
-    //Sign with the client operator private key and submit to a Hedera network
-    const txResponse = await signTx.execute(client);
-
-    //Request the receipt of the transaction
-    const receipt = await txResponse.getReceipt(client);
-
-    //Obtain the transaction consensus status
-    const transactionStatus = receipt.status;
-
-    console.log("The transfer transaction consensus status " + transactionStatus.toString());
+    console.log("Transfer GOD tokens transaction result:" + result);
   };
 
   // TODO: will need to pass in contractId in future when there are more pools

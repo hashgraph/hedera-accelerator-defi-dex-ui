@@ -58,6 +58,7 @@ export const Governance = (): JSX.Element => {
           >
             New Proposal
           </Button>
+          {/* Add get toekn button */}
         </Flex>
       </GridItem>
       <GridItem colSpan={1}>
