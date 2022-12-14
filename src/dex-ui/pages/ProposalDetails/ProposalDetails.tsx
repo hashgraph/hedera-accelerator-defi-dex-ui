@@ -43,7 +43,7 @@ export const ProposalDetails = () => {
 
   const castVote = (voteType: VoteType) => {
     if (formattedProposal) {
-      governance.castVote(formattedProposal.id, voteType);
+      governance.castVote(formattedProposal.contractId, formattedProposal.id, voteType);
     }
     if (voteType === VoteType.For) {
       setDialogState({ ...dialogState, isVoteYesOpen: false });
@@ -68,6 +68,9 @@ export const ProposalDetails = () => {
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </Breadcrumb>
+            {/**
+             * TODO: Add Notfication alert message for proposal cancellation.
+             */}
             <Box>
               <Skeleton
                 speed={0.4}
@@ -114,6 +117,7 @@ export const ProposalDetails = () => {
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
+              {/* TODO: Conditionally show execute button when quorum is reached. */}
               <Text textStyle="h3">Vote on Proposal</Text>
               <Flex gap="4">
                 <AlertDialog
@@ -178,6 +182,10 @@ export const ProposalDetails = () => {
               <Text textStyle="h3">Status</Text>
               <Spacer padding="0.5rem" />
               <HStack>
+                {/**
+                 * TODO: Create state mapping between proposal state and UI state.
+                 * e.g., The proposal do not have the concept of a 'Queued to Execute' state.
+                 */}
                 <Text textStyle="b2">{formattedProposal?.state}</Text>
                 <Text textStyle="b2" color={Color.Grey_02}>
                   - {formattedProposal?.timeRemaining}

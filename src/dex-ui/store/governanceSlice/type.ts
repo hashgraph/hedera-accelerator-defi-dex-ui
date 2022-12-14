@@ -37,6 +37,7 @@ enum ProposalState {
 
 interface Proposal {
   id: BigNumber;
+  contractId: string;
   title: string | undefined;
   author: AccountId;
   description: string;
@@ -56,9 +57,18 @@ enum GovernanceActionType {
   FETCH_PROPOSALS_STARTED = "governance/FETCH_PROPOSALS_STARTED",
   FETCH_PROPOSALS_SUCCEEDED = "governance/FETCH_PROPOSALS_SUCCEEDED",
   FETCH_PROPOSALS_FAILED = "governance/FETCH_PROPOSALS_FAILED",
+  SEND_TRANSFER_TOKEN_PROPOSAL_STARTED = "governance/SEND_TRANSFER_TOKEN_PROPOSAL_STARTED",
+  SEND_TRANSFER_TOKEN_PROPOSAL_SUCCEEDED = "governance/SEND_TRANSFER_TOKEN_PROPOSAL_SUCCEEDED",
+  SEND_TRANSFER_TOKEN_PROPOSAL_FAILED = "governance/SEND_TRANSFER_TOKEN_PROPOSAL_FAILED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED",
   SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED",
+  SEND_CONTRACT_UPGRADE_PROPOSAL_STARTED = "governance/SEND_CONTRACT_UPGRADE_PROPOSAL_STARTED",
+  SEND_CONTRACT_UPGRADE_PROPOSAL_SUCCEEDED = "governance/SEND_CONTRACT_UPGRADE_PROPOSAL_SUCCEEDED",
+  SEND_CONTRACT_UPGRADE_PROPOSAL_FAILED = "governance/SEND_CONTRACT_UPGRADE_PROPOSAL_FAILED",
+  SEND_TEXT_PROPOSAL_STARTED = "governance/SEND_TEXT_PROPOSAL_STARTED",
+  SEND_TEXT_PROPOSAL_SUCCEEDED = "governance/SEND_TEXT_PROPOSAL_SUCCEEDED",
+  SEND_TEXT_PROPOSAL_FAILED = "governance/SEND_TEXT_PROPOSAL_FAILED",
   SEND_VOTE_STARTED = "governance/SEND_VOTE_STARTED",
   SEND_VOTE_SUCCEEDED = "governance/SEND_VOTE_SUCCEEDED",
   SEND_VOTE_FAILED = "governance/SEND_VOTE_FAILED",
@@ -86,10 +96,19 @@ interface GovernanceState {
 interface sendCreateNewTokenProposalParams {
   title: string;
 }
+
+interface CreateTransferTokenProposalActionParams {
+  title: string;
+  accountToTransferTo: string;
+  tokenToTransfer: string;
+  amountToTransfer: number;
+}
+
 interface GovernanceActions {
-  castVote: (proposalId: string, voteType: number) => Promise<void>;
+  castVote: (contractId: string, proposalId: string, voteType: number) => Promise<void>;
   fetchProposal: (proposalId: string) => Proposal | undefined;
   fetchProposals: () => Promise<void>;
+  createTransferTokenProposal: (params: CreateTransferTokenProposalActionParams) => Promise<void>;
   sendCreateNewTokenProposalTransaction: ({ title }: sendCreateNewTokenProposalParams) => Promise<void>;
   clearProposalTransactionState: () => void;
 }

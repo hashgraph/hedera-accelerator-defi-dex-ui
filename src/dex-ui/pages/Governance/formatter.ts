@@ -8,7 +8,7 @@ import { FormattedProposal } from "./types";
  * @returns A formatted version of the proposal data.
  */
 export const formatProposal = (proposal: Proposal): FormattedProposal => {
-  const { id, title, author, description, status, timeRemaining, state, votes } = proposal;
+  const { contractId, id, title, author, description, status, timeRemaining, state, votes } = proposal;
   const [yes, no, abstain, quorum, max] = [
     votes.yes?.toNumber(),
     votes.no?.toNumber(),
@@ -17,6 +17,7 @@ export const formatProposal = (proposal: Proposal): FormattedProposal => {
     votes.max?.toNumber(),
   ];
   return {
+    contractId,
     id: id.toString(),
     title,
     author: author.toString(),

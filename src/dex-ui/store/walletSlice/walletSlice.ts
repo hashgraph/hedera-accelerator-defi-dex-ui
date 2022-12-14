@@ -23,12 +23,12 @@ const initialWalletState: WalletState = {
 const createWalletSlice: WalletSlice = (set, get): WalletStore => {
   return {
     ...initialWalletState,
-    getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number) => {
+    getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number, tokenId?: string) => {
       const defaultDecimals = 0;
       const { wallet } = get();
       const tokenData = wallet.pairedAccountBalance?.tokens;
-      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
-      const decimals = tokenData?.find((token: any) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
+      const tokenAccountId = tokenId ?? TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const decimals = tokenData?.find((token: any) => token.tokenId === tokenAccountId)?.decimals ?? defaultDecimals;
       return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
     },
     initializeWalletConnection: async () => {
