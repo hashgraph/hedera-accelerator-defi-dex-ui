@@ -8,7 +8,6 @@ import {
   TransferTransaction,
   TokenAssociateTransaction,
   TransactionResponse,
-  ContractCallQuery,
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
@@ -21,13 +20,21 @@ import {
 } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { createUserClient, getTreasurer } from "./utils";
+import { client, queryContract, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
+/**
+ * General format of service calls:
+ * 1 - Convert data types.
+ * 2 - Create contract parameters.
+ * 3 - Create and sign transaction.
+ * 4 - Send transaction to wallet and execute transaction.
+ * 5 - Extract and return resulting data.
+ */
+
 function createHederaService() {
-  const client = createUserClient();
   const { treasuryId, treasuryKey } = getTreasurer();
   const tokenA = TokenId.fromString(TOKEN_A_ID).toSolidityAddress();
   const tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
@@ -40,18 +47,6 @@ function createHederaService() {
 
   const getPrecision = () => {
     return _precision;
-  };
-
-  const queryContract = async (
-    contractId: ContractId,
-    functionName: string,
-    queryParams?: ContractFunctionParameters
-  ) => {
-    const gas = 50000;
-    const query = new ContractCallQuery().setContractId(contractId).setGas(gas).setFunction(functionName, queryParams);
-    const queryPayment = await query.getCost(client);
-    query.setMaxQueryPayment(queryPayment);
-    return await query.execute(client);
   };
 
   const fetchPrecision = async (): Promise<BigNumber | undefined> => {
@@ -172,6 +167,7 @@ function createHederaService() {
 
     console.log(`Swap status: ${transferTokenRx.status}`);
   };
+
   interface CreateProposalParams {
     targets: Array<string>;
     fees: Array<number>;
@@ -200,46 +196,6 @@ function createHederaService() {
       .freezeWithSigner(signer);
     const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
     return proposalTransactionResponse;
-  };
-
-  const fetchProposalState = async (proposalId: BigNumber): Promise<BigNumber | undefined> => {
-    const queryParams = new ContractFunctionParameters().addUint256(proposalId);
-    const result = await queryContract(
-      GovernorProxyContracts.TransferTokenContractId,
-      GovernorContractFunctions.GetState,
-      queryParams
-    );
-    const proposalStatus = result?.getUint256(0);
-    return proposalStatus;
-  };
-
-  const fetchQuorum = async (blockNumber: BigNumber): Promise<BigNumber | undefined> => {
-    const queryParams = new ContractFunctionParameters().addUint256(blockNumber);
-    const result = await queryContract(
-      GovernorProxyContracts.TransferTokenContractId,
-      GovernorContractFunctions.GetQuorum,
-      queryParams
-    );
-    const quorum = result?.getInt256(0);
-    return quorum;
-  };
-  interface ProposalVotes {
-    againstVotes: BigNumber | undefined;
-    forVotes: BigNumber | undefined;
-    abstainVotes: BigNumber | undefined;
-  }
-
-  const fetchProposalVotes = async (proposalId: BigNumber): Promise<ProposalVotes> => {
-    const queryParams = new ContractFunctionParameters().addUint256(proposalId);
-    const result = await queryContract(
-      GovernorProxyContracts.TransferTokenContractId,
-      GovernorContractFunctions.GetProposalVotes,
-      queryParams
-    );
-    const againstVotes = result?.getInt256(0);
-    const forVotes = result?.getInt256(1);
-    const abstainVotes = result?.getInt256(2);
-    return { againstVotes, forVotes, abstainVotes };
   };
 
   const get100LABTokens = async (
@@ -391,9 +347,6 @@ function createHederaService() {
     addLiquidity,
     removeLiquidity,
     createProposal,
-    fetchQuorum,
-    fetchProposalState,
-    fetchProposalVotes,
     getContributorTokenShare,
     getTokenBalances,
     getSpotPrice,

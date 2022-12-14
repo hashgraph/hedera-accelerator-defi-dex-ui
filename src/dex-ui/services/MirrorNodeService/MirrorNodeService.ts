@@ -196,7 +196,10 @@ function createMirrorNodeService() {
    * @param contractId - The id of the contract to fetch events from.
    * @returns An array of proposal event data.
    */
-  const fetchAllProposals = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
+  const fetchAllProposals = async (
+    proposalType: string,
+    contractId: string
+  ): Promise<MirrorNodeDecodedProposalEvent[]> => {
     /*
      Currently, each proposal requires multiple additional calls to the smart contract
      to get all of the desired data for the UI. This is an expensive action that costs a large
@@ -231,7 +234,7 @@ function createMirrorNodeService() {
           proposalEventLog.topics.slice(1)
         );
         return [
-          proposalCreatedEvent ? { ...proposalCreatedEvent, contractId } : undefined,
+          proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined,
           // decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
           // decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
         ];

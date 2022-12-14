@@ -23,6 +23,16 @@ const initialWalletState: WalletState = {
 const createWalletSlice: WalletSlice = (set, get): WalletStore => {
   return {
     ...initialWalletState,
+    getSigner: () => {
+      const { context, wallet } = get();
+      const provider = WalletService.getProvider(
+        context.network,
+        wallet.topicID,
+        wallet.savedPairingData?.accountIds[0] ?? ""
+      );
+      const signer = WalletService.getSigner(provider);
+      return signer;
+    },
     getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number, tokenId?: string) => {
       const defaultDecimals = 0;
       const { wallet } = get();

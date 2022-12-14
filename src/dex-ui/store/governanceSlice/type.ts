@@ -4,6 +4,13 @@ import { StateCreator } from "zustand";
 import { DEXState } from "..";
 import { TransactionStatus } from "../appSlice";
 
+enum ProposalType {
+  Text = "Text",
+  TokenTransfer = "Token Transfer",
+  CreateToken = "Create Token",
+  ContractUpgrade = "Contract Upgrade",
+}
+
 enum ProposalStatus {
   Active = "Active",
   Passed = "Passed",
@@ -36,8 +43,9 @@ enum ProposalState {
 }
 
 interface Proposal {
-  id: BigNumber;
+  id: string;
   contractId: string;
+  type: ProposalType | undefined;
   title: string | undefined;
   author: AccountId;
   description: string;
@@ -53,28 +61,38 @@ interface Proposal {
   };
 }
 
-enum GovernanceActionType {
-  FETCH_PROPOSALS_STARTED = "governance/FETCH_PROPOSALS_STARTED",
-  FETCH_PROPOSALS_SUCCEEDED = "governance/FETCH_PROPOSALS_SUCCEEDED",
-  FETCH_PROPOSALS_FAILED = "governance/FETCH_PROPOSALS_FAILED",
-  SEND_TRANSFER_TOKEN_PROPOSAL_STARTED = "governance/SEND_TRANSFER_TOKEN_PROPOSAL_STARTED",
-  SEND_TRANSFER_TOKEN_PROPOSAL_SUCCEEDED = "governance/SEND_TRANSFER_TOKEN_PROPOSAL_SUCCEEDED",
-  SEND_TRANSFER_TOKEN_PROPOSAL_FAILED = "governance/SEND_TRANSFER_TOKEN_PROPOSAL_FAILED",
-  SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_STARTED",
-  SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_SUCCEEDED",
-  SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED = "governance/SEND_CREATE_NEW_TOKEN_PROPOSAL_FAILED",
-  SEND_CONTRACT_UPGRADE_PROPOSAL_STARTED = "governance/SEND_CONTRACT_UPGRADE_PROPOSAL_STARTED",
-  SEND_CONTRACT_UPGRADE_PROPOSAL_SUCCEEDED = "governance/SEND_CONTRACT_UPGRADE_PROPOSAL_SUCCEEDED",
-  SEND_CONTRACT_UPGRADE_PROPOSAL_FAILED = "governance/SEND_CONTRACT_UPGRADE_PROPOSAL_FAILED",
-  SEND_TEXT_PROPOSAL_STARTED = "governance/SEND_TEXT_PROPOSAL_STARTED",
-  SEND_TEXT_PROPOSAL_SUCCEEDED = "governance/SEND_TEXT_PROPOSAL_SUCCEEDED",
-  SEND_TEXT_PROPOSAL_FAILED = "governance/SEND_TEXT_PROPOSAL_FAILED",
-  SEND_VOTE_STARTED = "governance/SEND_VOTE_STARTED",
-  SEND_VOTE_SUCCEEDED = "governance/SEND_VOTE_SUCCEEDED",
-  SEND_VOTE_FAILED = "governance/SEND_VOTE_FAILED",
-  SIGN_TRANSACTION = "governance/SIGN_TRANSACTION",
-  CLEAR_PROPOSAL_TRANSACTION_STATE = "governance/CLEAR_PROPOSAL_TRANSACTION_STATE",
+enum FETCH_PROPOSALS {
+  Started = "governance/FETCH_PROPOSALS_Started",
+  Succeeded = "governance/FETCH_PROPOSALS_Succeeded",
+  Failed = "governance/FETCH_PROPOSALS_Failed",
 }
+
+enum EXECUTE_PROPOSAL {
+  Started = "governance/EXECUTE_PROPOSAL_Started",
+  Succeeded = "governance/EXECUTE_PROPOSAL_Succeeded",
+  Failed = "governance/EXECUTE_PROPOSAL_Failed",
+}
+
+enum SEND_CREATE_PROPOSAL {
+  Started = "governance/SEND_CREATE_PROPOSAL_Started",
+  Succeeded = "governance/SEND_CREATE_PROPOSAL_Succeeded",
+  Failed = "governance/SEND_CREATE_PROPOSALL_Failed",
+}
+
+enum SEND_VOTE {
+  Started = "governance/SEND_VOTE_Started",
+  Succeeded = "governance/SEND_VOTE_Succeeded",
+  Failed = "governance/SEND_VOTE_Failed",
+}
+
+const GovernanceActionType = {
+  FETCH_PROPOSALS,
+  EXECUTE_PROPOSAL,
+  SEND_CREATE_PROPOSAL,
+  SEND_VOTE,
+  SIGN_TRANSACTION: "governance/SIGN_TRANSACTION",
+  CLEAR_PROPOSAL_TRANSACTION_STATE: "governance/CLEAR_PROPOSAL_TRANSACTION_STATE",
+};
 
 interface ProposalTransacationState {
   status: TransactionStatus;
@@ -93,24 +111,29 @@ interface GovernanceState {
   proposalTransacationState: ProposalTransacationState;
 }
 
-interface sendCreateNewTokenProposalParams {
+interface CreateNewTokenProposalData {
   title: string;
 }
 
-interface CreateTransferTokenProposalActionParams {
+interface CreateTextProposalData {
+  title: string;
+}
+
+interface CreateTransferTokenProposalData {
   title: string;
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: number;
 }
 
+type CreateProposalData = CreateNewTokenProposalData | CreateTextProposalData | CreateTransferTokenProposalData;
 interface GovernanceActions {
   castVote: (contractId: string, proposalId: string, voteType: number) => Promise<void>;
   fetchProposal: (proposalId: string) => Proposal | undefined;
   fetchProposals: () => Promise<void>;
-  createTransferTokenProposal: (params: CreateTransferTokenProposalActionParams) => Promise<void>;
-  sendCreateNewTokenProposalTransaction: ({ title }: sendCreateNewTokenProposalParams) => Promise<void>;
+  createProposal: (type: ProposalType, data: CreateProposalData) => Promise<void>;
   clearProposalTransactionState: () => void;
+  executeProposal: (contractId: string, title: string) => Promise<void>;
 }
 
 type GovernanceStore = GovernanceState & GovernanceActions;
@@ -122,5 +145,13 @@ type GovernanceSlice = StateCreator<
   GovernanceStore
 >;
 
-export { GovernanceActionType, ContractProposalState, ProposalState, ProposalStatus };
-export type { GovernanceSlice, GovernanceStore, GovernanceState, GovernanceActions, Proposal };
+export { GovernanceActionType, ProposalType, ContractProposalState, ProposalState, ProposalStatus };
+export type {
+  CreateProposalData,
+  CreateTransferTokenProposalData,
+  GovernanceSlice,
+  GovernanceStore,
+  GovernanceState,
+  GovernanceActions,
+  Proposal,
+};

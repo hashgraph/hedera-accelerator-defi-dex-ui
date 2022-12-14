@@ -1,8 +1,10 @@
 import { Button, Flex, FormControl, FormErrorMessage, Input, Spacer } from "@chakra-ui/react";
 import { ReactElement } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
+import { ProposalType } from "../../../store/governanceSlice";
 
 type TokenTransferProposalFormData = {
   title: string;
@@ -14,14 +16,17 @@ type TokenTransferProposalFormData = {
 
 export function TokenTransferProposalForm(): ReactElement {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
+  const navigate = useNavigate();
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
   } = useForm<TokenTransferProposalFormData>();
 
+  const handleCancelClick = () => navigate("/governance");
+
   async function onSubmit(data: TokenTransferProposalFormData) {
-    await governance.createTransferTokenProposal({
+    await governance.createProposal(ProposalType.TokenTransfer, {
       title: data.title,
       // TODO: Proposal Contract functions do not handle both title and description yet.
       // description: data.description,
@@ -90,16 +95,21 @@ export function TokenTransferProposalForm(): ReactElement {
           </FormControl>
         </Flex>
         <Spacer padding="0.5rem" />
-        <Button
-          type="submit"
-          variant="primary"
-          padding="10px 27px"
-          height="40px"
-          isLoading={isSubmitting}
-          alignSelf="end"
-        >
-          Publish
-        </Button>
+        <Flex direction="row" justifyContent="right" gap="0.5rem">
+          <Button variant="secondary" padding="10px 27px" height="40px" onClick={handleCancelClick}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            padding="10px 27px"
+            height="40px"
+            isLoading={isSubmitting}
+            alignSelf="end"
+          >
+            Publish
+          </Button>
+        </Flex>
       </Flex>
     </form>
   );
