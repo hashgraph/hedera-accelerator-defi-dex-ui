@@ -75,15 +75,16 @@ interface MirrorNodeProposalEventLog {
 }
 
 interface MirrorNodeDecodedProposalEvent {
-  proposalId: BigNumber;
+  proposalId: string;
   contractId: string;
+  type: string;
   proposer?: string;
   targets?: string[];
-  values?: BigNumber[];
+  values?: string[];
   signatures?: string[];
-  calldatas?: BigNumber[];
-  startBlock?: BigNumber;
-  endBlock?: BigNumber;
+  calldatas?: string[];
+  startBlock?: string;
+  endBlock?: string;
   description?: string;
 }
 

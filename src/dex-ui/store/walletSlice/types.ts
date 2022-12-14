@@ -1,3 +1,4 @@
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { HashConnectTypes, MessageTypes } from "hashconnect";
 import { BigNumber } from "bignumber.js";
 import { DEXState } from "../createDEXStore";
@@ -46,6 +47,7 @@ interface WalletState {
 }
 
 interface WalletActions {
+  getSigner: () => HashConnectSigner;
   getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number, tokenId?: string) => BigNumber;
   connectToWallet: () => void;
   disconnectWallet: () => void;
