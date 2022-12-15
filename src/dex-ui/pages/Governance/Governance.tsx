@@ -1,14 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Grid, GridItem, Circle, Box, Skeleton } from "@chakra-ui/react";
-import { ProposalCard } from "./ProposalCard";
-import { useDexContext } from "../../hooks";
-import { useGovernanceData } from "../../hooks/useGovernanceData";
-import { useState } from "react";
+import { Text, Button, Flex, Grid, GridItem, Circle, Box } from "@chakra-ui/react";
+import { ReactElement, useState } from "react";
 import { Notification, NotficationTypes } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
-import { formatProposal } from "./formatter";
-import { FormattedProposal } from "./types";
+import { ProposalList } from "./ProposalList";
 
 const VOTING_KEYS: { value: string; color: string }[] = [
   { value: "Yes", color: "#79B54B" },
@@ -17,12 +13,12 @@ const VOTING_KEYS: { value: string; color: string }[] = [
   { value: "Remain", color: "#DBDEDF" },
 ];
 
-export const Governance = (): JSX.Element => {
-  const { app, governance } = useDexContext(({ app, governance }) => ({ app, governance }));
-  const formattedProposals = governance.proposals.map(formatProposal);
-  useGovernanceData();
+/**
+ * Page layout component for Governance page.
+ * @returns Governance page.
+ */
+export const Governance = (): ReactElement => {
   const navigate = useNavigate();
-
   const locationState = useLocation().state as CreateProposalLocationProps;
   const [shouldShowNotification, setShouldShowNotification] = useState<boolean>(
     locationState?.isProposalCreationSuccessful ?? false
@@ -77,21 +73,8 @@ export const Governance = (): JSX.Element => {
           </Box>
         </Flex>
       </GridItem>
-
       <Flex direction="column" gap="2" minHeight="500px">
-        {app.isFeatureLoading("proposals") ? (
-          <>
-            <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-            <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-            <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-            <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-            <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-          </>
-        ) : (
-          formattedProposals.map((proposal: FormattedProposal, index: number) => (
-            <ProposalCard proposal={proposal} key={index} />
-          ))
-        )}
+        <ProposalList />
       </Flex>
     </Grid>
   );
