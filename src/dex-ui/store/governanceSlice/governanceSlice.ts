@@ -1,4 +1,3 @@
-import { BigNumber } from "bignumber.js";
 import { HederaService } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { TransactionStatus } from "../appSlice";
@@ -7,14 +6,12 @@ import {
   GovernanceSlice,
   GovernanceState,
   GovernanceStore,
-  Proposal,
   CreateProposalData,
   CreateTransferTokenProposalData,
   ProposalType,
 } from "./type";
 
 const initialGovernanceStore: GovernanceState = {
-  proposals: [],
   errorMessage: null,
   proposalTransacationState: {
     status: TransactionStatus.INIT,
@@ -74,10 +71,6 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
           GovernanceActionType.SEND_VOTE.Failed
         );
       }
-    },
-    fetchProposal: (proposalId: string) => {
-      const { governance } = get();
-      return governance.proposals.find((proposal: Proposal) => BigNumber(proposalId).eq(proposal.id));
     },
     createProposal: async (type: ProposalType, data: CreateProposalData) => {
       const { wallet } = get();

@@ -99,7 +99,6 @@ interface ProposalTransacationState {
 }
 
 interface GovernanceState {
-  proposals: Array<Proposal>;
   errorMessage: string | null;
   proposalTransacationState: ProposalTransacationState;
 }
@@ -122,7 +121,6 @@ interface CreateTransferTokenProposalData {
 type CreateProposalData = CreateNewTokenProposalData | CreateTextProposalData | CreateTransferTokenProposalData;
 interface GovernanceActions {
   castVote: (contractId: string, proposalId: string, voteType: number) => Promise<void>;
-  fetchProposal: (proposalId: string) => Proposal | undefined;
   createProposal: (type: ProposalType, data: CreateProposalData) => Promise<void>;
   clearProposalTransactionState: () => void;
   executeProposal: (contractId: string, title: string) => Promise<void>;

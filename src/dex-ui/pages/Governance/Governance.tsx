@@ -1,15 +1,9 @@
-import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Grid, GridItem, Circle, Box, Skeleton } from "@chakra-ui/react";
-import { ProposalCard } from "./ProposalCard";
-import { useDexContext } from "../../hooks";
+import { Text, Button, Flex, Grid, GridItem, Circle, Box } from "@chakra-ui/react";
 import { ReactElement, useState } from "react";
 import { Notification, NotficationTypes } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
-import { formatProposal } from "./formatter";
-import { FormattedProposal } from "./types";
-import { DexService } from "../../services";
 import { ProposalList } from "./ProposalList";
 
 const VOTING_KEYS: { value: string; color: string }[] = [
@@ -18,9 +12,10 @@ const VOTING_KEYS: { value: string; color: string }[] = [
   { value: "Abstain", color: "#000AFF" },
   { value: "Remain", color: "#DBDEDF" },
 ];
+
 /**
  * Page layout component for Governance page.
- * @returns
+ * @returns Governance page.
  */
 export const Governance = (): ReactElement => {
   const navigate = useNavigate();

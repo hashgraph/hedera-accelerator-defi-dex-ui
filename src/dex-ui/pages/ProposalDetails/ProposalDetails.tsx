@@ -20,36 +20,35 @@ import {
 import { useState } from "react";
 import { Link as ReachLink, useParams } from "react-router-dom";
 import { AlertDialog, Color, HorizontalStackBarChart, LoadingDialog, Metrics } from "../../../dex-ui-components";
-import { useDexContext } from "../../hooks";
+import { useDexContext, useProposal } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
-import { formatProposal } from "../Governance/formatter";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { VoteType } from "./types";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
-  // useGovernanceData();
   const [dialogState, setDialogState] = useState({
     isErrorDialogOpen: false,
     isVoteYesOpen: false,
     isVoteNoOpen: false,
     isVoteAbstainOpen: false,
   });
-  const { app, governance } = useDexContext(({ app, governance }) => ({ app, governance }));
-  if (id === undefined) {
-    return <>No proposal ID provided</>;
+  const { governance } = useDexContext(({ governance }) => ({ governance }));
+  const { data: proposal, error, isLoading, isError } = useProposal(id);
+
+  if (isError) {
+    return <span>Error: {error.message}</span>;
   }
-  const proposal = governance.fetchProposal(id);
-  const formattedProposal = proposal ? formatProposal(proposal) : proposal;
-  const isExecuteButtonVisible = formattedProposal?.status === ProposalStatus.Passed;
+
+  const isExecuteButtonVisible = proposal?.status === ProposalStatus.Passed;
 
   const handleExecuteClicked = async () => {
     await governance.executeProposal(proposal?.contractId ?? "", proposal?.title ?? "");
   };
 
   const castVote = async (voteType: VoteType) => {
-    if (formattedProposal) {
-      await governance.castVote(formattedProposal.contractId, formattedProposal.id, voteType);
+    if (proposal) {
+      await governance.castVote(proposal.contractId, proposal.id, voteType);
     }
     if (voteType === VoteType.For) {
       setDialogState({ ...dialogState, isVoteYesOpen: false });
@@ -82,14 +81,9 @@ export const ProposalDetails = () => {
              * TODO: Add Notfication alert message for proposal cancellation.
              */}
             <Box>
-              <Skeleton
-                speed={0.4}
-                fadeDuration={0}
-                width="fit-content"
-                isLoaded={formattedProposal && !app.isFeatureLoading("proposals")}
-              >
+              <Skeleton speed={0.4} fadeDuration={0} width="fit-content" isLoaded={!isLoading}>
                 <Text textStyle="h2" paddingRight="0.25rem">
-                  {formattedProposal?.title}
+                  {proposal?.title}
                 </Text>
               </Skeleton>
               <Spacer padding="0.25rem" />
@@ -98,7 +92,7 @@ export const ProposalDetails = () => {
                   Type:
                 </Text>
                 <Tag textStyle="b3" size="sm" maxHeight="0.5rem">
-                  {formattedProposal?.type}
+                  {proposal?.type}
                 </Tag>
               </Flex>
               <Spacer padding="0.25rem" />
@@ -106,11 +100,7 @@ export const ProposalDetails = () => {
                 <Text alignSelf="center" textStyle="b2">
                   Authored by &nbsp;
                 </Text>
-                <Skeleton
-                  speed={0.4}
-                  fadeDuration={0}
-                  isLoaded={formattedProposal && !app.isFeatureLoading("proposals")}
-                >
+                <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
                   <Link
                     width="fit-content"
                     display="flex"
@@ -119,7 +109,7 @@ export const ProposalDetails = () => {
                     // href={linkRef}
                     isExternal
                   >
-                    <Text textDecoration="underline">{formattedProposal?.author}</Text>
+                    <Text textDecoration="underline">{proposal?.author}</Text>
                     <ExternalLinkIcon margin="0rem 0.125rem" />
                   </Link>
                 </Skeleton>
@@ -128,13 +118,8 @@ export const ProposalDetails = () => {
             <Box flexGrow="1">
               <Text textStyle="h3">Description</Text>
               <Spacer padding="0.25rem" />
-              <SkeletonText
-                speed={0.4}
-                fadeDuration={0}
-                noOfLines={12}
-                isLoaded={formattedProposal && !app.isFeatureLoading("proposals")}
-              >
-                <Text textStyle="b2">{formattedProposal?.description}</Text>
+              <SkeletonText speed={0.4} fadeDuration={0} noOfLines={12} isLoaded={!isLoading}>
+                <Text textStyle="b2">{proposal?.description}</Text>
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
@@ -149,7 +134,7 @@ export const ProposalDetails = () => {
                     <AlertDialog
                       openDialogButtonStyles={{ flex: "1" }}
                       openDialogButtonText="Yes"
-                      isOpenDialogButtonDisabled={formattedProposal === undefined}
+                      isOpenDialogButtonDisabled={proposal === undefined}
                       title="Confirm Vote"
                       body={ConfirmVoteModalBody()}
                       footer={
@@ -164,7 +149,7 @@ export const ProposalDetails = () => {
                     <AlertDialog
                       openDialogButtonStyles={{ flex: "1" }}
                       openDialogButtonText="No"
-                      isOpenDialogButtonDisabled={formattedProposal === undefined}
+                      isOpenDialogButtonDisabled={proposal === undefined}
                       title="Confirm Vote"
                       body={ConfirmVoteModalBody()}
                       footer={
@@ -179,7 +164,7 @@ export const ProposalDetails = () => {
                     <AlertDialog
                       openDialogButtonStyles={{ flex: "1" }}
                       openDialogButtonText="Abstain"
-                      isOpenDialogButtonDisabled={formattedProposal === undefined}
+                      isOpenDialogButtonDisabled={proposal === undefined}
                       title="Confirm Vote"
                       body={ConfirmVoteModalBody()}
                       footer={
@@ -214,9 +199,9 @@ export const ProposalDetails = () => {
                  * TODO: Create state mapping between proposal state and UI state.
                  * e.g., The proposal do not have the concept of a 'Queued to Execute' state.
                  */}
-                <Text textStyle="b2">{formattedProposal?.state}</Text>
+                <Text textStyle="b2">{proposal?.state}</Text>
                 <Text textStyle="b2" color={Color.Grey_02}>
-                  - {formattedProposal?.timeRemaining}
+                  - {proposal?.timeRemaining}
                 </Text>
               </HStack>
             </Card>
@@ -231,15 +216,15 @@ export const ProposalDetails = () => {
                 <Text textStyle="h3">Votes</Text>
                 <Spacer padding="0.5rem 0" />
                 <HorizontalStackBarChart
-                  quorum={Number(formattedProposal?.votes.quorum)}
+                  quorum={Number(proposal?.votes.quorum)}
                   data={[
-                    { value: formattedProposal?.votes.yes ?? 0, bg: Color.Green_01 },
-                    { value: formattedProposal?.votes.no ?? 0, bg: Color.Red_01 },
-                    { value: formattedProposal?.votes.abstain ?? 0, bg: Color.Blue_02 },
-                    { value: formattedProposal?.votes.remaining ?? 0, bg: Color.Grey_01 },
+                    { value: proposal?.votes.yes ?? 0, bg: Color.Green_01 },
+                    { value: proposal?.votes.no ?? 0, bg: Color.Red_01 },
+                    { value: proposal?.votes.abstain ?? 0, bg: Color.Blue_02 },
+                    { value: proposal?.votes.remaining ?? 0, bg: Color.Grey_01 },
                   ]}
                 />
-                {Number(formattedProposal?.votes.yes) < Number(formattedProposal?.votes.quorum) ? (
+                {Number(proposal?.votes.yes) < Number(proposal?.votes.quorum) ? (
                   <Text textStyle="h4">Quorum Not Met</Text>
                 ) : (
                   <></>
@@ -248,10 +233,10 @@ export const ProposalDetails = () => {
                   <Metrics
                     rows={2}
                     data={[
-                      { label: "Yes", value: formattedProposal?.votes.yes ?? 0, color: Color.Green_01 },
-                      { label: "No", value: formattedProposal?.votes.no ?? 0, color: Color.Red_01 },
-                      { label: "Abstain", value: formattedProposal?.votes.abstain ?? 0, color: Color.Blue_02 },
-                      { label: "Remain", value: formattedProposal?.votes.remaining ?? 0, color: Color.Grey_01 },
+                      { label: "Yes", value: proposal?.votes.yes ?? 0, color: Color.Green_01 },
+                      { label: "No", value: proposal?.votes.no ?? 0, color: Color.Red_01 },
+                      { label: "Abstain", value: proposal?.votes.abstain ?? 0, color: Color.Blue_02 },
+                      { label: "Remain", value: proposal?.votes.remaining ?? 0, color: Color.Grey_01 },
                     ]}
                   />
                 </Box>
