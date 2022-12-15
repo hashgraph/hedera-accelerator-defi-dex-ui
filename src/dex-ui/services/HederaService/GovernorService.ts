@@ -1,7 +1,13 @@
 import { BigNumber } from "bignumber.js";
-import { AccountId, ContractExecuteTransaction, ContractFunctionParameters, TransactionResponse } from "@hashgraph/sdk";
+import {
+  TokenId,
+  AccountId,
+  ContractExecuteTransaction,
+  ContractFunctionParameters,
+  TransactionResponse,
+} from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { GovernorProxyContracts, TREASURY_ID } from "../constants";
+import { GovernorProxyContracts } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { queryContract } from "./utils";
@@ -93,7 +99,9 @@ const castVote = async (params: CastVoteParams) => {
 };
 
 interface CreateTransferTokenProposalParams {
+  title: string;
   description: string;
+  linkToDiscussion: string;
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: BigNumber;
@@ -108,17 +116,21 @@ interface CreateTransferTokenProposalParams {
 const sendCreateTransferTokenProposalTransaction = async (
   params: CreateTransferTokenProposalParams
 ): Promise<TransactionResponse> => {
-  const { description, accountToTransferTo, tokenToTransfer, amountToTransfer, signer } = params;
-  const accountToTransferFrom = TREASURY_ID;
-  const transferFromAddress = AccountId.fromString(accountToTransferFrom).toSolidityAddress();
+  const { title, description, linkToDiscussion, accountToTransferTo, tokenToTransfer, amountToTransfer, signer } =
+    params;
+  const transferFromAddress = signer.getAccountId().toSolidityAddress();
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
-  const tokenToTransferAddress = AccountId.fromString(tokenToTransfer).toSolidityAddress();
+  const tokenToTransferAddress = TokenId.fromString(tokenToTransfer).toSolidityAddress();
   const contractCallParams = new ContractFunctionParameters()
-    .addString(description)
+    /** This is 'description' on the contract function */
+    .addString(title)
     .addAddress(transferFromAddress)
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
-    .addInt256(amountToTransfer);
+    .addInt256(amountToTransfer)
+    /** This is 'title' on the contract function */
+    .addString(description)
+    .addString(linkToDiscussion);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(GovernorProxyContracts.TransferTokenContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
@@ -149,7 +161,7 @@ const sendCreateTextProposalTransaction = async (
 };
 interface ExecuteProposalParams {
   contractId: string;
-  description: string;
+  title: string;
   signer: HashConnectSigner;
 }
 
@@ -159,19 +171,41 @@ interface ExecuteProposalParams {
  * @returns
  */
 const executeProposal = async (params: ExecuteProposalParams) => {
-  const { contractId, description, signer } = params;
+  const { contractId, title, signer } = params;
   const governorContractId = ContractId.fromString(contractId);
-  const contractFunctionParameters = new ContractFunctionParameters().addString(description);
+  /** This parameter is named 'description' on the contract function */
+  const contractFunctionParameters = new ContractFunctionParameters().addString(title);
   const executeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.ExecuteProposal, contractFunctionParameters)
-    .setGas(900000)
+    .setGas(1000000)
     .freezeWithSigner(signer);
   const executeTransactionResponse = await executeProposalTransaction.executeWithSigner(signer);
   return executeTransactionResponse;
 };
 
+interface SendClaimGODTokenTransactionParams {
+  contractId: string;
+  proposalId: string;
+  signer: HashConnectSigner;
+}
+
+const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransactionParams) => {
+  const { contractId, proposalId, signer } = params;
+  const preciseProposalId = BigNumber(proposalId);
+  const governorContractId = ContractId.fromString(contractId);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(preciseProposalId);
+  const executeClaimGODTokenTransaction = await new ContractExecuteTransaction()
+    .setContractId(governorContractId)
+    .setFunction(GovernorContractFunctions.ClaimGODToken, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const claimGODTokenresponse = await executeClaimGODTokenTransaction.executeWithSigner(signer);
+  return claimGODTokenresponse;
+};
+
 const GovernorService = {
+  sendClaimGODTokenTransaction,
   fetchProposalState,
   fetchQuorum,
   fetchProposalVotes,
@@ -182,3 +216,4 @@ const GovernorService = {
 };
 
 export default GovernorService;
+export type { ProposalVotes };

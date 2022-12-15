@@ -9,6 +9,7 @@ enum GovernorContractFunctions {
   GetQuorum = "quorum",
   CastVote = "castVote",
   ExecuteProposal = "executeProposal",
+  ClaimGODToken = "claimGODToken",
 }
 
 enum PairContractFunctions {
