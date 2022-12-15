@@ -9,6 +9,7 @@ import {
   TOKEN_A_ID,
   TOKEN_B_ID,
   PAIR_TOKEN_SYMBOL,
+  GovernorProxyContracts,
 } from "../constants";
 import {
   MirrorNodeTokenByIdResponse,
@@ -21,6 +22,7 @@ import {
   MirrorNodeDecodedProposalEvent,
 } from "./types";
 import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
+import { ProposalType } from "../../store/governanceSlice";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -189,14 +191,7 @@ function createMirrorNodeService() {
     }
   };
 
-  /**
-   * Fetches all proposal events emitted by a smart contract. The "ProposalCreated",
-   * "ProposalExecuted", and "ProposalCanceled" are fetched. These events provide data
-   * regarding the contract proposals.
-   * @param contractId - The id of the contract to fetch events from.
-   * @returns An array of proposal event data.
-   */
-  const fetchAllProposals = async (
+  const fetchContractProposalEvents = async (
     proposalType: string,
     contractId: string
   ): Promise<MirrorNodeDecodedProposalEvent[]> => {
@@ -244,6 +239,49 @@ function createMirrorNodeService() {
   };
 
   /**
+   * Fetches all proposal events emitted by a smart contract. The "ProposalCreated",
+   * "ProposalExecuted", and "ProposalCanceled" are fetched. These events provide data
+   * regarding the contract proposals.
+   * @param contractId - The id of the contract to fetch events from.
+   * @returns An array of proposal event data.
+   */
+  const fetchAllProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
+    const tokenTransferEventsResults = fetchContractProposalEvents(
+      ProposalType.TokenTransfer,
+      GovernorProxyContracts.TransferTokenStringId
+    );
+    const createTokenEventsResults = fetchContractProposalEvents(
+      ProposalType.CreateToken,
+      GovernorProxyContracts.CreateTokenStringId
+    );
+    const textProposalEventsResults = fetchContractProposalEvents(
+      ProposalType.Text,
+      GovernorProxyContracts.TextProposalStringId
+    );
+    const contractUpgradeEventsResults = fetchContractProposalEvents(
+      ProposalType.ContractUpgrade,
+      GovernorProxyContracts.ContractUpgradeStringId
+    );
+    const proposalEventsResults = await Promise.allSettled([
+      tokenTransferEventsResults,
+      createTokenEventsResults,
+      textProposalEventsResults,
+      contractUpgradeEventsResults,
+    ]);
+    const proposalEvents = proposalEventsResults.reduce(
+      (
+        proposalEvents: MirrorNodeDecodedProposalEvent[],
+        proposalEventResult: PromiseSettledResult<MirrorNodeDecodedProposalEvent[]>
+      ): MirrorNodeDecodedProposalEvent[] => {
+        if (proposalEventResult.status === "fulfilled") return [...proposalEvents, ...proposalEventResult.value];
+        return proposalEvents;
+      },
+      []
+    );
+    return proposalEvents;
+  };
+
+  /**
    * Fetchs information about a specific blockNumber.
    * @param blockNumber - The block number to query.
    * @returns Information about the block.
@@ -259,7 +297,8 @@ function createMirrorNodeService() {
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
-    fetchAllProposals,
+    fetchAllProposalEvents,
+    fetchContractProposalEvents,
     fetchBlock,
   };
 }

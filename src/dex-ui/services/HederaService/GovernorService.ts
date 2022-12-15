@@ -182,3 +182,4 @@ const GovernorService = {
 };
 
 export default GovernorService;
+export type { ProposalVotes };

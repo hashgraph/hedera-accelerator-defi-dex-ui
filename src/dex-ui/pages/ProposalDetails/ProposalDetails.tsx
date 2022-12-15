@@ -21,7 +21,6 @@ import { useState } from "react";
 import { Link as ReachLink, useParams } from "react-router-dom";
 import { AlertDialog, Color, HorizontalStackBarChart, LoadingDialog, Metrics } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
-import { useGovernanceData } from "../../hooks/useGovernanceData";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { formatProposal } from "../Governance/formatter";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
@@ -29,7 +28,7 @@ import { VoteType } from "./types";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
-  useGovernanceData();
+  // useGovernanceData();
   const [dialogState, setDialogState] = useState({
     isErrorDialogOpen: false,
     isVoteYesOpen: false,

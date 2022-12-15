@@ -61,12 +61,6 @@ interface Proposal {
   };
 }
 
-enum FETCH_PROPOSALS {
-  Started = "governance/FETCH_PROPOSALS_Started",
-  Succeeded = "governance/FETCH_PROPOSALS_Succeeded",
-  Failed = "governance/FETCH_PROPOSALS_Failed",
-}
-
 enum EXECUTE_PROPOSAL {
   Started = "governance/EXECUTE_PROPOSAL_Started",
   Succeeded = "governance/EXECUTE_PROPOSAL_Succeeded",
@@ -86,7 +80,6 @@ enum SEND_VOTE {
 }
 
 const GovernanceActionType = {
-  FETCH_PROPOSALS,
   EXECUTE_PROPOSAL,
   SEND_CREATE_PROPOSAL,
   SEND_VOTE,
@@ -130,7 +123,6 @@ type CreateProposalData = CreateNewTokenProposalData | CreateTextProposalData | 
 interface GovernanceActions {
   castVote: (contractId: string, proposalId: string, voteType: number) => Promise<void>;
   fetchProposal: (proposalId: string) => Proposal | undefined;
-  fetchProposals: () => Promise<void>;
   createProposal: (type: ProposalType, data: CreateProposalData) => Promise<void>;
   clearProposalTransactionState: () => void;
   executeProposal: (contractId: string, title: string) => Promise<void>;
