@@ -182,8 +182,13 @@ const SwapTokens = (props: SwapTokensProps) => {
       // TODO: check on if we should keep getTokenExcchangeAmount
       // const tokenToReceiveAmount = getTokenExchangeAmount(tokenToTrade.amount, spotPrice);
       const tokenToReceiveAmount = getReceivedAmount(tokenToTrade, tokenToReceive);
-      dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0.0));
-      dispatch(setTokenToReceiveDisplayAmount(tokenToReceiveAmount ? String(tokenToReceiveAmount) : "0.0"));
+      if (!tokenToTrade.amount) {
+        dispatch(setTokenToReceiveAmount(0.0));
+        dispatch(setTokenToReceiveDisplayAmount("0.0"));
+      } else {
+        dispatch(setTokenToReceiveAmount(tokenToReceiveAmount || 0.0));
+        dispatch(setTokenToReceiveDisplayAmount(tokenToReceiveAmount ? String(tokenToReceiveAmount) : "0.0"));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, spotPrice, tokenToTrade.displayAmount]);
