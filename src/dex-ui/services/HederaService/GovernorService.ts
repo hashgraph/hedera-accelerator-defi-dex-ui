@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractExecuteTransaction, ContractFunctionParameters, TransactionResponse } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { GovernorProxyContracts, TOKEN_USER_ID } from "../constants";
+import { GovernorProxyContracts } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { queryContract } from "./utils";
@@ -112,8 +112,7 @@ const sendCreateTransferTokenProposalTransaction = async (
 ): Promise<TransactionResponse> => {
   const { title, description, linkToDiscussion, accountToTransferTo, tokenToTransfer, amountToTransfer, signer } =
     params;
-  const accountToTransferFrom = TOKEN_USER_ID;
-  const transferFromAddress = AccountId.fromString(accountToTransferFrom).toSolidityAddress();
+  const transferFromAddress = signer.getAccountId().toSolidityAddress();
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
   const tokenToTransferAddress = AccountId.fromString(tokenToTransfer).toSolidityAddress();
   const contractCallParams = new ContractFunctionParameters()
@@ -174,7 +173,7 @@ const executeProposal = async (params: ExecuteProposalParams) => {
   const executeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.ExecuteProposal, contractFunctionParameters)
-    .setGas(900000)
+    .setGas(1000000)
     .freezeWithSigner(signer);
   const executeTransactionResponse = await executeProposalTransaction.executeWithSigner(signer);
   return executeTransactionResponse;
@@ -190,7 +189,7 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
   const { contractId, proposalId, signer } = params;
   const preciseProposalId = BigNumber(proposalId);
   const governorContractId = ContractId.fromString(contractId);
-  const contractFunctionParameters = new ContractFunctionParameters().addInt256(preciseProposalId);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(preciseProposalId);
   const executeClaimGODTokenTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.ClaimGODToken, contractFunctionParameters)
