@@ -4,7 +4,7 @@ import { ContractId } from "@hashgraph/sdk";
 import { GovernorProxyContracts, TOKEN_USER_ID } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { client, queryContract } from "./utils";
+import { queryContract } from "./utils";
 
 /**
  * General format of service calls:
@@ -188,7 +188,6 @@ interface SendClaimGODTokenTransactionParams {
 
 const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransactionParams) => {
   const { contractId, proposalId, signer } = params;
-  console.log(params);
   const preciseProposalId = BigNumber(proposalId);
   const governorContractId = ContractId.fromString(contractId);
   const contractFunctionParameters = new ContractFunctionParameters().addInt256(preciseProposalId);
@@ -196,8 +195,7 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.ClaimGODToken, contractFunctionParameters)
     .setGas(900000)
-    .signWithOperator(client);
-  //.freezeWithSigner(signer);
+    .freezeWithSigner(signer);
   const claimGODTokenresponse = await executeClaimGODTokenTransaction.executeWithSigner(signer);
   return claimGODTokenresponse;
 };

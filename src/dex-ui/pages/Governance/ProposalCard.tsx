@@ -40,7 +40,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                 <Text
                   textStyle="h3"
                   paddingRight="0.5rem"
-                  maxWidth="600px"
+                  maxWidth="500px"
                   overflow="hidden"
                   textOverflow="ellipsis"
                   whiteSpace="nowrap"
