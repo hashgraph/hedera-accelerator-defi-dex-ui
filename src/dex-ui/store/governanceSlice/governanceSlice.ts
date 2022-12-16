@@ -100,7 +100,9 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
               createTransferTokenProposalData.tokenToTransfer
             );
             return HederaService.sendCreateTransferTokenProposalTransaction({
-              description: data.title,
+              title: createTransferTokenProposalData.title,
+              description: createTransferTokenProposalData.description,
+              linkToDiscussion: createTransferTokenProposalData.linkToDiscussion,
               accountToTransferTo: createTransferTokenProposalData.accountToTransferTo,
               tokenToTransfer: createTransferTokenProposalData.tokenToTransfer,
               amountToTransfer: preciseTransferTokenAmount,

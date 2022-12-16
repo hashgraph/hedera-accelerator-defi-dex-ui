@@ -228,6 +228,7 @@ function createMirrorNodeService() {
           proposalEventLog.data,
           proposalEventLog.topics.slice(1)
         );
+        console.log(proposalCreatedEvent, proposalEventLog);
         return [
           proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined,
           // decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),

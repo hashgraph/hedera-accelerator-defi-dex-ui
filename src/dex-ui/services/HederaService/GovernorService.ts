@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractExecuteTransaction, ContractFunctionParameters, TransactionResponse } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { GovernorProxyContracts, TREASURY_ID } from "../constants";
+import { GovernorProxyContracts, TOKEN_USER_ID } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { queryContract } from "./utils";
@@ -93,7 +93,9 @@ const castVote = async (params: CastVoteParams) => {
 };
 
 interface CreateTransferTokenProposalParams {
+  title: string;
   description: string;
+  linkToDiscussion: string;
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: BigNumber;
@@ -108,17 +110,22 @@ interface CreateTransferTokenProposalParams {
 const sendCreateTransferTokenProposalTransaction = async (
   params: CreateTransferTokenProposalParams
 ): Promise<TransactionResponse> => {
-  const { description, accountToTransferTo, tokenToTransfer, amountToTransfer, signer } = params;
-  const accountToTransferFrom = TREASURY_ID;
+  const { title, description, linkToDiscussion, accountToTransferTo, tokenToTransfer, amountToTransfer, signer } =
+    params;
+  const accountToTransferFrom = TOKEN_USER_ID;
   const transferFromAddress = AccountId.fromString(accountToTransferFrom).toSolidityAddress();
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
   const tokenToTransferAddress = AccountId.fromString(tokenToTransfer).toSolidityAddress();
   const contractCallParams = new ContractFunctionParameters()
-    .addString(description)
+    /** This is 'description' on the contract function */
+    .addString(title)
     .addAddress(transferFromAddress)
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
-    .addInt256(amountToTransfer);
+    .addInt256(amountToTransfer)
+    /** This is 'title' on the contract function */
+    .addString(description)
+    .addString(linkToDiscussion);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(GovernorProxyContracts.TransferTokenContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)

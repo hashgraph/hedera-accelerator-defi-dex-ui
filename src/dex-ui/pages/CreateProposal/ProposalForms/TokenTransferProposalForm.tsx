@@ -6,13 +6,14 @@ import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
 import { ProposalType } from "../../../store/governanceSlice";
 
-type TokenTransferProposalFormData = {
+interface TokenTransferProposalFormData {
   title: string;
   description: string;
+  linkToDiscussion: string;
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: number;
-};
+}
 
 export function TokenTransferProposalForm(): ReactElement {
   const { governance } = useDexContext(({ governance }) => ({ governance }));
@@ -26,10 +27,11 @@ export function TokenTransferProposalForm(): ReactElement {
   const handleCancelClick = () => navigate("/governance");
 
   async function onSubmit(data: TokenTransferProposalFormData) {
+    console.log(data);
     await governance.createProposal(ProposalType.TokenTransfer, {
       title: data.title,
-      // TODO: Proposal Contract functions do not handle both title and description yet.
-      // description: data.description,
+      description: "A description of this proposal.", // data.description ??,
+      linkToDiscussion: data.linkToDiscussion,
       accountToTransferTo: data.accountToTransferTo,
       tokenToTransfer: data.tokenToTransfer,
       amountToTransfer: data.amountToTransfer,
@@ -51,7 +53,15 @@ export function TokenTransferProposalForm(): ReactElement {
           <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
         </FormControl>
         <FormControl>
-          <TextEditor id="description" placeholder="Description" />
+          <TextEditor id="description" placeholder="Description" {...register("description")} />
+        </FormControl>
+        <FormControl>
+          <Input
+            variant="form-input"
+            id="linkToDiscussion"
+            placeholder="Link to Discussion (optional)"
+            {...register("linkToDiscussion")}
+          />
         </FormControl>
         <FormControl isInvalid={Boolean(errors.accountToTransferTo)}>
           <Input

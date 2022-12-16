@@ -123,7 +123,10 @@ export const ProposalDetails = () => {
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
-              {isExecuteButtonVisible ? (
+              {/** Refactor to separate layout component. */}
+              {isLoading ? (
+                <></>
+              ) : isExecuteButtonVisible ? (
                 <Button variant="primary" width="290px" onClick={handleExecuteClicked}>
                   Execute
                 </Button>

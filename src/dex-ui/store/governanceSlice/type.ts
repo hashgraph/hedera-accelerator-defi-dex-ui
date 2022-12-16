@@ -113,6 +113,8 @@ interface CreateTextProposalData {
 
 interface CreateTransferTokenProposalData {
   title: string;
+  description: string;
+  linkToDiscussion: string;
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: number;

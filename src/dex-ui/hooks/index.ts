@@ -3,4 +3,4 @@ export * from "./useDexContext";
 export * from "./useWalletConnection";
 export * from "./useSwapData";
 export * from "./usePoolsData";
-export * from "./queries";
+export * from "./governance/queries";

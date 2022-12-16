@@ -1,9 +1,9 @@
 import { useQuery } from "react-query";
 import { BigNumber } from "bignumber.js";
-import { formatProposal } from "../pages/Governance/formatter";
-import { FormattedProposal } from "../pages/Governance/types";
-import { DexService } from "../services";
-import { Proposal } from "../store/governanceSlice";
+import { formatProposal } from "../../pages/Governance/formatter";
+import { FormattedProposal } from "../../pages/Governance/types";
+import { DexService } from "../../services";
+import { Proposal } from "../../store/governanceSlice";
 import { isNil } from "ramda";
 
 export enum Queries {
