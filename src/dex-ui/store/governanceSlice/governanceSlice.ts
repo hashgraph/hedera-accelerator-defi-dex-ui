@@ -29,6 +29,11 @@ const initialGovernanceStore: GovernanceState = {
 const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
   return {
     ...initialGovernanceStore,
+    /** TODO: Send transaction using react-query */
+    claimGODTokens: async (contractId: string, proposalId: string) => {
+      const { wallet } = get();
+      await HederaService.sendClaimGODTokenTransaction({ contractId, proposalId, signer: wallet.getSigner() });
+    },
     castVote: async (contractId: string, proposalId: string, voteType: number) => {
       const { wallet } = get();
       set(
@@ -172,7 +177,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       const signer = wallet.getSigner();
 
       try {
-        const result = await HederaService.executeProposal({ contractId, description: title, signer });
+        const result = await HederaService.executeProposal({ contractId, title, signer });
 
         if (result !== undefined) {
           set(

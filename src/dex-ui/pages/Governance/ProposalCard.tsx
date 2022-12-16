@@ -2,7 +2,8 @@ import { Text, Box, Flex, Spacer, VStack, Tag } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { Card, HorizontalStackBarChart } from "../../../dex-ui-components";
 import { Color } from "../../../dex-ui-components/themes";
-import { ProposalStatus, ProposalState } from "../../store/governanceSlice";
+import { ProposalStatus } from "../../store/governanceSlice";
+import { getStatusColor } from "../../utils";
 import { FormattedProposal } from "./types";
 
 interface ProposalCardProps {
@@ -12,28 +13,6 @@ interface ProposalCardProps {
 export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal } = props;
   const navigate = useNavigate();
-
-  const getStatusColor = (status: ProposalStatus | undefined, state: ProposalState | undefined): string => {
-    if (status === ProposalStatus.Active) {
-      if (state === ProposalState.Active || state === ProposalState.Pending) {
-        return Color.Teal_02;
-      }
-    }
-    if (status === ProposalStatus.Passed && state === ProposalState.Queued) {
-      return Color.Yellow_02;
-    }
-    if (status === ProposalStatus.Passed) {
-      if (state === ProposalState.Executed || state === ProposalState.Succeeded) {
-        return Color.Green_02;
-      }
-    }
-    if (status === ProposalStatus.Failed) {
-      if (state === ProposalState.Canceled || state === ProposalState.Expired || state === ProposalState.Defeated) {
-        return Color.Red_02;
-      }
-    }
-    return "";
-  };
 
   const statusColor = getStatusColor(proposal.status, proposal.state);
 
@@ -57,11 +36,18 @@ export const ProposalCard = (props: ProposalCardProps) => {
         <Box flex="12" padding="0.5rem 0">
           <VStack alignItems="start">
             <Flex width="100%" flexDirection="row">
-              <Flex flex="8" textAlign="left">
-                <Text textStyle="h3" paddingRight="0.5rem">
+              <Flex flex="12" textAlign="left" alignItems="center">
+                <Text
+                  textStyle="h3"
+                  paddingRight="0.5rem"
+                  maxWidth="600px"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                >
                   {proposal.title}
                 </Text>
-                <Tag textStyle="b3" size="sm">
+                <Tag textStyle="b3" size="sm" minWidth="fit-content" height="fit-content">
                   {proposal.type}
                 </Tag>
               </Flex>

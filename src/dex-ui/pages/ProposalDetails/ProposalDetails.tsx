@@ -21,7 +21,8 @@ import { useState } from "react";
 import { Link as ReachLink, useParams } from "react-router-dom";
 import { AlertDialog, Color, HorizontalStackBarChart, LoadingDialog, Metrics } from "../../../dex-ui-components";
 import { useDexContext, useProposal } from "../../hooks";
-import { ProposalStatus } from "../../store/governanceSlice";
+import { ProposalState, ProposalStatus } from "../../store/governanceSlice";
+import { getStatusColor } from "../../utils";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { VoteType } from "./types";
 
@@ -39,11 +40,20 @@ export const ProposalDetails = () => {
   if (isError) {
     return <span>Error: {error.message}</span>;
   }
+  const areButtonsHidden = isLoading || proposal?.status === ProposalStatus.Failed;
+  const isExecuteButtonVisible =
+    proposal?.status === ProposalStatus.Passed && proposal?.state !== ProposalState.Executed;
+  const isClaimTokenButtonVisible = proposal?.state === ProposalState.Executed;
+  const areVoteButtonsVisible = proposal?.status === ProposalStatus.Active;
 
-  const isExecuteButtonVisible = proposal?.status === ProposalStatus.Passed;
+  const statusColor = getStatusColor(proposal?.status, proposal?.state);
 
   const handleExecuteClicked = async () => {
     await governance.executeProposal(proposal?.contractId ?? "", proposal?.title ?? "");
+  };
+
+  const handleClaimGODTokensClicked = async () => {
+    await governance.claimGODTokens(proposal?.contractId ?? "", proposal?.id ?? "");
   };
 
   const castVote = async (voteType: VoteType) => {
@@ -124,13 +134,18 @@ export const ProposalDetails = () => {
             </Box>
             <Flex gap="4" direction="column">
               {/** Refactor to separate layout component. */}
-              {isLoading ? (
-                <></>
-              ) : isExecuteButtonVisible ? (
+              {areButtonsHidden && <></>}
+              {isExecuteButtonVisible && (
                 <Button variant="primary" width="290px" onClick={handleExecuteClicked}>
                   Execute
                 </Button>
-              ) : (
+              )}
+              {isClaimTokenButtonVisible && (
+                <Button variant="primary" width="290px" onClick={handleClaimGODTokensClicked}>
+                  Claim Governance Tokens
+                </Button>
+              )}
+              {areVoteButtonsVisible && (
                 <>
                   <Text textStyle="h3">Vote on Proposal</Text>
                   <Flex gap="4">
@@ -202,7 +217,9 @@ export const ProposalDetails = () => {
                  * TODO: Create state mapping between proposal state and UI state.
                  * e.g., The proposal do not have the concept of a 'Queued to Execute' state.
                  */}
-                <Text textStyle="b2">{proposal?.state}</Text>
+                <Text textStyle="b2" color={statusColor}>
+                  {proposal?.state === ProposalState.Executed ? ProposalState.Executed : proposal?.status}
+                </Text>
                 <Text textStyle="b2" color={Color.Grey_02}>
                   - {proposal?.timeRemaining}
                 </Text>

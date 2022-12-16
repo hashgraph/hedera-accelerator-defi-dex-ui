@@ -4,7 +4,7 @@ import { ContractId } from "@hashgraph/sdk";
 import { GovernorProxyContracts, TOKEN_USER_ID } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { queryContract } from "./utils";
+import { client, queryContract } from "./utils";
 
 /**
  * General format of service calls:
@@ -156,7 +156,7 @@ const sendCreateTextProposalTransaction = async (
 };
 interface ExecuteProposalParams {
   contractId: string;
-  description: string;
+  title: string;
   signer: HashConnectSigner;
 }
 
@@ -166,9 +166,11 @@ interface ExecuteProposalParams {
  * @returns
  */
 const executeProposal = async (params: ExecuteProposalParams) => {
-  const { contractId, description, signer } = params;
+  const { contractId, title, signer } = params;
+  console.log(params);
   const governorContractId = ContractId.fromString(contractId);
-  const contractFunctionParameters = new ContractFunctionParameters().addString(description);
+  /** This parameter is named 'description' on the contract function */
+  const contractFunctionParameters = new ContractFunctionParameters().addString(title);
   const executeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.ExecuteProposal, contractFunctionParameters)
@@ -178,7 +180,30 @@ const executeProposal = async (params: ExecuteProposalParams) => {
   return executeTransactionResponse;
 };
 
+interface SendClaimGODTokenTransactionParams {
+  contractId: string;
+  proposalId: string;
+  signer: HashConnectSigner;
+}
+
+const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransactionParams) => {
+  const { contractId, proposalId, signer } = params;
+  console.log(params);
+  const preciseProposalId = BigNumber(proposalId);
+  const governorContractId = ContractId.fromString(contractId);
+  const contractFunctionParameters = new ContractFunctionParameters().addInt256(preciseProposalId);
+  const executeClaimGODTokenTransaction = await new ContractExecuteTransaction()
+    .setContractId(governorContractId)
+    .setFunction(GovernorContractFunctions.ClaimGODToken, contractFunctionParameters)
+    .setGas(900000)
+    .signWithOperator(client);
+  //.freezeWithSigner(signer);
+  const claimGODTokenresponse = await executeClaimGODTokenTransaction.executeWithSigner(signer);
+  return claimGODTokenresponse;
+};
+
 const GovernorService = {
+  sendClaimGODTokenTransaction,
   fetchProposalState,
   fetchQuorum,
   fetchProposalVotes,
