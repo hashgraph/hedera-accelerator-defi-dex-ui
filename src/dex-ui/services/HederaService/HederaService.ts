@@ -8,11 +8,10 @@ import {
   TransferTransaction,
   TokenAssociateTransaction,
   TransactionResponse,
-  ContractCallQuery,
 } from "@hashgraph/sdk";
 import {
   SWAP_CONTRACT_ID,
-  GOVERNOR_PROXY_CONTRACT,
+  GovernorProxyContracts,
   TOKEN_A_SYMBOL,
   TOKEN_B_SYMBOL,
   TOKEN_A_ID,
@@ -22,19 +21,27 @@ import {
 } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { createUserClient, getTreasurer, getAddressArray } from "./utils";
+import { client, queryContract, getTreasurer, getAddressArray } from "./utils";
+import GovernorService from "./GovernorService";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
+/**
+ * General format of service calls:
+ * 1 - Convert data types.
+ * 2 - Create contract parameters.
+ * 3 - Create and sign transaction.
+ * 4 - Send transaction to wallet and execute transaction.
+ * 5 - Extract and return resulting data.
+ */
+
 function createHederaService() {
-  const client = createUserClient();
   const { treasuryId, treasuryKey } = getTreasurer();
   const tokenA = TokenId.fromString(TOKEN_A_ID).toSolidityAddress();
   const tokenB = TokenId.fromString(TOKEN_B_ID).toSolidityAddress();
   const contractId = ContractId.fromString(SWAP_CONTRACT_ID); // "0.0.47712695";
   const factoryId = ContractId.fromString(FACTORY_CONTRACT_ID); //
   let _precision = BigNumber(0);
-
   const initHederaService = async () => {
     const precision = await fetchPrecision(contractId);
     _precision = precision ?? BigNumber(0);
@@ -52,18 +59,6 @@ function createHederaService() {
 
   const getPrecision = () => {
     return _precision;
-  };
-
-  const queryContract = async (
-    contractId: ContractId,
-    functionName: string,
-    queryParams?: ContractFunctionParameters
-  ) => {
-    const gas = 50000;
-    const query = new ContractCallQuery().setContractId(contractId).setGas(gas).setFunction(functionName, queryParams);
-    const queryPayment = await query.getCost(client);
-    query.setMaxQueryPayment(queryPayment);
-    return await query.execute(client);
   };
 
   const fetchPrecision = async (contractId: ContractId): Promise<BigNumber | undefined> => {
@@ -214,66 +209,13 @@ function createHederaService() {
       .addBytesArray(calls)
       .addString(description);
     const createProposalTransaction = await new ContractExecuteTransaction()
-      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
+      .setContractId(GovernorProxyContracts.TransferTokenContractId)
       .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
       .setGas(900000)
       .setNodeAccountIds([new AccountId(3)])
       .freezeWithSigner(signer);
     const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
     return proposalTransactionResponse;
-  };
-
-  const castVote = async ({ proposalId, voteType, signer }: any) => {
-    const contractFunctionParameters = new ContractFunctionParameters().addUint256(proposalId).addUint8(voteType);
-    const castVoteTransaction = await new ContractExecuteTransaction()
-      .setContractId(GOVERNOR_PROXY_CONTRACT.ContractId)
-      .setFunction(GovernorContractFunctions.CastVote, contractFunctionParameters)
-      .setGas(900000)
-      .setNodeAccountIds([new AccountId(3)])
-      .freezeWithSigner(signer);
-
-    const response = await castVoteTransaction.executeWithSigner(signer);
-    return response;
-  };
-
-  const fetchProposalState = async (proposalId: BigNumber): Promise<BigNumber | undefined> => {
-    const queryParams = new ContractFunctionParameters().addUint256(proposalId);
-    const result = await queryContract(
-      GOVERNOR_PROXY_CONTRACT.ContractId,
-      GovernorContractFunctions.GetState,
-      queryParams
-    );
-    const proposalStatus = result?.getUint256(0);
-    return proposalStatus;
-  };
-
-  const fetchQuorum = async (blockNumber: BigNumber): Promise<BigNumber | undefined> => {
-    const queryParams = new ContractFunctionParameters().addUint256(blockNumber);
-    const result = await queryContract(
-      GOVERNOR_PROXY_CONTRACT.ContractId,
-      GovernorContractFunctions.GetQuorum,
-      queryParams
-    );
-    const quorum = result?.getInt256(0);
-    return quorum;
-  };
-  interface ProposalVotes {
-    againstVotes: BigNumber | undefined;
-    forVotes: BigNumber | undefined;
-    abstainVotes: BigNumber | undefined;
-  }
-
-  const fetchProposalVotes = async (proposalId: BigNumber): Promise<ProposalVotes> => {
-    const queryParams = new ContractFunctionParameters().addUint256(proposalId);
-    const result = await queryContract(
-      GOVERNOR_PROXY_CONTRACT.ContractId,
-      GovernorContractFunctions.GetProposalVotes,
-      queryParams
-    );
-    const againstVotes = result?.getInt256(0);
-    const forVotes = result?.getInt256(1);
-    const abstainVotes = result?.getInt256(2);
-    return { againstVotes, forVotes, abstainVotes };
   };
 
   const get100LABTokens = async (
@@ -431,9 +373,6 @@ function createHederaService() {
     addLiquidity,
     removeLiquidity,
     createProposal,
-    fetchQuorum,
-    fetchProposalState,
-    fetchProposalVotes,
     getContributorTokenShare,
     getTokenBalances,
     getSpotPrice,
@@ -443,9 +382,9 @@ function createHederaService() {
     pairCurrentPosition,
     getContractAddress,
     getTokenPairAddress,
-    castVote,
     fetchTokenPairs,
     fetchPrecision,
+    ...GovernorService,
   };
 }
 

@@ -1,4 +1,4 @@
-import { Text, Box, Flex, Spacer, VStack } from "@chakra-ui/react";
+import { Text, Box, Flex, Spacer, VStack, Tag } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { Card, HorizontalStackBarChart } from "../../../dex-ui-components";
 import { Color } from "../../../dex-ui-components/themes";
@@ -57,9 +57,14 @@ export const ProposalCard = (props: ProposalCardProps) => {
         <Box flex="12" padding="0.5rem 0">
           <VStack alignItems="start">
             <Flex width="100%" flexDirection="row">
-              <Text flex="4" textStyle="h3" textAlign="left">
-                {proposal.title}
-              </Text>
+              <Flex flex="8" textAlign="left">
+                <Text textStyle="h3" paddingRight="0.5rem">
+                  {proposal.title}
+                </Text>
+                <Tag textStyle="b3" size="sm">
+                  {proposal.type}
+                </Tag>
+              </Flex>
               <Spacer flex="1" />
               <Text flex="4" textAlign="right" textStyle="b2">{`Author ${proposal.author.toString()}`}</Text>
             </Flex>

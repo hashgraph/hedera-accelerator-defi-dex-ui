@@ -3,11 +3,12 @@ import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { ContractId } from "@hashgraph/sdk";
 
 enum GovernorContractFunctions {
-  CreateProposal = "propose",
+  CreateProposal = "createProposal",
   GetState = "state",
   GetProposalVotes = "proposalVotes",
   GetQuorum = "quorum",
   CastVote = "castVote",
+  ExecuteProposal = "executeProposal",
 }
 
 enum PairContractFunctions {
