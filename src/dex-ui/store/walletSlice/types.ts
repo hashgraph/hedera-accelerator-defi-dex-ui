@@ -63,7 +63,7 @@ interface WalletActions {
   destroyHashConnectEvents: () => void;
 }
 
-interface WalletStore extends WalletState, WalletActions { }
+interface WalletStore extends WalletState, WalletActions {}
 
 type WalletSlice = StateCreator<
   DEXState,
