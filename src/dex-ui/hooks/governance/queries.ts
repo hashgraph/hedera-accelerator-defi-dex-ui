@@ -1,13 +1,15 @@
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useQuery } from "react-query";
 import { BigNumber } from "bignumber.js";
 import { formatProposal } from "../../pages/Governance/formatter";
 import { FormattedProposal } from "../../pages/Governance/types";
-import { DexService } from "../../services";
+import { DexService, HederaService } from "../../services";
 import { Proposal } from "../../store/governanceSlice";
 import { isNil } from "ramda";
 
 export enum Queries {
   FetchAllProposals = "fetchAllProposals",
+  FetchHasVoted = "hasVoted",
 }
 
 function useProposalQuery<T>(select: (data: Proposal[]) => T) {
@@ -31,4 +33,11 @@ export function useProposal(id: string | undefined) {
     return proposal ? formatProposal(proposal) : undefined;
   };
   return useProposalQuery<FormattedProposal | undefined>(getProposal);
+}
+
+export function useHasVoted(contractId: string | undefined, proposalId: string | undefined, signer: HashConnectSigner) {
+  return useQuery<boolean | undefined, Error, boolean, Queries.FetchHasVoted>(Queries.FetchHasVoted, async () => {
+    if (!isNil(contractId) && !isNil(proposalId))
+      return HederaService.fetchHasVoted({ contractId, proposalId, signer });
+  });
 }

@@ -35,31 +35,35 @@ function createDexService() {
     votes: ProposalVotes;
     quorum: BigNumber | undefined;
   }
+
   type ProposalEventsWithDetails = MirrorNodeDecodedProposalEvent & ProposalEventDetails;
 
   const convertEventToProposal = (proposalEvent: ProposalEventsWithDetails): Proposal => {
-    const { proposalId, contractId, type, description, proposer, startBlock, endBlock, state, votes, quorum } =
-      proposalEvent;
-    const proposalState = state
-      ? (ContractProposalState[state?.toNumber()] as keyof typeof ContractProposalState)
+    const proposalState = proposalEvent.state
+      ? (ContractProposalState[proposalEvent.state?.toNumber()] as keyof typeof ContractProposalState)
       : undefined;
-    const isProposalTypeValid = Object.values(ProposalType).includes(type as ProposalType);
+    const isProposalTypeValid = Object.values(ProposalType).includes(proposalEvent.type as ProposalType);
     return {
-      id: proposalId,
-      contractId,
-      type: isProposalTypeValid ? (type as ProposalType) : undefined,
-      title: description,
+      id: proposalEvent.proposalId,
+      contractId: proposalEvent.contractId,
+      type: isProposalTypeValid ? (proposalEvent.type as ProposalType) : undefined,
+      title: proposalEvent.description,
       description: `Preview of the description lorem ipsum dolor sit amit consectetur 
               adipiscing elit Phasellus congue, sapien eu...`,
-      author: proposer ? AccountId.fromSolidityAddress(proposer) : AccountId.fromString("0.0.34728121"),
+      author: proposalEvent.proposer
+        ? AccountId.fromSolidityAddress(proposalEvent.proposer)
+        : AccountId.fromString("0.0.34728121"),
       status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
-      timeRemaining: !isNil(startBlock) && !isNil(endBlock) ? getTimeRemaining(startBlock, endBlock) : undefined,
+      timeRemaining:
+        !isNil(proposalEvent.startBlock) && !isNil(proposalEvent.endBlock)
+          ? getTimeRemaining(proposalEvent.startBlock, proposalEvent.endBlock)
+          : undefined,
       state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
       votes: {
-        yes: votes.forVotes,
-        no: votes.againstVotes,
-        abstain: votes.abstainVotes,
-        quorum,
+        yes: proposalEvent.votes.forVotes,
+        no: proposalEvent.votes.againstVotes,
+        abstain: proposalEvent.votes.abstainVotes,
+        quorum: proposalEvent.quorum,
         max: TOTAL_GOD_TOKEN_SUPPLY,
       },
     };

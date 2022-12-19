@@ -10,7 +10,7 @@ import { ContractId } from "@hashgraph/sdk";
 import { GovernorProxyContracts } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { queryContract } from "./utils";
+import { checkTransactionResponseForError, queryContract } from "./utils";
 
 /**
  * General format of service calls:
@@ -34,6 +34,30 @@ const fetchProposalState = async (contractId: string, proposalId: string): Promi
   const result = await queryContract(governorContractId, GovernorContractFunctions.GetState, queryParams);
   const proposalState = result?.getUint256(0);
   return proposalState;
+};
+
+export interface FetchHasVotedParams {
+  /** The id of the governor contract. */
+  contractId: string;
+  /** The id of the governor proposal. */
+  proposalId: string;
+  /** The account signing the transaction. */
+  signer: HashConnectSigner;
+}
+/**
+ * Queries a contract to see if an account id has voted on the specified proposal.
+ * @param params - {@link FetchHasVotedParams}
+ * @returns true if the account has voted on the proposal.
+ */
+const fetchHasVoted = async (params: FetchHasVotedParams): Promise<boolean | undefined> => {
+  const { contractId, proposalId, signer } = params;
+  const governorContractId = ContractId.fromString(contractId);
+  const preciseProposalId = BigNumber(proposalId);
+  const accountAddress = signer.getAccountId().toSolidityAddress();
+  const queryParams = new ContractFunctionParameters().addUint256(preciseProposalId).addAddress(accountAddress);
+  const result = await queryContract(governorContractId, GovernorContractFunctions.GetHasVoted, queryParams);
+  const hasVoted = result?.getBool(0);
+  return hasVoted;
 };
 
 /**
@@ -95,6 +119,7 @@ const castVote = async (params: CastVoteParams) => {
     .setGas(900000)
     .freezeWithSigner(signer);
   const response = await castVoteTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(response, GovernorContractFunctions.CastVote);
   return response;
 };
 
@@ -181,6 +206,7 @@ const executeProposal = async (params: ExecuteProposalParams) => {
     .setGas(1000000)
     .freezeWithSigner(signer);
   const executeTransactionResponse = await executeProposalTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(executeTransactionResponse, GovernorContractFunctions.ExecuteProposal);
   return executeTransactionResponse;
 };
 
@@ -201,12 +227,14 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
     .setGas(900000)
     .freezeWithSigner(signer);
   const claimGODTokenresponse = await executeClaimGODTokenTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(claimGODTokenresponse, GovernorContractFunctions.ClaimGODToken);
   return claimGODTokenresponse;
 };
 
 const GovernorService = {
   sendClaimGODTokenTransaction,
   fetchProposalState,
+  fetchHasVoted,
   fetchQuorum,
   fetchProposalVotes,
   castVote,

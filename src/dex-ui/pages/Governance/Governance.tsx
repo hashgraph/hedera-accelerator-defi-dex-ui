@@ -20,25 +20,25 @@ const VOTING_KEYS: { value: string; color: string }[] = [
 export const Governance = (): ReactElement => {
   const navigate = useNavigate();
   const locationState = useLocation().state as CreateProposalLocationProps;
-  const [shouldShowNotification, setShouldShowNotification] = useState<boolean>(
+  const [isNotificationVisible, setIsNotificationVisible] = useState<boolean>(
     locationState?.isProposalCreationSuccessful ?? false
   );
+  const hashScanLink = createHashScanLink(locationState?.proposalTransactionId);
+  const handleClickNotificationCloseButton = () => setIsNotificationVisible(false);
+  const handleClickNewProposalButton = () => navigate("/governance/select-proposal-type");
 
   return (
     <Grid templateColumns="repeat(1, 1fr)" gap={8} minHeight="500px" width="100%">
-      {shouldShowNotification ? (
-        <Notification
-          type={NotficationTypes.SUCCESS}
-          message={`You have created ${locationState.proposalTitle}`}
-          isLinkShown={true}
-          linkText="View in HashScan"
-          linkRef={createHashScanLink(locationState.proposalTransactionId)}
-          isCloseButtonShown={true}
-          handleClickClose={() => setShouldShowNotification(false)}
-        />
-      ) : (
-        <></>
-      )}
+      <Notification
+        type={NotficationTypes.SUCCESS}
+        message={`You have created ${locationState?.proposalTitle}`}
+        isLinkShown={true}
+        linkText="View in HashScan"
+        linkRef={hashScanLink}
+        isCloseButtonShown={true}
+        isVisible={isNotificationVisible}
+        handleClickClose={handleClickNotificationCloseButton}
+      />
       <GridItem colSpan={1}>
         <Flex direction="row">
           <Text flex="4" textStyle="h1">
@@ -50,7 +50,7 @@ export const Governance = (): ReactElement => {
             variant="new-proposal"
             textStyle="h3"
             data-testid="new-proposal-button"
-            onClick={() => navigate("/governance/select-proposal-type")}
+            onClick={handleClickNewProposalButton}
           >
             New Proposal
           </Button>

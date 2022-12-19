@@ -215,6 +215,7 @@ function createMirrorNodeService() {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
+        limit: 100,
       },
     });
     const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs

@@ -5,6 +5,7 @@ import { ContractId } from "@hashgraph/sdk";
 enum GovernorContractFunctions {
   CreateProposal = "createProposal",
   GetState = "state",
+  GetHasVoted = "hasVoted",
   GetProposalVotes = "proposalVotes",
   GetQuorum = "quorum",
   CastVote = "castVote",
