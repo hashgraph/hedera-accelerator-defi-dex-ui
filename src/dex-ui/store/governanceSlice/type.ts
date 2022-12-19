@@ -61,28 +61,14 @@ interface Proposal {
   };
 }
 
-enum EXECUTE_PROPOSAL {
-  Started = "governance/EXECUTE_PROPOSAL_Started",
-  Succeeded = "governance/EXECUTE_PROPOSAL_Succeeded",
-  Failed = "governance/EXECUTE_PROPOSAL_Failed",
-}
-
 enum SEND_CREATE_PROPOSAL {
   Started = "governance/SEND_CREATE_PROPOSAL_Started",
   Succeeded = "governance/SEND_CREATE_PROPOSAL_Succeeded",
   Failed = "governance/SEND_CREATE_PROPOSALL_Failed",
 }
 
-enum SEND_VOTE {
-  Started = "governance/SEND_VOTE_Started",
-  Succeeded = "governance/SEND_VOTE_Succeeded",
-  Failed = "governance/SEND_VOTE_Failed",
-}
-
 const GovernanceActionType = {
-  EXECUTE_PROPOSAL,
   SEND_CREATE_PROPOSAL,
-  SEND_VOTE,
   SIGN_TRANSACTION: "governance/SIGN_TRANSACTION",
   CLEAR_PROPOSAL_TRANSACTION_STATE: "governance/CLEAR_PROPOSAL_TRANSACTION_STATE",
 };
@@ -123,10 +109,8 @@ interface CreateTransferTokenProposalData {
 type CreateProposalData = CreateNewTokenProposalData | CreateTextProposalData | CreateTransferTokenProposalData;
 interface GovernanceActions {
   claimGODTokens: (contractId: string, proposalId: string) => Promise<void>;
-  castVote: (contractId: string, proposalId: string, voteType: number) => Promise<void>;
   createProposal: (type: ProposalType, data: CreateProposalData) => Promise<void>;
   clearProposalTransactionState: () => void;
-  executeProposal: (contractId: string, title: string) => Promise<void>;
 }
 
 type GovernanceStore = GovernanceState & GovernanceActions;

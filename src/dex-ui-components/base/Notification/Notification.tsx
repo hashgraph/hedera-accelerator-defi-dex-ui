@@ -17,6 +17,7 @@ interface NotificationProps {
   isLinkShown?: boolean;
   linkText?: string;
   linkRef?: string;
+  isVisible?: boolean;
   isCloseButtonShown?: boolean;
   handleClickClose?: () => void;
 }
@@ -35,6 +36,7 @@ export const Notification = (props: NotificationProps) => {
     linkText,
     linkRef,
     isCloseButtonShown = false,
+    isVisible = true,
     handleClickClose,
   } = props;
 
@@ -53,6 +55,9 @@ export const Notification = (props: NotificationProps) => {
     }
   }, [type, bg]);
 
+  if (!isVisible) {
+    return <></>;
+  }
   /** The Alert component is most likely prefered over using Tag for this components. */
   return (
     <Tag

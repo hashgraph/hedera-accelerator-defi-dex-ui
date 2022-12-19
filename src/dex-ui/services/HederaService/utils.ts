@@ -6,7 +6,9 @@ import {
   ContractId,
   ContractCallQuery,
   ContractFunctionParameters,
+  TransactionResponse,
 } from "@hashgraph/sdk";
+import { isNil } from "ramda";
 
 const adminId = AccountId.fromString(ADMIN_ID);
 const adminKey = PrivateKey.fromString(ADMIN_KEY);
@@ -70,9 +72,14 @@ const queryContract = async (
   return await query.execute(client);
 };
 
+const checkTransactionResponseForError = (response: TransactionResponse, functionName: string) => {
+  if (isNil(response)) throw new Error(`${functionName} transaction failed.`);
+};
+
 export {
   client,
   queryContract,
+  checkTransactionResponseForError,
   getAdmin,
   getTreasurer,
   getUser,

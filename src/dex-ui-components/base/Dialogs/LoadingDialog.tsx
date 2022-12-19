@@ -18,6 +18,7 @@ interface LoadingDialogProps {
  */
 const LoadingDialog = (props: LoadingDialogProps) => {
   const { message, isOpen, onClose, width, icon, buttonConfig } = props;
+
   return (
     <>
       <Modal

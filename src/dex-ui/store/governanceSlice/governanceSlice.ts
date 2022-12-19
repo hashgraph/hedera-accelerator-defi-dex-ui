@@ -34,49 +34,6 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       const { wallet } = get();
       await HederaService.sendClaimGODTokenTransaction({ contractId, proposalId, signer: wallet.getSigner() });
     },
-    castVote: async (contractId: string, proposalId: string, voteType: number) => {
-      const { wallet } = get();
-      set(
-        ({ governance }) => {
-          governance.proposalTransacationState = initialGovernanceStore.proposalTransacationState;
-        },
-        false,
-        GovernanceActionType.SEND_VOTE.Started
-      );
-      const signer = wallet.getSigner();
-      try {
-        set(
-          ({ governance }) => {
-            governance.proposalTransacationState.status = TransactionStatus.IN_PROGRESS;
-          },
-          false,
-          GovernanceActionType.SIGN_TRANSACTION
-        );
-        const response = await HederaService.castVote({ contractId, proposalId, voteType, signer });
-        if (response) {
-          set(
-            ({ governance }) => {
-              governance.proposalTransacationState.status = TransactionStatus.SUCCESS;
-              governance.proposalTransacationState.successPayload.transactionResponse = response;
-            },
-            false,
-            GovernanceActionType.SEND_VOTE.Succeeded
-          );
-        } else {
-          throw new Error("Transaction Execution Failed");
-        }
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        set(
-          ({ governance }) => {
-            governance.proposalTransacationState.status = TransactionStatus.ERROR;
-            governance.proposalTransacationState.errorMessage = errorMessage;
-          },
-          false,
-          GovernanceActionType.SEND_VOTE.Failed
-        );
-      }
-    },
     createProposal: async (type: ProposalType, data: CreateProposalData) => {
       const { wallet } = get();
       set(
@@ -160,59 +117,6 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         false,
         GovernanceActionType.CLEAR_PROPOSAL_TRANSACTION_STATE
       );
-    },
-    executeProposal: async (contractId: string, title: string) => {
-      const { wallet } = get();
-      set(
-        ({ governance }) => {
-          governance.proposalTransacationState = {
-            ...initialGovernanceStore.proposalTransacationState,
-            status: TransactionStatus.IN_PROGRESS,
-          };
-          governance.errorMessage = initialGovernanceStore.errorMessage;
-        },
-        false,
-        GovernanceActionType.EXECUTE_PROPOSAL.Started
-      );
-      const signer = wallet.getSigner();
-
-      try {
-        const result = await HederaService.executeProposal({ contractId, title, signer });
-
-        if (result !== undefined) {
-          set(
-            ({ governance }) => {
-              governance.proposalTransacationState = {
-                status: TransactionStatus.SUCCESS,
-                successPayload: {
-                  proposal: { title },
-                  transactionResponse: result,
-                },
-                errorMessage: "",
-              };
-              governance.errorMessage = initialGovernanceStore.errorMessage;
-            },
-            false,
-            GovernanceActionType.EXECUTE_PROPOSAL.Succeeded
-          );
-        } else {
-          throw new Error(`Execute proposal failed`);
-        }
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        set(
-          ({ governance }) => {
-            governance.proposalTransacationState = {
-              status: TransactionStatus.ERROR,
-              successPayload: initialGovernanceStore.proposalTransacationState.successPayload,
-              errorMessage: errorMessage,
-            };
-            governance.errorMessage = errorMessage;
-          },
-          false,
-          GovernanceActionType.EXECUTE_PROPOSAL.Failed
-        );
-      }
     },
   };
 };
