@@ -144,10 +144,7 @@ function createHederaService() {
     const removeLiquidity = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(2000000)
-      .setFunction("removeLiquidity",
-        new ContractFunctionParameters()
-          .addAddress(accountId)
-          .addInt256(lpTokenAmount))
+      .setFunction("removeLiquidity", new ContractFunctionParameters().addAddress(accountId).addInt256(lpTokenAmount))
       .freezeWithSigner(signer);
     const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
 

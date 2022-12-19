@@ -38,7 +38,7 @@ const Withdraw = () => {
         tokenSymbol: "",
         userLpAmount: 0,
         userLpPercentage: "0%",
-        pairAcoountId: ""
+        pairAcoountId: "",
       },
     },
     lpInputAmount: 0,
@@ -165,7 +165,8 @@ const Withdraw = () => {
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
         isFeatureLoading={app.isFeatureLoading}
-      /> *
+      />{" "}
+      *
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}
         message={"Please confirm the swap in your wallet to proceed"}
