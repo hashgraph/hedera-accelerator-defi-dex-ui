@@ -30,8 +30,6 @@ export const TOKEN_A_ID = "0.0.48660644";
 export const TOKEN_B_SYMBOL = "Token SymbolB0";
 export const TOKEN_B_ID = "0.0.48660646";
 
-export const A_TO_B = `${TOKEN_A_SYMBOL}=>${TOKEN_B_SYMBOL}`;
-export const B_TO_A = `${TOKEN_B_SYMBOL}=>${TOKEN_A_SYMBOL}`;
 
 export const PAIR_TOKEN_SYMBOL = "L49";
 export const A_B_PAIR_TOKEN_ID = "0.0.48769790";

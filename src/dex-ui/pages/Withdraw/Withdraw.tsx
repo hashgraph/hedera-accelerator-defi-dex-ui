@@ -38,6 +38,7 @@ const Withdraw = () => {
         tokenSymbol: "",
         userLpAmount: 0,
         userLpPercentage: "0%",
+        pairAcoountId: ""
       },
     },
     lpInputAmount: 0,
@@ -139,9 +140,9 @@ const Withdraw = () => {
 
   const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      const { tokenSymbol } = withdrawState.withdrawProps.poolLpDetails;
+      const { tokenSymbol, pairAcoountId } = withdrawState.withdrawProps.poolLpDetails;
       const { poolFee } = withdrawState;
-      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee);
+      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee, pairAcoountId);
     },
     [pools, withdrawState]
   );
@@ -158,13 +159,13 @@ const Withdraw = () => {
 
   return !withdrawState.noPoolMetricsMessage ? (
     <>
-      {/* <WithdrawComponent
+      <WithdrawComponent
         {...withdrawState.withdrawProps}
         onWithdrawClick={onWithdrawClick}
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
         isFeatureLoading={app.isFeatureLoading}
-      /> */}
+      /> *
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}
         message={"Please confirm the swap in your wallet to proceed"}

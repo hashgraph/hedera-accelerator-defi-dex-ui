@@ -65,6 +65,7 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
     liquidity: userLiquidity,
     percentOfPool,
     unclaimedFees: BigNumber(0),
+    userTokenPair,
   };
 };
 

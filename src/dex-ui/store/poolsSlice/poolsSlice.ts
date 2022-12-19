@@ -333,14 +333,15 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       }
       app.setFeaturesAsLoaded(["userPoolsMetrics"]);
     },
-    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => {
+    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, fee: string,
+      pairAcoountId: string) => {
       const { context, app, wallet } = get();
       const { network } = context;
       app.setFeaturesAsLoading(["withdrawState"]);
       const provider = WalletService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
       const signer = WalletService.getSigner(provider);
       const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
-
+      const removeLiquidityContractId = ContractId.fromString(pairAcoountId);
       try {
         set(
           ({ pools }) => {
@@ -354,7 +355,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
-        const result = await HederaService.removeLiquidity(signer, lpTokenAmountBigNumber);
+        const result = await HederaService.removeLiquidity(signer, lpTokenAmountBigNumber, removeLiquidityContractId);
         console.log(result);
         if (result) {
           set(

@@ -138,13 +138,16 @@ function createHederaService() {
     console.log(result);
   };
 
-  const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, _contractId = contractId) => {
+  const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, contractId: ContractId) => {
     const accountId = signer.getAccountId().toSolidityAddress();
     console.log(`Removing ${lpTokenAmount} units of LP from the pool.`);
     const removeLiquidity = await new ContractExecuteTransaction()
-      .setContractId(_contractId)
+      .setContractId(contractId)
       .setGas(2000000)
-      .setFunction("removeLiquidity", new ContractFunctionParameters().addAddress(accountId).addInt256(lpTokenAmount))
+      .setFunction("removeLiquidity",
+        new ContractFunctionParameters()
+          .addAddress(accountId)
+          .addInt256(lpTokenAmount))
       .freezeWithSigner(signer);
     const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
 
