@@ -7,6 +7,7 @@ import {
   ContractCallQuery,
   ContractFunctionParameters,
   TransactionResponse,
+  ContractFunctionResult,
 } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 
@@ -58,6 +59,18 @@ const createUserClient = (): Client => {
   return createClient(userId, userKey);
 };
 
+/* This function is used to iterate over result of ContractFunctionResult which returning array
+ ** it return address as string stored after default values.
+ */
+const getAddressArray = (contractFunctionResult: ContractFunctionResult) => {
+  const tokenCount = contractFunctionResult.getUint256(1);
+  const result: string[] = [];
+  for (let i = 0; i < Number(tokenCount); i++) {
+    result.push(contractFunctionResult.getAddress(i + 2));
+  }
+  return result;
+};
+
 const client = createUserClient();
 
 const queryContract = async (
@@ -87,4 +100,5 @@ export {
   createAdminClient,
   createTreasuryClient,
   createUserClient,
+  getAddressArray,
 };

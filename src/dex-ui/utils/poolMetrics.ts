@@ -5,6 +5,7 @@ import {
   MirrorNodeTokenTransfer,
   MirrorNodeTokenBalance,
 } from "../services/MirrorNodeService/types";
+import { TokenPair } from "../store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
@@ -130,6 +131,11 @@ interface CalculatePercentOfPoolParams {
   liquidityTokenAccountId: string;
 }
 
+interface calculatePercentOfPoolFromTotalSupplyParams {
+  userTokenBalances: MirrorNodeTokenBalance[];
+  tokenPair: TokenPair;
+}
+
 /**
  * Calculates the percentage in decimal format of the pool owned by an account.
  * mLP = My LP tokens for a pool
@@ -150,10 +156,29 @@ const calculatePercentOfPool = (params: CalculatePercentOfPoolParams): BigNumber
   }
 };
 
+const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFromTotalSupplyParams): BigNumber => {
+  const {
+    userTokenBalances,
+    tokenPair: {
+      pairToken: { pairLpAccountId, totalSupply, decimals },
+    },
+  } = params;
+  const userLPTokenBalance = getTokenBalance(userTokenBalances, pairLpAccountId ?? "");
+  if (isNil(userLPTokenBalance)) {
+    console.error("Cannot find mirror node balance for LP token account ID.");
+    return BigNumber(0);
+  } else {
+    const number = totalSupply?.toString() ?? 0;
+    const balance = BigNumber(number).shiftedBy(-Number(decimals));
+    return BigNumber(userLPTokenBalance).div(balance);
+  }
+};
+
 export {
   calculateTotalValueLockedForPool,
   calculateVolume,
   calculatePercentOfPool,
   calculateUserPoolLiquidity,
   getTransactionsFromLast24Hours,
+  calculatePercentOfPoolFromTotalSupply,
 };

@@ -1,25 +1,26 @@
 import { BigNumber } from "bignumber.js";
 import {
-  calculatePercentOfPool,
   calculateTotalValueLockedForPool,
   calculateUserPoolLiquidity,
   calculateVolume,
+  calculatePercentOfPoolFromTotalSupply,
 } from "../../utils";
-import { Pool, UserPool } from "./types";
-import { A_B_PAIR_TOKEN_ID, MirrorNodeTokenBalance, MirrorNodeTransaction, TokenPair } from "../../services";
+import { Pool, UserPool, TokenPair } from "./types";
+import { MirrorNodeTokenBalance, MirrorNodeTransaction } from "../../services";
 
 /**
  * TODO: This is mocked data that adds a token pair balance to the primary pool balance data.
  * This should be removed after we can fetch pair tokens from the pool contract.
  * */
-const appendLiquidityTokenBalance = (poolTokenBalances: MirrorNodeTokenBalance[], mockLPbalance: BigNumber) => {
+/* const appendLiquidityTokenBalance = (poolTokenBalances: MirrorNodeTokenBalance[], mockLPbalance: BigNumber) => {
   const mockedTokenBalance = {
     token_id: A_B_PAIR_TOKEN_ID,
     balance: BigNumber(mockLPbalance),
     decimals: "8",
+    accountId: "",
   };
   return poolTokenBalances?.concat(mockedTokenBalance);
-};
+}; */
 
 interface CalculateUserPoolMetricsParams {
   /** Token balances for the liquidity pool. */
@@ -39,22 +40,26 @@ interface CalculateUserPoolMetricsParams {
  */
 const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserPool => {
   const { poolTokenBalances, userTokenBalances, userTokenPair, fee } = params;
-  const { pairToken, tokenA, tokenB } = userTokenPair;
+  const { tokenA, tokenB } = userTokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
-    tokenAAccountId: tokenA.accountId,
-    tokenBAccountId: tokenB.accountId,
+    tokenAAccountId: tokenA.tokenMeta.tokenId ?? "",
+    tokenBAccountId: tokenB.tokenMeta.tokenId ?? "",
   });
   /* TODO: Get real LP Amounts for pools */
-  const mockedLPPoolTokenBalances = appendLiquidityTokenBalance(poolTokenBalances, totalVolumeLocked);
-  const percentOfPool = calculatePercentOfPool({
+  // const mockedLPPoolTokenBalances = appendLiquidityTokenBalance(poolTokenBalances, totalVolumeLocked);
+  // const percentOfPool = calculatePercentOfPool({
+  //   userTokenBalances,
+  //   poolTokenBalances: mockedLPPoolTokenBalances,
+  //   liquidityTokenAccountId: pairToken.pairLpAccountId ?? "",
+  // });
+  const percentOfPool = calculatePercentOfPoolFromTotalSupply({
     userTokenBalances,
-    poolTokenBalances: mockedLPPoolTokenBalances,
-    liquidityTokenAccountId: pairToken.accountId,
+    tokenPair: userTokenPair,
   });
   const userLiquidity = calculateUserPoolLiquidity(percentOfPool, totalVolumeLocked);
   return {
-    name: pairToken.symbol,
+    name: `${tokenA.symbol}${tokenB.symbol}`,
     fee,
     liquidity: userLiquidity,
     percentOfPool,
@@ -84,28 +89,28 @@ interface CalculatePoolMetricsParams {
  */
 const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
   const { poolAccountId, poolTokenBalances, poolFee, last24Transactions, last7DTransactions, tokenPair } = params;
-  const { tokenA, tokenB, pairToken } = tokenPair;
+  const { tokenA, tokenB } = tokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
-    tokenAAccountId: tokenA.accountId,
-    tokenBAccountId: tokenB.accountId,
+    tokenAAccountId: tokenA.tokenMeta.tokenId ?? "",
+    tokenBAccountId: tokenB.tokenMeta.tokenId ?? "",
   });
   const tokenADecimals =
-    poolTokenBalances.find((tokenBalance) => tokenBalance.token_id === tokenA.accountId)?.decimals ?? "0";
+    poolTokenBalances.find((tokenBalance) => tokenBalance.token_id === tokenA.tokenMeta.tokenId)?.decimals ?? "0";
   const past24HoursVolume = calculateVolume({
     poolAccountId,
-    tokenAccountId: tokenA.accountId,
+    tokenAccountId: tokenA.tokenMeta.tokenId ?? "",
     tokenDecimals: tokenADecimals,
     accountTransactions: last24Transactions,
   });
   const past7daysVolume = calculateVolume({
     poolAccountId,
-    tokenAccountId: tokenA.accountId,
+    tokenAccountId: tokenA.tokenMeta.tokenId ?? "",
     tokenDecimals: tokenADecimals,
     accountTransactions: last7DTransactions,
   });
   return {
-    name: pairToken.symbol,
+    name: `${tokenA.symbol}${tokenB.symbol}`,
     fee: poolFee,
     totalVolumeLocked,
     past24HoursVolume,
