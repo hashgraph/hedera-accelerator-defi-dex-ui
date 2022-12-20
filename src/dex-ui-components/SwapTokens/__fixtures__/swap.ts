@@ -1,13 +1,13 @@
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { SwapTokensProps } from "..";
-import { WalletConnectionStatus } from "../../../dex-ui/store/walletSlice";
 
 export const mockSwapProps: SwapTokensProps = {
   title: "Swap",
   sendSwapTransaction: () => Promise.resolve(),
-  connectionStatus: WalletConnectionStatus.INITIALIZING,
+  connectionStatus: HashConnectConnectionState.Disconnected,
   connectToWallet: () => null,
-  clearWalletPairings: () => null,
   getPoolLiquidity: () => null,
+  setSelectedAccount: () => null,
   spotPrices: {},
   fee: "0.01",
   poolLiquidity: {},
@@ -25,4 +25,5 @@ export const mockSwapProps: SwapTokensProps = {
     errorMessage: "",
   },
   isFeatureLoading: () => false,
+  tokenPairs: [],
 };

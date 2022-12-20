@@ -1,4 +1,4 @@
-import { ChakraProvider, Container, Flex } from "@chakra-ui/react";
+import { ChakraProvider, Container, extendTheme, Flex } from "@chakra-ui/react";
 import {
   Swap,
   AddLiquidity,
@@ -10,22 +10,40 @@ import {
   SelectProposalType,
 } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
-import { DEXTheme } from "./styles";
+import { ButtonStyles, CardStyles, InputStyles, NumberInputStyles, TextStyles } from "../dex-ui-components";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useWalletConnection } from "./hooks";
 import { ScrollToTop } from "./utils";
 
 const menuOptions = ["Swap", "Pools", "Governance"];
+export const DEXTheme = extendTheme({
+  textStyles: TextStyles,
+  components: {
+    Button: ButtonStyles,
+    NumberInput: NumberInputStyles,
+    Input: InputStyles,
+    Card: CardStyles,
+  },
+});
 
 const DEX = () => {
   useWalletConnection();
   return (
     <ChakraProvider theme={DEXTheme}>
-      <Container color="black" w="100%" maxHeight="100%" maxWidth="100%" bg="#FFFFFF" marginBottom="5rem" centerContent>
+      <Container
+        color="black"
+        w="100%"
+        maxHeight="100%"
+        maxWidth="100%"
+        bg="#FFFFFF"
+        padding="0"
+        marginBottom="5rem"
+        centerContent
+      >
         <Router>
           <ScrollToTop>
-            <TopMenuBar menuOptions={menuOptions}></TopMenuBar>
-            <Flex width="66rem" justifyContent="center">
+            <TopMenuBar menuOptions={menuOptions} />
+            <Flex width="80rem" justifyContent="center">
               <Routes>
                 <Route path="/" element={<Navigate to="/swap" />} />
                 <Route path="/swap" element={<Swap />} />
@@ -33,7 +51,7 @@ const DEX = () => {
                 <Route path="/pools/add-liquidity" element={<AddLiquidity />} />
                 <Route path="/pools/withdraw" element={<Withdraw />} />
                 <Route path="/governance" element={<Governance />} />
-                <Route path="/governance/proposal-details" element={<ProposalDetails />} />
+                <Route path="/governance/proposal-details/:id" element={<ProposalDetails />} />
                 <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
                 <Route
                   path="/governance/select-proposal-type/new-token"

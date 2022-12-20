@@ -1,6 +1,8 @@
 import { AccountId } from "@hashgraph/sdk";
 import { HashConnect, HashConnectTypes } from "hashconnect";
-import { HashConnectProvider } from "hashconnect/dist/provider/provider";
+import { HashConnectProvider } from "hashconnect/dist/esm/provider/provider";
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { Networks } from "../../store/walletSlice";
 import { HashConnectEventHandlers } from "./types";
 
 type WalletServiceType = ReturnType<typeof createWalletService>;
@@ -12,17 +14,17 @@ function createWalletService() {
     return hashconnect;
   };
 
-  const getProvider = (network: string, topicId: string, signingAccount: string) => {
+  const getProvider = (network: string, topicId: string, signingAccount: string): HashConnectProvider => {
     return hashconnect.getProvider(network, topicId, signingAccount);
   };
 
-  const getSigner = (provider: HashConnectProvider) => {
+  const getSigner = (provider: HashConnectProvider): HashConnectSigner => {
     return hashconnect.getSigner(provider);
   };
 
   const initWalletConnection = async (
     DEXMetaData: HashConnectTypes.AppMetadata | HashConnectTypes.WalletMetadata,
-    network: string,
+    network: Networks,
     debug: boolean
   ) => {
     /**
@@ -32,35 +34,16 @@ function createWalletService() {
      * fixes this issue. The DEXMetaData state is updated later in the set() function.
      * */
     const initializedDexMetaData = { ...DEXMetaData };
-    const initData = await hashconnect.init(initializedDexMetaData);
-    const privateKey = initData.privKey;
-    const nodeConnectionState = await hashconnect.connect();
-    const walletPairingString = hashconnect.generatePairingString(nodeConnectionState, network, debug ?? false);
-    hashconnect.findLocalWallets();
-    const walletData = {
-      network,
-      privateKey: privateKey,
-      topicID: nodeConnectionState.topic,
-      walletPairingString,
+    const initData = await hashconnect.init(initializedDexMetaData, network, false);
+    return {
+      topic: initData.topic,
+      pairingString: initData.pairingString,
+      savedPairings: initData.savedPairings[0],
     };
-    return { walletData, initializedDexMetaData };
   };
 
-  const pairWithConnectedWallet = async (
-    DEXMetaData: HashConnectTypes.AppMetadata | HashConnectTypes.WalletMetadata,
-    privateKey: string,
-    topicID: string
-  ) => {
-    /**
-     * @see {@link initWalletConnection}
-     * */
-    const clonedDexMetaData = { ...DEXMetaData };
-    await hashconnect.init(clonedDexMetaData, privateKey);
-    await hashconnect.connect(topicID, DEXMetaData);
-  };
-
-  const connectToWalletExtension = async (pairingString: string) => {
-    return hashconnect.connectToLocalWallet(pairingString);
+  const connectToWalletExtension = async () => {
+    return hashconnect.connectToLocalWallet();
   };
 
   const getAccountBalance = async (provider: HashConnectProvider, accountId: string | AccountId) => {
@@ -68,19 +51,23 @@ function createWalletService() {
     return walletBalance.toJSON();
   };
 
+  const disconnect = async (topic: string) => {
+    await hashconnect.disconnect(topic);
+  };
+
   const setupHashConnectEvents = (eventHandlers: HashConnectEventHandlers) => {
     const {
       handleFoundExtensionEvent,
       handlePairingEvent,
       handleAcknowledgeMessageEvent,
-      handleConnectionStatusChange,
+      handleConnectionStatusChangeEvent,
       handleTransactionEvent,
       handleAdditionalAccountRequestEvent,
     } = eventHandlers;
     hashconnect.foundExtensionEvent.on(handleFoundExtensionEvent);
     hashconnect.pairingEvent.on(handlePairingEvent);
     hashconnect.acknowledgeMessageEvent.on(handleAcknowledgeMessageEvent);
-    hashconnect.connectionStatusChange.on(handleConnectionStatusChange);
+    hashconnect.connectionStatusChangeEvent.on(handleConnectionStatusChangeEvent);
     hashconnect.transactionEvent.on(handleTransactionEvent);
     hashconnect.additionalAccountRequestEvent.on(handleAdditionalAccountRequestEvent);
   };
@@ -90,14 +77,14 @@ function createWalletService() {
       handleFoundExtensionEvent,
       handlePairingEvent,
       handleAcknowledgeMessageEvent,
-      handleConnectionStatusChange,
+      handleConnectionStatusChangeEvent,
       handleTransactionEvent,
       handleAdditionalAccountRequestEvent,
     } = eventHandlers;
     hashconnect.foundExtensionEvent.off(handleFoundExtensionEvent);
     hashconnect.pairingEvent.off(handlePairingEvent);
     hashconnect.acknowledgeMessageEvent.off(handleAcknowledgeMessageEvent);
-    hashconnect.connectionStatusChange.off(handleConnectionStatusChange);
+    hashconnect.connectionStatusChangeEvent.off(handleConnectionStatusChangeEvent);
     hashconnect.transactionEvent.off(handleTransactionEvent);
     hashconnect.additionalAccountRequestEvent.off(handleAdditionalAccountRequestEvent);
   };
@@ -107,9 +94,9 @@ function createWalletService() {
     getProvider,
     getSigner,
     initWalletConnection,
-    pairWithConnectedWallet,
     connectToWalletExtension,
     getAccountBalance,
+    disconnect,
     setupHashConnectEvents,
     destroyHashConnectEvents,
   };

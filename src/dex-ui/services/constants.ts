@@ -19,6 +19,8 @@ export const TOKEN_USER_ID = "0.0.47540202";
 export const TOKEN_USER_KEY =
   "302e020100300506032b657004220420b69079b0cdebea97ec13c78bf7277d3f4aef35189755b5d11c2dfae40c566aa8";
 
+// Factory Contract Proxy
+export const FACTORY_CONTRACT_ID = "0.0.49078117";
 // Swap Contract (Pair) Proxy
 export const SWAP_CONTRACT_ID = "0.0.48660596";
 
@@ -36,10 +38,16 @@ export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
 
 export const USDC_TOKEN_ID = "0.0.2276691";
 
-export const GOVERNOR_PROXY_CONTRACT = {
-  StringId: "0.0.48634267",
-  ContractId: ContractId.fromString("0.0.48634267"),
-};
+export const GovernorProxyContracts = Object.freeze({
+  ContractUpgradeStringId: "0.0.49057286",
+  ContractUpgradeContractId: ContractId.fromString("0.0.49057286"),
+  TransferTokenStringId: "0.0.49057292",
+  TransferTokenContractId: ContractId.fromString("0.0.49057292"),
+  TextProposalStringId: "0.0.49057298",
+  TextProposalContractId: ContractId.fromString("0.0.49057298"),
+  CreateTokenStringId: "0.0.49057304",
+  CreateTokenContractId: ContractId.fromString("0.0.49057304"),
+});
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
   [TOKEN_A_SYMBOL, TOKEN_A_ID],

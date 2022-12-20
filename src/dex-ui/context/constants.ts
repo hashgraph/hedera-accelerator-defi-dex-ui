@@ -5,5 +5,5 @@ export const DEFAULT_APP_METADATA: HashConnectTypes.AppMetadata = {
   description: "An example of a Hedera based DEX",
   icon: "",
   publicKey: "",
-  url: "",
+  url: "https://defi-ui.hedera.com/",
 };

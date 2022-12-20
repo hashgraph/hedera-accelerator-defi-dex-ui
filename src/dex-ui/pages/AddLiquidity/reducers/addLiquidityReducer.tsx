@@ -2,20 +2,28 @@ import { ActionType, AddLiquidityActions } from "./actionTypes";
 
 export interface AddLiquidityState {
   inputToken: {
-    symbol: string;
-    amount: number;
-    displayedAmount: string;
-    address: string;
     spotPrice: number;
+    symbol: string | undefined;
+    amount: number;
+    displayAmount: string;
+    displayedAmount: string;
     balance: number | undefined;
+    tokenMeta: {
+      pairAccountId: string | undefined;
+      tokenId: string | undefined;
+    };
   };
   outputToken: {
-    symbol: string;
-    amount: number;
-    displayedAmount: string;
-    address: string;
     spotPrice: number;
+    symbol: string | undefined;
+    amount: number;
+    displayAmount: string;
+    displayedAmount: string;
     balance: number | undefined;
+    tokenMeta: {
+      pairAccountId: string | undefined;
+      tokenId: string | undefined;
+    };
   };
 }
 
@@ -23,18 +31,26 @@ const initialPoolState: AddLiquidityState = {
   inputToken: {
     symbol: "",
     amount: 0.0,
+    displayAmount: "0.0",
     displayedAmount: "0.0",
-    address: "",
     spotPrice: 0,
     balance: undefined,
+    tokenMeta: {
+      pairAccountId: undefined,
+      tokenId: undefined,
+    },
   },
   outputToken: {
     symbol: "",
     amount: 0.0,
+    displayAmount: "0.0",
     displayedAmount: "0.0",
-    address: "",
     spotPrice: 0,
     balance: undefined,
+    tokenMeta: {
+      pairAccountId: undefined,
+      tokenId: undefined,
+    },
   },
 };
 

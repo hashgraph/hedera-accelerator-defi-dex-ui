@@ -2,10 +2,10 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { chakra } from "@chakra-ui/react";
 import { customTextEditorStyles } from "./styles/TextEditorStyles";
-interface NewTokenProps {
+
+interface TextEditorProps {
+  id: string;
   placeholder: string;
-  textEditorValue: string;
-  handleTextValueChange: (event: string) => void;
 }
 
 const formats = [
@@ -47,14 +47,13 @@ const modules = {
 
 const ChakraTextEditor = chakra(ReactQuill);
 
-function TextEditor(props: NewTokenProps) {
-  const { placeholder, textEditorValue, handleTextValueChange } = props;
+function TextEditor(props: TextEditorProps) {
+  const { id, placeholder } = props;
   return (
     <ChakraTextEditor
-      theme="snow"
-      value={textEditorValue}
-      onChange={handleTextValueChange}
+      id={id}
       placeholder={placeholder}
+      theme="snow"
       modules={modules}
       formats={formats}
       sx={customTextEditorStyles}

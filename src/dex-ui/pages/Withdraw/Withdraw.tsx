@@ -10,7 +10,7 @@ import { PoolsLocationProps } from "../Pools";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
-  const { app, pools, wallet } = useDexContext(({ app, pools, wallet }) => ({ app, pools, wallet }));
+  const { app, pools, wallet, swap } = useDexContext(({ app, pools, wallet, swap }) => ({ app, pools, wallet, swap }));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -20,7 +20,8 @@ const Withdraw = () => {
     noPoolMetricsMessage: "",
     errorDialogOpen: false,
     withdrawProps: {
-      walletConnectionStatus: wallet.walletConnectionStatus,
+      walletConnectionStatus: wallet.hashConnectConnectionState,
+      tokenPairs: swap.tokenPairs,
       poolLiquidityDetails: {
         firstToken: {
           tokenSymbol: "",
@@ -157,13 +158,13 @@ const Withdraw = () => {
 
   return !withdrawState.noPoolMetricsMessage ? (
     <>
-      <WithdrawComponent
+      {/* <WithdrawComponent
         {...withdrawState.withdrawProps}
         onWithdrawClick={onWithdrawClick}
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
         isFeatureLoading={app.isFeatureLoading}
-      />
+      /> */}
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}
         message={"Please confirm the swap in your wallet to proceed"}

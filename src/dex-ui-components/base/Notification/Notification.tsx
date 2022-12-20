@@ -1,6 +1,7 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Tag, Text, Flex, Link, TagCloseButton, Box } from "@chakra-ui/react";
 import { useCallback } from "react";
+import { Color } from "../../themes";
 
 export enum NotficationTypes {
   SUCCESS = "success",
@@ -10,6 +11,7 @@ export enum NotficationTypes {
 
 interface NotificationProps {
   type: NotficationTypes;
+  bg?: string;
   textStyle?: string;
   message: string;
   isLinkShown?: boolean;
@@ -26,6 +28,7 @@ interface NotificationProps {
 export const Notification = (props: NotificationProps) => {
   const {
     type = NotficationTypes.WARNING,
+    bg,
     textStyle = "b2",
     message,
     isLinkShown = false,
@@ -36,27 +39,38 @@ export const Notification = (props: NotificationProps) => {
   } = props;
 
   const getNotificationColors = useCallback(() => {
+    if (bg) {
+      return { bg, text: Color.Black_01 };
+    }
     if (type === NotficationTypes.SUCCESS) {
-      return { bg: "#C4F2D3", text: "#23714B" };
+      return { bg: Color.Green_01_Opaque, text: Color.Black_01 };
     }
     if (type === NotficationTypes.WARNING) {
-      return { bg: "#FFF3CB", text: "#9F6000" };
+      return { bg: Color.Yellow__01_Opaque, text: Color.Black_01 };
     }
     if (type === NotficationTypes.ERROR) {
-      return { bg: "#FFD1D1", text: "#FF1A1A" };
+      return { bg: Color.Red_01_Opaque, text: Color.Black_01 };
     }
-  }, [type]);
+  }, [type, bg]);
 
   /** The Alert component is most likely prefered over using Tag for this components. */
   return (
-    <Tag width="100%" padding="0.5rem" backgroundColor={getNotificationColors()?.bg} borderRadius="5px">
+    <Tag
+      width="100%"
+      padding="0.5rem"
+      backgroundColor={getNotificationColors()?.bg}
+      borderRadius="5px"
+      textAlign="left"
+    >
       <Flex flexWrap="wrap" width="100%">
         <Text textStyle={textStyle} color={getNotificationColors()?.text}>
           {message} &nbsp;
         </Text>
         {isLinkShown ? (
           <Link width="fit-content" display="flex" alignItems="center" color="#0180FF" href={linkRef} isExternal>
-            <Text textDecoration="underline">{linkText}</Text>
+            <Text variant="link" textDecoration="underline">
+              {linkText}
+            </Text>
             <ExternalLinkIcon margin="0rem 0.125rem" />
           </Link>
         ) : (

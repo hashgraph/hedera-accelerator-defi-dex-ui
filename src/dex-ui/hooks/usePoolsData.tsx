@@ -13,7 +13,7 @@ import { useDexContext } from ".";
 export const usePoolsData = (refreshInterval = 0) => {
   const isInitialFetch = useRef(true);
   const { wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
-  const walletAccountId = wallet.walletData.pairedAccounts[0];
+  const walletAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { withdrawState, fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
 
   const fetchPoolDataOnLoad = useCallback(async () => {

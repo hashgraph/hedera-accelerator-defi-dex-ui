@@ -3,22 +3,14 @@ import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
 import {
-  A_B_PAIR_TOKEN_ID,
-  TOKEN_A_SYMBOL,
-  TOKEN_B_SYMBOL,
-  TOKEN_A_ID,
-  TOKEN_B_ID,
-  PAIR_TOKEN_SYMBOL,
-} from "../constants";
-import {
   MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
-  TokenPair,
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
+  MirrorNodeTokenPairResponse,
 } from "./types";
 import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 
@@ -90,18 +82,12 @@ function createMirrorNodeService() {
   };
 
   /**
-   * TODO: This is mocked data and should be replaced with a Hedera Service call to fetch
-   * all pairs associated with the primary swap/pool contract.
+   * Fetches information related to a specific pair pair token.
+   * @param pairAddress  - The ID / Addresss of the pair token account to return data for.
+   * @returns Attributes associated with the provided token ID.
    */
-  const fetchTokenPairs = async (): Promise<TokenPair[]> => {
-    // TODO: getTokenPairAddress()
-    return await Promise.resolve([
-      {
-        pairToken: { symbol: PAIR_TOKEN_SYMBOL, accountId: A_B_PAIR_TOKEN_ID },
-        tokenA: { symbol: TOKEN_A_SYMBOL, accountId: TOKEN_A_ID },
-        tokenB: { symbol: TOKEN_B_SYMBOL, accountId: TOKEN_B_ID },
-      },
-    ]);
+  const fetchContract = async (pairAddress: string): Promise<MirrorNodeTokenPairResponse> => {
+    return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
   };
 
   /**
@@ -148,6 +134,7 @@ function createMirrorNodeService() {
           ...token,
           balance,
           decimals: String(decimals),
+          accountId,
         };
       })
     );
@@ -196,7 +183,10 @@ function createMirrorNodeService() {
    * @param contractId - The id of the contract to fetch events from.
    * @returns An array of proposal event data.
    */
-  const fetchAllProposals = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
+  const fetchAllProposals = async (
+    proposalType: string,
+    contractId: string
+  ): Promise<MirrorNodeDecodedProposalEvent[]> => {
     /*
      Currently, each proposal requires multiple additional calls to the smart contract
      to get all of the desired data for the UI. This is an expensive action that costs a large
@@ -217,15 +207,23 @@ function createMirrorNodeService() {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
-        limit: 1,
+        limit: 10,
       },
     });
     const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
       .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+        if (proposalEventLog.data === "0x") {
+          return undefined;
+        }
+        const proposalCreatedEvent = decodeEvent(
+          "ProposalCreated",
+          proposalEventLog.data,
+          proposalEventLog.topics.slice(1)
+        );
         return [
-          decodeEvent("ProposalCreated", proposalEventLog.data, proposalEventLog.topics.slice(1)),
-          decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
-          decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined,
+          // decodeEvent("ProposalExecuted", proposalEventLog.data, proposalEventLog.topics.slice(1)),
+          // decodeEvent("ProposalCanceled", proposalEventLog.data, proposalEventLog.topics.slice(1)),
         ];
       })
       .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
@@ -244,12 +242,13 @@ function createMirrorNodeService() {
 
   return {
     fetchAccountTransactions,
-    fetchTokenPairs,
     fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
     fetchAllProposals,
     fetchBlock,
+    fetchContract,
+    fetchTokenData,
   };
 }
 

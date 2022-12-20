@@ -5,17 +5,21 @@ import { SettingsIcon } from "@chakra-ui/icons";
 import { TokenInput } from "../../../dex-ui-components/TokenInput";
 import { useDexContext, usePrevious } from "../../hooks";
 import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
-import { SWAP_CONTRACT_ID, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../../services";
 import { mapBigNumberValuesToNumber } from "../Swap/formatters";
 import { formatBigNumberToPercent } from "../../utils";
 import { useSwapData } from "../../hooks/useSwapData";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
 import { MetricLabel } from "../../../dex-ui-components";
+import {
+  getTokensByUniqueAccountIds,
+  getPairedTokens,
+  getTokenData,
+} from "../../../dex-ui-components/SwapTokens/utils";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
-  const { walletData, walletConnectionStatus: connectionStatus } = wallet;
-  const { fee, spotPrices } = swap;
+  const { fee, tokenPairs } = swap;
+  const { spotPrices } = pools;
   const formattedFee = formatBigNumberToPercent(fee);
   const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
@@ -45,13 +49,29 @@ const AddLiquidity = (): JSX.Element => {
    */
   const onAddLiquidityClick = useCallback(() => {
     pools.sendAddLiquidityTransaction({
-      inputToken: poolState.inputToken,
-      outputToken: poolState.outputToken,
-      contractId: SWAP_CONTRACT_ID,
+      inputToken: {
+        symbol: poolState.inputToken.symbol,
+        amount: poolState.inputToken.amount,
+        address: poolState.inputToken.tokenMeta.tokenId,
+      },
+      outputToken: {
+        symbol: poolState.outputToken.symbol,
+        amount: poolState.outputToken.amount,
+        address: poolState.outputToken.tokenMeta.tokenId,
+      },
+      contractId: poolState.inputToken.tokenMeta.pairAccountId,
     });
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolState, pools.sendAddLiquidityTransaction]);
+
+  const fetchSpotPrices = () => {
+    pools.fetchSpotPrices({
+      inputTokenAddress: poolState.inputToken.tokenMeta.tokenId,
+      outputTokenAddress: poolState.outputToken.tokenMeta.tokenId,
+      contractId: poolState.inputToken.tokenMeta.pairAccountId,
+    });
+  };
 
   /**
    * Returns the connected wallet's balance of a given token. Used for the
@@ -60,14 +80,13 @@ const AddLiquidity = (): JSX.Element => {
    * @returns balance of specified token in connected wallet
    */
   const getBalanceByTokenSymbol = useCallback(
-    (tokenSymbol: string): string => {
+    (tokenId: string): string => {
       const defaultBalance = "0.0";
-      const tokenBalances = walletData?.pairedAccountBalance?.tokens;
-      const tokenId = TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
+      const tokenBalances = wallet?.pairedAccountBalance?.tokens;
       const tokenData = tokenBalances?.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId);
       return tokenData?.balance ?? defaultBalance;
     },
-    [walletData]
+    [wallet]
   );
   /**
    * Whenever there is a change in the selected token in either input field or change in
@@ -75,18 +94,21 @@ const AddLiquidity = (): JSX.Element => {
    * spot price for each token accordingly
    */
   useEffect(() => {
-    const firstTokenSymbol = poolState.inputToken.symbol;
-    const secondTokenSymbol = poolState.outputToken.symbol;
-
+    const firstTokenSymbol = poolState.inputToken.tokenMeta.tokenId;
+    const secondTokenSymbol = poolState.outputToken.tokenMeta.tokenId;
     if (firstTokenSymbol && secondTokenSymbol) {
       const firstTokenSpotPrice = formattedSpotPrices?.[`${firstTokenSymbol}=>${secondTokenSymbol}`] || 0;
       const secondTokenSpotPrice = formattedSpotPrices?.[`${secondTokenSymbol}=>${firstTokenSymbol}`] || 0;
-      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "spotPrice", payload: firstTokenSpotPrice });
-      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "spotPrice", payload: secondTokenSpotPrice });
+      if (firstTokenSpotPrice === 0 && secondTokenSpotPrice === 0) {
+        fetchSpotPrices();
+      } else {
+        dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "spotPrice", payload: firstTokenSpotPrice });
+        dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "spotPrice", payload: secondTokenSpotPrice });
+      }
     }
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poolState.inputToken.symbol, poolState.outputToken.symbol, spotPrices]);
+  }, [poolState.inputToken.symbol, poolState.outputToken.symbol, poolState.inputToken.displayedAmount, spotPrices]);
 
   /**
    * Whenever there is a change in token selection or wallet balances, retrieve the wallet balance
@@ -95,11 +117,11 @@ const AddLiquidity = (): JSX.Element => {
    */
   useEffect(() => {
     if (poolState.inputToken.symbol) {
-      const firstTokenBalance = getBalanceByTokenSymbol(poolState.inputToken.symbol);
+      const firstTokenBalance = getBalanceByTokenSymbol(poolState.inputToken.tokenMeta.tokenId ?? "");
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "balance", payload: firstTokenBalance });
     }
     if (poolState.outputToken.symbol) {
-      const secondTokenBalance = getBalanceByTokenSymbol(poolState.outputToken.symbol);
+      const secondTokenBalance = getBalanceByTokenSymbol(poolState.outputToken.tokenMeta.tokenId ?? "");
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "balance", payload: secondTokenBalance });
     }
   }, [
@@ -107,7 +129,7 @@ const AddLiquidity = (): JSX.Element => {
     // getBalanceByTokenSymbol,   // for some reason keeping this in the dependency array causes infinite loop
     poolState.inputToken.symbol,
     poolState.outputToken.symbol,
-    walletData.pairedAccountBalance,
+    wallet.pairedAccountBalance,
     getBalanceByTokenSymbol,
   ]);
 
@@ -169,14 +191,12 @@ const AddLiquidity = (): JSX.Element => {
    */
   const handleInputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      handlePoolInputsChange(event, ActionType.UPDATE_INPUT_TOKEN, "symbol");
-      handlePoolInputsChange(
-        TOKEN_SYMBOL_TO_ACCOUNT_ID.get(event.target.value),
-        ActionType.UPDATE_INPUT_TOKEN,
-        "address"
-      );
+      const inputElement = event?.target as HTMLInputElement;
+      const token = getTokenData(inputElement.value, tokenPairs ?? []);
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "symbol", payload: token?.symbol });
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "tokenMeta", payload: token?.tokenMeta });
     },
-    [handlePoolInputsChange]
+    [tokenPairs]
   );
 
   /**
@@ -209,14 +229,11 @@ const AddLiquidity = (): JSX.Element => {
    */
   const handleOutputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      handlePoolInputsChange(event, ActionType.UPDATE_OUTPUT_TOKEN, "symbol");
-      handlePoolInputsChange(
-        TOKEN_SYMBOL_TO_ACCOUNT_ID.get(event.target.value),
-        ActionType.UPDATE_OUTPUT_TOKEN,
-        "address"
-      );
+      const token = getTokenData(event.target.value, tokenPairs ?? []);
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "symbol", payload: token?.symbol });
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "tokenMeta", payload: token?.tokenMeta });
     },
-    [handlePoolInputsChange]
+    [tokenPairs]
   );
 
   /**
@@ -266,12 +283,18 @@ const AddLiquidity = (): JSX.Element => {
       : "-";
   }, [poolState]);
 
+  const poolRatio = useCallback(() => {
+    const poolSymbol = `${poolState.inputToken.symbol}${poolState.outputToken.symbol}`;
+    const poolPercentage = pools.userPoolsMetrics.find((pool) => pool.name === poolSymbol)?.percentOfPool;
+    return formatBigNumberToPercent(poolPercentage) === "-" ? "<0.1%" : formatBigNumberToPercent(poolPercentage);
+  }, [poolState]);
+
   // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
   const sendLABTokensToConnectedWallet = useCallback(() => {
-    pools.send100LabTokensToWallet(walletData?.pairedAccounts[0]);
+    pools.send100LabTokensToWallet(wallet.savedPairingData?.accountIds[0] ?? "");
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletData?.pairedAccounts, pools.send100LabTokensToWallet]);
+  }, [wallet, pools.send100LabTokensToWallet]);
 
   return (
     <HStack>
@@ -302,13 +325,15 @@ const AddLiquidity = (): JSX.Element => {
           tokenAmount={poolState.inputToken.displayedAmount}
           tokenSymbol={poolState.inputToken.symbol}
           tokenBalance={poolState.inputToken.balance}
-          walletConnectionStatus={connectionStatus}
+          tokenId={poolState.inputToken.tokenMeta.tokenId}
+          walletConnectionStatus={wallet.hashConnectConnectionState}
+          tokenPairs={getTokensByUniqueAccountIds(swap.tokenPairs ?? [])}
           onTokenAmountChange={handleInputAmountChange}
           onTokenSymbolChange={handleInputSymbolChange}
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
-          isLoading={app.isFeatureLoading("walletData")}
+          isLoading={app.isFeatureLoading("pairedAccountBalance")}
         />
         <TokenInput
           data-testid="add-liquidity-output"
@@ -316,20 +341,22 @@ const AddLiquidity = (): JSX.Element => {
           tokenAmount={poolState.outputToken.displayedAmount}
           tokenSymbol={poolState.outputToken.symbol}
           tokenBalance={poolState.outputToken.balance}
-          walletConnectionStatus={connectionStatus}
+          tokenId={poolState.outputToken.tokenMeta.tokenId}
+          walletConnectionStatus={wallet.hashConnectConnectionState}
+          tokenPairs={getPairedTokens(poolState.inputToken.tokenMeta.tokenId ?? "", "", swap.tokenPairs ?? [])}
           onTokenAmountChange={handleOutputAmountChange}
           onTokenSymbolChange={handleOutputSymbolChange}
           isHalfAndMaxButtonsVisible={true}
           onMaxButtonClick={() => getPortionOfBalance("outputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("outputToken", "half")}
-          isLoading={app.isFeatureLoading("walletData")}
+          isLoading={app.isFeatureLoading("pairedAccountBalance")}
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>
             <MetricLabel label="Transaction Fee" value={formattedFee} isLoading={app.isFeatureLoading("fee")} />
           </Flex>
           <Flex flexDirection={"column"}>
-            <MetricLabel label="Share of Pool" value={"<0.1%"} />
+            <MetricLabel label="Share of Pool" value={poolRatio()} />
           </Flex>
           <Flex flexDirection={"column"}>
             <MetricLabel

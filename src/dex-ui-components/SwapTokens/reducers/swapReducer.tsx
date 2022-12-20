@@ -3,11 +3,18 @@ import { SwapTokensState } from "../types";
 
 const initialSwapState: SwapTokensState = {
   tokenToTrade: {
-    symbol: "HBAR",
+    symbol: undefined,
     amount: 0.0,
     displayAmount: "0.0",
     balance: undefined,
     poolLiquidity: undefined,
+    tokenName: undefined,
+    totalSupply: null,
+    maxSupply: null,
+    tokenMeta: {
+      pairAccountId: undefined,
+      tokenId: undefined,
+    },
   },
   tokenToReceive: {
     symbol: undefined,
@@ -15,6 +22,13 @@ const initialSwapState: SwapTokensState = {
     displayAmount: "0.0",
     balance: undefined,
     poolLiquidity: undefined,
+    tokenName: undefined,
+    totalSupply: null,
+    maxSupply: null,
+    tokenMeta: {
+      pairAccountId: undefined,
+      tokenId: undefined,
+    },
   },
   swapSettings: {
     slippage: "2.0",

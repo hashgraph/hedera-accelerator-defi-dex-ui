@@ -2,7 +2,9 @@ import { Box, Flex, Skeleton, Text } from "@chakra-ui/react";
 import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
-import { WalletConnectionStatus } from "../models/wallet.model";
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { Token } from "./types";
+
 export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
@@ -12,8 +14,10 @@ export interface TokenInputProps {
   tokenAmount: number | string;
   tokenSymbol: string | undefined;
   tokenBalance: number | undefined;
-  walletConnectionStatus: WalletConnectionStatus;
+  tokenId: string | undefined;
+  walletConnectionStatus: HashConnectConnectionState;
   hideTokenSelector?: boolean;
+  tokenPairs: Token[] | null;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -36,8 +40,10 @@ const TokenInput = (props: TokenInputProps) => {
     tokenAmount,
     tokenSymbol,
     tokenBalance,
+    tokenId,
     walletConnectionStatus,
     hideTokenSelector,
+    tokenPairs,
     onTokenAmountChange,
     onTokenSymbolChange,
     onMaxButtonClick,
@@ -45,7 +51,7 @@ const TokenInput = (props: TokenInputProps) => {
   } = props;
 
   const showTokenBalance = useCallback(() => {
-    if (walletConnectionStatus !== WalletConnectionStatus.PAIRED) {
+    if (walletConnectionStatus !== HashConnectConnectionState.Paired) {
       return CONNECT_TO_VIEW;
     }
     if (tokenSymbol === undefined || tokenSymbol === "") {
@@ -87,20 +93,16 @@ const TokenInput = (props: TokenInputProps) => {
           </Box>
           {!hideTokenSelector ? (
             <Box flex="4">
-              <TokenSelector value={tokenSymbol} onChangeHandler={onTokenSymbolChange} />
+              <TokenSelector value={tokenId} onChangeHandler={onTokenSymbolChange} tokenPairs={tokenPairs} />
             </Box>
           ) : (
             ""
           )}
         </Flex>
         <Flex padding="0.25rem 0" alignItems="center" backgroundColor="rgba(242,242,244,0.6)" borderRadius="5px">
-          <Text textStyle="b4-medium" paddingLeft="0.5rem" paddingRight="0.25rem">
-            Balance:
-          </Text>
+          <Text textStyle="b3">&nbsp; Balance: &nbsp;</Text>
           <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
-            <Text textStyle="b4-medium" paddingRight="0.75rem">
-              {showTokenBalance()}
-            </Text>
+            <Text textStyle="b3">{showTokenBalance()}</Text>
           </Skeleton>
           {getHalfAndMaxButtonDisplays()}
         </Flex>
