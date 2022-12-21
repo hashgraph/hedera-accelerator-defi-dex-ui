@@ -29,11 +29,12 @@ import {
   NotficationTypes,
   Notification,
 } from "../../../dex-ui-components";
-import { useDexContext, useHasVoted, useCastVote, useExecuteProposal, useProposal } from "../../hooks";
-import { ProposalState, ProposalStatus } from "../../store/governanceSlice";
-import { createHashScanLink, getStatusColor } from "../../utils";
+import { useDexContext } from "../../hooks";
+import { GovernanceTokenId } from "../../services";
+import { ProposalState } from "../../store/governanceSlice";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { VoteType } from "./types";
+import { useProposalDetails } from "./useProposalDetails";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
@@ -43,11 +44,26 @@ export const ProposalDetails = () => {
     isVoteNoOpen: false,
     isVoteAbstainOpen: false,
   });
-  const { wallet, governance } = useDexContext(({ wallet, governance }) => ({ wallet, governance }));
-  const proposal = useProposal(id);
-  const castVote = useCastVote();
-  const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
-  const executeProposal = useExecuteProposal();
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const {
+    proposal,
+    castVote,
+    executeProposal,
+    claimGODTokens,
+    isNotificationVisible,
+    successMessage,
+    hashScanLink,
+    areButtonsHidden,
+    isHasVotedMessageVisible,
+    areVoteButtonsVisible,
+    isExecuteButtonVisible,
+    isClaimTokenButtonVisible,
+    statusColor,
+    isLoadingDialogOpen,
+    loadingDialogMessage,
+    isErrorDialogOpen,
+    errorDialogMessage,
+  } = useProposalDetails(id);
 
   if (!proposal.isLoading && isNil(proposal.data)) {
     return <span>{`Proposal with id: ${id} not found.`}</span>;
@@ -57,30 +73,26 @@ export const ProposalDetails = () => {
     return <span>Error: {proposal.error.message}</span>;
   }
 
-  const castVoteTransactionId = castVote.data?.transactionId.toString();
-  const castVoteHashScanLink = createHashScanLink(castVoteTransactionId);
-  const executeProposalTransactionId = executeProposal.data?.transactionId.toString();
-  const executeProposalHashScanLink = createHashScanLink(executeProposalTransactionId);
+  function resetServerState() {
+    castVote.reset();
+    executeProposal.reset();
+    claimGODTokens.reset();
+  }
 
-  const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
-  const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;
-  const areVoteButtonsVisible = !hasVoted.data && proposal.data?.status === ProposalStatus.Active;
-  const isExecuteButtonVisible =
-    proposal.data?.status === ProposalStatus.Passed && proposal.data?.state !== ProposalState.Executed;
-  const isClaimTokenButtonVisible = proposal.data?.state === ProposalState.Executed;
-  const statusColor = getStatusColor(proposal.data?.status, proposal.data?.state);
-
-  const handleExecuteClicked = async () => {
+  async function handleExecuteClicked() {
+    resetServerState();
     const signer = wallet.getSigner();
     executeProposal.mutate({ contractId: proposal.data?.contractId ?? "", title: proposal.data?.title ?? "", signer });
-  };
+  }
 
-  const handleClaimGODTokensClicked = async () => {
-    /** TODO: Refactor using a react-query hook */
-    await governance.claimGODTokens(proposal.data?.contractId ?? "", proposal.data?.id ?? "");
-  };
+  async function handleClaimGODTokensClicked() {
+    resetServerState();
+    const signer = wallet.getSigner();
+    claimGODTokens.mutate({ contractId: proposal.data?.contractId ?? "", proposalId: proposal.data?.id ?? "", signer });
+  }
 
-  const handleVoteButtonClicked = (voteType: VoteType) => {
+  function handleVoteButtonClicked(voteType: VoteType) {
+    resetServerState();
     if (proposal) {
       const signer = wallet.getSigner();
       castVote.mutate({
@@ -99,19 +111,27 @@ export const ProposalDetails = () => {
     if (voteType === VoteType.Abstain) {
       setDialogState({ ...dialogState, isVoteAbstainOpen: false });
     }
-  };
+  }
 
-  const handleVoteYesClicked = () => handleVoteButtonClicked(VoteType.For);
-  const handleVoteNoClicked = () => handleVoteButtonClicked(VoteType.Against);
-  const handleVoteAbstainClicked = () => handleVoteButtonClicked(VoteType.Abstain);
-  const handleErrorDialogDismissButtonClicked = () => {
-    castVote.reset();
-    executeProposal.reset();
-  };
-  const handleNotificationCloseButtonClicked = () => {
-    castVote.reset();
-    executeProposal.reset();
-  };
+  function handleVoteYesClicked() {
+    handleVoteButtonClicked(VoteType.For);
+  }
+
+  function handleVoteNoClicked() {
+    handleVoteButtonClicked(VoteType.Against);
+  }
+
+  function handleVoteAbstainClicked() {
+    handleVoteButtonClicked(VoteType.Abstain);
+  }
+
+  function handleErrorDialogDismissButtonClicked() {
+    resetServerState();
+  }
+
+  function handleNotificationCloseButtonClicked() {
+    resetServerState();
+  }
 
   return (
     <>
@@ -125,26 +145,15 @@ export const ProposalDetails = () => {
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </Breadcrumb>
-            {/** TODO: Refactor to dedupe Notification component usage. */}
             <Notification
               type={NotficationTypes.SUCCESS}
               /** TODO: Add logic to display what type of vote the user casted. */
-              message={`Your vote has been submitted.`}
+              message={successMessage}
               isLinkShown={true}
               linkText="View in HashScan"
-              linkRef={castVoteHashScanLink}
+              linkRef={hashScanLink}
               isCloseButtonShown={true}
-              isVisible={castVote.isSuccess}
-              handleClickClose={handleNotificationCloseButtonClicked}
-            />
-            <Notification
-              type={NotficationTypes.SUCCESS}
-              message={`The ${proposal.data?.title} proposal has been executed.`}
-              isLinkShown={true}
-              linkText="View in HashScan"
-              linkRef={executeProposalHashScanLink}
-              isCloseButtonShown={true}
-              isVisible={executeProposal.isSuccess}
+              isVisible={isNotificationVisible}
               handleClickClose={handleNotificationCloseButtonClicked}
             />
             <Box>
@@ -225,7 +234,7 @@ export const ProposalDetails = () => {
                           openDialogButtonText="Yes"
                           isOpenDialogButtonDisabled={proposal === undefined}
                           title="Confirm Vote"
-                          body={ConfirmVoteModalBody()}
+                          body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
                           footer={
                             <Button flex="1" onClick={handleVoteYesClicked}>
                               Confirm Vote Yes
@@ -240,7 +249,7 @@ export const ProposalDetails = () => {
                           openDialogButtonText="No"
                           isOpenDialogButtonDisabled={proposal === undefined}
                           title="Confirm Vote"
-                          body={ConfirmVoteModalBody()}
+                          body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
                           footer={
                             <Button flex="1" onClick={handleVoteNoClicked}>
                               Confirm Vote No
@@ -255,7 +264,7 @@ export const ProposalDetails = () => {
                           openDialogButtonText="Abstain"
                           isOpenDialogButtonDisabled={proposal === undefined}
                           title="Confirm Vote"
-                          body={ConfirmVoteModalBody()}
+                          body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
                           footer={
                             <Button flex="1" onClick={handleVoteAbstainClicked}>
                               Confirm Vote Abstain
@@ -338,24 +347,10 @@ export const ProposalDetails = () => {
           </Flex>
         </GridItem>
       </Grid>
-      {/** TODO: Refactor to dynamically accept loading and loading message states */}
-      <LoadingDialog isOpen={castVote.isLoading} message={"Please confirm the vote in your wallet to proceed"} />
+      <LoadingDialog isOpen={isLoadingDialogOpen} message={loadingDialogMessage} />
       <LoadingDialog
-        isOpen={castVote.isError}
-        message={castVote.error?.message ?? ""}
-        icon={<WarningIcon h={10} w={10} />}
-        buttonConfig={{
-          text: "Dismiss",
-          onClick: handleErrorDialogDismissButtonClicked,
-        }}
-      />
-      <LoadingDialog
-        isOpen={executeProposal.isLoading}
-        message={"Please confirm the proposal execution in your wallet to proceed"}
-      />
-      <LoadingDialog
-        isOpen={executeProposal.isError}
-        message={executeProposal.error?.message ?? ""}
+        isOpen={isErrorDialogOpen}
+        message={errorDialogMessage}
         icon={<WarningIcon h={10} w={10} />}
         buttonConfig={{
           text: "Dismiss",

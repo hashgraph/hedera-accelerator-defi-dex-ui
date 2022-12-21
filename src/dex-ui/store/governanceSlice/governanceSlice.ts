@@ -29,11 +29,6 @@ const initialGovernanceStore: GovernanceState = {
 const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
   return {
     ...initialGovernanceStore,
-    /** TODO: Send transaction using react-query */
-    claimGODTokens: async (contractId: string, proposalId: string) => {
-      const { wallet } = get();
-      await HederaService.sendClaimGODTokenTransaction({ contractId, proposalId, signer: wallet.getSigner() });
-    },
     createProposal: async (type: ProposalType, data: CreateProposalData) => {
       const { wallet } = get();
       set(

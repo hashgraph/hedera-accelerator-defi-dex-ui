@@ -108,7 +108,6 @@ interface CreateTransferTokenProposalData {
 
 type CreateProposalData = CreateNewTokenProposalData | CreateTextProposalData | CreateTransferTokenProposalData;
 interface GovernanceActions {
-  claimGODTokens: (contractId: string, proposalId: string) => Promise<void>;
   createProposal: (type: ProposalType, data: CreateProposalData) => Promise<void>;
   clearProposalTransactionState: () => void;
 }
