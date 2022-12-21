@@ -24,6 +24,18 @@ import {
 import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 import { ProposalType } from "../../store/governanceSlice";
 
+const govenorAbiSingatureMap = new Map<string, any>();
+const web3 = new Web3();
+
+function loadGovernorAbiEventSignatures() {
+  govenorAbi.abi.forEach((eventAbi: any) => {
+    if (eventAbi.type === "event") {
+      govenorAbiSingatureMap.set(web3.eth.abi.encodeEventSignature(eventAbi), eventAbi);
+    }
+  });
+  return govenorAbiSingatureMap;
+}
+
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
   const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
@@ -191,6 +203,28 @@ function createMirrorNodeService() {
     }
   };
 
+  function decodeLog(signatureMap: Map<string, any>, logs: any[]) {
+    const eventsResult = new Map<string, any[]>();
+    logs.forEach((log) => {
+      try {
+        const eventAbi = signatureMap.get(log.topics[0]);
+        if (eventAbi !== undefined) {
+          const decodedLog = web3.eth.abi.decodeLog(
+            eventAbi.inputs,
+            log.data,
+            eventAbi.anonymous === true ? log.topics.splice(1) : log.topics
+          );
+          const events = eventsResult.get(eventAbi.name) ?? [];
+          events.push(decodedLog);
+          eventsResult.set(eventAbi.name, events);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    return eventsResult;
+  }
+
   const fetchContractProposalEvents = async (
     proposalType: string,
     contractId: string
@@ -218,39 +252,45 @@ function createMirrorNodeService() {
         limit: 100,
       },
     });
-    const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
-      .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
-        const proposalCreatedEvent = decodeEvent(
-          "ProposalCreated",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        /* TODO: Fix claim, executed, and canceled event logs. This may need to be addressed in the
-        contracts code.
-        const godTokenClaimedEvent = decodeEvent(
-          "GodTokenClaimed",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        let areGODTokensClaimed = false;
-        if (Boolean(godTokenClaimedEvent?.proposalId) && Boolean(proposalCreatedEvent?.proposalId))
-          areGODTokensClaimed = godTokenClaimedEvent?.proposalId === proposalCreatedEvent?.proposalId;
 
-        const proposalExecutedEvent = decodeEvent(
-          "ProposalExecuted",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        const proposalCanceledEvent = decodeEvent(
-          "ProposalCanceled",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        ); 
-        console.log(proposalCreatedEvent, godTokenClaimedEvent, proposalExecutedEvent, proposalCanceledEvent);
-        */
-        return [proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined];
-      })
-      .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
+    const allEvents = decodeLog(loadGovernorAbiEventSignatures(), response.data.logs);
+    const proposalCreatedEvents = allEvents.get("ProposalCreated") ?? [];
+    const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
+      return { ...item, contractId, type: proposalType };
+    });
+    // const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
+    //   .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+    //     const proposalCreatedEvent = decodeEvent(
+    //       "ProposalCreated",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     /* TODO: Fix claim, executed, and canceled event logs. This may need to be addressed in the
+    //     contracts code.
+    //     const godTokenClaimedEvent = decodeEvent(
+    //       "GodTokenClaimed",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     let areGODTokensClaimed = false;
+    //     if (Boolean(godTokenClaimedEvent?.proposalId) && Boolean(proposalCreatedEvent?.proposalId))
+    //       areGODTokensClaimed = godTokenClaimedEvent?.proposalId === proposalCreatedEvent?.proposalId;
+
+    //     const proposalExecutedEvent = decodeEvent(
+    //       "ProposalExecuted",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     const proposalCanceledEvent = decodeEvent(
+    //       "ProposalCanceled",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     console.log(proposalCreatedEvent, godTokenClaimedEvent, proposalExecutedEvent, proposalCanceledEvent);
+    //     */
+    //     return [proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined];
+    //   })
+    //   .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
     return proposals;
   };
 
