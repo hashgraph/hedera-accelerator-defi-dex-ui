@@ -1,6 +1,5 @@
-import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Card, Text } from "@chakra-ui/react";
+import { Card, Text, CardBody } from "@chakra-ui/react";
 import { Color } from "../../../dex-ui-components";
 interface File extends Blob {
   readonly lastModified: number;
@@ -8,6 +7,7 @@ interface File extends Blob {
   readonly webkitRelativePath: string;
 }
 interface FileUploaderProps {
+  id: string;
   title: string;
   subTitle: string;
   onHoverTitle: string;
@@ -18,7 +18,7 @@ interface FileUploaderProps {
 }
 
 function FileUploader(props: FileUploaderProps) {
-  const { title, subTitle, onHoverTitle, fileUploaderStyles, disabled, onFileRead, onFileReadFailed } = props;
+  const { id, title, subTitle, onHoverTitle, fileUploaderStyles, disabled, onFileRead, onFileReadFailed } = props;
 
   const onDrop = (acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -41,26 +41,28 @@ function FileUploader(props: FileUploaderProps) {
     onDrop,
     maxFiles: 1,
     accept: { "application/json": [".json"] },
-    disabled: disabled ?? false,
+    disabled: disabled,
   });
 
   return (
-    <Card {...getRootProps()} variant="file-uploader-card" style={{ ...fileUploaderStyles }}>
-      <input {...getInputProps()} />
-      {isDragActive ? (
-        <Text textStyle="b2" color={Color.Blue_03}>
-          {onHoverTitle}
-        </Text>
-      ) : (
-        <>
-          <Text textStyle="b2" color={Color.Blue_03}>
-            {title}
+    <Card id={id} {...getRootProps()} variant="file-uploader" style={{ ...fileUploaderStyles }}>
+      <CardBody>
+        <input {...getInputProps()} />
+        {isDragActive ? (
+          <Text textStyle="b2" color={Color.Teal_01}>
+            {onHoverTitle}
           </Text>
-          <Text textStyle="b2" color={Color.Blue_03}>
-            {subTitle}
-          </Text>
-        </>
-      )}
+        ) : (
+          <>
+            <Text textStyle="b2" color={Color.Teal_01}>
+              {title}
+            </Text>
+            <Text textStyle="b2" color={Color.Teal_01}>
+              {subTitle}
+            </Text>
+          </>
+        )}
+      </CardBody>
     </Card>
   );
 }

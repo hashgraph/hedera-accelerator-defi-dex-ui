@@ -19,5 +19,4 @@ export const Color = {
   Yellow_02: "#906A08",
   Blue_01: "#009FE3",
   Blue_02: "#000AFF",
-  Blue_03: "#31A9BD",
 };

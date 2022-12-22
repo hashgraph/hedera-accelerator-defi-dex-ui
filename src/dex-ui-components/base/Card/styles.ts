@@ -20,13 +20,13 @@ export const CardStyles: ComponentStyleConfig = {
       borderRadius: "0px",
       width: "100%",
     },
-    "file-uploader-card": {
-      bg: "white",
+    "file-uploader": {
+      bg: "#FFFFFF",
       width: "100%",
       textAlign: "center",
       justifyContent: "center",
       alignSelf: "center",
-      border: "1px #31A9BD dashed",
+      border: "1px #00BAC6 dashed",
       height: "102Px",
     },
   },
