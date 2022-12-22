@@ -7,16 +7,6 @@ interface File extends Blob {
   readonly name: string;
   readonly webkitRelativePath: string;
 }
-
-const defaultFileUploaderStyles = {
-  bg: "white",
-  width: "100%",
-  textAlign: "center",
-  justifyContent: "center",
-  alignSelf: "center",
-  border: "1px #31A9BD dashed",
-  height: "102Px",
-};
 interface FileUploaderProps {
   title: string;
   subTitle: string;
@@ -30,25 +20,22 @@ interface FileUploaderProps {
 function FileUploader(props: FileUploaderProps) {
   const { title, subTitle, onHoverTitle, fileUploaderStyles, disabled, onFileRead, onFileReadFailed } = props;
 
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      acceptedFiles.forEach((file) => {
-        const reader = new FileReader();
-        reader.onabort = () => {
-          if (onFileReadFailed) onFileReadFailed("File reading has aborted");
-        };
-        reader.onerror = () => {
-          if (onFileReadFailed) onFileReadFailed("File reading has failed");
-        };
-        reader.onload = () => {
-          const dataUrl = reader.result as string;
-          onFileRead(dataUrl, file.name);
-        };
-        reader.readAsText(file);
-      });
-    },
-    [onFileRead, onFileReadFailed]
-  );
+  const onDrop = (acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onabort = () => {
+        if (onFileReadFailed) onFileReadFailed("File reading has aborted");
+      };
+      reader.onerror = () => {
+        if (onFileReadFailed) onFileReadFailed("File reading has failed");
+      };
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        onFileRead(dataUrl, file.name);
+      };
+      reader.readAsText(file);
+    });
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -58,14 +45,20 @@ function FileUploader(props: FileUploaderProps) {
   });
 
   return (
-    <Card {...getRootProps()} style={{ ...defaultFileUploaderStyles, ...fileUploaderStyles }}>
+    <Card {...getRootProps()} variant="file-uploader-card" style={{ ...fileUploaderStyles }}>
       <input {...getInputProps()} />
       {isDragActive ? (
-        <Text color={Color.Blue_03}>{onHoverTitle}</Text>
+        <Text textStyle="b2" color={Color.Blue_03}>
+          {onHoverTitle}
+        </Text>
       ) : (
         <>
-          <Text color={Color.Blue_03}>{title}</Text>
-          <Text color={Color.Blue_03}>{subTitle}</Text>
+          <Text textStyle="b2" color={Color.Blue_03}>
+            {title}
+          </Text>
+          <Text textStyle="b2" color={Color.Blue_03}>
+            {subTitle}
+          </Text>
         </>
       )}
     </Card>
