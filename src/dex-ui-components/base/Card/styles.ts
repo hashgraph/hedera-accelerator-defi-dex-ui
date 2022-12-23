@@ -20,6 +20,18 @@ export const CardStyles: ComponentStyleConfig = {
       borderRadius: "0px",
       width: "100%",
     },
+    "file-uploader": {
+      body: {
+        bg: "#FFFFFF",
+        width: "100%",
+        textAlign: "center",
+        justifyContent: "center",
+        alignSelf: "center",
+        border: "1px #00BAC6 dashed",
+        height: "102Px",
+        borderRadius: "8px",
+      },
+    },
   },
   defaultProps: {},
 };
