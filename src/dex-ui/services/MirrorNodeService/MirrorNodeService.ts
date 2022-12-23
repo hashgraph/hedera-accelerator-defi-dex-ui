@@ -18,23 +18,12 @@ import {
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
   TokenPair,
-  MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
 } from "./types";
-import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 import { ProposalType } from "../../store/governanceSlice";
+import { governorAbiSignatureMap } from "./constants";
 
-const govenorAbiSingatureMap = new Map<string, any>();
 const web3 = new Web3();
-
-function loadGovernorAbiEventSignatures() {
-  govenorAbi.abi.forEach((eventAbi: any) => {
-    if (eventAbi.type === "event") {
-      govenorAbiSingatureMap.set(web3.eth.abi.encodeEventSignature(eventAbi), eventAbi);
-    }
-  });
-  return govenorAbiSingatureMap;
-}
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -181,28 +170,6 @@ function createMirrorNodeService() {
     });
   };
 
-  /**
-   * Decodes event contents using the ABI definition of the event.
-   * @param eventName - the name of the event.
-   * @param logData - log data as a Hex string.
-   * @param topics - an array of event topics.
-   */
-  const decodeEvent = (eventName: string, logData: string, topics: string[]) => {
-    const web3 = new Web3();
-    const abi = govenorAbi.abi;
-    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
-    if (eventAbi?.inputs === undefined) {
-      return undefined;
-    }
-    try {
-      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, logData, topics);
-      return decodedLog;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  };
-
   function decodeLog(signatureMap: Map<string, any>, logs: any[]) {
     const eventsResult = new Map<string, any[]>();
     logs.forEach((log) => {
@@ -253,7 +220,7 @@ function createMirrorNodeService() {
       },
     });
 
-    const allEvents = decodeLog(loadGovernorAbiEventSignatures(), response.data.logs);
+    const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
     const proposalCreatedEvents = allEvents.get("ProposalCreated") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
