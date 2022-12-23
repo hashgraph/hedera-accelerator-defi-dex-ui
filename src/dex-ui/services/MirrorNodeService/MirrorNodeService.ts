@@ -23,6 +23,7 @@ import {
 } from "./types";
 import { ProposalType } from "../../store/governanceSlice";
 import { governorAbiSignatureMap } from "./constants";
+import { getFulfilledResultsData } from "./utils";
 
 const web3 = new Web3();
 
@@ -224,39 +225,6 @@ function createMirrorNodeService() {
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
     });
-    // const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
-    //   .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
-    //     const proposalCreatedEvent = decodeEvent(
-    //       "ProposalCreated",
-    //       proposalEventLog.data,
-    //       proposalEventLog.topics.slice(1)
-    //     );
-    //     /* TODO: Fix claim, executed, and canceled event logs. This may need to be addressed in the
-    //     contracts code.
-    //     const godTokenClaimedEvent = decodeEvent(
-    //       "GodTokenClaimed",
-    //       proposalEventLog.data,
-    //       proposalEventLog.topics.slice(1)
-    //     );
-    //     let areGODTokensClaimed = false;
-    //     if (Boolean(godTokenClaimedEvent?.proposalId) && Boolean(proposalCreatedEvent?.proposalId))
-    //       areGODTokensClaimed = godTokenClaimedEvent?.proposalId === proposalCreatedEvent?.proposalId;
-
-    //     const proposalExecutedEvent = decodeEvent(
-    //       "ProposalExecuted",
-    //       proposalEventLog.data,
-    //       proposalEventLog.topics.slice(1)
-    //     );
-    //     const proposalCanceledEvent = decodeEvent(
-    //       "ProposalCanceled",
-    //       proposalEventLog.data,
-    //       proposalEventLog.topics.slice(1)
-    //     );
-    //     console.log(proposalCreatedEvent, godTokenClaimedEvent, proposalExecutedEvent, proposalCanceledEvent);
-    //     */
-    //     return [proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined];
-    //   })
-    //   .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
     return proposals;
   };
 
@@ -272,7 +240,6 @@ function createMirrorNodeService() {
       ProposalType.TokenTransfer,
       GovernorProxyContracts.TransferTokenStringId
     );
-    /* TODO: Enable event fetching for all proposal types.   
     const createTokenEventsResults = fetchContractProposalEvents(
       ProposalType.CreateToken,
       GovernorProxyContracts.CreateTokenStringId
@@ -284,26 +251,14 @@ function createMirrorNodeService() {
     const contractUpgradeEventsResults = fetchContractProposalEvents(
       ProposalType.ContractUpgrade,
       GovernorProxyContracts.ContractUpgradeStringId
-    ); 
-    */
+    );
     const proposalEventsResults = await Promise.allSettled([
       tokenTransferEventsResults,
-      /*      
       createTokenEventsResults,
       textProposalEventsResults,
-      contractUpgradeEventsResults, 
-      */
+      contractUpgradeEventsResults,
     ]);
-    const proposalEvents = proposalEventsResults.reduce(
-      (
-        proposalEvents: MirrorNodeDecodedProposalEvent[],
-        proposalEventResult: PromiseSettledResult<MirrorNodeDecodedProposalEvent[]>
-      ): MirrorNodeDecodedProposalEvent[] => {
-        if (proposalEventResult.status === "fulfilled") return [...proposalEvents, ...proposalEventResult.value];
-        return proposalEvents;
-      },
-      []
-    );
+    const proposalEvents = getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
     return proposalEvents;
   };
 
