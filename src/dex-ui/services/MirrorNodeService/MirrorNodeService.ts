@@ -18,11 +18,13 @@ import {
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
   TokenPair,
-  MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
+  MirrorNodeProposalEventLog,
 } from "./types";
-import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 import { ProposalType } from "../../store/governanceSlice";
+import { governorAbiSignatureMap } from "./constants";
+
+const web3 = new Web3();
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -169,27 +171,25 @@ function createMirrorNodeService() {
     });
   };
 
-  /**
-   * Decodes event contents using the ABI definition of the event.
-   * @param eventName - the name of the event.
-   * @param logData - log data as a Hex string.
-   * @param topics - an array of event topics.
-   */
-  const decodeEvent = (eventName: string, logData: string, topics: string[]) => {
-    const web3 = new Web3();
-    const abi = govenorAbi.abi;
-    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
-    if (eventAbi?.inputs === undefined) {
-      return undefined;
+  function decodeLog(signatureMap: Map<string, any>, logs: MirrorNodeProposalEventLog[]) {
+    const eventsMap = new Map<string, any[]>();
+    for (const log of logs) {
+      try {
+        const data = log.data;
+        const topics = log.topics;
+        const eventAbi = signatureMap.get(topics[0]);
+        if (eventAbi !== undefined) {
+          const requiredTopics = eventAbi.anonymous === true ? topics.splice(1) : topics;
+          const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
+          const events = eventsMap.get(eventAbi.name) ?? [];
+          eventsMap.set(eventAbi.name, [...events, event]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
-    try {
-      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, logData, topics);
-      return decodedLog;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  };
+    return eventsMap;
+  }
 
   const fetchContractProposalEvents = async (
     proposalType: string,
@@ -218,39 +218,45 @@ function createMirrorNodeService() {
         limit: 100,
       },
     });
-    const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
-      .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
-        const proposalCreatedEvent = decodeEvent(
-          "ProposalCreated",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        /* TODO: Fix claim, executed, and canceled event logs. This may need to be addressed in the
-        contracts code.
-        const godTokenClaimedEvent = decodeEvent(
-          "GodTokenClaimed",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        let areGODTokensClaimed = false;
-        if (Boolean(godTokenClaimedEvent?.proposalId) && Boolean(proposalCreatedEvent?.proposalId))
-          areGODTokensClaimed = godTokenClaimedEvent?.proposalId === proposalCreatedEvent?.proposalId;
 
-        const proposalExecutedEvent = decodeEvent(
-          "ProposalExecuted",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        const proposalCanceledEvent = decodeEvent(
-          "ProposalCanceled",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        ); 
-        console.log(proposalCreatedEvent, godTokenClaimedEvent, proposalExecutedEvent, proposalCanceledEvent);
-        */
-        return [proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined];
-      })
-      .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
+    const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
+    const proposalCreatedEvents = allEvents.get("ProposalCreated") ?? [];
+    const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
+      return { ...item, contractId, type: proposalType };
+    });
+    // const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
+    //   .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
+    //     const proposalCreatedEvent = decodeEvent(
+    //       "ProposalCreated",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     /* TODO: Fix claim, executed, and canceled event logs. This may need to be addressed in the
+    //     contracts code.
+    //     const godTokenClaimedEvent = decodeEvent(
+    //       "GodTokenClaimed",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     let areGODTokensClaimed = false;
+    //     if (Boolean(godTokenClaimedEvent?.proposalId) && Boolean(proposalCreatedEvent?.proposalId))
+    //       areGODTokensClaimed = godTokenClaimedEvent?.proposalId === proposalCreatedEvent?.proposalId;
+
+    //     const proposalExecutedEvent = decodeEvent(
+    //       "ProposalExecuted",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     const proposalCanceledEvent = decodeEvent(
+    //       "ProposalCanceled",
+    //       proposalEventLog.data,
+    //       proposalEventLog.topics.slice(1)
+    //     );
+    //     console.log(proposalCreatedEvent, godTokenClaimedEvent, proposalExecutedEvent, proposalCanceledEvent);
+    //     */
+    //     return [proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined];
+    //   })
+    //   .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
     return proposals;
   };
 
