@@ -19,6 +19,7 @@ import {
   MirrorNodeTransaction,
   TokenPair,
   MirrorNodeDecodedProposalEvent,
+  MirrorNodeProposalEventLog,
 } from "./types";
 import { ProposalType } from "../../store/governanceSlice";
 import { governorAbiSignatureMap } from "./constants";
@@ -170,26 +171,24 @@ function createMirrorNodeService() {
     });
   };
 
-  function decodeLog(signatureMap: Map<string, any>, logs: any[]) {
-    const eventsResult = new Map<string, any[]>();
-    logs.forEach((log) => {
+  function decodeLog(signatureMap: Map<string, any>, logs: MirrorNodeProposalEventLog[]) {
+    const eventsMap = new Map<string, any[]>();
+    for (const log of logs) {
       try {
-        const eventAbi = signatureMap.get(log.topics[0]);
+        const data = log.data;
+        const topics = log.topics;
+        const eventAbi = signatureMap.get(topics[0]);
         if (eventAbi !== undefined) {
-          const decodedLog = web3.eth.abi.decodeLog(
-            eventAbi.inputs,
-            log.data,
-            eventAbi.anonymous === true ? log.topics.splice(1) : log.topics
-          );
-          const events = eventsResult.get(eventAbi.name) ?? [];
-          events.push(decodedLog);
-          eventsResult.set(eventAbi.name, events);
+          const requiredTopics = eventAbi.anonymous === true ? topics.splice(1) : topics;
+          const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
+          const events = eventsMap.get(eventAbi.name) ?? [];
+          eventsMap.set(eventAbi.name, [...events, event]);
         }
       } catch (e) {
         console.error(e);
       }
-    });
-    return eventsResult;
+    }
+    return eventsMap;
   }
 
   const fetchContractProposalEvents = async (
