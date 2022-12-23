@@ -5,12 +5,16 @@ import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
   TransactionResponse,
+  FileCreateTransaction,
+  PrivateKey,
+  ContractCreateTransaction,
+  FileAppendTransaction,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { GovernorProxyContracts } from "../constants";
+import { GovernorProxyContracts, TOKEN_USER_KEY } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { checkTransactionResponseForError, queryContract } from "./utils";
+import { checkTransactionResponseForError, queryContract, client } from "./utils";
 
 /**
  * General format of service calls:
@@ -165,6 +169,44 @@ const sendCreateTransferTokenProposalTransaction = async (
   return proposalTransactionResponse;
 };
 
+interface CreateContratctUpgradeProposalParams {
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  contarctId: string;
+  proxyId: string;
+  signer: HashConnectSigner;
+}
+
+/**
+ * TODO
+ * @param params -
+ * @returns
+ */
+const sendCreateContractUpgradeProposalTransaction = async (
+  params: CreateContratctUpgradeProposalParams
+): Promise<TransactionResponse> => {
+  const { title, description, linkToDiscussion, contarctId, proxyId, signer } = params;
+  const upgradeProposalContractId = ContractId.fromString(contarctId).toSolidityAddress();
+  const upgradeProposalProxyId = ContractId.fromString(proxyId).toSolidityAddress();
+
+  console.log(`Roshan data is ${title} ${upgradeProposalContractId} ${upgradeProposalProxyId} ${signer}`);
+
+  const contractCallParams = new ContractFunctionParameters()
+    .addString(title)
+    .addAddress(upgradeProposalProxyId)
+    .addAddress(upgradeProposalContractId);
+
+  const createUpgradeProposalTransaction = await new ContractExecuteTransaction()
+    .setContractId(GovernorProxyContracts.ContractUpgradeContractId)
+    .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
+    .setGas(9000000)
+    .freezeWithSigner(signer);
+  const proposalTransactionResponse = await createUpgradeProposalTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(proposalTransactionResponse, GovernorContractFunctions.CreateProposal);
+  return proposalTransactionResponse;
+};
+
 /**
  * TODO
  * @param description -
@@ -231,6 +273,45 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
   return claimGODTokenresponse;
 };
 
+/**
+ * TODO
+ * @param params -
+ * @returns
+ */
+const deployABIFile = async (abiFile: string) => {
+  const compiledContract = JSON.parse(abiFile);
+  const contractByteCode = compiledContract.bytecode;
+  const userKey = PrivateKey.fromString(TOKEN_USER_KEY);
+
+  const fileCreateTx = await new FileCreateTransaction().setKeys([userKey]).execute(client);
+  const fileCreateRx = await fileCreateTx.getReceipt(client);
+  const bytecodeFileId = fileCreateRx.fileId;
+
+  const fileAppendTx = await new FileAppendTransaction()
+    .setFileId(bytecodeFileId ?? "")
+    .setContents(contractByteCode)
+    .setMaxChunks(100)
+    .execute(client);
+  await fileAppendTx.getReceipt(client);
+
+  const contractCreateTx = await new ContractCreateTransaction()
+    .setAdminKey(userKey)
+    .setBytecodeFileId(bytecodeFileId ?? "")
+    .setConstructorParameters(new ContractFunctionParameters())
+    .setGas(9000000)
+    .execute(client);
+
+  const deployABIFileResponse = await contractCreateTx.getReceipt(client);
+  const contractId = deployABIFileResponse.contractId;
+  // client.close();
+
+  checkTransactionResponseForError(deployABIFileResponse, GovernorContractFunctions.DeployABIFile);
+  return {
+    id: contractId?.toString() ?? "",
+    address: "0x" + contractId?.toSolidityAddress() ?? "",
+  };
+};
+
 const GovernorService = {
   sendClaimGODTokenTransaction,
   fetchProposalState,
@@ -241,6 +322,8 @@ const GovernorService = {
   sendCreateTextProposalTransaction,
   sendCreateTransferTokenProposalTransaction,
   executeProposal,
+  deployABIFile,
+  sendCreateContractUpgradeProposalTransaction,
 };
 
 export default GovernorService;
