@@ -45,19 +45,19 @@ function FileUploader(props: FileUploaderProps) {
   });
 
   return (
-    <Card id={id} {...getRootProps()} variant="file-uploader" style={{ ...fileUploaderStyles }}>
+    <Card id={id} {...getRootProps()} variant="file-uploader" style={{ ...fileUploaderStyles }} cursor="pointer">
       <CardBody>
         <input {...getInputProps()} />
         {isDragActive ? (
-          <Text textStyle="b2" color={Color.Teal_01}>
+          <Text textStyle="b2" color={Color.Blue_02}>
             {onHoverTitle}
           </Text>
         ) : (
           <>
-            <Text textStyle="b2" color={Color.Teal_01}>
+            <Text textStyle="b2" color={Color.Blue_02}>
               {title}
             </Text>
-            <Text textStyle="b2" color={Color.Teal_01}>
+            <Text textStyle="b2" color={Color.Blue_02}>
               {subTitle}
             </Text>
           </>
