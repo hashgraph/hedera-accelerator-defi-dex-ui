@@ -1,14 +1,14 @@
 import { FormControl, Input, FormErrorMessage, Flex, Button, Spacer, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Color, TextEditor } from "../../../../dex-ui-components";
-import { FileUploader, LoadingDialog } from "../../../../dex-ui-components";
-import { useDeployContract } from "../../../hooks/governance";
-import { useCreateProposal } from "../../../hooks/governance";
-import { CreateProposalType } from "../../../hooks/governance/types";
-import { useDexContext } from "../../../hooks";
+import { Color, TextEditor } from "../../../../../dex-ui-components";
+import { FileUploader, LoadingDialog } from "../../../../../dex-ui-components";
+import { CreateProposalType } from "../../../../hooks/governance/types";
+import { useDexContext } from "../../../../hooks";
+import { useContractUpgradeProposalDetails } from "./useContractUpgradeProposalDetails";
+import { CreateProposalLocationProps } from "../../CreateProposal";
 
 interface ContractUpgradeProposalFormData {
   title: string;
@@ -27,12 +27,21 @@ export function ContractUpgradeProposalForm(): ReactElement {
     register,
     setValue,
     reset,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<ContractUpgradeProposalFormData>();
 
   const handleCancelClick = () => navigate("/governance");
-  const deployContract = useDeployContract();
-  const createProposal = useCreateProposal();
+
+  const {
+    deployContract,
+    createProposal,
+    isLoadingDialogOpen,
+    loadingDialogMessage,
+    isErrorDialogOpen,
+    errorDialogMessage,
+  } = useContractUpgradeProposalDetails();
+
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const [fileName, setFileName] = useState("");
 
@@ -58,6 +67,11 @@ export function ContractUpgradeProposalForm(): ReactElement {
     });
   }
 
+  function handleErrorDialogDismissButtonClicked() {
+    resetServerState();
+    resetFormValues();
+  }
+
   function resetServerState() {
     deployContract.reset();
     createProposal.reset();
@@ -71,20 +85,37 @@ export function ContractUpgradeProposalForm(): ReactElement {
     });
   }
 
+  /**
+   * TODO: Making the Location Props in Success to show the Notification in Proposal List Page,
+   *       Need to Implement some state management with React Query like Immer.js
+   */
   if (createProposal.isSuccess) {
-    navigate("/governance");
+    const createProposalLocationProps = {
+      state: {
+        proposalTitle: getValues("title"),
+        proposalTransactionId: createProposal.data.transactionId.toString(),
+        isProposalCreationSuccessful: true,
+      } as CreateProposalLocationProps,
+    };
+    navigate("/governance", createProposalLocationProps);
   }
 
-  if (deployContract.isSuccess && deployContract.data?.id) {
-    setValue("newImplementationAddress", deployContract.data?.id ?? "", { shouldValidate: true });
-    // TODO: Hard Coded proxy Address for now, need to discuss the final flow
-    setValue("proxyAddress", "0.0.49078140", { shouldValidate: true });
-  }
+  /**
+   *  TODO: Setting the Disabled Form New Implementation Address field once the deploy contract return id
+   *        Hard Coded the Value for Proxy Address for now, need to change once the flow is decided.
+   *        Use Effect is needed here since we updating the component and Validating too with `shouldValidate` property
+   *        it re-renders the form again and can stuck in infinite loop.
+   */
+  useEffect(() => {
+    if (deployContract.data?.id) {
+      setValue("newImplementationAddress", deployContract.data?.id, { shouldValidate: true });
+      // TODO: Hard Coded proxy Address for now, need to discuss the final flow
+      setValue("proxyAddress", "0.0.49078140", { shouldValidate: true });
+    }
+  }, [deployContract.data?.id]);
 
   return (
     <>
-      <LoadingDialog isOpen={deployContract.isLoading} message={"Fetching Details.. Please wait"} />
-      <LoadingDialog isOpen={createProposal.isLoading} message={"Submitting.. Please wait"} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex direction="column" gap="0.5rem">
           <FormControl isInvalid={Boolean(errors.title)}>
@@ -118,14 +149,11 @@ export function ContractUpgradeProposalForm(): ReactElement {
                 onHoverTitle="Drop your ABI file here ..."
                 onFileRead={onFileReadAction}
               />
-              {
-                fileName.length !== 0 && (
-                  <Text textStyle="b3" color={Color.Blue_02}>
-                    {" "}
-                    {fileName}
-                  </Text>
-                ) // TODO: Place for the file name to show
-              }
+              {fileName.length !== 0 ? (
+                <Text textStyle="b3" color={Color.Blue_02}>
+                  {fileName}
+                </Text>
+              ) : null}
             </Flex>
           </FormControl>
           <FormControl isInvalid={Boolean(errors.newImplementationAddress)}>
@@ -171,28 +199,14 @@ export function ContractUpgradeProposalForm(): ReactElement {
           </Flex>
         </Flex>
       </form>
+      <LoadingDialog isOpen={isLoadingDialogOpen} message={loadingDialogMessage} />
       <LoadingDialog
-        isOpen={deployContract.isError}
-        message={deployContract.error?.message ?? ""}
-        icon={<WarningIcon color="#EF5C5C" h={10} w={10} />}
+        isOpen={isErrorDialogOpen}
+        message={errorDialogMessage}
+        icon={<WarningIcon h={10} w={10} />}
         buttonConfig={{
           text: "Dismiss",
-          onClick: () => {
-            resetFormValues();
-            resetServerState();
-          },
-        }}
-      />
-      <LoadingDialog
-        isOpen={createProposal.isError}
-        message={createProposal.error?.message ?? ""}
-        icon={<WarningIcon color="#EF5C5C" h={10} w={10} />}
-        buttonConfig={{
-          text: "Dismiss",
-          onClick: () => {
-            resetServerState();
-            resetFormValues();
-          },
+          onClick: handleErrorDialogDismissButtonClicked,
         }}
       />
     </>

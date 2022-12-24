@@ -190,8 +190,6 @@ const sendCreateContractUpgradeProposalTransaction = async (
   const upgradeProposalContractId = ContractId.fromString(contarctId).toSolidityAddress();
   const upgradeProposalProxyId = ContractId.fromString(proxyId).toSolidityAddress();
 
-  console.log(`Roshan data is ${title} ${upgradeProposalContractId} ${upgradeProposalProxyId} ${signer}`);
-
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addAddress(upgradeProposalProxyId)
