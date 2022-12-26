@@ -1,5 +1,5 @@
 import { Button, Flex, FormControl, FormErrorMessage, Input, Spacer } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
@@ -16,6 +16,7 @@ function TextProposalForm() {
   const {
     handleSubmit,
     register,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<TextProposalFormData>();
 
@@ -41,8 +42,27 @@ function TextProposalForm() {
           />
           <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
         </FormControl>
-        <FormControl>
-          <TextEditor id="description" placeholder="Description" />
+        <FormControl isInvalid={Boolean(errors.description)}>
+          <Controller
+            name="description"
+            control={control}
+            rules={{
+              required: { value: true, message: "Description is required." },
+              minLength: { value: 100, message: "Please enter atleast 100 characters in the description." },
+              validate: (value) => value.length >= 100,
+            }}
+            render={({ field }) => (
+              <TextEditor
+                {...field}
+                id="description"
+                placeholder="Description"
+                onError={Boolean(errors.description)}
+                onChange={(text) => field.onChange(text)}
+                value={field.value || ""}
+              />
+            )}
+          />
+          <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
         </FormControl>
         <Spacer padding="0.5rem" />
         <Flex direction="row" justifyContent="right" gap="0.5rem">
