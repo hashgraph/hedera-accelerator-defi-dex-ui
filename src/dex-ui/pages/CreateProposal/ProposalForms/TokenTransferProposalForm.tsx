@@ -62,8 +62,8 @@ export function TokenTransferProposalForm(): ReactElement {
             control={control}
             rules={{
               required: { value: true, message: "Description is required." },
-              minLength: { value: 100, message: "Please enter atleast 100 characters in the description." },
-              validate: (value) => value.length >= 100,
+              minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
+              validate: (value) => value.length >= 107,
             }}
             render={({ field }) => (
               <TextEditor
