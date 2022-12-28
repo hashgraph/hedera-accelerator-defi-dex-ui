@@ -130,7 +130,7 @@ export function ContractUpgradeProposalForm(): ReactElement {
             />
             <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl isInvalid={Boolean(errors.description)}>
             <Controller
               name="description"
               control={control}
