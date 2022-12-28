@@ -13,8 +13,11 @@ import {
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
 } from "./types";
-import govenorAbi from "../abi/GovernorCountingSimpleInternal.json";
 import { ProposalType } from "../../store/governanceSlice";
+import { governorAbiSignatureMap } from "./constants";
+import { getFulfilledResultsData } from "./utils";
+
+const web3 = new Web3();
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -84,7 +87,7 @@ function createMirrorNodeService() {
   };
 
   /**
-   * Fetches information related to a specific pair pair token.
+   * Fetches information related to a specific pair token.
    * @param pairAddress  - The ID / Addresss of the pair token account to return data for.
    * @returns Attributes associated with the provided token ID.
    */
@@ -156,27 +159,25 @@ function createMirrorNodeService() {
     });
   };
 
-  /**
-   * Decodes event contents using the ABI definition of the event.
-   * @param eventName - the name of the event.
-   * @param logData - log data as a Hex string.
-   * @param topics - an array of event topics.
-   */
-  const decodeEvent = (eventName: string, logData: string, topics: string[]) => {
-    const web3 = new Web3();
-    const abi = govenorAbi.abi;
-    const eventAbi = abi.find((event: any) => event.name === eventName && event.type === "event");
-    if (eventAbi?.inputs === undefined) {
-      return undefined;
+  function decodeLog(signatureMap: Map<string, any>, logs: MirrorNodeProposalEventLog[]) {
+    const eventsMap = new Map<string, any[]>();
+    for (const log of logs) {
+      try {
+        const data = log.data;
+        const topics = log.topics;
+        const eventAbi = signatureMap.get(topics[0]);
+        if (eventAbi !== undefined) {
+          const requiredTopics = eventAbi.anonymous === true ? topics.splice(1) : topics;
+          const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
+          const events = eventsMap.get(eventAbi.name) ?? [];
+          eventsMap.set(eventAbi.name, [...events, event]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
-    try {
-      const decodedLog = web3.eth.abi.decodeLog(eventAbi?.inputs, logData, topics);
-      return decodedLog;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  };
+    return eventsMap;
+  }
 
   const fetchContractProposalEvents = async (
     proposalType: string,
@@ -205,39 +206,12 @@ function createMirrorNodeService() {
         limit: 100,
       },
     });
-    const proposals: MirrorNodeDecodedProposalEvent[] = response.data.logs
-      .flatMap((proposalEventLog: MirrorNodeProposalEventLog) => {
-        const proposalCreatedEvent = decodeEvent(
-          "ProposalCreated",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        /* TODO: Fix claim, executed, and canceled event logs. This may need to be addressed in the
-        contracts code.
-        const godTokenClaimedEvent = decodeEvent(
-          "GodTokenClaimed",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        let areGODTokensClaimed = false;
-        if (Boolean(godTokenClaimedEvent?.proposalId) && Boolean(proposalCreatedEvent?.proposalId))
-          areGODTokensClaimed = godTokenClaimedEvent?.proposalId === proposalCreatedEvent?.proposalId;
 
-        const proposalExecutedEvent = decodeEvent(
-          "ProposalExecuted",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        );
-        const proposalCanceledEvent = decodeEvent(
-          "ProposalCanceled",
-          proposalEventLog.data,
-          proposalEventLog.topics.slice(1)
-        ); 
-        console.log(proposalCreatedEvent, godTokenClaimedEvent, proposalExecutedEvent, proposalCanceledEvent);
-        */
-        return [proposalCreatedEvent ? { ...proposalCreatedEvent, contractId, type: proposalType } : undefined];
-      })
-      .filter((proposal: MirrorNodeDecodedProposalEvent | undefined) => proposal !== undefined);
+    const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
+    const proposalCreatedEvents = allEvents.get("ProposalCreated") ?? [];
+    const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
+      return { ...item, contractId, type: proposalType };
+    });
     return proposals;
   };
 
@@ -253,7 +227,6 @@ function createMirrorNodeService() {
       ProposalType.TokenTransfer,
       GovernorProxyContracts.TransferTokenStringId
     );
-    /* TODO: Enable event fetching for all proposal types.   
     const createTokenEventsResults = fetchContractProposalEvents(
       ProposalType.CreateToken,
       GovernorProxyContracts.CreateTokenStringId
@@ -265,26 +238,14 @@ function createMirrorNodeService() {
     const contractUpgradeEventsResults = fetchContractProposalEvents(
       ProposalType.ContractUpgrade,
       GovernorProxyContracts.ContractUpgradeStringId
-    ); 
-    */
+    );
     const proposalEventsResults = await Promise.allSettled([
       tokenTransferEventsResults,
-      /*      
       createTokenEventsResults,
       textProposalEventsResults,
-      contractUpgradeEventsResults, 
-      */
+      contractUpgradeEventsResults,
     ]);
-    const proposalEvents = proposalEventsResults.reduce(
-      (
-        proposalEvents: MirrorNodeDecodedProposalEvent[],
-        proposalEventResult: PromiseSettledResult<MirrorNodeDecodedProposalEvent[]>
-      ): MirrorNodeDecodedProposalEvent[] => {
-        if (proposalEventResult.status === "fulfilled") return [...proposalEvents, ...proposalEventResult.value];
-        return proposalEvents;
-      },
-      []
-    );
+    const proposalEvents = getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
     return proposalEvents;
   };
 
