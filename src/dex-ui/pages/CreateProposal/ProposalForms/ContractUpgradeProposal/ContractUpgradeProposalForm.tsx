@@ -1,7 +1,7 @@
 import { FormControl, Input, FormErrorMessage, Flex, Button, Spacer, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { ReactElement, useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Color, TextEditor } from "../../../../../dex-ui-components";
 import { FileUploader, LoadingDialog } from "../../../../../dex-ui-components";
@@ -28,6 +28,7 @@ export function ContractUpgradeProposalForm(): ReactElement {
     setValue,
     reset,
     getValues,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ContractUpgradeProposalFormData>();
 
@@ -130,7 +131,26 @@ export function ContractUpgradeProposalForm(): ReactElement {
             <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
           </FormControl>
           <FormControl>
-            <TextEditor id="description" placeholder="Description" {...register("description")} />
+            <Controller
+              name="description"
+              control={control}
+              rules={{
+                required: { value: true, message: "Description is required." },
+                minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
+                validate: (value) => value.length >= 107,
+              }}
+              render={({ field }) => (
+                <TextEditor
+                  {...field}
+                  id="description"
+                  placeholder="Description"
+                  onError={Boolean(errors.description)}
+                  onChange={(text) => field.onChange(text)}
+                  value={field.value || ""}
+                />
+              )}
+            />
+            <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
           </FormControl>
           <FormControl>
             <Input
