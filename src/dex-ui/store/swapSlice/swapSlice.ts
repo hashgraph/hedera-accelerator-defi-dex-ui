@@ -23,76 +23,58 @@ const initialSwapState: SwapState = {
   tokenPairs: null,
 };
 
-const fetchEachToken = (evmAddress: string) => {
-  return new Promise<TokenPair>((resolve, reject) => {
-    MirrorNodeService.fetchContract(evmAddress)
-      .then((pairData) => {
-        const pairContractId = ContractId.fromString(pairData.data.contract_id);
-        HederaService.getTokenPairAddress(pairContractId)
-          .then((data) => {
-            const { tokenAAddress, tokenBAddress, tokenCAddress } = data;
-            let tokenAInfoDetails: Token;
-            let tokenBInfoDetails: Token;
-            MirrorNodeService.fetchTokenData(tokenAAddress)
-              .then((tokenAInfo) => {
-                const { data } = tokenAInfo;
-                tokenAInfoDetails = {
-                  amount: 0.0,
-                  displayAmount: "",
-                  balance: undefined,
-                  poolLiquidity: undefined,
-                  tokenName: data.name,
-                  totalSupply: data.total_supply,
-                  maxSupply: null,
-                  symbol: data.symbol,
-                  tokenMeta: {
-                    pairAccountId: pairData.data.contract_id,
-                    tokenId: data.token_id,
-                  },
-                };
-                MirrorNodeService.fetchTokenData(tokenBAddress)
-                  .then((tokenBInfo) => {
-                    const { data } = tokenBInfo;
-                    tokenBInfoDetails = {
-                      amount: 0.0,
-                      displayAmount: "",
-                      balance: undefined,
-                      poolLiquidity: undefined,
-                      tokenName: data.name,
-                      totalSupply: data.total_supply,
-                      maxSupply: null,
-                      symbol: data.symbol,
-                      tokenMeta: {
-                        pairAccountId: pairData.data.contract_id,
-                        tokenId: data.token_id,
-                      },
-                    };
-                    MirrorNodeService.fetchTokenData(tokenCAddress)
-                      .then((tokenCInfo) => {
-                        const { data } = tokenCInfo;
-                        const pairToken = {
-                          symbol: data.symbol,
-                          pairLpAccountId: tokenCAddress,
-                          totalSupply: data.total_supply,
-                          decimals: data.decimals,
-                        };
-                        const updated: TokenPair = {
-                          pairToken,
-                          tokenA: tokenAInfoDetails,
-                          tokenB: tokenBInfoDetails,
-                        };
-                        resolve(updated);
-                      })
-                      .catch((error) => reject(error));
-                  })
-                  .catch((error) => reject(error));
-              })
-              .catch((error) => reject(error));
-          })
-          .catch((error) => reject(error));
-      })
-      .catch((error) => reject(error));
-  });
+const fetchEachToken = async (evmAddress: string) => {
+  const pairData = await MirrorNodeService.fetchContract(evmAddress);
+  const pairContractId = ContractId.fromString(pairData.data.contract_id);
+  const { tokenAAddress, tokenBAddress, tokenCAddress } = await HederaService.getTokenPairAddress(pairContractId);
+
+  const [tokenAInfo, tokenBInfo, tokenCInfo] = await Promise.all([
+    MirrorNodeService.fetchTokenData(tokenAAddress),
+    MirrorNodeService.fetchTokenData(tokenBAddress),
+    MirrorNodeService.fetchTokenData(tokenCAddress),
+  ]);
+
+  const tokenAInfoDetails: Token = {
+    amount: 0.0,
+    displayAmount: "",
+    balance: undefined,
+    poolLiquidity: undefined,
+    tokenName: tokenAInfo.data.name,
+    totalSupply: tokenAInfo.data.total_supply,
+    maxSupply: null,
+    symbol: tokenAInfo.data.symbol,
+    tokenMeta: {
+      pairAccountId: pairData.data.contract_id,
+      tokenId: tokenAInfo.data.token_id,
+    },
+  };
+
+  const tokenBInfoDetails: Token = {
+    amount: 0.0,
+    displayAmount: "",
+    balance: undefined,
+    poolLiquidity: undefined,
+    tokenName: tokenBInfo.data.name,
+    totalSupply: tokenBInfo.data.total_supply,
+    maxSupply: null,
+    symbol: tokenBInfo.data.symbol,
+    tokenMeta: {
+      pairAccountId: pairData.data.contract_id,
+      tokenId: tokenBInfo.data.token_id,
+    },
+  };
+  const pairToken = {
+    symbol: tokenCInfo.data.symbol,
+    pairLpAccountId: tokenCAddress,
+    totalSupply: tokenCInfo.data.total_supply,
+    decimals: tokenCInfo.data.decimals,
+  };
+  const updated: TokenPair = {
+    pairToken,
+    tokenA: tokenAInfoDetails,
+    tokenB: tokenBInfoDetails,
+  };
+  return updated;
 };
 
 /**
@@ -145,10 +127,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       app.setFeaturesAsLoading(["tokenPairs"]);
       try {
         const pairsAddresses = await HederaService.fetchTokenPairs();
-        const urlRequest: Array<Promise<TokenPair>> = [];
-        pairsAddresses?.forEach((address) => {
-          urlRequest.push(fetchEachToken(address));
-        });
+        const urlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const pairs = await Promise.all(urlRequest);
         set(
           ({ swap }) => {
@@ -263,7 +242,6 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
         // TODO: In below Contract call we are directly returining the hard coded
-        // Token A and Token B in real scenario how will we know which is token A and which is token B
         const pairId = ContractId.fromString(tokenToReceive.tokenMeta.pairAccountId ?? "");
         const { tokenAAddress } = await HederaService.getTokenPairAddress(
           ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "")

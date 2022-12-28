@@ -39,76 +39,58 @@ const initialPoolsStore: PoolsState = {
   },
 };
 
-const fetchEachToken = (evmAddress: string) => {
-  return new Promise<TokenPair>((resolve, reject) => {
-    MirrorNodeService.fetchContract(evmAddress)
-      .then((pairData) => {
-        const pairContractId = ContractId.fromString(pairData.data.contract_id);
-        HederaService.getTokenPairAddress(pairContractId)
-          .then((data) => {
-            const { tokenAAddress, tokenBAddress, tokenCAddress } = data;
-            let tokenAInfoDetails: Token;
-            let tokenBInfoDetails: Token;
-            MirrorNodeService.fetchTokenData(tokenAAddress)
-              .then((tokenAInfo) => {
-                const { data } = tokenAInfo;
-                tokenAInfoDetails = {
-                  amount: 0.0,
-                  displayAmount: "",
-                  balance: undefined,
-                  poolLiquidity: undefined,
-                  tokenName: data.name,
-                  totalSupply: data.total_supply,
-                  maxSupply: null,
-                  symbol: data.symbol,
-                  tokenMeta: {
-                    pairAccountId: pairData.data.contract_id,
-                    tokenId: data.token_id,
-                  },
-                };
-                MirrorNodeService.fetchTokenData(tokenBAddress)
-                  .then((tokenBInfo) => {
-                    const { data } = tokenBInfo;
-                    tokenBInfoDetails = {
-                      amount: 0.0,
-                      displayAmount: "",
-                      balance: undefined,
-                      poolLiquidity: undefined,
-                      tokenName: data.name,
-                      totalSupply: data.total_supply,
-                      maxSupply: null,
-                      symbol: data.symbol,
-                      tokenMeta: {
-                        pairAccountId: pairData.data.contract_id,
-                        tokenId: data.token_id,
-                      },
-                    };
-                    MirrorNodeService.fetchTokenData(tokenCAddress)
-                      .then((tokenCInfo) => {
-                        const { data } = tokenCInfo;
-                        const pairToken = {
-                          symbol: data.symbol,
-                          pairLpAccountId: tokenCAddress,
-                          totalSupply: data.total_supply,
-                          decimals: data.decimals,
-                        };
-                        const updated: TokenPair = {
-                          pairToken,
-                          tokenA: tokenAInfoDetails,
-                          tokenB: tokenBInfoDetails,
-                        };
-                        resolve(updated);
-                      })
-                      .catch((error) => reject(error));
-                  })
-                  .catch((error) => reject(error));
-              })
-              .catch((error) => reject(error));
-          })
-          .catch((error) => reject(error));
-      })
-      .catch((error) => reject(error));
-  });
+const fetchEachToken = async (evmAddress: string) => {
+  const pairData = await MirrorNodeService.fetchContract(evmAddress);
+  const pairContractId = ContractId.fromString(pairData.data.contract_id);
+  const { tokenAAddress, tokenBAddress, tokenCAddress } = await HederaService.getTokenPairAddress(pairContractId);
+
+  const [tokenAInfo, tokenBInfo, tokenCInfo] = await Promise.all([
+    MirrorNodeService.fetchTokenData(tokenAAddress),
+    MirrorNodeService.fetchTokenData(tokenBAddress),
+    MirrorNodeService.fetchTokenData(tokenCAddress),
+  ]);
+
+  const tokenAInfoDetails: Token = {
+    amount: 0.0,
+    displayAmount: "",
+    balance: undefined,
+    poolLiquidity: undefined,
+    tokenName: tokenAInfo.data.name,
+    totalSupply: tokenAInfo.data.total_supply,
+    maxSupply: null,
+    symbol: tokenAInfo.data.symbol,
+    tokenMeta: {
+      pairAccountId: pairData.data.contract_id,
+      tokenId: tokenAInfo.data.token_id,
+    },
+  };
+
+  const tokenBInfoDetails: Token = {
+    amount: 0.0,
+    displayAmount: "",
+    balance: undefined,
+    poolLiquidity: undefined,
+    tokenName: tokenBInfo.data.name,
+    totalSupply: tokenBInfo.data.total_supply,
+    maxSupply: null,
+    symbol: tokenBInfo.data.symbol,
+    tokenMeta: {
+      pairAccountId: pairData.data.contract_id,
+      tokenId: tokenBInfo.data.token_id,
+    },
+  };
+  const pairToken = {
+    symbol: tokenCInfo.data.symbol,
+    pairLpAccountId: tokenCAddress,
+    totalSupply: tokenCInfo.data.total_supply,
+    decimals: tokenCInfo.data.decimals,
+  };
+  const updated: TokenPair = {
+    pairToken,
+    tokenA: tokenAInfoDetails,
+    tokenB: tokenBInfoDetails,
+  };
+  return updated;
 };
 
 /**
@@ -165,33 +147,23 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
         const pairsAddresses = await HederaService.fetchTokenPairs();
-        const addressessURlRequest: Promise<TokenPair>[] = [];
-        pairsAddresses?.forEach((pairAddress) => {
-          addressessURlRequest.push(fetchEachToken(pairAddress));
-        });
+        const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
-        const poolBalanceUrlRequest: Array<Promise<MirrorNodeTokenBalance[]>> = [];
-        poolTokenPairs?.forEach((pair) =>
-          poolBalanceUrlRequest.push(
+        const poolBalanceUrlRequest =
+          poolTokenPairs.map((pair) =>
             MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "")
-          )
-        );
+          ) ?? [];
         const allPairsPoolTokenBalances = await Promise.all(poolBalanceUrlRequest);
-        // TODO: Need to change it, since now we haave a array of pool token balance for each pair
         const poolTokenBalances = allPairsPoolTokenBalances.flat(1);
-
         const timestamp7DaysAgo = getTimestamp7DaysAgo();
-        const urlRequest: Array<Promise<MirrorNodeTransaction[]>> = [];
-        poolTokenPairs?.forEach((pair) =>
-          urlRequest.push(
+        const allTransactionsArrayUrlRequest =
+          poolTokenPairs.map((pair) =>
             MirrorNodeService.fetchAccountTransactions(pair.tokenA.tokenMeta.pairAccountId ?? "", timestamp7DaysAgo)
-          )
-        );
+          ) ?? [];
 
         // TODO: Assuming the Array order will be same as allPairsPoolTokenBalances
-        const allPairslast7DTransactions: Array<MirrorNodeTransaction[]> = await Promise.all(urlRequest);
+        const allPairslast7DTransactions = await Promise.all(allTransactionsArrayUrlRequest);
 
-        // TODO: Needs to be updated once fees are unique to each individial pool.
         let individialPoolMetrices: Pool[] = [];
         for (const [i, tokenPair] of poolTokenPairs?.entries() ?? []) {
           const last24Transactions = getTransactionsFromLast24Hours(allPairslast7DTransactions[i]);
@@ -288,10 +260,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           throw Error("User Account ID must be defined.");
         }
         const pairsAddresses = await HederaService.fetchTokenPairs();
-        const addressessURlRequest: Array<Promise<any>> = [];
-        pairsAddresses?.forEach((pairAddress) => {
-          addressessURlRequest.push(fetchEachToken(pairAddress));
-        });
+        const addressessURlRequest = pairsAddresses?.map((pairAddress) => fetchEachToken(pairAddress)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
         const userTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(userAccountId);
         const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
@@ -354,7 +323,11 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
-        const result = await HederaService.removeLiquidity(signer, lpTokenAmountBigNumber);
+        const result = await HederaService.removeLiquidity(
+          signer,
+          lpTokenAmountBigNumber,
+          ContractId.fromString("0.0.48660596") // TODO: To be changed in next MR
+        );
         console.log(result);
         if (result) {
           set(

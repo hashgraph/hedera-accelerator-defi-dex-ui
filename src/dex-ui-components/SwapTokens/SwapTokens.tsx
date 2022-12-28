@@ -253,7 +253,7 @@ const SwapTokens = (props: SwapTokensProps) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeId = inputElement.value;
       const token = getTokenData(tokenToTradeId, tokenPairs ?? []);
-      dispatch(setTokenToTradeSymbol(token?.symbol ?? ""));
+      dispatch(setTokenToTradeSymbol(token?.symbol));
       dispatch(setTokenToTradeMeta(token?.tokenMeta ?? { pairAccountId: undefined, tokenId: undefined }));
       const tokenToTradeBalance = getTokenBalance(tokenToTradeId, walletData?.pairedAccountBalance?.tokens ?? []);
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
@@ -294,7 +294,7 @@ const SwapTokens = (props: SwapTokensProps) => {
       );
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
 
-      dispatch(setTokenToReceiveSymbol(tokenToReceive?.symbol ?? ""));
+      dispatch(setTokenToReceiveSymbol(tokenToReceive?.symbol));
       dispatch(setTokenToReceiveMeta(tokenToReceive?.tokenMeta ?? { pairAccountId: undefined, tokenId: undefined }));
       const tokenToReceiveBalance = getTokenBalance(
         tokenToReceive?.tokenMeta.tokenId ?? "",
