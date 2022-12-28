@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Text, Button, Flex, Grid, GridItem, Circle, Input } from "@chakra-ui/react";
 import { ReactElement, useState } from "react";
-import { Notification, NotficationTypes, CardList } from "../../../dex-ui-components";
+import { Notification, NotficationTypes, CardList, Pagination, usePagination } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
 import { CardListLayout, TabFilter, TabFilters } from "../../layouts";
@@ -9,6 +9,9 @@ import { useAllProposals, useTabFilters } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
 import { useInput } from "../../hooks/useInput";
+import { FormattedProposal } from "./types";
+
+const PageLimit = 20;
 
 const VOTING_KEYS: { value: string; color: string }[] = [
   { value: "Yes", color: "#79B54B" },
@@ -36,7 +39,18 @@ export const Governance = (): ReactElement => {
     isLoading,
     isSuccess,
     isError,
-  } = useAllProposals({ titleFilter: proposalTitleFilter, statusFilters: proposalTabFilters.at(tabIndex)?.filters });
+  } = useAllProposals({
+    titleFilter: proposalTitleFilter,
+    statusFilters: proposalTabFilters.at(tabIndex)?.filters,
+  });
+  const {
+    paginatedData: paginatedProposals,
+    pageCount,
+    isPaginationVisible,
+    isPreviousButtonVisible,
+    isNextButtonVisible,
+    handlePageClick,
+  } = usePagination<FormattedProposal>({ data: proposals ?? [], pageLimit: PageLimit });
   const navigate = useNavigate();
   const locationState = useLocation().state as CreateProposalLocationProps;
   const [isNotificationVisible, setIsNotificationVisible] = useState<boolean>(
@@ -107,13 +121,21 @@ export const Governance = (): ReactElement => {
           }
           cardLists={proposalTabFilters.map(() => (
             <CardList error={error} isSuccess={isSuccess} isLoading={isLoading} isError={isError}>
-              {proposals?.map((proposal, index) => (
+              {paginatedProposals?.map((proposal, index) => (
                 <ProposalCard proposal={proposal} key={index} />
               ))}
             </CardList>
           ))}
+          paginationComponent={
+            <Pagination
+              pageCount={pageCount}
+              isPaginationVisible={isPaginationVisible}
+              isPreviousButtonVisible={isPreviousButtonVisible}
+              isNextButtonVisible={isNextButtonVisible}
+              handlePageClick={handlePageClick}
+            />
+          }
         />
-        {/* TODO: Card List Pagination */}
       </GridItem>
     </Grid>
   );

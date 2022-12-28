@@ -17,14 +17,17 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const statusColor = getStatusColor(proposal.status, proposal.state);
 
   return (
+    /** TODO: Update UI Library Card component to accept style variants. */
     <Card
       variant="proposal-card"
+      height="99px"
+      minHeight="99px"
       borderRadius="0px"
       padding="0.25rem"
       onClick={() => navigate(`/governance/proposal-details/${proposal.id}`)}
     >
-      <Flex gap="8">
-        <Box bg={statusColor} width="0.25rem"></Box>
+      <Flex gap="8" alignItems="center" height="100%">
+        <Box bg={statusColor} width="0.25rem" height="100%"></Box>
         <Flex direction="column" alignItems="start" justifyContent="center" flex="2" gap="1">
           <Text textStyle="h4" color={statusColor}>
             {proposal.status}
