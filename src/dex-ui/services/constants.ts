@@ -39,8 +39,8 @@ export const USDC_TOKEN_ID = "0.0.2276691";
 export const GovernorProxyContracts = Object.freeze({
   ContractUpgradeStringId: "0.0.49057286",
   ContractUpgradeContractId: ContractId.fromString("0.0.49057286"),
-  TransferTokenStringId: "0.0.49129958",
-  TransferTokenContractId: ContractId.fromString("0.0.49129958"),
+  TransferTokenStringId: "0.0.49180063",
+  TransferTokenContractId: ContractId.fromString("0.0.49180063"),
   TextProposalStringId: "0.0.49176059",
   TextProposalContractId: ContractId.fromString("0.0.49176059"),
   CreateTokenStringId: "0.0.49057304",
