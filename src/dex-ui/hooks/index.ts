@@ -4,3 +4,4 @@ export * from "./useWalletConnection";
 export * from "./useSwapData";
 export * from "./usePoolsData";
 export * from "./governance";
+export * from "./useTabFilters";
