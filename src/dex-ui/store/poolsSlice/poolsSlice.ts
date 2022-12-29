@@ -302,7 +302,12 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       }
       app.setFeaturesAsLoaded(["userPoolsMetrics"]);
     },
-    sendRemoveLiquidityTransaction: async (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => {
+    sendRemoveLiquidityTransaction: async (
+      lpTokenSymbol: string,
+      lpTokenAmount: number,
+      fee: string,
+      pairAcoountId: string
+    ) => {
       const { context, app, wallet } = get();
       const { network } = context;
       app.setFeaturesAsLoading(["withdrawState"]);

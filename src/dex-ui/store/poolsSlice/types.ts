@@ -55,6 +55,7 @@ interface UserPool {
   liquidity: BigNumber;
   percentOfPool: BigNumber;
   unclaimedFees: BigNumber;
+  userTokenPair: TokenPair | undefined;
 }
 
 interface TokenBalance {
@@ -97,7 +98,12 @@ interface PoolsActions {
   fetchAllPoolMetrics: () => Promise<void>;
   fetchUserPoolMetrics: (userAccountId: string) => Promise<void>;
   fetchSpotPrices: ({ inputTokenAddress, outputTokenAddress, pairAccountId }: any) => Promise<void>;
-  sendRemoveLiquidityTransaction: (lpTokenSymbol: string, lpTokenAmount: number, fee: string) => Promise<void>;
+  sendRemoveLiquidityTransaction: (
+    lpTokenSymbol: string,
+    lpTokenAmount: number,
+    fee: string,
+    pairAccountId: string
+  ) => Promise<void>;
   resetWithdrawState: () => Promise<void>;
   // Temporary - should be removed
   send100LabTokensToWallet: (receivingAccountId: string) => Promise<void>;

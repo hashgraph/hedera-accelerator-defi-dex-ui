@@ -1,4 +1,3 @@
-import { A_B_PAIR_TOKEN_ID, TOKEN_ID_TO_TOKEN_SYMBOL } from "../../services";
 import { PoolsStore, UserPool } from "../../store/poolsSlice";
 import { formatBigNumberToPercent } from "../../utils";
 
@@ -16,17 +15,21 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const userPercentOfPool = selectedPoolMetrics.percentOfPool;
   const userPercentOfPoolAsNumber = userPercentOfPool.toNumber();
   const userPercentOfPoolAsPercent = formatBigNumberToPercent(userPercentOfPool);
-  const userLpAmount = userTokenBalances.find((token) => token.token_id === A_B_PAIR_TOKEN_ID)?.balance.toNumber() || 0;
+  const userLpAmount =
+    userTokenBalances
+      .find((token) => token.token_id === selectedPoolMetrics.userTokenPair?.pairToken.pairLpAccountId)
+      ?.balance.toNumber() || 0;
 
   // details of first token
-  const firstTokenSymbol = TOKEN_ID_TO_TOKEN_SYMBOL.get(firstTokenBalance.token_id) || "";
+  const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
   const firstTokenPoolLiquidity = firstTokenBalance.balance.toNumber();
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * firstTokenPoolLiquidity;
 
   // details of first token
-  const secondTokenSymbol = TOKEN_ID_TO_TOKEN_SYMBOL.get(secondTokenBalance.token_id) || "";
+  const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
   const secondTokenPoolLiquidity = secondTokenBalance.balance.toNumber();
   const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * secondTokenPoolLiquidity;
+  const pairAcoountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
 
   const firstToken = {
     tokenSymbol: firstTokenSymbol,
@@ -42,6 +45,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
     tokenSymbol: selectedPoolMetrics.name,
     userLpAmount,
     userLpPercentage: userPercentOfPoolAsPercent,
+    pairAcoountId,
   };
 
   return { firstToken, secondToken, poolLpDetails };

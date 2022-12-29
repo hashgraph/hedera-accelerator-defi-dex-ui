@@ -2,7 +2,7 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoadingDialog } from "../../../dex-ui-components";
-/* import { WithdrawComponent } from "../../../dex-ui-components/Pool"; */
+import { WithdrawComponent } from "../../../dex-ui-components/Pool";
 import { useDexContext, usePoolsData } from "../../hooks";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
 import { formatBigNumberToPercent } from "../../utils";
@@ -10,11 +10,11 @@ import { PoolsLocationProps } from "../Pools";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
-  const { pools, wallet, swap } = useDexContext(({ pools, wallet, swap }) => ({ pools, wallet, swap }));
+  const { app, pools, wallet, swap } = useDexContext(({ pools, wallet, swap, app }) => ({ pools, wallet, swap, app }));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  usePoolsData(REFRESH_INTERVAL);
+  usePoolsData(400000);
 
   const [withdrawState, setWithdrawState] = useState({
     noPoolMetricsMessage: "",
@@ -38,6 +38,7 @@ const Withdraw = () => {
         tokenSymbol: "",
         userLpAmount: 0,
         userLpPercentage: "0%",
+        pairAcoountId: "",
       },
     },
     lpInputAmount: 0,
@@ -137,16 +138,16 @@ const Withdraw = () => {
     [findPoolByLpToken, pools, withdrawState]
   );
 
-  /*   const onWithdrawClick = useCallback(
+  const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      const { tokenSymbol } = withdrawState.withdrawProps.poolLpDetails;
+      const { tokenSymbol, pairAcoountId } = withdrawState.withdrawProps.poolLpDetails;
       const { poolFee } = withdrawState;
-      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee);
+      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee, pairAcoountId);
     },
     [pools, withdrawState]
-  ); */
+  );
 
-  /*   const onInputAmountChange = useCallback(
+  const onInputAmountChange = useCallback(
     (lpAmount: number) => {
       setWithdrawState({
         ...withdrawState,
@@ -154,17 +155,17 @@ const Withdraw = () => {
       });
     },
     [withdrawState]
-  ); */
+  );
 
   return !withdrawState.noPoolMetricsMessage ? (
     <>
-      {/* <WithdrawComponent
+      <WithdrawComponent
         {...withdrawState.withdrawProps}
         onWithdrawClick={onWithdrawClick}
         onInputAmountChange={onInputAmountChange}
         disableWithdrawButton={withdrawState.lpInputAmount === 0}
         isFeatureLoading={app.isFeatureLoading}
-      /> */}
+      />
       <LoadingDialog
         isOpen={pools.withdrawState.status === "in progress"}
         message={"Please confirm the swap in your wallet to proceed"}
