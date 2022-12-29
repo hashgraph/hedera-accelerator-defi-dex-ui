@@ -47,9 +47,8 @@ function createDexService() {
       id: proposalEvent.proposalId,
       contractId: proposalEvent.contractId,
       type: isProposalTypeValid ? (proposalEvent.type as ProposalType) : undefined,
-      title: proposalEvent.description,
-      description: `Preview of the description lorem ipsum dolor sit amit consectetur 
-              adipiscing elit Phasellus congue, sapien eu...`,
+      title: proposalEvent.title,
+      description: proposalEvent.description ?? "",
       author: proposalEvent.proposer
         ? AccountId.fromSolidityAddress(proposalEvent.proposer)
         : AccountId.fromString("0.0.34728121"),

@@ -41,8 +41,8 @@ export const GovernorProxyContracts = Object.freeze({
   ContractUpgradeContractId: ContractId.fromString("0.0.49057286"),
   TransferTokenStringId: "0.0.49129958",
   TransferTokenContractId: ContractId.fromString("0.0.49129958"),
-  TextProposalStringId: "0.0.49057298",
-  TextProposalContractId: ContractId.fromString("0.0.49057298"),
+  TextProposalStringId: "0.0.49176059",
+  TextProposalContractId: ContractId.fromString("0.0.49176059"),
   CreateTokenStringId: "0.0.49057304",
   CreateTokenContractId: ContractId.fromString("0.0.49057304"),
 });

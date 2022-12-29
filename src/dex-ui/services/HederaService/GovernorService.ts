@@ -172,10 +172,15 @@ const sendCreateTransferTokenProposalTransaction = async (
  * @returns
  */
 const sendCreateTextProposalTransaction = async (
+  title: string,
   description: string,
+  linkToDiscussion: string,
   signer: HashConnectSigner
 ): Promise<TransactionResponse> => {
-  const contractCallParams = new ContractFunctionParameters().addString(description);
+  const contractCallParams = new ContractFunctionParameters()
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(GovernorProxyContracts.TextProposalContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
