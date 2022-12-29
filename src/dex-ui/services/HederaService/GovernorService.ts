@@ -186,7 +186,8 @@ interface CreateContratctUpgradeProposalParams {
 const sendCreateContractUpgradeProposalTransaction = async (
   params: CreateContratctUpgradeProposalParams
 ): Promise<TransactionResponse> => {
-  const { title, description, linkToDiscussion, contarctId, proxyId, signer } = params;
+  const { title, linkToDiscussion, description, contarctId, proxyId, signer } = params;
+  console.log(`Contract Upgrade Details ${linkToDiscussion} ${description}`);
   const upgradeProposalContractId = ContractId.fromString(contarctId).toSolidityAddress();
   const upgradeProposalProxyId = ContractId.fromString(proxyId).toSolidityAddress();
 

@@ -113,6 +113,7 @@ export function ContractUpgradeProposalForm(): ReactElement {
       // TODO: Hard Coded proxy Address for now, need to discuss the final flow
       setValue("proxyAddress", "0.0.49078140", { shouldValidate: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployContract.data?.id]);
 
   return (
