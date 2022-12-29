@@ -221,7 +221,7 @@ function createMirrorNodeService() {
     });
 
     const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
-    const proposalCreatedEvents = allEvents.get("ProposalCreated") ?? [];
+    const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
     });

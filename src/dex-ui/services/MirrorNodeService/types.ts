@@ -79,13 +79,11 @@ interface MirrorNodeDecodedProposalEvent {
   contractId: string;
   type: string;
   proposer?: string;
-  targets?: string[];
-  values?: string[];
-  signatures?: string[];
-  calldatas?: string[];
   startBlock?: string;
   endBlock?: string;
   description?: string;
+  title?: string;
+  link?: string;
 }
 
 export type {

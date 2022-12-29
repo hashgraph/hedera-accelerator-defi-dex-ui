@@ -23,9 +23,11 @@ function TextProposalForm() {
   const handleCancelClick = () => navigate("/governance");
 
   async function onSubmit(data: TextProposalFormData) {
-    // TODO: Proposal Contract functions do not handle both title and description yet.
-    // description: data.description,
-    await governance.createProposal(ProposalType.Text, { title: data.title });
+    await governance.createProposal(ProposalType.Text, {
+      title: data.title,
+      description: data.description,
+      linkToDiscussion: "",
+    });
   }
 
   return (
