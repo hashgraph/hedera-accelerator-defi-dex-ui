@@ -158,7 +158,6 @@ const sendCreateTransferTokenProposalTransaction = async (
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
     .addInt256(amountToTransfer);
-  return Promise.reject();
 
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(GovernorProxyContracts.TransferTokenContractId)
