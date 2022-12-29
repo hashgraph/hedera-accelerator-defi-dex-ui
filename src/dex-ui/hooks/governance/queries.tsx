@@ -8,6 +8,7 @@ export function useProposalQuery<T>(select: (data: Proposal[]) => T) {
     GovernanceQueries.FetchAllProposals,
     async () => DexService.fetchAllProposals(),
     {
+      keepPreviousData: true,
       select,
     }
   );
