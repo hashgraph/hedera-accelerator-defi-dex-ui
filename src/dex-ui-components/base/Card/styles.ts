@@ -30,6 +30,7 @@ export const CardStyles: ComponentStyleConfig = {
         border: "1px #00BAC6 dashed",
         height: "102Px",
         borderRadius: "8px",
+        cursor: "pointer",
       },
     },
   },
