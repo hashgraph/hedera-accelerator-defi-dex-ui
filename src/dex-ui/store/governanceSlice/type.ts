@@ -49,6 +49,7 @@ interface Proposal {
   title: string | undefined;
   author: AccountId;
   description: string;
+  link: string;
   status: ProposalStatus | undefined;
   timeRemaining: BigNumber | undefined;
   state: ProposalState | undefined;

@@ -49,6 +49,7 @@ function createDexService() {
       type: isProposalTypeValid ? (proposalEvent.type as ProposalType) : undefined,
       title: proposalEvent.title,
       description: proposalEvent.description ?? "",
+      link: proposalEvent.link ?? "",
       author: proposalEvent.proposer
         ? AccountId.fromSolidityAddress(proposalEvent.proposer)
         : AccountId.fromString("0.0.34728121"),

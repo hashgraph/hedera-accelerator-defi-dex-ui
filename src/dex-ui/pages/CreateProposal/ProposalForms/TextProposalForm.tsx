@@ -8,6 +8,7 @@ import { ProposalType } from "../../../store/governanceSlice";
 type TextProposalFormData = {
   title: string;
   description: string;
+  linkToDiscussion: string;
 };
 
 function TextProposalForm() {
@@ -22,11 +23,20 @@ function TextProposalForm() {
 
   const handleCancelClick = () => navigate("/governance");
 
+  const checkIsValidUrl = (urlString: string) => {
+    try {
+      const url = new URL(urlString);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch (_) {
+      return urlString.length === 0 ? true : false;
+    }
+  };
+
   async function onSubmit(data: TextProposalFormData) {
     await governance.createProposal(ProposalType.Text, {
       title: data.title,
       description: data.description,
-      linkToDiscussion: "",
+      linkToDiscussion: data.linkToDiscussion ?? "",
     });
   }
 
@@ -51,7 +61,6 @@ function TextProposalForm() {
             rules={{
               required: { value: true, message: "Description is required." },
               minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
-              validate: (value) => value.length >= 107,
             }}
             render={({ field }) => (
               <TextEditor
@@ -65,6 +74,17 @@ function TextProposalForm() {
             )}
           />
           <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={Boolean(errors.linkToDiscussion)}>
+          <Input
+            variant="form-input"
+            id="linkToDiscussion"
+            placeholder="Link to Discussion (optional)"
+            {...register("linkToDiscussion", {
+              validate: (value) => checkIsValidUrl(value) || "Enter a Valid URL.",
+            })}
+          />
+          <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>
         </FormControl>
         <Spacer padding="0.5rem" />
         <Flex direction="row" justifyContent="right" gap="0.5rem">

@@ -186,6 +186,7 @@ const sendCreateTextProposalTransaction = async (
     .setGas(9000000)
     .freezeWithSigner(signer);
   const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(proposalTransactionResponse, GovernorContractFunctions.CreateProposal);
   return proposalTransactionResponse;
 };
 interface ExecuteProposalParams {
