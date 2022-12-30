@@ -12,8 +12,10 @@ interface CreateNewTokenProposalData {
 }
 
 interface CreateTextProposalData {
-  title: string;
   signer: HashConnectSigner;
+  title: string;
+  description: string;
+  linkToDiscussion: string;
 }
 
 interface CreateTransferTokenProposalData {
@@ -63,8 +65,8 @@ export function useCreateProposal() {
           linkToDiscussion,
         });
       } else if (type === CreateProposalType.Text) {
-        const { signer, title } = proposalData as CreateTextProposalData;
-        return HederaService.sendCreateTextProposalTransaction(title, signer);
+        const { signer, title, description, linkToDiscussion } = proposalData as CreateTextProposalData;
+        return HederaService.sendCreateTextProposalTransaction(title, description, linkToDiscussion, signer);
       } else {
         // TODO: In the default case its Token Tranfer
         const { wallet, title, description, linkToDiscussion, tokenToTransfer, amountToTransfer, accountToTransferTo } =
