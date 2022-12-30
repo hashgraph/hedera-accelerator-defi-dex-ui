@@ -37,20 +37,10 @@ export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
 export const USDC_TOKEN_ID = "0.0.2276691";
 
 export const GovernorProxyContracts = Object.freeze({
-<<<<<<< HEAD
-  // MARK: Below ContractUpgradeContractId has more validity for the proposal to test
-  ContractUpgradeStringId: "0.0.49148745",
-  ContractUpgradeContractId: ContractId.fromString("0.0.49148745"),
-  // ContractUpgradeStringId: "0.0.49057286",
-  // ContractUpgradeContractId: ContractId.fromString("0.0.49057286"),
-  TransferTokenStringId: "0.0.49129958",
-  TransferTokenContractId: ContractId.fromString("0.0.49129958"),
-=======
   ContractUpgradeStringId: "0.0.49057286",
   ContractUpgradeContractId: ContractId.fromString("0.0.49057286"),
   TransferTokenStringId: "0.0.49180063",
   TransferTokenContractId: ContractId.fromString("0.0.49180063"),
->>>>>>> 031fd1a (changes done for Token transfer)
   TextProposalStringId: "0.0.49176059",
   TextProposalContractId: ContractId.fromString("0.0.49176059"),
   CreateTokenStringId: "0.0.49057304",
