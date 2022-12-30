@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
 import { ProposalType } from "../../../store/governanceSlice";
-import { checkIsValidUrl } from "../utils";
+import { isValidUrl } from "../utils";
 
 type TextProposalFormData = {
   title: string;
@@ -73,7 +73,7 @@ function TextProposalForm() {
             id="linkToDiscussion"
             placeholder="Link to Discussion (optional)"
             {...register("linkToDiscussion", {
-              validate: (value) => checkIsValidUrl(value) || "Enter a Valid URL.",
+              validate: (value) => isValidUrl(value) || "Enter a Valid URL.",
             })}
           />
           <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>

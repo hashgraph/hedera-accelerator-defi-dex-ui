@@ -9,7 +9,7 @@ import { CreateProposalType } from "../../../../hooks/governance/types";
 import { useDexContext } from "../../../../hooks";
 import { useContractUpgradeProposalDetails } from "./useContractUpgradeProposalDetails";
 import { CreateProposalLocationProps } from "../../CreateProposal";
-import { checkIsValidUrl } from "../../utils";
+import { isValidUrl } from "../../utils";
 
 interface ContractUpgradeProposalFormData {
   title: string;
@@ -159,7 +159,7 @@ export function ContractUpgradeProposalForm(): ReactElement {
               id="linkToDiscussion"
               placeholder="Link to Discussion (optional)"
               {...register("linkToDiscussion", {
-                validate: (value) => checkIsValidUrl(value) || "Enter a Valid URL.",
+                validate: (value) => isValidUrl(value) || "Enter a Valid URL.",
               })}
             />
             <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>

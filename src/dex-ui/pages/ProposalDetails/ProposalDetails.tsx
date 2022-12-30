@@ -35,7 +35,7 @@ import { ProposalState } from "../../store/governanceSlice";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { VoteType } from "./types";
 import { useProposalDetails } from "./useProposalDetails";
-import parse from "html-react-parser";
+import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
@@ -207,7 +207,7 @@ export const ProposalDetails = () => {
               <Text textStyle="h3">Description</Text>
               <Spacer padding="0.25rem" />
               <SkeletonText speed={0.4} fadeDuration={0} noOfLines={12} isLoaded={!proposal.isLoading}>
-                <Text>{parse(proposal.data?.description ?? "")}</Text>
+                <DisplayHTMLContent value={proposal.data?.description ?? ""} />
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
