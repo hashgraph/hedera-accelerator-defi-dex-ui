@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
 import { ProposalType } from "../../../store/governanceSlice";
+import { checkIsValidUrl } from "../utils";
 
 type TextProposalFormData = {
   title: string;
@@ -22,15 +23,6 @@ function TextProposalForm() {
   } = useForm<TextProposalFormData>();
 
   const handleCancelClick = () => navigate("/governance");
-
-  const checkIsValidUrl = (urlString: string) => {
-    try {
-      const url = new URL(urlString);
-      return url.protocol === "http:" || url.protocol === "https:";
-    } catch (_) {
-      return urlString.length === 0 ? true : false;
-    }
-  };
 
   async function onSubmit(data: TextProposalFormData) {
     await governance.createProposal(ProposalType.Text, {

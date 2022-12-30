@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
 import { ProposalType } from "../../../store/governanceSlice";
+import { checkIsValidUrl } from "../utils";
 
 interface TokenTransferProposalFormData {
   title: string;
@@ -63,7 +64,6 @@ export function TokenTransferProposalForm(): ReactElement {
             rules={{
               required: { value: true, message: "Description is required." },
               minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
-              validate: (value) => value.length >= 107,
             }}
             render={({ field }) => (
               <TextEditor
@@ -78,13 +78,16 @@ export function TokenTransferProposalForm(): ReactElement {
           />
           <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
         </FormControl>
-        <FormControl>
+        <FormControl isInvalid={Boolean(errors.linkToDiscussion)}>
           <Input
             variant="form-input"
             id="linkToDiscussion"
             placeholder="Link to Discussion (optional)"
-            {...register("linkToDiscussion")}
+            {...register("linkToDiscussion", {
+              validate: (value) => checkIsValidUrl(value) || "Enter a Valid URL.",
+            })}
           />
+          <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>
         </FormControl>
         <FormControl isInvalid={Boolean(errors.accountToTransferTo)}>
           <Input
