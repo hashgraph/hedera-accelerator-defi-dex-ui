@@ -1,27 +1,25 @@
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { chakra } from "@chakra-ui/react";
-import { displayHTMLContentEditorStyles } from "./styles/TextEditorStyles";
+import { displayHTMLContentStyles } from "./styles/TextEditorStyles";
 
-interface TextEditorProps {
+interface DisplayHTMLContentProps {
+  id?: string;
   value: string;
 }
 
-const modules = {
-  toolbar: false,
-};
-
 const ChakraTextEditor = chakra(ReactQuill);
 
-function DisplayHTMLContent(props: TextEditorProps) {
-  const { value } = props;
+function DisplayHTMLContent(props: DisplayHTMLContentProps) {
+  const { value, id } = props;
   return (
     <ChakraTextEditor
+      id={id}
       value={value}
       readOnly={true}
       theme="snow"
-      modules={modules}
-      sx={displayHTMLContentEditorStyles}
+      modules={{ toolbar: false }}
+      sx={displayHTMLContentStyles}
     />
   );
 }
