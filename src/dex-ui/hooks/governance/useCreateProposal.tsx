@@ -69,10 +69,7 @@ export function useCreateProposal() {
         // TODO: In the default case its Token Tranfer
         const { wallet, title, description, linkToDiscussion, tokenToTransfer, amountToTransfer, accountToTransferTo } =
           proposalData as CreateTransferTokenProposalData;
-        const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision(
-          tokenToTransfer,
-          amountToTransfer,
-        );
+        const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision(tokenToTransfer, amountToTransfer);
         return HederaService.sendCreateTransferTokenProposalTransaction({
           title,
           linkToDiscussion,
