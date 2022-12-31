@@ -70,10 +70,8 @@ export function useCreateProposal() {
         const { wallet, title, description, linkToDiscussion, tokenToTransfer, amountToTransfer, accountToTransferTo } =
           proposalData as CreateTransferTokenProposalData;
         const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision(
-          // TODO: This is a temporary override to use token id instead of symbol
-          "",
+          tokenToTransfer,
           amountToTransfer,
-          tokenToTransfer
         );
         return HederaService.sendCreateTransferTokenProposalTransaction({
           title,
