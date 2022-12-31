@@ -8,3 +8,5 @@ export * from "./Card";
 export * from "./RadioCard";
 export * from "./Notification";
 export * from "./Charts";
+export * from "./CardList";
+export * from "./Tabs";

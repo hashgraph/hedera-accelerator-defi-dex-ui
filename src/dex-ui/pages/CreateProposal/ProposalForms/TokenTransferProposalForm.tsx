@@ -34,7 +34,7 @@ export function TokenTransferProposalForm(): ReactElement {
        * TODO: Add ref data controller for Rich Text Editor to retrieve description value from react-hook-form.
        * Need to update contract logs to emit description and linkToDiscussion.
        * */
-      description: "A description of this proposal.",
+      description: data.description,
       linkToDiscussion: data.linkToDiscussion,
       accountToTransferTo: data.accountToTransferTo,
       tokenToTransfer: data.tokenToTransfer,

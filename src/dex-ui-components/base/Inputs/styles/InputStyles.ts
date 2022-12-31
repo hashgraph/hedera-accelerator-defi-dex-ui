@@ -29,6 +29,18 @@ export const InputStyles: ComponentStyleConfig = {
         },
       },
     },
+    filter: {
+      field: {
+        bg: Color.White_02,
+        border: `1px solid ${Color.Grey_02}`,
+        minWidth: "300px",
+        borderRadius: "0px",
+        padding: "0 0.5rem",
+        _placeholder: {
+          color: Color.Black_01,
+        },
+      },
+    },
   },
   defaultProps: {},
 };
