@@ -445,6 +445,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           tokenPairs={uniqueTokens}
           onMaxButtonClick={handleTokenToTradeMaxButtonClick}
           onHalfButtonClick={handleTokenToTradeHalfButtonClick}
+          isPairsLoading={isFeatureLoading("tokenPairs")}
           isLoading={isFeatureLoading("pairedAccountBalance")}
         />
         <Flex>
@@ -471,6 +472,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           tokenPairs={tokensPairedWithTradeToken}
           onTokenAmountChange={handleTokenToReceiveAmountChange}
           onTokenSymbolChange={handleTokenToReceiveSymbolChange}
+          isPairsLoading={isFeatureLoading("tokenPairs")}
           isLoading={isFeatureLoading("pairedAccountBalance")}
         />
         <Flex paddingTop="1rem">

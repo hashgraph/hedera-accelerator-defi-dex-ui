@@ -10,6 +10,7 @@ export interface TokenInputProps {
   isDisabled?: boolean;
   isHalfAndMaxButtonsVisible?: boolean;
   isLoading?: boolean;
+  isPairsLoading?: boolean;
   title: string;
   tokenAmount: number | string;
   tokenSymbol: string | undefined;
@@ -37,6 +38,7 @@ const TokenInput = (props: TokenInputProps) => {
     isDisabled = false,
     isHalfAndMaxButtonsVisible = false,
     isLoading = false,
+    isPairsLoading = false,
     tokenAmount,
     tokenSymbol,
     tokenBalance,
@@ -93,7 +95,9 @@ const TokenInput = (props: TokenInputProps) => {
           </Box>
           {!hideTokenSelector ? (
             <Box flex="4">
-              <TokenSelector value={tokenId} onChangeHandler={onTokenSymbolChange} tokenPairs={tokenPairs} />
+              <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isPairsLoading}>
+                <TokenSelector value={tokenId} onChangeHandler={onTokenSymbolChange} tokenPairs={tokenPairs} />
+              </Skeleton>
             </Box>
           ) : (
             ""
