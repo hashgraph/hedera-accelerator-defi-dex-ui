@@ -132,14 +132,14 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.firstToken.poolLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.firstToken.userProvidedLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                 </>
@@ -150,21 +150,21 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.secondToken.poolLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.secondToken.userProvidedLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={"Remaining share of pool"}
                       value={poolLpDetails.userLpPercentage}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                 </>

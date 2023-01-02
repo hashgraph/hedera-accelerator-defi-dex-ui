@@ -14,7 +14,7 @@ const Withdraw = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  usePoolsData(400000);
+  usePoolsData(REFRESH_INTERVAL);
 
   const [withdrawState, setWithdrawState] = useState({
     noPoolMetricsMessage: "",
@@ -38,7 +38,7 @@ const Withdraw = () => {
         tokenSymbol: "",
         userLpAmount: 0,
         userLpPercentage: "0%",
-        pairAcoountId: "",
+        pairAccountId: "",
       },
     },
     lpInputAmount: 0,
@@ -140,9 +140,9 @@ const Withdraw = () => {
 
   const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      const { tokenSymbol, pairAcoountId } = withdrawState.withdrawProps.poolLpDetails;
+      const { tokenSymbol, pairAccountId } = withdrawState.withdrawProps.poolLpDetails;
       const { poolFee } = withdrawState;
-      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee, pairAcoountId);
+      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee, pairAccountId);
     },
     [pools, withdrawState]
   );
