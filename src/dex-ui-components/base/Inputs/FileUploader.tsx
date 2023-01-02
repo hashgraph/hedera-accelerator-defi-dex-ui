@@ -45,7 +45,7 @@ function FileUploader(props: FileUploaderProps) {
   });
 
   return (
-    <Card id={id} {...getRootProps()} variant="file-uploader" style={{ ...fileUploaderStyles }} cursor="pointer">
+    <Card id={id} {...getRootProps()} variant="file-uploader" style={{ ...fileUploaderStyles }}>
       <CardBody>
         <input {...getInputProps()} />
         {isDragActive ? (

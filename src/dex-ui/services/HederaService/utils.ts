@@ -8,6 +8,7 @@ import {
   ContractFunctionParameters,
   TransactionResponse,
   ContractFunctionResult,
+  TransactionReceipt,
 } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 
@@ -85,7 +86,7 @@ const queryContract = async (
   return await query.execute(client);
 };
 
-const checkTransactionResponseForError = (response: TransactionResponse, functionName: string) => {
+const checkTransactionResponseForError = (response: TransactionResponse | TransactionReceipt, functionName: string) => {
   if (isNil(response)) throw new Error(`${functionName} transaction failed.`);
 };
 

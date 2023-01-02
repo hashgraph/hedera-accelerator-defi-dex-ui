@@ -1,7 +1,8 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Menu, MenuItem, HStack, Box, Text, Center, Flex, Tag } from "@chakra-ui/react";
-import { useDexContext } from "../../hooks";
-import { WalletConnection } from "../../../dex-ui-components";
+import { useDexContext } from "../hooks";
+import { WalletConnection } from "../../dex-ui-components";
+
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
 }
@@ -13,7 +14,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
     <Menu>
       <Flex
         padding="2rem 1rem"
-        marginBottom="3rem"
+        marginBottom="2rem"
         w="100%"
         height="84px"
         alignItems="center"
