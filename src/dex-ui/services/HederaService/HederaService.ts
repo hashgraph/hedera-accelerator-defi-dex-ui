@@ -8,6 +8,7 @@ import {
   TransferTransaction,
   TokenAssociateTransaction,
   TransactionResponse,
+  PrivateKey,
 } from "@hashgraph/sdk";
 import {
   GovernorProxyContracts,
@@ -17,6 +18,7 @@ import {
   TOKEN_B_ID,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
   FACTORY_CONTRACT_ID,
+  TOKEN_USER_KEY,
 } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
@@ -37,10 +39,10 @@ type HederaServiceType = ReturnType<typeof createHederaService>;
 function createHederaService() {
   const { treasuryId, treasuryKey } = getTreasurer();
   const factoryId = ContractId.fromString(FACTORY_CONTRACT_ID); //
-  let _precision = BigNumber(0);
+  let _precision = BigNumber(100000000);
   const initHederaService = async () => {
     // Since the Precision if fixed from Backend keeping it constant for a while.
-    _precision = BigNumber(10000000);
+    _precision = BigNumber(100000000);
   };
 
   const fetchTokenPairs = async (): Promise<string[] | null> => {
@@ -138,7 +140,9 @@ function createHederaService() {
       .setGas(2000000)
       .setFunction("removeLiquidity", new ContractFunctionParameters().addAddress(accountId).addInt256(lpTokenAmount))
       .freezeWithSigner(signer);
-    const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
+    const key = PrivateKey.fromString(TOKEN_USER_KEY);
+    const firstSignedTrasaction = await removeLiquidity.sign(key);
+    const removeLiquidityTx = await firstSignedTrasaction.executeWithSigner(signer);
 
     console.log(`Liquidity remove Tx: ${removeLiquidityTx}`);
     return removeLiquidityTx;
@@ -176,7 +180,9 @@ function createHederaService() {
       .setGas(2000000)
       .setNodeAccountIds([new AccountId(3)])
       .freezeWithSigner(signer);
-    const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);
+    const key = PrivateKey.fromString(TOKEN_USER_KEY);
+    const secondSignedTrasaction = await swapTokenTransaction.sign(key);
+    const swapTokenResponse = await secondSignedTrasaction.executeWithSigner(signer);
     return swapTokenResponse;
   };
 

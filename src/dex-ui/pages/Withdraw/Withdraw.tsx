@@ -38,6 +38,7 @@ const Withdraw = () => {
         tokenSymbol: "",
         userLpAmount: 0,
         userLpPercentage: "0%",
+        lpAccountId: "",
         pairAccountId: "",
       },
     },
@@ -140,9 +141,9 @@ const Withdraw = () => {
 
   const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      const { tokenSymbol, pairAccountId } = withdrawState.withdrawProps.poolLpDetails;
+      const { pairAccountId, lpAccountId } = withdrawState.withdrawProps.poolLpDetails;
       const { poolFee } = withdrawState;
-      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee, pairAccountId);
+      pools.sendRemoveLiquidityTransaction(lpAccountId, lpAmount, poolFee, pairAccountId);
     },
     [pools, withdrawState]
   );

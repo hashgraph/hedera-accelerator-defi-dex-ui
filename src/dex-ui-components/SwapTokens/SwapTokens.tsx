@@ -36,7 +36,7 @@ import {
   getTokensByUniqueAccountIds,
   halfOf,
   getTokenData,
-  getTradeTokenMeta,
+  getPairedTokenData,
 } from "./utils";
 import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks, WalletStore } from "../../dex-ui/store/walletSlice";
@@ -277,33 +277,36 @@ const SwapTokens = (props: SwapTokensProps) => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToReceiveId = inputElement.value;
-      const tokenToReceive = getTokenData(tokenToReceiveId, tokenPairs ?? []);
 
-      const tokenToTrade = getTradeTokenMeta(
-        tokenToReceive?.tokenMeta.tokenId,
-        tokenToReceive?.tokenMeta.pairAccountId,
+      const { tokenToTradeData, tokenToReceiveData } = getPairedTokenData(
+        tokenToTrade.tokenMeta.tokenId ?? "",
+        tokenToReceiveId,
         tokenPairs ?? []
       );
 
       dispatch(
-        setTokenToTradeMeta(tokenToTrade?.tokenMeta ? tokenToTrade?.tokenMeta : swapState.tokenToTrade.tokenMeta)
+        setTokenToTradeMeta(
+          tokenToTradeData?.tokenMeta ? tokenToTradeData?.tokenMeta : swapState.tokenToTrade.tokenMeta
+        )
       );
       const tokenToTradeBalance = getTokenBalance(
-        tokenToTrade?.tokenMeta.tokenId ?? "",
+        tokenToTradeData?.tokenMeta.tokenId ?? "",
         walletData?.pairedAccountBalance?.tokens ?? []
       );
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
 
-      dispatch(setTokenToReceiveSymbol(tokenToReceive?.symbol));
-      dispatch(setTokenToReceiveMeta(tokenToReceive?.tokenMeta ?? { pairAccountId: undefined, tokenId: undefined }));
+      dispatch(setTokenToReceiveSymbol(tokenToReceiveData?.symbol));
+      dispatch(
+        setTokenToReceiveMeta(tokenToReceiveData?.tokenMeta ?? { pairAccountId: undefined, tokenId: undefined })
+      );
       const tokenToReceiveBalance = getTokenBalance(
-        tokenToReceive?.tokenMeta.tokenId ?? "",
+        tokenToReceiveData?.tokenMeta.tokenId ?? "",
         walletData?.pairedAccountBalance?.tokens ?? []
       );
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
       updateExchangeRate({
-        tokenToTradeId: tokenToTrade?.tokenMeta.tokenId,
-        tokenToReceiveId: tokenToReceive?.tokenMeta.tokenId,
+        tokenToTradeId: tokenToTradeData?.tokenMeta.tokenId,
+        tokenToReceiveId: tokenToReceiveData?.tokenMeta.tokenId,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

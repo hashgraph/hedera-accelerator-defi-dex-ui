@@ -325,7 +325,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const result = await HederaService.removeLiquidity(
           signer,
           lpTokenAmountBigNumber,
-          ContractId.fromString("0.0.48660596") // TODO: To be changed in next MR
+          ContractId.fromString(pairAcoountId)
         );
         console.log(result);
         if (result) {

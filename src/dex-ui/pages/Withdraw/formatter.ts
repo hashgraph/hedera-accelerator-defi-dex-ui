@@ -30,6 +30,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const secondTokenPoolLiquidity = secondTokenBalance.balance.toNumber();
   const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * secondTokenPoolLiquidity;
   const pairAccountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
+  const lpAccountId = selectedPoolMetrics?.userTokenPair?.pairToken.pairLpAccountId ?? "";
 
   const firstToken = {
     tokenSymbol: firstTokenSymbol,
@@ -46,6 +47,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
     userLpAmount,
     userLpPercentage: userPercentOfPoolAsPercent,
     pairAccountId,
+    lpAccountId,
   };
 
   return { firstToken, secondToken, poolLpDetails };

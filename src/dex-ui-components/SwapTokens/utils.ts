@@ -71,27 +71,25 @@ export const getTokenData = (tokenId: string, tokenPairs: TokenPair[]) => {
   return token;
 };
 
-interface GetPairedTokenDataParams {
-  tokenId: string;
-  tokenPairContractId: string;
-  tokenPairs: TokenPair[];
+interface PairTokenData {
+  tokenToTradeData: Token | undefined;
+  tokenToReceiveData: Token | undefined;
 }
 
-export const getPairedTokenData = ({ tokenId, tokenPairContractId, tokenPairs }: GetPairedTokenDataParams) => {
-  const pairedToken = tokenPairs
-    ?.map((token: TokenPair) => {
-      if (token.tokenA.tokenMeta.pairAccountId === tokenPairContractId && token.tokenA.tokenMeta.tokenId === tokenId) {
-        return token.tokenB;
-      } else if (
-        token.tokenB.tokenMeta.pairAccountId === tokenPairContractId &&
-        token.tokenB.tokenMeta.tokenId === tokenId
-      ) {
-        return token.tokenA;
+export const getPairedTokenData = (tokenId: string, receiveTokenId: string, tokenPairs: TokenPair[]): PairTokenData => {
+  const data = tokenPairs
+    ?.map((pair: TokenPair) => {
+      if (pair.tokenA.tokenMeta.tokenId === tokenId && pair.tokenB.tokenMeta.tokenId === receiveTokenId) {
+        return { tokenToTradeData: pair.tokenA, tokenToReceiveData: pair.tokenB };
+      } else if (pair.tokenA.tokenMeta.tokenId === receiveTokenId && pair.tokenB.tokenMeta.tokenId === tokenId) {
+        return { tokenToTradeData: pair.tokenB, tokenToReceiveData: pair.tokenA };
+      } else {
+        return undefined;
       }
-      return undefined;
     })
     .filter((entry) => entry !== undefined)[0];
-  return pairedToken;
+
+  return { tokenToTradeData: data?.tokenToTradeData, tokenToReceiveData: data?.tokenToReceiveData };
 };
 
 export const getTokenBalance = (tokenId: string, tokens: TokenBalanceJson[]): number => {

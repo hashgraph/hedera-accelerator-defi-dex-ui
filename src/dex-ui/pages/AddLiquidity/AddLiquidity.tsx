@@ -14,6 +14,7 @@ import {
   getTokensByUniqueAccountIds,
   getPairedTokens,
   getTokenData,
+  getPairedTokenData,
 } from "../../../dex-ui-components/SwapTokens/utils";
 
 const AddLiquidity = (): JSX.Element => {
@@ -231,11 +232,20 @@ const AddLiquidity = (): JSX.Element => {
    */
   const handleOutputSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const token = getTokenData(event.target.value, tokenPairs ?? []);
-      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "symbol", payload: token?.symbol });
-      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "tokenMeta", payload: token?.tokenMeta });
+      const { tokenToTradeData, tokenToReceiveData } = getPairedTokenData(
+        poolState.inputToken.tokenMeta.tokenId ?? "",
+        event.target.value,
+        tokenPairs ?? []
+      );
+
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "symbol", payload: tokenToTradeData?.symbol });
+      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "tokenMeta", payload: tokenToTradeData?.tokenMeta });
+
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "symbol", payload: tokenToReceiveData?.symbol });
+      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "tokenMeta", payload: tokenToReceiveData?.tokenMeta });
     },
-    [tokenPairs]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tokenPairs, poolState.inputToken, poolState.outputToken]
   );
 
   /**
@@ -337,6 +347,7 @@ const AddLiquidity = (): JSX.Element => {
           onMaxButtonClick={() => getPortionOfBalance("inputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("inputToken", "half")}
           isLoading={app.isFeatureLoading("pairedAccountBalance")}
+          isPairsLoading={app.isFeatureLoading("tokenPairs")}
         />
         <TokenInput
           data-testid="add-liquidity-output"
@@ -353,6 +364,7 @@ const AddLiquidity = (): JSX.Element => {
           onMaxButtonClick={() => getPortionOfBalance("outputToken", "max")}
           onHalfButtonClick={() => getPortionOfBalance("outputToken", "half")}
           isLoading={app.isFeatureLoading("pairedAccountBalance")}
+          isPairsLoading={app.isFeatureLoading("tokenPairs")}
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>
