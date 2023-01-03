@@ -95,6 +95,8 @@ interface CreateNewTokenProposalData {
 
 interface CreateTextProposalData {
   title: string;
+  description: string;
+  linkToDiscussion: string;
 }
 
 interface CreateTransferTokenProposalData {
@@ -124,6 +126,7 @@ type GovernanceSlice = StateCreator<
 export { GovernanceActionType, ProposalType, ContractProposalState, ProposalState, ProposalStatus };
 export type {
   CreateProposalData,
+  CreateTextProposalData,
   CreateTransferTokenProposalData,
   GovernanceSlice,
   GovernanceStore,

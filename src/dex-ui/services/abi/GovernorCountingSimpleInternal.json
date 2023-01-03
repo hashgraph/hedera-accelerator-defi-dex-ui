@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "GovernorCountingSimpleInternal",
-  "sourceName": "contracts/common/GovernorCountingSimpleInternal.sol",
+  "sourceName": "contracts/governance/GovernorCountingSimpleInternal.sol",
   "abi": [
     {
       "inputs": [],
@@ -32,31 +32,6 @@
         }
       ],
       "name": "ProposalCanceled",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "proposalId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "fromUser",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "toUser",
-          "type": "address"
-        }
-      ],
-      "name": "GodTokenClaimed",
       "type": "event"
     },
     {
@@ -118,6 +93,55 @@
         }
       ],
       "name": "ProposalCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "proposer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "link",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "startBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "endBlock",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProposalDetails",
       "type": "event"
     },
     {
@@ -312,6 +336,25 @@
     {
       "inputs": [
         {
+          "internalType": "string",
+          "name": "title",
+          "type": "string"
+        }
+      ],
+      "name": "cancelProposal",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
           "name": "proposalId",
           "type": "uint256"
@@ -487,6 +530,19 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "delegatee",
+          "type": "address"
+        }
+      ],
+      "name": "delegateTo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address[]",
           "name": "targets",
           "type": "address[]"
@@ -521,27 +577,12 @@
     {
       "inputs": [
         {
-          "internalType": "address[]",
-          "name": "targets",
-          "type": "address[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "values",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes[]",
-          "name": "calldatas",
-          "type": "bytes[]"
-        },
-        {
           "internalType": "string",
-          "name": "description",
+          "name": "title",
           "type": "string"
         }
       ],
-      "name": "execute",
+      "name": "executeProposal",
       "outputs": [
         {
           "internalType": "uint256",
@@ -555,98 +596,35 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "getTokenExpiryInfo",
-      "outputs": [
-        {
-          "internalType": "int256",
-          "name": "responseCode",
-          "type": "int256"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint32",
-              "name": "second",
-              "type": "uint32"
-            },
-            {
-              "internalType": "address",
-              "name": "autoRenewAccount",
-              "type": "address"
-            },
-            {
-              "internalType": "uint32",
-              "name": "autoRenewPeriod",
-              "type": "uint32"
-            }
-          ],
-          "internalType": "struct IHederaTokenService.Expiry",
-          "name": "expiryInfo",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
           "internalType": "uint256",
-          "name": "keyType",
+          "name": "proposalId",
           "type": "uint256"
         }
       ],
-      "name": "getTokenKey",
+      "name": "getProposalDetails",
       "outputs": [
         {
-          "internalType": "int64",
-          "name": "responseCode",
-          "type": "int64"
+          "internalType": "address",
+          "name": "",
+          "type": "address"
         },
         {
-          "components": [
-            {
-              "internalType": "bool",
-              "name": "inheritAccountKey",
-              "type": "bool"
-            },
-            {
-              "internalType": "address",
-              "name": "contractId",
-              "type": "address"
-            },
-            {
-              "internalType": "bytes",
-              "name": "ed25519",
-              "type": "bytes"
-            },
-            {
-              "internalType": "bytes",
-              "name": "ECDSA_secp256k1",
-              "type": "bytes"
-            },
-            {
-              "internalType": "address",
-              "name": "delegatableContractId",
-              "type": "address"
-            }
-          ],
-          "internalType": "struct IHederaTokenService.KeyValue",
-          "name": "key",
-          "type": "tuple"
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
         }
       ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -700,30 +678,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "grantTokenKyc",
-      "outputs": [
-        {
-          "internalType": "int64",
-          "name": "responseCode",
-          "type": "int64"
-        }
-      ],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -787,29 +741,28 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "token",
+          "internalType": "contract IERC20",
+          "name": "_token",
           "type": "address"
         },
         {
-          "internalType": "address",
-          "name": "account",
+          "internalType": "uint256",
+          "name": "_votingDelayValue",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_votingPeriodValue",
+          "type": "uint256"
+        },
+        {
+          "internalType": "contract IBaseHTS",
+          "name": "_tokenService",
           "type": "address"
         }
       ],
-      "name": "isKyc",
-      "outputs": [
-        {
-          "internalType": "int64",
-          "name": "responseCode",
-          "type": "int64"
-        },
-        {
-          "internalType": "bool",
-          "name": "kycGranted",
-          "type": "bool"
-        }
-      ],
+      "name": "initialize",
+      "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -933,25 +886,6 @@
           "internalType": "bytes4",
           "name": "",
           "type": "bytes4"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "pauseToken",
-      "outputs": [
-        {
-          "internalType": "int256",
-          "name": "responseCode",
-          "type": "int256"
         }
       ],
       "stateMutability": "nonpayable",
@@ -1129,31 +1063,7 @@
       ],
       "name": "relay",
       "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "revokeTokenKyc",
-      "outputs": [
-        {
-          "internalType": "int64",
-          "name": "responseCode",
-          "type": "int64"
-        }
-      ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -1231,129 +1141,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "unpauseToken",
-      "outputs": [
-        {
-          "internalType": "int256",
-          "name": "responseCode",
-          "type": "int256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint32",
-              "name": "second",
-              "type": "uint32"
-            },
-            {
-              "internalType": "address",
-              "name": "autoRenewAccount",
-              "type": "address"
-            },
-            {
-              "internalType": "uint32",
-              "name": "autoRenewPeriod",
-              "type": "uint32"
-            }
-          ],
-          "internalType": "struct IHederaTokenService.Expiry",
-          "name": "expiryInfo",
-          "type": "tuple"
-        }
-      ],
-      "name": "updateTokenExpiryInfo",
-      "outputs": [
-        {
-          "internalType": "int256",
-          "name": "responseCode",
-          "type": "int256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "keyType",
-              "type": "uint256"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "bool",
-                  "name": "inheritAccountKey",
-                  "type": "bool"
-                },
-                {
-                  "internalType": "address",
-                  "name": "contractId",
-                  "type": "address"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "ed25519",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "ECDSA_secp256k1",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "address",
-                  "name": "delegatableContractId",
-                  "type": "address"
-                }
-              ],
-              "internalType": "struct IHederaTokenService.KeyValue",
-              "name": "key",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct IHederaTokenService.TokenKey[]",
-          "name": "keys",
-          "type": "tuple[]"
-        }
-      ],
-      "name": "updateTokenKeys",
-      "outputs": [
-        {
-          "internalType": "int64",
-          "name": "responseCode",
-          "type": "int64"
-        }
-      ],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {

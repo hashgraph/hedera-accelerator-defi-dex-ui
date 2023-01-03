@@ -151,15 +151,14 @@ const sendCreateTransferTokenProposalTransaction = async (
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
   const tokenToTransferAddress = TokenId.fromString(tokenToTransfer).toSolidityAddress();
   const contractCallParams = new ContractFunctionParameters()
-    /** This is 'description' on the contract function */
     .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion)
     .addAddress(transferFromAddress)
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
-    .addInt256(amountToTransfer)
-    /** This is 'title' on the contract function */
-    .addString(description)
-    .addString(linkToDiscussion);
+    .addInt256(amountToTransfer);
+
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(GovernorProxyContracts.TransferTokenContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
@@ -213,10 +212,15 @@ const sendCreateContractUpgradeProposalTransaction = async (
  * @returns
  */
 const sendCreateTextProposalTransaction = async (
+  title: string,
   description: string,
+  linkToDiscussion: string,
   signer: HashConnectSigner
 ): Promise<TransactionResponse> => {
-  const contractCallParams = new ContractFunctionParameters().addString(description);
+  const contractCallParams = new ContractFunctionParameters()
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(GovernorProxyContracts.TextProposalContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
