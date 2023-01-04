@@ -63,3 +63,10 @@ export const customErrorTextEditorStyles = {
     color: "#cbcbcb",
   },
 };
+
+export const displayHTMLContentStyles = {
+  ".ql-container.ql-snow": {
+    backgroundColor: "#ffffff",
+    border: "none",
+  },
+};

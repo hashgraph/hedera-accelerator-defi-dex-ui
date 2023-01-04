@@ -186,12 +186,13 @@ const sendCreateContractUpgradeProposalTransaction = async (
   params: CreateContratctUpgradeProposalParams
 ): Promise<TransactionResponse> => {
   const { title, linkToDiscussion, description, contarctId, proxyId, signer } = params;
-  console.log(`Contract Upgrade Details ${linkToDiscussion} ${description}`);
   const upgradeProposalContractId = ContractId.fromString(contarctId).toSolidityAddress();
   const upgradeProposalProxyId = ContractId.fromString(proxyId).toSolidityAddress();
 
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion)
     .addAddress(upgradeProposalProxyId)
     .addAddress(upgradeProposalContractId);
 
@@ -227,6 +228,7 @@ const sendCreateTextProposalTransaction = async (
     .setGas(9000000)
     .freezeWithSigner(signer);
   const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(proposalTransactionResponse, GovernorContractFunctions.CreateProposal);
   return proposalTransactionResponse;
 };
 interface ExecuteProposalParams {

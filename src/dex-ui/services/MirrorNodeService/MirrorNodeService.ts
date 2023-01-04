@@ -180,7 +180,7 @@ function createMirrorNodeService() {
         const topics = log.topics;
         const eventAbi = signatureMap.get(topics[0]);
         if (eventAbi !== undefined) {
-          const requiredTopics = eventAbi.anonymous === true ? topics.splice(1) : topics;
+          const requiredTopics = eventAbi.anonymous === true ? topics : topics.splice(1);
           const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
           const events = eventsMap.get(eventAbi.name) ?? [];
           eventsMap.set(eventAbi.name, [...events, event]);

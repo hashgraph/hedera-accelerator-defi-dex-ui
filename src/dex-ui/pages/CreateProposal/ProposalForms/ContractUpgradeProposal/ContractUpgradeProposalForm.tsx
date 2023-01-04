@@ -9,6 +9,7 @@ import { CreateProposalType } from "../../../../hooks/governance/types";
 import { useDexContext } from "../../../../hooks";
 import { useContractUpgradeProposalDetails } from "./useContractUpgradeProposalDetails";
 import { CreateProposalLocationProps } from "../../CreateProposal";
+import { isValidUrl } from "../../utils";
 
 interface ContractUpgradeProposalFormData {
   title: string;
@@ -138,7 +139,6 @@ export function ContractUpgradeProposalForm(): ReactElement {
               rules={{
                 required: { value: true, message: "Description is required." },
                 minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
-                validate: (value) => value.length >= 107,
               }}
               render={({ field }) => (
                 <TextEditor
@@ -153,13 +153,16 @@ export function ContractUpgradeProposalForm(): ReactElement {
             />
             <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl isInvalid={Boolean(errors.linkToDiscussion)}>
             <Input
               variant="form-input"
               id="linkToDiscussion"
               placeholder="Link to Discussion (optional)"
-              {...register("linkToDiscussion")}
+              {...register("linkToDiscussion", {
+                validate: (value) => isValidUrl(value) || "Enter a Valid URL.",
+              })}
             />
+            <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>
           </FormControl>
           <FormControl>
             <Flex direction="column" justifyContent="right" gap="0.5rem">

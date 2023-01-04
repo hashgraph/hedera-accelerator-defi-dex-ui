@@ -7,6 +7,7 @@ interface FormattedProposal {
   title: string | undefined;
   author: string;
   description: string;
+  link: string | undefined;
   status: ProposalStatus | undefined;
   timeRemaining: string | undefined;
   state: ProposalState | undefined;
