@@ -216,3 +216,5 @@ export const getTradeTokenMeta = (
 
   return filterToken;
 };
+
+export const getDefaultTokenMeta = { pairAccountId: undefined, tokenId: undefined };

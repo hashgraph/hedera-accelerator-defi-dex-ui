@@ -37,6 +37,7 @@ import {
   halfOf,
   getTokenData,
   getPairedTokenData,
+  getDefaultTokenMeta,
 } from "./utils";
 import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks, WalletStore } from "../../dex-ui/store/walletSlice";
@@ -89,7 +90,6 @@ const SwapTokens = (props: SwapTokensProps) => {
     tokenToTrade?.tokenMeta?.pairAccountId ?? "",
     tokenPairs ?? []
   );
-  console.log(uniqueTokens, tokensPairedWithTradeToken, swapState);
   const [localSwapState, setLocalSwapState] = useState({
     settingsOpen: false,
     showSuccessMessage: false,
@@ -248,14 +248,24 @@ const SwapTokens = (props: SwapTokensProps) => {
     [dispatch]
   );
 
+  const resetTokenReceive = () => {
+    dispatch(setTokenToReceiveSymbol(undefined));
+    dispatch(setTokenToReceiveMeta(getDefaultTokenMeta));
+    dispatch(setTokenToReceiveDisplayAmount("0.0"));
+    dispatch(setTokenToReceiveAmount(0.0));
+    dispatch(setTokenToReceiveBalance(undefined));
+    dispatch(setTokenToReceivePoolLiquidity(undefined));
+  };
+
   const handleTokenToTradeSymbolChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeId = inputElement.value;
       const token = getTokenData(tokenToTradeId, tokenPairs ?? []);
-      dispatch(setTokenToTradeSymbol(token?.symbol));
-      dispatch(setTokenToTradeMeta(token?.tokenMeta ?? { pairAccountId: undefined, tokenId: undefined }));
       const tokenToTradeBalance = getTokenBalance(tokenToTradeId, walletData?.pairedAccountBalance?.tokens ?? []);
+      resetTokenReceive();
+      dispatch(setTokenToTradeSymbol(token?.symbol));
+      dispatch(setTokenToTradeMeta(token?.tokenMeta ?? getDefaultTokenMeta));
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
       updateExchangeRate({ tokenToTradeId: token?.tokenMeta.tokenId ?? undefined });
     },
@@ -284,25 +294,21 @@ const SwapTokens = (props: SwapTokensProps) => {
         tokenPairs ?? []
       );
 
-      dispatch(
-        setTokenToTradeMeta(
-          tokenToTradeData?.tokenMeta ? tokenToTradeData?.tokenMeta : swapState.tokenToTrade.tokenMeta
-        )
-      );
+      dispatch(setTokenToTradeMeta(tokenToTradeData?.tokenMeta ?? tokenToTrade.tokenMeta));
+      dispatch(setTokenToTradeSymbol(tokenToTradeData?.symbol ?? tokenToTrade.symbol));
+
       const tokenToTradeBalance = getTokenBalance(
         tokenToTradeData?.tokenMeta.tokenId ?? "",
         walletData?.pairedAccountBalance?.tokens ?? []
-      );
-      dispatch(setTokenToTradeBalance(tokenToTradeBalance));
-
-      dispatch(setTokenToReceiveSymbol(tokenToReceiveData?.symbol));
-      dispatch(
-        setTokenToReceiveMeta(tokenToReceiveData?.tokenMeta ?? { pairAccountId: undefined, tokenId: undefined })
       );
       const tokenToReceiveBalance = getTokenBalance(
         tokenToReceiveData?.tokenMeta.tokenId ?? "",
         walletData?.pairedAccountBalance?.tokens ?? []
       );
+
+      dispatch(setTokenToTradeBalance(tokenToTradeBalance));
+      dispatch(setTokenToReceiveSymbol(tokenToReceiveData?.symbol));
+      dispatch(setTokenToReceiveMeta(tokenToReceiveData?.tokenMeta ?? getDefaultTokenMeta));
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
       updateExchangeRate({
         tokenToTradeId: tokenToTradeData?.tokenMeta.tokenId,

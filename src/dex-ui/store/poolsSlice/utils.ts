@@ -8,20 +8,6 @@ import {
 import { Pool, UserPool, TokenPair } from "./types";
 import { MirrorNodeTokenBalance, MirrorNodeTransaction } from "../../services";
 
-/**
- * TODO: This is mocked data that adds a token pair balance to the primary pool balance data.
- * This should be removed after we can fetch pair tokens from the pool contract.
- * */
-/* const appendLiquidityTokenBalance = (poolTokenBalances: MirrorNodeTokenBalance[], mockLPbalance: BigNumber) => {
-  const mockedTokenBalance = {
-    token_id: A_B_PAIR_TOKEN_ID,
-    balance: BigNumber(mockLPbalance),
-    decimals: "8",
-    accountId: "",
-  };
-  return poolTokenBalances?.concat(mockedTokenBalance);
-}; */
-
 interface CalculateUserPoolMetricsParams {
   /** Token balances for the liquidity pool. */
   poolTokenBalances: MirrorNodeTokenBalance[];
@@ -46,13 +32,6 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
     tokenAAccountId: tokenA.tokenMeta.tokenId ?? "",
     tokenBAccountId: tokenB.tokenMeta.tokenId ?? "",
   });
-  /* TODO: Get real LP Amounts for pools */
-  // const mockedLPPoolTokenBalances = appendLiquidityTokenBalance(poolTokenBalances, totalVolumeLocked);
-  // const percentOfPool = calculatePercentOfPool({
-  //   userTokenBalances,
-  //   poolTokenBalances: mockedLPPoolTokenBalances,
-  //   liquidityTokenAccountId: pairToken.pairLpAccountId ?? "",
-  // });
   const percentOfPool = calculatePercentOfPoolFromTotalSupply({
     userTokenBalances,
     tokenPair: userTokenPair,

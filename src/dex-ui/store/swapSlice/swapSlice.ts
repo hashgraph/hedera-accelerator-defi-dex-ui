@@ -242,11 +242,11 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
         // TODO: In below Contract call we are directly returining the hard coded
-        const pairId = ContractId.fromString(tokenToReceive.tokenMeta.pairAccountId ?? "");
+        const contractId = ContractId.fromString(tokenToReceive.tokenMeta.pairAccountId ?? "");
         const { tokenAAddress } = await HederaService.getTokenPairAddress(
           ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "")
         );
-        const rawPoolLiquidity = await HederaService.pairCurrentPosition(pairId);
+        const rawPoolLiquidity = await HederaService.pairCurrentPosition(contractId);
 
         let tokens: { [x: string]: BigNumber } = {};
         if (tokenAAddress === tokenToTrade.tokenMeta.tokenId) {
@@ -299,7 +299,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       );
       const tokenToTradeAccountId = tokenToTrade.tokenMeta.tokenId ?? "";
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
-      const swapContractId = ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "");
+      const contractId = ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "");
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
       const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
       const tokenToTradeAmount = wallet.getTokenAmountWithPrecision(
@@ -323,7 +323,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
         );
         const result = await HederaService.swapToken({
-          swapContractId,
+          contractId,
           walletAddress,
           tokenToTradeAddress,
           tokenToTradeAmount,

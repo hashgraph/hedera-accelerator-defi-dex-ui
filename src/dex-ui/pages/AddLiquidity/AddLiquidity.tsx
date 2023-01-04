@@ -15,13 +15,13 @@ import {
   getPairedTokens,
   getTokenData,
   getPairedTokenData,
+  getDefaultTokenMeta,
 } from "../../../dex-ui-components/SwapTokens/utils";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
-  const { fee, tokenPairs } = swap;
-  const { spotPrices } = pools;
-  const formattedFee = formatBigNumberToPercent(fee);
+  const { tokenPairs } = swap;
+  const { spotPrices, allPoolsMetrics } = pools;
   const formattedSpotPrices = mapBigNumberValuesToNumber(spotPrices);
   const [poolState, dispatch] = useReducer(poolReducer, initialPoolState, initPoolReducer);
   const previousPoolState: AddLiquidityState | undefined = usePrevious(poolState);
@@ -188,6 +188,17 @@ const AddLiquidity = (): JSX.Element => {
     [poolState]
   );
 
+  const resetOutputToken = () => {
+    dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "amount", payload: 0.0 });
+    dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "displayedAmount", payload: "0.0" });
+    dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "symbol", payload: undefined });
+    dispatch({
+      type: ActionType.UPDATE_OUTPUT_TOKEN,
+      field: "tokenMeta",
+      payload: getDefaultTokenMeta,
+    });
+  };
+
   /**
    * Called when the first input field's token is changed from the select/dropdown. Calls
    * handleInputSymbolChange to update store with the selected token's symbol and address
@@ -196,8 +207,13 @@ const AddLiquidity = (): JSX.Element => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const inputElement = event?.target as HTMLInputElement;
       const token = getTokenData(inputElement.value, tokenPairs ?? []);
+      resetOutputToken();
       dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "symbol", payload: token?.symbol });
-      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "tokenMeta", payload: token?.tokenMeta });
+      dispatch({
+        type: ActionType.UPDATE_INPUT_TOKEN,
+        field: "tokenMeta",
+        payload: token?.tokenMeta ?? getDefaultTokenMeta,
+      });
     },
     [tokenPairs]
   );
@@ -237,12 +253,23 @@ const AddLiquidity = (): JSX.Element => {
         event.target.value,
         tokenPairs ?? []
       );
-
-      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "symbol", payload: tokenToTradeData?.symbol });
-      dispatch({ type: ActionType.UPDATE_INPUT_TOKEN, field: "tokenMeta", payload: tokenToTradeData?.tokenMeta });
+      dispatch({
+        type: ActionType.UPDATE_INPUT_TOKEN,
+        field: "symbol",
+        payload: tokenToTradeData?.symbol ?? poolState.inputToken.symbol,
+      });
+      dispatch({
+        type: ActionType.UPDATE_INPUT_TOKEN,
+        field: "tokenMeta",
+        payload: tokenToTradeData?.tokenMeta ?? poolState.inputToken.tokenMeta,
+      });
 
       dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "symbol", payload: tokenToReceiveData?.symbol });
-      dispatch({ type: ActionType.UPDATE_OUTPUT_TOKEN, field: "tokenMeta", payload: tokenToReceiveData?.tokenMeta });
+      dispatch({
+        type: ActionType.UPDATE_OUTPUT_TOKEN,
+        field: "tokenMeta",
+        payload: tokenToReceiveData?.tokenMeta ?? getDefaultTokenMeta,
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tokenPairs, poolState.inputToken, poolState.outputToken]
@@ -284,9 +311,30 @@ const AddLiquidity = (): JSX.Element => {
   };
 
   /**
+   * Returns the Pool fee for selected pool
+   */
+  const getPoolFee = useCallback(() => {
+    if (poolState.inputToken && poolState.outputToken) {
+      const poolA_BName = `${poolState.inputToken.symbol}${poolState.outputToken.symbol}`;
+      const poolB_AName = `${poolState.outputToken.symbol}${poolState.inputToken.symbol}`;
+      const selectedPoolFee = allPoolsMetrics.find(
+        (pool) => pool.name === poolA_BName || pool.name === poolB_AName
+      )?.fee;
+      const formattedFee = formatBigNumberToPercent(selectedPoolFee);
+      return formattedFee;
+    } else {
+      return "--";
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poolState]);
+
+  /**
    * Returns the Pool Exchange Ratio display
    */
   const getExchangeRatio = useCallback(() => {
+    if (poolState.inputToken.symbol === undefined || poolState.outputToken.symbol === undefined) {
+      return "--";
+    }
     const firstToken = poolState.inputToken.symbol;
     const secondToken = poolState.outputToken.symbol;
     const selectedTokenSpotPrice = poolState.inputToken.spotPrice;
@@ -368,7 +416,7 @@ const AddLiquidity = (): JSX.Element => {
         />
         <Flex justifyContent={"space-between"} width={"100%"} paddingTop={"1rem"}>
           <Flex flexDirection={"column"}>
-            <MetricLabel label="Transaction Fee" value={formattedFee} isLoading={app.isFeatureLoading("fee")} />
+            <MetricLabel label="Transaction Fee" value={getPoolFee()} isLoading={app.isFeatureLoading("fee")} />
           </Flex>
           <Flex flexDirection={"column"}>
             <MetricLabel label="Share of Pool" value={poolRatio()} />

@@ -327,7 +327,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           lpTokenAmountBigNumber,
           ContractId.fromString(pairAcoountId)
         );
-        console.log(result);
         if (result) {
           set(
             ({ pools }) => {
