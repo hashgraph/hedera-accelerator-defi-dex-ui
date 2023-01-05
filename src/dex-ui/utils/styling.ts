@@ -22,3 +22,8 @@ export const getStatusColor = (status: ProposalStatus | undefined, state: Propos
   }
   return "";
 };
+
+export const getShortDescription = (description: string) => {
+  const stringWithoutHTML = description.replace(/<[^>]+>/g, "");
+  return stringWithoutHTML.length > 80 ? stringWithoutHTML.slice(0, 80 - 1) + "..." : stringWithoutHTML;
+};

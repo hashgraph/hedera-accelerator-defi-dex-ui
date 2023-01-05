@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, HorizontalStackBarChart } from "../../../dex-ui-components";
 import { Color } from "../../../dex-ui-components/themes";
 import { ProposalStatus } from "../../store/governanceSlice";
-import { getStatusColor } from "../../utils";
+import { getStatusColor, getShortDescription } from "../../utils";
 import { FormattedProposal } from "./types";
 
 interface ProposalCardProps {
@@ -55,7 +55,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
               <Text flex="4" textAlign="right" textStyle="b2">{`Author ${proposal.author.toString()}`}</Text>
             </Flex>
             <Text textStyle="b2" textAlign="left">
-              {proposal.description}
+              {getShortDescription(proposal.description)}
             </Text>
           </VStack>
         </Box>
