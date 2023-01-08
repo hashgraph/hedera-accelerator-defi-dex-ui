@@ -9,28 +9,26 @@ import { formatBigNumberToPercent } from "../../utils";
  */
 export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics: UserPool) {
   const { poolTokenBalances, userTokenBalances } = pools;
-  const [firstTokenBalance, secondTokenBalance] = poolTokenBalances;
 
+  const pairAccountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
+  const lpAccountId = selectedPoolMetrics?.userTokenPair?.pairToken.pairLpAccountId ?? "";
+  const token = poolTokenBalances.find((pool) => pool.pairAccountId === pairAccountId);
+  const [firstTokenBalance, secondTokenBalance] = token?.tokenBalances ?? [];
   // user provided liquidity as percent of pool in number and percent format
   const userPercentOfPool = selectedPoolMetrics.percentOfPool;
   const userPercentOfPoolAsNumber = userPercentOfPool.toNumber();
   const userPercentOfPoolAsPercent = formatBigNumberToPercent(userPercentOfPool);
-  const userLpAmount =
-    userTokenBalances
-      .find((token) => token.token_id === selectedPoolMetrics.userTokenPair?.pairToken.pairLpAccountId)
-      ?.balance.toNumber() || 0;
+  const userLpAmount = userTokenBalances.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
 
   // details of first token
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
-  const firstTokenPoolLiquidity = firstTokenBalance.balance.toNumber();
+  const firstTokenPoolLiquidity = firstTokenBalance?.balance.toNumber() ?? 0;
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * firstTokenPoolLiquidity;
 
-  // details of first token
+  // details of Second token
   const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
-  const secondTokenPoolLiquidity = secondTokenBalance.balance.toNumber();
+  const secondTokenPoolLiquidity = secondTokenBalance?.balance.toNumber() ?? 0;
   const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * secondTokenPoolLiquidity;
-  const pairAccountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
-  const lpAccountId = selectedPoolMetrics?.userTokenPair?.pairToken.pairLpAccountId ?? "";
 
   const firstToken = {
     tokenSymbol: firstTokenSymbol,
