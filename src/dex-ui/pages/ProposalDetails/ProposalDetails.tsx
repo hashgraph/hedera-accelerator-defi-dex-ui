@@ -36,6 +36,7 @@ import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { VoteType } from "./types";
 import { useProposalDetails } from "./useProposalDetails";
 import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
+import { ChangeVoteModalBody } from "./ChangeVoteModalBody";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
@@ -44,11 +45,13 @@ export const ProposalDetails = () => {
     isVoteYesOpen: false,
     isVoteNoOpen: false,
     isVoteAbstainOpen: false,
+    isChangeVoteOpen: false,
   });
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const {
     proposal,
     castVote,
+    changeVote,
     executeProposal,
     claimGODTokens,
     isNotificationVisible,
@@ -90,6 +93,32 @@ export const ProposalDetails = () => {
     resetServerState();
     const signer = wallet.getSigner();
     claimGODTokens.mutate({ contractId: proposal.data?.contractId ?? "", proposalId: proposal.data?.id ?? "", signer });
+  }
+
+  function handleChangeVoteClicked(voteType: VoteType) {
+    resetServerState();
+    if (proposal) {
+      const signer = wallet.getSigner();
+      changeVote.mutate({
+        contractId: proposal.data?.contractId ?? "",
+        proposalId: proposal.data?.id ?? "",
+        voteType,
+        signer,
+      });
+    }
+    setDialogState({ ...dialogState, isChangeVoteOpen: false });
+  }
+
+  function handleChangeVoteToYesClicked() {
+    handleChangeVoteClicked(VoteType.For);
+  }
+
+  function handleChangeVoteToNoClicked() {
+    handleChangeVoteClicked(VoteType.Against);
+  }
+
+  function handleChangeVoteToAbstainClicked() {
+    handleChangeVoteClicked(VoteType.Abstain);
   }
 
   function handleVoteButtonClicked(voteType: VoteType) {
@@ -220,6 +249,29 @@ export const ProposalDetails = () => {
                     <>
                       <Text textStyle="h3">Vote on Proposal</Text>
                       <Text textStyle="b2">You have voted on this proposal.</Text>
+                      <AlertDialog
+                        openDialogButtonStyles={{ marginTop: "0.5rem", flex: "1" }}
+                        openDialogButtonText="Yes"
+                        isOpenDialogButtonDisabled={proposal === undefined}
+                        title="Change Vote"
+                        body={<ChangeVoteModalBody governanceTokenId={GovernanceTokenId} />}
+                        footer={
+                          <Flex flexDirection="column" gap="0.5rem" flexGrow="1">
+                            <Button flex="1" onClick={handleChangeVoteToYesClicked}>
+                              Vote Yes
+                            </Button>
+                            <Button flex="1" onClick={handleChangeVoteToNoClicked}>
+                              Vote No
+                            </Button>
+                            <Button flex="1" onClick={handleChangeVoteToAbstainClicked}>
+                              Abstain
+                            </Button>
+                          </Flex>
+                        }
+                        alertDialogOpen={dialogState.isChangeVoteOpen}
+                        onAlertDialogOpen={() => setDialogState({ ...dialogState, isChangeVoteOpen: true })}
+                        onAlertDialogClose={() => setDialogState({ ...dialogState, isChangeVoteOpen: false })}
+                      />
                     </>
                   )}
                   {isExecuteButtonVisible && (

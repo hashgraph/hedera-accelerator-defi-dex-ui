@@ -127,6 +127,33 @@ const castVote = async (params: CastVoteParams) => {
   return response;
 };
 
+interface ChangeVoteParams {
+  contractId: string;
+  proposalId: string;
+  voteType: number;
+  signer: HashConnectSigner;
+}
+
+/**
+ * TODO: This function is under development
+ * @param params -
+ * @returns
+ */
+const changeVote = async (params: ChangeVoteParams) => {
+  const { contractId, proposalId, voteType, signer } = params;
+  const governorContractId = ContractId.fromString(contractId);
+  const preciseProposalId = BigNumber(proposalId);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(preciseProposalId).addUint8(voteType);
+  const changeVoteTransaction = await new ContractExecuteTransaction()
+    .setContractId(governorContractId)
+    .setFunction(GovernorContractFunctions.ChangeVote, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const response = await changeVoteTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(response, GovernorContractFunctions.ChangeVote);
+  return response;
+};
+
 interface CreateTransferTokenProposalParams {
   title: string;
   description: string;
@@ -324,6 +351,7 @@ const GovernorService = {
   fetchQuorum,
   fetchProposalVotes,
   castVote,
+  changeVote,
   sendCreateTextProposalTransaction,
   sendCreateTransferTokenProposalTransaction,
   executeProposal,

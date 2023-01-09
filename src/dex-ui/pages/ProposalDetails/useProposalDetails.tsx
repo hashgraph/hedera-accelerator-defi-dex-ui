@@ -5,6 +5,7 @@ import {
   useExecuteProposal,
   useProposal,
   useClaimGODTokens,
+  useChangeVote,
 } from "../../hooks";
 import { ProposalState, ProposalStatus } from "../../store/governanceSlice";
 import { createHashScanLink, getStatusColor } from "../../utils";
@@ -13,6 +14,7 @@ export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const proposal = useProposal(proposalId);
   const castVote = useCastVote();
+  const changeVote = useChangeVote();
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
   const executeProposal = useExecuteProposal();
   const claimGODTokens = useClaimGODTokens();
@@ -71,6 +73,7 @@ export function useProposalDetails(proposalId: string | undefined) {
 
   return {
     proposal,
+    changeVote,
     castVote,
     hasVoted,
     executeProposal,

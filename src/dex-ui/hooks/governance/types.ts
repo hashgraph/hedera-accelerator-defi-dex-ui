@@ -1,5 +1,6 @@
 export enum GovernanceMutations {
   CastVote = "castVote",
+  ChangeVote = "changeVote",
   ExecuteProposal = "executeProposal",
   ClaimGODToken = "claimGODToken",
   DeployContract = "deployContract",
