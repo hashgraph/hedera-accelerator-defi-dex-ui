@@ -5,6 +5,7 @@ import {
   useExecuteProposal,
   useProposal,
   useClaimGODTokens,
+  useCancelProposal,
 } from "../../hooks";
 import { ProposalState, ProposalStatus } from "../../store/governanceSlice";
 import { createHashScanLink, getStatusColor } from "../../utils";
@@ -13,6 +14,7 @@ export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const proposal = useProposal(proposalId);
   const castVote = useCastVote();
+  const cancelProposal = useCancelProposal();
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
   const executeProposal = useExecuteProposal();
   const claimGODTokens = useClaimGODTokens();
@@ -25,30 +27,36 @@ export function useProposalDetails(proposalId: string | undefined) {
   const isClaimTokenButtonVisible = proposal.data?.state === ProposalState.Executed;
   const statusColor = getStatusColor(proposal.data?.status, proposal.data?.state);
 
-  const isLoadingDialogOpen = executeProposal.isLoading || castVote.isLoading || claimGODTokens.isLoading;
+  const isLoadingDialogOpen =
+    executeProposal.isLoading || castVote.isLoading || claimGODTokens.isLoading || cancelProposal.isLoading;
   function getLoadingDialogMessage(): string {
-    if (castVote.isLoading) return "Please confirm the vote in your wallet to proceed";
-    if (executeProposal.isLoading) return "Please confirm the proposal execution in your wallet to proceed";
-    if (claimGODTokens.isLoading) return "Please confirm the governance token claim in your wallet to proceed";
+    if (castVote.isLoading) return "Please confirm the vote in your wallet to proceed.";
+    if (executeProposal.isLoading) return "Please confirm the proposal execution in your wallet to proceed.";
+    if (claimGODTokens.isLoading) return "Please confirm the governance token claim in your wallet to proceed.";
+    if (cancelProposal.isLoading) return "Please confirm the proposal cancelation in your wallet to proceed.";
     return "";
   }
   const loadingDialogMessage = getLoadingDialogMessage();
 
-  const isErrorDialogOpen = executeProposal.isError || castVote.isError || claimGODTokens.isError;
+  const isErrorDialogOpen =
+    executeProposal.isError || castVote.isError || claimGODTokens.isError || cancelProposal.isError;
   function getErrorDialogMessage(): string {
     if (castVote.isError) return castVote.error?.message;
     if (executeProposal.isError) return executeProposal.error?.message;
     if (claimGODTokens.isError) return claimGODTokens.error?.message;
+    if (cancelProposal.isError) return cancelProposal.error?.message;
     return "";
   }
   const errorDialogMessage = getErrorDialogMessage();
 
-  const isNotificationVisible = executeProposal.isSuccess || castVote.isSuccess || claimGODTokens.isSuccess;
+  const isNotificationVisible =
+    executeProposal.isSuccess || castVote.isSuccess || claimGODTokens.isSuccess || cancelProposal.isSuccess;
 
   function getSuccessMessage(): string {
     if (castVote.isSuccess) return `Your vote has been submitted.`;
     if (executeProposal.isSuccess) return `The ${proposal.data?.title} proposal has been executed.`;
     if (claimGODTokens.isSuccess) return `GOD tokens returned to ${proposal.data?.author}.`;
+    if (cancelProposal.isSuccess) return `You have canceled ${proposal.data?.title}.`;
     return "";
   }
   const successMessage = getSuccessMessage();
@@ -66,12 +74,17 @@ export function useProposalDetails(proposalId: string | undefined) {
       const claimGODTokensTransactionId = claimGODTokens.data?.transactionId.toString();
       return createHashScanLink(claimGODTokensTransactionId);
     }
+    if (cancelProposal.isSuccess) {
+      const cancelProposalTransactionId = cancelProposal.data?.transactionId.toString();
+      return createHashScanLink(cancelProposalTransactionId);
+    }
   }
   const hashScanLink = getHashScanLink();
 
   return {
     proposal,
     castVote,
+    cancelProposal,
     hasVoted,
     executeProposal,
     claimGODTokens,

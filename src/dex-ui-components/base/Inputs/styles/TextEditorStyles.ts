@@ -69,4 +69,7 @@ export const displayHTMLContentStyles = {
     backgroundColor: "#ffffff",
     border: "none",
   },
+  ".ql-container.ql-snow .ql-editor": {
+    padding: 0,
+  },
 };

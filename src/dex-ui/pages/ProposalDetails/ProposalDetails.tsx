@@ -18,10 +18,8 @@ import {
   Tag,
 } from "@chakra-ui/react";
 import { isNil } from "ramda";
-import { useState } from "react";
 import { Link as ReachLink, useParams } from "react-router-dom";
 import {
-  AlertDialog,
   Color,
   HorizontalStackBarChart,
   LoadingDialog,
@@ -29,42 +27,29 @@ import {
   NotficationTypes,
   Notification,
 } from "../../../dex-ui-components";
-import { useDexContext } from "../../hooks";
-import { GovernanceTokenId } from "../../services";
 import { ProposalState } from "../../store/governanceSlice";
-import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
-import { VoteType } from "./types";
 import { useProposalDetails } from "./useProposalDetails";
 import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
+import { ProposalDetailsControls } from "./ProposalDetailsControls";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
-  const [dialogState, setDialogState] = useState({
-    isErrorDialogOpen: false,
-    isVoteYesOpen: false,
-    isVoteNoOpen: false,
-    isVoteAbstainOpen: false,
-  });
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const proposalDetails = useProposalDetails(id);
   const {
     proposal,
     castVote,
+    cancelProposal,
     executeProposal,
     claimGODTokens,
     isNotificationVisible,
     successMessage,
     hashScanLink,
-    areButtonsHidden,
-    isHasVotedMessageVisible,
-    areVoteButtonsVisible,
-    isExecuteButtonVisible,
-    isClaimTokenButtonVisible,
     statusColor,
     isLoadingDialogOpen,
     loadingDialogMessage,
     isErrorDialogOpen,
     errorDialogMessage,
-  } = useProposalDetails(id);
+  } = proposalDetails;
 
   if (!proposal.isLoading && isNil(proposal.data)) {
     return <span>{`Proposal with id: ${id} not found.`}</span>;
@@ -78,52 +63,7 @@ export const ProposalDetails = () => {
     castVote.reset();
     executeProposal.reset();
     claimGODTokens.reset();
-  }
-
-  async function handleExecuteClicked() {
-    resetServerState();
-    const signer = wallet.getSigner();
-    executeProposal.mutate({ contractId: proposal.data?.contractId ?? "", title: proposal.data?.title ?? "", signer });
-  }
-
-  async function handleClaimGODTokensClicked() {
-    resetServerState();
-    const signer = wallet.getSigner();
-    claimGODTokens.mutate({ contractId: proposal.data?.contractId ?? "", proposalId: proposal.data?.id ?? "", signer });
-  }
-
-  function handleVoteButtonClicked(voteType: VoteType) {
-    resetServerState();
-    if (proposal) {
-      const signer = wallet.getSigner();
-      castVote.mutate({
-        contractId: proposal.data?.contractId ?? "",
-        proposalId: proposal.data?.id ?? "",
-        voteType,
-        signer,
-      });
-    }
-    if (voteType === VoteType.For) {
-      setDialogState({ ...dialogState, isVoteYesOpen: false });
-    }
-    if (voteType === VoteType.Against) {
-      setDialogState({ ...dialogState, isVoteNoOpen: false });
-    }
-    if (voteType === VoteType.Abstain) {
-      setDialogState({ ...dialogState, isVoteAbstainOpen: false });
-    }
-  }
-
-  function handleVoteYesClicked() {
-    handleVoteButtonClicked(VoteType.For);
-  }
-
-  function handleVoteNoClicked() {
-    handleVoteButtonClicked(VoteType.Against);
-  }
-
-  function handleVoteAbstainClicked() {
-    handleVoteButtonClicked(VoteType.Abstain);
+    cancelProposal.reset();
   }
 
   function handleErrorDialogDismissButtonClicked() {
@@ -211,81 +151,7 @@ export const ProposalDetails = () => {
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
-              {/** Refactor to separate layout component. */}
-              {areButtonsHidden ? (
-                <></>
-              ) : (
-                <>
-                  {isHasVotedMessageVisible && (
-                    <>
-                      <Text textStyle="h3">Vote on Proposal</Text>
-                      <Text textStyle="b2">You have voted on this proposal.</Text>
-                    </>
-                  )}
-                  {isExecuteButtonVisible && (
-                    <Button variant="primary" width="290px" onClick={handleExecuteClicked}>
-                      Execute
-                    </Button>
-                  )}
-                  {isClaimTokenButtonVisible && (
-                    <Button variant="primary" width="290px" onClick={handleClaimGODTokensClicked}>
-                      Claim Governance Tokens
-                    </Button>
-                  )}
-                  {areVoteButtonsVisible && (
-                    <>
-                      <Text textStyle="h3">Vote on Proposal</Text>
-                      <Flex gap="4">
-                        <AlertDialog
-                          openDialogButtonStyles={{ flex: "1" }}
-                          openDialogButtonText="Yes"
-                          isOpenDialogButtonDisabled={proposal === undefined}
-                          title="Confirm Vote"
-                          body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
-                          footer={
-                            <Button flex="1" onClick={handleVoteYesClicked}>
-                              Confirm Vote Yes
-                            </Button>
-                          }
-                          alertDialogOpen={dialogState.isVoteYesOpen}
-                          onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteYesOpen: true })}
-                          onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteYesOpen: false })}
-                        />
-                        <AlertDialog
-                          openDialogButtonStyles={{ flex: "1" }}
-                          openDialogButtonText="No"
-                          isOpenDialogButtonDisabled={proposal === undefined}
-                          title="Confirm Vote"
-                          body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
-                          footer={
-                            <Button flex="1" onClick={handleVoteNoClicked}>
-                              Confirm Vote No
-                            </Button>
-                          }
-                          alertDialogOpen={dialogState.isVoteNoOpen}
-                          onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteNoOpen: true })}
-                          onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteNoOpen: false })}
-                        />
-                        <AlertDialog
-                          openDialogButtonStyles={{ flex: "1" }}
-                          openDialogButtonText="Abstain"
-                          isOpenDialogButtonDisabled={proposal === undefined}
-                          title="Confirm Vote"
-                          body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
-                          footer={
-                            <Button flex="1" onClick={handleVoteAbstainClicked}>
-                              Confirm Vote Abstain
-                            </Button>
-                          }
-                          alertDialogOpen={dialogState.isVoteAbstainOpen}
-                          onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteAbstainOpen: true })}
-                          onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteAbstainOpen: false })}
-                        />
-                      </Flex>
-                    </>
-                  )}
-                </>
-              )}
+              <ProposalDetailsControls proposalDetails={proposalDetails} resetServerState={resetServerState} />
             </Flex>
           </Flex>
         </GridItem>
