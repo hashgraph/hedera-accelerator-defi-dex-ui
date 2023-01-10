@@ -35,6 +35,7 @@ import { ProposalState } from "../../store/governanceSlice";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { VoteType } from "./types";
 import { useProposalDetails } from "./useProposalDetails";
+import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
@@ -133,6 +134,12 @@ export const ProposalDetails = () => {
     resetServerState();
   }
 
+  function onViewDiscussionLinkTap() {
+    if (proposal.data?.link) {
+      window.open(proposal.data?.link);
+    }
+  }
+
   return (
     <>
       <Grid templateColumns="repeat(4, 1fr)" gap="4" width="100%" minHeight="500px">
@@ -200,7 +207,7 @@ export const ProposalDetails = () => {
               <Text textStyle="h3">Description</Text>
               <Spacer padding="0.25rem" />
               <SkeletonText speed={0.4} fadeDuration={0} noOfLines={12} isLoaded={!proposal.isLoading}>
-                <Text textStyle="b2">{proposal.data?.description}</Text>
+                <DisplayHTMLContent value={proposal.data?.description ?? ""} />
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
@@ -284,7 +291,9 @@ export const ProposalDetails = () => {
         </GridItem>
         <GridItem colSpan={1}>
           <Flex direction="column" gap="2">
-            <Button variant="secondary">View Discussion</Button>
+            <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
+              View Discussion
+            </Button>
             <Card
               bg={Color.White_01}
               border={`0.25px solid ${Color.Grey_01}`}

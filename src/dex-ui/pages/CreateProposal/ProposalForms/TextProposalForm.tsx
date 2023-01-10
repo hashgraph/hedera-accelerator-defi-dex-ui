@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
 import { ProposalType } from "../../../store/governanceSlice";
+import { isValidUrl } from "../utils";
 
 type TextProposalFormData = {
   title: string;
   description: string;
+  linkToDiscussion: string;
 };
 
 function TextProposalForm() {
@@ -23,9 +25,11 @@ function TextProposalForm() {
   const handleCancelClick = () => navigate("/governance");
 
   async function onSubmit(data: TextProposalFormData) {
-    // TODO: Proposal Contract functions do not handle both title and description yet.
-    // description: data.description,
-    await governance.createProposal(ProposalType.Text, { title: data.title });
+    await governance.createProposal(ProposalType.Text, {
+      title: data.title,
+      description: data.description,
+      linkToDiscussion: data.linkToDiscussion ?? "",
+    });
   }
 
   return (
@@ -49,7 +53,6 @@ function TextProposalForm() {
             rules={{
               required: { value: true, message: "Description is required." },
               minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
-              validate: (value) => value.length >= 107,
             }}
             render={({ field }) => (
               <TextEditor
@@ -63,6 +66,17 @@ function TextProposalForm() {
             )}
           />
           <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={Boolean(errors.linkToDiscussion)}>
+          <Input
+            variant="form-input"
+            id="linkToDiscussion"
+            placeholder="Link to Discussion (optional)"
+            {...register("linkToDiscussion", {
+              validate: (value) => isValidUrl(value) || "Enter a Valid URL.",
+            })}
+          />
+          <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>
         </FormControl>
         <Spacer padding="0.5rem" />
         <Flex direction="row" justifyContent="right" gap="0.5rem">

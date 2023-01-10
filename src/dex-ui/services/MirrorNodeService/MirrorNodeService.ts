@@ -166,8 +166,8 @@ function createMirrorNodeService() {
         const data = log.data;
         const topics = log.topics;
         const eventAbi = signatureMap.get(topics[0]);
-        if (eventAbi !== undefined) {
-          const requiredTopics = eventAbi.anonymous === true ? topics.splice(1) : topics;
+        if (eventAbi !== undefined && eventAbi.name === "ProposalDetails") {
+          const requiredTopics = eventAbi.anonymous === true ? topics : topics.splice(1);
           const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
           const events = eventsMap.get(eventAbi.name) ?? [];
           eventsMap.set(eventAbi.name, [...events, event]);
@@ -208,7 +208,8 @@ function createMirrorNodeService() {
     });
 
     const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
-    const proposalCreatedEvents = allEvents.get("ProposalCreated") ?? [];
+    console.log(allEvents);
+    const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
     });

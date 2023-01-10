@@ -6,12 +6,21 @@ import { isNil } from "ramda";
 
 const defaultStatusFilter = [...Object.values(ProposalStatus)];
 const proposalStatusSortOrder = [ProposalStatus.Active, ProposalStatus.Passed, ProposalStatus.Failed];
-interface UseAllProposalsParams {
+interface UseAllProposalsProps {
   titleFilter?: string;
   statusFilters?: ProposalStatus[];
 }
 
-export function useAllProposals({ titleFilter = "", statusFilters = defaultStatusFilter }: UseAllProposalsParams) {
+export function useAllProposals(props: UseAllProposalsProps) {
+  const { titleFilter = "", statusFilters = defaultStatusFilter } = props;
+
+  function sortProposalCompareFn(proposalA: FormattedProposal, proposalB: FormattedProposal) {
+    if (!isNil(proposalA.status) && !isNil(proposalB.status)) {
+      return proposalStatusSortOrder.indexOf(proposalA.status) - proposalStatusSortOrder.indexOf(proposalB.status);
+    }
+    return 0;
+  }
+
   function filterFormatSortProposals(data: Proposal[]) {
     const formattedProposals = data.reduce((formattedProposals: FormattedProposal[], proposal): FormattedProposal[] => {
       const doesTitleFilterMatch = proposal.title?.toLowerCase().includes(titleFilter.toLowerCase());
@@ -23,13 +32,6 @@ export function useAllProposals({ titleFilter = "", statusFilters = defaultStatu
       return formattedProposals;
     }, []);
     return formattedProposals.sort(sortProposalCompareFn);
-  }
-
-  function sortProposalCompareFn(a: FormattedProposal, b: FormattedProposal) {
-    if (!isNil(a.status) && !isNil(b.status)) {
-      return proposalStatusSortOrder.indexOf(a.status) - proposalStatusSortOrder.indexOf(b.status);
-    }
-    return 0;
   }
 
   return useProposalQuery<FormattedProposal[]>(filterFormatSortProposals);

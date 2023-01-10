@@ -16,11 +16,11 @@ export function CardList(props: CardListProps): ReactElement {
   if (isLoading) {
     return (
       <>
-        <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-        <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-        <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-        <Skeleton height="92px" speed={0.4} fadeDuration={0} />
-        <Skeleton height="92px" speed={0.4} fadeDuration={0} />
+        <Skeleton height="99px" speed={0.4} fadeDuration={0} />
+        <Skeleton height="99px" speed={0.4} fadeDuration={0} />
+        <Skeleton height="99px" speed={0.4} fadeDuration={0} />
+        <Skeleton height="99px" speed={0.4} fadeDuration={0} />
+        <Skeleton height="99px" speed={0.4} fadeDuration={0} />
       </>
     );
   }

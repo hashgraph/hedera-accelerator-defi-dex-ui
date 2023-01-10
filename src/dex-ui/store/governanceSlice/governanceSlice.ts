@@ -9,6 +9,7 @@ import {
   CreateProposalData,
   CreateTransferTokenProposalData,
   ProposalType,
+  CreateTextProposalData,
 } from "./type";
 
 const initialGovernanceStore: GovernanceState = {
@@ -46,7 +47,13 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
       try {
         const getResult = async () => {
           if (type === ProposalType.Text) {
-            return HederaService.sendCreateTextProposalTransaction(data.title, signer);
+            const createTextProposal = data as CreateTextProposalData;
+            return HederaService.sendCreateTextProposalTransaction(
+              createTextProposal.title,
+              createTextProposal.description,
+              createTextProposal.linkToDiscussion,
+              signer
+            );
           }
           if (type === ProposalType.TokenTransfer) {
             const createTransferTokenProposalData = data as CreateTransferTokenProposalData;

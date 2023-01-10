@@ -6,6 +6,7 @@ interface CardListLayoutProps {
   tabFilters?: ReactNode;
   inputFilters?: ReactNode;
   cardLists?: ReactNode[];
+  paginationComponent?: ReactNode;
 }
 
 export function CardListLayout(props: CardListLayoutProps) {
@@ -27,7 +28,9 @@ export function CardListLayout(props: CardListLayoutProps) {
           ))}
         </TabPanels>
       </Tabs>
-      {/* TODO: Add Pagination */}
+      <Flex alignSelf="end" width="fit-content">
+        {props.paginationComponent}
+      </Flex>
     </Flex>
   );
 }

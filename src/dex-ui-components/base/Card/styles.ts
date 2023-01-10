@@ -28,7 +28,7 @@ export const CardStyles: ComponentStyleConfig = {
         justifyContent: "center",
         alignSelf: "center",
         border: "1px #00BAC6 dashed",
-        height: "102Px",
+        height: "102px",
         borderRadius: "8px",
         cursor: "pointer",
       },
