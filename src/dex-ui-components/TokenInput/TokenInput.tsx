@@ -3,17 +3,22 @@ import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { Token } from "./types";
+
 export interface TokenInputProps {
   "data-testid": string;
   isDisabled?: boolean;
   isHalfAndMaxButtonsVisible?: boolean;
   isLoading?: boolean;
+  isPairsLoading?: boolean;
   title: string;
   tokenAmount: number | string;
   tokenSymbol: string | undefined;
   tokenBalance: number | undefined;
+  tokenId: string | undefined;
   walletConnectionStatus: HashConnectConnectionState;
   hideTokenSelector?: boolean;
+  tokenPairs: Token[] | null;
   onTokenAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onTokenSymbolChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onMaxButtonClick?: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -33,11 +38,14 @@ const TokenInput = (props: TokenInputProps) => {
     isDisabled = false,
     isHalfAndMaxButtonsVisible = false,
     isLoading = false,
+    isPairsLoading = false,
     tokenAmount,
     tokenSymbol,
     tokenBalance,
+    tokenId,
     walletConnectionStatus,
     hideTokenSelector,
+    tokenPairs,
     onTokenAmountChange,
     onTokenSymbolChange,
     onMaxButtonClick,
@@ -87,7 +95,9 @@ const TokenInput = (props: TokenInputProps) => {
           </Box>
           {!hideTokenSelector ? (
             <Box flex="4">
-              <TokenSelector value={tokenSymbol} onChangeHandler={onTokenSymbolChange} />
+              <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isPairsLoading}>
+                <TokenSelector value={tokenId} onChangeHandler={onTokenSymbolChange} tokenPairs={tokenPairs} />
+              </Skeleton>
             </Box>
           ) : (
             ""

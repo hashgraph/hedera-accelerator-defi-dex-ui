@@ -17,19 +17,19 @@ export const useSwapData = (refreshInterval = 0) => {
     swap,
   }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0];
-  const { transactionState, fetchFee, fetchSpotPrices, getPrecision } = swap;
+  const { transactionState, fetchFee, fetchSpotPrices, getPrecision, fetchTokenPairs } = swap;
 
   const fetchSwapDataOnLoad = useCallback(async () => {
-    getPrecision();
-    await Promise.allSettled([fetchFee(), fetchSpotPrices()]);
-  }, [getPrecision, fetchFee, fetchSpotPrices]);
+    await Promise.allSettled([fetchFee(), fetchSpotPrices(), fetchTokenPairs(), getPrecision()]);
+  }, [fetchFee, fetchSpotPrices, fetchTokenPairs, getPrecision]);
 
   const fetchSwapDataOnInterval = useCallback(async () => {
     await fetchSpotPrices();
   }, [fetchSpotPrices]);
 
+  /** need to fetch spot fee and fee on change of pairs */
   const fetchSwapDataOnEvent = useCallback(async () => {
-    await Promise.allSettled([wallet.fetchAccountBalance(), fetchSpotPrices()]);
+    await Promise.allSettled([wallet.fetchAccountBalance(), fetchFee(), fetchSpotPrices(), getPrecision()]);
     // Todo: Fixed hook dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -65,5 +65,5 @@ export const useSwapData = (refreshInterval = 0) => {
       return;
     }
     fetchSwapDataOnEvent();
-  }, [fetchSwapDataOnEvent, transactionState.successPayload, transactionState.errorMessage]);
+  }, [fetchSwapDataOnEvent, swap.selectedAccount, transactionState.successPayload, transactionState.errorMessage]);
 };

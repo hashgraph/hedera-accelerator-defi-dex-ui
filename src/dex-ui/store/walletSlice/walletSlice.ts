@@ -1,10 +1,11 @@
 import { MessageTypes, HashConnectTypes } from "hashconnect";
 import { BigNumber } from "bignumber.js";
+import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 import { getErrorMessage } from "../../utils";
 import { WalletSlice, WalletStore, WalletActionType, WalletState } from "./types";
 import { getFormattedTokenBalances } from "./utils";
-import { TOKEN_SYMBOL_TO_ACCOUNT_ID, WalletService } from "../../services";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { WalletService } from "../../services";
 
 const initialWalletState: WalletState = {
   availableExtension: null,
@@ -33,12 +34,12 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       const signer = WalletService.getSigner(provider);
       return signer;
     },
-    getTokenAmountWithPrecision: (tokenSymbol: string, tokenAmount: number, tokenId?: string) => {
-      const defaultDecimals = 0;
+    getTokenAmountWithPrecision: (tokenId: string, tokenAmount: number) => {
       const { wallet } = get();
+      const defaultDecimals = 8;
       const tokenData = wallet.pairedAccountBalance?.tokens;
-      const tokenAccountId = tokenId ?? TOKEN_SYMBOL_TO_ACCOUNT_ID.get(tokenSymbol);
-      const decimals = tokenData?.find((token: any) => token.tokenId === tokenAccountId)?.decimals ?? defaultDecimals;
+      const decimals =
+        tokenData?.find((token: TokenBalanceJson) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
       return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
     },
     initializeWalletConnection: async () => {

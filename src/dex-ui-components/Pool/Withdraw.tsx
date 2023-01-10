@@ -17,13 +17,16 @@ import {
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ChangeEvent, useState, useCallback } from "react";
 import { MetricLabel } from "..";
+import { TokenPair } from "../../dex-ui/services";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
 import { TokenInput } from "../TokenInput";
+import { getLPTokens } from "./utils";
 
 export interface WithdrawProps {
   walletConnectionStatus: HashConnectConnectionState;
   poolLpDetails: LPTokenDetails;
   poolLiquidityDetails: PoolLiquidityDetails;
+  tokenPairs: TokenPair[] | null;
   onWithdrawClick: (lpAmount: number) => void;
   onInputAmountChange?: (lpAmount: number) => void;
   disableWithdrawButton?: boolean;
@@ -55,6 +58,7 @@ const WithdrawComponent = (props: WithdrawProps) => {
     onWithdrawClick,
     onInputAmountChange,
     disableWithdrawButton,
+    tokenPairs,
     isFeatureLoading,
   } = props;
 
@@ -108,6 +112,9 @@ const WithdrawComponent = (props: WithdrawProps) => {
           tokenAmount={localWithdrawState.lpInputAmount}
           tokenSymbol={poolLpDetails.tokenSymbol}
           tokenBalance={poolLpDetails.userLpAmount}
+          // update to take tokenid
+          tokenId={poolLpDetails.tokenSymbol}
+          tokenPairs={getLPTokens(tokenPairs ?? [])}
           walletConnectionStatus={walletConnectionStatus}
           onTokenAmountChange={handleInputAmountChange}
           isHalfAndMaxButtonsVisible={true}
@@ -125,14 +132,14 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.firstToken.poolLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={`${poolLiquidityDetails.firstToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.firstToken.userProvidedLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                 </>
@@ -143,21 +150,21 @@ const WithdrawComponent = (props: WithdrawProps) => {
                     <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} in pool`}
                       value={`${poolLiquidityDetails.secondToken.poolLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={`${poolLiquidityDetails.secondToken.tokenSymbol} to Withdraw`}
                       value={`${poolLiquidityDetails.secondToken.userProvidedLiquidity}`}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                   <Td padding={"12px 40px 0 0"}>
                     <MetricLabel
                       label={"Remaining share of pool"}
                       value={poolLpDetails.userLpPercentage}
-                      isLoading={isFeatureLoading("allPoolsMetrics") || isFeatureLoading("userPoolsMetrics")}
+                      isLoading={isFeatureLoading("userPoolsMetrics")}
                     />
                   </Td>
                 </>

@@ -1,4 +1,3 @@
-import { A_B_PAIR_TOKEN_ID, TOKEN_ID_TO_TOKEN_SYMBOL } from "../../services";
 import { PoolsStore, UserPool } from "../../store/poolsSlice";
 import { formatBigNumberToPercent } from "../../utils";
 
@@ -10,22 +9,25 @@ import { formatBigNumberToPercent } from "../../utils";
  */
 export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics: UserPool) {
   const { poolTokenBalances, userTokenBalances } = pools;
-  const [firstTokenBalance, secondTokenBalance] = poolTokenBalances;
 
+  const pairAccountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
+  const lpAccountId = selectedPoolMetrics?.userTokenPair?.pairToken.pairLpAccountId ?? "";
+  const token = poolTokenBalances.find((pool) => pool.pairAccountId === pairAccountId);
+  const [firstTokenBalance, secondTokenBalance] = token?.tokenBalances ?? [];
   // user provided liquidity as percent of pool in number and percent format
   const userPercentOfPool = selectedPoolMetrics.percentOfPool;
   const userPercentOfPoolAsNumber = userPercentOfPool.toNumber();
   const userPercentOfPoolAsPercent = formatBigNumberToPercent(userPercentOfPool);
-  const userLpAmount = userTokenBalances.find((token) => token.token_id === A_B_PAIR_TOKEN_ID)?.balance.toNumber() || 0;
+  const userLpAmount = userTokenBalances.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
 
   // details of first token
-  const firstTokenSymbol = TOKEN_ID_TO_TOKEN_SYMBOL.get(firstTokenBalance.token_id) || "";
-  const firstTokenPoolLiquidity = firstTokenBalance.balance.toNumber();
+  const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
+  const firstTokenPoolLiquidity = firstTokenBalance?.balance.toNumber() ?? 0;
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * firstTokenPoolLiquidity;
 
-  // details of first token
-  const secondTokenSymbol = TOKEN_ID_TO_TOKEN_SYMBOL.get(secondTokenBalance.token_id) || "";
-  const secondTokenPoolLiquidity = secondTokenBalance.balance.toNumber();
+  // details of Second token
+  const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
+  const secondTokenPoolLiquidity = secondTokenBalance?.balance.toNumber() ?? 0;
   const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * secondTokenPoolLiquidity;
 
   const firstToken = {
@@ -42,6 +44,8 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
     tokenSymbol: selectedPoolMetrics.name,
     userLpAmount,
     userLpPercentage: userPercentOfPoolAsPercent,
+    pairAccountId,
+    lpAccountId,
   };
 
   return { firstToken, secondToken, poolLpDetails };

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Text, Flex, Spacer } from "@chakra-ui/react";
-import { SwapTokensState } from "./types";
+import { SwapTokensState, Token } from "./types";
 import { WarningIcon } from "@chakra-ui/icons";
 import { AlertDialog, LoadingDialog, Button } from "../base";
 import { Color } from "../themes";
@@ -12,7 +12,7 @@ export enum SwapConfirmationStep {
   ERROR, // When there is an error with the executed transaction (for error dialog)
 }
 interface SwapConfirmationProps {
-  sendSwapTransaction: (payload: any) => void;
+  sendSwapTransaction: (tokenToTrade: Token) => void;
   swapState: SwapTokensState;
   confirmationStep: SwapConfirmationStep;
   errorMessage?: string;
@@ -62,10 +62,7 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
       console.error("Token types must be selected to Swap tokens.");
       return;
     }
-    sendSwapTransaction({
-      tokenToTrade: { ...tokenToTrade },
-      tokenToReceive: { ...tokenToReceive },
-    });
+    sendSwapTransaction(tokenToTrade);
     // close AlertDialog with swap settings/confirmation and fire onClose prop
     setDialogsOpenState({ ...dialogsOpenState, alertDialog: false });
     if (props.onClose) props.onClose();

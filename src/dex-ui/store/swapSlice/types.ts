@@ -19,13 +19,47 @@ enum SwapActionType {
   FETCH_SWAP_FEE_SUCCEEDED = "swap/FETCH_SWAP_FEE_SUCCEEDED",
   FETCH_SWAP_FEE_FAILED = "swap/FETCH_SWAP_FEE_FAILED",
   SET_PRECISION = "swap/SET_PRECISION",
+  SET_SELECTED_ACCOUNT_ID = "swap/SET_SELECTED_ACCOUNT_ID",
+  SET_TOKEN_PAIRS = "swap/SET_TOKEN_PAIRS",
+  FETCH_TOKEN_PAIRS_STARTED = "swap/FETCH_TOKEN_PAIRS_STARTED",
+  FETCH_TOKEN_PAIRS_SUCCEEDED = "swap/FETCH_TOKEN_PAIRS_SUCCEEDED",
+  FETCH_TOKEN_PAIRS_FAILED = "swap/FETCH_TOKEN_PAIRS_FAILED",
 }
-
+interface TokenPair {
+  tokenA: Token;
+  tokenB: Token;
+  pairToken: {
+    symbol: string | undefined;
+    pairLpAccountId: string | undefined;
+    totalSupply?: Long | null;
+    decimals: number;
+  };
+}
+interface Token {
+  amount: number;
+  displayAmount: string;
+  balance: number | undefined;
+  poolLiquidity: number | undefined;
+  symbol: string | undefined;
+  tokenName: string | undefined;
+  totalSupply: Long | null;
+  maxSupply: Long | null;
+  tokenMeta: {
+    pairAccountId: string | undefined;
+    tokenId: string | undefined;
+  };
+}
 interface TransactionState {
   transactionWaitingToBeSigned: boolean;
   successPayload: TransactionResponse | null;
   errorMessage: string;
 }
+interface AccountDetails {
+  selectedAccountId: string | null;
+  selectedAToBRoute: string | null;
+  selectedBToARoute: string | null;
+}
+
 interface SwapState {
   precision: BigNumber | undefined;
   fee: BigNumber | undefined;
@@ -33,14 +67,18 @@ interface SwapState {
   poolLiquidity: Record<string, BigNumber | undefined>;
   transactionState: TransactionState;
   errorMessage: string | null;
+  tokenPairs: TokenPair[] | null;
+  selectedAccount: AccountDetails;
 }
 
 interface SwapActions {
-  getPrecision: () => void;
+  getPrecision: () => Promise<void>;
   fetchSpotPrices: () => Promise<void>;
   fetchFee: () => Promise<void>;
-  getPoolLiquidity: (tokenToTrade: string, tokenToReceive: string) => Promise<void>;
-  sendSwapTransaction: ({ tokenToTrade, tokenToReceive }: any) => Promise<void>;
+  getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: Token) => Promise<void>;
+  fetchTokenPairs: () => Promise<void>;
+  setSelectedAccount: (accountId: string, tokenToTradeASymbol: string, tokenToTradeBSymbol: string) => void;
 }
 
 type SwapStore = SwapState & SwapActions;
@@ -48,4 +86,4 @@ type SwapStore = SwapState & SwapActions;
 type SwapSlice = StateCreator<DEXState, [["zustand/devtools", never], ["zustand/immer", never]], [], SwapStore>;
 
 export { SwapActionType };
-export type { SwapSlice, SwapStore, SwapState, SwapActions, TransactionState };
+export type { SwapSlice, SwapStore, SwapState, SwapActions, TransactionState, TokenPair, Token };

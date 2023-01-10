@@ -10,7 +10,7 @@ import { PoolsLocationProps } from "../Pools";
 import { formatWithdrawDataPoints } from "./formatter";
 
 const Withdraw = () => {
-  const { app, pools, wallet } = useDexContext(({ app, pools, wallet }) => ({ app, pools, wallet }));
+  const { app, pools, wallet, swap } = useDexContext(({ pools, wallet, swap, app }) => ({ pools, wallet, swap, app }));
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -21,6 +21,7 @@ const Withdraw = () => {
     errorDialogOpen: false,
     withdrawProps: {
       walletConnectionStatus: wallet.hashConnectConnectionState,
+      tokenPairs: swap.tokenPairs,
       poolLiquidityDetails: {
         firstToken: {
           tokenSymbol: "",
@@ -37,6 +38,8 @@ const Withdraw = () => {
         tokenSymbol: "",
         userLpAmount: 0,
         userLpPercentage: "0%",
+        lpAccountId: "",
+        pairAccountId: "",
       },
     },
     lpInputAmount: 0,
@@ -138,9 +141,9 @@ const Withdraw = () => {
 
   const onWithdrawClick = useCallback(
     (lpAmount: number) => {
-      const { tokenSymbol } = withdrawState.withdrawProps.poolLpDetails;
+      const { pairAccountId, lpAccountId } = withdrawState.withdrawProps.poolLpDetails;
       const { poolFee } = withdrawState;
-      pools.sendRemoveLiquidityTransaction(tokenSymbol, lpAmount, poolFee);
+      pools.sendRemoveLiquidityTransaction(lpAccountId, lpAmount, poolFee, pairAccountId);
     },
     [pools, withdrawState]
   );

@@ -58,10 +58,8 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
           if (type === ProposalType.TokenTransfer) {
             const createTransferTokenProposalData = data as CreateTransferTokenProposalData;
             const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision(
-              // TODO: This is a temporary override to use token id instead of symbol
-              "",
-              createTransferTokenProposalData.amountToTransfer,
-              createTransferTokenProposalData.tokenToTransfer
+              createTransferTokenProposalData.tokenToTransfer,
+              createTransferTokenProposalData.amountToTransfer
             );
             return HederaService.sendCreateTransferTokenProposalTransaction({
               title: createTransferTokenProposalData.title,
