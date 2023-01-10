@@ -6,3 +6,4 @@ export * from "./useProposal";
 export * from "./useClaimGODTokens";
 export * from "./useCreateProposal";
 export * from "./useDeployContract";
+export * from "./useCancelProposal";

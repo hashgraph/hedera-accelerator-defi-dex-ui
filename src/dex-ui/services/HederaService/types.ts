@@ -12,6 +12,7 @@ enum GovernorContractFunctions {
   ExecuteProposal = "executeProposal",
   ClaimGODToken = "claimGODToken",
   DeployABIFile = "deployABIFile",
+  CancelProposal = "cancelProposal",
 }
 
 enum PairContractFunctions {

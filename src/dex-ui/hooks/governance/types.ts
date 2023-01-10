@@ -3,6 +3,7 @@ export enum GovernanceMutations {
   ExecuteProposal = "executeProposal",
   ClaimGODToken = "claimGODToken",
   DeployContract = "deployContract",
+  CancelProposal = "cancelProposal",
 }
 
 export enum GovernanceQueries {

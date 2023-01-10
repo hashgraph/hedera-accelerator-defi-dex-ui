@@ -26,7 +26,7 @@ const ConfirmVoteModalBody = (props: ConfirmVoteModalBodyProps) => {
         <Text textStyle="h4">Voting Power Breakdown</Text>
         <Flex>
           <Text flex="1" textStyle="b3" color={Color.Grey_02}>
-            Dexcoins
+            DexCoins
           </Text>
           <Text flex="1" textStyle="b3" textAlign="right">
             {governanceTokenBalance}

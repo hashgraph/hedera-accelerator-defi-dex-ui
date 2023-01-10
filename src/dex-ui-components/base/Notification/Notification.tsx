@@ -1,6 +1,5 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Tag, Text, Flex, Link, TagCloseButton, Box } from "@chakra-ui/react";
-import { useCallback } from "react";
 import { Color } from "../../themes";
 
 export enum NotficationTypes {
@@ -19,6 +18,8 @@ interface NotificationProps {
   linkRef?: string;
   isVisible?: boolean;
   isCloseButtonShown?: boolean;
+  isButton?: boolean;
+  handleLinkClick?: () => void;
   handleClickClose?: () => void;
 }
 
@@ -37,10 +38,12 @@ export const Notification = (props: NotificationProps) => {
     linkRef,
     isCloseButtonShown = false,
     isVisible = true,
+    isButton = false,
+    handleLinkClick,
     handleClickClose,
   } = props;
 
-  const getNotificationColors = useCallback(() => {
+  function getNotificationColors() {
     if (bg) {
       return { bg, text: Color.Black_01 };
     }
@@ -53,11 +56,12 @@ export const Notification = (props: NotificationProps) => {
     if (type === NotficationTypes.ERROR) {
       return { bg: Color.Red_01_Opaque, text: Color.Black_01 };
     }
-  }, [type, bg]);
+  }
 
   if (!isVisible) {
     return <></>;
   }
+
   /** The Alert component is most likely prefered over using Tag for this components. */
   return (
     <Tag
@@ -72,11 +76,17 @@ export const Notification = (props: NotificationProps) => {
           {message} &nbsp;
         </Text>
         {isLinkShown ? (
-          <Link width="fit-content" display="flex" alignItems="center" color="#0180FF" href={linkRef} isExternal>
+          <Link
+            width="fit-content"
+            display="flex"
+            alignItems="center"
+            color="#0180FF"
+            {...(isButton ? { onClick: handleLinkClick } : { href: linkRef, isExternal: true })}
+          >
             <Text variant="link" textDecoration="underline">
               {linkText}
             </Text>
-            <ExternalLinkIcon margin="0rem 0.125rem" />
+            {isButton ? <></> : <ExternalLinkIcon margin="0rem 0.125rem" />}
           </Link>
         ) : (
           <></>

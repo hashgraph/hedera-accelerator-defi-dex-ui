@@ -127,6 +127,31 @@ const castVote = async (params: CastVoteParams) => {
   return response;
 };
 
+interface CancelProposalParams {
+  contractId: string;
+  title: string;
+  signer: HashConnectSigner;
+}
+
+/**
+ * TODO
+ * @param params -
+ * @returns
+ */
+const cancelProposal = async (params: CancelProposalParams) => {
+  const { contractId, title, signer } = params;
+  const governorContractId = ContractId.fromString(contractId);
+  const contractFunctionParameters = new ContractFunctionParameters().addString(title);
+  const cancelProposalTransaction = await new ContractExecuteTransaction()
+    .setContractId(governorContractId)
+    .setFunction(GovernorContractFunctions.CancelProposal, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const response = await cancelProposalTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(response, GovernorContractFunctions.CancelProposal);
+  return response;
+};
+
 interface CreateTransferTokenProposalParams {
   title: string;
   description: string;
@@ -324,6 +349,7 @@ const GovernorService = {
   fetchQuorum,
   fetchProposalVotes,
   castVote,
+  cancelProposal,
   sendCreateTextProposalTransaction,
   sendCreateTransferTokenProposalTransaction,
   executeProposal,

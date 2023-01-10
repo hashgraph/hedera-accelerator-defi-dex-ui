@@ -10,8 +10,8 @@ export function usePagination<T>({ data, initialPage = 0, pageLimit }: UsePagina
   const [page, setPage] = useState(initialPage);
   const pageCount = Math.ceil((data?.length ?? 0) / pageLimit);
   const isPaginationVisible = pageCount - 1 > 0;
-  const isPreviousButtonVisible = page > 0;
-  const isNextButtonVisible = page < pageCount - 1;
+  const isPreviousButtonVisible = page < pageCount - 1;
+  const isNextButtonVisible = page > 0;
   const paginatedData = getDataForPage(data);
 
   function getDataForPage(formattedProposals: T[]) {
