@@ -56,7 +56,7 @@ export const GovernorProxyContracts = Object.freeze({
   CreateTokenContractId: ContractId.fromString("0.0.49057304"),
 });
 
-export const GovernanceTokenId = "0.0.48602743";
+export const GovernanceTokenId = "0.0.48602639";
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
   [Tokens.TokenASymbol, Tokens.TokenAAccountId],
