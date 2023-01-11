@@ -9,15 +9,7 @@ import {
   TokenAssociateTransaction,
   TransactionResponse,
 } from "@hashgraph/sdk";
-import {
-  GovernorProxyContracts,
-  TOKEN_A_SYMBOL,
-  TOKEN_B_SYMBOL,
-  TOKEN_A_ID,
-  TOKEN_B_ID,
-  TOKEN_SYMBOL_TO_ACCOUNT_ID,
-  FACTORY_CONTRACT_ID,
-} from "../constants";
+import { GovernorProxyContracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, FACTORY_CONTRACT_ID } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { client, queryContract, getTreasurer, getAddressArray } from "./utils";
@@ -180,28 +172,25 @@ function createHederaService() {
     return proposalTransactionResponse;
   };
 
-  const get100LABTokens = async (
-    receivingAccoundId: string,
-    hashconnect: any,
-    hashConnectState: any,
-    network: string
+  const get10L49ABCDTokens = async (
+    receivingAccountId: string,
+    associatedTokenIds: string[] | undefined,
+    signer: HashConnectSigner
   ) => {
-    const tokenQuantity = withPrecision(100).toNumber();
-    const L49ATokenId = TokenId.fromString(TOKEN_A_ID);
-    const L49BTokenId = TokenId.fromString(TOKEN_B_ID);
-    const targetAccountId = AccountId.fromString(receivingAccoundId);
+    const tokenQuantity = withPrecision(10).toNumber();
+    const L49ATokenId = TokenId.fromString(Tokens.TokenAAccountId);
+    const L49BTokenId = TokenId.fromString(Tokens.TokenBAccountId);
+    const L49CTokenId = TokenId.fromString(Tokens.TokenCAccountId);
+    const L49DTokenId = TokenId.fromString(Tokens.TokenDAccountId);
+    const targetAccountId = AccountId.fromString(receivingAccountId);
 
-    const { walletData } = hashConnectState;
-    const signingAccount = walletData.pairedAccounts[0];
-    const provider = hashconnect.getProvider(network, walletData.topicID, signingAccount);
-    const signer = hashconnect.getSigner(provider);
-
-    const associatedTokenIds = walletData.pairedAccountBalance.tokens.map((token: any) => token.tokenId);
     const tokensToAssociate = [
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(TOKEN_A_SYMBOL),
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(TOKEN_B_SYMBOL),
+      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenASymbol),
+      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenBSymbol),
+      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenCSymbol),
+      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenDSymbol),
     ].reduce((_tokensToAssociate: string[], tokenId: string | undefined) => {
-      if (!associatedTokenIds.includes(tokenId)) {
+      if (associatedTokenIds && !associatedTokenIds.includes(tokenId ?? "")) {
         _tokensToAssociate.push(tokenId || "");
       }
       return _tokensToAssociate;
@@ -209,41 +198,28 @@ function createHederaService() {
 
     if (tokensToAssociate.length > 0) {
       const tokenAssociateTx = new TokenAssociateTransaction()
-        .setAccountId(receivingAccoundId)
+        .setAccountId(receivingAccountId)
         .setTokenIds(tokensToAssociate);
-
-      console.log(`Associating ${TOKEN_A_SYMBOL} and Token ${TOKEN_B_SYMBOL} with connected wallet`);
-
       const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
       const tokenAssociateRes = await tokenAssociateSignedTx.executeWithSigner(signer);
-
-      console.log(`Associate ${TOKEN_A_SYMBOL} and Token SymbolB0 transaction result:`, tokenAssociateRes);
+      console.log("Token association transactions:" + tokenAssociateRes.toString());
     }
-
-    console.log(
-      `Moving ${tokenQuantity} units of ${TOKEN_B_SYMBOL} and Token SymbolB0 from the Swap contract to Wallet.`
-    );
 
     const transaction = new TransferTransaction()
       .addTokenTransfer(L49ATokenId, treasuryId, -tokenQuantity)
       .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
       .addTokenTransfer(L49BTokenId, treasuryId, -tokenQuantity)
       .addTokenTransfer(L49BTokenId, targetAccountId, tokenQuantity)
+      .addTokenTransfer(L49CTokenId, treasuryId, -tokenQuantity)
+      .addTokenTransfer(L49CTokenId, targetAccountId, tokenQuantity)
+      .addTokenTransfer(L49DTokenId, treasuryId, -tokenQuantity)
+      .addTokenTransfer(L49DTokenId, targetAccountId, tokenQuantity)
       .freezeWith(client);
 
-    //Sign with the sender account private key
     const signTx = await transaction.sign(treasuryKey);
-
-    //Sign with the client operator private key and submit to a Hedera network
     const txResponse = await signTx.execute(client);
-
-    //Request the receipt of the transaction
-    const receipt = await txResponse.getReceipt(client);
-
-    //Obtain the transaction consensus status
-    const transactionStatus = receipt.status;
-
-    console.log("The transfer transaction consensus status " + transactionStatus.toString());
+    console.log("Get tokens response: ", txResponse);
+    return txResponse;
   };
 
   // TODO: will need to pass in contractId in future when there are more pools
@@ -332,7 +308,7 @@ function createHederaService() {
 
   return {
     initHederaService,
-    get100LABTokens,
+    get10L49ABCDTokens,
     getPrecision,
     swapToken,
     addLiquidity,

@@ -26,14 +26,19 @@ export const FACTORY_CONTRACT_ID = "0.0.49271021";
 // Swap Contract (Pair) Proxy
 export const SWAP_CONTRACT_ID = "0.0.48660596";
 
-export const TOKEN_A_SYMBOL = "Token SymbolA0";
-export const TOKEN_A_ID = "0.0.48660644";
+export const Tokens = Object.freeze({
+  TokenASymbol: "L49A",
+  TokenAAccountId: "0.0.48289687",
+  TokenBSymbol: "L49B",
+  TokenBAccountId: "0.0.48289686",
+  TokenCSymbol: "L49C",
+  TokenCAccountId: "0.0.48301281",
+  TokenDSymbol: "L49D",
+  TokenDAccountId: "0.0.48301282",
+});
 
-export const TOKEN_B_SYMBOL = "Token SymbolB0";
-export const TOKEN_B_ID = "0.0.48660646";
-
-export const A_TO_B = `${TOKEN_A_SYMBOL}=>${TOKEN_B_SYMBOL}`;
-export const B_TO_A = `${TOKEN_B_SYMBOL}=>${TOKEN_A_SYMBOL}`;
+export const A_TO_B = `${Tokens.TokenASymbol}=>${Tokens.TokenBSymbol}`;
+export const B_TO_A = `${Tokens.TokenBSymbol}=>${Tokens.TokenASymbol}`;
 
 export const PAIR_TOKEN_SYMBOL = "L49";
 export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
@@ -54,13 +59,17 @@ export const GovernorProxyContracts = Object.freeze({
 export const GovernanceTokenId = "0.0.48602743";
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
-  [TOKEN_A_SYMBOL, TOKEN_A_ID],
-  [TOKEN_B_SYMBOL, TOKEN_B_ID],
+  [Tokens.TokenASymbol, Tokens.TokenAAccountId],
+  [Tokens.TokenBSymbol, Tokens.TokenBAccountId],
+  [Tokens.TokenCSymbol, Tokens.TokenCAccountId],
+  [Tokens.TokenDSymbol, Tokens.TokenDAccountId],
   [PAIR_TOKEN_SYMBOL, A_B_PAIR_TOKEN_ID],
 ]);
 
 export const TOKEN_ID_TO_TOKEN_SYMBOL = new Map<string, string>([
-  [TOKEN_A_ID, TOKEN_A_SYMBOL],
-  [TOKEN_B_ID, TOKEN_B_SYMBOL],
+  [Tokens.TokenAAccountId, Tokens.TokenASymbol],
+  [Tokens.TokenBAccountId, Tokens.TokenBSymbol],
+  [Tokens.TokenCAccountId, Tokens.TokenCSymbol],
+  [Tokens.TokenDAccountId, Tokens.TokenDSymbol],
   [A_B_PAIR_TOKEN_ID, PAIR_TOKEN_SYMBOL],
 ]);
