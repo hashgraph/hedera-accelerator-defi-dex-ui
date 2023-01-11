@@ -12,7 +12,6 @@ import {
   FetchSpotPriceParams,
 } from "./types";
 import { MirrorNodeService, WalletService, HederaService, MirrorNodeTokenBalance } from "../../services";
-
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours } from "../../utils";
@@ -373,13 +372,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         false,
         PoolsActionType.RESET_WITHDRAW_STATE
       );
-    },
-    // Temporary - should be removed
-    send100LabTokensToWallet: async (receivingAccountId: string) => {
-      const hashconnect = WalletService.getHashconnectInstance();
-      const { network } = get().context;
-      const walletState = get().wallet;
-      await HederaService.get100LABTokens(receivingAccountId, hashconnect, walletState, network);
     },
   };
 };

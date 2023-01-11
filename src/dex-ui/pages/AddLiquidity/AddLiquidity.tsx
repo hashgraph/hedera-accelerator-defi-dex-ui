@@ -350,26 +350,18 @@ const AddLiquidity = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolState]);
 
-  // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed
-  const sendLABTokensToConnectedWallet = useCallback(() => {
-    pools.send100LabTokensToWallet(wallet.savedPairingData?.accountIds[0] ?? "");
-    // Todo: Fixed hook dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wallet, pools.send100LabTokensToWallet]);
-
   return (
     <HStack>
       <Box
         data-testid="pool-component"
         bg="white"
         borderRadius="15px"
-        width="100%"
-        minWidth="496px"
+        width="400px"
         padding="0.5rem 1rem 1rem 1rem"
         boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
       >
         <Flex>
-          <Heading as="h4" size="lg">
+          <Heading as="h4" fontWeight="500" size="lg">
             Add Liquidity
           </Heading>
           <Spacer />
@@ -397,6 +389,7 @@ const AddLiquidity = (): JSX.Element => {
           isLoading={app.isFeatureLoading("pairedAccountBalance")}
           isPairsLoading={app.isFeatureLoading("tokenPairs")}
         />
+        <Spacer margin="1rem" />
         <TokenInput
           data-testid="add-liquidity-output"
           title="Second Token"
@@ -430,37 +423,13 @@ const AddLiquidity = (): JSX.Element => {
           </Flex>
         </Flex>
         <Button
+          variant="primary"
+          width="100%"
+          marginTop="1.25rem"
           onClick={onAddLiquidityClick}
           data-testid="add-liqidity-button"
-          size="lg"
-          height="48px"
-          width="100%"
-          border="2px"
-          marginTop="0.5rem"
-          marginBottom="0.5rem"
-          bg="black"
-          color="white"
-          fontSize="16px"
-          fontWeight="500"
         >
-          {"Add to Pool"}
-        </Button>
-        {/* // TODO: remove this, keeping for now to add L49A and L49B to wallet for testing purposes if needed  */}
-        <Button
-          onClick={sendLABTokensToConnectedWallet}
-          data-testid="get-L49A-tokens-button"
-          size="lg"
-          height="48px"
-          width="100%"
-          border="2px"
-          marginTop="0.5rem"
-          marginBottom="0.5rem"
-          bg="black"
-          color="white"
-          fontSize="16px"
-          fontWeight="500"
-        >
-          {"Send 100 A and B To Wallet"}
+          Add to Pool
         </Button>
       </Box>
     </HStack>

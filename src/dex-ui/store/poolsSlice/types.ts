@@ -109,8 +109,6 @@ interface PoolsActions {
     pairAccountId: string
   ) => Promise<void>;
   resetWithdrawState: () => Promise<void>;
-  // Temporary - should be removed
-  send100LabTokensToWallet: (receivingAccountId: string) => Promise<void>;
 }
 interface TokenPair {
   tokenA: Token;
