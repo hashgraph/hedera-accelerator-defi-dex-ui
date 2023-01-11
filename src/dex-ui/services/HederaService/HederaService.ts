@@ -8,7 +8,6 @@ import {
   TransferTransaction,
   TokenAssociateTransaction,
   TransactionResponse,
-  PrivateKey,
 } from "@hashgraph/sdk";
 import {
   GovernorProxyContracts,
@@ -18,7 +17,6 @@ import {
   TOKEN_B_ID,
   TOKEN_SYMBOL_TO_ACCOUNT_ID,
   FACTORY_CONTRACT_ID,
-  TOKEN_USER_KEY,
 } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
@@ -107,13 +105,11 @@ function createHederaService() {
     console.log(`Removing ${lpTokenAmount} units of LP from the pool.`);
     const removeLiquidity = await new ContractExecuteTransaction()
       .setContractId(contractId)
-      .setGas(2000000)
+      .setGas(5000000)
       .setFunction("removeLiquidity", new ContractFunctionParameters().addAddress(accountId).addInt256(lpTokenAmount))
       .freezeWithSigner(signer);
-    const key = PrivateKey.fromString(TOKEN_USER_KEY);
-    const firstSignedTrasaction = await removeLiquidity.sign(key);
-    const removeLiquidityTx = await firstSignedTrasaction.executeWithSigner(signer);
 
+    const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
     console.log(`Liquidity remove Tx: ${removeLiquidityTx}`);
     return removeLiquidityTx;
   };
@@ -147,12 +143,10 @@ function createHederaService() {
     const swapTokenTransaction = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
-      .setGas(2000000)
+      .setGas(9000000)
       .setNodeAccountIds([new AccountId(3)])
       .freezeWithSigner(signer);
-    const key = PrivateKey.fromString(TOKEN_USER_KEY);
-    const secondSignedTrasaction = await swapTokenTransaction.sign(key);
-    const swapTokenResponse = await secondSignedTrasaction.executeWithSigner(signer);
+    const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);
     return swapTokenResponse;
   };
 
