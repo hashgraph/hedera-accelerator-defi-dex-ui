@@ -6,12 +6,12 @@ import {
   ContractFunctionParameters,
   TransactionResponse,
   FileCreateTransaction,
-  PrivateKey,
+  PublicKey,
   ContractCreateTransaction,
   FileAppendTransaction,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { GovernorProxyContracts, TOKEN_USER_KEY } from "../constants";
+import { GovernorProxyContracts, TOKEN_USER_PUB_KEY } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError, queryContract, client } from "./utils";
@@ -311,7 +311,7 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
 const deployABIFile = async (abiFile: string) => {
   const compiledContract = JSON.parse(abiFile);
   const contractByteCode = compiledContract.bytecode;
-  const userKey = PrivateKey.fromString(TOKEN_USER_KEY);
+  const userKey = PublicKey.fromString(TOKEN_USER_PUB_KEY);
 
   const fileCreateTx = await new FileCreateTransaction().setKeys([userKey]).execute(client);
   const fileCreateRx = await fileCreateTx.getReceipt(client);

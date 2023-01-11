@@ -12,6 +12,8 @@ export const TREASURY_ID = "0.0.47645191";
 
 export const TREASURY_KEY = "308ed38983d9d20216d00371e174fe2d475dd32ac1450ffe2edfaab782b32fc5";
 
+export const TOKEN_USER_PUB_KEY = "3e0f62c7c812d0c9d1d045c4efb70369d69549914455370adab22207ec37d967";
+
 export const CONTRACT_NAME = "governorcountingsimpleinternal";
 
 export const TOKEN_USER_ID = "0.0.47540202";
@@ -20,7 +22,7 @@ export const TOKEN_USER_KEY =
   "302e020100300506032b657004220420b69079b0cdebea97ec13c78bf7277d3f4aef35189755b5d11c2dfae40c566aa8";
 
 // Factory Contract Proxy
-export const FACTORY_CONTRACT_ID = "0.0.49207069";
+export const FACTORY_CONTRACT_ID = "0.0.49271021";
 // Swap Contract (Pair) Proxy
 export const SWAP_CONTRACT_ID = "0.0.48660596";
 
