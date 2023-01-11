@@ -12,7 +12,7 @@ import {
 import { GovernorProxyContracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, FACTORY_CONTRACT_ID } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { client, queryContract, getTreasurer, getAddressArray } from "./utils";
+import { client, queryContract, getAddressArray, queryContractWithSigner } from "./utils";
 import GovernorService from "./GovernorService";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
@@ -27,7 +27,7 @@ type HederaServiceType = ReturnType<typeof createHederaService>;
  */
 
 function createHederaService() {
-  const { treasuryId, treasuryKey } = getTreasurer();
+  // const { treasuryId, treasuryKey } = getTreasurer();
   const factoryContractId = ContractId.fromString(FACTORY_CONTRACT_ID); //
   let _precision = BigNumber(100000000);
   const initHederaService = async () => {
@@ -37,6 +37,12 @@ function createHederaService() {
 
   const fetchTokenPairs = async (): Promise<string[] | null> => {
     const result = await queryContract(factoryContractId, PairContractFunctions.GetTokenPair);
+    const pairEvmAddressess = getAddressArray(result);
+    return pairEvmAddressess;
+  };
+
+  const fetchTokenPairsWithSigner = async (signer: HashConnectSigner): Promise<string[] | null> => {
+    const result = await queryContractWithSigner(factoryContractId, PairContractFunctions.GetTokenPair, signer);
     const pairEvmAddressess = getAddressArray(result);
     return pairEvmAddressess;
   };
@@ -205,6 +211,7 @@ function createHederaService() {
       console.log("Token association transactions:" + tokenAssociateRes.toString());
     }
 
+    /*     
     const transaction = new TransferTransaction()
       .addTokenTransfer(L49ATokenId, treasuryId, -tokenQuantity)
       .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
@@ -220,6 +227,10 @@ function createHederaService() {
     const txResponse = await signTx.execute(client);
     console.log("Get tokens response: ", txResponse);
     return txResponse;
+    console.log(
+      `Moving ${tokenQuantity} units of ${TOKEN_B_SYMBOL} and Token SymbolB0 from the Swap contract to Wallet.`
+    );
+    */
   };
 
   // TODO: will need to pass in contractId in future when there are more pools
@@ -236,11 +247,12 @@ function createHederaService() {
     tokenAQty: BigNumber;
     tokenBQty: BigNumber;
   }> => {
-    const queryParams = new ContractFunctionParameters().addAddress(treasuryId.toSolidityAddress());
-    const result = await queryContract(contractId, PairContractFunctions.GetLiquidityProviderTokenAmounts, queryParams);
-    const tokenAQty = result?.getInt64(0);
-    const tokenBQty = result?.getInt64(1);
-    return { tokenAQty, tokenBQty };
+    // const queryParams = new ContractFunctionParameters().addAddress(treasuryId.toSolidityAddress());
+    // const result = await
+    // queryContract(contractId, PairContractFunctions.GetLiquidityProviderTokenAmounts, queryParams);
+    // const tokenAQty = result?.getInt64(0);
+    // const tokenBQty = result?.getInt64(1);
+    return { tokenAQty: BigNumber(0), tokenBQty: BigNumber(0) };
   };
 
   const getSpotPrice = async (pairAccountId: string): Promise<BigNumber> => {
@@ -325,6 +337,7 @@ function createHederaService() {
     getTokenPairAddress,
     fetchTokenPairs,
     fetchPrecision,
+    fetchTokenPairsWithSigner,
     ...GovernorService,
   };
 }

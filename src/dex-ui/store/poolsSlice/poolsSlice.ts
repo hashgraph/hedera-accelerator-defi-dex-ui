@@ -156,7 +156,16 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       }
     },
     fetchAllPoolMetrics: async () => {
-      const { app } = get();
+      const { app, context, wallet } = get();
+      const provider = WalletService.getProvider(
+        context.network,
+        wallet.topicID,
+        wallet.savedPairingData?.accountIds[0] ?? ""
+      );
+      //TODO: I also tried Passing the Operator but does not work
+      // provider.client.setOperator("0.0.49024116",
+      //   "302e020100300506032b657004220420cc87c4750c2331ac861e8572b43e67e6b9ff362fded292821cab0f4fda17f3c4");
+      const signer = WalletService.getSigner(provider);
       set(
         ({ pools }) => {
           pools.status = "fetching";
@@ -166,7 +175,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       );
       app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
-        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const pairsAddresses = await HederaService.fetchTokenPairsWithSigner(signer);
         const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
         const addressessURlRequestForMetrices = poolTokenPairs?.map((pair) => metricesForEachPair(pair));
@@ -194,7 +203,13 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       app.setFeaturesAsLoaded(["allPoolsMetrics"]);
     },
     fetchUserPoolMetrics: async (userAccountId: string) => {
-      const { app } = get();
+      const { app, context, wallet } = get();
+      const provider = WalletService.getProvider(
+        context.network,
+        wallet.topicID,
+        wallet.savedPairingData?.accountIds[0] ?? ""
+      );
+      const signer = WalletService.getSigner(provider);
       set(
         ({ pools }) => {
           pools.status = "fetching";
