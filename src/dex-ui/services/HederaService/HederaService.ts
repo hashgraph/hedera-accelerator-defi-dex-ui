@@ -202,6 +202,10 @@ function createHederaService() {
       return _tokensToAssociate;
     }, []);
 
+    if (tokensToAssociate.length <= 0) {
+      return;
+    }
+
     if (tokensToAssociate.length > 0) {
       const tokenAssociateTx = new TokenAssociateTransaction()
         .setAccountId(receivingAccountId)
@@ -209,6 +213,7 @@ function createHederaService() {
       const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
       const tokenAssociateRes = await tokenAssociateSignedTx.executeWithSigner(signer);
       console.log("Token association transactions:" + tokenAssociateRes.toString());
+      return tokenAssociateRes;
     }
 
     /*     

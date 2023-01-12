@@ -22,7 +22,7 @@ interface UseGetL49TokensParams {
 }
 
 function useGetL49Tokens() {
-  return useMutation<TransactionResponse, Error, UseGetL49TokensParams, "getL49Tokens">(
+  return useMutation<TransactionResponse | undefined, Error, UseGetL49TokensParams, "getL49Tokens">(
     (params: UseGetL49TokensParams) => {
       const { receivingAccountId, associatedTokenIds, signer } = params;
       return HederaService.get10L49ABCDTokens(receivingAccountId, associatedTokenIds, signer);
