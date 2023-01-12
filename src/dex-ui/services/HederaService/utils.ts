@@ -1,4 +1,4 @@
-import { ADMIN_ID, ADMIN_KEY, TREASURY_ID, TREASURY_KEY, TOKEN_USER_ID, TOKEN_USER_KEY } from "../constants";
+import { ADMIN_ID, ADMIN_KEY, TREASURY_ID, TREASURY_KEY, TOKEN_USER_ID, TOKEN_USER_KEY, HBAR_ID } from "../constants";
 import {
   PrivateKey,
   Client,
@@ -9,6 +9,7 @@ import {
   TransactionResponse,
   ContractFunctionResult,
   TransactionReceipt,
+  TokenId,
 } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 
@@ -90,6 +91,10 @@ const checkTransactionResponseForError = (response: TransactionResponse | Transa
   if (isNil(response)) throw new Error(`${functionName} transaction failed.`);
 };
 
+const isHbarToken = (tokenAddress: string): boolean => {
+  return TokenId.fromString(HBAR_ID).toSolidityAddress() === tokenAddress;
+};
+
 export {
   client,
   queryContract,
@@ -102,4 +107,5 @@ export {
   createTreasuryClient,
   createUserClient,
   getAddressArray,
+  isHbarToken,
 };

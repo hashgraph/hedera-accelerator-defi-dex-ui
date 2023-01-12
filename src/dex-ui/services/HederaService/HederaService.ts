@@ -8,11 +8,12 @@ import {
   TransferTransaction,
   TokenAssociateTransaction,
   TransactionResponse,
+  Hbar,
 } from "@hashgraph/sdk";
 import { GovernorProxyContracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, FACTORY_CONTRACT_ID } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { client, queryContract, getTreasurer, getAddressArray } from "./utils";
+import { client, queryContract, getTreasurer, getAddressArray, isHbarToken } from "./utils";
 import GovernorService from "./GovernorService";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
@@ -69,11 +70,11 @@ function createHederaService() {
       signer,
     } = addLiquidityDetails;
 
-    // TODO: remove fallbacks if no signer and not all details are provided
-    const firstTokenQty = firstTokenQuantity ? firstTokenQuantity : new BigNumber(10);
-    const secondTokenQty = secondTokenQuantity ? secondTokenQuantity : new BigNumber(10);
+    const firstTokenHbarQty = isHbarToken(firstTokenAddress) ? firstTokenQuantity : BigNumber(0);
+    const secondTokenHbarQty = isHbarToken(secondTokenAddress) ? secondTokenQuantity : BigNumber(0);
+    const finalHbarQty = firstTokenHbarQty.plus(secondTokenHbarQty);
 
-    console.log(`Adding ${firstTokenQty} units of token A and ${secondTokenQty} units of token B to the pool.`);
+    console.log(`Adding ${firstTokenQuantity} units of tokenA and ${secondTokenQuantity} units of tokenB to the pool.`);
 
     const addLiquidityTransaction = await new ContractExecuteTransaction()
       .setContractId(addLiquidityContractAddress)
@@ -84,10 +85,11 @@ function createHederaService() {
           .addAddress(walletAddress)
           .addAddress(firstTokenAddress)
           .addAddress(secondTokenAddress)
-          .addInt256(firstTokenQty)
-          .addInt256(secondTokenQty)
+          .addInt256(firstTokenQuantity)
+          .addInt256(secondTokenQuantity)
       )
       .setNodeAccountIds([new AccountId(3)])
+      .setPayableAmount(new Hbar(finalHbarQty))
       .freezeWithSigner(signer);
     await addLiquidityTransaction.executeWithSigner(signer);
   };
@@ -128,6 +130,7 @@ function createHederaService() {
       tokenToTradeAmount: tokenToTradeAmount.toNumber(),
       signer,
     });
+    const hbarAmount = isHbarToken(tokenToTradeAddress) ? tokenToTradeAmount : 0.0;
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(walletAddress)
       .addAddress(tokenToTradeAddress)
@@ -137,6 +140,7 @@ function createHederaService() {
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
       .setGas(9000000)
       .setNodeAccountIds([new AccountId(3)])
+      .setPayableAmount(new Hbar(hbarAmount))
       .freezeWithSigner(signer);
     const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);
     return swapTokenResponse;

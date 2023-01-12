@@ -3,10 +3,11 @@ import { isNil } from "ramda";
 import {
   MirrorNodeTransaction,
   MirrorNodeTokenTransfer,
-  MirrorNodeTokenBalance,
+  MirrorNodeAccountBalance,
 } from "../services/MirrorNodeService/types";
 import { TokenPair } from "../store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
+import { HBAR_ID } from "../services";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;
@@ -29,13 +30,21 @@ const getTransactionsFromLast24Hours = (transactions: MirrorNodeTransaction[]) =
  * @param tokenId - The ID of the token to get the balance for.
  * @returns The balance for the token with an ID equal to the tokenId.
  */
-const getTokenBalance = (tokenBalances: MirrorNodeTokenBalance[], tokenId: string) => {
-  return tokenBalances?.find((tokenBalance) => tokenBalance.token_id === tokenId)?.balance;
+const getTokenBalance = (tokenBalances: MirrorNodeAccountBalance, tokenId: string) => {
+  const hbarToken = tokenBalances.tokens.find((token) => token.token_id === HBAR_ID);
+  return hbarToken
+    ? tokenBalances.balance
+    : tokenBalances?.tokens?.find((tokenBalance) => tokenBalance.token_id === tokenId)?.balance;
+};
+
+// TODO: Remove this method once the backend resolves HBARX Association from User's wallet
+const getUserTokenBalance = (tokenBalances: MirrorNodeAccountBalance, tokenId: string) => {
+  return tokenBalances?.tokens?.find((tokenBalance) => tokenBalance.token_id === tokenId)?.balance;
 };
 
 interface CalculateTotalValueLockedForPoolParams {
   /** Token balances for the liquidity pool. */
-  poolTokenBalances: MirrorNodeTokenBalance[];
+  poolTokenBalances: MirrorNodeAccountBalance;
   /** Account ID for Token A. */
   tokenAAccountId: string;
   /** Account ID for Token B. */
@@ -124,15 +133,15 @@ const calculateUserPoolLiquidity = (percentOfPool: BigNumber, totalValueLocked: 
 
 interface CalculatePercentOfPoolParams {
   /** Token types and balances owned by the user's account. */
-  userTokenBalances: MirrorNodeTokenBalance[];
+  userTokenBalances: MirrorNodeAccountBalance;
   /** Token types and balances owned by the liquidity pool account. */
-  poolTokenBalances: MirrorNodeTokenBalance[];
+  poolTokenBalances: MirrorNodeAccountBalance;
   /** Account ID of the liquidity pool. */
   liquidityTokenAccountId: string;
 }
 
 interface calculatePercentOfPoolFromTotalSupplyParams {
-  userTokenBalances: MirrorNodeTokenBalance[];
+  userTokenBalances: MirrorNodeAccountBalance;
   tokenPair: TokenPair;
 }
 
@@ -163,7 +172,7 @@ const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFro
       pairToken: { pairLpAccountId, totalSupply, decimals },
     },
   } = params;
-  const userLPTokenBalance = getTokenBalance(userTokenBalances, pairLpAccountId ?? "");
+  const userLPTokenBalance = getUserTokenBalance(userTokenBalances, pairLpAccountId ?? "");
   if (isNil(userLPTokenBalance)) {
     console.error("Cannot find mirror node balance for LP token account ID.");
     return BigNumber(0);

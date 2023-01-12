@@ -2,7 +2,6 @@ import { BigNumber } from "bignumber.js";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { MirrorNodeTokenBalance } from "../../services";
 
 enum PoolsActionType {
   FETCH_ALL_POOL_METRICS_STARTED = "pools/FETCH_ALL_POOL_METRICS_STARTED",
@@ -62,13 +61,13 @@ interface UserPool {
 interface TokenBalance {
   /** Should update this field to be tokenId */
   token_id: string;
-  accountId: string;
   balance: BigNumber;
   decimals?: string;
 }
-interface PairTokenBalance {
-  pairAccountId: string | undefined;
-  tokenBalances: MirrorNodeTokenBalance[];
+interface MirrorNodeAccountBalance {
+  account: string;
+  balance: BigNumber;
+  tokens: TokenBalance[];
 }
 interface WithdrawState {
   status: "init" | "in progress" | "success" | "error";
@@ -83,8 +82,8 @@ interface WithdrawState {
 interface PoolsState {
   allPoolsMetrics: Pool[];
   userPoolsMetrics: UserPool[];
-  poolTokenBalances: PairTokenBalance[];
-  userTokenBalances: TokenBalance[];
+  poolTokenBalances: MirrorNodeAccountBalance[];
+  userTokenBalances: MirrorNodeAccountBalance | undefined;
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
   spotPrices: Record<string, BigNumber | undefined>;

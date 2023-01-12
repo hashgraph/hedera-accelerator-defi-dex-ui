@@ -20,7 +20,7 @@ const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
   userPoolsMetrics: [],
   poolTokenBalances: [],
-  userTokenBalances: [],
+  userTokenBalances: undefined,
   spotPrices: {},
   status: "init",
   errorMessage: null,
@@ -87,13 +87,13 @@ const fetchEachToken = async (evmAddress: string) => {
 
 const metricesForEachPair = async (pair: TokenPair) => {
   const tokenPairBalance = await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
+  const poolFee = await HederaService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
   const timestamp7DaysAgo = getTimestamp7DaysAgo();
   const last7DTransactions = await MirrorNodeService.fetchAccountTransactions(
     pair.tokenA.tokenMeta.pairAccountId ?? "",
     timestamp7DaysAgo
   );
   const last24Transactions = getTransactionsFromLast24Hours(last7DTransactions);
-  const poolFee = await HederaService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
   return calculatePoolMetrics({
     poolAccountId: pair.tokenA.tokenMeta.pairAccountId ?? "",
     poolTokenBalances: tokenPairBalance,
@@ -105,12 +105,7 @@ const metricesForEachPair = async (pair: TokenPair) => {
 };
 
 const getAllPoolBalanceFor = async (pair: TokenPair) => {
-  const tokenPairBalance = await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
-
-  return {
-    pairAccountId: pair.tokenA.tokenMeta.pairAccountId,
-    tokenBalances: tokenPairBalance,
-  };
+  return await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
 };
 
 /**
@@ -212,7 +207,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
         const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
-          return userTokenBalances.some(
+          return userTokenBalances.tokens.some(
             (userTokenBalance: MirrorNodeTokenBalance) =>
               userTokenBalance.token_id === poolTokenPair.pairToken.pairLpAccountId
           );
@@ -224,10 +219,10 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
             return pool.name === `${userTokenPair.tokenA.symbol}${userTokenPair.tokenB.symbol}`;
           })?.fee;
           const poolTokenBalance = poolTokenBalances.filter(
-            (pair) => pair.pairAccountId === userTokenPair.tokenA.tokenMeta.pairAccountId
+            (pair) => pair.account === userTokenPair.tokenA.tokenMeta.pairAccountId
           );
           return calculateUserPoolMetrics({
-            poolTokenBalances: poolTokenBalance[0].tokenBalances,
+            poolTokenBalances: poolTokenBalance[0],
             userTokenBalances,
             userTokenPair,
             fee,

@@ -7,7 +7,6 @@ import {
   MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
-  MirrorNodeTokenBalance,
   MirrorNodeTransaction,
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
@@ -127,11 +126,11 @@ function createMirrorNodeService() {
    * @param accountId - The ID of the account to return token balances for.
    * @returns The list of balances (in decimal format) for the given account ID.
    */
-  const fetchAccountTokenBalances = async (accountId: string): Promise<MirrorNodeTokenBalance[]> => {
+  const fetchAccountTokenBalances = async (accountId: string): Promise<MirrorNodeAccountBalance> => {
     const accountBalances = await fetchAccountBalances(accountId);
-    const accountTokens = accountBalances.flatMap((accountBalance) => accountBalance.tokens);
-    return await Promise.all(
-      accountTokens.map(async (token) => {
+    const account = accountBalances[0];
+    const tokenBalances = await Promise.all(
+      account.tokens.map(async (token) => {
         const tokenData = await fetchTokenData(token.token_id);
         const { decimals } = tokenData.data;
         const balance = BigNumber(token.balance).shiftedBy(-Number(decimals));
@@ -139,10 +138,15 @@ function createMirrorNodeService() {
           ...token,
           balance,
           decimals: String(decimals),
-          accountId,
         };
       })
     );
+    return {
+      account: accountId,
+      tokens: tokenBalances,
+      // TODO: To check with team and it can be shift in UI layer.
+      balance: BigNumber(account.balance).shiftedBy(-Number(8)),
+    };
   };
 
   /**

@@ -12,13 +12,14 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
 
   const pairAccountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
   const lpAccountId = selectedPoolMetrics?.userTokenPair?.pairToken.pairLpAccountId ?? "";
-  const token = poolTokenBalances.find((pool) => pool.pairAccountId === pairAccountId);
-  const [firstTokenBalance, secondTokenBalance] = token?.tokenBalances ?? [];
+  const token = poolTokenBalances.find((pool) => pool.account === pairAccountId);
+  const [firstTokenBalance, secondTokenBalance] = token?.tokens ?? [];
   // user provided liquidity as percent of pool in number and percent format
   const userPercentOfPool = selectedPoolMetrics.percentOfPool;
   const userPercentOfPoolAsNumber = userPercentOfPool.toNumber();
   const userPercentOfPoolAsPercent = formatBigNumberToPercent(userPercentOfPool);
-  const userLpAmount = userTokenBalances.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
+  const userLpAmount =
+    userTokenBalances?.tokens.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
 
   // details of first token
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";

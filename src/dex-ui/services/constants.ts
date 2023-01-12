@@ -26,6 +26,8 @@ export const FACTORY_CONTRACT_ID = "0.0.49271021";
 // Swap Contract (Pair) Proxy
 export const SWAP_CONTRACT_ID = "0.0.48660596";
 
+export const HBAR_ID = "0.0.49217385";
+
 export const Tokens = Object.freeze({
   TokenASymbol: "L49A",
   TokenAAccountId: "0.0.48289687",
