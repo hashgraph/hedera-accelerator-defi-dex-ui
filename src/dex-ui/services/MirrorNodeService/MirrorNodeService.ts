@@ -128,7 +128,7 @@ function createMirrorNodeService() {
    */
   const fetchAccountTokenBalances = async (accountId: string): Promise<MirrorNodeAccountBalance> => {
     const accountBalances = await fetchAccountBalances(accountId);
-    const account = accountBalances[0];
+    const account = accountBalances.filter((accountDetails) => accountDetails.account === accountId)[0];
     const tokenBalances = await Promise.all(
       account.tokens.map(async (token) => {
         const tokenData = await fetchTokenData(token.token_id);
