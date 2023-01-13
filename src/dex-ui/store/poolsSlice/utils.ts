@@ -6,13 +6,13 @@ import {
   calculatePercentOfPoolFromTotalSupply,
 } from "../../utils";
 import { Pool, UserPool, TokenPair } from "./types";
-import { MirrorNodeTokenBalance, MirrorNodeTransaction } from "../../services";
+import { MirrorNodeAccountBalance, MirrorNodeTransaction } from "../../services";
 
 interface CalculateUserPoolMetricsParams {
   /** Token balances for the liquidity pool. */
-  poolTokenBalances: MirrorNodeTokenBalance[];
+  poolTokenBalances: MirrorNodeAccountBalance;
   /** Token balances for the user's account. */
-  userTokenBalances: MirrorNodeTokenBalance[];
+  userTokenBalances: MirrorNodeAccountBalance;
   /** A list of liquidity pairs held by a user's account. */
   userTokenPair: TokenPair;
   /** The percent (decimal) fee for executing transactions on the pool contract. */
@@ -32,6 +32,7 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
     tokenAAccountId: tokenA.tokenMeta.tokenId ?? "",
     tokenBAccountId: tokenB.tokenMeta.tokenId ?? "",
   });
+
   const percentOfPool = calculatePercentOfPoolFromTotalSupply({
     userTokenBalances,
     tokenPair: userTokenPair,
@@ -51,7 +52,7 @@ interface CalculatePoolMetricsParams {
   /** Account ID of a liquidity pool. */
   poolAccountId: string;
   /** Token balances for the liquidity pool. */
-  poolTokenBalances: MirrorNodeTokenBalance[];
+  poolTokenBalances: MirrorNodeAccountBalance;
   /** Transactions on the liquidity pool for the previous 24 hours */
   last24Transactions: MirrorNodeTransaction[];
   /** Transactions on the liquidity pool for the previous 7 days */
@@ -76,7 +77,8 @@ const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
     tokenBAccountId: tokenB.tokenMeta.tokenId ?? "",
   });
   const tokenADecimals =
-    poolTokenBalances.find((tokenBalance) => tokenBalance.token_id === tokenA.tokenMeta.tokenId)?.decimals ?? "0";
+    poolTokenBalances.tokens?.find((tokenBalance) => tokenBalance.token_id === tokenA.tokenMeta.tokenId)?.decimals ??
+    "0";
   const past24HoursVolume = calculateVolume({
     poolAccountId,
     tokenAccountId: tokenA.tokenMeta.tokenId ?? "",

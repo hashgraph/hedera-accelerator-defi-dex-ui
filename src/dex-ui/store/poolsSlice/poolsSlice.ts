@@ -14,13 +14,13 @@ import {
 import { MirrorNodeService, WalletService, HederaService, MirrorNodeTokenBalance } from "../../services";
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
-import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours } from "../../utils";
+import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours, isHbarToken } from "../../utils";
 
 const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
   userPoolsMetrics: [],
   poolTokenBalances: [],
-  userTokenBalances: [],
+  userTokenBalances: undefined,
   spotPrices: {},
   status: "init",
   errorMessage: null,
@@ -87,13 +87,13 @@ const fetchEachToken = async (evmAddress: string) => {
 
 const metricesForEachPair = async (pair: TokenPair) => {
   const tokenPairBalance = await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
+  const poolFee = await HederaService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
   const timestamp7DaysAgo = getTimestamp7DaysAgo();
   const last7DTransactions = await MirrorNodeService.fetchAccountTransactions(
     pair.tokenA.tokenMeta.pairAccountId ?? "",
     timestamp7DaysAgo
   );
   const last24Transactions = getTransactionsFromLast24Hours(last7DTransactions);
-  const poolFee = await HederaService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
   return calculatePoolMetrics({
     poolAccountId: pair.tokenA.tokenMeta.pairAccountId ?? "",
     poolTokenBalances: tokenPairBalance,
@@ -105,12 +105,7 @@ const metricesForEachPair = async (pair: TokenPair) => {
 };
 
 const getAllPoolBalanceFor = async (pair: TokenPair) => {
-  const tokenPairBalance = await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
-
-  return {
-    pairAccountId: pair.tokenA.tokenMeta.pairAccountId,
-    tokenBalances: tokenPairBalance,
-  };
+  return await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
 };
 
 /**
@@ -132,6 +127,11 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
       const provider = WalletService.getProvider(network, wallet.topicID, signingAccount);
       const signer = WalletService.getSigner(provider);
+
+      const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
+      const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
+      const HbarAmount = tokenAHbarQty + tokenBHbarQty;
+
       try {
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
         await HederaService.addLiquidity({
@@ -141,6 +141,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           secondTokenQuantity,
           addLiquidityContractAddress,
           walletAddress,
+          HbarAmount,
           signer,
         });
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED);
@@ -212,7 +213,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
         const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
-          return userTokenBalances.some(
+          return userTokenBalances.tokens.some(
             (userTokenBalance: MirrorNodeTokenBalance) =>
               userTokenBalance.token_id === poolTokenPair.pairToken.pairLpAccountId
           );
@@ -224,10 +225,10 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
             return pool.name === `${userTokenPair.tokenA.symbol}${userTokenPair.tokenB.symbol}`;
           })?.fee;
           const poolTokenBalance = poolTokenBalances.filter(
-            (pair) => pair.pairAccountId === userTokenPair.tokenA.tokenMeta.pairAccountId
+            (pair) => pair.account === userTokenPair.tokenA.tokenMeta.pairAccountId
           );
           return calculateUserPoolMetrics({
-            poolTokenBalances: poolTokenBalance[0].tokenBalances,
+            poolTokenBalances: poolTokenBalance[0],
             userTokenBalances,
             userTokenPair,
             fee,

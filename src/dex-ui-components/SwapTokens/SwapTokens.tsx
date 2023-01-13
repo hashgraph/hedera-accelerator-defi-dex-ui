@@ -198,20 +198,14 @@ const SwapTokens = (props: SwapTokensProps) => {
   /** Update balances any time the token symbols or the cached paired account balances change. */
   useEffect(() => {
     if (tokenToTrade.tokenMeta.tokenId !== undefined) {
-      const tokenToTradeBalance = getTokenBalance(
-        tokenToTrade.tokenMeta.tokenId,
-        walletData?.pairedAccountBalance?.tokens ?? []
-      );
+      const tokenToTradeBalance = getTokenBalance(tokenToTrade.tokenMeta.tokenId, walletData?.pairedAccountBalance);
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));
       if (poolLiquidity !== undefined && tokenToTrade.symbol !== undefined) {
         dispatch(setTokenToTradePoolLiquidity(poolLiquidity?.[tokenToTrade.symbol]));
       }
     }
     if (tokenToReceive.tokenMeta.tokenId !== undefined) {
-      const tokenToReceiveBalance = getTokenBalance(
-        tokenToReceive.tokenMeta.tokenId,
-        walletData?.pairedAccountBalance?.tokens ?? []
-      );
+      const tokenToReceiveBalance = getTokenBalance(tokenToReceive.tokenMeta.tokenId, walletData?.pairedAccountBalance);
       dispatch(setTokenToReceiveBalance(tokenToReceiveBalance));
       if (poolLiquidity !== undefined && tokenToReceive.symbol !== undefined) {
         dispatch(setTokenToReceivePoolLiquidity(poolLiquidity?.[tokenToReceive.symbol]));
@@ -262,7 +256,7 @@ const SwapTokens = (props: SwapTokensProps) => {
       const inputElement = event?.target as HTMLInputElement;
       const tokenToTradeId = inputElement.value;
       const token = getTokenData(tokenToTradeId, tokenPairs ?? []);
-      const tokenToTradeBalance = getTokenBalance(tokenToTradeId, walletData?.pairedAccountBalance?.tokens ?? []);
+      const tokenToTradeBalance = getTokenBalance(tokenToTradeId, walletData?.pairedAccountBalance);
       resetTokenReceive();
       dispatch(setTokenToTradeSymbol(token?.symbol));
       dispatch(setTokenToTradeMeta(token?.tokenMeta ?? getDefaultTokenMeta));
@@ -299,11 +293,11 @@ const SwapTokens = (props: SwapTokensProps) => {
 
       const tokenToTradeBalance = getTokenBalance(
         tokenToTradeData?.tokenMeta.tokenId ?? "",
-        walletData?.pairedAccountBalance?.tokens ?? []
+        walletData?.pairedAccountBalance
       );
       const tokenToReceiveBalance = getTokenBalance(
         tokenToReceiveData?.tokenMeta.tokenId ?? "",
-        walletData?.pairedAccountBalance?.tokens ?? []
+        walletData?.pairedAccountBalance
       );
 
       dispatch(setTokenToTradeBalance(tokenToTradeBalance));

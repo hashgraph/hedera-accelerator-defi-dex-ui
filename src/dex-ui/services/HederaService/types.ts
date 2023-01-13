@@ -34,6 +34,7 @@ interface AddLiquidityDetails {
   secondTokenAddress: string;
   secondTokenQuantity: BigNumber;
   addLiquidityContractAddress: ContractId;
+  HbarAmount: BigNumber | number;
   walletAddress: string;
   signer: HashConnectSigner;
 }

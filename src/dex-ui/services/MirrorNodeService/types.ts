@@ -22,7 +22,6 @@ interface MirrorNodeTokenPairResponse {
 
 interface MirrorNodeTokenBalance {
   token_id: string;
-  accountId: string;
   balance: BigNumber;
   decimals?: string;
 }
@@ -35,7 +34,7 @@ interface MirrorNodeBalanceResponse {
 
 interface MirrorNodeAccountBalance {
   account: string;
-  balance: number;
+  balance: BigNumber;
   tokens: MirrorNodeTokenBalance[];
 }
 

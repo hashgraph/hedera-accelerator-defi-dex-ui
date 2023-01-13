@@ -17,6 +17,7 @@ import {
   getPairedTokenData,
   getDefaultTokenMeta,
 } from "../../../dex-ui-components/SwapTokens/utils";
+import { HBAR_ID } from "../../services";
 
 const AddLiquidity = (): JSX.Element => {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
@@ -82,10 +83,12 @@ const AddLiquidity = (): JSX.Element => {
    */
   const getBalanceByTokenSymbol = useCallback(
     (tokenId: string): string => {
-      const defaultBalance = "0.0";
-      const tokenBalances = wallet?.pairedAccountBalance?.tokens;
-      const tokenData = tokenBalances?.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId);
-      return tokenData?.balance ?? defaultBalance;
+      const balance =
+        tokenId === HBAR_ID
+          ? wallet?.pairedAccountBalance?.hbars.replace("ℏ", "") ?? "0.0"
+          : wallet?.pairedAccountBalance?.tokens.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId)
+              ?.balance ?? "0.0";
+      return balance ?? 0.0;
     },
     [wallet]
   );

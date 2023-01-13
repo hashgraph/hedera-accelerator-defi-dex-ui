@@ -1,9 +1,10 @@
 import { uniqBy } from "ramda";
 import { Token, TokenPair } from "../TokenInput";
-import { TokenBalanceJson } from "@hashgraph/sdk";
+import { TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
 import { SwapSettingsInputProps } from "../base";
 import { ChangeEvent } from "react";
 import { TokenState } from "./types";
+import { HBAR_ID } from "../../dex-ui/services";
 
 /**
  * Returns half of the input amount.
@@ -92,11 +93,15 @@ export const getPairedTokenData = (tokenId: string, receiveTokenId: string, toke
   return { tokenToTradeData: data?.tokenToTradeData, tokenToReceiveData: data?.tokenToReceiveData };
 };
 
-export const getTokenBalance = (tokenId: string, tokens: TokenBalanceJson[]): number => {
-  const defaultBalance = 0.0;
-  const balance =
-    tokens?.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId)?.balance ?? defaultBalance;
+export const getTokenBalance = (tokenId: string, accountBalances: AccountBalanceJson | null | undefined): number => {
+  const balance = isHbarToken(tokenId)
+    ? accountBalances?.hbars.replace("ℏ", "") ?? "0.0"
+    : accountBalances?.tokens.find((tokenData: TokenBalanceJson) => tokenData.tokenId === tokenId)?.balance ?? "0.0";
   return Number(balance);
+};
+
+const isHbarToken = (tokenId: string): boolean => {
+  return tokenId === HBAR_ID;
 };
 
 interface GetSwapSettingsPropsParams {
