@@ -183,6 +183,10 @@ const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFro
   }
 };
 
+const isHbarToken = (TokenID: string): boolean => {
+  return TokenID === HBAR_ID;
+};
+
 export {
   calculateTotalValueLockedForPool,
   calculateVolume,
@@ -190,4 +194,5 @@ export {
   calculateUserPoolLiquidity,
   getTransactionsFromLast24Hours,
   calculatePercentOfPoolFromTotalSupply,
+  isHbarToken,
 };

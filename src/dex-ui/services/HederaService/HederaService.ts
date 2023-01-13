@@ -13,7 +13,7 @@ import {
 import { GovernorProxyContracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, FACTORY_CONTRACT_ID } from "../constants";
 import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { client, queryContract, getTreasurer, getAddressArray, isHbarToken } from "./utils";
+import { client, queryContract, getTreasurer, getAddressArray } from "./utils";
 import GovernorService from "./GovernorService";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
@@ -67,14 +67,9 @@ function createHederaService() {
       secondTokenQuantity,
       addLiquidityContractAddress,
       walletAddress,
+      HbarAmount,
       signer,
     } = addLiquidityDetails;
-
-    const firstTokenHbarQty = isHbarToken(firstTokenAddress) ? firstTokenQuantity : BigNumber(0);
-    const secondTokenHbarQty = isHbarToken(secondTokenAddress) ? secondTokenQuantity : BigNumber(0);
-    const finalHbarQty = firstTokenHbarQty.plus(secondTokenHbarQty);
-
-    console.log(`Adding ${firstTokenQuantity} units of tokenA and ${secondTokenQuantity} units of tokenB to the pool.`);
 
     const addLiquidityTransaction = await new ContractExecuteTransaction()
       .setContractId(addLiquidityContractAddress)
@@ -89,14 +84,13 @@ function createHederaService() {
           .addInt256(secondTokenQuantity)
       )
       .setNodeAccountIds([new AccountId(3)])
-      .setPayableAmount(new Hbar(finalHbarQty))
+      .setPayableAmount(new Hbar(HbarAmount))
       .freezeWithSigner(signer);
     await addLiquidityTransaction.executeWithSigner(signer);
   };
 
   const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, contractId: ContractId) => {
     const accountId = signer.getAccountId().toSolidityAddress();
-    console.log(`Removing ${lpTokenAmount} units of LP from the pool.`);
     const removeLiquidity = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(5000000)
@@ -104,7 +98,6 @@ function createHederaService() {
       .freezeWithSigner(signer);
 
     const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
-    console.log(`Liquidity remove Tx: ${removeLiquidityTx}`);
     return removeLiquidityTx;
   };
 
@@ -113,6 +106,7 @@ function createHederaService() {
     walletAddress: string;
     tokenToTradeAddress: string;
     tokenToTradeAmount: BigNumber;
+    HbarAmount: number;
     signer: HashConnectSigner;
   }
 
@@ -121,16 +115,9 @@ function createHederaService() {
     walletAddress,
     tokenToTradeAddress,
     tokenToTradeAmount,
+    HbarAmount,
     signer,
   }: SwapTokenParams): Promise<TransactionResponse> => {
-    console.log({
-      contractId,
-      walletAddress,
-      tokenToTradeAddress,
-      tokenToTradeAmount: tokenToTradeAmount.toNumber(),
-      signer,
-    });
-    const hbarAmount = isHbarToken(tokenToTradeAddress) ? tokenToTradeAmount : 0.0;
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(walletAddress)
       .addAddress(tokenToTradeAddress)
@@ -140,7 +127,7 @@ function createHederaService() {
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
       .setGas(9000000)
       .setNodeAccountIds([new AccountId(3)])
-      .setPayableAmount(new Hbar(hbarAmount))
+      .setPayableAmount(new Hbar(HbarAmount))
       .freezeWithSigner(signer);
     const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);
     return swapTokenResponse;
@@ -205,8 +192,7 @@ function createHederaService() {
         .setAccountId(receivingAccountId)
         .setTokenIds(tokensToAssociate);
       const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
-      const tokenAssociateRes = await tokenAssociateSignedTx.executeWithSigner(signer);
-      console.log("Token association transactions:" + tokenAssociateRes.toString());
+      await tokenAssociateSignedTx.executeWithSigner(signer);
     }
 
     const transaction = new TransferTransaction()
@@ -222,7 +208,6 @@ function createHederaService() {
 
     const signTx = await transaction.sign(treasuryKey);
     const txResponse = await signTx.execute(client);
-    console.log("Get tokens response: ", txResponse);
     return txResponse;
   };
 

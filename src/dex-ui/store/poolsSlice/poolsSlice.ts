@@ -14,7 +14,7 @@ import {
 import { MirrorNodeService, WalletService, HederaService, MirrorNodeTokenBalance } from "../../services";
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
-import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours } from "../../utils";
+import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours, isHbarToken } from "../../utils";
 
 const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
@@ -127,6 +127,11 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
       const provider = WalletService.getProvider(network, wallet.topicID, signingAccount);
       const signer = WalletService.getSigner(provider);
+
+      const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
+      const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
+      const HbarAmount = tokenAHbarQty + tokenBHbarQty;
+
       try {
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
         await HederaService.addLiquidity({
@@ -136,6 +141,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           secondTokenQuantity,
           addLiquidityContractAddress,
           walletAddress,
+          HbarAmount,
           signer,
         });
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED);

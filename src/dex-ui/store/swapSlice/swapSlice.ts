@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { WalletService, HederaService, MirrorNodeService } from "../../services";
+import { WalletService, HederaService, MirrorNodeService, HBAR_ID } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
@@ -306,6 +306,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         tokenToTrade.tokenMeta.tokenId ?? "",
         tokenToTrade.amount ?? ""
       );
+      const HbarAmount = tokenToTradeAccountId === HBAR_ID ? tokenToTrade.amount : 0.0;
       const provider = WalletService.getProvider(
         context.network,
         wallet.topicID,
@@ -327,6 +328,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           walletAddress,
           tokenToTradeAddress,
           tokenToTradeAmount,
+          HbarAmount,
           signer,
         });
         set(
