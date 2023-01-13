@@ -1,3 +1,4 @@
+import { HBAR_ID } from "../../services";
 import { PoolsStore, UserPool } from "../../store/poolsSlice";
 import { formatBigNumberToPercent } from "../../utils";
 
@@ -23,13 +24,19 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
 
   // details of first token
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
-  const firstTokenPoolLiquidity = firstTokenBalance?.balance.toNumber() ?? 0;
-  const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * firstTokenPoolLiquidity;
-
+  const firstTokenPoolLiquidity =
+    firstTokenBalance.token_id === HBAR_ID
+      ? token?.balance.toNumber() ?? 0
+      : firstTokenBalance?.balance.toNumber() ?? 0;
+  const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (firstTokenPoolLiquidity ?? 0);
   // details of Second token
   const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
-  const secondTokenPoolLiquidity = secondTokenBalance?.balance.toNumber() ?? 0;
-  const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * secondTokenPoolLiquidity;
+  const secondTokenPoolLiquidity =
+    secondTokenBalance.token_id === HBAR_ID
+      ? token?.balance.toNumber() ?? 0
+      : secondTokenBalance?.balance.toNumber() ?? 0;
+
+  const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (secondTokenPoolLiquidity ?? 0);
 
   const firstToken = {
     tokenSymbol: firstTokenSymbol,
