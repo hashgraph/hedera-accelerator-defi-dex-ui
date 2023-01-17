@@ -54,6 +54,8 @@ export const Governance = (): ReactElement => {
   } = useAllProposals({
     titleFilter: proposalTitleFilter,
     statusFilters: proposalTabFilters.at(tabIndex)?.filters,
+    startDate,
+    endDate,
   });
   const {
     paginatedData: paginatedProposals,
@@ -117,10 +119,16 @@ export const Governance = (): ReactElement => {
           tabFilters={<TabFilters<ProposalStatus> filters={proposalTabFilters} />}
           inputFilters={
             <>
-              {/* TODO: Add Filter By Date input component and functionality.
-                <Input variant="filter" placeholder="Filter By Date" flex="1" minWidth="300px" />
-                <Spacer margin="0.5rem" /> 
-              */}
+              <RangeDatePicker
+                placeholder="Filter By Date"
+                startDate={startDate}
+                endDate={endDate}
+                onSelection={(dates: any) => {
+                  const [startDate, endDate] = dates;
+                  handleProposalDatesFilterChange(startDate, endDate);
+                }}
+              />
+              <Spacer padding="0.5rem" />
               <Input
                 variant="filter"
                 value={proposalTitleFilter}
@@ -128,16 +136,6 @@ export const Governance = (): ReactElement => {
                 placeholder="Filter By Name"
                 flex="1"
                 minWidth="300px"
-              />
-              <Spacer padding="0.3rem" />
-              <RangeDatePicker
-                placeholder="Filter by Date"
-                startDate={startDate}
-                endDate={endDate}
-                onSelection={(dates: any) => {
-                  const [startDate, endDate] = dates;
-                  handleProposalDatesFilterChange(startDate, endDate);
-                }}
               />
             </>
           }

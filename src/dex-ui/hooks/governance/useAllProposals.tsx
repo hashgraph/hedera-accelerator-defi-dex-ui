@@ -9,10 +9,12 @@ const proposalStatusSortOrder = [ProposalStatus.Active, ProposalStatus.Passed, P
 interface UseAllProposalsProps {
   titleFilter?: string;
   statusFilters?: ProposalStatus[];
+  startDate?: Date | null;
+  endDate?: Date | null;
 }
 
 export function useAllProposals(props: UseAllProposalsProps) {
-  const { titleFilter = "", statusFilters = defaultStatusFilter } = props;
+  const { titleFilter = "", startDate, endDate, statusFilters = defaultStatusFilter } = props;
 
   function sortProposalCompareFn(proposalA: FormattedProposal, proposalB: FormattedProposal) {
     if (!isNil(proposalA.status) && !isNil(proposalB.status)) {
@@ -26,11 +28,22 @@ export function useAllProposals(props: UseAllProposalsProps) {
       const doesTitleFilterMatch = proposal.title?.toLowerCase().includes(titleFilter.toLowerCase());
       const doesStatusFilterMatch = !isNil(proposal?.status) && statusFilters.includes(proposal?.status);
       if (doesTitleFilterMatch && doesStatusFilterMatch) {
-        const formattedProposal = formatProposal(proposal);
-        return [...formattedProposals, formattedProposal];
+        if (startDate && endDate) {
+          const timeStamp = Number(proposal.timestamp) * 1000;
+          const doesDateFilterMatch =
+            startDate.getTime() <= new Date(timeStamp).getTime() && new Date(timeStamp).getTime() <= endDate.getTime();
+          if (doesDateFilterMatch) {
+            const formattedProposal = formatProposal(proposal);
+            return [...formattedProposals, formattedProposal];
+          }
+        } else {
+          const formattedProposal = formatProposal(proposal);
+          return [...formattedProposals, formattedProposal];
+        }
       }
       return formattedProposals;
     }, []);
+
     return formattedProposals.sort(sortProposalCompareFn);
   }
 

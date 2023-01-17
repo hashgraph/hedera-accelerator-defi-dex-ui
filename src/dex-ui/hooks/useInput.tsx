@@ -14,10 +14,10 @@ export function useInput<T>(initialValue: T) {
 }
 
 export function useDates<T, Z>(initialStartDateValue: T, initialEndDateValue: Z) {
-  const [startDate, setStartDate] = useState(initialStartDateValue);
-  const [endDate, setEndDate] = useState(initialEndDateValue);
+  const [startDate, setStartDate] = useState<T>(initialStartDateValue);
+  const [endDate, setEndDate] = useState<Z>(initialEndDateValue);
 
-  function handleChange(startDate: any, endDate: any) {
+  function handleChange(startDate: T, endDate: Z) {
     setStartDate(startDate);
     setEndDate(endDate);
   }

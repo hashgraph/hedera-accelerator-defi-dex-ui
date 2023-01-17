@@ -66,6 +66,7 @@ interface MirrorNodeTransaction {
 interface MirrorNodeProposalEventLog {
   data: string;
   topics: string[];
+  timestamp: string;
 }
 
 interface MirrorNodeDecodedProposalEvent {
@@ -78,6 +79,7 @@ interface MirrorNodeDecodedProposalEvent {
   description?: string;
   title?: string;
   link?: string;
+  timestamp?: string;
 }
 
 export type {

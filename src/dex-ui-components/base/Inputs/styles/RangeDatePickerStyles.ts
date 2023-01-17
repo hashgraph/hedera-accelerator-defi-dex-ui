@@ -13,7 +13,7 @@ export const RangeDatePickerStyles = {
       border: `1px solid ${Color.Grey_02}`,
       lineHeight: "19px",
       fontWeight: "400",
-      padding: "5px",
+      padding: "8px",
       color: Color.Black_01,
       "::placeholder": {
         fontSize: "16px",
