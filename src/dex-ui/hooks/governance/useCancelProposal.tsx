@@ -2,7 +2,7 @@ import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, UseMutationResult, useQueryClient } from "react-query";
-import { HederaService } from "../../services";
+import { DexService } from "../../services";
 
 export type UseCancelProposalResult = UseMutationResult<
   TransactionResponse,
@@ -21,7 +21,7 @@ export function useCancelProposal() {
   return useMutation<TransactionResponse, Error, UseCancelProposalParams, GovernanceMutations.CancelProposal>(
     (params: UseCancelProposalParams) => {
       const { contractId, title, signer } = params;
-      return HederaService.cancelProposal({ contractId, title, signer });
+      return DexService.cancelProposal({ contractId, title, signer });
     },
     {
       onSuccess: () => {

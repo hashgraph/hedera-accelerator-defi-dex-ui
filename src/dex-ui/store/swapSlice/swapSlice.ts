@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { WalletService, HederaService, MirrorNodeService, HBAR_ID } from "../../services";
+import { DexService, HBAR_ID } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
@@ -24,14 +24,13 @@ const initialSwapState: SwapState = {
 };
 
 const fetchEachToken = async (evmAddress: string) => {
-  const pairData = await MirrorNodeService.fetchContract(evmAddress);
-  const pairContractId = ContractId.fromString(pairData.data.contract_id);
-  const { tokenAAddress, tokenBAddress, tokenCAddress } = await HederaService.getTokenPairAddress(pairContractId);
+  const pairData = await DexService.fetchContract(evmAddress);
+  const { tokenATokenId, tokenBTokenId, lpTokenId } = await DexService.fetchPairTokenIds(pairData.data.contract_id);
 
   const [tokenAInfo, tokenBInfo, tokenCInfo] = await Promise.all([
-    MirrorNodeService.fetchTokenData(tokenAAddress),
-    MirrorNodeService.fetchTokenData(tokenBAddress),
-    MirrorNodeService.fetchTokenData(tokenCAddress),
+    DexService.fetchTokenData(tokenATokenId),
+    DexService.fetchTokenData(tokenBTokenId),
+    DexService.fetchTokenData(lpTokenId),
   ]);
 
   const tokenAInfoDetails: Token = {
@@ -65,7 +64,7 @@ const fetchEachToken = async (evmAddress: string) => {
   };
   const pairToken = {
     symbol: tokenCInfo.data.symbol,
-    pairLpAccountId: tokenCAddress,
+    pairLpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
     decimals: tokenCInfo.data.decimals,
   };
@@ -89,8 +88,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const { swap } = get();
       const { selectedAccountId } = swap.selectedAccount;
       try {
-        const contractId = ContractId.fromString(selectedAccountId ?? "");
-        const precision = await HederaService.fetchPrecision(contractId);
+        const precision = await DexService.fetchPrecisionValue(selectedAccountId ?? "");
         set(
           ({ swap }) => {
             swap.precision = precision;
@@ -100,7 +98,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         );
       } catch {
         // TODO: A fix for To get Precision and get The UI working when no account is selected
-        const precision = HederaService.getPrecision();
+        const precision = DexService.getPrecision();
         set(
           ({ swap }) => {
             swap.precision = precision;
@@ -126,7 +124,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const { app } = get();
       app.setFeaturesAsLoading(["tokenPairs"]);
       try {
-        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const pairsAddresses = await DexService.fetchAllTokenPairs();
         const urlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const pairs = await Promise.all(urlRequest);
         set(
@@ -169,7 +167,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         if (precision === undefined) {
           throw Error("Precision not found");
         }
-        const spotPriceL49BToL49A = await HederaService.getSpotPrice(selectedAccountId);
+        const spotPriceL49BToL49A = await DexService.fetchSpotPrice(selectedAccountId);
         const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
         const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
         const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
@@ -204,7 +202,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       app.setFeaturesAsLoading(["fee"]);
       set({}, false, SwapActionType.FETCH_SWAP_FEE_STARTED);
       try {
-        const fee = await HederaService.fetchFeeWithPrecision(selectedAccountId);
+        const fee = await DexService.fetchFeeWithPrecision(selectedAccountId);
         set(
           ({ swap }) => {
             swap.fee = fee;
@@ -224,7 +222,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
       app.setFeaturesAsLoaded(["fee"]);
     },
-    // TODO: need to pass in contract address of pool (to pass to pairCurrentPosition)
+    // TODO: need to pass in contract address of pool (to pass to getPoolTokenBalances)
     getPoolLiquidity: async (tokenToTrade: Token, tokenToReceive: Token) => {
       console.log(`Getting pool liquidity
        ${JSON.stringify(tokenToTrade, null, 2)} and 
@@ -241,15 +239,11 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       set({}, false, SwapActionType.FETCH_POOL_LIQUIDITY_STARTED);
       try {
         const poolLiquidity = new Map<string, BigNumber | undefined>();
-        // TODO: In below Contract call we are directly returining the hard coded
-        const contractId = ContractId.fromString(tokenToReceive.tokenMeta.pairAccountId ?? "");
-        const { tokenAAddress } = await HederaService.getTokenPairAddress(
-          ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "")
-        );
-        const rawPoolLiquidity = await HederaService.pairCurrentPosition(contractId);
+        const { tokenATokenId } = await DexService.fetchPairTokenIds(tokenToTrade.tokenMeta.pairAccountId ?? "");
+        const rawPoolLiquidity = await DexService.fetchPoolTokenBalances(tokenToReceive.tokenMeta.pairAccountId ?? "");
 
         let tokens: { [x: string]: BigNumber } = {};
-        if (tokenAAddress === tokenToTrade.tokenMeta.tokenId) {
+        if (tokenATokenId === tokenToTrade.tokenMeta.tokenId) {
           tokens = {
             [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenAQty,
             [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenBQty,
@@ -307,12 +301,12 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         tokenToTrade.amount ?? ""
       );
       const HbarAmount = tokenToTradeAccountId === HBAR_ID ? tokenToTrade.amount : 0.0;
-      const provider = WalletService.getProvider(
+      const provider = DexService.getProvider(
         context.network,
         wallet.topicID,
         wallet.savedPairingData?.accountIds[0] ?? ""
       );
-      const signer = WalletService.getSigner(provider);
+      const signer = DexService.getSigner(provider);
       try {
         // Sometimes (on first run throught it seems) the AcknowledgeMessageEvent from hashpack does not fire
         // so we need to manually dispatch the action here indicating that transaction is waiting to be signed
@@ -323,7 +317,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           false,
           SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
         );
-        const result = await HederaService.swapToken({
+        const result = await DexService.swapToken({
           contractId,
           walletAddress,
           tokenToTradeAddress,

@@ -5,7 +5,7 @@ import { getErrorMessage } from "../../utils";
 import { WalletSlice, WalletStore, WalletActionType, WalletState } from "./types";
 import { getFormattedTokenBalances } from "./utils";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { GovernanceTokenId, WalletService } from "../../services";
+import { GovernanceTokenId, DexService } from "../../services";
 
 const initialWalletState: WalletState = {
   availableExtension: null,
@@ -26,12 +26,12 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     ...initialWalletState,
     getSigner: () => {
       const { context, wallet } = get();
-      const provider = WalletService.getProvider(
+      const provider = DexService.getProvider(
         context.network,
         wallet.topicID,
         wallet.savedPairingData?.accountIds[0] ?? ""
       );
-      const signer = WalletService.getSigner(provider);
+      const signer = DexService.getSigner(provider);
       return signer;
     },
     getTokenAmountWithPrecision: (tokenId: string, tokenAmount: number) => {
@@ -45,7 +45,7 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     doesUserHaveGODTokensToVote: () => {
       const { wallet } = get();
       const doesUserHaveGodTokens =
-        Number(wallet.pairedAccountBalance?.tokens.find((token) => token.tokenId === GovernanceTokenId)?.balance) > 0;
+        Number(wallet.pairedAccountBalance?.tokens.find((token) => token.tokenId === GovernanceTokenId)?.balance) > 1;
       return doesUserHaveGodTokens;
     },
     isPaired: () => {
@@ -56,7 +56,7 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       set({}, false, WalletActionType.INITIALIZE_WALLET_CONNECTION_STARTED);
       try {
         const { DEXMetaData, network, debug } = get().context;
-        const { topic, pairingString, savedPairings } = await WalletService.initWalletConnection(
+        const { topic, pairingString, savedPairings } = await DexService.initWalletConnection(
           DEXMetaData,
           network,
           debug
@@ -84,14 +84,14 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
     },
     connectToWallet: () => {
       set({}, false, WalletActionType.PAIR_WITH_SELECTED_WALLET_EXTENSION_STARTED);
-      WalletService.connectToWalletExtension();
+      DexService.connectToWalletExtension();
       set({}, false, WalletActionType.PAIR_WITH_SELECTED_WALLET_EXTENSION_SUCCEEDED);
     },
     disconnectWallet: async () => {
       set({}, false, WalletActionType.DISCONNECT_WALLET_STARTED);
       const { wallet } = get();
       try {
-        await WalletService.disconnect(wallet.topicID);
+        await DexService.disconnect(wallet.topicID);
         set({}, false, WalletActionType.DISCONNECT_WALLET_SUCCEEDED);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
@@ -109,12 +109,12 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       const { context, app, wallet } = get();
       app.setFeaturesAsLoading(["pairedAccountBalance"]);
       try {
-        const provider = WalletService.getProvider(
+        const provider = DexService.getProvider(
           context.network,
           wallet.topicID,
           wallet.savedPairingData?.accountIds[0] ?? "" // replace with error handling
         );
-        const accountBalance = await WalletService.getAccountBalance(
+        const accountBalance = await DexService.getAccountBalance(
           provider,
           wallet.savedPairingData?.accountIds[0] ?? "" // replace with error handling
         );
@@ -186,7 +186,7 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
         handleTransactionEvent,
         handleAdditionalAccountRequestEvent,
       } = get().wallet;
-      WalletService.setupHashConnectEvents({
+      DexService.setupHashConnectEvents({
         handleFoundExtensionEvent,
         handlePairingEvent,
         handleAcknowledgeMessageEvent,
@@ -204,7 +204,7 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
         handleTransactionEvent,
         handleAdditionalAccountRequestEvent,
       } = get().wallet;
-      WalletService.destroyHashConnectEvents({
+      DexService.destroyHashConnectEvents({
         handleFoundExtensionEvent,
         handlePairingEvent,
         handleAcknowledgeMessageEvent,

@@ -1,4 +1,4 @@
-import { HederaService } from "../../services";
+import { DexService } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { TransactionStatus } from "../appSlice";
 import {
@@ -48,7 +48,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         const getResult = async () => {
           if (type === ProposalType.Text) {
             const createTextProposal = data as CreateTextProposalData;
-            return HederaService.sendCreateTextProposalTransaction(
+            return DexService.sendCreateTextProposalTransaction(
               createTextProposal.title,
               createTextProposal.description,
               createTextProposal.linkToDiscussion,
@@ -61,7 +61,7 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
               createTransferTokenProposalData.tokenToTransfer,
               createTransferTokenProposalData.amountToTransfer
             );
-            return HederaService.sendCreateTransferTokenProposalTransaction({
+            return DexService.sendCreateTransferTokenProposalTransaction({
               title: createTransferTokenProposalData.title,
               description: createTransferTokenProposalData.description,
               linkToDiscussion: createTransferTokenProposalData.linkToDiscussion,

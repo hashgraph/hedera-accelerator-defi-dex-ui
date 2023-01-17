@@ -4,10 +4,6 @@ import { ContractId } from "@hashgraph/sdk";
 
 enum GovernorContractFunctions {
   CreateProposal = "createProposal",
-  GetState = "state",
-  GetHasVoted = "hasVoted",
-  GetProposalVotes = "proposalVotes",
-  GetQuorum = "quorum",
   CastVote = "castVote",
   ExecuteProposal = "executeProposal",
   ClaimGODToken = "claimGODToken",
@@ -16,15 +12,6 @@ enum GovernorContractFunctions {
 }
 
 enum PairContractFunctions {
-  GetLiquidityProviderTokenAmounts = "getContributorTokenShare",
-  GetSpotPrice = "getSpotPrice",
-  GetFee = "getFee",
-  GetFeePrecision = "getFeePrecision",
-  GetPrecision = "getPrecisionValue",
-  GetPoolBalances = "getPairQty",
-  GetContractAddress = "getContractAddress",
-  GetTokenAddresses = "getTokenPairAddress",
-  GetTokenPair = "getPairs",
   SwapToken = "swapToken",
 }
 

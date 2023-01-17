@@ -2,7 +2,7 @@ import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, useQueryClient } from "react-query";
-import { HederaService } from "../../services";
+import { DexService } from "../../services";
 
 interface UseClaimGODTokensParams {
   contractId: string;
@@ -20,7 +20,7 @@ export function useClaimGODTokens() {
   return useMutation<TransactionResponse, Error, UseClaimGODTokensParams, GovernanceMutations.ClaimGODToken>(
     (params: UseClaimGODTokensParams) => {
       const { contractId, proposalId, signer } = params;
-      return HederaService.sendClaimGODTokenTransaction({ contractId, proposalId, signer });
+      return DexService.sendClaimGODTokenTransaction({ contractId, proposalId, signer });
     },
     {
       onSuccess: () => {

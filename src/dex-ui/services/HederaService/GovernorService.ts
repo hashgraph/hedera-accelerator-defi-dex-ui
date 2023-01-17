@@ -14,7 +14,7 @@ import { ContractId } from "@hashgraph/sdk";
 import { GovernorProxyContracts, TOKEN_USER_PUB_KEY } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { checkTransactionResponseForError, queryContract, client } from "./utils";
+import { checkTransactionResponseForError, client } from "./utils";
 
 /**
  * General format of service calls:
@@ -24,82 +24,6 @@ import { checkTransactionResponseForError, queryContract, client } from "./utils
  * 4 - Send transaction to wallet and execute transaction.
  * 5 - Extract and return resulting data.
  */
-
-/**
- * Fetches the current state of a governor proposal.
- * @param contractId - The account id of the governor contract.
- * @param proposalId - The id of the governor proposal.
- * @returns The state of the proposal
- */
-const fetchProposalState = async (contractId: string, proposalId: string): Promise<BigNumber | undefined> => {
-  const governorContractId = ContractId.fromString(contractId);
-  const preciseProposalId = BigNumber(proposalId);
-  const queryParams = new ContractFunctionParameters().addUint256(preciseProposalId);
-  const result = await queryContract(governorContractId, GovernorContractFunctions.GetState, queryParams);
-  const proposalState = result?.getUint256(0);
-  return proposalState;
-};
-
-export interface FetchHasVotedParams {
-  /** The id of the governor contract. */
-  contractId: string;
-  /** The id of the governor proposal. */
-  proposalId: string;
-  /** The account signing the transaction. */
-  signer: HashConnectSigner;
-}
-/**
- * Queries a contract to see if an account id has voted on the specified proposal.
- * @param params - {@link FetchHasVotedParams}
- * @returns true if the account has voted on the proposal.
- */
-const fetchHasVoted = async (params: FetchHasVotedParams): Promise<boolean | undefined> => {
-  const { contractId, proposalId, signer } = params;
-  const governorContractId = ContractId.fromString(contractId);
-  const preciseProposalId = BigNumber(proposalId);
-  const accountAddress = signer.getAccountId().toSolidityAddress();
-  const queryParams = new ContractFunctionParameters().addUint256(preciseProposalId).addAddress(accountAddress);
-  const result = await queryContract(governorContractId, GovernorContractFunctions.GetHasVoted, queryParams);
-  const hasVoted = result?.getBool(0);
-  return hasVoted;
-};
-
-/**
- * TODO
- * @param contractId -
- * @param blockNumber -
- * @returns
- */
-const fetchQuorum = async (contractId: string, blockNumber: string): Promise<BigNumber | undefined> => {
-  const governorContractId = ContractId.fromString(contractId);
-  const preciseBlockNumber = BigNumber(blockNumber);
-  const queryParams = new ContractFunctionParameters().addUint256(preciseBlockNumber);
-  const result = await queryContract(governorContractId, GovernorContractFunctions.GetQuorum, queryParams);
-  const quorum = result?.getInt256(0);
-  return quorum;
-};
-interface ProposalVotes {
-  againstVotes: BigNumber | undefined;
-  forVotes: BigNumber | undefined;
-  abstainVotes: BigNumber | undefined;
-}
-
-/**
- * TODO
- * @param contractId -
- * @param proposalId -
- * @returns
- */
-const fetchProposalVotes = async (contractId: string, proposalId: string): Promise<ProposalVotes> => {
-  const governorContractId = ContractId.fromString(contractId);
-  const preciseProposalId = BigNumber(proposalId);
-  const queryParams = new ContractFunctionParameters().addUint256(preciseProposalId);
-  const result = await queryContract(governorContractId, GovernorContractFunctions.GetProposalVotes, queryParams);
-  const againstVotes = result?.getInt256(0);
-  const forVotes = result?.getInt256(1);
-  const abstainVotes = result?.getInt256(2);
-  return { againstVotes, forVotes, abstainVotes };
-};
 interface CastVoteParams {
   contractId: string;
   proposalId: string;
@@ -344,10 +268,6 @@ const deployABIFile = async (abiFile: string) => {
 
 const GovernorService = {
   sendClaimGODTokenTransaction,
-  fetchProposalState,
-  fetchHasVoted,
-  fetchQuorum,
-  fetchProposalVotes,
   castVote,
   cancelProposal,
   sendCreateTextProposalTransaction,
@@ -358,4 +278,3 @@ const GovernorService = {
 };
 
 export default GovernorService;
-export type { ProposalVotes };

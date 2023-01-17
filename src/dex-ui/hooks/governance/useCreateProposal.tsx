@@ -2,7 +2,7 @@ import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, useQueryClient } from "react-query";
-import { HederaService } from "../../services";
+import { DexService } from "../../services";
 import { CreateProposalType } from "./types";
 import { WalletStore } from "../../store/walletSlice";
 
@@ -56,7 +56,7 @@ export function useCreateProposal() {
       if (type === CreateProposalType.ContractUpgrade) {
         const { linkToDiscussion, title, signer, description, implementationAddress, proxyAddress } =
           proposalData as CreateContractUpgradeProposalData;
-        return HederaService.sendCreateContractUpgradeProposalTransaction({
+        return DexService.sendCreateContractUpgradeProposalTransaction({
           title,
           signer,
           description,
@@ -66,13 +66,13 @@ export function useCreateProposal() {
         });
       } else if (type === CreateProposalType.Text) {
         const { signer, title, description, linkToDiscussion } = proposalData as CreateTextProposalData;
-        return HederaService.sendCreateTextProposalTransaction(title, description, linkToDiscussion, signer);
+        return DexService.sendCreateTextProposalTransaction(title, description, linkToDiscussion, signer);
       } else {
         // TODO: In the default case its Token Tranfer
         const { wallet, title, description, linkToDiscussion, tokenToTransfer, amountToTransfer, accountToTransferTo } =
           proposalData as CreateTransferTokenProposalData;
         const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision(tokenToTransfer, amountToTransfer);
-        return HederaService.sendCreateTransferTokenProposalTransaction({
+        return DexService.sendCreateTransferTokenProposalTransaction({
           title,
           linkToDiscussion,
           description,
