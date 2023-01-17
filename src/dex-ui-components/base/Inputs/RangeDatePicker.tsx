@@ -15,7 +15,7 @@ const RangeDatePicker = (props: RangeDatePickerProps) => {
   return (
     <Box sx={RangeDatePickerStyles}>
       <DatePicker
-        selectsRange={true}
+        selectsRange
         id={id}
         selected={startDate}
         startDate={startDate}
