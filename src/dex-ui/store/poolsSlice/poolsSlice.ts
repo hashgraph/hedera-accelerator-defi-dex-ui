@@ -11,7 +11,7 @@ import {
   Token,
   FetchSpotPriceParams,
 } from "./types";
-import { MirrorNodeService, WalletService, HederaService, MirrorNodeTokenBalance } from "../../services";
+import { DexService, MirrorNodeTokenBalance } from "../../services";
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours, isHbarToken } from "../../utils";
@@ -32,14 +32,13 @@ const initialPoolsStore: PoolsState = {
 };
 
 const fetchEachToken = async (evmAddress: string) => {
-  const pairData = await MirrorNodeService.fetchContract(evmAddress);
-  const pairContractId = ContractId.fromString(pairData.data.contract_id);
-  const { tokenAAddress, tokenBAddress, tokenCAddress } = await HederaService.getTokenPairAddress(pairContractId);
+  const pairData = await DexService.fetchContract(evmAddress);
+  const { tokenATokenId, tokenBTokenId, lpTokenId } = await DexService.fetchPairTokenIds(pairData.data.contract_id);
 
   const [tokenAInfo, tokenBInfo, tokenCInfo] = await Promise.all([
-    MirrorNodeService.fetchTokenData(tokenAAddress),
-    MirrorNodeService.fetchTokenData(tokenBAddress),
-    MirrorNodeService.fetchTokenData(tokenCAddress),
+    DexService.fetchTokenData(tokenATokenId),
+    DexService.fetchTokenData(tokenBTokenId),
+    DexService.fetchTokenData(lpTokenId),
   ]);
 
   const tokenAInfoDetails: Token = {
@@ -73,7 +72,7 @@ const fetchEachToken = async (evmAddress: string) => {
   };
   const pairToken = {
     symbol: tokenCInfo.data.symbol,
-    pairLpAccountId: tokenCAddress,
+    pairLpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
     decimals: tokenCInfo.data.decimals,
   };
@@ -86,10 +85,10 @@ const fetchEachToken = async (evmAddress: string) => {
 };
 
 const metricesForEachPair = async (pair: TokenPair) => {
-  const tokenPairBalance = await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
-  const poolFee = await HederaService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
+  const tokenPairBalance = await DexService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
+  const poolFee = await DexService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
   const timestamp7DaysAgo = getTimestamp7DaysAgo();
-  const last7DTransactions = await MirrorNodeService.fetchAccountTransactions(
+  const last7DTransactions = await DexService.fetchAccountTransactions(
     pair.tokenA.tokenMeta.pairAccountId ?? "",
     timestamp7DaysAgo
   );
@@ -105,7 +104,7 @@ const metricesForEachPair = async (pair: TokenPair) => {
 };
 
 const getAllPoolBalanceFor = async (pair: TokenPair) => {
-  return await MirrorNodeService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
+  return await DexService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
 };
 
 /**
@@ -125,8 +124,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
 
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-      const provider = WalletService.getProvider(network, wallet.topicID, signingAccount);
-      const signer = WalletService.getSigner(provider);
+      const provider = DexService.getProvider(network, wallet.topicID, signingAccount);
+      const signer = DexService.getSigner(provider);
 
       const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
       const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
@@ -134,7 +133,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
 
       try {
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
-        await HederaService.addLiquidity({
+        await DexService.addLiquidity({
           firstTokenAddress,
           firstTokenQuantity,
           secondTokenAddress,
@@ -167,7 +166,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       );
       app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
-        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const pairsAddresses = await DexService.fetchAllTokenPairs();
         const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
         const addressessURlRequestForMetrices = poolTokenPairs?.map((pair) => metricesForEachPair(pair));
@@ -208,8 +207,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         if (isNil(userAccountId)) {
           throw Error("User Account ID must be defined.");
         }
-        const userTokenBalances = await MirrorNodeService.fetchAccountTokenBalances(userAccountId);
-        const pairsAddresses = await HederaService.fetchTokenPairs();
+        const userTokenBalances = await DexService.fetchAccountTokenBalances(userAccountId);
+        const pairsAddresses = await DexService.fetchAllTokenPairs();
         const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
         const poolTokenPairs = await Promise.all(addressessURlRequest);
         const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
@@ -269,7 +268,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         if (precision === undefined) {
           throw Error("Precision not found");
         }
-        const spotPriceL49BToL49A = await HederaService.getSpotPrice(contractId);
+        const spotPriceL49BToL49A = await DexService.fetchSpotPrice(contractId);
         const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
         const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
         const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
@@ -304,8 +303,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const { context, app, wallet } = get();
       const { network } = context;
       app.setFeaturesAsLoading(["withdrawState"]);
-      const provider = WalletService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
-      const signer = WalletService.getSigner(provider);
+      const provider = DexService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
+      const signer = DexService.getSigner(provider);
       const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
 
       try {
@@ -321,7 +320,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
-        const result = await HederaService.removeLiquidity(
+        const result = await DexService.removeLiquidity(
           signer,
           lpTokenAmountBigNumber,
           ContractId.fromString(pairAcoountId)

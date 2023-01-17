@@ -1,4 +1,4 @@
-import { HederaService } from "../../services";
+import { DexService } from "../../services";
 import { GovernanceMutations } from "./types";
 import { useMutation } from "react-query";
 
@@ -15,7 +15,7 @@ export function useDeployContract() {
   return useMutation<Response | undefined, Error, UseDeployContractParams, GovernanceMutations.DeployContract>(
     (params: UseDeployContractParams) => {
       const { abiFile } = params;
-      return HederaService.deployABIFile(abiFile);
+      return DexService.deployABIFile(abiFile);
     }
   );
 }

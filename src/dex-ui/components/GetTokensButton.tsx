@@ -3,7 +3,7 @@ import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation } from "react-query";
 import { useDexContext } from "../hooks";
-import { HederaService } from "../services";
+import { DexService } from "../services";
 import { Link, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { Notification, LoadingDialog, NotficationTypes } from "../../dex-ui-components";
@@ -25,7 +25,7 @@ function useGetL49Tokens() {
   return useMutation<TransactionResponse, Error, UseGetL49TokensParams, "getL49Tokens">(
     (params: UseGetL49TokensParams) => {
       const { receivingAccountId, associatedTokenIds, signer } = params;
-      return HederaService.get100L49ABCDTokens(receivingAccountId, associatedTokenIds, signer);
+      return DexService.get1000L49ABCDTokens(receivingAccountId, associatedTokenIds, signer);
     }
   );
 }
@@ -58,7 +58,7 @@ export function GetTokensButton() {
       <Notification
         type={NotficationTypes.SUCCESS}
         textStyle="b3"
-        message={`10 L49A, L49B, L49C, and L49D Tokens sent to the connected wallet (${receivingAccountId}).`}
+        message={`1000 L49A, L49B, L49C, and L49D Tokens sent to the connected wallet (${receivingAccountId}).`}
         isLinkShown={true}
         linkText="View in HashScan"
         linkRef={createHashScanTransactionLink(getL49Tokens.data?.transactionId.toString())}
@@ -68,12 +68,12 @@ export function GetTokensButton() {
       />
       <Link width="fit-content" color="#0180FF" onClick={handleClickSendL49TokensToWallet}>
         <Text variant="link" textDecoration="underline">
-          Send 100 of each L49 Token to Wallet
+          Send 1000 of each L49 Token to Wallet
         </Text>
       </Link>
       <LoadingDialog
         isOpen={getL49Tokens.isLoading}
-        message={`Sending 100 L49A, L49B, L49C, and L49D Tokens to the connected wallet (${receivingAccountId}).`}
+        message={`Sending 1000 L49A, L49B, L49C, and L49D Tokens to the connected wallet (${receivingAccountId}).`}
       />
       <LoadingDialog
         isOpen={getL49Tokens.isError}

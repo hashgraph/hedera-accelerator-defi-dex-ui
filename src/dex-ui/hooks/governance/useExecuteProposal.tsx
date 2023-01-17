@@ -2,7 +2,7 @@ import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, useQueryClient } from "react-query";
-import { HederaService } from "../../services";
+import { DexService } from "../../services";
 
 interface UseExecuteProposalParams {
   contractId: string;
@@ -15,7 +15,7 @@ export function useExecuteProposal() {
   return useMutation<TransactionResponse, Error, UseExecuteProposalParams, GovernanceMutations.ExecuteProposal>(
     (params: UseExecuteProposalParams) => {
       const { contractId, title, signer } = params;
-      return HederaService.executeProposal({ contractId, title, signer });
+      return DexService.executeProposal({ contractId, title, signer });
     },
     {
       onSuccess: () => {

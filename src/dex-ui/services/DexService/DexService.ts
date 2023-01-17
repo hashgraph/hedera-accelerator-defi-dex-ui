@@ -1,8 +1,8 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId } from "@hashgraph/sdk";
-import { HederaService, MirrorNodeDecodedProposalEvent, MirrorNodeService } from "..";
+import { DexService, MirrorNodeDecodedProposalEvent } from "..";
 import { ContractProposalState, Proposal, ProposalState, ProposalType } from "../../store/governanceSlice";
-import { ProposalVotes } from "../HederaService/GovernorService";
+import { ProposalVotes } from "../JsonRpcService/Governor";
 import { isNil } from "ramda";
 import { getStatus } from "../../store/governanceSlice/utils";
 
@@ -74,9 +74,9 @@ function createDexService() {
     proposalEvent: MirrorNodeDecodedProposalEvent
   ): Promise<ProposalEventsWithDetails> => {
     const { proposalId, contractId, endBlock } = proposalEvent;
-    const stateResult = HederaService.fetchProposalState(contractId, proposalId);
-    const votesResult = HederaService.fetchProposalVotes(contractId, proposalId);
-    const quorumResult = endBlock ? HederaService.fetchQuorum(contractId, endBlock) : undefined;
+    const stateResult = DexService.fetchProposalState(contractId, proposalId);
+    const votesResult = DexService.fetchProposalVotes(contractId, proposalId);
+    const quorumResult = endBlock ? DexService.fetchQuorum(contractId, endBlock) : undefined;
     const eventDetailsResults = await Promise.allSettled([stateResult, votesResult, quorumResult]);
     const [state, votes, quorum] = eventDetailsResults.map<any>((event: PromiseSettledResult<any>) => {
       return event.status === "fulfilled" ? event.value : undefined;
@@ -95,13 +95,15 @@ function createDexService() {
   };
 
   const fetchAllProposals = async (): Promise<Proposal[]> => {
-    const proposalEvents = await MirrorNodeService.fetchAllProposalEvents();
+    const proposalEvents = await DexService.fetchAllProposalEvents();
     const proposalEventsWithDetails = await fetchAllProposalDetails(proposalEvents);
     const proposals = proposalEventsWithDetails.map(convertEventToProposal);
     return proposals;
   };
 
-  return { fetchAllProposals };
+  return {
+    fetchAllProposals,
+  };
 }
 
 export { createDexService };

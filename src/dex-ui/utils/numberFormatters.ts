@@ -18,7 +18,7 @@ const formatBigNumberToPercent = (bigNumber: BigNumber | undefined) => {
   if (bigNumber === undefined) {
     return DEFAULT;
   }
-  return formatToPercent(bigNumber.toNumber());
+  return formatToPercent(bigNumber.shiftedBy(-2).toNumber());
 };
 
 export { formatBigNumberToUSD, formatToUSD, formatBigNumberToPercent, formatToPercent };
