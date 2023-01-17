@@ -1,14 +1,21 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Grid, GridItem, Circle, Input } from "@chakra-ui/react";
+import { Text, Button, Flex, Grid, GridItem, Circle, Input, Spacer } from "@chakra-ui/react";
 import { ReactElement, useState } from "react";
-import { Notification, NotficationTypes, CardList, Pagination, usePagination } from "../../../dex-ui-components";
+import {
+  Notification,
+  NotficationTypes,
+  CardList,
+  Pagination,
+  usePagination,
+  RangeDatePicker,
+} from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanLink } from "../../utils";
 import { CardListLayout, TabFilter, TabFilters } from "../../layouts";
 import { useAllProposals, useTabFilters } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
-import { useInput } from "../../hooks/useInput";
+import { useInput, useDates } from "../../hooks/useInput";
 import { FormattedProposal } from "./types";
 
 const PageLimit = 20;
@@ -33,6 +40,11 @@ const proposalTabFilters: TabFilter<ProposalStatus>[] = [
 export const Governance = (): ReactElement => {
   const { tabIndex, handleTabChange } = useTabFilters();
   const { value: proposalTitleFilter, handleChange: handleProposalTitleFilterChange } = useInput<string>("");
+  const {
+    startDate,
+    endDate,
+    handleChange: handleProposalDatesFilterChange,
+  } = useDates<Date | null, Date | null>(null, null);
   const {
     data: proposals,
     error,
@@ -116,6 +128,16 @@ export const Governance = (): ReactElement => {
                 placeholder="Filter By Name"
                 flex="1"
                 minWidth="300px"
+              />
+              <Spacer padding="0.3rem" />
+              <RangeDatePicker
+                placeholder="Filter by Date"
+                startDate={startDate}
+                endDate={endDate}
+                onSelection={(dates: any) => {
+                  const [startDate, endDate] = dates;
+                  handleProposalDatesFilterChange(startDate, endDate);
+                }}
               />
             </>
           }
