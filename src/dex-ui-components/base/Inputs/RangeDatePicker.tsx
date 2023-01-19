@@ -23,6 +23,7 @@ const RangeDatePicker = (props: RangeDatePickerProps) => {
         className="react-datepicker__input-container"
         placeholderText={placeholder}
         showYearDropdown
+        showMonthDropdown
         onChange={onSelection}
       />
     </Box>

@@ -88,4 +88,31 @@ export const RangeDatePickerStyles = {
   ".react-datepicker__year-read-view--down-arrow": {
     top: "3px",
   },
+  ".react-datepicker__year-read-view": {
+    left: "10px",
+  },
+  ".react-datepicker__month-read-view": {
+    right: "10px",
+  },
+  ".react-datepicker__month-read-view--down-arrow": {
+    top: "3px",
+  },
+  ".react-datepicker__month-option": {
+    background: "white",
+    border: "none",
+    fontSize: "16px",
+    lineHeight: "19.78px",
+    fontWeight: "600",
+    fontColor: "#000000",
+  },
+  ".react-datepicker__current-month": {
+    visibility: "hidden",
+    height: "0px",
+  },
+  ".react-datepicker__navigation.react-datepicker__navigation--previous": {
+    top: "-1px",
+  },
+  ".react-datepicker__navigation.react-datepicker__navigation--next": {
+    top: "-1px",
+  },
 };
