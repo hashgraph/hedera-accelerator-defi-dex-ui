@@ -27,21 +27,20 @@ export function useAllProposals(props: UseAllProposalsProps) {
     const formattedProposals = data.reduce((formattedProposals: FormattedProposal[], proposal): FormattedProposal[] => {
       const doesTitleFilterMatch = proposal.title?.toLowerCase().includes(titleFilter.toLowerCase());
       const doesStatusFilterMatch = !isNil(proposal?.status) && statusFilters.includes(proposal?.status);
-      if (doesTitleFilterMatch && doesStatusFilterMatch) {
-        if (startDate && endDate) {
-          const timeStamp = Number(proposal.timestamp) * 1000;
-          const doesDateFilterMatch =
-            startDate.getTime() <= new Date(timeStamp).getTime() && new Date(timeStamp).getTime() <= endDate.getTime();
-          if (doesDateFilterMatch) {
-            const formattedProposal = formatProposal(proposal);
-            return [...formattedProposals, formattedProposal];
-          }
-        } else {
-          const formattedProposal = formatProposal(proposal);
-          return [...formattedProposals, formattedProposal];
-        }
+      const isDateFilterApplied = !isNil(startDate) && !isNil(endDate);
+      const timeStamp = Number(proposal.timestamp) * 1000;
+      const doesDateFilterMatch = isDateFilterApplied &&
+        startDate.getTime() <= new Date(timeStamp).getTime() && new Date(timeStamp).getTime() <= endDate.getTime();
+
+      if (doesDateFilterMatch && doesTitleFilterMatch && doesStatusFilterMatch) {
+        const formattedProposal = formatProposal(proposal);
+        return [...formattedProposals, formattedProposal];
+      } else if (!isDateFilterApplied && doesTitleFilterMatch && doesStatusFilterMatch) {
+        const formattedProposal = formatProposal(proposal);
+        return [...formattedProposals, formattedProposal];
+      } else {
+        return formattedProposals;
       }
-      return formattedProposals;
     }, []);
 
     return formattedProposals.sort(sortProposalCompareFn);

@@ -12,19 +12,3 @@ export function useInput<T>(initialValue: T) {
     handleChange,
   };
 }
-
-export function useDates<T, Z>(initialStartDateValue: T, initialEndDateValue: Z) {
-  const [startDate, setStartDate] = useState<T>(initialStartDateValue);
-  const [endDate, setEndDate] = useState<Z>(initialEndDateValue);
-
-  function handleChange(startDate: T, endDate: Z) {
-    setStartDate(startDate);
-    setEndDate(endDate);
-  }
-
-  return {
-    startDate,
-    endDate,
-    handleChange,
-  };
-}

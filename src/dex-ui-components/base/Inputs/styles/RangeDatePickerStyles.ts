@@ -25,7 +25,67 @@ export const RangeDatePickerStyles = {
   },
   ".react-datepicker__day.react-datepicker__day--keyboard-selected": {
     border: "none",
-    borderRadius: "7px",
+    borderRadius: "0px",
     backgroundColor: Color.Teal_02,
   },
+  ".react-datepicker__day.react-datepicker__day--selected": {
+    border: "none",
+    borderRadius: "0px",
+  },
+  ".react-datepicker__day--in-range": {
+    background: Color.Teal_02,
+  },
+  ".react-datepicker__day.react-datepicker__day": {
+    fontSize: "16px",
+    lineHeight: "19.78px",
+    fontWeight: "600",
+    fontColor: "#000000",
+    border: "none",
+    borderRadius: "0px",
+  },
+  ".react-datepicker__header": {
+    background: "white",
+    border: "none",
+    fontSize: "16px",
+    lineHeight: "19.78px",
+    fontWeight: "600",
+    fontColor: "#000000",
+  },
+  ".react-datepicker__day--in-selecting-range": {
+    background: Color.Teal_02,
+  },
+  ".react-datepicker__day--selected:hover": {
+    background: Color.Teal_02,
+  },
+  ".react-datepicker__day--in-selecting-range:hover": {
+    background: Color.Teal_02,
+  },
+  ".react-datepicker__day--in-range:hover": {
+    background: Color.Teal_02,
+  },
+  ".react-datepicker__year-dropdown": {
+    background: "white",
+  },
+  ".react-datepicker__navigation--years-option": {
+    background: "white",
+    border: "none",
+    fontSize: "16px",
+    lineHeight: "19.78px",
+    fontWeight: "600",
+    fontColor: "#000000",
+  },
+  ".react-datepicker__year-text--in-range:hover": {
+    background: "white",
+    border: "none",
+    fontSize: "16px",
+    lineHeight: "19.78px",
+    fontWeight: "600",
+    fontColor: "#000000",
+  },
+  ".react-datepicker__navigation-icon": {
+    height: "10px",
+  },
+  ".react-datepicker__year-read-view--down-arrow": {
+    top: "3px",
+  }
 };

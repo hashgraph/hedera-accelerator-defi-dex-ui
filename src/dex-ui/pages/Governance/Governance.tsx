@@ -15,7 +15,8 @@ import { CardListLayout, TabFilter, TabFilters } from "../../layouts";
 import { useAllProposals, useTabFilters } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
-import { useInput, useDates } from "../../hooks/useInput";
+import { useInput } from "../../hooks/useInput";
+import { useDateRange } from "../../hooks/useDateRange";
 import { FormattedProposal } from "./types";
 
 const PageLimit = 20;
@@ -44,7 +45,7 @@ export const Governance = (): ReactElement => {
     startDate,
     endDate,
     handleChange: handleProposalDatesFilterChange,
-  } = useDates<Date | null, Date | null>(null, null);
+  } = useDateRange(null, null);
   const {
     data: proposals,
     error,
