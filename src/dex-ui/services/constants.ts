@@ -50,15 +50,15 @@ export const USDC_TOKEN_ID = "0.0.2276691";
 export const GovernorProxyContracts = Object.freeze({
   ContractUpgradeStringId: "0.0.49180576",
   ContractUpgradeContractId: ContractId.fromString("0.0.49180576"),
-  TransferTokenStringId: "0.0.49180063",
-  TransferTokenContractId: ContractId.fromString("0.0.49180063"),
+  TransferTokenStringId: "0.0.49327518",
+  TransferTokenContractId: ContractId.fromString("0.0.49327518"),
   TextProposalStringId: "0.0.49176059",
   TextProposalContractId: ContractId.fromString("0.0.49176059"),
   CreateTokenStringId: "0.0.49057304",
   CreateTokenContractId: ContractId.fromString("0.0.49057304"),
 });
 
-export const GovernanceTokenId = "0.0.48602639";
+export const GovernanceTokenId = "0.0.49327254";
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
   [Tokens.TokenASymbol, Tokens.TokenAAccountId],
