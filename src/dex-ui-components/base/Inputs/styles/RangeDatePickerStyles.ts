@@ -87,5 +87,5 @@ export const RangeDatePickerStyles = {
   },
   ".react-datepicker__year-read-view--down-arrow": {
     top: "3px",
-  }
+  },
 };

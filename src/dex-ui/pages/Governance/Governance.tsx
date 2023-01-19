@@ -41,11 +41,7 @@ const proposalTabFilters: TabFilter<ProposalStatus>[] = [
 export const Governance = (): ReactElement => {
   const { tabIndex, handleTabChange } = useTabFilters();
   const { value: proposalTitleFilter, handleChange: handleProposalTitleFilterChange } = useInput<string>("");
-  const {
-    startDate,
-    endDate,
-    handleChange: handleProposalDatesFilterChange,
-  } = useDateRange(null, null);
+  const { startDate, endDate, handleChange: handleProposalDatesFilterChange } = useDateRange(null, null);
   const {
     data: proposals,
     error,

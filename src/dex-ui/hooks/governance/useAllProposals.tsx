@@ -29,8 +29,10 @@ export function useAllProposals(props: UseAllProposalsProps) {
       const doesStatusFilterMatch = !isNil(proposal?.status) && statusFilters.includes(proposal?.status);
       const isDateFilterApplied = !isNil(startDate) && !isNil(endDate);
       const timeStamp = Number(proposal.timestamp) * 1000;
-      const doesDateFilterMatch = isDateFilterApplied &&
-        startDate.getTime() <= new Date(timeStamp).getTime() && new Date(timeStamp).getTime() <= endDate.getTime();
+      const doesDateFilterMatch =
+        isDateFilterApplied &&
+        startDate.getTime() <= new Date(timeStamp).getTime() &&
+        new Date(timeStamp).getTime() <= endDate.getTime();
 
       if (doesDateFilterMatch && doesTitleFilterMatch && doesStatusFilterMatch) {
         const formattedProposal = formatProposal(proposal);
