@@ -42,7 +42,8 @@ export const ProposalDetails = () => {
     executeProposal,
     isNotificationVisible,
     successMessage,
-    hashScanLink,
+    hashScanTransactionLink,
+    hashScanAccountLink,
     statusColor,
     isLoadingDialogOpen,
     loadingDialogMessage,
@@ -96,7 +97,7 @@ export const ProposalDetails = () => {
               message={successMessage}
               isLinkShown={true}
               linkText="View in HashScan"
-              linkRef={hashScanLink}
+              linkRef={hashScanTransactionLink}
               isCloseButtonShown={true}
               isVisible={isNotificationVisible}
               handleClickClose={handleNotificationCloseButtonClicked}
@@ -127,7 +128,7 @@ export const ProposalDetails = () => {
                     display="flex"
                     alignItems="center"
                     color="#0180FF"
-                    // href={linkRef}
+                    href={hashScanAccountLink}
                     isExternal
                   >
                     <Text textDecoration="underline">{proposal.data?.author}</Text>

@@ -7,7 +7,7 @@ import { HederaService } from "../services";
 import { Link, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { Notification, LoadingDialog, NotficationTypes } from "../../dex-ui-components";
-import { createHashScanLink } from "../utils";
+import { createHashScanTransactionLink } from "../utils";
 
 /**
  * This is a temporary component used to add L49A, L49B, L49C, and L49D to a
@@ -61,7 +61,7 @@ export function GetTokensButton() {
         message={`10 L49A, L49B, L49C, and L49D Tokens sent to the connected wallet (${receivingAccountId}).`}
         isLinkShown={true}
         linkText="View in HashScan"
-        linkRef={createHashScanLink(getL49Tokens.data?.transactionId.toString())}
+        linkRef={createHashScanTransactionLink(getL49Tokens.data?.transactionId.toString())}
         isCloseButtonShown={true}
         isVisible={getL49Tokens.isSuccess}
         handleClickClose={handleNotificationCloseButtonClicked}
