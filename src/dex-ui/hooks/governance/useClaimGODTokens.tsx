@@ -9,7 +9,12 @@ interface UseClaimGODTokensParams {
   proposalId: string;
   signer: HashConnectSigner;
 }
-
+/**
+ * @privateRemarks
+ *
+ * This hook is not currently in use. However, it will most likely be needed
+ * for upcoming governance token claiming features.
+ * */
 export function useClaimGODTokens() {
   const queryClient = useQueryClient();
   return useMutation<TransactionResponse, Error, UseClaimGODTokensParams, GovernanceMutations.ClaimGODToken>(

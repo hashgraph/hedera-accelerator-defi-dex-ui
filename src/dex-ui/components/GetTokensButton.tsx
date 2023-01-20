@@ -25,7 +25,7 @@ function useGetL49Tokens() {
   return useMutation<TransactionResponse, Error, UseGetL49TokensParams, "getL49Tokens">(
     (params: UseGetL49TokensParams) => {
       const { receivingAccountId, associatedTokenIds, signer } = params;
-      return HederaService.get10L49ABCDTokens(receivingAccountId, associatedTokenIds, signer);
+      return HederaService.get100L49ABCDTokens(receivingAccountId, associatedTokenIds, signer);
     }
   );
 }
@@ -68,12 +68,12 @@ export function GetTokensButton() {
       />
       <Link width="fit-content" color="#0180FF" onClick={handleClickSendL49TokensToWallet}>
         <Text variant="link" textDecoration="underline">
-          Send 10 L49 Tokens to Wallet
+          Send 100 of each L49 Token to Wallet
         </Text>
       </Link>
       <LoadingDialog
         isOpen={getL49Tokens.isLoading}
-        message={`Sending 10 L49A, L49B, L49C, and L49D Tokens to the connected wallet (${receivingAccountId}).`}
+        message={`Sending 100 L49A, L49B, L49C, and L49D Tokens to the connected wallet (${receivingAccountId}).`}
       />
       <LoadingDialog
         isOpen={getL49Tokens.isError}
