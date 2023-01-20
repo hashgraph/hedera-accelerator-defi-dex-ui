@@ -3,7 +3,7 @@ import { Text, Button, Flex, Grid, GridItem, Circle, Input } from "@chakra-ui/re
 import { ReactElement, useState } from "react";
 import { Notification, NotficationTypes, CardList, Pagination, usePagination } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
-import { createHashScanLink } from "../../utils";
+import { createHashScanTransactionLink } from "../../utils";
 import { CardListLayout, TabFilter, TabFilters } from "../../layouts";
 import { useAllProposals, useTabFilters } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
@@ -56,7 +56,7 @@ export const Governance = (): ReactElement => {
   const [isNotificationVisible, setIsNotificationVisible] = useState<boolean>(
     locationState?.isProposalCreationSuccessful ?? false
   );
-  const hashScanLink = createHashScanLink(locationState?.proposalTransactionId);
+  const hashScanLink = createHashScanTransactionLink(locationState?.proposalTransactionId);
   const handleClickNotificationCloseButton = () => setIsNotificationVisible(false);
   const handleClickNewProposalButton = () => navigate("/governance/select-proposal-type");
 

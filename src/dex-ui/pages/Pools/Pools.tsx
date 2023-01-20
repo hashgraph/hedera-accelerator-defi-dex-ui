@@ -20,7 +20,7 @@ import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
 import { useDexContext, usePoolsData } from "../../hooks";
 import { Pool, UserPool } from "../../store/poolsSlice";
-import { createHashScanLink } from "../../utils";
+import { createHashScanTransactionLink } from "../../utils";
 
 export interface FormattedUserPoolDetails {
   name: string;
@@ -216,7 +216,7 @@ const Pools = (): JSX.Element => {
         ${pools.withdrawState.successPayload?.fee} fee Pool.`}
               isLinkShown={true}
               linkText="View in HashScan"
-              linkRef={createHashScanLink(
+              linkRef={createHashScanTransactionLink(
                 pools.withdrawState.successPayload?.transactionResponse.transactionId.toString()
               )}
               isCloseButtonShown={true}

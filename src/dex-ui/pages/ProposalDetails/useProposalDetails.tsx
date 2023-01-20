@@ -7,7 +7,7 @@ import {
   useCancelProposal,
 } from "../../hooks";
 import { ProposalState, ProposalStatus } from "../../store/governanceSlice";
-import { createHashScanLink, getStatusColor } from "../../utils";
+import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "../../utils";
 
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -56,18 +56,19 @@ export function useProposalDetails(proposalId: string | undefined) {
   function getHashScanLink(): string | undefined {
     if (castVote.isSuccess) {
       const castVoteTransactionId = castVote.data?.transactionId.toString();
-      return createHashScanLink(castVoteTransactionId);
+      return createHashScanTransactionLink(castVoteTransactionId);
     }
     if (executeProposal.isSuccess) {
       const executeProposalTransactionId = executeProposal.data?.transactionId.toString();
-      return createHashScanLink(executeProposalTransactionId);
+      return createHashScanTransactionLink(executeProposalTransactionId);
     }
     if (cancelProposal.isSuccess) {
       const cancelProposalTransactionId = cancelProposal.data?.transactionId.toString();
-      return createHashScanLink(cancelProposalTransactionId);
+      return createHashScanTransactionLink(cancelProposalTransactionId);
     }
   }
-  const hashScanLink = getHashScanLink();
+  const hashScanTransactionLink = getHashScanLink();
+  const hashScanAccountLink = createHashScanAccountIdLink(wallet.getSigner().getAccountId().toString());
 
   return {
     proposal,
@@ -77,7 +78,8 @@ export function useProposalDetails(proposalId: string | undefined) {
     executeProposal,
     isNotificationVisible,
     successMessage,
-    hashScanLink,
+    hashScanTransactionLink,
+    hashScanAccountLink,
     areButtonsHidden,
     isHasVotedMessageVisible,
     areVoteButtonsVisible,

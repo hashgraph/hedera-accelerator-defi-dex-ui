@@ -43,7 +43,7 @@ import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { Networks, WalletStore } from "../../dex-ui/store/walletSlice";
 import { TransactionState } from "../../dex-ui/store/swapSlice";
 import { AppFeatures } from "../../dex-ui/store/appSlice";
-import { createHashScanLink } from "../../dex-ui/utils";
+import { createHashScanTransactionLink } from "../../dex-ui/utils";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 
 export interface SwapTokensProps {
@@ -425,7 +425,7 @@ const SwapTokens = (props: SwapTokensProps) => {
           for ${Number(localSwapState.tokenToReceiveAmount.toFixed(6))} ${localSwapState.tokenToReceiveSymbol}`}
               isLinkShown={true}
               linkText="View in HashScan"
-              linkRef={createHashScanLink(transactionState.successPayload?.transactionId.toString())}
+              linkRef={createHashScanTransactionLink(transactionState.successPayload?.transactionId.toString())}
               isCloseButtonShown={true}
               handleClickClose={() => setLocalSwapState({ ...localSwapState, showSuccessMessage: false })}
             />
