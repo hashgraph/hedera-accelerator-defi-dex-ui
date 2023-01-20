@@ -5,7 +5,7 @@ import { getErrorMessage } from "../../utils";
 import { WalletSlice, WalletStore, WalletActionType, WalletState } from "./types";
 import { getFormattedTokenBalances } from "./utils";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { WalletService } from "../../services";
+import { GovernanceTokenId, WalletService } from "../../services";
 
 const initialWalletState: WalletState = {
   availableExtension: null,
@@ -41,6 +41,16 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       const decimals =
         tokenData?.find((token: TokenBalanceJson) => token.tokenId === tokenId)?.decimals ?? defaultDecimals;
       return BigNumber(tokenAmount).shiftedBy(decimals).integerValue();
+    },
+    doesUserHaveGODTokensToVote: () => {
+      const { wallet } = get();
+      const doesUserHaveGodTokens =
+        Number(wallet.pairedAccountBalance?.tokens.find((token) => token.tokenId === GovernanceTokenId)?.balance) > 0;
+      return doesUserHaveGodTokens;
+    },
+    isPaired: () => {
+      const { wallet } = get();
+      return wallet.hashConnectConnectionState === HashConnectConnectionState.Paired;
     },
     initializeWalletConnection: async () => {
       set({}, false, WalletActionType.INITIALIZE_WALLET_CONNECTION_STARTED);

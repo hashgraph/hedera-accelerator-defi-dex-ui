@@ -26,6 +26,10 @@ export function useProposalDetails(proposalId: string | undefined) {
   const statusColor = getStatusColor(proposal.data?.status, proposal.data?.state);
 
   const isLoadingDialogOpen = executeProposal.isLoading || castVote.isLoading || cancelProposal.isLoading;
+
+  const isWalletConnected = wallet.isPaired();
+  const doesUserHaveGodTokens = wallet.doesUserHaveGODTokensToVote();
+
   function getLoadingDialogMessage(): string {
     if (castVote.isLoading) return "Please confirm the vote in your wallet to proceed.";
     if (executeProposal.isLoading) return "Please confirm the proposal execution in your wallet to proceed.";
@@ -90,5 +94,7 @@ export function useProposalDetails(proposalId: string | undefined) {
     loadingDialogMessage,
     isErrorDialogOpen,
     errorDialogMessage,
+    isWalletConnected,
+    doesUserHaveGodTokens,
   };
 }

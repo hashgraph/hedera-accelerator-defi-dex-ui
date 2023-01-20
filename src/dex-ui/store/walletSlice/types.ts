@@ -53,6 +53,8 @@ interface WalletActions {
   disconnectWallet: () => void;
   initializeWalletConnection: () => Promise<void>;
   fetchAccountBalance: () => Promise<void>;
+  doesUserHaveGODTokensToVote: () => boolean;
+  isPaired: () => boolean;
   handleFoundExtensionEvent: (walletMetadata: HashConnectTypes.WalletMetadata) => void;
   handlePairingEvent: (approvePairing: MessageTypes.ApprovePairing) => void;
   handleAcknowledgeMessageEvent: (acknowledgeData: MessageTypes.Acknowledge) => void;
