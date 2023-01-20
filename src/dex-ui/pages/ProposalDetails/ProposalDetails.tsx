@@ -40,7 +40,6 @@ export const ProposalDetails = () => {
     castVote,
     cancelProposal,
     executeProposal,
-    claimGODTokens,
     isNotificationVisible,
     successMessage,
     hashScanLink,
@@ -62,7 +61,6 @@ export const ProposalDetails = () => {
   function resetServerState() {
     castVote.reset();
     executeProposal.reset();
-    claimGODTokens.reset();
     cancelProposal.reset();
   }
 

@@ -28,9 +28,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     castVote,
     cancelProposal,
     executeProposal,
-    claimGODTokens,
     areVoteButtonsVisible,
-    isClaimTokenButtonVisible,
     areButtonsHidden,
     isHasVotedMessageVisible,
     isExecuteButtonVisible,
@@ -42,12 +40,6 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     props.resetServerState();
     const signer = wallet.getSigner();
     executeProposal.mutate({ contractId: proposal.data?.contractId ?? "", title: proposal.data?.title ?? "", signer });
-  }
-
-  async function handleClaimGODTokensClicked() {
-    props.resetServerState();
-    const signer = wallet.getSigner();
-    claimGODTokens.mutate({ contractId: proposal.data?.contractId ?? "", proposalId: proposal.data?.id ?? "", signer });
   }
 
   function handleCancelProposalClicked() {
@@ -132,14 +124,6 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
           Execute
         </Button>
       </Flex>
-    );
-  }
-
-  if (isClaimTokenButtonVisible) {
-    return (
-      <Button variant="primary" width="290px" onClick={handleClaimGODTokensClicked}>
-        Claim Governance Tokens
-      </Button>
     );
   }
 

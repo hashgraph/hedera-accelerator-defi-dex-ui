@@ -163,12 +163,12 @@ function createHederaService() {
     return proposalTransactionResponse;
   };
 
-  const get10L49ABCDTokens = async (
+  const get100L49ABCDTokens = async (
     receivingAccountId: string,
     associatedTokenIds: string[] | undefined,
     signer: HashConnectSigner
   ) => {
-    const tokenQuantity = withPrecision(10).toNumber();
+    const tokenQuantity = withPrecision(100).toNumber();
     const L49ATokenId = TokenId.fromString(Tokens.TokenAAccountId);
     const L49BTokenId = TokenId.fromString(Tokens.TokenBAccountId);
     const L49CTokenId = TokenId.fromString(Tokens.TokenCAccountId);
@@ -297,7 +297,7 @@ function createHederaService() {
 
   return {
     initHederaService,
-    get10L49ABCDTokens,
+    get100L49ABCDTokens,
     getPrecision,
     swapToken,
     addLiquidity,
