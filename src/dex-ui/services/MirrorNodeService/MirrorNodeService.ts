@@ -169,10 +169,12 @@ function createMirrorNodeService() {
       try {
         const data = log.data;
         const topics = log.topics;
+        const timeStamp = log.timestamp;
         const eventAbi = signatureMap.get(topics[0]);
         if (eventAbi !== undefined && eventAbi.name === "ProposalDetails") {
           const requiredTopics = eventAbi.anonymous === true ? topics : topics.splice(1);
           const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
+          event["timestamp"] = timeStamp;
           const events = eventsMap.get(eventAbi.name) ?? [];
           eventsMap.set(eventAbi.name, [...events, event]);
         }

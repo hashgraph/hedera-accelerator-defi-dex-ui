@@ -53,6 +53,7 @@ interface Proposal {
   status: ProposalStatus | undefined;
   timeRemaining: BigNumber | undefined;
   state: ProposalState | undefined;
+  timestamp: string | undefined;
   votes: {
     yes: BigNumber | undefined;
     no: BigNumber | undefined;

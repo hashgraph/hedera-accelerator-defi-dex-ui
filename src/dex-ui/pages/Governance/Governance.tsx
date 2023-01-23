@@ -1,7 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Grid, GridItem, Circle, Input } from "@chakra-ui/react";
+import { Text, Button, Flex, Grid, GridItem, Circle, Input, Spacer } from "@chakra-ui/react";
 import { ReactElement, useState } from "react";
-import { Notification, NotficationTypes, CardList, Pagination, usePagination } from "../../../dex-ui-components";
+import {
+  Notification,
+  NotficationTypes,
+  CardList,
+  Pagination,
+  usePagination,
+  RangeDatePicker,
+} from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanTransactionLink } from "../../utils";
 import { CardListLayout, TabFilter, TabFilters } from "../../layouts";
@@ -9,6 +16,7 @@ import { useAllProposals, useTabFilters } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
 import { useInput } from "../../hooks/useInput";
+import { useDateRange } from "../../hooks/useDateRange";
 import { FormattedProposal } from "./types";
 
 const PageLimit = 20;
@@ -33,6 +41,7 @@ const proposalTabFilters: TabFilter<ProposalStatus>[] = [
 export const Governance = (): ReactElement => {
   const { tabIndex, handleTabChange } = useTabFilters();
   const { value: proposalTitleFilter, handleChange: handleProposalTitleFilterChange } = useInput<string>("");
+  const { startDate, endDate, handleChange: handleProposalDatesFilterChange } = useDateRange(null, null);
   const {
     data: proposals,
     error,
@@ -42,6 +51,8 @@ export const Governance = (): ReactElement => {
   } = useAllProposals({
     titleFilter: proposalTitleFilter,
     statusFilters: proposalTabFilters.at(tabIndex)?.filters,
+    startDate,
+    endDate,
   });
   const {
     paginatedData: paginatedProposals,
@@ -105,10 +116,16 @@ export const Governance = (): ReactElement => {
           tabFilters={<TabFilters<ProposalStatus> filters={proposalTabFilters} />}
           inputFilters={
             <>
-              {/* TODO: Add Filter By Date input component and functionality.
-                <Input variant="filter" placeholder="Filter By Date" flex="1" minWidth="300px" />
-                <Spacer margin="0.5rem" /> 
-              */}
+              <RangeDatePicker
+                placeholder="Filter By Date"
+                startDate={startDate}
+                endDate={endDate}
+                onSelection={(dates: any) => {
+                  const [startDate, endDate] = dates;
+                  handleProposalDatesFilterChange(startDate, endDate);
+                }}
+              />
+              <Spacer padding="0.5rem" />
               <Input
                 variant="filter"
                 value={proposalTitleFilter}

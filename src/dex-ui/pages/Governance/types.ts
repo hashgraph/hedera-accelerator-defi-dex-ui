@@ -11,6 +11,7 @@ interface FormattedProposal {
   status: ProposalStatus | undefined;
   timeRemaining: string | undefined;
   state: ProposalState | undefined;
+  timestamp: string | undefined;
   votes: {
     yes: number | undefined;
     no: number | undefined;

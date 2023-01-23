@@ -59,6 +59,7 @@ function createDexService() {
           ? getTimeRemaining(proposalEvent.startBlock, proposalEvent.endBlock)
           : undefined,
       state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
+      timestamp: proposalEvent.timestamp,
       votes: {
         yes: proposalEvent.votes.forVotes,
         no: proposalEvent.votes.againstVotes,
