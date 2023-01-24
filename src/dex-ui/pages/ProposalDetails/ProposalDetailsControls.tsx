@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { AlertDialog, NotficationTypes, Notification } from "../../../dex-ui-components";
 import { GovernanceTokenId } from "../../services";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useProposalDetails } from "./useProposalDetails";
 import { VoteType } from "./types";
 import { useDexContext } from "../../hooks";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../../../dex-ui-components";
 
 type UseProposalDetailsData = ReturnType<typeof useProposalDetails>;
 
@@ -23,6 +25,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     isCancelProposalOpen: false,
   });
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const navigate = useNavigate();
   const {
     proposal,
     castVote,
@@ -32,9 +35,18 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     areButtonsHidden,
     isHasVotedMessageVisible,
     isExecuteButtonVisible,
+    isWalletConnected,
+    doesUserHaveGodTokens,
   } = props.proposalDetails;
 
-  const isUserProposalCreator = proposal.data?.author === wallet.getSigner().getAccountId().toString();
+  let isUserProposalCreator = false;
+  try {
+    isUserProposalCreator = proposal.data?.author === wallet.getSigner().getAccountId().toString();
+  } catch (error) {
+    console.log(error);
+  }
+
+  const handleGetDexCoinsClicked = () => navigate("/swap");
 
   async function handleExecuteClicked() {
     props.resetServerState();
@@ -127,7 +139,38 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     );
   }
 
-  if (areVoteButtonsVisible) {
+  if (areVoteButtonsVisible && !isWalletConnected) {
+    return (
+      <>
+        <Text textStyle="h3">Vote on Proposal</Text>
+        <Flex width="fit-content">
+          <Notification
+            type={NotficationTypes.WARNING}
+            message={"You’ll need to connect a wallet before you can vote on a proposal."}
+          />
+        </Flex>
+      </>
+    );
+  }
+
+  if (areVoteButtonsVisible && isWalletConnected && !doesUserHaveGodTokens) {
+    return (
+      <>
+        <Text textStyle="h3">Vote on Proposal</Text>
+        <Flex direction="column" gap="4" width="fit-content">
+          <Notification
+            type={NotficationTypes.WARNING}
+            message={"You’ll need some DexCoin in order to vote on proposals"}
+          />
+          <Button variant="secondary" width="290px" borderRadius="2px" onClick={handleGetDexCoinsClicked}>
+            Get DexCoins to Vote
+          </Button>
+        </Flex>
+      </>
+    );
+  }
+
+  if (areVoteButtonsVisible && isWalletConnected && doesUserHaveGodTokens) {
     return (
       <>
         <Text textStyle="h3">Vote on Proposal</Text>
