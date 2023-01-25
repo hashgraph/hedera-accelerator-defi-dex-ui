@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDexContext } from ".";
 
 /**
@@ -10,7 +10,7 @@ import { useDexContext } from ".";
  * which swap data will be refetched and refreshed in the UI. If the refresh
  * interval is set to 0, swap data will not refresh on a timed interval.
  */
-export const useSwapData = (refreshInterval = 0) => {
+export const useSwapData = (selectedRoute: any, refreshInterval = 0) => {
   const isInitialFetch = useRef(true);
   const { wallet, swap } = useDexContext(({ wallet, swap }) => ({
     wallet,
@@ -19,32 +19,33 @@ export const useSwapData = (refreshInterval = 0) => {
   const walletAccountId = wallet.savedPairingData?.accountIds[0];
   const { transactionState, fetchFee, fetchSpotPrices, getPrecision, fetchTokenPairs } = swap;
 
-  const fetchSwapDataOnLoad = useCallback(async () => {
-    await Promise.allSettled([fetchFee(), fetchSpotPrices(), fetchTokenPairs(), getPrecision()]);
-  }, [fetchFee, fetchSpotPrices, fetchTokenPairs, getPrecision]);
-
-  const fetchSwapDataOnInterval = useCallback(async () => {
-    await fetchSpotPrices();
-  }, [fetchSpotPrices]);
-
-  /** need to fetch spot fee and fee on change of pairs */
-  const fetchSwapDataOnEvent = useCallback(async () => {
-    await Promise.allSettled([wallet.fetchAccountBalance(), fetchFee(), fetchSpotPrices(), getPrecision()]);
-    // Todo: Fixed hook dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   /**
    * Fetches all swap data on first load and change of wallet account ID.
    */
   useEffect(() => {
+    async function fetchSwapDataOnLoad() {
+      await Promise.allSettled([
+        fetchFee(selectedRoute.selectedPairId),
+        fetchSpotPrices(selectedRoute.selectedPairId, selectedRoute.selectedAToBRoute, selectedRoute.selectedBToARoute),
+        fetchTokenPairs(),
+        getPrecision(selectedRoute.selectedPairId),
+      ]);
+    }
     fetchSwapDataOnLoad();
-  }, [fetchSwapDataOnLoad, walletAccountId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAccountId]);
 
   /**
    * Fetches all swap data on a specified interval (milliseconds).
    */
   useEffect(() => {
+    async function fetchSwapDataOnInterval() {
+      await fetchSpotPrices(
+        selectedRoute.selectedPairId,
+        selectedRoute.selectedAToBRoute,
+        selectedRoute.selectedBToARoute
+      );
+    }
     const shouldRefresh = refreshInterval > 0;
     if (shouldRefresh) {
       const interval = setInterval(() => {
@@ -54,7 +55,8 @@ export const useSwapData = (refreshInterval = 0) => {
         clearInterval(interval);
       };
     }
-  }, [refreshInterval, fetchSwapDataOnInterval]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshInterval]);
 
   /**
    * Fetches all swap data on completion of a transaction event (success or failure).
@@ -64,6 +66,16 @@ export const useSwapData = (refreshInterval = 0) => {
       isInitialFetch.current = false;
       return;
     }
+    /** need to fetch spot fee and fee on change of pairs */
+    async function fetchSwapDataOnEvent() {
+      await Promise.allSettled([
+        wallet.fetchAccountBalance(),
+        fetchFee(selectedRoute.selectedPairId),
+        fetchSpotPrices(selectedRoute.selectedPairId, selectedRoute.selectedAToBRoute, selectedRoute.selectedBToARoute),
+        getPrecision(selectedRoute.selectedPairId),
+      ]);
+    }
     fetchSwapDataOnEvent();
-  }, [fetchSwapDataOnEvent, swap.selectedAccount, transactionState.successPayload, transactionState.errorMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRoute.selectedPairId, transactionState.successPayload, transactionState.errorMessage]);
 };

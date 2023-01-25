@@ -1,9 +1,11 @@
 import { Box, Flex, Skeleton, Text } from "@chakra-ui/react";
 import { Button, TokenAmountInput, TokenSelector } from "../base";
 import { ChangeEvent, MouseEvent, useCallback } from "react";
-import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW } from "./constants";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { Token } from "./types";
+
+export const SELECT_TOKEN_TO_VIEW = "Select Token To View";
+export const CONNECT_TO_VIEW = "Connect to View";
 
 export interface TokenInputProps {
   "data-testid": string;

@@ -88,7 +88,12 @@ const AlertDialogBase = (props: AlertDialogProps) => {
       {openModalComponent ? (
         cloneElement(openModalComponent, { onClick: openDialog })
       ) : (
-        <Button sx={openDialogButtonStyles} isDisabled={isOpenDialogButtonDisabled} textStyle="h3" onClick={openDialog}>
+        <Button
+          variant="primary"
+          sx={openDialogButtonStyles}
+          isDisabled={isOpenDialogButtonDisabled}
+          onClick={openDialog}
+        >
           {openDialogButtonText}
         </Button>
       )}

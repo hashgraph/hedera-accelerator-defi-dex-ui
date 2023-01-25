@@ -17,6 +17,7 @@ enum PoolsActionType {
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED",
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
   RESET_WITHDRAW_STATE = "pools/RESET_WITHDRAW_STATE",
+  RESET_ADD_LIQUIDITY_STATE = "pools/RESET_ADD_LIQUIDITY_STATE",
   FETCH_SPOT_PRICES_STARTED = "pools/FETCH_SPOT_PRICES_STARTED",
   FETCH_SPOT_PRICES_SUCCEEDED = "pools/FETCH_SPOT_PRICES_SUCCEEDED",
   FETCH_SPOT_PRICES_FAILED = "pools/FETCH_SPOT_PRICES_SUCCEEDED",
@@ -79,6 +80,15 @@ interface WithdrawState {
   } | null;
   errorMessage: string;
 }
+
+interface AddLiquidityState {
+  status: "init" | "in progress" | "success" | "error";
+  successPayload: {
+    transactionResponse: TransactionResponse;
+  } | null;
+  errorMessage: string;
+}
+
 interface PoolsState {
   allPoolsMetrics: Pool[];
   userPoolsMetrics: UserPool[];
@@ -88,6 +98,7 @@ interface PoolsState {
   errorMessage: string | null;
   spotPrices: Record<string, BigNumber | undefined>;
   withdrawState: WithdrawState;
+  addLiquidityTransactionState: AddLiquidityState;
 }
 
 interface PoolsActions {
@@ -108,6 +119,7 @@ interface PoolsActions {
     pairAccountId: string
   ) => Promise<void>;
   resetWithdrawState: () => Promise<void>;
+  resetAddLiquidityState: () => Promise<void>;
 }
 interface TokenPair {
   tokenA: Token;
@@ -147,6 +159,7 @@ export type {
   UserPool,
   Pool,
   SendAddLiquidityTransactionParams,
+  AddLiquidityState,
   TokenPair,
   Token,
   FetchSpotPriceParams,

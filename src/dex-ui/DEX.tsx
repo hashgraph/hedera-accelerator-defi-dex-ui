@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { ChakraProvider, Container, extendTheme, Flex } from "@chakra-ui/react";
 import {
-  Swap,
-  AddLiquidity,
+  SwapPage,
+  AddLiquidityPage,
   Pools,
   Withdraw,
   Governance,
@@ -12,7 +12,15 @@ import {
   SelectProposalType,
 } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
-import { ButtonStyles, CardStyles, InputStyles, NumberInputStyles, TextStyles } from "../dex-ui-components";
+import {
+  ButtonStyles,
+  CardStyles,
+  InputStyles,
+  NumberInputStyles,
+  TextStyles,
+  SelectStyles,
+  TooltipStyles,
+} from "../dex-ui-components";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useWalletConnection } from "./hooks";
 import { ScrollToTop } from "./utils";
@@ -27,6 +35,8 @@ export const DEXTheme = extendTheme({
     NumberInput: NumberInputStyles,
     Input: InputStyles,
     Card: CardStyles,
+    Select: SelectStyles,
+    Tooltip: TooltipStyles,
   },
 });
 
@@ -51,9 +61,9 @@ const DEX = () => {
               <Flex width="80rem" justifyContent="center">
                 <Routes>
                   <Route path="/" element={<Navigate to="/swap" />} />
-                  <Route path="/swap" element={<Swap />} />
+                  <Route path="/swap" element={<SwapPage />} />
                   <Route path="/pools" element={<Pools />} />
-                  <Route path="/pools/add-liquidity" element={<AddLiquidity />} />
+                  <Route path="/pools/add-liquidity" element={<AddLiquidityPage />} />
                   <Route path="/pools/withdraw" element={<Withdraw />} />
                   <Route path="/governance" element={<Governance />} />
                   <Route path="/governance/proposal-details/:id" element={<ProposalDetails />} />

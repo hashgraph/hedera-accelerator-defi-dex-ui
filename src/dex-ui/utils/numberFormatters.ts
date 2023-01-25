@@ -1,22 +1,23 @@
 import { BigNumber } from "bignumber.js";
 import numeral from "numeral";
 
-const DEFAULT = "-";
+const DefaultAmount = "--";
+const DefaultPercent = "-.-%";
 
-const formatToUSD = (number: number) => (number ? numeral(number).format("$0,0.00") : DEFAULT);
+const formatToUSD = (number: number) => (number ? numeral(number).format("$0,0.00") : DefaultAmount);
 
-const formatToPercent = (number: number) => (number ? numeral(number).format("0.00%") : DEFAULT);
+const formatToPercent = (number: number) => (number ? numeral(number).format("0.00%") : DefaultPercent);
 
 const formatBigNumberToUSD = (bigNumber: BigNumber | undefined) => {
   if (bigNumber === undefined) {
-    return DEFAULT;
+    return DefaultAmount;
   }
   return formatToUSD(bigNumber.toNumber());
 };
 
 const formatBigNumberToPercent = (bigNumber: BigNumber | undefined) => {
   if (bigNumber === undefined) {
-    return DEFAULT;
+    return DefaultPercent;
   }
   return formatToPercent(bigNumber.shiftedBy(-2).toNumber());
 };

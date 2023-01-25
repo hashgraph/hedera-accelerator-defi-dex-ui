@@ -1,5 +1,5 @@
 export * from "./base";
-export * from "./SwapTokens";
+export * from "./presets/SwapTokensForm";
 export * from "./WalletConnection";
 export * from "./themes";
 export * from "./hooks";
