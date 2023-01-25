@@ -12,14 +12,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
 
   return (
     <Menu>
-      <Flex
-        padding="2rem 1rem"
-        marginBottom="2rem"
-        w="100%"
-        height="84px"
-        alignItems="center"
-        borderBottom="0.25px solid #DBDEDF"
-      >
+      <Flex padding="2rem 1rem" marginBottom="2rem" w="100%" height="84px" alignItems="center">
         <Box flex="1.5">
           <HStack spacing="0.5rem">
             <Text textStyle="h3">Hedera Open DEX</Text>

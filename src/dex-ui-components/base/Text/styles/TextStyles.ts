@@ -85,8 +85,8 @@ export const TextStyles = {
   link: {
     ...fontType,
     fontWeight: fontWeight.Bold,
-    fontSize: "10px",
-    lineHeight: "12px",
+    fontSize: "12px",
+    lineHeight: "15px",
     color: Color.Teal_01,
     ":hover": {
       textDecoration: "underline",

@@ -47,7 +47,7 @@ function createHederaService() {
     return BigNumber(value).multipliedBy(_precision);
   };
 
-  const addLiquidity = async (addLiquidityDetails: AddLiquidityDetails) => {
+  const addLiquidity = async (addLiquidityDetails: AddLiquidityDetails): Promise<TransactionResponse> => {
     const {
       firstTokenAddress,
       firstTokenQuantity,
@@ -74,7 +74,8 @@ function createHederaService() {
       .setNodeAccountIds([new AccountId(3)])
       .setPayableAmount(new Hbar(HbarAmount))
       .freezeWithSigner(signer);
-    await addLiquidityTransaction.executeWithSigner(signer);
+    const transactionResponse = addLiquidityTransaction.executeWithSigner(signer);
+    return transactionResponse;
   };
 
   const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, contractId: ContractId) => {

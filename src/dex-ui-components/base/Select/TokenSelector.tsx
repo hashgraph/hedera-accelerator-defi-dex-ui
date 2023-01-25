@@ -1,18 +1,27 @@
 import { ChangeEvent, cloneElement } from "react";
 import { Select } from "@chakra-ui/react";
 import { Token } from "../../TokenInput/types";
+import { UseFormRegisterReturn } from "react-hook-form";
+import { ArrowDropDownIcon } from "../";
 
 interface TokenSelectorProps {
   /* The unique Account ID of the token */
-  value: string | undefined;
+  value?: string | undefined;
   tokenPairs: Token[] | null;
+  selectControls?: UseFormRegisterReturn<any>;
   onChangeHandler?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TokenSelector = (props: TokenSelectorProps) => {
   const { value, onChangeHandler, tokenPairs } = props;
   return cloneElement(
-    <Select value={value} placeholder="Select a Token">
+    <Select
+      variant="tokenSymbolSelector"
+      value={value}
+      placeholder="Select Token"
+      icon={<ArrowDropDownIcon />}
+      {...props.selectControls}
+    >
       {tokenPairs !== null &&
         tokenPairs.map((token: Token) => {
           return (

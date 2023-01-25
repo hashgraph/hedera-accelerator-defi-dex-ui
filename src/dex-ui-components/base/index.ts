@@ -11,3 +11,5 @@ export * from "./Charts";
 export * from "./CardList";
 export * from "./Tabs";
 export * from "./Pagination";
+export * from "./Icons";
+export * from "./Tooltip";

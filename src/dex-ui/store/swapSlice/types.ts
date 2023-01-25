@@ -54,11 +54,6 @@ interface TransactionState {
   successPayload: TransactionResponse | null;
   errorMessage: string;
 }
-interface AccountDetails {
-  selectedAccountId: string | null;
-  selectedAToBRoute: string | null;
-  selectedBToARoute: string | null;
-}
 
 interface SwapState {
   precision: BigNumber | undefined;
@@ -68,17 +63,15 @@ interface SwapState {
   transactionState: TransactionState;
   errorMessage: string | null;
   tokenPairs: TokenPair[] | null;
-  selectedAccount: AccountDetails;
 }
 
 interface SwapActions {
-  getPrecision: () => Promise<void>;
-  fetchSpotPrices: () => Promise<void>;
-  fetchFee: () => Promise<void>;
+  getPrecision: (selectedAccountId: string) => Promise<void>;
+  fetchSpotPrices: (selectedAccountId: string, selectedAToBRoute: string, selectedBToARoute: string) => Promise<void>;
+  fetchFee: (selectedAccountId: string) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
   sendSwapTransaction: (tokenToTrade: Token) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
-  setSelectedAccount: (accountId: string, tokenToTradeASymbol: string, tokenToTradeBSymbol: string) => void;
 }
 
 type SwapStore = SwapState & SwapActions;

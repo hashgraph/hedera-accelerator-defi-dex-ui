@@ -1,3 +1,4 @@
+import { TextStyles } from "./../../Text/styles/TextStyles";
 import { ComponentStyleConfig } from "@chakra-ui/react";
 import { Color } from "../../../themes";
 
@@ -9,6 +10,23 @@ export const InputStyles: ComponentStyleConfig = {
   baseStyle: {},
   sizes: {},
   variants: {
+    "token-amount-input": {
+      field: {
+        ...TextStyles.h2,
+        height: "fit-content",
+        background: Color.White_01,
+        padding: "12px 10px",
+        border: `1px solid ${Color.Grey_01}`,
+        borderRadius: 0,
+      },
+    },
+    settings: {
+      field: {
+        bg: Color.White_02,
+        border: `1px solid ${Color.Grey_01}`,
+        borderRadius: "2px",
+      },
+    },
     "form-input": {
       field: {
         bg: "#FFFFFF",

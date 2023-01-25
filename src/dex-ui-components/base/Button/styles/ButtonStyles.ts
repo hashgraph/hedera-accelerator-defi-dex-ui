@@ -9,6 +9,13 @@ const primary = {
   padding: "16px",
   borderRadius: "2px",
   boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+  ":disabled": {
+    bg: Color.Grey_01,
+    opacity: 1,
+  },
+  ":hover:disabled": {
+    bg: Color.Grey_01,
+  },
 };
 
 /**
@@ -42,27 +49,26 @@ export const ButtonStyles: ComponentStyleConfig = {
     },
     "switch-token-inputs": (props) => ({
       ...theme.components.Button.variants?.outline(props),
-      height: "42px",
-      width: "42px",
-      bg: "white",
-      color: "black",
-      borderColor: "black",
-      marginTop: "0.5rem",
+      height: "48px",
+      width: "48px",
+      bg: Color.White_01,
+      boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.15)",
     }),
     settings: {
-      height: "42px",
-      width: "42px",
-      bg: "white",
-      color: "black",
+      height: "32px",
+      width: "fit-content",
+      padding: "0.5rem 0.75rem",
+      bg: Color.White_01,
+      border: `1px solid ${Color.Grey_01}`,
+      borderRadius: "8px",
     },
-    "xs-text": {
+    link: {
+      ...TextStyles.link,
       height: "fit-content",
       width: "fit-content",
       bg: "transparent",
-      textDecoration: "none",
-      fontWeight: "bold",
-      fontSize: "12px",
-      padding: "0",
+      padding: 0,
+      margin: "0 -0.25rem",
     },
   },
   defaultProps: {
