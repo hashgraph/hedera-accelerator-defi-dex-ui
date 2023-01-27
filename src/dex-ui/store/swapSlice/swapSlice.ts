@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { DexService, HBAR_ID } from "../../services";
+import { DexService, HBARTokenId, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
@@ -23,6 +23,23 @@ const initialSwapState: SwapState = {
   tokenPairs: null,
 };
 
+function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse) {
+  return {
+    amount: 0.0,
+    displayAmount: "",
+    balance: undefined,
+    poolLiquidity: undefined,
+    tokenName: token.data.name,
+    totalSupply: token.data.total_supply,
+    maxSupply: null,
+    symbol: token.data.symbol,
+    tokenMeta: {
+      pairAccountId: pair.data.contract_id,
+      tokenId: token.data.token_id,
+    },
+  };
+}
+
 const fetchEachToken = async (evmAddress: string) => {
   const pairData = await DexService.fetchContract(evmAddress);
   const { tokenATokenId, tokenBTokenId, lpTokenId } = await DexService.fetchPairTokenIds(pairData.data.contract_id);
@@ -33,35 +50,9 @@ const fetchEachToken = async (evmAddress: string) => {
     DexService.fetchTokenData(lpTokenId),
   ]);
 
-  const tokenAInfoDetails: Token = {
-    amount: 0.0,
-    displayAmount: "",
-    balance: undefined,
-    poolLiquidity: undefined,
-    tokenName: tokenAInfo.data.name,
-    totalSupply: tokenAInfo.data.total_supply,
-    maxSupply: null,
-    symbol: tokenAInfo.data.symbol,
-    tokenMeta: {
-      pairAccountId: pairData.data.contract_id,
-      tokenId: tokenAInfo.data.token_id,
-    },
-  };
+  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData);
+  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData);
 
-  const tokenBInfoDetails: Token = {
-    amount: 0.0,
-    displayAmount: "",
-    balance: undefined,
-    poolLiquidity: undefined,
-    tokenName: tokenBInfo.data.name,
-    totalSupply: tokenBInfo.data.total_supply,
-    maxSupply: null,
-    symbol: tokenBInfo.data.symbol,
-    tokenMeta: {
-      pairAccountId: pairData.data.contract_id,
-      tokenId: tokenBInfo.data.token_id,
-    },
-  };
   const pairToken = {
     symbol: tokenCInfo.data.symbol,
     pairLpAccountId: lpTokenId,
@@ -300,7 +291,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         tokenToTrade.tokenMeta.tokenId ?? "",
         tokenToTrade.amount ?? ""
       );
-      const HbarAmount = tokenToTradeAccountId === HBAR_ID ? tokenToTrade.amount : 0.0;
+      const HbarAmount = tokenToTradeAccountId === HBARTokenId ? tokenToTrade.amount : 0.0;
       const provider = DexService.getProvider(
         context.network,
         wallet.topicID,

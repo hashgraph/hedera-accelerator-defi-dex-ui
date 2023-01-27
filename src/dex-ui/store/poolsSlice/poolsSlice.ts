@@ -11,7 +11,13 @@ import {
   Token,
   FetchSpotPriceParams,
 } from "./types";
-import { DexService, MirrorNodeTokenBalance } from "../../services";
+import {
+  DexService,
+  HBARTokenId,
+  MirrorNodeTokenBalance,
+  MirrorNodeTokenByIdResponse,
+  MirrorNodeTokenPairResponse,
+} from "../../services";
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours, isHbarToken } from "../../utils";
@@ -31,6 +37,23 @@ const initialPoolsStore: PoolsState = {
   },
 };
 
+function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse) {
+  return {
+    amount: 0.0,
+    displayAmount: "",
+    balance: undefined,
+    poolLiquidity: undefined,
+    tokenName: token.data.name,
+    totalSupply: token.data.total_supply,
+    maxSupply: null,
+    symbol: token.data.symbol,
+    tokenMeta: {
+      pairAccountId: pair.data.contract_id,
+      tokenId: token.data.token_id,
+    },
+  };
+}
+
 const fetchEachToken = async (evmAddress: string) => {
   const pairData = await DexService.fetchContract(evmAddress);
   const { tokenATokenId, tokenBTokenId, lpTokenId } = await DexService.fetchPairTokenIds(pairData.data.contract_id);
@@ -41,35 +64,9 @@ const fetchEachToken = async (evmAddress: string) => {
     DexService.fetchTokenData(lpTokenId),
   ]);
 
-  const tokenAInfoDetails: Token = {
-    amount: 0.0,
-    displayAmount: "",
-    balance: undefined,
-    poolLiquidity: undefined,
-    tokenName: tokenAInfo.data.name,
-    totalSupply: tokenAInfo.data.total_supply,
-    maxSupply: null,
-    symbol: tokenAInfo.data.symbol,
-    tokenMeta: {
-      pairAccountId: pairData.data.contract_id,
-      tokenId: tokenAInfo.data.token_id,
-    },
-  };
+  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData);
+  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData);
 
-  const tokenBInfoDetails: Token = {
-    amount: 0.0,
-    displayAmount: "",
-    balance: undefined,
-    poolLiquidity: undefined,
-    tokenName: tokenBInfo.data.name,
-    totalSupply: tokenBInfo.data.total_supply,
-    maxSupply: null,
-    symbol: tokenBInfo.data.symbol,
-    tokenMeta: {
-      pairAccountId: pairData.data.contract_id,
-      tokenId: tokenBInfo.data.token_id,
-    },
-  };
   const pairToken = {
     symbol: tokenCInfo.data.symbol,
     pairLpAccountId: lpTokenId,
@@ -130,6 +127,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
       const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
       const HbarAmount = tokenAHbarQty + tokenBHbarQty;
+      const HbarTokenAddress = TokenId.fromString(HBARTokenId).toSolidityAddress();
 
       try {
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
@@ -138,6 +136,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           firstTokenQuantity,
           secondTokenAddress,
           secondTokenQuantity,
+          HbarTokenAddress,
           addLiquidityContractAddress,
           walletAddress,
           HbarAmount,

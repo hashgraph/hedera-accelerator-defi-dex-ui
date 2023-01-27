@@ -7,7 +7,7 @@ import {
 } from "../services/MirrorNodeService/types";
 import { TokenPair } from "../store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
-import { HBAR_ID } from "../services";
+import { HBARTokenId } from "../services";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;
@@ -31,7 +31,7 @@ const getTransactionsFromLast24Hours = (transactions: MirrorNodeTransaction[]) =
  * @returns The balance for the token with an ID equal to the tokenId.
  */
 const getTokenBalance = (tokenBalances: MirrorNodeAccountBalance, tokenId: string) => {
-  const hbarToken = tokenBalances.tokens.find((token) => token.token_id === HBAR_ID);
+  const hbarToken = tokenBalances.tokens.find((token) => token.token_id === HBARTokenId);
   return hbarToken
     ? tokenBalances.balance
     : tokenBalances?.tokens?.find((tokenBalance) => tokenBalance.token_id === tokenId)?.balance;
@@ -184,7 +184,7 @@ const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFro
 };
 
 const isHbarToken = (TokenID: string): boolean => {
-  return TokenID === HBAR_ID;
+  return TokenID === HBARTokenId;
 };
 
 export {
