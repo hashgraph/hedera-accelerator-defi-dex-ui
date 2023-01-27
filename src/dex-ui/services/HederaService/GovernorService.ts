@@ -44,7 +44,7 @@ const castVote = async (params: CastVoteParams) => {
   const castVoteTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.CastVote, contractFunctionParameters)
-    .setGas(900000)
+    .setGas(1000000)
     .freezeWithSigner(signer);
   const response = await castVoteTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(response, GovernorContractFunctions.CastVote);

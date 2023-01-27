@@ -53,6 +53,7 @@ function createHederaService() {
       firstTokenQuantity,
       secondTokenAddress,
       secondTokenQuantity,
+      HbarTokenAddress,
       addLiquidityContractAddress,
       walletAddress,
       HbarAmount,
@@ -68,8 +69,8 @@ function createHederaService() {
           .addAddress(walletAddress)
           .addAddress(firstTokenAddress)
           .addAddress(secondTokenAddress)
-          .addInt256(firstTokenQuantity)
-          .addInt256(secondTokenQuantity)
+          .addInt256(firstTokenAddress === HbarTokenAddress ? BigNumber(0) : firstTokenQuantity)
+          .addInt256(secondTokenAddress === HbarTokenAddress ? BigNumber(0) : secondTokenQuantity)
       )
       .setNodeAccountIds([new AccountId(3)])
       .setPayableAmount(new Hbar(HbarAmount))
@@ -109,7 +110,7 @@ function createHederaService() {
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(walletAddress)
       .addAddress(tokenToTradeAddress)
-      .addInt256(tokenToTradeAmount);
+      .addInt256(HbarAmount > 0.0 ? BigNumber(0) : tokenToTradeAmount);
     const swapTokenTransaction = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)

@@ -4,7 +4,7 @@ import { TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
 import { SwapSettingsInputProps } from "../base";
 import { ChangeEvent } from "react";
 import { TokenState } from "./types";
-import { HBAR_ID } from "../../dex-ui/services";
+import { HBARTokenId } from "../../dex-ui/services";
 
 /**
  * Returns half of the input amount.
@@ -101,7 +101,7 @@ export const getTokenBalance = (tokenId: string, accountBalances: AccountBalance
 };
 
 const isHbarToken = (tokenId: string): boolean => {
-  return tokenId === HBAR_ID;
+  return tokenId === HBARTokenId;
 };
 
 interface GetSwapSettingsPropsParams {
