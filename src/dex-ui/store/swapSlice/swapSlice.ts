@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { DexService, HBARTokenId, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
-import { getErrorMessage } from "../../utils";
+import { DexService, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
+import { getErrorMessage, isHbarToken } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
 const initialSwapState: SwapState = {
@@ -287,11 +287,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const contractId = ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "");
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
       const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
-      const tokenToTradeAmount = wallet.getTokenAmountWithPrecision(
-        tokenToTrade.tokenMeta.tokenId ?? "",
-        tokenToTrade.amount ?? ""
-      );
-      const HbarAmount = tokenToTradeAccountId === HBARTokenId ? tokenToTrade.amount : 0.0;
+      const tokenToTradeAmount = isHbarToken(tokenToTradeAccountId)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(tokenToTrade.tokenMeta.tokenId ?? "", tokenToTrade.amount ?? "");
+      const HbarAmount = isHbarToken(tokenToTradeAccountId) ? tokenToTrade.amount : 0.0;
       const provider = DexService.getProvider(
         context.network,
         wallet.topicID,
