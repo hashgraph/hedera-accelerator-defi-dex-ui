@@ -14,7 +14,6 @@ import {
   Spacer,
   Skeleton,
   SkeletonText,
-  HStack,
   Tag,
 } from "@chakra-ui/react";
 import { isNil } from "ramda";
@@ -31,6 +30,7 @@ import { ProposalState } from "../../store/governanceSlice";
 import { useProposalDetails } from "./useProposalDetails";
 import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
 import { ProposalDetailsControls } from "./ProposalDetailsControls";
+import { StepperUI } from "../../../dex-ui-components/base/Stepper";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
@@ -44,11 +44,11 @@ export const ProposalDetails = () => {
     successMessage,
     hashScanTransactionLink,
     hashScanAccountLink,
-    statusColor,
     isLoadingDialogOpen,
     loadingDialogMessage,
     isErrorDialogOpen,
     errorDialogMessage,
+    proposalStatus,
   } = proposalDetails;
 
   if (!proposal.isLoading && isNil(proposal.data)) {
@@ -168,18 +168,7 @@ export const ProposalDetails = () => {
             >
               <Text textStyle="h3">Status</Text>
               <Spacer padding="0.5rem" />
-              <HStack>
-                {/**
-                 * TODO: Create state mapping between proposal state and UI state.
-                 * e.g., The proposal do not have the concept of a 'Queued to Execute' state.
-                 */}
-                <Text textStyle="b2" color={statusColor}>
-                  {proposal.data?.state === ProposalState.Executed ? ProposalState.Executed : proposal.data?.status}
-                </Text>
-                <Text textStyle="b2" color={Color.Grey_02}>
-                  - {proposal.data?.timeRemaining}
-                </Text>
-              </HStack>
+              <StepperUI state={proposalStatus} />
             </Card>
             <Card
               bg={Color.White_01}

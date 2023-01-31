@@ -6,7 +6,7 @@ import {
   useProposal,
   useCancelProposal,
 } from "../../hooks";
-import { ProposalState, ProposalStatus } from "../../store/governanceSlice";
+import { ProposalState, ProposalStatus, ProposalStates } from "../../store/governanceSlice";
 import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "../../utils";
 
 export function useProposalDetails(proposalId: string | undefined) {
@@ -74,6 +74,52 @@ export function useProposalDetails(proposalId: string | undefined) {
   const hashScanTransactionLink = getHashScanLink();
   const hashScanAccountLink = createHashScanAccountIdLink(wallet.getSigner().getAccountId().toString());
 
+  function getProposalStatus(): ProposalStates[] | undefined {
+    switch (proposal.data?.state) {
+      case "Pending":
+      case "Active":
+        return [
+          { status: "Review", iconType: "full" },
+          { status: "Active", iconType: "current", timeRemaining: proposal.data.timeRemaining },
+          { status: "Queued To Execute", iconType: "half" },
+          { status: "Executed", iconType: "half" },
+        ];
+      case "Succeeded":
+      case "Queued":
+        return [
+          { status: "Review", iconType: "full" },
+          { status: "Active", iconType: "full" },
+          { status: "Queued To Execute", iconType: "current" },
+          { status: "Executed", iconType: "half" },
+        ];
+
+      case "Executed":
+        return [
+          { status: "Review", iconType: "full" },
+          { status: "Active", iconType: "full" },
+          { status: "Queued To Execute", iconType: "full" },
+          { status: "Executed", iconType: "full" },
+        ];
+      case "Canceled":
+        return [
+          { status: "Review", iconType: "full" },
+          { status: "Cancelled", iconType: "cancel" },
+        ];
+
+      case "Defeated":
+      case "Expired":
+        return [
+          { status: "Review", iconType: "full" },
+          { status: "Active", iconType: "full" },
+          { status: "Defeated", iconType: "cancel" },
+        ];
+
+      default:
+        return undefined;
+    }
+  }
+  const proposalStatus = getProposalStatus();
+
   return {
     proposal,
     castVote,
@@ -96,5 +142,6 @@ export function useProposalDetails(proposalId: string | undefined) {
     errorDialogMessage,
     isWalletConnected,
     doesUserHaveGodTokens,
+    proposalStatus,
   };
 }
