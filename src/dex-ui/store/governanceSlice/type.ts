@@ -41,6 +41,11 @@ enum ProposalState {
   Expired = "Expired",
   Executed = "Executed",
 }
+interface ProposalStates {
+  status: string;
+  iconType: string;
+  timeRemaining?: string;
+}
 
 interface Proposal {
   id: string;
@@ -135,4 +140,5 @@ export type {
   GovernanceState,
   GovernanceActions,
   Proposal,
+  ProposalStates,
 };
