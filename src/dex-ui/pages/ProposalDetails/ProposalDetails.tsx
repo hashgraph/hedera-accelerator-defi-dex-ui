@@ -168,7 +168,7 @@ export const ProposalDetails = () => {
             >
               <Text textStyle="h3">Status</Text>
               <Spacer padding="0.5rem" />
-              <StepperUI state={proposalStatus} />
+              {proposalStatus && <StepperUI states={proposalStatus} />}
             </Card>
             <Card
               bg={Color.White_01}

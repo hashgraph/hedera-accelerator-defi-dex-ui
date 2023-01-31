@@ -6,7 +6,7 @@ import {
   useProposal,
   useCancelProposal,
 } from "../../hooks";
-import { ProposalState, ProposalStatus, ProposalStates } from "../../store/governanceSlice";
+import { ProposalState, ProposalStatus, ProposalStates, ProposalStateIcon } from "../../store/governanceSlice";
 import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "../../utils";
 
 export function useProposalDetails(proposalId: string | undefined) {
@@ -76,42 +76,42 @@ export function useProposalDetails(proposalId: string | undefined) {
 
   function getProposalStatus(): ProposalStates[] | undefined {
     switch (proposal.data?.state) {
-      case "Pending":
-      case "Active":
+      case ProposalState.Pending:
+      case ProposalState.Active:
         return [
-          { status: "Review", iconType: "full" },
-          { status: "Active", iconType: "current", timeRemaining: proposal.data.timeRemaining },
-          { status: "Queued To Execute", iconType: "half" },
-          { status: "Executed", iconType: "half" },
+          { status: "Review", iconType: ProposalStateIcon.Completed },
+          { status: "Active", iconType: ProposalStateIcon.Active, timeRemaining: proposal.data.timeRemaining },
+          { status: "Queued To Execute", iconType: ProposalStateIcon.Disabled },
+          { status: "Executed", iconType: ProposalStateIcon.Disabled },
         ];
-      case "Succeeded":
-      case "Queued":
+      case ProposalState.Succeeded:
+      case ProposalState.Queued:
         return [
-          { status: "Review", iconType: "full" },
-          { status: "Active", iconType: "full" },
-          { status: "Queued To Execute", iconType: "current" },
-          { status: "Executed", iconType: "half" },
-        ];
-
-      case "Executed":
-        return [
-          { status: "Review", iconType: "full" },
-          { status: "Active", iconType: "full" },
-          { status: "Queued To Execute", iconType: "full" },
-          { status: "Executed", iconType: "full" },
-        ];
-      case "Canceled":
-        return [
-          { status: "Review", iconType: "full" },
-          { status: "Cancelled", iconType: "cancel" },
+          { status: "Review", iconType: ProposalStateIcon.Completed },
+          { status: "Active", iconType: ProposalStateIcon.Completed },
+          { status: "Queued To Execute", iconType: ProposalStateIcon.Active },
+          { status: "Executed", iconType: ProposalStateIcon.Disabled },
         ];
 
-      case "Defeated":
-      case "Expired":
+      case ProposalState.Executed:
         return [
-          { status: "Review", iconType: "full" },
-          { status: "Active", iconType: "full" },
-          { status: "Defeated", iconType: "cancel" },
+          { status: "Review", iconType: ProposalStateIcon.Completed },
+          { status: "Active", iconType: ProposalStateIcon.Completed },
+          { status: "Queued To Execute", iconType: ProposalStateIcon.Completed },
+          { status: "Executed", iconType: ProposalStateIcon.Completed },
+        ];
+      case ProposalState.Canceled:
+        return [
+          { status: "Review", iconType: ProposalStateIcon.Completed },
+          { status: "Cancelled", iconType: ProposalStateIcon.Cancelled },
+        ];
+
+      case ProposalState.Defeated:
+      case ProposalState.Expired:
+        return [
+          { status: "Review", iconType: ProposalStateIcon.Completed },
+          { status: "Active", iconType: ProposalStateIcon.Completed },
+          { status: "Defeated", iconType: ProposalStateIcon.Cancelled },
         ];
 
       default:
