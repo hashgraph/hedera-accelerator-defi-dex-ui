@@ -13,7 +13,6 @@ import {
 } from "./types";
 import {
   DexService,
-  HBARTokenId,
   MirrorNodeTokenBalance,
   MirrorNodeTokenByIdResponse,
   MirrorNodeTokenPairResponse,
@@ -115,8 +114,12 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const { network } = get().context;
       const firstTokenAddress = TokenId.fromString(inputToken.address).toSolidityAddress();
       const secondTokenAddress = TokenId.fromString(outputToken.address).toSolidityAddress();
-      const firstTokenQuantity = wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
-      const secondTokenQuantity = wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
+      const firstTokenQuantity = isHbarToken(inputToken.address)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
+      const secondTokenQuantity = isHbarToken(outputToken.address)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
       const addLiquidityContractAddress = ContractId.fromString(contractId);
 
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
@@ -127,7 +130,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
       const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
       const HbarAmount = tokenAHbarQty + tokenBHbarQty;
-      const HbarTokenAddress = TokenId.fromString(HBARTokenId).toSolidityAddress();
 
       try {
         set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
@@ -136,7 +138,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           firstTokenQuantity,
           secondTokenAddress,
           secondTokenQuantity,
-          HbarTokenAddress,
           addLiquidityContractAddress,
           walletAddress,
           HbarAmount,
