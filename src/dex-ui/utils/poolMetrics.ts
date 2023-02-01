@@ -66,7 +66,6 @@ const calculateTotalValueLockedForPool = (params: CalculateTotalValueLockedForPo
   const tokenAPoolBalance = getTokenBalance(poolTokenBalances, tokenAAccountId);
   const tokenBPoolBalance = getTokenBalance(poolTokenBalances, tokenBAccountId);
   if (isNil(tokenAPoolBalance) || isNil(tokenBPoolBalance)) {
-    console.error("Cannot find mirror node balance for token account ID.");
     return BigNumber(0);
   } else {
     const tokenAPoolBalanceInUSD = getValueInUSD();

@@ -20,7 +20,6 @@ interface AddLiquidityDetails {
   firstTokenQuantity: BigNumber;
   secondTokenAddress: string;
   secondTokenQuantity: BigNumber;
-  HbarTokenAddress: string;
   addLiquidityContractAddress: ContractId;
   HbarAmount: BigNumber | number;
   walletAddress: string;

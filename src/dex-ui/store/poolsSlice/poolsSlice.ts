@@ -13,7 +13,6 @@ import {
 } from "./types";
 import {
   DexService,
-  HBARTokenId,
   MirrorNodeTokenBalance,
   MirrorNodeTokenByIdResponse,
   MirrorNodeTokenPairResponse,
@@ -21,6 +20,7 @@ import {
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours, isHbarToken } from "../../utils";
+import { TransactionStatus } from "../appSlice";
 
 const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
@@ -32,6 +32,12 @@ const initialPoolsStore: PoolsState = {
   errorMessage: null,
   withdrawState: {
     status: "init",
+    successPayload: null,
+    errorMessage: "",
+  },
+  /** Replace with React Query States */
+  addLiquidityTransactionState: {
+    status: TransactionStatus.INIT,
     successPayload: null,
     errorMessage: "",
   },
@@ -111,12 +117,17 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
   return {
     ...initialPoolsStore,
     sendAddLiquidityTransaction: async ({ inputToken, outputToken, contractId }: SendAddLiquidityTransactionParams) => {
-      const { wallet } = get();
+      const { wallet, app } = get();
       const { network } = get().context;
+      app.setFeaturesAsLoading(["addLiquidityTransactionState"]);
       const firstTokenAddress = TokenId.fromString(inputToken.address).toSolidityAddress();
       const secondTokenAddress = TokenId.fromString(outputToken.address).toSolidityAddress();
-      const firstTokenQuantity = wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
-      const secondTokenQuantity = wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
+      const firstTokenQuantity = isHbarToken(inputToken.address)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
+      const secondTokenQuantity = isHbarToken(outputToken.address)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
       const addLiquidityContractAddress = ContractId.fromString(contractId);
 
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
@@ -127,32 +138,64 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
       const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
       const HbarAmount = tokenAHbarQty + tokenBHbarQty;
-      const HbarTokenAddress = TokenId.fromString(HBARTokenId).toSolidityAddress();
 
       try {
-        set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED);
-        await DexService.addLiquidity({
+        set(
+          ({ pools }) => {
+            pools.addLiquidityTransactionState = {
+              status: "in progress",
+              successPayload: null,
+              errorMessage: "",
+            };
+            pools.errorMessage = "";
+          },
+          false,
+          PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
+        );
+        const result = await DexService.addLiquidity({
           firstTokenAddress,
           firstTokenQuantity,
           secondTokenAddress,
           secondTokenQuantity,
-          HbarTokenAddress,
           addLiquidityContractAddress,
           walletAddress,
           HbarAmount,
           signer,
         });
-        set({}, false, PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED);
+        if (result) {
+          set(
+            ({ pools }) => {
+              pools.addLiquidityTransactionState = {
+                status: "success",
+                successPayload: {
+                  transactionResponse: result,
+                },
+                errorMessage: "",
+              };
+              pools.errorMessage = "";
+            },
+            false,
+            PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_SUCCEEDED
+          );
+        } else {
+          throw new Error("Add Liquidity Transaction Execution Failed");
+        }
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         set(
           ({ pools }) => {
+            pools.addLiquidityTransactionState = {
+              status: "error",
+              successPayload: null,
+              errorMessage: errorMessage,
+            };
             pools.errorMessage = errorMessage;
           },
           false,
           PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED
         );
       }
+      app.setFeaturesAsLoaded(["addLiquidityTransactionState"]);
     },
     fetchAllPoolMetrics: async () => {
       const { app } = get();
@@ -370,6 +413,16 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         },
         false,
         PoolsActionType.RESET_WITHDRAW_STATE
+      );
+    },
+    resetAddLiquidityState: async () => {
+      set(
+        ({ pools }) => {
+          pools.addLiquidityTransactionState = initialPoolsStore.addLiquidityTransactionState;
+          pools.errorMessage = "";
+        },
+        false,
+        PoolsActionType.RESET_ADD_LIQUIDITY_STATE
       );
     },
   };

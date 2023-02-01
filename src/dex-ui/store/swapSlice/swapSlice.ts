@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { DexService, HBARTokenId, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
-import { getErrorMessage } from "../../utils";
+import { DexService, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
+import { getErrorMessage, isHbarToken } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
 const initialSwapState: SwapState = {
@@ -10,11 +10,6 @@ const initialSwapState: SwapState = {
   spotPrices: {},
   poolLiquidity: {},
   errorMessage: null,
-  selectedAccount: {
-    selectedAccountId: null,
-    selectedAToBRoute: null,
-    selectedBToARoute: null,
-  },
   transactionState: {
     transactionWaitingToBeSigned: false,
     successPayload: null,
@@ -75,9 +70,7 @@ const fetchEachToken = async (evmAddress: string) => {
 const createSwapSlice: SwapSlice = (set, get): SwapStore => {
   return {
     ...initialSwapState,
-    getPrecision: async () => {
-      const { swap } = get();
-      const { selectedAccountId } = swap.selectedAccount;
+    getPrecision: async (selectedAccountId: string) => {
       try {
         const precision = await DexService.fetchPrecisionValue(selectedAccountId ?? "");
         set(
@@ -98,17 +91,6 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           SwapActionType.SET_PRECISION
         );
       }
-    },
-    setSelectedAccount: (accountId: string, tokenToTradeAId: string, tokenToTradeBId: string) => {
-      set(
-        ({ swap }) => {
-          swap.selectedAccount.selectedAccountId = accountId;
-          swap.selectedAccount.selectedAToBRoute = `${tokenToTradeAId}=>${tokenToTradeBId}`;
-          swap.selectedAccount.selectedBToARoute = `${tokenToTradeBId}=>${tokenToTradeAId}`;
-        },
-        false,
-        SwapActionType.SET_SELECTED_ACCOUNT_ID
-      );
     },
     fetchTokenPairs: async () => {
       set({}, false, SwapActionType.FETCH_TOKEN_PAIRS_STARTED);
@@ -145,9 +127,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
      * on two different token symbols. This requires an update to the Swap contract spot price
      * function to support token symbol parameters.
      */
-    fetchSpotPrices: async () => {
+    fetchSpotPrices: async (selectedAccountId: string, selectedAToBRoute: string, selectedBToARoute: string) => {
       const { swap, app } = get();
-      const { selectedAccountId, selectedAToBRoute, selectedBToARoute } = swap.selectedAccount;
       if (!selectedAccountId || !selectedAToBRoute || !selectedBToARoute) {
         return;
       }
@@ -184,9 +165,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
       app.setFeaturesAsLoaded(["spotPrices"]);
     },
-    fetchFee: async () => {
-      const { app, swap } = get();
-      const { selectedAccountId } = swap.selectedAccount;
+    fetchFee: async (selectedAccountId: string) => {
+      const { app } = get();
       if (!selectedAccountId) {
         return;
       }
@@ -287,11 +267,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const contractId = ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "");
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
       const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
-      const tokenToTradeAmount = wallet.getTokenAmountWithPrecision(
-        tokenToTrade.tokenMeta.tokenId ?? "",
-        tokenToTrade.amount ?? ""
-      );
-      const HbarAmount = tokenToTradeAccountId === HBARTokenId ? tokenToTrade.amount : 0.0;
+      const tokenToTradeAmount = isHbarToken(tokenToTradeAccountId)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(tokenToTrade.tokenMeta.tokenId ?? "", tokenToTrade.amount ?? "");
+      const HbarAmount = isHbarToken(tokenToTradeAccountId) ? tokenToTrade.amount : 0.0;
       const provider = DexService.getProvider(
         context.network,
         wallet.topicID,

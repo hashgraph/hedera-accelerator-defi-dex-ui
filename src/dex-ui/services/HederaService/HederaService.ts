@@ -47,13 +47,12 @@ function createHederaService() {
     return BigNumber(value).multipliedBy(_precision);
   };
 
-  const addLiquidity = async (addLiquidityDetails: AddLiquidityDetails) => {
+  const addLiquidity = async (addLiquidityDetails: AddLiquidityDetails): Promise<TransactionResponse> => {
     const {
       firstTokenAddress,
       firstTokenQuantity,
       secondTokenAddress,
       secondTokenQuantity,
-      HbarTokenAddress,
       addLiquidityContractAddress,
       walletAddress,
       HbarAmount,
@@ -69,13 +68,14 @@ function createHederaService() {
           .addAddress(walletAddress)
           .addAddress(firstTokenAddress)
           .addAddress(secondTokenAddress)
-          .addInt256(firstTokenAddress === HbarTokenAddress ? BigNumber(0) : firstTokenQuantity)
-          .addInt256(secondTokenAddress === HbarTokenAddress ? BigNumber(0) : secondTokenQuantity)
+          .addInt256(firstTokenQuantity)
+          .addInt256(secondTokenQuantity)
       )
       .setNodeAccountIds([new AccountId(3)])
       .setPayableAmount(new Hbar(HbarAmount))
       .freezeWithSigner(signer);
-    await addLiquidityTransaction.executeWithSigner(signer);
+    const transactionResponse = addLiquidityTransaction.executeWithSigner(signer);
+    return transactionResponse;
   };
 
   const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, contractId: ContractId) => {
@@ -110,7 +110,7 @@ function createHederaService() {
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(walletAddress)
       .addAddress(tokenToTradeAddress)
-      .addInt256(HbarAmount > 0.0 ? BigNumber(0) : tokenToTradeAmount);
+      .addInt256(tokenToTradeAmount);
     const swapTokenTransaction = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)

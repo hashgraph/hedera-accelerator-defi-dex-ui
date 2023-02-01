@@ -1,1 +1,1 @@
-export * from "./AddLiquidity";
+export * from "./AddLiquidityPage";
