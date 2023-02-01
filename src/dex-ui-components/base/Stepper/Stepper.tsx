@@ -6,8 +6,8 @@ import { Box, Text } from "@chakra-ui/react";
 import { StepperStyles } from "./StepperStyles";
 import { StepperState, ProposalStateIcon } from "./types";
 
-const RadioUnCheckedIcon = createIcon({
-  displayName: "RadioCheckedIcon",
+const DisabledIcon = createIcon({
+  displayName: "DisabledIcon",
   viewBox: "0 0 25.5 25.5",
   path: [
     <path
@@ -19,8 +19,8 @@ const RadioUnCheckedIcon = createIcon({
   ],
 });
 
-const RadioCheckedIcon = createIcon({
-  displayName: "RadioCheckedIcon",
+const ActiveIcon = createIcon({
+  displayName: "ActiveIcon",
   viewBox: "0 0 25.5 25.5",
   path: [
     <path
@@ -55,6 +55,21 @@ const CancelledIcon = createIcon({
   ],
 });
 
+const GetStatusIcon = (iconType: string) => {
+  switch (iconType) {
+    case ProposalStateIcon.Active:
+      return <ActiveIcon color={Color.Teal_01} height="8" width="8" />;
+    case ProposalStateIcon.Completed:
+      return <CheckCircleIcon color={Color.Teal_01} height="8" width="8" />;
+    case ProposalStateIcon.Disabled:
+      return <DisabledIcon height="8" width="8" />;
+    case ProposalStateIcon.Cancelled:
+      return <CancelledIcon height="8" width="8" />;
+    default:
+      break;
+  }
+};
+
 function StepperUI(props: StepperState) {
   const { states } = props;
   return (
@@ -65,22 +80,22 @@ function StepperUI(props: StepperState) {
             return (
               <Step key={state.status}>
                 <Flex flexDirection="row" gap="10px">
-                  {state.iconType === ProposalStateIcon.Completed && (
-                    <CheckCircleIcon color={Color.Teal_01} height="8" width="8" />
-                  )}
-                  {state.iconType === ProposalStateIcon.Active && (
-                    <RadioCheckedIcon color={Color.Teal_01} height="8" width="8" />
-                  )}
-                  {state.iconType === ProposalStateIcon.Disabled && <RadioUnCheckedIcon height="8" width="8" />}
-                  {state.iconType === ProposalStateIcon.Cancelled && <CancelledIcon height="8" width="8" />}
-                  <Flex flexDirection="row" gap="0px">
-                    <StepLabel>{state.status}</StepLabel>
-                    {state.timeRemaining && (
-                      <Text textStyle="b2" paddingTop="6px" color={Color.Grey_02}>
-                        - {state.timeRemaining}
+                  {GetStatusIcon(state.iconType)}
+                  <StepLabel>
+                    <Flex flexDirection="row" gap="4px">
+                      <Text
+                        textStyle="b4"
+                        color={state.iconType === ProposalStateIcon.Disabled ? Color.Grey_01 : Color.Text_Primary}
+                      >
+                        {state.status}
                       </Text>
-                    )}
-                  </Flex>
+                      {state.timeRemaining && (
+                        <Text textStyle="b2" color={Color.Grey_02}>
+                          {` - ${state.timeRemaining}`}
+                        </Text>
+                      )}
+                    </Flex>
+                  </StepLabel>
                 </Flex>
               </Step>
             );

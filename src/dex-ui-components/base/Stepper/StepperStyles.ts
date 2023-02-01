@@ -8,13 +8,12 @@ export const StepperStyles = {
     paddingLeft: "10px",
   },
   ".MuiStepConnector-vertical": {
-    paddingLeft: "3px",
-    height: "50px",
-    paddingBottom: "2px",
-    paddingTop: "4px",
+    paddingLeft: "2.4px",
+    height: "40px",
+    paddingTop: "3px",
   },
   ".MuiStepConnector-lineVertical": {
-    height: "40px",
+    height: "34px",
   },
   ".MuiStepper-vertical": {
     background: Color.White_01,

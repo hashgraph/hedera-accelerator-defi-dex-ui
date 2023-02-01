@@ -15,6 +15,7 @@ import {
   Skeleton,
   SkeletonText,
   Tag,
+  CardBody,
 } from "@chakra-ui/react";
 import { isNil } from "ramda";
 import { Link as ReachLink, useParams } from "react-router-dom";
@@ -162,13 +163,13 @@ export const ProposalDetails = () => {
             <Card
               bg={Color.White_01}
               border={`0.25px solid ${Color.Grey_01}`}
+              boxShadow={"0px 4px 15px rgba(0, 0, 0, 0.15)"}
               borderRadius="2px"
-              padding="0.5rem"
-              boxShadow="none"
             >
-              <Text textStyle="h3">Status</Text>
-              <Spacer padding="0.5rem" />
-              {proposalStatus && <StepperUI states={proposalStatus} />}
+              <CardBody>
+                <Text textStyle="h3">Status</Text>
+                {proposalStatus && <StepperUI states={proposalStatus} />}
+              </CardBody>
             </Card>
             <Card
               bg={Color.White_01}
