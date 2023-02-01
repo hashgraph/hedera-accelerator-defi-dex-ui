@@ -1,10 +1,10 @@
 import {
+  Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   Button,
   Center,
-  Circle,
   Flex,
   Spacer,
   Text,
@@ -13,34 +13,32 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { RadioCard } from "../../../dex-ui-components";
-
-// interface SelectProposalType {}
+import { Color, RadioCard, TextIcon, TokenIcon, TrendingUpIcon, WalletIcon } from "../../../dex-ui-components";
 
 const mockNewProposalOptions = [
   {
     name: "new-token",
     type: "New Token",
-    iconColor: "#FFC400",
-    description: "Text proposals are for lorem ipsum dolor sit",
+    icon: <TokenIcon fill={Color.Yellow_01} options={{ boxSize: "2rem" }} />,
+    description: "Proposal to add a new token to the exchange",
   },
   {
     name: "text",
     type: "Text",
-    iconColor: "#6DC3D1",
-    description: "Text proposals are for lorem ipsum dolor sit",
+    icon: <TextIcon fill={Color.Blue_01} options={{ boxSize: "2rem" }} />,
+    description: "Create a text only proposal",
   },
   {
     name: "token-transfer",
     type: "Token Transfer",
-    iconColor: "#EDC1C1",
-    description: "Text proposals are for lorem ipsum dolor sit",
+    icon: <WalletIcon fill={Color.Red_01_Opaque} options={{ boxSize: "2rem" }} />,
+    description: "Proposal to transfer tokens from the community pool",
   },
   {
     name: "contract-upgrade",
     type: "Contract Upgrade",
-    iconColor: "#2CB997",
-    description: "Text proposals are for lorem ipsum dolor sit",
+    icon: <TrendingUpIcon fill={Color.Green_02} options={{ boxSize: "2rem" }} />,
+    description: "Upgrade an existing contract",
   },
 ];
 
@@ -77,16 +75,15 @@ export const SelectProposalType = (props: any) => {
           {mockNewProposalOptions.map((option, index) => {
             const radio = getRadioProps({ value: option.name });
             return (
-              <RadioCard key={index} {...radio} flex="1" padding="0.75rem">
-                <Center flexDirection="column">
-                  <Text textStyle="h3">{option.type}</Text>
-                  <Spacer padding="0.5rem" />
-                  <Circle size="3em" bg={option.iconColor} />
-                  <Spacer padding="0.5rem" />
-                  <Text textStyle="b2">{option.description}</Text>
-                  <Spacer padding="0.25rem" />
-                </Center>
-              </RadioCard>
+              <Box flex="1" width="255px" height="155px">
+                <RadioCard key={index} {...radio} padding="0.75rem">
+                  <Flex height="100%" flexDirection="column" alignItems="center" justifyContent="space-between">
+                    <Text textStyle="h3">{option.type}</Text>
+                    {option.icon}
+                    <Text textStyle="b2">{option.description}</Text>
+                  </Flex>
+                </RadioCard>
+              </Box>
             );
           })}
         </Flex>
