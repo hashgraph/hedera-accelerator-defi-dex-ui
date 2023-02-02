@@ -24,7 +24,7 @@ const GetStatusIcon = (iconType: string) => {
 function StepperUI(props: StepperState) {
   const { states } = props;
   return (
-    <Box sx={StepperStyles}>
+    <Box sx={StepperStyles} marginLeft="-10px">
       <Stepper orientation="vertical">
         {states.length !== 0 &&
           states.map((state) => {
