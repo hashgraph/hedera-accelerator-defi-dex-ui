@@ -1,14 +1,5 @@
 import { ADMIN_ID, ADMIN_KEY, TREASURY_ID, TREASURY_KEY, TOKEN_USER_ID, TOKEN_USER_KEY } from "../constants";
-import {
-  PrivateKey,
-  Client,
-  AccountId,
-  ContractId,
-  ContractCallQuery,
-  ContractFunctionParameters,
-  TransactionResponse,
-  TransactionReceipt,
-} from "@hashgraph/sdk";
+import { PrivateKey, Client, AccountId, TransactionResponse, TransactionReceipt } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 
 const adminId = AccountId.fromString(ADMIN_ID);
@@ -61,25 +52,12 @@ const createUserClient = (): Client => {
 
 const client = createUserClient();
 
-const queryContract = async (
-  contractId: ContractId,
-  functionName: string,
-  queryParams?: ContractFunctionParameters
-) => {
-  const gas = 50000;
-  const query = new ContractCallQuery().setContractId(contractId).setGas(gas).setFunction(functionName, queryParams);
-  const queryPayment = await query.getCost(client);
-  query.setMaxQueryPayment(queryPayment);
-  return await query.execute(client);
-};
-
 const checkTransactionResponseForError = (response: TransactionResponse | TransactionReceipt, functionName: string) => {
   if (isNil(response)) throw new Error(`${functionName} transaction failed.`);
 };
 
 export {
   client,
-  queryContract,
   checkTransactionResponseForError,
   getAdmin,
   getTreasurer,

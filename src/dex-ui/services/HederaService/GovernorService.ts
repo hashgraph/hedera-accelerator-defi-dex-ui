@@ -11,7 +11,7 @@ import {
   FileAppendTransaction,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { GovernorProxyContracts, TOKEN_USER_PUB_KEY } from "../constants";
+import { Contracts, TOKEN_USER_PUB_KEY } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError, client } from "./utils";
@@ -99,6 +99,7 @@ const sendCreateTransferTokenProposalTransaction = async (
   const transferFromAddress = signer.getAccountId().toSolidityAddress();
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
   const tokenToTransferAddress = TokenId.fromString(tokenToTransfer).toSolidityAddress();
+  const transferTokenContractId = ContractId.fromString(Contracts.Governor.TransferToken.ProxyId);
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
@@ -109,7 +110,7 @@ const sendCreateTransferTokenProposalTransaction = async (
     .addInt256(amountToTransfer);
 
   const createProposalTransaction = await new ContractExecuteTransaction()
-    .setContractId(GovernorProxyContracts.TransferTokenContractId)
+    .setContractId(transferTokenContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
     .setGas(9000000)
     .freezeWithSigner(signer);
@@ -137,7 +138,7 @@ const sendCreateContractUpgradeProposalTransaction = async (
   const { title, linkToDiscussion, description, contarctId, proxyId, signer } = params;
   const upgradeProposalContractId = ContractId.fromString(contarctId).toSolidityAddress();
   const upgradeProposalProxyId = ContractId.fromString(proxyId).toSolidityAddress();
-
+  const contractUpgradeContractId = ContractId.fromString(Contracts.Governor.ContractUpgrade.ProxyId);
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
@@ -146,7 +147,7 @@ const sendCreateContractUpgradeProposalTransaction = async (
     .addAddress(upgradeProposalContractId);
 
   const createUpgradeProposalTransaction = await new ContractExecuteTransaction()
-    .setContractId(GovernorProxyContracts.ContractUpgradeContractId)
+    .setContractId(contractUpgradeContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
     .setGas(9000000)
     .freezeWithSigner(signer);
@@ -167,12 +168,13 @@ const sendCreateTextProposalTransaction = async (
   linkToDiscussion: string,
   signer: HashConnectSigner
 ): Promise<TransactionResponse> => {
+  const textProposalContractId = ContractId.fromString(Contracts.Governor.TextProposal.ProxyId);
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion);
   const createProposalTransaction = await new ContractExecuteTransaction()
-    .setContractId(GovernorProxyContracts.TextProposalContractId)
+    .setContractId(textProposalContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
     .setGas(9000000)
     .freezeWithSigner(signer);
