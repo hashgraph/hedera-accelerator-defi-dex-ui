@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { FactoryContractId } from "../constants";
+import { Contracts } from "../constants";
 import Factory from "../abi/Factory.json";
 import { createContract } from "./utils";
 
@@ -9,7 +9,7 @@ import { createContract } from "./utils";
  * @returns An ethers.Contract representation of the Factory contract
  */
 function createFactoryContract(): ethers.Contract {
-  return createContract(FactoryContractId, Factory.abi);
+  return createContract(Contracts.Factory.ProxyId, Factory.abi);
 }
 
 /**

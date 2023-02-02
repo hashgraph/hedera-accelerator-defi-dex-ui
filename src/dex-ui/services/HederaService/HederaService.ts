@@ -11,8 +11,8 @@ import {
   TransactionResponse,
   Hbar,
 } from "@hashgraph/sdk";
-import { GovernorProxyContracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../constants";
-import { AddLiquidityDetails, GovernorContractFunctions, PairContractFunctions } from "./types";
+import { Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../constants";
+import { AddLiquidityDetails, PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
 
@@ -122,36 +122,6 @@ function createHederaService() {
     return swapTokenResponse;
   };
 
-  interface CreateProposalParams {
-    targets: Array<string>;
-    fees: Array<number>;
-    calls: Array<Uint8Array>;
-    description: string;
-    signer: HashConnectSigner;
-  }
-
-  const createProposal = async ({
-    targets,
-    fees,
-    calls,
-    description,
-    signer,
-  }: CreateProposalParams): Promise<TransactionResponse> => {
-    const contractCallParams = new ContractFunctionParameters()
-      .addAddressArray(targets)
-      .addUint256Array(fees)
-      .addBytesArray(calls)
-      .addString(description);
-    const createProposalTransaction = await new ContractExecuteTransaction()
-      .setContractId(GovernorProxyContracts.TransferTokenContractId)
-      .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
-      .setGas(900000)
-      .setNodeAccountIds([new AccountId(3)])
-      .freezeWithSigner(signer);
-    const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
-    return proposalTransactionResponse;
-  };
-
   const get1000L49ABCDTokens = async (
     receivingAccountId: string,
     associatedTokenIds: string[] | undefined,
@@ -207,7 +177,6 @@ function createHederaService() {
     swapToken,
     addLiquidity,
     removeLiquidity,
-    createProposal,
     ...GovernorService,
   };
 }
