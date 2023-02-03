@@ -42,6 +42,19 @@ enum ProposalState {
   Executed = "Executed",
 }
 
+enum ProposalStateIcon {
+  Active = "Active",
+  Completed = "Completed",
+  Cancelled = "Cancelled",
+  Disabled = "Disabled",
+}
+
+interface ProposalStates {
+  status: string;
+  iconType: string;
+  timeRemaining?: string;
+}
+
 interface Proposal {
   id: string;
   contractId: string;
@@ -125,7 +138,7 @@ type GovernanceSlice = StateCreator<
   GovernanceStore
 >;
 
-export { GovernanceActionType, ProposalType, ContractProposalState, ProposalState, ProposalStatus };
+export { GovernanceActionType, ProposalType, ContractProposalState, ProposalState, ProposalStatus, ProposalStateIcon };
 export type {
   CreateProposalData,
   CreateTextProposalData,
@@ -135,4 +148,5 @@ export type {
   GovernanceState,
   GovernanceActions,
   Proposal,
+  ProposalStates,
 };
