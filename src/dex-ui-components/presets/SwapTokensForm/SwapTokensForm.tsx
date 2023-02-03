@@ -21,9 +21,9 @@ import {
   getExchangeRateDisplay,
   getPairedTokenData,
   getPairedTokens,
-  getPoolLiquidityForTokenSymbol,
-  getPriceImpact,
-  getReceivedAmount,
+  getPoolLiquidityForTokenId,
+  calculatePriceImpact,
+  calculateTokenAmountToReceive,
   getSpotPrice,
   getTokenBalance,
   getTokensByUniqueAccountIds,
@@ -46,9 +46,9 @@ interface SwapTokensFormProps {
   poolLiquidity: Record<string, number | undefined>;
   transactionState: TransactionState;
   connectionStatus: HashConnectConnectionState;
-  sendSwapTransaction: (tokenToTrade: Token) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
-  getSpotPrices: (selectedAccountId: string, selectedAToBRoute: string, selectedBToARoute: string) => Promise<void>;
+  fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
   connectToWallet: () => void;
 }
 
@@ -60,29 +60,28 @@ export function SwapTokensForm(props: SwapTokensFormProps) {
     },
   });
   const formValues: SwapTokensFormData = structuredClone(swapTokensForm.getValues());
-  swapTokensForm.watch("tokenToTrade.displayAmount");
-  swapTokensForm.watch("tokenToTrade.symbol");
-  swapTokensForm.watch("tokenToReceive.symbol");
-  const selectedRoute = {
-    selectedPairId: formValues.tokenToReceive.tokenMeta.pairAccountId,
-    selectedAToBRoute: `${formValues.tokenToTrade.tokenMeta.tokenId}=>${formValues.tokenToReceive.tokenMeta.tokenId}`,
-    selectedBToARoute: `${formValues.tokenToReceive.tokenMeta.tokenId}=>${formValues.tokenToTrade.tokenMeta.tokenId}`,
-  };
-  useSwapData(selectedRoute, REFRESH_INTERVAL);
+  /**
+   * Changes to these form inputs require the form to rerender.
+   */
+  swapTokensForm.watch([
+    "tokenToTrade.displayAmount",
+    "tokenToTrade.symbol",
+    "tokenToReceive.symbol",
+    "tokenToReceive.displayAmount",
+    "tokenToTrade.poolLiquidity",
+    "tokenToReceive.poolLiquidity",
+  ]);
+
+  const selectedPairContractId = formValues.tokenToReceive.tokenMeta.pairAccountId ?? "";
+  useSwapData(selectedPairContractId, REFRESH_INTERVAL);
   const formSettings = useFormSettings({ initialSlippage: formValues.slippage });
 
   const successMessage = `Swapped
-  ${formValues.tokenToTrade.amount.toFixed(6)} 
+  ${formValues.tokenToTrade.amount.toFixed(8)} 
   ${formValues.tokenToTrade.symbol}
-for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.symbol}`;
+for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.symbol}`;
 
   const notification = useNotification({ successMessage, transactionState: props.transactionState });
-
-  const isSubmitButtonDisabled =
-    isEmpty(formValues.tokenToTrade.displayAmount) ||
-    isNil(formValues.tokenToTrade.symbol) ||
-    isEmpty(formValues.tokenToReceive.displayAmount) ||
-    isNil(formValues.tokenToReceive.symbol);
 
   const spotPrice = getSpotPrice({
     spotPrices: props.spotPrices,
@@ -90,11 +89,26 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
     tokenToReceive: formValues.tokenToReceive,
   });
 
-  const priceImpact = getPriceImpact({
-    spotPrice,
-    tokenToTrade: formValues.tokenToTrade,
-    tokenToReceive: formValues.tokenToReceive,
+  const priceImpact = calculatePriceImpact({
+    tokenToTrade: {
+      tokenId: formValues.tokenToTrade.tokenMeta.tokenId ?? "",
+      amount: formValues.tokenToTrade.amount ?? 0,
+      poolLiquidity: formValues.tokenToTrade.poolLiquidity ?? 0,
+    },
+    tokenToReceive: {
+      tokenId: formValues.tokenToReceive.tokenMeta.tokenId ?? "",
+      poolLiquidity: formValues.tokenToReceive.poolLiquidity ?? 0,
+    },
   });
+
+  const isUserSetSlippageBreached = priceImpact > formSettings.slippage;
+
+  const isSubmitButtonDisabled =
+    isEmpty(formValues.tokenToTrade.displayAmount) ||
+    isNil(formValues.tokenToTrade.symbol) ||
+    isEmpty(formValues.tokenToReceive.displayAmount) ||
+    isNil(formValues.tokenToReceive.symbol) ||
+    isUserSetSlippageBreached;
 
   const exchangeRate = getExchangeRateDisplay({
     spotPrice,
@@ -127,46 +141,41 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
 
   /** Update receive amount based on new liquidity */
   useEffect(() => {
+    const tokenToTradeId = formValues.tokenToTrade.tokenMeta.tokenId ?? "";
+    const tokenToReceiveId = formValues.tokenToReceive.tokenMeta.tokenId ?? "";
+    const areTokensPaired = !isEmpty(tokenToTradeId) && !isEmpty(tokenToReceiveId);
     const updatedTokenToTrade = {
       ...formValues.tokenToTrade,
-      poolLiquidity: getPoolLiquidityForTokenSymbol(formValues.tokenToTrade.symbol, props.poolLiquidity),
+      poolLiquidity: areTokensPaired ? getPoolLiquidityForTokenId(tokenToTradeId, props.poolLiquidity) : undefined,
     };
     const updatedTokenToReceive = {
       ...formValues.tokenToReceive,
-      poolLiquidity: getPoolLiquidityForTokenSymbol(formValues.tokenToReceive.symbol, props.poolLiquidity),
+      poolLiquidity: areTokensPaired ? getPoolLiquidityForTokenId(tokenToReceiveId, props.poolLiquidity) : undefined,
     };
     swapTokensForm.setValue("tokenToTrade.poolLiquidity", updatedTokenToTrade.poolLiquidity);
     swapTokensForm.setValue("tokenToReceive.poolLiquidity", updatedTokenToReceive.poolLiquidity);
     if (updatedTokenToTrade.amount > 0) {
-      const tokenToReceiveAmount = getReceivedAmount(updatedTokenToTrade, updatedTokenToReceive);
-      swapTokensForm.setValue("tokenToReceive.amount", tokenToReceiveAmount || 0);
-      swapTokensForm.setValue("tokenToReceive.displayAmount", tokenToReceiveAmount ? String(tokenToReceiveAmount) : "");
-      // forces render to show spot price
-      swapTokensForm.setValue("tokenToTrade.displayAmount", updatedTokenToTrade.displayAmount);
+      const tokenToReceiveAmount = calculateTokenAmountToReceive({
+        tokenToTradeAmount: updatedTokenToTrade.amount,
+        tokenToTradeLiquidity: updatedTokenToTrade.poolLiquidity ?? 0,
+        tokenToReceiveLiquidity: updatedTokenToReceive.poolLiquidity ?? 0,
+      });
+      const updatedAmount = tokenToReceiveAmount.toNumber();
+      const updatedDisplayAmount = tokenToReceiveAmount.gt(0) ? tokenToReceiveAmount.toString() : "";
+      updateTokenToReceiveAmounts(updatedAmount, updatedDisplayAmount);
     } else {
-      swapTokensForm.setValue("tokenToReceive.amount", InitialSwapFormState.tokenToReceive.amount);
-      swapTokensForm.setValue("tokenToReceive.displayAmount", InitialSwapFormState.tokenToReceive.displayAmount);
+      updateTokenToReceiveAmounts(
+        InitialSwapFormState.tokenToReceive.amount,
+        InitialSwapFormState.tokenToReceive.displayAmount
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(props.poolLiquidity)]);
+  }, [props.poolLiquidity]);
 
   function fetchPoolLiquidity(tokenToTrade: TokenState, tokenToReceive: TokenState) {
-    if (tokenToTrade.symbol && tokenToReceive.symbol) {
+    if (tokenToTrade.tokenMeta.tokenId && tokenToReceive.tokenMeta.tokenId) {
       props.getPoolLiquidity(tokenToTrade, tokenToReceive);
     }
-  }
-
-  interface FetchSpotPricesParams {
-    pairAccountId: string;
-    tokenToTradeId?: string;
-    tokenToReceiveId?: string;
-  }
-
-  function fetchSpotPrices({ pairAccountId, tokenToTradeId, tokenToReceiveId }: FetchSpotPricesParams) {
-    const selectedPairId = pairAccountId;
-    const selectedAToBRoute = `${tokenToTradeId}=>${tokenToReceiveId}`;
-    const selectedBToARoute = `${tokenToReceiveId}=>${tokenToTradeId}`;
-    props.getSpotPrices(selectedPairId, selectedAToBRoute, selectedBToARoute);
   }
 
   function onSubmit(data: SwapTokensFormData) {
@@ -174,7 +183,7 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
       console.error("Token types must be selected to Swap tokens.");
       return;
     }
-    props.sendSwapTransaction(data.tokenToTrade);
+    props.sendSwapTransaction(data.tokenToTrade, data.slippage);
   }
 
   /* TODO: Remove after swap queries are replaced with React Query */
@@ -187,15 +196,23 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
       : SwapConfirmationStep.CONFIRM;
   }
 
+  function updateTokenToReceiveAmounts(amount: number, displayAmount: string) {
+    swapTokensForm.setValue("tokenToReceive.amount", amount);
+    swapTokensForm.setValue("tokenToReceive.displayAmount", displayAmount);
+  }
+
   function handleTokenToTradeAmountChanged(updatedToken: TokenState) {
-    const tokenToReceiveAmount = getReceivedAmount(updatedToken, formValues.tokenToReceive);
+    const tokenToReceiveAmount = calculateTokenAmountToReceive({
+      tokenToTradeAmount: updatedToken.amount,
+      tokenToTradeLiquidity: updatedToken.poolLiquidity ?? 0,
+      tokenToReceiveLiquidity: formValues.tokenToReceive.poolLiquidity ?? 0,
+    });
     const updatedTokenToReceive = {
       ...formValues.tokenToReceive,
-      amount: tokenToReceiveAmount || 0,
-      displayAmount: tokenToReceiveAmount ? String(tokenToReceiveAmount) : "",
+      amount: tokenToReceiveAmount.toNumber(),
+      displayAmount: tokenToReceiveAmount.gt(0) ? String(tokenToReceiveAmount) : "",
     };
-    swapTokensForm.setValue("tokenToReceive.amount", updatedTokenToReceive.amount);
-    swapTokensForm.setValue("tokenToReceive.displayAmount", updatedTokenToReceive.displayAmount);
+    updateTokenToReceiveAmounts(updatedTokenToReceive.amount, updatedTokenToReceive.displayAmount);
   }
 
   function handleTokenToTradeSymbolChanged(updatedToken: TokenState) {
@@ -231,23 +248,8 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
     swapTokensForm.setValue("tokenToReceive.symbol", updatedTokenToReceive.symbol);
     swapTokensForm.setValue("tokenToReceive.balance", updatedTokenToReceive.balance);
     swapTokensForm.setValue("tokenToReceive.tokenMeta", updatedTokenToReceive.tokenMeta);
-    fetchPoolLiquidity(updatedTokenToTrade, updatedToken);
-    fetchSpotPrices({
-      pairAccountId: updatedTokenToReceive.tokenMeta.pairAccountId ?? "",
-      tokenToTradeId: updatedTokenToTrade.tokenMeta.tokenId,
-      tokenToReceiveId: updatedTokenToReceive.tokenMeta.tokenId,
-    });
-  }
-
-  function handleSetTokenToTradeAmountWithFormula(updatedToken: TokenState) {
-    const tokenToReceiveAmount = getReceivedAmount(updatedToken, formValues.tokenToReceive);
-    const updatedTokenToReceive = {
-      ...formValues.tokenToReceive,
-      amount: tokenToReceiveAmount || 0,
-      displayAmount: tokenToReceiveAmount ? String(tokenToReceiveAmount) : "",
-    };
-    swapTokensForm.setValue("tokenToReceive.amount", updatedTokenToReceive.amount);
-    swapTokensForm.setValue("tokenToReceive.displayAmount", updatedTokenToReceive.displayAmount);
+    fetchPoolLiquidity(updatedTokenToTrade, updatedTokenToReceive);
+    props.fetchSpotPrices(updatedTokenToReceive.tokenMeta.pairAccountId ?? "");
   }
 
   function handleSwapTokenInputsClicked() {
@@ -256,11 +258,8 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
     swapTokensForm.setValue("tokenToTrade", { ...newTokenToTrade });
     swapTokensForm.setValue("tokenToReceive", { ...newTokenToReceive });
     fetchPoolLiquidity(newTokenToTrade, newTokenToReceive);
-    fetchSpotPrices({
-      pairAccountId: newTokenToReceive.tokenMeta.pairAccountId ?? "",
-      tokenToTradeId: newTokenToTrade.tokenMeta.tokenId,
-      tokenToReceiveId: newTokenToReceive.tokenMeta.tokenId,
-    });
+    props.fetchSpotPrices(newTokenToReceive.tokenMeta.pairAccountId ?? "");
+    handleTokenToTradeAmountChanged(newTokenToTrade);
   }
 
   function handleCloseSwapConfirmationButtonClicked() {
@@ -272,7 +271,11 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
       <DefiFormLayout
         title={<Text textStyle="h2">{title}</Text>}
         settingsButton={
-          <SettingsButton slippage={formSettings.slippage} onClick={formSettings.handleSettingsButtonClicked} />
+          <SettingsButton
+            isError={isUserSetSlippageBreached}
+            slippage={formSettings.slippage}
+            onClick={formSettings.handleSettingsButtonClicked}
+          />
         }
         notification={
           notification.isSuccessNotificationVisible && (
@@ -290,6 +293,7 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
         }
         settingsInputs={
           <FormSettings
+            isSlippageBreached={isUserSetSlippageBreached}
             isSettingsOpen={formSettings.isSettingsOpen}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
@@ -311,7 +315,7 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
             isLoading={props.isLoading}
             onTokenAmountChanged={handleTokenToTradeAmountChanged}
             onTokenSymbolChanged={handleTokenToTradeSymbolChanged}
-            onSetInputAmountWithFormula={handleSetTokenToTradeAmountWithFormula}
+            onSetInputAmountWithFormula={handleTokenToTradeAmountChanged}
           />,
           <Flex direction="column" justifyContent="center" alignItems="end">
             <SwitchTokenButton onClick={handleSwapTokenInputsClicked} />
@@ -332,9 +336,18 @@ for ${formValues.tokenToReceive.amount.toFixed(6)} ${formValues.tokenToReceive.s
         ]}
         metrics={[
           <MetricLabel label="Transaction Fee" value={props.fee} isLoading={props.isLoading} />,
-          <MetricLabel label="Price Impact" value={priceImpact} isLoading={props.isLoading} />,
+          <MetricLabel label="Price Impact" value={`${priceImpact.toFixed(2)}%`} isLoading={props.isLoading} />,
           <MetricLabel label="Exchange Rate" value={exchangeRate} isLoading={props.isLoading} />,
         ]}
+        actionButtonNotifications={
+          isUserSetSlippageBreached && (
+            <Notification
+              type={NotficationTypes.ERROR}
+              textStyle="b3"
+              message="The price impact is over the set slippage tolerance."
+            />
+          )
+        }
         actionButtons={
           isWalletPaired ? (
             <SwapConfirmation

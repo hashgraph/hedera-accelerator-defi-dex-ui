@@ -95,6 +95,7 @@ function createHederaService() {
     walletAddress: string;
     tokenToTradeAddress: string;
     tokenToTradeAmount: BigNumber;
+    slippageTolerance: BigNumber;
     HbarAmount: number;
     signer: HashConnectSigner;
   }
@@ -104,18 +105,19 @@ function createHederaService() {
     walletAddress,
     tokenToTradeAddress,
     tokenToTradeAmount,
+    slippageTolerance,
     HbarAmount,
     signer,
   }: SwapTokenParams): Promise<TransactionResponse> => {
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(walletAddress)
       .addAddress(tokenToTradeAddress)
-      .addInt256(tokenToTradeAmount);
+      .addInt256(tokenToTradeAmount)
+      .addInt256(slippageTolerance);
     const swapTokenTransaction = await new ContractExecuteTransaction()
       .setContractId(contractId)
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
       .setGas(9000000)
-      .setNodeAccountIds([new AccountId(3)])
       .setPayableAmount(new Hbar(HbarAmount))
       .freezeWithSigner(signer);
     const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);

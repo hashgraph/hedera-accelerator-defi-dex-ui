@@ -4,6 +4,7 @@ import { UseFormRegister } from "react-hook-form";
 import { ChangeEvent } from "react";
 
 interface FormSettingsProps {
+  isSlippageBreached?: boolean;
   isSettingsOpen: boolean;
   handleSlippageChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   handleTransactionDeadlineChanged: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -22,7 +23,11 @@ export function FormSettings(props: FormSettingsProps) {
   price of a trade and the price at which the trade is executed.`}
         isTooltipVisible={true}
         unit="%"
-        register={props.register("slippage", { onChange: props.handleSlippageChanged })}
+        isError={props.isSlippageBreached}
+        register={props.register("slippage", {
+          validate: () => !props.isSlippageBreached,
+          onChange: props.handleSlippageChanged,
+        })}
       />
       <Input<"transactionDeadline">
         type="number"
