@@ -6,3 +6,7 @@ export * from "./ActiveStepIcon";
 export * from "./CancelledStepIcon";
 export * from "./DisabledStepIcon";
 export * from "./CompletedStepIcon";
+export * from "./TextIcon";
+export * from "./TrendingUpIcon";
+export * from "./WalletIcon";
+export * from "./TokenIcon";

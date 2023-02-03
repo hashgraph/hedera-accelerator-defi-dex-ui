@@ -2,7 +2,7 @@ import axios from "axios";
 import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
-import { GovernorProxyContracts } from "../constants";
+import { Contracts } from "../constants";
 import {
   MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
@@ -231,19 +231,19 @@ function createMirrorNodeService() {
   const fetchAllProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
     const tokenTransferEventsResults = fetchContractProposalEvents(
       ProposalType.TokenTransfer,
-      GovernorProxyContracts.TransferTokenStringId
+      Contracts.Governor.TransferToken.ProxyId
     );
     const createTokenEventsResults = fetchContractProposalEvents(
       ProposalType.CreateToken,
-      GovernorProxyContracts.CreateTokenStringId
+      Contracts.Governor.CreateToken.ProxyId
     );
     const textProposalEventsResults = fetchContractProposalEvents(
       ProposalType.Text,
-      GovernorProxyContracts.TextProposalStringId
+      Contracts.Governor.TextProposal.ProxyId
     );
     const contractUpgradeEventsResults = fetchContractProposalEvents(
       ProposalType.ContractUpgrade,
-      GovernorProxyContracts.ContractUpgradeStringId
+      Contracts.Governor.ContractUpgrade.ProxyId
     );
     const proposalEventsResults = await Promise.allSettled([
       tokenTransferEventsResults,

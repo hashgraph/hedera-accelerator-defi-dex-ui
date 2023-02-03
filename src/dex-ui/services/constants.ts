@@ -1,4 +1,51 @@
-import { ContractId } from "@hashgraph/sdk";
+import contractsUAT from "./contractsUAT.json";
+
+interface ContractMetaData {
+  name: string;
+  id: string;
+  address: string;
+  timestamp: string;
+  hash: string;
+  transparentProxyAddress: string;
+  transparentProxyId: string;
+}
+
+enum ContractNames {
+  Factory = "factory",
+  GodHolder = "godholder",
+  Value = "vault",
+  Splitter = "splitter",
+  Pair = "pair",
+  LPToken = "lptoken",
+  GovernorContractUpgrade = "governorupgrade",
+  GovernorTransferToken = "governortransfertoken",
+  GovernorTextProposal = "governortextproposal",
+  GovernorCreateToken = "governortokencreate",
+}
+
+function getProxyId(contractName: ContractNames): string {
+  return contractsUAT.find((contract: ContractMetaData) => contract.name === contractName)?.transparentProxyId ?? "";
+}
+
+export const Contracts = {
+  Factory: {
+    ProxyId: getProxyId(ContractNames.Factory),
+  },
+  Governor: {
+    ContractUpgrade: {
+      ProxyId: getProxyId(ContractNames.GovernorContractUpgrade),
+    },
+    TransferToken: {
+      ProxyId: getProxyId(ContractNames.GovernorTransferToken),
+    },
+    TextProposal: {
+      ProxyId: getProxyId(ContractNames.GovernorTextProposal),
+    },
+    CreateToken: {
+      ProxyId: getProxyId(ContractNames.GovernorCreateToken),
+    },
+  },
+};
 
 /** The "hashconnectData" is the string used by the hashconnect lib to modify localStorage */
 export const WALLET_LOCAL_DATA_KEY = "hashconnectData";
@@ -17,8 +64,6 @@ export const TOKEN_USER_ID = "0.0.8255";
 
 export const TOKEN_USER_KEY = "0bf5b9ac3f3066f6046a778409891e9f2081c349b4cf8688d29023312cc2d632";
 
-export const FactoryContractId = "0.0.8993";
-
 export const DEX_TOKEN_PRECISION_VALUE = 8;
 
 export const Tokens = Object.freeze({
@@ -36,17 +81,6 @@ export const PAIR_TOKEN_SYMBOL = "L49";
 export const A_B_PAIR_TOKEN_ID = "0.0.48769790";
 
 export const USDC_TOKEN_ID = "0.0.2276691";
-
-export const GovernorProxyContracts = Object.freeze({
-  ContractUpgradeStringId: "0.0.9049",
-  ContractUpgradeContractId: ContractId.fromString("0.0.9049"),
-  TransferTokenStringId: "0.0.9063",
-  TransferTokenContractId: ContractId.fromString("0.0.9063"),
-  TextProposalStringId: "0.0.9081",
-  TextProposalContractId: ContractId.fromString("0.0.9081"),
-  CreateTokenStringId: "0.0.9102",
-  CreateTokenContractId: ContractId.fromString("0.0.9102"),
-});
 
 export const GovernanceTokenId = "0.0.8576";
 export const HBARTokenId = "0.0.8578";

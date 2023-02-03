@@ -11,6 +11,7 @@ export function RadioCard(props: any) {
       <input {...input} />
       <Box
         {...checkbox}
+        height="100%"
         cursor="pointer"
         borderWidth="1px"
         borderRadius="md"

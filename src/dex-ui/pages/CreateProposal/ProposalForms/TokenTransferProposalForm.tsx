@@ -115,9 +115,9 @@ export function TokenTransferProposalForm(): ReactElement {
             <FormErrorMessage>{errors.tokenToTransfer && errors.tokenToTransfer.message}</FormErrorMessage>
           </FormControl>
           <FormControl isInvalid={Boolean(errors.amountToTransfer)}>
-            {/** NOTE: This may be replaced with the TokenAmountInput in future iterations. */}
             <Input
               type="number"
+              step="any"
               variant="form-input"
               id="amountToTransfer"
               placeholder="Amount to Transfer"
