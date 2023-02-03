@@ -67,14 +67,9 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
 
   const [isConfirmAddLiquidityDialogOpen, setIsConfirmAddLiquidityDialogOpen] = useState(false);
 
-  const selectedPair = {
-    selectedPairId: formValues.firstToken.tokenMeta.pairAccountId,
-    selectedAToBRoute: `${formValues.firstToken.tokenMeta.tokenId}=>${formValues.secondToken.tokenMeta.tokenId}`,
-    selectedBToARoute: `${formValues.secondToken.tokenMeta.tokenId}=>${formValues.firstToken.tokenMeta.tokenId}`,
-  };
-
+  const selectedPairContractId = formValues.firstToken.tokenMeta.pairAccountId ?? "";
   usePoolsData(REFRESH_INTERVAL);
-  useSwapData(selectedPair, REFRESH_INTERVAL);
+  useSwapData(selectedPairContractId, REFRESH_INTERVAL);
 
   const isSubmitButtonDisabled =
     isEmpty(formValues.firstToken.displayAmount) ||

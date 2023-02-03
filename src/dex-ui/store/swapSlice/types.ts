@@ -67,10 +67,10 @@ interface SwapState {
 
 interface SwapActions {
   getPrecision: (selectedAccountId: string) => Promise<void>;
-  fetchSpotPrices: (selectedAccountId: string, selectedAToBRoute: string, selectedBToARoute: string) => Promise<void>;
+  fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
   fetchFee: (selectedAccountId: string) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
-  sendSwapTransaction: (tokenToTrade: Token) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
 }
 

@@ -3,6 +3,7 @@ import { Select } from "@chakra-ui/react";
 import { Token } from "../../TokenInput/types";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { ArrowDropDownIcon } from "../";
+import { isEmpty } from "ramda";
 
 interface TokenSelectorProps {
   /* The unique Account ID of the token */
@@ -17,7 +18,7 @@ const TokenSelector = (props: TokenSelectorProps) => {
   return cloneElement(
     <Select
       variant="tokenSymbolSelector"
-      value={value}
+      value={isEmpty(value) ? undefined : value}
       placeholder="Select Token"
       icon={<ArrowDropDownIcon />}
       {...props.selectControls}

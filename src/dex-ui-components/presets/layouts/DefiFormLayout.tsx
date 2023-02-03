@@ -17,6 +17,7 @@ interface DefiFormLayoutProps {
   notification: React.ReactNode;
   formInputs: React.ReactNode[];
   metrics: React.ReactNode[];
+  actionButtonNotifications?: React.ReactNode;
   actionButtons: React.ReactNode;
 }
 
@@ -54,6 +55,9 @@ export function DefiFormLayout(props: DefiFormLayoutProps) {
             </GridItem>
           ))}
         </Grid>
+      </GridItem>
+      <GridItem marginBottom={props.actionButtonNotifications ? gridGap : 0} colSpan={2}>
+        {props.actionButtonNotifications}
       </GridItem>
       <GridItem colSpan={2}>
         <Flex direction="column" alignItems="stretch">
