@@ -93,7 +93,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
             <PopoverArrow />
             <PopoverBody width="100%">
               <HStack width="100%">
-                <VStack wrap={"initial"}>
+                <VStack>
                   <Text textStyle="b3">Yes</Text>
                   <Text textStyle="h2">{proposal.votes.yes}</Text>
                 </VStack>
