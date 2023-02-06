@@ -64,7 +64,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
           </VStack>
         </Box>
         <Popover
-          triggerType={"hover"}
+          triggerType="hover"
           data={[
             { value: proposal.votes.yes ?? 0, label: "Yes" },
             { value: proposal.votes.no ?? 0, label: "No" },
