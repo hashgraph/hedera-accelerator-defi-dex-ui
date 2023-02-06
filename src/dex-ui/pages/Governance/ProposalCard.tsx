@@ -64,11 +64,11 @@ export const ProposalCard = (props: ProposalCardProps) => {
         </Box>
         <Box flex="4" margin="auto 1rem auto 0">
           <HorizontalStackBarChart
-            quorum={Number(proposal.votes.quorum)}
+            quorum={proposal.votes.quorum}
             data={[
-              { value: proposal.votes.yes ?? 0, bg: Color.Green_01 },
-              { value: proposal.votes.no ?? 0, bg: Color.Red_01 },
-              { value: proposal.votes.abstain ?? 0, bg: Color.Blue_02 },
+              { value: proposal.votes.yes ?? 0, bg: Color.Blue_01 },
+              { value: proposal.votes.no ?? 0, bg: "#DF5656" },
+              { value: proposal.votes.abstain ?? 0, bg: "#757575" },
               { value: proposal.votes.remaining ?? 0, bg: Color.Grey_01 },
             ]}
           />

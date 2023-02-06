@@ -10,3 +10,4 @@ export * from "./TextIcon";
 export * from "./TrendingUpIcon";
 export * from "./WalletIcon";
 export * from "./TokenIcon";
+export * from "./CircleMinusIcon";

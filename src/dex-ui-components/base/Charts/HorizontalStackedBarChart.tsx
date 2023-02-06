@@ -33,6 +33,7 @@ const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => 
         direction="column"
         alignItems="center"
         transform="translateY(-22px)"
+        width="0px"
       >
         <Box bg={Color.Black_01} padding="0.125rem 0.25rem">
           <Text textStyle="h4" color={Color.White_01}>

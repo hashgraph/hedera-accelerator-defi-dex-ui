@@ -2,7 +2,7 @@ import axios from "axios";
 import Web3 from "web3";
 import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
-import { Contracts } from "../constants";
+import { Contracts, DEX_TOKEN_PRECISION_VALUE } from "../constants";
 import {
   MirrorNodeTokenByIdResponse,
   MirrorNodeAccountBalance,
@@ -144,8 +144,7 @@ function createMirrorNodeService() {
     return {
       account: accountId,
       tokens: tokenBalances,
-      // TODO: To check with team and it can be shift in UI layer.
-      balance: BigNumber(account.balance).shiftedBy(-Number(8)),
+      balance: BigNumber(account.balance).shiftedBy(-Number(DEX_TOKEN_PRECISION_VALUE)),
     };
   };
 

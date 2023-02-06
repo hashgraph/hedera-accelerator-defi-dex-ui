@@ -1,9 +1,8 @@
-import { chakra, Circle, Flex, Grid, GridItem, Text, VStack } from "@chakra-ui/react";
-
+import { chakra, Grid, GridItem, HStack, Spacer, Text } from "@chakra-ui/react";
 interface Metric {
   label: string;
   value: number;
-  color: string;
+  icon?: React.ReactNode;
 }
 
 interface MetricsProps {
@@ -14,16 +13,23 @@ interface MetricsProps {
 const MetricsBase = (props: MetricsProps) => {
   const { data, rows } = props;
   return (
-    <Grid templateColumns={`repeat(${data.length}, 1fr)`} gap="4">
+    <Grid templateColumns={`repeat(${data.length}, 1fr)`} gap="5">
       {data.map((metric, index) => (
         <GridItem key={index} colSpan={rows}>
-          <Flex gap="2">
-            <Circle size="1em" bg={metric.color} />
-            <VStack alignItems="left">
-              <Text textStyle="h4">{metric.label}</Text>
-              <Text textStyle="h2">{metric.value}</Text>
-            </VStack>
-          </Flex>
+          <HStack width="100%">
+            {metric.icon ? (
+              <>
+                <HStack gap="1">
+                  {metric.icon}
+                  <Text textStyle="b4">{metric.label}</Text>
+                </HStack>
+              </>
+            ) : (
+              <Text textStyle="b4">{metric.label}</Text>
+            )}
+            <Spacer />
+            <Text textStyle="b1">{metric.value}</Text>
+          </HStack>
         </GridItem>
       ))}
     </Grid>

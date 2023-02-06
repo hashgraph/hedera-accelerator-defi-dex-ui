@@ -1,14 +1,12 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId } from "@hashgraph/sdk";
-import { DexService, MirrorNodeDecodedProposalEvent } from "..";
+import { DexService, GovernanceTokenId, MirrorNodeDecodedProposalEvent } from "..";
 import { ContractProposalState, Proposal, ProposalState, ProposalType } from "../../store/governanceSlice";
 import { ProposalVotes } from "../JsonRpcService/Governor";
 import { isNil } from "ramda";
 import { getStatus } from "../../store/governanceSlice/utils";
 
 type DexServiceType = ReturnType<typeof createDexService>;
-
-const TOTAL_GOD_TOKEN_SUPPLY = BigNumber(100);
 
 const getTimeRemaining = (startBlock: string, endBlock: string): BigNumber => {
   /** Each Blocktime is about 12 secs long */
@@ -38,7 +36,10 @@ function createDexService() {
 
   type ProposalEventsWithDetails = MirrorNodeDecodedProposalEvent & ProposalEventDetails;
 
-  const convertEventToProposal = (proposalEvent: ProposalEventsWithDetails): Proposal => {
+  const convertEventToProposal = (
+    proposalEvent: ProposalEventsWithDetails,
+    totalGodTokenSupply: Long | null
+  ): Proposal => {
     const proposalState = proposalEvent.state
       ? (ContractProposalState[proposalEvent.state?.toNumber()] as keyof typeof ContractProposalState)
       : undefined;
@@ -65,7 +66,7 @@ function createDexService() {
         no: proposalEvent.votes.againstVotes,
         abstain: proposalEvent.votes.abstainVotes,
         quorum: proposalEvent.quorum,
-        max: TOTAL_GOD_TOKEN_SUPPLY,
+        max: !isNil(totalGodTokenSupply) ? new BigNumber(totalGodTokenSupply.toString()) : BigNumber(0),
       },
     };
   };
@@ -97,7 +98,10 @@ function createDexService() {
   const fetchAllProposals = async (): Promise<Proposal[]> => {
     const proposalEvents = await DexService.fetchAllProposalEvents();
     const proposalEventsWithDetails = await fetchAllProposalDetails(proposalEvents);
-    const proposals = proposalEventsWithDetails.map(convertEventToProposal);
+    const totalGodTokenSupply = await DexService.fetchTokenData(GovernanceTokenId);
+    const proposals = proposalEventsWithDetails.map((event) => {
+      return convertEventToProposal(event, totalGodTokenSupply.data.total_supply);
+    });
     return proposals;
   };
 
