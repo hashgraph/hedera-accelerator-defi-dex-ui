@@ -15,8 +15,8 @@ export const formatProposal = (proposal: Proposal): FormattedProposal => {
     votes.yes?.shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber(),
     votes.no?.shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber(),
     votes.abstain?.shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber(),
-    votes.quorum?.toNumber(),
-    votes.max?.toNumber(),
+    votes.quorum?.shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber(),
+    votes.max?.shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber(),
   ];
   return {
     id: id.toString(),
@@ -34,7 +34,7 @@ export const formatProposal = (proposal: Proposal): FormattedProposal => {
       yes,
       no,
       abstain,
-      quorum,
+      quorum: (Number(quorum) / Number(max)) * 100,
       remaining: Number(max) - (Number(yes) + Number(no) + Number(abstain)),
       max,
     },

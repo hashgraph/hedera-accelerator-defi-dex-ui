@@ -21,6 +21,9 @@ import { isNil } from "ramda";
 import { Link as ReachLink, useParams } from "react-router-dom";
 import {
   Color,
+  CompletedStepIcon,
+  CancelledStepIcon,
+  CircleMinusIcon,
   HorizontalStackBarChart,
   LoadingDialog,
   Metrics,
@@ -174,39 +177,53 @@ export const ProposalDetails = () => {
             <Card
               bg={Color.White_01}
               border={`0.25px solid ${Color.Grey_01}`}
+              boxShadow={"0px 4px 15px rgba(0, 0, 0, 0.15)"}
               borderRadius="2px"
-              padding="0.75rem"
-              boxShadow="none"
+              alignContent="center"
             >
-              <Flex direction="column" gap="4">
-                <Text textStyle="h3">Votes</Text>
-                <Spacer padding="0.5rem 0" />
-                <HorizontalStackBarChart
-                  quorum={Number(proposal.data?.votes.quorum)}
-                  data={[
-                    { value: proposal.data?.votes.yes ?? 0, bg: Color.Green_01 },
-                    { value: proposal.data?.votes.no ?? 0, bg: Color.Red_01 },
-                    { value: proposal.data?.votes.abstain ?? 0, bg: Color.Blue_02 },
-                    { value: proposal.data?.votes.remaining ?? 0, bg: Color.Grey_01 },
-                  ]}
-                />
-                {Number(proposal.data?.votes.yes) < Number(proposal.data?.votes.quorum) ? (
-                  <Text textStyle="h4">Quorum Not Met</Text>
-                ) : (
-                  <></>
-                )}
-                <Box width="90%">
-                  <Metrics
-                    rows={2}
-                    data={[
-                      { label: "Yes", value: proposal.data?.votes.yes ?? 0, color: Color.Green_01 },
-                      { label: "No", value: proposal.data?.votes.no ?? 0, color: Color.Red_01 },
-                      { label: "Abstain", value: proposal.data?.votes.abstain ?? 0, color: Color.Blue_02 },
-                      { label: "Remain", value: proposal.data?.votes.remaining ?? 0, color: Color.Grey_01 },
-                    ]}
-                  />
-                </Box>
-              </Flex>
+              <CardBody>
+                <Flex direction="column" gap="7">
+                  <Text textStyle="h3">Votes</Text>
+                  <Flex padding="0.8rem" direction="column" gap="4">
+                    <HorizontalStackBarChart
+                      quorum={proposal.data?.votes.quorum}
+                      data={[
+                        { value: proposal.data?.votes.yes ?? 0, bg: Color.Blue_01 },
+                        { value: proposal.data?.votes.no ?? 0, bg: "#DF5656" },
+                        { value: proposal.data?.votes.abstain ?? 0, bg: "#757575" },
+                        { value: proposal.data?.votes.remaining ?? 0, bg: Color.Grey_01 },
+                      ]}
+                    />
+                    {Number(proposal.data?.votes.yes) < Number(proposal.data?.votes.quorum) ? (
+                      <Text textStyle="h4">Quorum Not Met</Text>
+                    ) : (
+                      <></>
+                    )}
+                    <Box width="100%">
+                      <Metrics
+                        rows={4}
+                        data={[
+                          {
+                            label: "Yes",
+                            value: proposal.data?.votes.yes ?? 0,
+                            icon: <CompletedStepIcon />,
+                          },
+                          {
+                            label: "No",
+                            value: proposal.data?.votes.no ?? 0,
+                            icon: <CancelledStepIcon fill={"#DF5656"} />,
+                          },
+                          {
+                            label: "Abstain",
+                            value: proposal.data?.votes.abstain ?? 0,
+                            icon: <CircleMinusIcon fill={Color.Black_01} fillOpacity="0.54" />,
+                          },
+                        ]}
+                      />
+                    </Box>
+                  </Flex>
+                </Flex>
+              </CardBody>
             </Card>
           </Flex>
         </GridItem>
