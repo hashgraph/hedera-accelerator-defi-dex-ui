@@ -9,7 +9,6 @@ import {
   PopoverContent,
   PopoverBody,
   PopoverTrigger,
-  PopoverArrow,
   HStack,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -89,27 +88,31 @@ export const ProposalCard = (props: ProposalCardProps) => {
               />
             </Box>
           </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverBody width="100%">
-              <HStack width="100%">
+          <PopoverContent width="100%" border="hidden">
+            <PopoverBody
+              width="fit-content"
+              background={Color.White_01}
+              border={`0.25px solid ${Color.Grey_01}`}
+              boxShadow={"0px 4px 15px rgba(0, 0, 0, 0.15)"}
+            >
+              <HStack>
                 <VStack>
-                  <Text textStyle="b3">Yes</Text>
+                  <Text textStyle="h4">Yes</Text>
                   <Text textStyle="h2">{proposal.votes.yes}</Text>
                 </VStack>
                 <Spacer />
                 <VStack>
-                  <Text textStyle="b3">No</Text>
+                  <Text textStyle="h4">No</Text>
                   <Text textStyle="h2">{proposal.votes.no}</Text>
                 </VStack>
                 <Spacer />
                 <VStack>
-                  <Text textStyle="b3">Abstain</Text>
+                  <Text textStyle="h4">Abstain</Text>
                   <Text textStyle="h2">{proposal.votes.abstain}</Text>
                 </VStack>
                 <Spacer />
                 <VStack>
-                  <Text textStyle="b3">Remaining</Text>
+                  <Text textStyle="h4">Remaining</Text>
                   <Text textStyle="h2">{proposal.votes.remaining}</Text>
                 </VStack>
               </HStack>
