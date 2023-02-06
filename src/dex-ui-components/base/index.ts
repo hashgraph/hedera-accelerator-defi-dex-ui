@@ -13,3 +13,4 @@ export * from "./Tabs";
 export * from "./Pagination";
 export * from "./Icons";
 export * from "./Tooltip";
+export * from "./Popover";
