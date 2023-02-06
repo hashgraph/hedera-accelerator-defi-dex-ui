@@ -1,4 +1,17 @@
-import { Text, Box, Flex, Spacer, VStack, Tag } from "@chakra-ui/react";
+import {
+  Text,
+  Box,
+  Flex,
+  Spacer,
+  VStack,
+  Tag,
+  Popover,
+  PopoverContent,
+  PopoverBody,
+  PopoverTrigger,
+  PopoverArrow,
+  HStack,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { Card, HorizontalStackBarChart } from "../../../dex-ui-components";
 import { Color } from "../../../dex-ui-components/themes";
@@ -62,17 +75,47 @@ export const ProposalCard = (props: ProposalCardProps) => {
             </Text>
           </VStack>
         </Box>
-        <Box flex="4" margin="auto 1rem auto 0">
-          <HorizontalStackBarChart
-            quorum={proposal.votes.quorum}
-            data={[
-              { value: proposal.votes.yes ?? 0, bg: Color.Blue_01 },
-              { value: proposal.votes.no ?? 0, bg: "#DF5656" },
-              { value: proposal.votes.abstain ?? 0, bg: "#757575" },
-              { value: proposal.votes.remaining ?? 0, bg: Color.Grey_01 },
-            ]}
-          />
-        </Box>
+        <Popover trigger="hover">
+          <PopoverTrigger>
+            <Box flex="4" margin="auto 1rem auto 0">
+              <HorizontalStackBarChart
+                quorum={proposal.votes.quorum}
+                data={[
+                  { value: proposal.votes.yes ?? 0, bg: Color.Blue_01 },
+                  { value: proposal.votes.no ?? 0, bg: "#DF5656" },
+                  { value: proposal.votes.abstain ?? 0, bg: "#757575" },
+                  { value: proposal.votes.remaining ?? 0, bg: Color.Grey_01 },
+                ]}
+              />
+            </Box>
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverArrow />
+            <PopoverBody width="100%">
+              <HStack width="100%">
+                <VStack wrap={"initial"}>
+                  <Text textStyle="b3">Yes</Text>
+                  <Text textStyle="h2">{proposal.votes.yes}</Text>
+                </VStack>
+                <Spacer />
+                <VStack>
+                  <Text textStyle="b3">No</Text>
+                  <Text textStyle="h2">{proposal.votes.no}</Text>
+                </VStack>
+                <Spacer />
+                <VStack>
+                  <Text textStyle="b3">Abstain</Text>
+                  <Text textStyle="h2">{proposal.votes.abstain}</Text>
+                </VStack>
+                <Spacer />
+                <VStack>
+                  <Text textStyle="b3">Remaining</Text>
+                  <Text textStyle="h2">{proposal.votes.remaining}</Text>
+                </VStack>
+              </HStack>
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
       </Flex>
     </Card>
   );
