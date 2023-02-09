@@ -28,15 +28,15 @@ import {
   getTokenBalance,
   getTokensByUniqueAccountIds,
 } from "../utils";
-import { InitialTokenState } from "../constants";
+import { InitialTokenState, TransactionDeadline } from "../constants";
 import { InitialSwapFormState } from "./constants";
 import { isEmpty, isNil } from "ramda";
 import { useSwapData } from "../../../dex-ui/hooks";
 import { REFRESH_INTERVAL } from "../../../dex-ui/hooks/constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
+import { convertNumberOfMinsToSeconds, DefaultPercent } from "../../../dex-ui/utils";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
-
 interface SwapTokensFormProps {
   fee: string;
   isLoading: boolean;
@@ -46,7 +46,7 @@ interface SwapTokensFormProps {
   poolLiquidity: Record<string, number | undefined>;
   transactionState: TransactionState;
   connectionStatus: HashConnectConnectionState;
-  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
   fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
   connectToWallet: () => void;
@@ -74,14 +74,33 @@ export function SwapTokensForm(props: SwapTokensFormProps) {
 
   const selectedPairContractId = formValues.tokenToReceive.tokenMeta.pairAccountId ?? "";
   useSwapData(selectedPairContractId, REFRESH_INTERVAL);
-  const formSettings = useFormSettings({ initialSlippage: formValues.slippage });
+  const formSettings = useFormSettings({
+    initialSlippage: formValues.slippage,
+    initialTransactionDeadline: formValues.transactionDeadline,
+  });
 
   const successMessage = `Swapped
   ${formValues.tokenToTrade.amount.toFixed(8)} 
   ${formValues.tokenToTrade.symbol}
 for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.symbol}`;
 
+  function createTransactionDeadlineErrorMessage(transactionDeadline: number): string {
+    if (transactionDeadline <= TransactionDeadline.Min) {
+      return "Transaction deadline must be greater than 0 minutes.";
+    }
+    if (transactionDeadline > TransactionDeadline.Max) {
+      return "Transaction deadline is over the maximum allowed time limit (3 minutes).";
+    }
+    return "";
+  }
+
+  const transactionDeadlineErrorMessage = createTransactionDeadlineErrorMessage(formValues.transactionDeadline);
+  const priceImpactErrorMessage = "The price impact is over the set slippage tolerance.";
+
   const notification = useNotification({ successMessage, transactionState: props.transactionState });
+
+  const formattedSlippage =
+    formSettings.slippage > 0 ? `${Number(formSettings.slippage)?.toFixed(2)}%` : DefaultPercent;
 
   const spotPrice = getSpotPrice({
     spotPrices: props.spotPrices,
@@ -102,13 +121,17 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
   });
 
   const isUserSetSlippageBreached = priceImpact > formSettings.slippage;
+  const isTransactionDeadlineValid =
+    formSettings.transactionDeadline > TransactionDeadline.Min &&
+    formSettings.transactionDeadline <= TransactionDeadline.Max;
 
   const isSubmitButtonDisabled =
     isEmpty(formValues.tokenToTrade.displayAmount) ||
     isNil(formValues.tokenToTrade.symbol) ||
     isEmpty(formValues.tokenToReceive.displayAmount) ||
     isNil(formValues.tokenToReceive.symbol) ||
-    isUserSetSlippageBreached;
+    isUserSetSlippageBreached ||
+    !isTransactionDeadlineValid;
 
   const exchangeRate = getExchangeRateDisplay({
     spotPrice,
@@ -183,7 +206,8 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
       console.error("Token types must be selected to Swap tokens.");
       return;
     }
-    props.sendSwapTransaction(data.tokenToTrade, data.slippage);
+    const transactionDeadlineInSeconds = convertNumberOfMinsToSeconds(data.transactionDeadline);
+    props.sendSwapTransaction(data.tokenToTrade, data.slippage, transactionDeadlineInSeconds);
   }
 
   /* TODO: Remove after swap queries are replaced with React Query */
@@ -272,8 +296,8 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
         title={<Text textStyle="h2">{title}</Text>}
         settingsButton={
           <SettingsButton
-            isError={isUserSetSlippageBreached}
-            slippage={formSettings.slippage}
+            isError={isUserSetSlippageBreached || !isTransactionDeadlineValid}
+            display={formattedSlippage}
             onClick={formSettings.handleSettingsButtonClicked}
           />
         }
@@ -295,6 +319,7 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
           <FormSettings
             isSlippageBreached={isUserSetSlippageBreached}
             isSettingsOpen={formSettings.isSettingsOpen}
+            isTransactionDeadlineValid={isTransactionDeadlineValid}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
             register={swapTokensForm.register}
@@ -339,15 +364,14 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
           <MetricLabel label="Price Impact" value={`${priceImpact.toFixed(2)}%`} isLoading={props.isLoading} />,
           <MetricLabel label="Exchange Rate" value={exchangeRate} isLoading={props.isLoading} />,
         ]}
-        actionButtonNotifications={
-          isUserSetSlippageBreached && (
-            <Notification
-              type={NotficationTypes.ERROR}
-              textStyle="b3"
-              message="The price impact is over the set slippage tolerance."
-            />
-          )
-        }
+        actionButtonNotifications={[
+          !isTransactionDeadlineValid ? (
+            <Notification type={NotficationTypes.ERROR} textStyle="b3" message={transactionDeadlineErrorMessage} />
+          ) : null,
+          isUserSetSlippageBreached ? (
+            <Notification type={NotficationTypes.ERROR} textStyle="b3" message={priceImpactErrorMessage} />
+          ) : null,
+        ].filter((notification: React.ReactNode) => !isNil(notification))}
         actionButtons={
           isWalletPaired ? (
             <SwapConfirmation

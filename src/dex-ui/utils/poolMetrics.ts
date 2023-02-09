@@ -31,8 +31,7 @@ const getTransactionsFromLast24Hours = (transactions: MirrorNodeTransaction[]) =
  * @returns The balance for the token with an ID equal to the tokenId.
  */
 const getTokenBalance = (tokenBalances: MirrorNodeAccountBalance, tokenId: string) => {
-  const hbarToken = tokenBalances.tokens.find((token) => token.token_id === HBARTokenId);
-  return hbarToken
+  return isHbarToken(tokenId)
     ? tokenBalances.balance
     : tokenBalances?.tokens?.find((tokenBalance) => tokenBalance.token_id === tokenId)?.balance;
 };

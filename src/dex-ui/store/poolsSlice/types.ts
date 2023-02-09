@@ -18,9 +18,6 @@ enum PoolsActionType {
   SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED = "pools/SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED",
   RESET_WITHDRAW_STATE = "pools/RESET_WITHDRAW_STATE",
   RESET_ADD_LIQUIDITY_STATE = "pools/RESET_ADD_LIQUIDITY_STATE",
-  FETCH_SPOT_PRICES_STARTED = "pools/FETCH_SPOT_PRICES_STARTED",
-  FETCH_SPOT_PRICES_SUCCEEDED = "pools/FETCH_SPOT_PRICES_SUCCEEDED",
-  FETCH_SPOT_PRICES_FAILED = "pools/FETCH_SPOT_PRICES_SUCCEEDED",
 }
 interface SendAddLiquidityTransactionParams {
   inputToken: {
@@ -34,6 +31,7 @@ interface SendAddLiquidityTransactionParams {
     address: string;
   };
   contractId: string;
+  transactionDeadline: number;
 }
 interface FetchSpotPriceParams {
   inputTokenAddress: string;
@@ -96,7 +94,6 @@ interface PoolsState {
   userTokenBalances: MirrorNodeAccountBalance | undefined;
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
-  spotPrices: Record<string, BigNumber | undefined>;
   withdrawState: WithdrawState;
   addLiquidityTransactionState: AddLiquidityState;
 }
@@ -111,7 +108,6 @@ interface PoolsActions {
   }: any) => Promise<void>;
   fetchAllPoolMetrics: () => Promise<void>;
   fetchUserPoolMetrics: (userAccountId: string) => Promise<void>;
-  fetchSpotPrices: ({ inputTokenAddress, outputTokenAddress, pairAccountId }: any) => Promise<void>;
   sendRemoveLiquidityTransaction: (
     lpTokenSymbol: string,
     lpTokenAmount: number,

@@ -97,7 +97,8 @@ async function fetchFee(pairAccountId: string): Promise<BigNumber> {
 async function fetchFeeWithPrecision(pairAccountId: string): Promise<BigNumber> {
   const fee = await fetchFee(pairAccountId);
   const feePrecision = await fetchFeePrecision(pairAccountId);
-  return fee.dividedBy(feePrecision);
+  /** NOTE: shiftedBy(-2) is added to return the fee as a numeric representation of a percentage value. */
+  return fee.dividedBy(feePrecision).shiftedBy(-2);
 }
 
 const PairContract = {

@@ -6,6 +6,7 @@ import { ChangeEvent } from "react";
 interface FormSettingsProps {
   isSlippageBreached?: boolean;
   isSettingsOpen: boolean;
+  isTransactionDeadlineValid?: boolean;
   handleSlippageChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   handleTransactionDeadlineChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   register: UseFormRegister<any>;
@@ -38,7 +39,11 @@ export function FormSettings(props: FormSettingsProps) {
   (less the fee) will be returned to you.`}
         isTooltipVisible={true}
         unit="min"
-        register={props.register("transactionDeadline", { onChange: props.handleTransactionDeadlineChanged })}
+        isError={!props.isTransactionDeadlineValid}
+        register={props.register("transactionDeadline", {
+          validate: () => props.isTransactionDeadlineValid,
+          onChange: props.handleTransactionDeadlineChanged,
+        })}
       />
     </DefiFormSettingsLayout>
   );
