@@ -9,7 +9,6 @@ import {
   SendAddLiquidityTransactionParams,
   TokenPair,
   Token,
-  FetchSpotPriceParams,
 } from "./types";
 import {
   DexService,
@@ -27,7 +26,6 @@ const initialPoolsStore: PoolsState = {
   userPoolsMetrics: [],
   poolTokenBalances: [],
   userTokenBalances: undefined,
-  spotPrices: {},
   status: "init",
   errorMessage: null,
   withdrawState: {
@@ -116,7 +114,12 @@ const getAllPoolBalanceFor = async (pair: TokenPair) => {
 const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
   return {
     ...initialPoolsStore,
-    sendAddLiquidityTransaction: async ({ inputToken, outputToken, contractId }: SendAddLiquidityTransactionParams) => {
+    sendAddLiquidityTransaction: async ({
+      inputToken,
+      outputToken,
+      contractId,
+      transactionDeadline,
+    }: SendAddLiquidityTransactionParams) => {
       const { wallet, app } = get();
       const { network } = get().context;
       app.setFeaturesAsLoading(["addLiquidityTransactionState"]);
@@ -159,6 +162,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           secondTokenQuantity,
           addLiquidityContractAddress,
           walletAddress,
+          transactionDeadline,
           HbarAmount,
           signer,
         });
@@ -263,7 +267,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const poolTokenBalances = await Promise.all(poolBalanceUrlRequest);
         const userPoolsMetrics = userLiquidityPoolTokensList?.map((userTokenPair: TokenPair) => {
           const fee = get().pools.allPoolsMetrics.find((pool) => {
-            return pool.name === `${userTokenPair.tokenA.symbol}${userTokenPair.tokenB.symbol}`;
+            return pool.name === `${userTokenPair.tokenA.symbol}-${userTokenPair.tokenB.symbol}`;
           })?.fee;
           const poolTokenBalance = poolTokenBalances.filter(
             (pair) => pair.account === userTokenPair.tokenA.tokenMeta.pairAccountId
@@ -297,44 +301,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
       app.setFeaturesAsLoaded(["userPoolsMetrics"]);
-    },
-    fetchSpotPrices: async ({ inputTokenAddress, outputTokenAddress, contractId }: FetchSpotPriceParams) => {
-      if (!inputTokenAddress || !outputTokenAddress || !contractId) {
-        return;
-      }
-      const { app, swap } = get();
-      set({}, false, PoolsActionType.FETCH_SPOT_PRICES_STARTED);
-      app.setFeaturesAsLoading(["spotPrices"]);
-      try {
-        const { precision } = swap;
-        if (precision === undefined) {
-          throw Error("Precision not found");
-        }
-        const spotPriceL49BToL49A = await DexService.fetchSpotPrice(contractId);
-        const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
-        const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
-        const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
-          ? spotPriceL49BToL49A.dividedBy(precision)
-          : undefined;
-        set(
-          ({ pools }) => {
-            pools.spotPrices[`${inputTokenAddress}=>${outputTokenAddress}`] = spotPriceL49AToL49BWithPrecision;
-            pools.spotPrices[`${outputTokenAddress}=>${inputTokenAddress}`] = spotPriceL49BToL49AWithPrecision;
-          },
-          false,
-          PoolsActionType.FETCH_SPOT_PRICES_SUCCEEDED
-        );
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        set(
-          ({ swap }) => {
-            swap.errorMessage = errorMessage;
-          },
-          false,
-          PoolsActionType.FETCH_SPOT_PRICES_FAILED
-        );
-      }
-      app.setFeaturesAsLoaded(["spotPrices"]);
     },
     sendRemoveLiquidityTransaction: async (
       lpTokenSymbol: string,

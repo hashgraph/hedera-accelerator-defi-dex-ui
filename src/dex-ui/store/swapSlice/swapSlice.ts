@@ -122,11 +122,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
     },
     /**
-     * Fetches the spot price for swapping L49A tokens for L49B tokens.
-     *
-     * TODO: This action should be updated to dynamically request spot prices based
-     * on two different token symbols. This requires an update to the Swap contract spot price
-     * function to support token symbol parameters.
+     * Fetches the spot price for from a pair contract to determine the
+     * exchange rates to and from Token A and Token B.
      */
     fetchSpotPrices: async (selectedAccountId: string) => {
       const { swap, app } = get();
@@ -259,7 +256,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
       app.setFeaturesAsLoaded(["poolLiquidity"]);
     },
-    sendSwapTransaction: async (tokenToTrade: Token, slippageTolerance: number) => {
+    sendSwapTransaction: async (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => {
       const { context, wallet, app, swap } = get();
       app.setFeaturesAsLoading(["transactionState"]);
       set(
@@ -304,6 +301,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           tokenToTradeAddress,
           tokenToTradeAmount,
           slippageTolerance: preciseSlippage,
+          transactionDeadline,
           HbarAmount,
           signer,
         });

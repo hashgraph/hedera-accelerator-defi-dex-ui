@@ -4,9 +4,10 @@ import {
   calculateUserPoolLiquidity,
   calculateVolume,
   calculatePercentOfPoolFromTotalSupply,
+  isHbarToken,
 } from "../../utils";
 import { Pool, UserPool, TokenPair } from "./types";
-import { MirrorNodeAccountBalance, MirrorNodeTransaction } from "../../services";
+import { MirrorNodeAccountBalance, MirrorNodeTokenBalance, MirrorNodeTransaction } from "../../services";
 
 interface CalculateUserPoolMetricsParams {
   /** Token balances for the liquidity pool. */
@@ -48,6 +49,25 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
   };
 };
 
+function getTokenDecimals(poolBalances: MirrorNodeAccountBalance, tokenAId: string, tokenBId: string): string {
+  const defaultDecimals = "0";
+  /**
+   * HBAR swap transactions are not appearing in the MirrorNode API transaction history calls. The current
+   * workaround is to use the tokenB balances to calculate pool metrics. There may be an alternative solution
+   * to read HBAR transactions from the API.
+   */
+  if (isHbarToken(tokenAId)) {
+    const tokenBBalance = poolBalances.tokens?.find(
+      (tokenBalance: MirrorNodeTokenBalance) => tokenBalance.token_id === tokenBId
+    );
+    return tokenBBalance?.decimals ?? defaultDecimals;
+  }
+  const tokenABalance = poolBalances.tokens?.find(
+    (tokenBalance: MirrorNodeTokenBalance) => tokenBalance.token_id === tokenAId
+  );
+  return tokenABalance?.decimals ?? defaultDecimals;
+}
+
 interface CalculatePoolMetricsParams {
   /** Account ID of a liquidity pool. */
   poolAccountId: string;
@@ -71,23 +91,23 @@ interface CalculatePoolMetricsParams {
 const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
   const { poolAccountId, poolTokenBalances, poolFee, last24Transactions, last7DTransactions, tokenPair } = params;
   const { tokenA, tokenB, pairToken } = tokenPair;
+  const tokenAId = tokenA.tokenMeta.tokenId ?? "";
+  const tokenBId = tokenB.tokenMeta.tokenId ?? "";
+  const tokenADecimals = getTokenDecimals(poolTokenBalances, tokenAId, tokenBId);
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
-    tokenAAccountId: tokenA.tokenMeta.tokenId ?? "",
-    tokenBAccountId: tokenB.tokenMeta.tokenId ?? "",
+    tokenAAccountId: tokenAId,
+    tokenBAccountId: tokenBId,
   });
-  const tokenADecimals =
-    poolTokenBalances.tokens?.find((tokenBalance) => tokenBalance.token_id === tokenA.tokenMeta.tokenId)?.decimals ??
-    "0";
   const past24HoursVolume = calculateVolume({
     poolAccountId,
-    tokenAccountId: tokenA.tokenMeta.tokenId ?? "",
+    tokenAccountId: isHbarToken(tokenAId) ? tokenBId : tokenAId,
     tokenDecimals: tokenADecimals,
     accountTransactions: last24Transactions,
   });
   const past7daysVolume = calculateVolume({
     poolAccountId,
-    tokenAccountId: tokenA.tokenMeta.tokenId ?? "",
+    tokenAccountId: isHbarToken(tokenAId) ? tokenBId : tokenAId,
     tokenDecimals: tokenADecimals,
     accountTransactions: last7DTransactions,
   });

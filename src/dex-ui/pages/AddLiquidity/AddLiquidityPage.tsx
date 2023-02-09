@@ -5,10 +5,10 @@ import { AddLiquidityForm } from "../../../dex-ui-components/presets/AddLiquidit
 
 export function AddLiquidityPage() {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
+  const { spotPrices, poolLiquidity } = swap;
   const { formattedSpotPrices } = formatSwapPageData({
-    spotPrices: pools.spotPrices,
-    poolLiquidity: swap.poolLiquidity,
-    fee: swap.fee,
+    spotPrices,
+    poolLiquidity,
   });
 
   const isFormLoading =
@@ -30,7 +30,7 @@ export function AddLiquidityPage() {
               transactionState={pools.addLiquidityTransactionState}
               connectionStatus={wallet.hashConnectConnectionState}
               connectToWallet={wallet.connectToWallet}
-              fetchSpotPrices={pools.fetchSpotPrices}
+              fetchSpotPrices={swap.fetchSpotPrices}
               sendAddLiquidityTransaction={pools.sendAddLiquidityTransaction}
               resetAddLiquidityState={pools.resetAddLiquidityState}
             />

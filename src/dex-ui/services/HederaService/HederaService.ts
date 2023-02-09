@@ -12,7 +12,7 @@ import {
   Hbar,
 } from "@hashgraph/sdk";
 import { Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../constants";
-import { AddLiquidityDetails, PairContractFunctions } from "./types";
+import { PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
 
@@ -47,36 +47,38 @@ function createHederaService() {
     return BigNumber(value).multipliedBy(_precision);
   };
 
-  const addLiquidity = async (addLiquidityDetails: AddLiquidityDetails): Promise<TransactionResponse> => {
-    const {
-      firstTokenAddress,
-      firstTokenQuantity,
-      secondTokenAddress,
-      secondTokenQuantity,
-      addLiquidityContractAddress,
-      walletAddress,
-      HbarAmount,
-      signer,
-    } = addLiquidityDetails;
+  interface AddLiquidityParams {
+    firstTokenAddress: string;
+    firstTokenQuantity: BigNumber;
+    secondTokenAddress: string;
+    secondTokenQuantity: BigNumber;
+    addLiquidityContractAddress: ContractId;
+    HbarAmount: BigNumber | number;
+    /** Duration the transaction is valid for in seconds. Default is 120 seconds. */
+    transactionDeadline: number;
+    walletAddress: string;
+    signer: HashConnectSigner;
+  }
 
+  async function addLiquidity(params: AddLiquidityParams): Promise<TransactionResponse> {
     const addLiquidityTransaction = await new ContractExecuteTransaction()
-      .setContractId(addLiquidityContractAddress)
+      .setContractId(params.addLiquidityContractAddress)
       .setGas(9000000)
       .setFunction(
         "addLiquidity",
         new ContractFunctionParameters()
-          .addAddress(walletAddress)
-          .addAddress(firstTokenAddress)
-          .addAddress(secondTokenAddress)
-          .addInt256(firstTokenQuantity)
-          .addInt256(secondTokenQuantity)
+          .addAddress(params.walletAddress)
+          .addAddress(params.firstTokenAddress)
+          .addAddress(params.secondTokenAddress)
+          .addInt256(params.firstTokenQuantity)
+          .addInt256(params.secondTokenQuantity)
       )
-      .setNodeAccountIds([new AccountId(3)])
-      .setPayableAmount(new Hbar(HbarAmount))
-      .freezeWithSigner(signer);
-    const transactionResponse = addLiquidityTransaction.executeWithSigner(signer);
+      .setPayableAmount(new Hbar(params.HbarAmount))
+      .setTransactionValidDuration(params.transactionDeadline)
+      .freezeWithSigner(params.signer);
+    const transactionResponse = addLiquidityTransaction.executeWithSigner(params.signer);
     return transactionResponse;
-  };
+  }
 
   const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, contractId: ContractId) => {
     const accountId = signer.getAccountId().toSolidityAddress();
@@ -96,33 +98,28 @@ function createHederaService() {
     tokenToTradeAddress: string;
     tokenToTradeAmount: BigNumber;
     slippageTolerance: BigNumber;
+    /** Duration the transaction is valid for in seconds. Default is 120 seconds. */
+    transactionDeadline: number;
     HbarAmount: number;
     signer: HashConnectSigner;
   }
 
-  const swapToken = async ({
-    contractId,
-    walletAddress,
-    tokenToTradeAddress,
-    tokenToTradeAmount,
-    slippageTolerance,
-    HbarAmount,
-    signer,
-  }: SwapTokenParams): Promise<TransactionResponse> => {
+  async function swapToken(params: SwapTokenParams): Promise<TransactionResponse> {
     const contractFunctionParams = new ContractFunctionParameters()
-      .addAddress(walletAddress)
-      .addAddress(tokenToTradeAddress)
-      .addInt256(tokenToTradeAmount)
-      .addInt256(slippageTolerance);
+      .addAddress(params.walletAddress)
+      .addAddress(params.tokenToTradeAddress)
+      .addInt256(params.tokenToTradeAmount)
+      .addInt256(params.slippageTolerance);
     const swapTokenTransaction = await new ContractExecuteTransaction()
-      .setContractId(contractId)
+      .setContractId(params.contractId)
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
       .setGas(9000000)
-      .setPayableAmount(new Hbar(HbarAmount))
-      .freezeWithSigner(signer);
-    const swapTokenResponse = await swapTokenTransaction.executeWithSigner(signer);
+      .setPayableAmount(new Hbar(params.HbarAmount))
+      .setTransactionValidDuration(params.transactionDeadline)
+      .freezeWithSigner(params.signer);
+    const swapTokenResponse = await swapTokenTransaction.executeWithSigner(params.signer);
     return swapTokenResponse;
-  };
+  }
 
   const get1000L49ABCDTokens = async (
     receivingAccountId: string,
