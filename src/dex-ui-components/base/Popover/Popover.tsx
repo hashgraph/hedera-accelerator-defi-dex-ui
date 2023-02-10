@@ -10,22 +10,22 @@ import {
 } from "@chakra-ui/react";
 import { Color } from "../../themes";
 
-interface PopOverData {
+interface PopoverData {
   value: string | number;
   label?: string;
   labelTextStyle?: any;
   valueTextStyle?: any;
 }
 
-interface PopOverProps {
+interface PopoverProps {
   triggerBody: React.ReactNode;
   triggerType: "click" | "hover";
   triggerBodystyle?: any;
-  data: PopOverData[];
+  data: PopoverData[];
   children?: React.ReactNode;
 }
 
-const getPopOverDataBody = (data: PopOverData) => {
+const getPopoverDataBody = (data: PopoverData) => {
   return (
     <VStack>
       <Text textStyle="h4" style={{ ...data.labelTextStyle }}>
@@ -38,7 +38,7 @@ const getPopOverDataBody = (data: PopOverData) => {
   );
 };
 
-export function Popover(props: PopOverProps) {
+export function Popover(props: PopoverProps) {
   const { data, triggerBody, triggerType, triggerBodystyle } = props;
   return (
     <ChakraPopOver trigger={triggerType}>
@@ -53,7 +53,7 @@ export function Popover(props: PopOverProps) {
         >
           <HStack spacing={5}>
             {data.map((popOverdata) => {
-              return getPopOverDataBody(popOverdata);
+              return getPopoverDataBody(popOverdata);
             })}
           </HStack>
           <Spacer />
