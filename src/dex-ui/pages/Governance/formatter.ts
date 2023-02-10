@@ -19,9 +19,15 @@ export const formatProposal = (proposal: Proposal): FormattedProposal => {
     votes.max?.shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber(),
   ];
 
-  const quorum = votes.quorum?.div(votes.max ?? BigNumber(1)).multipliedBy(BigNumber(100)).toNumber();
+  const quorum = votes.quorum
+    ?.div(votes.max ?? BigNumber(1))
+    .multipliedBy(BigNumber(100))
+    .toNumber();
   const totalVotes = votes.yes?.plus(votes.no ?? BigNumber(0)).plus(votes.abstain ?? BigNumber(0));
-  const remaining = votes.max?.minus(totalVotes ?? BigNumber(0)).shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber();
+  const remaining = votes.max
+    ?.minus(totalVotes ?? BigNumber(0))
+    .shiftedBy(-DEX_TOKEN_PRECISION_VALUE)
+    .toNumber();
   return {
     id: id.toString(),
     contractId,
