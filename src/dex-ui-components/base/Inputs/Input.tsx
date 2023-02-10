@@ -15,7 +15,7 @@ interface InputProps<T extends string> {
 
 export function Input<T extends string>(props: InputProps<T>) {
   return (
-    <Box>
+    <Box width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
         <Text textStyle="h4">{props.label}</Text>
         {props.isTooltipVisible && <Tooltip label={props.tooltipLabel} />}

@@ -61,6 +61,17 @@ export const getPairedTokens = (tokenId: string, pairAccountId: string, tokenPai
   return pairedTokens;
 };
 
+/**
+ * @param tokenId - Token Account Id
+ * @param tokenPairs - - Array of token Pairs
+ */
+export const getUniqueTokensFromSelectedOne = (tokenId: string, tokenPairs: TokenPair[]): Token[] => {
+  const allTokens = tokenPairs.flatMap(({ tokenA, tokenB }: TokenPair) => [tokenA, tokenB]);
+  const remainingTokens = allTokens.filter((token) => token.tokenMeta.tokenId !== tokenId);
+  const uniqueTokens = uniqBy((token: Token) => token.tokenMeta.tokenId, remainingTokens);
+  return uniqueTokens;
+};
+
 export const getTokenData = (tokenId: string, tokenPairs: TokenPair[]) => {
   const token = tokenPairs
     ?.map((token) => {
@@ -156,6 +167,24 @@ export const getExchangeRateDisplay = ({
     return "--";
   }
   return `${spotPrice?.toFixed(5)} ${tokenToReceiveSymbol}`;
+};
+
+interface CreatePoolExchangeRateParams {
+  firstToken: TokenState | undefined;
+  secondToken: TokenState | undefined;
+}
+
+export const getCreatePoolExchangeRate = ({ firstToken, secondToken }: CreatePoolExchangeRateParams) => {
+  if (
+    isNil(firstToken?.displayAmount) ||
+    isNil(secondToken?.displayAmount) ||
+    isNil(firstToken?.symbol) ||
+    isNil(secondToken?.symbol)
+  ) {
+    return "--";
+  }
+  const exchangeRatio = Number(secondToken?.displayAmount) / Number(firstToken?.displayAmount);
+  return `1 ${firstToken?.symbol} = ${exchangeRatio} ${secondToken?.symbol}`;
 };
 
 /**

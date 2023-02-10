@@ -21,6 +21,21 @@ const tokenSymbolSelector = definePartsStyle({
   },
 });
 
+const inputSelector = definePartsStyle({
+  field: {
+    ...TextStyles.b1,
+    height: "45.52px",
+    padding: "0.5rem",
+    background: Color.White_01,
+    border: `1px solid ${Color.Grey_01}`,
+    borderRadius: 0,
+  },
+  icon: {
+    color: Color.Black_01,
+    fontSize: "0.5rem",
+  },
+});
+
 /**
  * Chakra UI styles and variants for the Hedera DEX Select components
  * and sub-component parts.
@@ -28,6 +43,6 @@ const tokenSymbolSelector = definePartsStyle({
 export const SelectStyles = defineMultiStyleConfig({
   baseStyle: {},
   sizes: {},
-  variants: { tokenSymbolSelector },
+  variants: { tokenSymbolSelector, inputSelector },
   defaultProps: {},
 });

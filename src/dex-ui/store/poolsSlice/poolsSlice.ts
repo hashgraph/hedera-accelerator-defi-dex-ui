@@ -10,6 +10,7 @@ import {
   TokenPair,
   Token,
   FetchSpotPriceParams,
+  SendCreatePoolTransactionParams,
 } from "./types";
 import {
   DexService,
@@ -37,6 +38,11 @@ const initialPoolsStore: PoolsState = {
   },
   /** Replace with React Query States */
   addLiquidityTransactionState: {
+    status: TransactionStatus.INIT,
+    successPayload: null,
+    errorMessage: "",
+  },
+  createPoolTransactionState: {
     status: TransactionStatus.INIT,
     successPayload: null,
     errorMessage: "",
@@ -196,6 +202,107 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         );
       }
       app.setFeaturesAsLoaded(["addLiquidityTransactionState"]);
+    },
+    sendCreatePoolTransaction: async ({ firstToken, secondToken, transactionFee }: SendCreatePoolTransactionParams) => {
+      const { wallet, app, pools } = get();
+      const { network } = get().context;
+      app.setFeaturesAsLoading(["createPoolTransactionState"]);
+      const firstTokenAddress = TokenId.fromString(firstToken.address).toSolidityAddress();
+      const secondTokenAddress = TokenId.fromString(secondToken.address).toSolidityAddress();
+      const firstTokenQuantity = isHbarToken(firstToken.address)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(firstToken.address, firstToken.qunatity);
+      const secondTokenQuantity = isHbarToken(secondToken.address)
+        ? BigNumber(0)
+        : wallet.getTokenAmountWithPrecision(secondToken.address, secondToken.qunatity);
+
+      const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
+      const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
+      const provider = DexService.getProvider(network, wallet.topicID, signingAccount);
+      const signer = DexService.getSigner(provider);
+
+      const tokenAHbarQty = isHbarToken(firstToken.address) ? firstToken.qunatity : 0.0;
+      const tokenBHbarQty = isHbarToken(secondToken.address) ? secondToken.qunatity : 0.0;
+      const HbarAmount = tokenAHbarQty + tokenBHbarQty;
+      try {
+        set(
+          ({ pools }) => {
+            pools.createPoolTransactionState = {
+              status: "in progress",
+              successPayload: null,
+              errorMessage: "",
+            };
+            pools.errorMessage = "";
+          },
+          false,
+          PoolsActionType.SEND_CREATE_POOL_TRANSACTION_TO_WALLET_STARTED
+        );
+        const doesPairAlreadyExist = pools.allPoolsMetrics.find((pool) => {
+          return (
+            pool.name === `${firstToken.symbol}-${secondToken.symbol}` ||
+            (pool.name === `${secondToken.symbol}-${firstToken.symbol}` &&
+              BigNumber(transactionFee).eq(pool.fee ?? BigNumber(0)))
+          );
+        });
+
+        if (doesPairAlreadyExist) {
+          throw new Error("Pool Already Exist");
+        }
+        await DexService.createPool({
+          firstTokenAddress,
+          secondTokenAddress,
+          transactionFee: BigNumber(transactionFee),
+          walletAddress,
+          signer,
+        });
+
+        const newPairAddress = await DexService.getPair(firstTokenAddress, secondTokenAddress, transactionFee);
+
+        const contractId = ContractId.fromSolidityAddress(newPairAddress);
+        const result = await DexService.addLiquidity({
+          firstTokenAddress,
+          firstTokenQuantity,
+          secondTokenAddress,
+          secondTokenQuantity,
+          addLiquidityContractAddress: contractId,
+          walletAddress,
+          HbarAmount,
+          signer,
+        });
+        if (result) {
+          set(
+            ({ pools }) => {
+              pools.createPoolTransactionState = {
+                status: "success",
+                successPayload: {
+                  transactionResponse: result,
+                },
+                errorMessage: "",
+              };
+              pools.errorMessage = "";
+            },
+            false,
+            PoolsActionType.SEND_CREATE_POOL_TRANSACTION_TO_WALLET_SUCCEEDED
+          );
+        } else {
+          throw new Error("Create Pool Transaction Execution Failed");
+        }
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        set(
+          ({ pools }) => {
+            pools.createPoolTransactionState = {
+              status: "error",
+              successPayload: null,
+              errorMessage: errorMessage,
+            };
+            pools.errorMessage = errorMessage;
+          },
+          false,
+          PoolsActionType.SEND_CREATE_POOL_TRANSACTION_TO_WALLET_FAILED
+        );
+      }
+      app.setFeaturesAsLoaded(["createPoolTransactionState"]);
     },
     fetchAllPoolMetrics: async () => {
       const { app } = get();
@@ -423,6 +530,16 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         },
         false,
         PoolsActionType.RESET_ADD_LIQUIDITY_STATE
+      );
+    },
+    resetCreatePoolState: async () => {
+      set(
+        ({ pools }) => {
+          pools.createPoolTransactionState = initialPoolsStore.createPoolTransactionState;
+          pools.errorMessage = "";
+        },
+        false,
+        PoolsActionType.RESET_CREATE_POOL_STATE
       );
     },
   };

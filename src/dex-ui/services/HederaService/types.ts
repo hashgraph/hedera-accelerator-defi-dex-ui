@@ -13,6 +13,7 @@ enum GovernorContractFunctions {
 
 enum PairContractFunctions {
   SwapToken = "swapToken",
+  CreatePair = "createPair",
 }
 
 interface AddLiquidityDetails {
@@ -22,6 +23,14 @@ interface AddLiquidityDetails {
   secondTokenQuantity: BigNumber;
   addLiquidityContractAddress: ContractId;
   HbarAmount: BigNumber | number;
+  walletAddress: string;
+  signer: HashConnectSigner;
+}
+
+interface CreatePoolDetails {
+  firstTokenAddress: string;
+  secondTokenAddress: string;
+  transactionFee: BigNumber;
   walletAddress: string;
   signer: HashConnectSigner;
 }
@@ -52,4 +61,4 @@ interface Token {
 }
 
 export { GovernorContractFunctions, PairContractFunctions };
-export type { AddLiquidityDetails, TokenPair, Token };
+export type { AddLiquidityDetails, CreatePoolDetails, TokenPair, Token };

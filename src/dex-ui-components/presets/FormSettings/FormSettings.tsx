@@ -5,6 +5,7 @@ import { ChangeEvent } from "react";
 
 interface FormSettingsProps {
   isSettingsOpen: boolean;
+  hideSlippageField?: boolean;
   handleSlippageChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   handleTransactionDeadlineChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   register: UseFormRegister<any>;
@@ -13,17 +14,20 @@ interface FormSettingsProps {
 export function FormSettings(props: FormSettingsProps) {
   return (
     <DefiFormSettingsLayout isSettingsOpen={props.isSettingsOpen}>
-      <Input<"slippage">
-        type="number"
-        step="any"
-        label="Slippage"
-        id="slippage"
-        tooltipLabel={`Slippage refers to the difference between the expected 
+      {!props.hideSlippageField ? (
+        <Input<"slippage">
+          type="number"
+          step="any"
+          label="Slippage"
+          id="slippage"
+          tooltipLabel={`Slippage refers to the difference between the expected 
   price of a trade and the price at which the trade is executed.`}
-        isTooltipVisible={true}
-        unit="%"
-        register={props.register("slippage", { onChange: props.handleSlippageChanged })}
-      />
+          isTooltipVisible={true}
+          unit="%"
+          register={props.register("slippage", { onChange: props.handleSlippageChanged })}
+        />
+      ) : undefined}
+
       <Input<"transactionDeadline">
         type="number"
         step="any"

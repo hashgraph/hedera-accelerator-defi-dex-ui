@@ -11,8 +11,8 @@ import {
   TransactionResponse,
   Hbar,
 } from "@hashgraph/sdk";
-import { Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID } from "../constants";
-import { AddLiquidityDetails, PairContractFunctions } from "./types";
+import { Contracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, TREASURY_ID } from "../constants";
+import { AddLiquidityDetails, CreatePoolDetails, PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
 
@@ -75,6 +75,29 @@ function createHederaService() {
       .setPayableAmount(new Hbar(HbarAmount))
       .freezeWithSigner(signer);
     const transactionResponse = addLiquidityTransaction.executeWithSigner(signer);
+    return transactionResponse;
+  };
+
+  const createPool = async (createPoolDetails: CreatePoolDetails): Promise<TransactionResponse> => {
+    const { firstTokenAddress, secondTokenAddress, transactionFee, signer } = createPoolDetails;
+
+    const factoryContractId = ContractId.fromString(Contracts.Factory.ProxyId);
+    const createPoolTransaction = await new ContractExecuteTransaction()
+      .setContractId(factoryContractId)
+      .setGas(9000000)
+      .setFunction(
+        PairContractFunctions.CreatePair,
+        new ContractFunctionParameters()
+          .addAddress(firstTokenAddress)
+          .addAddress(secondTokenAddress)
+          .addAddress(ContractId.fromString(TREASURY_ID).toSolidityAddress())
+          .addInt256(transactionFee)
+      )
+      .setMaxTransactionFee(new Hbar(100))
+      .setPayableAmount(new Hbar(100))
+      .setNodeAccountIds([new AccountId(3)])
+      .freezeWithSigner(signer);
+    const transactionResponse = createPoolTransaction.executeWithSigner(signer);
     return transactionResponse;
   };
 
@@ -177,6 +200,7 @@ function createHederaService() {
     swapToken,
     addLiquidity,
     removeLiquidity,
+    createPool,
     ...GovernorService,
   };
 }

@@ -5,3 +5,4 @@ export * from "./Withdraw";
 export * from "./Governance";
 export * from "./CreateProposal";
 export * from "./ProposalDetails";
+export * from "./CreatePool";
