@@ -189,8 +189,8 @@ export const ProposalDetails = () => {
                       quorum={proposal.data?.votes.quorum}
                       data={[
                         { value: proposal.data?.votes.yes ?? 0, bg: Color.Blue_01 },
-                        { value: proposal.data?.votes.no ?? 0, bg: "#DF5656" },
-                        { value: proposal.data?.votes.abstain ?? 0, bg: "#757575" },
+                        { value: proposal.data?.votes.no ?? 0, bg: Color.Red_03 },
+                        { value: proposal.data?.votes.abstain ?? 0, bg: Color.Grey_03 },
                         { value: proposal.data?.votes.remaining ?? 0, bg: Color.Grey_01 },
                       ]}
                     />
@@ -211,7 +211,7 @@ export const ProposalDetails = () => {
                           {
                             label: "No",
                             value: proposal.data?.votes.no ?? 0,
-                            icon: <CancelledStepIcon fill={"#DF5656"} />,
+                            icon: <CancelledStepIcon fill={Color.Red_03} />,
                           },
                           {
                             label: "Abstain",
