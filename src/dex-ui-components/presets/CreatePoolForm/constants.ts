@@ -6,7 +6,7 @@ export const InitialCreatePoolFormState: CreatePoolState = {
   firstToken: { ...InitialTokenState },
   secondToken: { ...InitialTokenState },
   transactionFee: 30,
-  transactionDeadline: 5,
+  transactionDeadline: 3,
 };
 
 export type CreatePoolStateFormData = {

@@ -4,8 +4,10 @@ import { UseFormRegister } from "react-hook-form";
 import { ChangeEvent } from "react";
 
 interface FormSettingsProps {
+  isSlippageBreached?: boolean;
+  hideSlippage?: boolean;
   isSettingsOpen: boolean;
-  hideSlippageField?: boolean;
+  isTransactionDeadlineValid?: boolean;
   handleSlippageChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   handleTransactionDeadlineChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   register: UseFormRegister<any>;
@@ -14,7 +16,7 @@ interface FormSettingsProps {
 export function FormSettings(props: FormSettingsProps) {
   return (
     <DefiFormSettingsLayout isSettingsOpen={props.isSettingsOpen}>
-      {!props.hideSlippageField ? (
+      {!props.hideSlippage && (
         <Input<"slippage">
           type="number"
           step="any"
@@ -24,10 +26,13 @@ export function FormSettings(props: FormSettingsProps) {
   price of a trade and the price at which the trade is executed.`}
           isTooltipVisible={true}
           unit="%"
-          register={props.register("slippage", { onChange: props.handleSlippageChanged })}
+          isError={props.isSlippageBreached}
+          register={props.register("slippage", {
+            validate: () => !props.isSlippageBreached,
+            onChange: props.handleSlippageChanged,
+          })}
         />
-      ) : undefined}
-
+      )}
       <Input<"transactionDeadline">
         type="number"
         step="any"
@@ -37,7 +42,11 @@ export function FormSettings(props: FormSettingsProps) {
   (less the fee) will be returned to you.`}
         isTooltipVisible={true}
         unit="min"
-        register={props.register("transactionDeadline", { onChange: props.handleTransactionDeadlineChanged })}
+        isError={!props.isTransactionDeadlineValid}
+        register={props.register("transactionDeadline", {
+          validate: () => props.isTransactionDeadlineValid,
+          onChange: props.handleTransactionDeadlineChanged,
+        })}
       />
     </DefiFormSettingsLayout>
   );

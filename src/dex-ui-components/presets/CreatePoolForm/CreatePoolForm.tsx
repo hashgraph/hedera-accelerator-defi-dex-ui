@@ -5,6 +5,7 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { Notification, MetricLabel, NotficationTypes, SettingsButton, useNotification, Color } from "../..";
 import { CreatePoolStateFormData, InitialCreatePoolFormState, InputSelectData } from "./constants";
+import { TransactionDeadline } from "../constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
 import { DefiFormLayout } from "../layouts";
 import { TokenPair } from "../SwapTokensForm/types";
@@ -31,11 +32,7 @@ interface CreatePoolFormProps {
   transactionState: CreatePoolState;
   connectionStatus: HashConnectConnectionState;
   connectToWallet: () => void;
-  sendCreatePoolTransaction: ({
-    firstToken,
-    secondToken,
-    transactionFee,
-  }: CreatePoolTransactionParams) => Promise<void>;
+  sendCreatePoolTransaction: (params: CreatePoolTransactionParams) => Promise<void>;
   resetCreatePoolState: () => Promise<void>;
 }
 
@@ -48,12 +45,14 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
   });
   const formValues: CreatePoolStateFormData = structuredClone(createPoolForm.getValues());
 
-  const formSettings = useFormSettings({ initialSlippage: 2.0, transactionDeadline: 5.0 });
-  createPoolForm.watch("firstToken.displayAmount");
-  createPoolForm.watch("firstToken.symbol");
-  createPoolForm.watch("secondToken.displayAmount");
-  createPoolForm.watch("secondToken.symbol");
-  createPoolForm.watch("transactionFee");
+  const formSettings = useFormSettings({ initialTransactionDeadline: 3.0 });
+
+  createPoolForm.watch([
+    "firstToken.displayAmount",
+    "firstToken.symbol",
+    "secondToken.symbol",
+    "secondToken.displayAmount",
+  ]);
 
   const [isConfirmCreatePoolDialogOpen, setIsConfirmCreatePoolDialogOpen] = useState(false);
 
@@ -66,9 +65,9 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
     isNil(formValues.secondToken.symbol);
 
   const successMessage = `Created and added
-  ${formValues.firstToken.amount.toFixed(6)} 
-  ${formValues.firstToken.symbol}
-  and ${formValues.secondToken.amount.toFixed(6)} ${formValues.secondToken.symbol} to pool.`;
+                            ${formValues.firstToken.amount.toFixed(6)} 
+                            ${formValues.firstToken.symbol}
+                            and ${formValues.secondToken.amount.toFixed(6)} ${formValues.secondToken.symbol} to pool.`;
 
   const notification = useNotification({
     successMessage,
@@ -79,6 +78,13 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
     },
   });
   const isWalletPaired = props.connectionStatus === HashConnectConnectionState.Paired;
+
+  const isTransactionDeadlineValid =
+    formSettings.transactionDeadline > TransactionDeadline.Min &&
+    formSettings.transactionDeadline <= TransactionDeadline.Max;
+
+  const formattedTransactionDeadline =
+    formSettings.transactionDeadline > 0 ? `${formSettings.transactionDeadline} min` : "";
 
   const tokensWithPairs = getTokensByUniqueAccountIds(props.tokenPairs ?? []);
   const uniqueTokensFromSlectedOne = getUniqueTokensFromSelectedOne(
@@ -135,8 +141,8 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
 
   function handleSwapTokenInputsClicked() {
     const newFirstToken = { ...formValues.secondToken };
-    const newSeconToken = { ...formValues.firstToken };
-    createPoolForm.setValue("secondToken", { ...newSeconToken });
+    const newSecondToken = { ...formValues.firstToken };
+    createPoolForm.setValue("secondToken", { ...newSecondToken });
     createPoolForm.setValue("firstToken", { ...newFirstToken });
   }
 
@@ -177,6 +183,7 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
         qunatity: data.secondToken.amount,
       },
       transactionFee: data.transactionFee,
+      transactionDeadline: data.transactionDeadline,
     });
   }
   return (
@@ -185,7 +192,8 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
         title={<Text textStyle="h2">{title}</Text>}
         settingsButton={
           <SettingsButton
-            transactionDeadLine={formSettings.transactionDeadline}
+            isError={!isTransactionDeadlineValid}
+            display={formattedTransactionDeadline}
             onClick={formSettings.handleSettingsButtonClicked}
           />
         }
@@ -206,7 +214,8 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
         settingsInputs={
           <FormSettings
             isSettingsOpen={formSettings.isSettingsOpen}
-            hideSlippageField
+            hideSlippage
+            isTransactionDeadlineValid={isTransactionDeadlineValid}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
             register={createPoolForm.register}
@@ -251,13 +260,14 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
             <InputSelector
               data={InputSelectData}
               value={formValues.transactionFee}
-              selectControls={createPoolForm.register(`transactionFee` as any, {
+              selectControls={createPoolForm.register("transactionFee" as any, {
                 onChange: handleTransactionfeeClicked,
               })}
             />
           </Flex>,
         ]}
         metrics={[
+          //eslint-disable-next-line max-len
           <MetricLabel label="Exchange Ratio" value={getNewPoolExchangeRateDisplay} isLoading={props.isLoading} />,
         ]}
         actionButtons={

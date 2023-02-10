@@ -5,6 +5,7 @@ import { Color } from "../../../dex-ui-components/themes";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { getStatusColor, getShortDescription } from "../../utils";
 import { FormattedProposal } from "./types";
+import { Popover } from "../../../dex-ui-components";
 
 interface ProposalCardProps {
   proposal: FormattedProposal;
@@ -62,17 +63,28 @@ export const ProposalCard = (props: ProposalCardProps) => {
             </Text>
           </VStack>
         </Box>
-        <Box flex="4" margin="auto 1rem auto 0">
-          <HorizontalStackBarChart
-            quorum={Number(proposal.votes.quorum)}
-            data={[
-              { value: proposal.votes.yes ?? 0, bg: Color.Green_01 },
-              { value: proposal.votes.no ?? 0, bg: Color.Red_01 },
-              { value: proposal.votes.abstain ?? 0, bg: Color.Blue_02 },
-              { value: proposal.votes.remaining ?? 0, bg: Color.Grey_01 },
-            ]}
-          />
-        </Box>
+        <Popover
+          triggerType="hover"
+          data={[
+            { value: proposal.votes.yes ?? 0, label: "Yes" },
+            { value: proposal.votes.no ?? 0, label: "No" },
+            { value: proposal.votes.abstain ?? 0, label: "Abstain" },
+            { value: proposal.votes.remaining ?? 0, label: "Remaining" },
+          ]}
+          triggerBody={
+            <Box flex="4" margin="auto 1rem auto 0">
+              <HorizontalStackBarChart
+                quorum={proposal.votes.quorum}
+                data={[
+                  { value: proposal.votes.yes ?? 0, bg: Color.Blue_01 },
+                  { value: proposal.votes.no ?? 0, bg: Color.Red_03 },
+                  { value: proposal.votes.abstain ?? 0, bg: Color.Grey_03 },
+                  { value: proposal.votes.remaining ?? 0, bg: Color.Grey_01 },
+                ]}
+              />
+            </Box>
+          }
+        ></Popover>
       </Flex>
     </Card>
   );

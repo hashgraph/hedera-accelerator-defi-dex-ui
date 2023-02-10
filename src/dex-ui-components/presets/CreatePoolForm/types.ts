@@ -19,4 +19,5 @@ export interface CreatePoolTransactionParams {
     qunatity: number;
   };
   transactionFee: number;
+  transactionDeadline: number;
 }

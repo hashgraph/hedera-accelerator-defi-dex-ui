@@ -45,48 +45,48 @@
     "transparentProxyId": "0.0.9141"
   },
   {
-    "name": "governorupgrade",
-    "id": "0.0.3061883",
-    "address": "00000000000000000000000000000000002eb87b",
-    "timestamp": "2023-01-31T08:26:06.091Z",
-    "hash": "fbb7cc6ae3112388e0670e01f11ea9fb",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000002359",
-    "transparentProxyId": "0.0.9049"
+    "name": "factory",
+    "id": "0.0.3404129",
+    "address": "0x000000000000000000000000000000000033f161",
+    "timestamp": "2023-02-08T02:55:13.998Z",
+    "hash": "6da23e6aa07b521fb8630769ebe02d8e",
+    "transparentProxyAddress": "0x000000000000000000000000000000000033f163",
+    "transparentProxyId": "0.0.3404131"
   },
   {
     "name": "governortransfertoken",
-    "id": "0.0.3061890",
-    "address": "00000000000000000000000000000000002eb882",
-    "timestamp": "2023-01-31T08:26:15.570Z",
-    "hash": "8fede69c37c1a22eb7a24caa9396bbd7",
+    "id": "0.0.3373825",
+    "address": "0000000000000000000000000000000000337b01",
+    "timestamp": "2023-02-03T13:10:40.931Z",
+    "hash": "448ce5dfdc7bce6aab8477f0d9e91d63",
     "transparentProxyAddress": "0x0000000000000000000000000000000000002367",
     "transparentProxyId": "0.0.9063"
   },
   {
     "name": "governortextproposal",
-    "id": "0.0.3061898",
-    "address": "00000000000000000000000000000000002eb88a",
-    "timestamp": "2023-01-31T08:26:22.776Z",
-    "hash": "de08ec22b73c6da4cc4ad85aef6a2a89",
+    "id": "0.0.3373836",
+    "address": "0000000000000000000000000000000000337b0c",
+    "timestamp": "2023-02-03T13:10:47.521Z",
+    "hash": "4a69e295f26171bbb14beffa6006ccc5",
     "transparentProxyAddress": "0x0000000000000000000000000000000000002379",
     "transparentProxyId": "0.0.9081"
   },
   {
     "name": "governortokencreate",
-    "id": "0.0.3061908",
-    "address": "00000000000000000000000000000000002eb894",
-    "timestamp": "2023-01-31T08:26:32.450Z",
-    "hash": "ef7c14142902a5b1ff5d2e8b0e0f77cf",
+    "id": "0.0.3373849",
+    "address": "0000000000000000000000000000000000337b19",
+    "timestamp": "2023-02-03T13:10:54.944Z",
+    "hash": "f5e45f2b1a3a5471562122161ab4258b",
     "transparentProxyAddress": "0x000000000000000000000000000000000000238e",
     "transparentProxyId": "0.0.9102"
   },
   {
-    "name": "factory",
-    "id": "0.0.3328756",
-    "address": "0x000000000000000000000000000000000032caf4",
-    "timestamp": "2023-02-02T08:34:33.336Z",
-    "hash": "01f1b94b1f29dc87c697b67d030f7634",
-    "transparentProxyAddress": "0x000000000000000000000000000000000032cb1d",
-    "transparentProxyId": "0.0.3328797"
+    "name": "governorupgrade",
+    "id": "0.0.3387248",
+    "address": "000000000000000000000000000000000033af70",
+    "timestamp": "2023-02-06T06:43:50.044Z",
+    "hash": "1bcd3345661a9648832a092721fb28d6",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000002359",
+    "transparentProxyId": "0.0.9049"
   }
 ]

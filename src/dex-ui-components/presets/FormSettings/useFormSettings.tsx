@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useInput } from "../../../dex-ui/hooks/useInput";
 
 interface UseFormSettingsProps {
-  initialSlippage: number;
-  transactionDeadline?: number;
+  initialSlippage?: number;
+  initialTransactionDeadline?: number;
 }
 
 export function useFormSettings(props: UseFormSettingsProps) {
-  const { value: slippage, handleChange: handleSlippageChanged } = useInput<number>(props.initialSlippage);
+  const { value: slippage, handleChange: handleSlippageChanged } = useInput<number>(props.initialSlippage ?? 0);
   const { value: transactionDeadline, handleChange: handleTransactionDeadlineChanged } = useInput<number>(
-    props.transactionDeadline ?? 0
+    props.initialTransactionDeadline ?? 0
   );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 

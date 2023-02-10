@@ -1,4 +1,4 @@
-import { isNil, uniqBy } from "ramda";
+import { isEmpty, isNil, uniqBy } from "ramda";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW, Token, TokenPair } from "../TokenInput";
 import { TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
 import { SwapSettingsInputProps } from "../base";
@@ -8,6 +8,7 @@ import { HBARTokenId } from "../../dex-ui/services";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { formatBigNumberToPercent } from "../../dex-ui/utils";
 import { UserPool } from "../../dex-ui/store/poolsSlice";
+import { BigNumber } from "bignumber.js";
 
 /**
  * Returns half of the input amount.
@@ -25,7 +26,7 @@ export const halfOf = (amount: number) => amount / 2;
  */
 export const getTokenExchangeAmount = (tokenAmount: number, spotPrice: number | undefined): number => {
   if (spotPrice !== undefined) {
-    return Number((tokenAmount * spotPrice).toFixed(5));
+    return Number((tokenAmount * spotPrice).toFixed(8));
   } else {
     console.warn("Spot Price is undefined");
     return 0;
@@ -166,7 +167,7 @@ export const getExchangeRateDisplay = ({
   if (spotPrice === undefined || tokenToTradeSymbol === undefined || tokenToReceiveSymbol === undefined) {
     return "--";
   }
-  return `${spotPrice?.toFixed(5)} ${tokenToReceiveSymbol}`;
+  return `${spotPrice?.toFixed(8)} ${tokenToReceiveSymbol}`;
 };
 
 interface CreatePoolExchangeRateParams {
@@ -187,6 +188,34 @@ export const getCreatePoolExchangeRate = ({ firstToken, secondToken }: CreatePoo
   return `1 ${firstToken?.symbol} = ${exchangeRatio} ${secondToken?.symbol}`;
 };
 
+interface CalculateLiquidityAfterSwap {
+  tokenToTradeAmount: number;
+  tokenToTradeLiquidity: number;
+  tokenToReceiveLiquidity: number;
+}
+
+export const calculateLiquidityAfterSwap = ({
+  tokenToTradeAmount,
+  tokenToTradeLiquidity,
+  tokenToReceiveLiquidity,
+}: CalculateLiquidityAfterSwap): BigNumber => {
+  if (tokenToTradeLiquidity <= 0 || tokenToReceiveLiquidity <= 0) {
+    return BigNumber(0);
+  }
+  if (isNil(tokenToTradeAmount) || tokenToTradeAmount <= 0) {
+    return BigNumber(0);
+  }
+  const constantProduct = BigNumber(tokenToTradeLiquidity).times(tokenToReceiveLiquidity);
+  const tokenToTradeLiquidityAfterSwap = tokenToTradeLiquidity + tokenToTradeAmount; //+fee
+  const tokenToReceiveLiquidityAfterSwap = constantProduct.div(tokenToTradeLiquidityAfterSwap);
+  return tokenToReceiveLiquidityAfterSwap;
+};
+
+interface CalculateTokenAmountToReceive {
+  tokenToTradeAmount: number;
+  tokenToTradeLiquidity: number;
+  tokenToReceiveLiquidity: number;
+}
 /**
  * Calculates the token to receive amount based on the tokenToTradeAmount input.
  * Follows the x*y=K formula where x and y are the amounts of each token's liquidity.
@@ -195,20 +224,21 @@ export const getCreatePoolExchangeRate = ({ firstToken, secondToken }: CreatePoo
  * liquidity of the tokenToTrade in the pool, we get "newX". Taking k/newX, we can compute
  * newY. We then subtract the newY from the current liquidty of Y to get the tokenToReceive amount
  */
-export const getReceivedAmount = (tokenToTrade: TokenState, tokenToReceive: TokenState) => {
-  if (tokenToTrade.poolLiquidity && tokenToReceive.poolLiquidity) {
-    if (isNil(tokenToTrade.amount) || tokenToTrade.amount <= 0) {
-      return 0;
-    }
-    // TODO: pull k from contract?
-    const k = tokenToTrade.poolLiquidity * tokenToReceive.poolLiquidity;
-    const postSwapTokenToTradeLiquidity = tokenToTrade?.poolLiquidity + tokenToTrade.amount;
-    const postSwapTokenToReceiveLiquidity = k / postSwapTokenToTradeLiquidity;
-    const amountToReceive = tokenToReceive.poolLiquidity - postSwapTokenToReceiveLiquidity;
-    return +amountToReceive; // TODO: check this decimal value
-  } else {
-    return undefined;
+export const calculateTokenAmountToReceive = ({
+  tokenToTradeAmount,
+  tokenToTradeLiquidity,
+  tokenToReceiveLiquidity,
+}: CalculateTokenAmountToReceive): BigNumber => {
+  if (tokenToTradeAmount <= 0) {
+    return BigNumber(0);
   }
+  const tokenToReceiveLiquidityAfterSwap = calculateLiquidityAfterSwap({
+    tokenToTradeAmount,
+    tokenToTradeLiquidity,
+    tokenToReceiveLiquidity,
+  });
+  const amountToReceive = BigNumber(tokenToReceiveLiquidity).minus(tokenToReceiveLiquidityAfterSwap);
+  return amountToReceive;
 };
 interface GetSpotPriceParams {
   spotPrices: Record<string, number | undefined>;
@@ -216,42 +246,61 @@ interface GetSpotPriceParams {
   tokenToReceive: TokenState;
 }
 
-export function getSpotPrice(params: GetSpotPriceParams) {
-  if (params.spotPrices !== null) {
-    const tokenToTradeId = params.tokenToTrade.tokenMeta.tokenId || "";
-    const tokenToReceiveId = params.tokenToReceive.tokenMeta.tokenId || "";
-    const route = `${tokenToTradeId}=>${tokenToReceiveId}`;
-    if (params.spotPrices?.[route] !== undefined) {
-      return params.spotPrices[route] ?? 0;
-    }
+export function getSpotPrice(params: GetSpotPriceParams): number | undefined {
+  if (isEmpty(params.spotPrices)) {
+    return undefined;
+  }
+  /**
+   * TODO: Token Id strings should be directly passed into the function
+   * instead of accepting the full TokenState.
+   */
+  const tokenToTradeId = params.tokenToTrade.tokenMeta.tokenId || "";
+  const tokenToReceiveId = params.tokenToReceive.tokenMeta.tokenId || "";
+  const route = `${tokenToTradeId}=>${tokenToReceiveId}`;
+  if (params.spotPrices?.[route] !== undefined) {
+    return params.spotPrices[route] ?? 0;
   }
 }
 
-interface GetPriceImpactParams {
-  spotPrice: number | undefined;
-  tokenToTrade: TokenState;
-  tokenToReceive: TokenState;
+interface CalculatePriceImpactParams {
+  tokenToTrade: {
+    tokenId: string;
+    amount: number;
+    poolLiquidity: number;
+  };
+  tokenToReceive: {
+    tokenId: string;
+    poolLiquidity: number;
+  };
 }
 
 /**
- * Gets price impact based on liquidity values in pool
- * before and after proposed swap
+ * Calculates price impact given the token input amount and pool sizes.
+ *
  */
-export const getPriceImpact = ({ spotPrice, tokenToTrade, tokenToReceive }: GetPriceImpactParams) => {
+export const calculatePriceImpact = ({ tokenToTrade, tokenToReceive }: CalculatePriceImpactParams) => {
   if (
-    tokenToTrade.poolLiquidity &&
-    tokenToReceive.poolLiquidity &&
-    tokenToTrade.amount &&
-    tokenToReceive.amount &&
-    tokenToTrade.symbol !== tokenToReceive.symbol
+    tokenToTrade.poolLiquidity <= 0 ||
+    tokenToReceive.poolLiquidity <= 0 ||
+    tokenToTrade.amount <= 0 ||
+    tokenToTrade.tokenId === tokenToReceive.tokenId
   ) {
-    const amountReceived = getReceivedAmount(tokenToTrade, tokenToReceive) || 1;
-    const newSpotPrice = amountReceived / tokenToTrade.amount;
-    const _priceImpact = ((spotPrice || 1) / newSpotPrice - 1) * 100;
-    return `${_priceImpact.toFixed(2)}%`;
-  } else {
-    return "--";
+    return 0;
   }
+  /** TODO: Incorporate fees into price impact calculation. */
+  const amountInWithFees = tokenToTrade.amount;
+  const tokenAmountToReceive = calculateTokenAmountToReceive({
+    tokenToTradeAmount: amountInWithFees,
+    tokenToTradeLiquidity: tokenToTrade.poolLiquidity,
+    tokenToReceiveLiquidity: tokenToReceive.poolLiquidity,
+  });
+  if (tokenAmountToReceive.lte(0)) {
+    return 0;
+  }
+  const newSpotPrice = BigNumber(amountInWithFees).div(tokenAmountToReceive);
+  const currentSpotPrice = BigNumber(tokenToTrade.poolLiquidity).div(tokenToReceive.poolLiquidity);
+  const priceImpact = BigNumber(1).minus(currentSpotPrice.div(newSpotPrice));
+  return priceImpact.shiftedBy(2).toNumber();
 };
 
 export const getTradeTokenMeta = (
@@ -275,11 +324,8 @@ export const getTradeTokenMeta = (
 
 export const getDefaultTokenMeta = { pairAccountId: undefined, tokenId: undefined };
 
-export function getPoolLiquidityForTokenSymbol(
-  symbol: string | undefined,
-  poolLiquidity: Record<string, number | undefined>
-) {
-  if (!isNil(symbol)) return poolLiquidity?.[symbol];
+export function getPoolLiquidityForTokenId(tokenId: string, poolLiquidity: Record<string, number | undefined>) {
+  return poolLiquidity?.[tokenId];
 }
 
 interface FormatTokenBalanceParams {

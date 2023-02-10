@@ -15,7 +15,7 @@ const GetStatusIcon = (iconType: string) => {
     case ProposalStateIcon.Disabled:
       return <DisbaledStepIcon />;
     case ProposalStateIcon.Cancelled:
-      return <CancelledStepIcon />;
+      return <CancelledStepIcon fill={Color.Black_01} fillOpacity="0.54" />;
     default:
       break;
   }

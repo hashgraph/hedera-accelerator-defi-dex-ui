@@ -23,11 +23,12 @@ import {
   getTokenExchangeAmount,
   getTokensByUniqueAccountIds,
 } from "../utils";
-import { InitialTokenState } from "../constants";
-import { AddLiquidityState, UserPool } from "../../../dex-ui/store/poolsSlice";
+import { InitialTokenState, TransactionDeadline } from "../constants";
+import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "../../../dex-ui/store/poolsSlice";
 import { AlertDialog, LoadingDialog } from "../../base";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionStatus } from "../../../dex-ui/store/appSlice";
+import { convertNumberOfMinsToSeconds, DefaultAmount } from "../../../dex-ui/utils";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 
@@ -40,14 +41,13 @@ interface AddLiquidityFormProps {
   transactionState: AddLiquidityState;
   connectionStatus: HashConnectConnectionState;
   connectToWallet: () => void;
-  fetchSpotPrices: ({ inputTokenAddress, outputTokenAddress, contractId }: any) => Promise<void>;
+  fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
   sendAddLiquidityTransaction: ({
-    firstTokenAddr,
-    firstTokenQty,
-    secondTokenAddr,
-    secondTokenQty,
-    addLiquidityContractAddr,
-  }: any) => Promise<void>;
+    inputToken,
+    outputToken,
+    contractId,
+    transactionDeadline,
+  }: SendAddLiquidityTransactionParams) => Promise<void>;
   resetAddLiquidityState: () => Promise<void>;
 }
 
@@ -60,27 +60,46 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
   });
   const formValues: AddLiquidityFormData = structuredClone(addLiquidityForm.getValues());
 
-  const formSettings = useFormSettings({ initialSlippage: 2.0 });
+  const formSettings = useFormSettings({
+    initialSlippage: formValues.slippage,
+    initialTransactionDeadline: formValues.transactionDeadline,
+  });
   addLiquidityForm.watch("firstToken.displayAmount");
   addLiquidityForm.watch("firstToken.symbol");
   addLiquidityForm.watch("secondToken.symbol");
 
   const [isConfirmAddLiquidityDialogOpen, setIsConfirmAddLiquidityDialogOpen] = useState(false);
 
-  const selectedPair = {
-    selectedPairId: formValues.firstToken.tokenMeta.pairAccountId,
-    selectedAToBRoute: `${formValues.firstToken.tokenMeta.tokenId}=>${formValues.secondToken.tokenMeta.tokenId}`,
-    selectedBToARoute: `${formValues.secondToken.tokenMeta.tokenId}=>${formValues.firstToken.tokenMeta.tokenId}`,
-  };
-
+  const selectedPairContractId = formValues.firstToken.tokenMeta.pairAccountId ?? "";
   usePoolsData(REFRESH_INTERVAL);
-  useSwapData(selectedPair, REFRESH_INTERVAL);
+  useSwapData(selectedPairContractId, REFRESH_INTERVAL);
+
+  function createTransactionDeadlineErrorMessage(transactionDeadline: number): string {
+    if (transactionDeadline <= TransactionDeadline.Min) {
+      return "Transaction deadline must be greater than 0 minutes.";
+    }
+    if (transactionDeadline > TransactionDeadline.Max) {
+      return "Transaction deadline is over the maximum allowed time limit (3 minutes).";
+    }
+    return "";
+  }
+
+  const transactionDeadlineErrorMessage = createTransactionDeadlineErrorMessage(formValues.transactionDeadline);
+  const isWalletPaired = props.connectionStatus === HashConnectConnectionState.Paired;
+  const isTransactionDeadlineValid =
+    formSettings.transactionDeadline > TransactionDeadline.Min &&
+    formSettings.transactionDeadline <= TransactionDeadline.Max;
+  const formattedTransactionDeadline =
+    formSettings.transactionDeadline > TransactionDeadline.Min
+      ? `${Number(formSettings.transactionDeadline)} min`
+      : DefaultAmount;
 
   const isSubmitButtonDisabled =
     isEmpty(formValues.firstToken.displayAmount) ||
     isNil(formValues.firstToken.symbol) ||
     isEmpty(formValues.secondToken.displayAmount) ||
-    isNil(formValues.secondToken.symbol);
+    isNil(formValues.secondToken.symbol) ||
+    !isTransactionDeadlineValid;
 
   const successMessage = `Added
   ${formValues.firstToken.amount.toFixed(6)} 
@@ -95,7 +114,6 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
       errorMessage: props.transactionState.errorMessage,
     },
   });
-  const isWalletPaired = props.connectionStatus === HashConnectConnectionState.Paired;
 
   const spotPrice = getSpotPrice({
     spotPrices: props.spotPrices,
@@ -142,18 +160,20 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
       console.error("Tokens must be selected to add liquidity to a pool.");
       return;
     }
+    const transactionDeadlineInSeconds = convertNumberOfMinsToSeconds(data.transactionDeadline);
     props.sendAddLiquidityTransaction({
       inputToken: {
         symbol: data.firstToken.symbol,
         amount: data.firstToken.amount,
-        address: data.firstToken.tokenMeta.tokenId,
+        address: data.firstToken.tokenMeta.tokenId ?? "",
       },
       outputToken: {
         symbol: data.firstToken.symbol,
         amount: data.secondToken.amount,
-        address: data.secondToken.tokenMeta.tokenId,
+        address: data.secondToken.tokenMeta.tokenId ?? "",
       },
-      contractId: data.secondToken.tokenMeta.pairAccountId,
+      contractId: data.secondToken.tokenMeta.pairAccountId ?? "",
+      transactionDeadline: transactionDeadlineInSeconds,
     });
   }
 
@@ -219,11 +239,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     addLiquidityForm.setValue("secondToken.symbol", updatedSecondToken.symbol);
     addLiquidityForm.setValue("secondToken.balance", updatedSecondToken.balance);
     addLiquidityForm.setValue("secondToken.tokenMeta", updatedSecondToken.tokenMeta);
-    props.fetchSpotPrices({
-      contractId: updatedFirstToken.tokenMeta.pairAccountId ?? "",
-      inputTokenAddress: updatedFirstToken.tokenMeta.tokenId,
-      outputTokenAddress: updatedSecondToken.tokenMeta.tokenId,
-    });
+    props.fetchSpotPrices(updatedFirstToken.tokenMeta.pairAccountId ?? "");
   }
 
   function handleSetFirstTokenAmountWithFormula(updatedToken: TokenState) {
@@ -263,7 +279,11 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
       <DefiFormLayout
         title={<Text textStyle="h2">{title}</Text>}
         settingsButton={
-          <SettingsButton slippage={formSettings.slippage} onClick={formSettings.handleSettingsButtonClicked} />
+          <SettingsButton
+            isError={!isTransactionDeadlineValid}
+            display={formattedTransactionDeadline}
+            onClick={formSettings.handleSettingsButtonClicked}
+          />
         }
         notification={
           notification.isSuccessNotificationVisible && (
@@ -281,6 +301,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
         }
         settingsInputs={
           <FormSettings
+            isTransactionDeadlineValid={isTransactionDeadlineValid}
             isSettingsOpen={formSettings.isSettingsOpen}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
@@ -325,6 +346,11 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
           <MetricLabel label="Share of Pool" value={poolRatio} isLoading={props.isLoading} />,
           <MetricLabel label="Exchange Ratio" value={exchangeRatio} isLoading={props.isLoading} />,
         ]}
+        actionButtonNotifications={[
+          !isTransactionDeadlineValid ? (
+            <Notification type={NotficationTypes.ERROR} textStyle="b3" message={transactionDeadlineErrorMessage} />
+          ) : null,
+        ].filter((notification: React.ReactNode) => !isNil(notification))}
         actionButtons={
           isWalletPaired ? (
             <>

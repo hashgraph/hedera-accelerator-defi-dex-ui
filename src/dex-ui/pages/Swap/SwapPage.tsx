@@ -35,7 +35,7 @@ export function SwapPage() {
               connectionStatus={wallet.hashConnectConnectionState}
               sendSwapTransaction={swap.sendSwapTransaction}
               getPoolLiquidity={swap.getPoolLiquidity}
-              getSpotPrices={swap.fetchSpotPrices}
+              fetchSpotPrices={swap.fetchSpotPrices}
               connectToWallet={wallet.connectToWallet}
             />
             <GetTokensButton />
