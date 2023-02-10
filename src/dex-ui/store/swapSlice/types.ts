@@ -70,7 +70,7 @@ interface SwapActions {
   fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
   fetchFee: (selectedAccountId: string) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
-  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number) => Promise<void>;
+  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
 }
 

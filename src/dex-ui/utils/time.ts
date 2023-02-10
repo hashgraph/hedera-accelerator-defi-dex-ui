@@ -43,4 +43,8 @@ const getTimestampNDaysAgo = (NDaysAgo: number): string => {
 const getTimestamp24HoursAgo = () => getTimestampNDaysAgo(1);
 const getTimestamp7DaysAgo = () => getTimestampNDaysAgo(7);
 
+export function convertNumberOfMinsToSeconds(mins: number): number {
+  return BigNumber(mins).times(SECONDS_IN_A_MINUTE).toNumber();
+}
+
 export { getCurrentUnixTimestamp, getTimestamp24HoursAgo, getTimestamp7DaysAgo, formatDuration };

@@ -1,4 +1,5 @@
 import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
+import { isEmpty } from "ramda";
 
 const defiFormLayoutStyles = {
   templateColumns: "repeat(2, 1fr)",
@@ -17,7 +18,7 @@ interface DefiFormLayoutProps {
   notification: React.ReactNode;
   formInputs: React.ReactNode[];
   metrics: React.ReactNode[];
-  actionButtonNotifications?: React.ReactNode;
+  actionButtonNotifications?: React.ReactNode[];
   actionButtons: React.ReactNode;
 }
 
@@ -56,8 +57,12 @@ export function DefiFormLayout(props: DefiFormLayoutProps) {
           ))}
         </Grid>
       </GridItem>
-      <GridItem marginBottom={props.actionButtonNotifications ? gridGap : 0} colSpan={2}>
-        {props.actionButtonNotifications}
+      <GridItem marginBottom={isEmpty(props.actionButtonNotifications) ? 0 : gridGap} colSpan={2}>
+        <Flex direction="column" alignItems="stretch" gap="2">
+          {props.actionButtonNotifications?.map((notification: React.ReactNode, index: number) => (
+            <Box key={index}>{notification}</Box>
+          ))}
+        </Flex>
       </GridItem>
       <GridItem colSpan={2}>
         <Flex direction="column" alignItems="stretch">

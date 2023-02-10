@@ -19,7 +19,7 @@ const formatBigNumberToPercent = (bigNumber: BigNumber | undefined) => {
   if (bigNumber === undefined) {
     return DefaultPercent;
   }
-  return formatToPercent(bigNumber.shiftedBy(-2).toNumber());
+  return formatToPercent(bigNumber.toNumber());
 };
 
 export function withPrecision(number: BigNumber, precision: BigNumber) {
