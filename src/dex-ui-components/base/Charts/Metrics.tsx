@@ -18,12 +18,10 @@ const MetricsBase = (props: MetricsProps) => {
         <GridItem key={index} colSpan={rows}>
           <HStack width="100%">
             {metric.icon ? (
-              <>
-                <HStack gap="1">
-                  {metric.icon}
-                  <Text textStyle="b4">{metric.label}</Text>
-                </HStack>
-              </>
+              <HStack gap="1">
+                {metric.icon}
+                <Text textStyle="b4">{metric.label}</Text>
+              </HStack>
             ) : (
               <Text textStyle="b4">{metric.label}</Text>
             )}
