@@ -1,8 +1,9 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { DexService, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
-import { getErrorMessage, isHbarToken } from "../../utils";
+import { getErrorMessage, isHbarToken, valueToPercentAsNumberWithPrecision, withPrecision } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
+import { isEmpty } from "ramda";
 
 const initialSwapState: SwapState = {
   precision: undefined,
@@ -127,9 +128,9 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
      * on two different token symbols. This requires an update to the Swap contract spot price
      * function to support token symbol parameters.
      */
-    fetchSpotPrices: async (selectedAccountId: string, selectedAToBRoute: string, selectedBToARoute: string) => {
+    fetchSpotPrices: async (selectedAccountId: string) => {
       const { swap, app } = get();
-      if (!selectedAccountId || !selectedAToBRoute || !selectedBToARoute) {
+      if (isEmpty(selectedAccountId)) {
         return;
       }
       set({}, false, SwapActionType.FETCH_SPOT_PRICES_STARTED);
@@ -139,12 +140,21 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         if (precision === undefined) {
           throw Error("Precision not found");
         }
-        const spotPriceL49BToL49A = await DexService.fetchSpotPrice(selectedAccountId);
-        const spotPriceL49AToL49B = spotPriceL49BToL49A ? BigNumber(1).dividedBy(spotPriceL49BToL49A) : undefined;
-        const spotPriceL49AToL49BWithPrecision = spotPriceL49AToL49B ? spotPriceL49AToL49B.times(precision) : undefined;
-        const spotPriceL49BToL49AWithPrecision = spotPriceL49BToL49A
-          ? spotPriceL49BToL49A.dividedBy(precision)
+        const [spotPriceTokenBToTokenA, pairTokenIds] = await Promise.all([
+          DexService.fetchSpotPrice(selectedAccountId),
+          DexService.fetchPairTokenIds(selectedAccountId),
+        ]);
+        const spotPriceTokenAToTokenB = spotPriceTokenBToTokenA
+          ? BigNumber(1).dividedBy(spotPriceTokenBToTokenA)
           : undefined;
+        const spotPriceL49AToL49BWithPrecision = spotPriceTokenAToTokenB
+          ? spotPriceTokenAToTokenB.times(precision)
+          : undefined;
+        const spotPriceL49BToL49AWithPrecision = spotPriceTokenBToTokenA
+          ? spotPriceTokenBToTokenA.dividedBy(precision)
+          : undefined;
+        const selectedAToBRoute = `${pairTokenIds.tokenATokenId}=>${pairTokenIds.tokenBTokenId}`;
+        const selectedBToARoute = `${pairTokenIds.tokenBTokenId}=>${pairTokenIds.tokenATokenId}`;
         set(
           ({ swap }) => {
             swap.spotPrices[selectedAToBRoute] = spotPriceL49AToL49BWithPrecision;
@@ -201,41 +211,38 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       const { swap, app } = get();
 
       if (tokenToReceive.tokenMeta.pairAccountId !== tokenToTrade.tokenMeta.pairAccountId) {
-        swap.errorMessage = "Swap Tokens not available for selected tokens";
+        set(
+          ({ swap }) => {
+            swap.errorMessage = "Swap Tokens not available for selected tokens";
+          },
+          false,
+          SwapActionType.FETCH_SPOT_PRICES_FAILED
+        );
         return;
       }
 
-      /** poolLiquidity should be updated to be tracked by unique account id pairs instead of token symbols */
       app.setFeaturesAsLoading(["poolLiquidity"]);
       set({}, false, SwapActionType.FETCH_POOL_LIQUIDITY_STARTED);
       try {
-        const poolLiquidity = new Map<string, BigNumber | undefined>();
         const { tokenATokenId } = await DexService.fetchPairTokenIds(tokenToTrade.tokenMeta.pairAccountId ?? "");
-        const rawPoolLiquidity = await DexService.fetchPoolTokenBalances(tokenToReceive.tokenMeta.pairAccountId ?? "");
-
-        let tokens: { [x: string]: BigNumber } = {};
-        if (tokenATokenId === tokenToTrade.tokenMeta.tokenId) {
-          tokens = {
-            [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenAQty,
-            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenBQty,
-          };
-        } else {
-          tokens = {
-            [tokenToTrade.symbol ?? ""]: rawPoolLiquidity.tokenBQty,
-            [tokenToReceive.symbol ?? ""]: rawPoolLiquidity.tokenAQty,
-          };
+        const poolTokenBalances = await DexService.fetchPoolTokenBalances(tokenToReceive.tokenMeta.pairAccountId ?? "");
+        const isTokenToTradeTokenA = tokenATokenId === tokenToTrade.tokenMeta.tokenId;
+        const tokenAId = isTokenToTradeTokenA
+          ? tokenToTrade.tokenMeta.tokenId ?? ""
+          : tokenToReceive.tokenMeta.tokenId ?? "";
+        const tokenBId = isTokenToTradeTokenA
+          ? tokenToReceive.tokenMeta.tokenId ?? ""
+          : tokenToTrade.tokenMeta.tokenId ?? "";
+        if (swap.precision === undefined) {
+          throw Error("Precision not found");
         }
-
-        Object.keys(tokens).forEach((tokenSymbol) => {
-          if (swap.precision === undefined) {
-            throw Error("Precision not found");
-          }
-          const amount = tokens[tokenSymbol];
-          poolLiquidity.set(tokenSymbol, amount?.dividedBy(swap.precision.times(10)));
-        });
+        const poolLiquidity = {
+          [tokenAId]: withPrecision(poolTokenBalances.tokenAQty, swap.precision),
+          [tokenBId]: withPrecision(poolTokenBalances.tokenBQty, swap.precision),
+        };
         set(
           ({ swap }) => {
-            swap.poolLiquidity = Object.fromEntries(poolLiquidity);
+            swap.poolLiquidity = poolLiquidity;
           },
           false,
           SwapActionType.FETCH_POOL_LIQUIDITY_SUCCEEDED
@@ -252,8 +259,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
       app.setFeaturesAsLoaded(["poolLiquidity"]);
     },
-    sendSwapTransaction: async (tokenToTrade: Token) => {
-      const { context, wallet, app } = get();
+    sendSwapTransaction: async (tokenToTrade: Token, slippageTolerance: number) => {
+      const { context, wallet, app, swap } = get();
       app.setFeaturesAsLoading(["transactionState"]);
       set(
         ({ swap }) => {
@@ -277,6 +284,10 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         wallet.savedPairingData?.accountIds[0] ?? ""
       );
       const signer = DexService.getSigner(provider);
+      if (swap.precision === undefined) {
+        throw Error("Precision not found");
+      }
+      const preciseSlippage = valueToPercentAsNumberWithPrecision(slippageTolerance, swap.precision);
       try {
         // Sometimes (on first run throught it seems) the AcknowledgeMessageEvent from hashpack does not fire
         // so we need to manually dispatch the action here indicating that transaction is waiting to be signed
@@ -292,6 +303,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           walletAddress,
           tokenToTradeAddress,
           tokenToTradeAmount,
+          slippageTolerance: preciseSlippage,
           HbarAmount,
           signer,
         });
