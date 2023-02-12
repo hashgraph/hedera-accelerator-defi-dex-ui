@@ -23,12 +23,12 @@ import {
   getTokenExchangeAmount,
   getTokensByUniqueAccountIds,
 } from "../utils";
-import { InitialTokenState, TransactionDeadline } from "../constants";
+import { InitialTokenState } from "../constants";
 import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "../../../dex-ui/store/poolsSlice";
 import { AlertDialog, LoadingDialog } from "../../base";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionStatus } from "../../../dex-ui/store/appSlice";
-import { convertNumberOfMinsToSeconds, DefaultAmount } from "../../../dex-ui/utils";
+import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 
@@ -61,8 +61,8 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
   const formValues: AddLiquidityFormData = structuredClone(addLiquidityForm.getValues());
 
   const formSettings = useFormSettings({
-    initialSlippage: formValues.slippage,
-    initialTransactionDeadline: formValues.transactionDeadline,
+    slippage: formValues.slippage,
+    transactionDeadline: formValues.transactionDeadline,
   });
   addLiquidityForm.watch("firstToken.displayAmount");
   addLiquidityForm.watch("firstToken.symbol");
@@ -74,32 +74,14 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
   usePoolsData(REFRESH_INTERVAL);
   useSwapData(selectedPairContractId, REFRESH_INTERVAL);
 
-  function createTransactionDeadlineErrorMessage(transactionDeadline: number): string {
-    if (transactionDeadline <= TransactionDeadline.Min) {
-      return "Transaction deadline must be greater than 0 minutes.";
-    }
-    if (transactionDeadline > TransactionDeadline.Max) {
-      return "Transaction deadline is over the maximum allowed time limit (3 minutes).";
-    }
-    return "";
-  }
-
-  const transactionDeadlineErrorMessage = createTransactionDeadlineErrorMessage(formValues.transactionDeadline);
   const isWalletPaired = props.connectionStatus === HashConnectConnectionState.Paired;
-  const isTransactionDeadlineValid =
-    formSettings.transactionDeadline > TransactionDeadline.Min &&
-    formSettings.transactionDeadline <= TransactionDeadline.Max;
-  const formattedTransactionDeadline =
-    formSettings.transactionDeadline > TransactionDeadline.Min
-      ? `${Number(formSettings.transactionDeadline)} min`
-      : DefaultAmount;
 
   const isSubmitButtonDisabled =
     isEmpty(formValues.firstToken.displayAmount) ||
     isNil(formValues.firstToken.symbol) ||
     isEmpty(formValues.secondToken.displayAmount) ||
     isNil(formValues.secondToken.symbol) ||
-    !isTransactionDeadlineValid;
+    !formSettings.isTransactionDeadlineValid;
 
   const successMessage = `Added
   ${formValues.firstToken.amount.toFixed(6)} 
@@ -180,7 +162,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
   function handleFirstTokenAmountChanged(updatedToken: TokenState) {
     const secondTokenSpotPrice = getSpotPrice({
       spotPrices: props.spotPrices,
-      tokenToTrade: formValues.firstToken,
+      tokenToTrade: updatedToken,
       tokenToReceive: formValues.secondToken,
     });
     const secondTokenAmount = getTokenExchangeAmount(updatedToken.amount, secondTokenSpotPrice);
@@ -200,7 +182,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
   function handleSecondTokenAmountChanged(updatedToken: TokenState) {
     const firstTokenSpotPrice = getSpotPrice({
       spotPrices: props.spotPrices,
-      tokenToTrade: formValues.secondToken,
+      tokenToTrade: updatedToken,
       tokenToReceive: formValues.firstToken,
     });
     const firstTokenAmount = getTokenExchangeAmount(updatedToken.amount, firstTokenSpotPrice);
@@ -242,46 +224,14 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     props.fetchSpotPrices(updatedFirstToken.tokenMeta.pairAccountId ?? "");
   }
 
-  function handleSetFirstTokenAmountWithFormula(updatedToken: TokenState) {
-    const secondTokenSpotPrice = getSpotPrice({
-      spotPrices: props.spotPrices,
-      tokenToTrade: updatedToken,
-      tokenToReceive: formValues.secondToken,
-    });
-    const secondTokenAmount = getTokenExchangeAmount(updatedToken.amount, secondTokenSpotPrice);
-    const updatedSecondTokenAmount = {
-      ...formValues.secondToken,
-      amount: secondTokenAmount || 0,
-      displayAmount: secondTokenAmount ? String(secondTokenAmount) : "",
-    };
-    addLiquidityForm.setValue("secondToken.amount", updatedSecondTokenAmount.amount);
-    addLiquidityForm.setValue("secondToken.displayAmount", updatedSecondTokenAmount.displayAmount);
-  }
-
-  function handleSetSecondTokenAmountWithFormula(updatedToken: TokenState) {
-    const firstTokenSpotPrice = getSpotPrice({
-      spotPrices: props.spotPrices,
-      tokenToTrade: updatedToken,
-      tokenToReceive: formValues.firstToken,
-    });
-    const firstTokenAmount = getTokenExchangeAmount(updatedToken.amount, firstTokenSpotPrice);
-    const updatedFirstTokenAmount = {
-      ...formValues.firstToken,
-      amount: firstTokenAmount || 0,
-      displayAmount: firstTokenAmount ? String(firstTokenAmount) : "",
-    };
-    addLiquidityForm.setValue("firstToken.amount", updatedFirstTokenAmount.amount);
-    addLiquidityForm.setValue("firstToken.displayAmount", updatedFirstTokenAmount.displayAmount);
-  }
-
   return (
     <form onSubmit={addLiquidityForm.handleSubmit(onSubmit)} id="add-liquidity-form">
       <DefiFormLayout
         title={<Text textStyle="h2">{title}</Text>}
         settingsButton={
           <SettingsButton
-            isError={!isTransactionDeadlineValid}
-            display={formattedTransactionDeadline}
+            isError={!formSettings.isTransactionDeadlineValid}
+            display={formSettings.formattedTransactionDeadline}
             onClick={formSettings.handleSettingsButtonClicked}
           />
         }
@@ -301,7 +251,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
         }
         settingsInputs={
           <FormSettings
-            isTransactionDeadlineValid={isTransactionDeadlineValid}
+            isTransactionDeadlineValid={formSettings.isTransactionDeadlineValid}
             isSettingsOpen={formSettings.isSettingsOpen}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
@@ -323,7 +273,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
             tokenPairs={props.tokenPairs ?? []}
             onTokenAmountChanged={handleFirstTokenAmountChanged}
             onTokenSymbolChanged={handleFirstTokenSymbolChanged}
-            onSetInputAmountWithFormula={handleSetFirstTokenAmountWithFormula}
+            onSetInputAmountWithFormula={handleFirstTokenAmountChanged}
           />,
           <Spacer />,
           <TokenInput
@@ -339,7 +289,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
             tokenPairs={props.tokenPairs ?? []}
             onTokenAmountChanged={handleSecondTokenAmountChanged}
             onTokenSymbolChanged={handleSecondTokenSymbolChanged}
-            onSetInputAmountWithFormula={handleSetSecondTokenAmountWithFormula}
+            onSetInputAmountWithFormula={handleSecondTokenAmountChanged}
           />,
         ]}
         metrics={[
@@ -347,8 +297,12 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
           <MetricLabel label="Exchange Ratio" value={exchangeRatio} isLoading={props.isLoading} />,
         ]}
         actionButtonNotifications={[
-          !isTransactionDeadlineValid ? (
-            <Notification type={NotficationTypes.ERROR} textStyle="b3" message={transactionDeadlineErrorMessage} />
+          !formSettings.isTransactionDeadlineValid ? (
+            <Notification
+              type={NotficationTypes.ERROR}
+              textStyle="b3"
+              message={formSettings.transactionDeadlineErrorMessage}
+            />
           ) : null,
         ].filter((notification: React.ReactNode) => !isNil(notification))}
         actionButtons={

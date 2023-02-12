@@ -3,12 +3,9 @@ import { useDexContext } from "../../hooks";
 import { CreatePoolForm } from "../../../dex-ui-components/presets";
 
 export function CreatePoolPage() {
-  const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
+  const { app, wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
 
-  const isFormLoading =
-    app.isFeatureLoading("tokenPairs") ||
-    app.isFeatureLoading("pairedAccountBalance") ||
-    app.isFeatureLoading("allPoolsMetrics");
+  const isFormLoading = app.isFeatureLoading("pairedAccountBalance") || app.isFeatureLoading("allPoolsMetrics");
 
   return (
     <HStack>
@@ -18,7 +15,8 @@ export function CreatePoolPage() {
             <CreatePoolForm
               isLoading={isFormLoading}
               pairedAccountBalance={wallet.pairedAccountBalance}
-              tokenPairs={swap.tokenPairs}
+              tokenPairs={pools.tokenPairs}
+              allPoolsMetrics={pools.allPoolsMetrics}
               transactionState={pools.createPoolTransactionState}
               connectionStatus={wallet.hashConnectConnectionState}
               connectToWallet={wallet.connectToWallet}

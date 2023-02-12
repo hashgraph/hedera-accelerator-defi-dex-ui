@@ -5,14 +5,13 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { Notification, MetricLabel, NotficationTypes, SettingsButton, useNotification, Color } from "../..";
 import { CreatePoolStateFormData, InitialCreatePoolFormState, InputSelectData } from "./constants";
-import { TransactionDeadline } from "../constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
 import { DefiFormLayout } from "../layouts";
 import { TokenPair } from "../SwapTokensForm/types";
 import { TokenInput } from "../TokenInput";
-import { isEmpty, isNil } from "ramda";
-import { CreatePoolState } from "../../../dex-ui/store/poolsSlice";
-import { AlertDialog, InputSelector, LoadingDialog, SwitchTokenButton } from "../../base";
+import { isNil } from "ramda";
+import { CreatePoolState, Pool } from "../../../dex-ui/store/poolsSlice";
+import { AlertDialog, InputSelector, LoadingDialog } from "../../base";
 import { TransactionStatus } from "../../../dex-ui/store/appSlice";
 import { WarningIcon } from "@chakra-ui/icons";
 import { usePoolsData } from "../../../dex-ui/hooks";
@@ -25,10 +24,12 @@ import {
 } from "../utils";
 import { TokenState } from "../types";
 import { CreatePoolTransactionParams } from "./types";
+import { useCreatePoolFormData } from "./useCreatePoolForm";
 interface CreatePoolFormProps {
   isLoading: boolean;
   pairedAccountBalance: AccountBalanceJson | null;
   tokenPairs: TokenPair[] | null;
+  allPoolsMetrics: Pool[];
   transactionState: CreatePoolState;
   connectionStatus: HashConnectConnectionState;
   connectToWallet: () => void;
@@ -45,32 +46,32 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
   });
   const formValues: CreatePoolStateFormData = structuredClone(createPoolForm.getValues());
 
-  const formSettings = useFormSettings({ initialTransactionDeadline: 3.0 });
-
   createPoolForm.watch([
     "firstToken.displayAmount",
     "firstToken.symbol",
     "secondToken.symbol",
     "secondToken.displayAmount",
+    "transactionFee",
   ]);
 
   const [isConfirmCreatePoolDialogOpen, setIsConfirmCreatePoolDialogOpen] = useState(false);
 
   usePoolsData(REFRESH_INTERVAL);
 
-  const isSubmitButtonDisabled =
-    isEmpty(formValues.firstToken.displayAmount) ||
-    isNil(formValues.firstToken.symbol) ||
-    isEmpty(formValues.secondToken.displayAmount) ||
-    isNil(formValues.secondToken.symbol);
+  const formSettings = useFormSettings({
+    transactionDeadline: formValues.transactionDeadline,
+  });
 
-  const successMessage = `Created and added
-                            ${formValues.firstToken.amount.toFixed(6)} 
-                            ${formValues.firstToken.symbol}
-                            and ${formValues.secondToken.amount.toFixed(6)} ${formValues.secondToken.symbol} to pool.`;
+  const createPoolFormData = useCreatePoolFormData({
+    firstToken: formValues.firstToken,
+    secondToken: formValues.secondToken,
+    transactionFee: formValues.transactionFee,
+    isTransactionDeadlineValid: formSettings.isTransactionDeadlineValid,
+    allPoolsMetrics: props.allPoolsMetrics,
+  });
 
   const notification = useNotification({
-    successMessage,
+    successMessage: createPoolFormData.successMessage,
     transactionState: {
       transactionWaitingToBeSigned: props.transactionState.status === "in progress",
       successPayload: props.transactionState.successPayload?.transactionResponse ?? null,
@@ -78,13 +79,6 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
     },
   });
   const isWalletPaired = props.connectionStatus === HashConnectConnectionState.Paired;
-
-  const isTransactionDeadlineValid =
-    formSettings.transactionDeadline > TransactionDeadline.Min &&
-    formSettings.transactionDeadline <= TransactionDeadline.Max;
-
-  const formattedTransactionDeadline =
-    formSettings.transactionDeadline > 0 ? `${formSettings.transactionDeadline} min` : "";
 
   const tokensWithPairs = getTokensByUniqueAccountIds(props.tokenPairs ?? []);
   const uniqueTokensFromSlectedOne = getUniqueTokensFromSelectedOne(
@@ -139,13 +133,6 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
     createPoolForm.setValue("secondToken.displayAmount", updatedFirstToken.displayAmount);
   }
 
-  function handleSwapTokenInputsClicked() {
-    const newFirstToken = { ...formValues.secondToken };
-    const newSecondToken = { ...formValues.firstToken };
-    createPoolForm.setValue("secondToken", { ...newSecondToken });
-    createPoolForm.setValue("firstToken", { ...newFirstToken });
-  }
-
   function handleTransactionfeeClicked(event: ChangeEvent<HTMLInputElement>) {
     const inputElement = event?.target as HTMLInputElement;
     const fee = inputElement.value;
@@ -164,7 +151,7 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
     createPoolForm.setValue("firstToken.balance", firstTokenBalance);
     createPoolForm.setValue("secondToken.balance", secondTokenBalance);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(props.pairedAccountBalance)]);
+  }, [JSON.stringify(props.pairedAccountBalance), formValues.firstToken, formValues.secondToken]);
 
   function onSubmit(data: CreatePoolStateFormData) {
     if (data.firstToken.symbol === undefined || data.secondToken.symbol === undefined) {
@@ -192,8 +179,8 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
         title={<Text textStyle="h2">{title}</Text>}
         settingsButton={
           <SettingsButton
-            isError={!isTransactionDeadlineValid}
-            display={formattedTransactionDeadline}
+            isError={!formSettings.isTransactionDeadlineValid}
+            display={formSettings.formattedTransactionDeadline}
             onClick={formSettings.handleSettingsButtonClicked}
           />
         }
@@ -215,7 +202,7 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
           <FormSettings
             isSettingsOpen={formSettings.isSettingsOpen}
             hideSlippage
-            isTransactionDeadlineValid={isTransactionDeadlineValid}
+            isTransactionDeadlineValid={formSettings.isTransactionDeadlineValid}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
             register={createPoolForm.register}
@@ -237,9 +224,6 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
             onTokenAmountChanged={handleFirstTokenAmountChanged}
             onTokenSymbolChanged={handleFirstTokenSymbolChanged}
           />,
-          <Flex direction="column" justifyContent="center" alignItems="end">
-            <SwitchTokenButton onClick={handleSwapTokenInputsClicked} />
-          </Flex>,
           <TokenInput
             form={createPoolForm}
             fieldValue="secondToken"
@@ -270,13 +254,29 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
           //eslint-disable-next-line max-len
           <MetricLabel label="Exchange Ratio" value={getNewPoolExchangeRateDisplay} isLoading={props.isLoading} />,
         ]}
+        actionButtonNotifications={[
+          !formSettings.isTransactionDeadlineValid ? (
+            <Notification
+              type={NotficationTypes.ERROR}
+              textStyle="b3"
+              message={formSettings.transactionDeadlineErrorMessage}
+            />
+          ) : null,
+          createPoolFormData.isSelectedPoolAlreadyExist ? (
+            <Notification
+              type={NotficationTypes.ERROR}
+              textStyle="b3"
+              message={createPoolFormData.poolAlreadyExistMessage}
+            />
+          ) : null,
+        ].filter((notification: React.ReactNode) => !isNil(notification))}
         actionButtons={
           isWalletPaired ? (
             <>
               <AlertDialog
                 title="Confirm Create Pool"
                 openDialogButtonText="Create Pool"
-                isOpenDialogButtonDisabled={isSubmitButtonDisabled}
+                isOpenDialogButtonDisabled={createPoolFormData.isSubmitButtonDisabled}
                 body={
                   <Flex flexDirection="column">
                     <Flex paddingBottom="0.25rem">
@@ -320,7 +320,7 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
                   <Button
                     variant="primary"
                     flex="1"
-                    isDisabled={isSubmitButtonDisabled}
+                    isDisabled={createPoolFormData.isSubmitButtonDisabled}
                     onClick={() => {
                       setIsConfirmCreatePoolDialogOpen(false);
                       createPoolForm.handleSubmit(onSubmit)();

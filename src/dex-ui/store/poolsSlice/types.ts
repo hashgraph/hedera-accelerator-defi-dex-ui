@@ -116,6 +116,7 @@ interface CreatePoolState {
 interface PoolsState {
   allPoolsMetrics: Pool[];
   userPoolsMetrics: UserPool[];
+  tokenPairs: TokenPair[];
   poolTokenBalances: MirrorNodeAccountBalance[];
   userTokenBalances: MirrorNodeAccountBalance | undefined;
   status: string; // "init" | "fetching" | "success" | "error";

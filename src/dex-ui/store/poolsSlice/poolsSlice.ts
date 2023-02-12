@@ -26,6 +26,7 @@ const initialPoolsStore: PoolsState = {
   allPoolsMetrics: [],
   userPoolsMetrics: [],
   poolTokenBalances: [],
+  tokenPairs: [],
   userTokenBalances: undefined,
   status: "init",
   errorMessage: null,
@@ -208,7 +209,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       app.setFeaturesAsLoaded(["addLiquidityTransactionState"]);
     },
     sendCreatePoolTransaction: async (params: SendCreatePoolTransactionParams) => {
-      const { wallet, app, pools } = get();
+      const { wallet, app } = get();
       const { network } = get().context;
       app.setFeaturesAsLoading(["createPoolTransactionState"]);
       const firstTokenAddress = TokenId.fromString(params.firstToken.address).toSolidityAddress();
@@ -228,7 +229,6 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       const tokenAHbarQty = isHbarToken(params.firstToken.address) ? params.firstToken.qunatity : 0.0;
       const tokenBHbarQty = isHbarToken(params.secondToken.address) ? params.secondToken.qunatity : 0.0;
       const HbarAmount = tokenAHbarQty + tokenBHbarQty;
-      const createPoolContractAddress = ContractId.fromString("");
       try {
         set(
           ({ pools }) => {
@@ -242,37 +242,25 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_CREATE_POOL_TRANSACTION_TO_WALLET_STARTED
         );
-        const doesPairAlreadyExist = pools.allPoolsMetrics.find((pool) => {
-          return (
-            pool.name === `${params.firstToken.symbol}-${params.secondToken.symbol}` ||
-            (pool.name === `${params.secondToken.symbol}-${params.firstToken.symbol}` &&
-              BigNumber(params.transactionFee).eq(pool.fee ?? BigNumber(0)))
-          );
-        });
-
-        if (doesPairAlreadyExist) {
-          throw new Error("Pool Already Exist");
-        }
         await DexService.createPool({
           firstTokenAddress,
           secondTokenAddress,
           transactionFee: BigNumber(params.transactionFee),
           transactionDeadline: params.transactionDeadline,
-          createPoolContractAddress,
           walletAddress,
           signer,
         });
 
         const newPairAddress = await DexService.getPair(firstTokenAddress, secondTokenAddress, params.transactionFee);
+        const pairContractId = ContractId.fromSolidityAddress(newPairAddress);
 
-        const contractId = ContractId.fromSolidityAddress(newPairAddress);
         const result = await DexService.addLiquidity({
           firstTokenAddress,
           firstTokenQuantity,
           secondTokenAddress,
           secondTokenQuantity,
           transactionDeadline: params.transactionDeadline,
-          addLiquidityContractAddress: contractId,
+          addLiquidityContractAddress: pairContractId,
           walletAddress,
           HbarAmount,
           signer,
@@ -332,6 +320,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           ({ pools }) => {
             pools.status = "success";
             pools.allPoolsMetrics = allPoolMetrices;
+            pools.tokenPairs = poolTokenPairs;
           },
           false,
           PoolsActionType.FETCH_ALL_METRICS_SUCCEEDED

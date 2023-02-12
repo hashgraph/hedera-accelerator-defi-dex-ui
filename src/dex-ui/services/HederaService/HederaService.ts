@@ -11,7 +11,7 @@ import {
   TransactionResponse,
   Hbar,
 } from "@hashgraph/sdk";
-import { Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, TREASURY_ID } from "../constants";
+import { Contracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, TREASURY_ID } from "../constants";
 import { PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
@@ -64,7 +64,6 @@ function createHederaService() {
     firstTokenAddress: string;
     secondTokenAddress: string;
     transactionFee: BigNumber;
-    createPoolContractAddress: ContractId;
     transactionDeadline: number;
     walletAddress: string;
     signer: HashConnectSigner;
@@ -91,16 +90,10 @@ function createHederaService() {
   }
 
   const createPool = async (createPoolDetails: CreatePoolDetails): Promise<TransactionResponse> => {
-    const {
-      firstTokenAddress,
-      secondTokenAddress,
-      transactionFee,
-      createPoolContractAddress,
-      transactionDeadline,
-      signer,
-    } = createPoolDetails;
+    const factoryContractId = ContractId.fromString(Contracts.Factory.ProxyId);
+    const { firstTokenAddress, secondTokenAddress, transactionFee, transactionDeadline, signer } = createPoolDetails;
     const createPoolTransaction = await new ContractExecuteTransaction()
-      .setContractId(createPoolContractAddress)
+      .setContractId(factoryContractId)
       .setGas(9000000)
       .setFunction(
         PairContractFunctions.CreatePair,
