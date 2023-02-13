@@ -161,7 +161,7 @@ const Pools = (): JSX.Element => {
   const actionNavigation = async (action: "withdraw" | "swap", pool?: string) => {
     if (action === "withdraw") {
       await pools.resetWithdrawState();
-      navigate(`/pools/withdraw?pool=${(pool || "").replace("/", "-")}`);
+      navigate(`/pools/withdraw?pool=${pool || ""}`);
     } else {
       navigate("/swap");
     }

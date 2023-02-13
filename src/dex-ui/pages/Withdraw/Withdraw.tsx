@@ -60,7 +60,7 @@ const Withdraw = () => {
 
     // When routing from My Pools, slashes are replaced with dashes
     // in order to prevent issues with the URL. Replacing back here
-    const queryParam = searchParams.get("pool")?.replace("-", "/");
+    const queryParam = searchParams.get("pool");
     if (queryParam) {
       if (pools.userPoolsMetrics.length > 0) {
         setWithdrawComponentProps(queryParam);
