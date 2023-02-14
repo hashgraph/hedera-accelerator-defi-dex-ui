@@ -84,6 +84,7 @@ export const USDC_TOKEN_ID = "0.0.2276691";
 
 export const GovernanceTokenId = "0.0.8576";
 export const HBARTokenId = "0.0.8578";
+export const HBARTokenSymbol = "HBAR";
 
 export const TOKEN_SYMBOL_TO_ACCOUNT_ID = new Map<string, string>([
   [Tokens.TokenASymbol, Tokens.TokenAAccountId],
