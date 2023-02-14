@@ -25,14 +25,17 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
     userTokenBalances?.tokens.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
 
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
-  const firstTokenPoolLiquidity = isHBARTokenPair && firstTokenSymbol === HBARTokenSymbol
-    ? pairAccount?.balance.toNumber() ?? 0
-    : firstPairToken?.balance.toNumber() ?? 0;
+  const firstTokenPoolLiquidity =
+    isHBARTokenPair && firstTokenSymbol === HBARTokenSymbol
+      ? pairAccount?.balance.toNumber() ?? 0
+      : firstPairToken?.balance.toNumber() ?? 0;
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (firstTokenPoolLiquidity ?? 0);
 
   const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
   const secondTokenPoolLiquidity = isHBARTokenPair
-    ? (secondTokenSymbol === HBARTokenSymbol ? pairAccount.balance.toNumber() : firstPairToken?.balance.toNumber())
+    ? secondTokenSymbol === HBARTokenSymbol
+      ? pairAccount.balance.toNumber()
+      : firstPairToken?.balance.toNumber()
     : secondPairToken?.balance.toNumber() ?? 0;
   const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (secondTokenPoolLiquidity ?? 0);
 
