@@ -29,6 +29,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const pairAccount = poolTokenBalances.find((pool) => pool.account === pairAccountId);
   const [firstPairToken, secondPairToken] = pairAccount?.tokens ?? [];
 
+  /** NOTE: In case of HBAR Pair secondPairToken will be null, get balance of secondPairToken from pairAccount */
   const isHBARTokenPair = pairAccount?.tokens.length === 1;
 
   const userPercentOfPool = selectedPoolMetrics.percentOfPool;
@@ -37,6 +38,9 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const userLpAmount =
     userTokenBalances?.tokens.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
 
+  /**
+   * First Token Details
+   */
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
   const firstTokenPoolLiquidity = isHBARTokenPair
     ? getBalanceOfToken(firstPairToken, firstTokenSymbol, pairAccount)
@@ -44,6 +48,9 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
 
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (firstTokenPoolLiquidity ?? 0);
 
+  /**
+   * Second Token Details
+   */
   const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
   const secondTokenPoolLiquidity = isHBARTokenPair
     ? getBalanceOfToken(firstPairToken, secondTokenSymbol, pairAccount)
