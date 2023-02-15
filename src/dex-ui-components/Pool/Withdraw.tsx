@@ -78,7 +78,11 @@ const WithdrawComponent = (props: WithdrawProps) => {
         lpInputAmount:
           portion === "half" ? (+poolLpDetails.userLpAmount / 2).toString() : poolLpDetails.userLpAmount.toString(),
       });
+      if (onInputAmountChange) {
+        onInputAmountChange(portion === "half" ? +poolLpDetails.userLpAmount / 2 : poolLpDetails.userLpAmount);
+      }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localWithdrawState, poolLpDetails.userLpAmount]
   );
 
