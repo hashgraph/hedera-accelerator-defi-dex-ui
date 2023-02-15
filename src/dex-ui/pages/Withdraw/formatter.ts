@@ -1,4 +1,4 @@
-import { HBARTokenSymbol } from "../../services";
+import { HBARTokenSymbol, MirrorNodeAccountBalance, MirrorNodeTokenBalance } from "../../services";
 import { PoolsStore, UserPool } from "../../store/poolsSlice";
 import { formatBigNumberToPercent } from "../../utils";
 
@@ -8,6 +8,19 @@ import { formatBigNumberToPercent } from "../../utils";
  * @param selectedPoolMetrics - specific UserPool to be withdrawn from
  * @returns details of pool and associated tokens to be fed into WithdrawComponent as props
  */
+
+function getBalanceOfToken(
+  tokenBalance: MirrorNodeTokenBalance,
+  tokenSymbol: string,
+  pairAccount: MirrorNodeAccountBalance | undefined
+) {
+  if (tokenSymbol === HBARTokenSymbol) {
+    return pairAccount?.balance.toNumber() ?? 0;
+  } else {
+    return tokenBalance.balance.toNumber() ?? 0;
+  }
+}
+
 export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics: UserPool) {
   const { poolTokenBalances, userTokenBalances } = pools;
 
@@ -25,18 +38,17 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
     userTokenBalances?.tokens.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
 
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
-  const firstTokenPoolLiquidity =
-    isHBARTokenPair && firstTokenSymbol === HBARTokenSymbol
-      ? pairAccount?.balance.toNumber() ?? 0
-      : firstPairToken?.balance.toNumber() ?? 0;
+  const firstTokenPoolLiquidity = isHBARTokenPair
+    ? getBalanceOfToken(firstPairToken, firstTokenSymbol, pairAccount)
+    : firstPairToken.balance.toNumber() ?? 0;
+
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (firstTokenPoolLiquidity ?? 0);
 
   const secondTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenB.symbol ?? "";
   const secondTokenPoolLiquidity = isHBARTokenPair
-    ? secondTokenSymbol === HBARTokenSymbol
-      ? pairAccount.balance.toNumber()
-      : firstPairToken?.balance.toNumber()
+    ? getBalanceOfToken(firstPairToken, secondTokenSymbol, pairAccount)
     : secondPairToken?.balance.toNumber() ?? 0;
+
   const secondTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (secondTokenPoolLiquidity ?? 0);
 
   const firstToken = {
