@@ -10,6 +10,7 @@ enum GovernorContractFunctions {
 enum PairContractFunctions {
   SwapToken = "swapToken",
   RemoveLiquidity = "removeLiquidity",
+  CreatePair = "createPair",
 }
 
 interface TokenPair {

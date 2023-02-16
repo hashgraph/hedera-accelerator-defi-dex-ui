@@ -30,6 +30,7 @@ interface PairTokenIds {
   tokenATokenId: string;
   tokenBTokenId: string;
   lpTokenId: string;
+  transactionFee: BigNumber;
 }
 
 /**
@@ -38,12 +39,15 @@ interface PairTokenIds {
 async function fetchPairTokenIds(pairAccountId: string): Promise<PairTokenIds> {
   const pairContract = createPairContract(pairAccountId);
   const results: string[] = await pairContract.getTokenPairAddress();
-  checkIfTokenAddressesAreValid(results);
-  const [tokenATokenId, tokenBTokenId, lpTokenId] = results.map(solidityAddressToTokenIdString);
+  const newResults = [...results];
+  const transactionfee = ethers.BigNumber.from(newResults.pop());
+  checkIfTokenAddressesAreValid(newResults);
+  const [tokenATokenId, tokenBTokenId, lpTokenId] = newResults.map(solidityAddressToTokenIdString);
   return {
     tokenATokenId,
     tokenBTokenId,
     lpTokenId,
+    transactionFee: convertEthersBigNumberToBigNumberJS(transactionfee),
   };
 }
 

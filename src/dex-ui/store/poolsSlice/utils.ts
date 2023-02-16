@@ -116,6 +116,7 @@ const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
     fee: poolFee,
     totalVolumeLocked,
     past24HoursVolume,
+    tokensId: `${tokenAId}-${tokenBId}`,
     past7daysVolume,
   };
 };

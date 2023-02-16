@@ -257,7 +257,7 @@ const Pools = (): JSX.Element => {
               ""
             )}
           </Flex>
-          <Button width={"200px"} marginBottom={"10px"}>
+          <Button width={"200px"} marginBottom={"10px"} onClick={() => navigate("/pools/create-pool")}>
             Create Pool
           </Button>
         </TabList>

@@ -10,6 +10,7 @@ import {
   ProposalDetails,
   CreateProposal,
   SelectProposalType,
+  CreatePoolPage,
 } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import {
@@ -65,6 +66,7 @@ const DEX = () => {
                   <Route path="/pools" element={<Pools />} />
                   <Route path="/pools/add-liquidity" element={<AddLiquidityPage />} />
                   <Route path="/pools/withdraw" element={<WithdrawPage />} />
+                  <Route path="/pools/create-pool" element={<CreatePoolPage />} />
                   <Route path="/governance" element={<Governance />} />
                   <Route path="/governance/proposal-details/:id" element={<ProposalDetails />} />
                   <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
