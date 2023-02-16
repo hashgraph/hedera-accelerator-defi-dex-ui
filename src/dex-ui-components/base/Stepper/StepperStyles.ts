@@ -10,7 +10,7 @@ export const StepperStyles = {
     height: "25px",
     borderLeftWidth: "3px",
     borderColor: Color.Grey_01,
-    marginLeft: "-0.5px",
+    marginLeft: "-0.6px",
     borderStyle: "dashed",
     verticalAlign: "middle",
   },
