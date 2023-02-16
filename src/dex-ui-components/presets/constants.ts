@@ -12,6 +12,7 @@ export enum LocalStorageKeys {
 
 export const InitialSlippage = 0.5;
 export const InitialTransactionDeadline = 3;
+export const InitialTransactionFee = 30;
 
 export const InitialTokenState: TokenState = {
   symbol: undefined,

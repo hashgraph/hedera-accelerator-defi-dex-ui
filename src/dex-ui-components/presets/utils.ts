@@ -323,3 +323,32 @@ export function calculatePoolRatio(firstTokenSymbol: string, secondTokenSymbol: 
   )?.percentOfPool;
   return formatBigNumberToPercent(poolPercentage);
 }
+
+/**
+ * @param tokenId - Token Account Id
+ * @param tokenPairs - - Array of token Pairs
+ */
+export const getUniqueTokensFromSelectedOne = (tokenId: string, tokenPairs: TokenPair[]): Token[] => {
+  const allTokens = tokenPairs.flatMap(({ tokenA, tokenB }: TokenPair) => [tokenA, tokenB]);
+  const remainingTokens = allTokens.filter((token) => token.tokenMeta.tokenId !== tokenId);
+  const uniqueTokens = uniqBy((token: Token) => token.tokenMeta.tokenId, remainingTokens);
+  return uniqueTokens;
+};
+
+interface CreatePoolExchangeRateParams {
+  firstToken: TokenState | undefined;
+  secondToken: TokenState | undefined;
+}
+
+export const getCreatePoolExchangeRate = ({ firstToken, secondToken }: CreatePoolExchangeRateParams) => {
+  if (
+    isEmpty(firstToken?.displayAmount) ||
+    isEmpty(secondToken?.displayAmount) ||
+    isNil(firstToken?.symbol) ||
+    isNil(secondToken?.symbol)
+  ) {
+    return "--";
+  }
+  const exchangeRatio = Number(secondToken?.displayAmount) / Number(firstToken?.displayAmount);
+  return `1 ${firstToken?.symbol} = ${exchangeRatio} ${secondToken?.symbol}`;
+};

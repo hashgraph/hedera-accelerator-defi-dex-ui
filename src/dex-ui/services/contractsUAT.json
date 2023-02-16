@@ -9,15 +9,6 @@
     "transparentProxyId": "0.0.9015"
   },
   {
-    "name": "pair",
-    "id": "0.0.9021",
-    "address": "0x000000000000000000000000000000000000233d",
-    "timestamp": "2023-01-27T10:24:13.670Z",
-    "hash": "de94d5c59f96ac24151040a9da23da4e",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000002346",
-    "transparentProxyId": "0.0.9030"
-  },
-  {
     "name": "splitter",
     "id": "0.0.9110",
     "address": "0x0000000000000000000000000000000000002396",
@@ -43,15 +34,6 @@
     "hash": "4e634fcde2567f8d719a976326be7385",
     "transparentProxyAddress": "0x00000000000000000000000000000000000023b5",
     "transparentProxyId": "0.0.9141"
-  },
-  {
-    "name": "factory",
-    "id": "0.0.3404129",
-    "address": "0x000000000000000000000000000000000033f161",
-    "timestamp": "2023-02-08T02:55:13.998Z",
-    "hash": "6da23e6aa07b521fb8630769ebe02d8e",
-    "transparentProxyAddress": "0x000000000000000000000000000000000033f163",
-    "transparentProxyId": "0.0.3404131"
   },
   {
     "name": "governortransfertoken",
@@ -88,5 +70,32 @@
     "hash": "1bcd3345661a9648832a092721fb28d6",
     "transparentProxyAddress": "0x0000000000000000000000000000000000002359",
     "transparentProxyId": "0.0.9049"
+  },
+  {
+    "name": "configuration",
+    "id": "0.0.3474773",
+    "address": "0000000000000000000000000000000000350555",
+    "timestamp": "2023-02-14T08:32:20.686Z",
+    "hash": "8d7d0b8fb14e6da453d0e982b8746dc7",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000344158",
+    "transparentProxyId": "0.0.3424600"
+  },
+  {
+    "name": "factory",
+    "id": "0.0.3533176",
+    "address": "0x000000000000000000000000000000000035e978",
+    "timestamp": "2023-02-21T07:28:48.245Z",
+    "hash": "2aa0ae048dc8f7830b648fc9811bde1f",
+    "transparentProxyAddress": "0x000000000000000000000000000000000035e97b",
+    "transparentProxyId": "0.0.3533179"
+  },
+  {
+    "name": "pair",
+    "id": "0.0.3478719",
+    "address": "00000000000000000000000000000000003514bf",
+    "timestamp": "2023-02-14T14:13:06.984Z",
+    "hash": "ca2f4ade1e242a0b1c1e93d4e6ab05bb",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000002346",
+    "transparentProxyId": "0.0.9030"
   }
 ]
