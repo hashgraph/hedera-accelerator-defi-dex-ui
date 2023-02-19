@@ -12,6 +12,7 @@ interface InputProps<T extends string> {
   id: string;
   unit: string;
   isError?: boolean;
+  value?: string | undefined;
   register: UseFormRegisterReturn<T>;
 }
 
@@ -28,6 +29,7 @@ export function Input<T extends string>(props: InputProps<T>) {
           type={props.type}
           step={props.step}
           id={props.id}
+          value={props.value}
           {...props.register}
           borderColor={props.isError ? Color.Red_01 : Color.Black_01}
         />

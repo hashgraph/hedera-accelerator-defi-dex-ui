@@ -254,6 +254,8 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
             isTransactionDeadlineValid={formSettings.isTransactionDeadlineValid}
             isSettingsOpen={formSettings.isSettingsOpen}
             handleSlippageChanged={formSettings.handleSlippageChanged}
+            initialSlippage={`${formSettings.slippage}`}
+            initialTransactionDeadline={`${formSettings.transactionDeadline}`}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
             register={addLiquidityForm.register}
           />

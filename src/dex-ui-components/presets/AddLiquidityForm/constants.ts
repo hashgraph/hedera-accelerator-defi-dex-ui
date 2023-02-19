@@ -1,4 +1,4 @@
-import { InitialSlippage, InitialTokenState, InitialTransactionDeadline } from "../constants";
+import { InitialTokenState, InitialSlippage, InitialTransactionDeadline } from "../constants";
 import { TokenState } from "../types";
 import { AddLiquidityState } from "./types";
 

@@ -5,3 +5,4 @@ export * from "./useSwapData";
 export * from "./usePoolsData";
 export * from "./governance";
 export * from "./useTabFilters";
+export * from "./useLocalStorage";
