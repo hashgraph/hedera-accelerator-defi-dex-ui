@@ -5,6 +5,11 @@ export const TransactionDeadline = {
   Min: 0,
 };
 
+export enum LocalStorageKeys {
+  SLIPPAGE = "DEX_SLIPPAGE",
+  TRANSACTIONDEAD_LINE = "DEX_TRANSACTION_DEADLINE",
+}
+
 export const InitialSlippage = 0.5;
 export const InitialTransactionDeadline = 3;
 

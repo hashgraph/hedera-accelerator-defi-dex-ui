@@ -301,6 +301,8 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
             isSlippageBreached={formSettings.isUserSetSlippageBreached}
             isSettingsOpen={formSettings.isSettingsOpen}
             isTransactionDeadlineValid={formSettings.isTransactionDeadlineValid}
+            initialSlippage={`${formSettings.slippage}`}
+            initialTransactionDeadline={`${formSettings.transactionDeadline}`}
             handleSlippageChanged={formSettings.handleSlippageChanged}
             handleTransactionDeadlineChanged={formSettings.handleTransactionDeadlineChanged}
             register={swapTokensForm.register}

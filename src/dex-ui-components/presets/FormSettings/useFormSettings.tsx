@@ -1,8 +1,8 @@
 import { isNil } from "ramda";
 import { useState } from "react";
-import { useInput } from "../../../dex-ui/hooks/useInput";
+import { useLocalStorage } from "../../../dex-ui/hooks";
 import { DefaultAmount, DefaultPercent } from "../../../dex-ui/utils";
-import { TransactionDeadline } from "../constants";
+import { TransactionDeadline, LocalStorageKeys } from "../constants";
 interface UseFormSettingsProps {
   slippage: number;
   priceImpact?: number;
@@ -10,14 +10,21 @@ interface UseFormSettingsProps {
 }
 
 export function useFormSettings(props: UseFormSettingsProps) {
-  const { value: slippage, handleChange: handleSlippageChanged } = useInput<number>(props.slippage);
-  const { value: transactionDeadline, handleChange: handleTransactionDeadlineChanged } = useInput<number>(
+  const { value: slippageValue, handleChange: handleSlippageChanged } = useLocalStorage(
+    LocalStorageKeys.SLIPPAGE,
+    props.slippage
+  );
+
+  const { value: transactionDeadlineValue, handleChange: handleTransactionDeadlineChanged } = useLocalStorage(
+    LocalStorageKeys.TRANSACTIONDEAD_LINE,
     props.transactionDeadline
   );
+  const slippage = Number(slippageValue);
+  const transactionDeadline = Number(transactionDeadlineValue);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const formattedSlippage = slippage > 0 ? `${Number(slippage)?.toFixed(2)}%` : DefaultPercent;
+  const formattedSlippage = slippage > 0 ? `${slippage?.toFixed(2)}%` : DefaultPercent;
   const formattedTransactionDeadline =
-    transactionDeadline > TransactionDeadline.Min ? `${Number(transactionDeadline)} min` : DefaultAmount;
+    transactionDeadline > TransactionDeadline.Min ? `${transactionDeadline} min` : DefaultAmount;
 
   const isUserSetSlippageBreached = !isNil(props.priceImpact) ? props.priceImpact > slippage : false;
   const isTransactionDeadlineValid =

@@ -1,5 +1,4 @@
-import { InitialTransactionDeadline } from "./../constants";
-import { InitialSlippage, InitialTokenState } from "../constants";
+import { InitialTokenState, InitialTransactionDeadline, InitialSlippage } from "../constants";
 import { SwapTokensState } from "./types";
 
 export const InitialSwapFormState: SwapTokensState = {

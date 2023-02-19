@@ -7,6 +7,8 @@ interface FormSettingsProps {
   isSlippageBreached?: boolean;
   isSettingsOpen: boolean;
   isTransactionDeadlineValid?: boolean;
+  initialSlippage?: string | undefined;
+  initialTransactionDeadline?: string | undefined;
   handleSlippageChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   handleTransactionDeadlineChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   register: UseFormRegister<any>;
@@ -24,6 +26,7 @@ export function FormSettings(props: FormSettingsProps) {
   price of a trade and the price at which the trade is executed.`}
         isTooltipVisible={true}
         unit="%"
+        value={props.initialSlippage}
         isError={props.isSlippageBreached}
         register={props.register("slippage", {
           validate: () => !props.isSlippageBreached,
@@ -40,6 +43,7 @@ export function FormSettings(props: FormSettingsProps) {
         isTooltipVisible={true}
         unit="min"
         isError={!props.isTransactionDeadlineValid}
+        value={props.initialTransactionDeadline}
         register={props.register("transactionDeadline", {
           validate: () => props.isTransactionDeadlineValid,
           onChange: props.handleTransactionDeadlineChanged,
