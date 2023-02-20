@@ -5,7 +5,8 @@ const defiFormLayoutStyles = {
   templateColumns: "repeat(2, 1fr)",
   bg: "white",
   borderRadius: "15px",
-  width: "410px",
+  maxWidth: "550px",
+  minWidth: "410px",
   padding: "1.25rem",
   boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
 };
@@ -15,7 +16,7 @@ interface DefiFormLayoutProps {
   settingsButton: React.ReactNode;
   settingsInputs: React.ReactNode;
   isSettingsOpen: boolean;
-  notification: React.ReactNode;
+  notification?: React.ReactNode;
   formInputs: React.ReactNode[];
   metrics: React.ReactNode[];
   actionButtonNotifications?: React.ReactNode[];

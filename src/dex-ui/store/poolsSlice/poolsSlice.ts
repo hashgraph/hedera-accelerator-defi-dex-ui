@@ -7,6 +7,7 @@ import {
   PoolsState,
   PoolsActionType,
   SendAddLiquidityTransactionParams,
+  SendWithdrawTransactionParams,
   TokenPair,
   Token,
 } from "./types";
@@ -28,13 +29,13 @@ const initialPoolsStore: PoolsState = {
   userTokenBalances: undefined,
   status: "init",
   errorMessage: null,
-  withdrawState: {
-    status: "init",
+  /** Replace with React Query States */
+  addLiquidityTransactionState: {
+    status: TransactionStatus.INIT,
     successPayload: null,
     errorMessage: "",
   },
-  /** Replace with React Query States */
-  addLiquidityTransactionState: {
+  withdrawTransactionState: {
     status: TransactionStatus.INIT,
     successPayload: null,
     errorMessage: "",
@@ -302,23 +303,25 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       }
       app.setFeaturesAsLoaded(["userPoolsMetrics"]);
     },
-    sendRemoveLiquidityTransaction: async (
-      lpTokenSymbol: string,
-      lpTokenAmount: number,
-      fee: string,
-      pairAcoountId: string
-    ) => {
+    sendRemoveLiquidityTransaction: async ({
+      tokenSymbol,
+      lpTokenAmount,
+      fee,
+      pairAcountId,
+      lpAccountId,
+      transactionDeadline,
+    }: SendWithdrawTransactionParams) => {
       const { context, app, wallet } = get();
       const { network } = context;
-      app.setFeaturesAsLoading(["withdrawState"]);
+      app.setFeaturesAsLoading(["withdrawTransactionState"]);
       const provider = DexService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
       const signer = DexService.getSigner(provider);
-      const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpTokenSymbol, lpTokenAmount);
+      const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpAccountId, lpTokenAmount);
 
       try {
         set(
           ({ pools }) => {
-            pools.withdrawState = {
+            pools.withdrawTransactionState = {
               status: "in progress",
               successPayload: null,
               errorMessage: "",
@@ -328,18 +331,20 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
-        const result = await DexService.removeLiquidity(
+
+        const result = await DexService.removeLiquidity({
           signer,
-          lpTokenAmountBigNumber,
-          ContractId.fromString(pairAcoountId)
-        );
+          lpTokenAmount: lpTokenAmountBigNumber,
+          contractId: ContractId.fromString(pairAcountId),
+          transactionDeadline,
+        });
         if (result) {
           set(
             ({ pools }) => {
-              pools.withdrawState = {
+              pools.withdrawTransactionState = {
                 status: "success",
                 successPayload: {
-                  lpTokenSymbol,
+                  tokenSymbol,
                   lpTokenAmount,
                   fee,
                   transactionResponse: result,
@@ -358,7 +363,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         const errorMessage = getErrorMessage(error);
         set(
           ({ pools }) => {
-            pools.withdrawState = {
+            pools.withdrawTransactionState = {
               status: "error",
               successPayload: null,
               errorMessage: errorMessage,
@@ -369,12 +374,12 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_FAILED
         );
       }
-      app.setFeaturesAsLoaded(["withdrawState"]);
+      app.setFeaturesAsLoaded(["withdrawTransactionState"]);
     },
     resetWithdrawState: async () => {
       set(
         ({ pools }) => {
-          pools.withdrawState = initialPoolsStore.withdrawState;
+          pools.withdrawTransactionState = initialPoolsStore.withdrawTransactionState;
           pools.errorMessage = "";
         },
         false,

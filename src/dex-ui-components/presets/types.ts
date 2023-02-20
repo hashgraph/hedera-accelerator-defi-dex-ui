@@ -17,3 +17,14 @@ export interface TokenState {
     tokenId: string | undefined;
   };
 }
+
+export interface LPTokenState {
+  tokenSymbol: string | undefined;
+  userLpAmount: number | undefined;
+  userLpPercentage: string | undefined;
+  pairAccountId: string | undefined;
+  lpAccountId: string | undefined;
+  amount: number;
+  fee: string;
+  displayAmount: string;
+}

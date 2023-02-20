@@ -14,7 +14,7 @@ export const usePoolsData = (refreshInterval = 0) => {
   const isInitialFetch = useRef(true);
   const { wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
-  const { withdrawState, fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
+  const { withdrawTransactionState, fetchAllPoolMetrics, fetchUserPoolMetrics } = pools;
 
   const fetchPoolDataOnLoad = useCallback(async () => {
     await fetchAllPoolMetrics();
@@ -62,5 +62,5 @@ export const usePoolsData = (refreshInterval = 0) => {
       return;
     }
     fetchPoolDataOnEvent();
-  }, [fetchPoolDataOnEvent, withdrawState.successPayload, withdrawState.errorMessage]);
+  }, [fetchPoolDataOnEvent, withdrawTransactionState.successPayload, withdrawTransactionState.errorMessage]);
 };

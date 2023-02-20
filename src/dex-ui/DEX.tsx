@@ -4,8 +4,8 @@ import { ChakraProvider, Container, extendTheme, Flex } from "@chakra-ui/react";
 import {
   SwapPage,
   AddLiquidityPage,
+  WithdrawPage,
   Pools,
-  Withdraw,
   Governance,
   ProposalDetails,
   CreateProposal,
@@ -64,7 +64,7 @@ const DEX = () => {
                   <Route path="/swap" element={<SwapPage />} />
                   <Route path="/pools" element={<Pools />} />
                   <Route path="/pools/add-liquidity" element={<AddLiquidityPage />} />
-                  <Route path="/pools/withdraw" element={<Withdraw />} />
+                  <Route path="/pools/withdraw" element={<WithdrawPage />} />
                   <Route path="/governance" element={<Governance />} />
                   <Route path="/governance/proposal-details/:id" element={<ProposalDetails />} />
                   <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />

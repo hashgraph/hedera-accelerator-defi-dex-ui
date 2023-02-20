@@ -80,15 +80,27 @@ function createHederaService() {
     return transactionResponse;
   }
 
-  const removeLiquidity = async (signer: HashConnectSigner, lpTokenAmount: BigNumber, contractId: ContractId) => {
-    const accountId = signer.getAccountId().toSolidityAddress();
-    const removeLiquidity = await new ContractExecuteTransaction()
-      .setContractId(contractId)
-      .setGas(5000000)
-      .setFunction("removeLiquidity", new ContractFunctionParameters().addAddress(accountId).addInt256(lpTokenAmount))
-      .freezeWithSigner(signer);
+  interface RemoveLiquidityParams {
+    /** Duration the transaction is valid for in seconds. Default is 120 seconds. */
+    transactionDeadline: number;
+    lpTokenAmount: BigNumber;
+    signer: HashConnectSigner;
+    contractId: ContractId;
+  }
 
-    const removeLiquidityTx = await removeLiquidity.executeWithSigner(signer);
+  const removeLiquidity = async (params: RemoveLiquidityParams): Promise<TransactionResponse> => {
+    const accountId = params.signer.getAccountId().toSolidityAddress();
+    const contractFunctionParams = new ContractFunctionParameters()
+      .addAddress(accountId)
+      .addInt256(params.lpTokenAmount);
+    const removeLiquidity = await new ContractExecuteTransaction()
+      .setContractId(params.contractId)
+      .setGas(5000000)
+      .setFunction(PairContractFunctions.RemoveLiquidity, contractFunctionParams)
+      .setTransactionValidDuration(params.transactionDeadline)
+      .freezeWithSigner(params.signer);
+
+    const removeLiquidityTx = await removeLiquidity.executeWithSigner(params.signer);
     return removeLiquidityTx;
   };
 

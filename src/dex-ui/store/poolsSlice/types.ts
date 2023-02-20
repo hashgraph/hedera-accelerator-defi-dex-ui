@@ -33,6 +33,15 @@ interface SendAddLiquidityTransactionParams {
   contractId: string;
   transactionDeadline: number;
 }
+
+interface SendWithdrawTransactionParams {
+  tokenSymbol: string;
+  lpTokenAmount: number;
+  fee: string;
+  pairAcountId: string;
+  transactionDeadline: number;
+  lpAccountId: string;
+}
 interface FetchSpotPriceParams {
   inputTokenAddress: string;
   outputTokenAddress: string;
@@ -71,7 +80,7 @@ interface MirrorNodeAccountBalance {
 interface WithdrawState {
   status: "init" | "in progress" | "success" | "error";
   successPayload: {
-    lpTokenSymbol: string;
+    tokenSymbol: string;
     lpTokenAmount: number;
     fee: string;
     transactionResponse: TransactionResponse;
@@ -94,7 +103,7 @@ interface PoolsState {
   userTokenBalances: MirrorNodeAccountBalance | undefined;
   status: string; // "init" | "fetching" | "success" | "error";
   errorMessage: string | null;
-  withdrawState: WithdrawState;
+  withdrawTransactionState: WithdrawState;
   addLiquidityTransactionState: AddLiquidityState;
 }
 
@@ -108,12 +117,13 @@ interface PoolsActions {
   }: any) => Promise<void>;
   fetchAllPoolMetrics: () => Promise<void>;
   fetchUserPoolMetrics: (userAccountId: string) => Promise<void>;
-  sendRemoveLiquidityTransaction: (
-    lpTokenSymbol: string,
-    lpTokenAmount: number,
-    fee: string,
-    pairAccountId: string
-  ) => Promise<void>;
+  sendRemoveLiquidityTransaction: ({
+    tokenSymbol,
+    lpTokenAmount,
+    fee,
+    pairAcountId,
+    transactionDeadline,
+  }: SendWithdrawTransactionParams) => Promise<void>;
   resetWithdrawState: () => Promise<void>;
   resetAddLiquidityState: () => Promise<void>;
 }
@@ -155,7 +165,9 @@ export type {
   UserPool,
   Pool,
   SendAddLiquidityTransactionParams,
+  SendWithdrawTransactionParams,
   AddLiquidityState,
+  WithdrawState,
   TokenPair,
   Token,
   FetchSpotPriceParams,
