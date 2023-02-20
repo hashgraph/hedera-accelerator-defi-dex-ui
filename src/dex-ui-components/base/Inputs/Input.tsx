@@ -4,6 +4,7 @@ import { Tooltip } from "..";
 import { Color } from "../..";
 
 interface InputProps<T extends string> {
+  flex?: number | string;
   type: "number" | "text";
   step?: string;
   label: string;
@@ -18,7 +19,7 @@ interface InputProps<T extends string> {
 
 export function Input<T extends string>(props: InputProps<T>) {
   return (
-    <Box>
+    <Box flex={props.flex} width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
         <Text textStyle="h4">{props.label}</Text>
         {props.isTooltipVisible && <Tooltip label={props.tooltipLabel} />}

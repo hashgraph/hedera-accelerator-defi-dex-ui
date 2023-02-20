@@ -26,13 +26,14 @@ const formatPoolMetrics = (poolState: Pool): FormattedPoolDetails => {
  * @returns A formatted version of the user's liquidity pool data.
  */
 const formatUserPoolMetrics = (userPoolState: UserPool): FormattedUserPoolDetails => {
-  const { name, fee, liquidity, percentOfPool, unclaimedFees } = userPoolState;
+  const { name, fee, liquidity, percentOfPool, unclaimedFees, userTokenPair } = userPoolState;
   return {
     name,
     fee: formatBigNumberToPercent(fee),
     liquidity: formatBigNumberToUSD(liquidity),
     percentOfPool: formatBigNumberToPercent(percentOfPool),
-    unclaimedFees: formatBigNumberToPercent(unclaimedFees),
+    unclaimedFees: formatBigNumberToUSD(unclaimedFees),
+    pairLpAccountId: userTokenPair?.pairToken.pairLpAccountId,
   };
 };
 

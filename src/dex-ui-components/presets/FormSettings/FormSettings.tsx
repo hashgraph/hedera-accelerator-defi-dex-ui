@@ -2,14 +2,16 @@ import { Input } from "../..";
 import { DefiFormSettingsLayout } from "../layouts";
 import { UseFormRegister } from "react-hook-form";
 import { ChangeEvent } from "react";
+import { Spacer } from "@chakra-ui/react";
 
 interface FormSettingsProps {
   isSlippageBreached?: boolean;
   isSettingsOpen: boolean;
+  hideSlippage?: boolean;
   isTransactionDeadlineValid?: boolean;
   initialSlippage?: string | undefined;
   initialTransactionDeadline?: string | undefined;
-  handleSlippageChanged: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleSlippageChanged?: (event: ChangeEvent<HTMLInputElement>) => void;
   handleTransactionDeadlineChanged: (event: ChangeEvent<HTMLInputElement>) => void;
   register: UseFormRegister<any>;
 }
@@ -17,23 +19,29 @@ interface FormSettingsProps {
 export function FormSettings(props: FormSettingsProps) {
   return (
     <DefiFormSettingsLayout isSettingsOpen={props.isSettingsOpen}>
-      <Input<"slippage">
-        type="number"
-        step="any"
-        label="Slippage"
-        id="slippage"
-        tooltipLabel={`Slippage refers to the difference between the expected 
+      {props.hideSlippage ? (
+        <Spacer flex="1" />
+      ) : (
+        <Input<"slippage">
+          flex="1"
+          type="number"
+          step="any"
+          label="Slippage"
+          id="slippage"
+          tooltipLabel={`Slippage refers to the difference between the expected 
   price of a trade and the price at which the trade is executed.`}
-        isTooltipVisible={true}
-        unit="%"
-        value={props.initialSlippage}
-        isError={props.isSlippageBreached}
-        register={props.register("slippage", {
-          validate: () => !props.isSlippageBreached,
-          onChange: props.handleSlippageChanged,
-        })}
-      />
+          isTooltipVisible={true}
+          unit="%"
+          value={props.initialSlippage}
+          isError={props.isSlippageBreached}
+          register={props.register("slippage", {
+            validate: () => !props.isSlippageBreached,
+            onChange: props.handleSlippageChanged,
+          })}
+        />
+      )}
       <Input<"transactionDeadline">
+        flex="1"
         type="number"
         step="any"
         label="Transaction Deadline"

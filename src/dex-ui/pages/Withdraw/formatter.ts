@@ -1,6 +1,6 @@
 import { HBARTokenSymbol, MirrorNodeAccountBalance, MirrorNodeTokenBalance } from "../../services";
 import { PoolsStore, UserPool } from "../../store/poolsSlice";
-import { formatBigNumberToPercent } from "../../utils";
+import { formatBigNumberToPercent, formatBigNumberToUSD } from "../../utils";
 
 /**
  * Formats raw PoolsStore data into numbers and percents for WithdrawComponent to display
@@ -33,7 +33,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const isHBARTokenPair = pairAccount?.tokens.length === 1;
 
   const userPercentOfPool = selectedPoolMetrics.percentOfPool;
-  const userPercentOfPoolAsNumber = userPercentOfPool.toNumber();
+  const userPercentOfPoolAsNumber = userPercentOfPool?.toNumber() ?? 0;
   const userPercentOfPoolAsPercent = formatBigNumberToPercent(userPercentOfPool);
   const userLpAmount =
     userTokenBalances?.tokens.find((token) => token.token_id === lpAccountId)?.balance.toNumber() || 0;
@@ -44,7 +44,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const firstTokenSymbol = selectedPoolMetrics.userTokenPair?.tokenA.symbol ?? "";
   const firstTokenPoolLiquidity = isHBARTokenPair
     ? getBalanceOfToken(firstPairToken, firstTokenSymbol, pairAccount)
-    : firstPairToken.balance.toNumber() ?? 0;
+    : firstPairToken?.balance?.toNumber() ?? 0;
 
   const firstTokenUserProvidedLiquidity = userPercentOfPoolAsNumber * (firstTokenPoolLiquidity ?? 0);
 
@@ -74,6 +74,8 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
     userLpPercentage: userPercentOfPoolAsPercent,
     pairAccountId,
     lpAccountId,
+    unclaimedFees: formatBigNumberToUSD(selectedPoolMetrics.unclaimedFees),
+    fee: formatBigNumberToPercent(selectedPoolMetrics.fee),
   };
 
   return { firstToken, secondToken, poolLpDetails };

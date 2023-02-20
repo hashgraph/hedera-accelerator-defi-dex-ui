@@ -4,21 +4,21 @@ import { useLocalStorage } from "../../../dex-ui/hooks";
 import { DefaultAmount, DefaultPercent } from "../../../dex-ui/utils";
 import { TransactionDeadline, LocalStorageKeys } from "../constants";
 interface UseFormSettingsProps {
-  slippage: number;
+  slippage?: number;
   priceImpact?: number;
   transactionDeadline: number;
 }
 
 export function useFormSettings(props: UseFormSettingsProps) {
-  const { value: slippageValue, handleChange: handleSlippageChanged } = useLocalStorage(
+  const { value: slippageValue, handleChange: handleSlippageChanged } = useLocalStorage<number | undefined>(
     LocalStorageKeys.SLIPPAGE,
     props.slippage
   );
 
-  const { value: transactionDeadlineValue, handleChange: handleTransactionDeadlineChanged } = useLocalStorage(
-    LocalStorageKeys.TRANSACTIONDEAD_LINE,
-    props.transactionDeadline
-  );
+  const { value: transactionDeadlineValue, handleChange: handleTransactionDeadlineChanged } = useLocalStorage<
+    number | undefined
+  >(LocalStorageKeys.TRANSACTION_DEADLINE, props.transactionDeadline);
+
   const slippage = Number(slippageValue);
   const transactionDeadline = Number(transactionDeadlineValue);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

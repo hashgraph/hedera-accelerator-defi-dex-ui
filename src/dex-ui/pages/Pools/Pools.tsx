@@ -28,6 +28,7 @@ export interface FormattedUserPoolDetails {
   liquidity: string;
   percentOfPool: string;
   unclaimedFees: string;
+  pairLpAccountId: string | undefined;
   actions?: JSX.Element;
 }
 
@@ -185,7 +186,11 @@ const Pools = (): JSX.Element => {
                   mr={"1em"}
                   as={RouterLink}
                   to={userPool ? "/pools" : "/swap"}
-                  onClick={userPool ? () => actionNavigation("withdraw", row.name) : () => actionNavigation("swap")}
+                  onClick={
+                    userPool
+                      ? () => actionNavigation("withdraw", (row as FormattedUserPoolDetails).pairLpAccountId)
+                      : () => actionNavigation("swap")
+                  }
                 >
                   {userPool ? "Withdraw" : "Swap"}
                 </Link>
@@ -207,17 +212,17 @@ const Pools = (): JSX.Element => {
         index={poolsParamsState.selectedTab}
         onChange={(index) => setPoolsParamsState({ ...poolsParamsState, selectedTab: index })}
       >
-        {pools.withdrawState.status === "success" && poolsParamsState.showSuccessfulWithdrawalMessage ? (
+        {pools.withdrawTransactionState.status === "success" && poolsParamsState.showSuccessfulWithdrawalMessage ? (
           <>
             <Notification
               type={NotficationTypes.SUCCESS}
-              message={`Withdrew ${pools.withdrawState.successPayload?.lpTokenAmount} LP Tokens from 
-        ${pools.withdrawState.successPayload?.lpTokenSymbol} 
-        ${pools.withdrawState.successPayload?.fee} fee Pool.`}
+              message={`Withdrew ${pools.withdrawTransactionState.successPayload?.lpTokenAmount} LP Tokens from 
+        ${pools.withdrawTransactionState.successPayload?.tokenSymbol} 
+        ${pools.withdrawTransactionState.successPayload?.fee} fee Pool.`}
               isLinkShown={true}
               linkText="View in HashScan"
               linkRef={createHashScanTransactionLink(
-                pools.withdrawState.successPayload?.transactionResponse.transactionId.toString()
+                pools.withdrawTransactionState.successPayload?.transactionResponse.transactionId.toString()
               )}
               isCloseButtonShown={true}
               handleClickClose={() =>
