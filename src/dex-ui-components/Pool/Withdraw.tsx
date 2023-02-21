@@ -66,19 +66,20 @@ const WithdrawComponent = (props: WithdrawProps) => {
     lpInputAmount: "0",
   });
 
+  const updateInputValue = (lpInputAmount: number) => {
+    if (onInputAmountChange) onInputAmountChange(lpInputAmount);
+    setLocalWithdrawState({ ...localWithdrawState, lpInputAmount: lpInputAmount.toString() });
+  };
+
   const handleInputAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (onInputAmountChange) onInputAmountChange(+event.target.value);
-    setLocalWithdrawState({ ...localWithdrawState, lpInputAmount: event.target.value });
+    updateInputValue(+event.target.value);
   };
 
   const getPortionOfBalance = useCallback(
     (portion: "half" | "max") => {
-      setLocalWithdrawState({
-        ...localWithdrawState,
-        lpInputAmount:
-          portion === "half" ? (+poolLpDetails.userLpAmount / 2).toString() : poolLpDetails.userLpAmount.toString(),
-      });
+      updateInputValue(portion === "half" ? poolLpDetails.userLpAmount / 2 : poolLpDetails.userLpAmount);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localWithdrawState, poolLpDetails.userLpAmount]
   );
 
