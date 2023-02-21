@@ -126,6 +126,7 @@ const Withdraw = () => {
               secondToken,
             },
             poolLpDetails,
+            walletConnectionStatus: wallet.hashConnectConnectionState,
           },
         });
       } else {
@@ -136,7 +137,7 @@ const Withdraw = () => {
         });
       }
     },
-    [findPoolByLpToken, pools, withdrawState]
+    [findPoolByLpToken, pools, withdrawState, wallet.hashConnectConnectionState]
   );
 
   const onWithdrawClick = useCallback(
