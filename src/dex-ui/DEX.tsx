@@ -11,6 +11,7 @@ import {
   CreateProposal,
   SelectProposalType,
   CreatePoolPage,
+  DAOsListPage,
 } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import {
@@ -26,7 +27,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useWalletConnection } from "./hooks";
 import { ScrollToTop } from "./utils";
 
-const menuOptions = ["Swap", "Pools", "Governance"];
+const menuOptions = ["Swap", "Pools", "Governance", "DAOs"];
 const queryClient = new QueryClient();
 
 export const DEXTheme = extendTheme({
@@ -86,6 +87,7 @@ const DEX = () => {
                     path="/governance/select-proposal-type/contract-upgrade"
                     element={<CreateProposal proposalType="contract-upgrade" />}
                   />
+                  <Route path="/DAOs" element={<DAOsListPage />} />
                 </Routes>
               </Flex>
             </ScrollToTop>

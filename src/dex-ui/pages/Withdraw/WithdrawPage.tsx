@@ -1,6 +1,5 @@
-import { Box, HStack, Flex, Center } from "@chakra-ui/react";
 import { useDexContext, usePoolsData } from "../../hooks";
-import { WithdrawForm } from "../../../dex-ui-components/presets/WithdrawForm/WithdrawForm";
+import { WithdrawForm } from "../../../dex-ui-components";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
 import { formatWithdrawDataPoints } from "./formatter";
@@ -8,6 +7,7 @@ import { findPoolByLpToken } from "./utils";
 import { UserPool } from "../../store/poolsSlice";
 import { PoolsLocationProps } from "../Pools";
 import { useEffect, useState } from "react";
+import { Page, DefiFormContainer } from "../../layouts";
 
 export function WithdrawPage() {
   const { app, wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
@@ -47,24 +47,22 @@ export function WithdrawPage() {
     app.isFeatureLoading("allPoolsMetrics");
 
   return (
-    <HStack>
-      <Box margin="1rem">
-        <Center>
-          <Flex flexDirection="column" alignItems="center" gap="1rem" maxWidth="410px">
-            <WithdrawForm
-              pairedAccountBalance={wallet.pairedAccountBalance}
-              isLoading={isFormLoading}
-              poolLpDetails={withdrawState.poolLpDetails}
-              poolLiquidityDetails={{ firstToken: withdrawState.firstToken, secondToken: withdrawState.secondToken }}
-              transactionState={pools.withdrawTransactionState}
-              connectionStatus={wallet.hashConnectConnectionState}
-              connectToWallet={wallet.connectToWallet}
-              sendWithdrawTransaction={pools.sendRemoveLiquidityTransaction}
-              resetWithdrawState={pools.resetWithdrawState}
-            />
-          </Flex>
-        </Center>
-      </Box>
-    </HStack>
+    <Page
+      body={
+        <DefiFormContainer>
+          <WithdrawForm
+            pairedAccountBalance={wallet.pairedAccountBalance}
+            isLoading={isFormLoading}
+            poolLpDetails={withdrawState.poolLpDetails}
+            poolLiquidityDetails={{ firstToken: withdrawState.firstToken, secondToken: withdrawState.secondToken }}
+            transactionState={pools.withdrawTransactionState}
+            connectionStatus={wallet.hashConnectConnectionState}
+            connectToWallet={wallet.connectToWallet}
+            sendWithdrawTransaction={pools.sendRemoveLiquidityTransaction}
+            resetWithdrawState={pools.resetWithdrawState}
+          />
+        </DefiFormContainer>
+      }
+    />
   );
 }
