@@ -1,7 +1,7 @@
-import { Box, HStack, Flex, Center } from "@chakra-ui/react";
 import { useDexContext } from "../../hooks";
 import { formatSwapPageData } from "../Swap/formatters";
-import { AddLiquidityForm } from "../../../dex-ui-components/presets/AddLiquidityForm/AddLiquidityForm";
+import { AddLiquidityForm } from "../../../dex-ui-components";
+import { Page, DefiFormContainer } from "../../layouts";
 
 export function AddLiquidityPage() {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
@@ -17,26 +17,24 @@ export function AddLiquidityPage() {
     app.isFeatureLoading("tokenPairs");
 
   return (
-    <HStack>
-      <Box margin="1rem">
-        <Center>
-          <Flex flexDirection="column" alignItems="center" gap="1rem" maxWidth="410px">
-            <AddLiquidityForm
-              isLoading={isFormLoading}
-              pairedAccountBalance={wallet.pairedAccountBalance}
-              tokenPairs={swap.tokenPairs}
-              spotPrices={formattedSpotPrices}
-              userPoolsMetrics={pools.userPoolsMetrics}
-              transactionState={pools.addLiquidityTransactionState}
-              connectionStatus={wallet.hashConnectConnectionState}
-              connectToWallet={wallet.connectToWallet}
-              fetchSpotPrices={swap.fetchSpotPrices}
-              sendAddLiquidityTransaction={pools.sendAddLiquidityTransaction}
-              resetAddLiquidityState={pools.resetAddLiquidityState}
-            />
-          </Flex>
-        </Center>
-      </Box>
-    </HStack>
+    <Page
+      body={
+        <DefiFormContainer>
+          <AddLiquidityForm
+            isLoading={isFormLoading}
+            pairedAccountBalance={wallet.pairedAccountBalance}
+            tokenPairs={swap.tokenPairs}
+            spotPrices={formattedSpotPrices}
+            userPoolsMetrics={pools.userPoolsMetrics}
+            transactionState={pools.addLiquidityTransactionState}
+            connectionStatus={wallet.hashConnectConnectionState}
+            connectToWallet={wallet.connectToWallet}
+            fetchSpotPrices={swap.fetchSpotPrices}
+            sendAddLiquidityTransaction={pools.sendAddLiquidityTransaction}
+            resetAddLiquidityState={pools.resetAddLiquidityState}
+          />
+        </DefiFormContainer>
+      }
+    />
   );
 }

@@ -21,6 +21,7 @@ import { isEmpty } from "ramda";
 import { useDexContext, usePoolsData } from "../../hooks";
 import { Pool, UserPool } from "../../store/poolsSlice";
 import { createHashScanTransactionLink } from "../../utils";
+import { Page } from "../../layouts";
 
 export interface FormattedUserPoolDetails {
   name: string;
@@ -205,98 +206,100 @@ const Pools = (): JSX.Element => {
   };
 
   return (
-    <>
-      <Tabs
-        display={"flex"}
-        flexDirection={"column"}
-        index={poolsParamsState.selectedTab}
-        onChange={(index) => setPoolsParamsState({ ...poolsParamsState, selectedTab: index })}
-      >
-        {pools.withdrawTransactionState.status === "success" && poolsParamsState.showSuccessfulWithdrawalMessage ? (
-          <>
-            <Notification
-              type={NotficationTypes.SUCCESS}
-              message={`Withdrew ${pools.withdrawTransactionState.successPayload?.lpTokenAmount} LP Tokens from 
+    <Page
+      body={
+        <Tabs
+          display={"flex"}
+          flexDirection={"column"}
+          index={poolsParamsState.selectedTab}
+          onChange={(index) => setPoolsParamsState({ ...poolsParamsState, selectedTab: index })}
+        >
+          {pools.withdrawTransactionState.status === "success" && poolsParamsState.showSuccessfulWithdrawalMessage ? (
+            <>
+              <Notification
+                type={NotficationTypes.SUCCESS}
+                message={`Withdrew ${pools.withdrawTransactionState.successPayload?.lpTokenAmount} LP Tokens from 
         ${pools.withdrawTransactionState.successPayload?.tokenSymbol} 
         ${pools.withdrawTransactionState.successPayload?.fee} fee Pool.`}
-              isLinkShown={true}
-              linkText="View in HashScan"
-              linkRef={createHashScanTransactionLink(
-                pools.withdrawTransactionState.successPayload?.transactionResponse.transactionId.toString()
+                isLinkShown={true}
+                linkText="View in HashScan"
+                linkRef={createHashScanTransactionLink(
+                  pools.withdrawTransactionState.successPayload?.transactionResponse.transactionId.toString()
+                )}
+                isCloseButtonShown={true}
+                handleClickClose={() =>
+                  setPoolsParamsState({ ...poolsParamsState, showSuccessfulWithdrawalMessage: false })
+                }
+              />
+              <Spacer margin="0.25rem 0rem" />
+            </>
+          ) : (
+            <></>
+          )}
+          <TabList
+            display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+            padding={"0"}
+            margin={"0 16px"}
+          >
+            <Flex>
+              {!isEmpty(pools.allPoolsMetrics) ? (
+                <Tab fontSize={"32px"} padding={"0 0 8px 0"} marginRight={"32px"}>
+                  Pools
+                </Tab>
+              ) : (
+                ""
               )}
-              isCloseButtonShown={true}
-              handleClickClose={() =>
-                setPoolsParamsState({ ...poolsParamsState, showSuccessfulWithdrawalMessage: false })
-              }
-            />
-            <Spacer margin="0.25rem 0rem" />
-          </>
-        ) : (
-          <></>
-        )}
-        <TabList
-          display={"flex"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-          padding={"0"}
-          margin={"0 16px"}
-        >
-          <Flex>
-            {!isEmpty(pools.allPoolsMetrics) ? (
-              <Tab fontSize={"32px"} padding={"0 0 8px 0"} marginRight={"32px"}>
-                Pools
-              </Tab>
-            ) : (
-              ""
-            )}
-            {pools.userPoolsMetrics ? (
-              <Tab fontSize={"32px"} padding={"0 0 8px 0"}>
-                My Pools
-              </Tab>
-            ) : (
-              ""
-            )}
-          </Flex>
-          <Button width={"200px"} marginBottom={"10px"} onClick={() => navigate("/pools/create-pool")}>
-            Create Pool
-          </Button>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("allPoolsMetrics")}>
-              <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
-            </Skeleton>
-          </TabPanel>
-          <TabPanel>
-            {unclaimedFeeTotal() > 0 ? (
-              <Container
-                padding={"12px"}
-                margin={"0 0 16px 0"}
-                width={"100%"}
-                maxWidth={"100%"}
-                backgroundColor={"#D9D9D9"}
-              >
-                <Flex width={"100%"} justifyContent={"space-between"} alignItems={"center"} flexWrap={"wrap"}>
-                  <Text>
-                    Total unclaimed fees across {pools.userPoolsMetrics?.length} pools:&nbsp;
-                    <span style={{ fontWeight: "bold" }}>${unclaimedFeeTotal()}</span>
-                  </Text>
+              {pools.userPoolsMetrics ? (
+                <Tab fontSize={"32px"} padding={"0 0 8px 0"}>
+                  My Pools
+                </Tab>
+              ) : (
+                ""
+              )}
+            </Flex>
+            <Button width={"200px"} marginBottom={"10px"} onClick={() => navigate("/pools/create-pool")}>
+              Create Pool
+            </Button>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("allPoolsMetrics")}>
+                <DataTable colHeaders={colHeadersState.allPoolsColHeaders} rowData={getAllPoolsRowData()} />
+              </Skeleton>
+            </TabPanel>
+            <TabPanel>
+              {unclaimedFeeTotal() > 0 ? (
+                <Container
+                  padding={"12px"}
+                  margin={"0 0 16px 0"}
+                  width={"100%"}
+                  maxWidth={"100%"}
+                  backgroundColor={"#D9D9D9"}
+                >
+                  <Flex width={"100%"} justifyContent={"space-between"} alignItems={"center"} flexWrap={"wrap"}>
+                    <Text>
+                      Total unclaimed fees across {pools.userPoolsMetrics?.length} pools:&nbsp;
+                      <span style={{ fontWeight: "bold" }}>${unclaimedFeeTotal()}</span>
+                    </Text>
 
-                  <Button size={"sm"} height={"32px"}>
-                    Claim Fees
-                  </Button>
-                </Flex>
-              </Container>
-            ) : (
-              ""
-            )}
-            <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("userPoolsMetrics")}>
-              <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
-            </Skeleton>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </>
+                    <Button size={"sm"} height={"32px"}>
+                      Claim Fees
+                    </Button>
+                  </Flex>
+                </Container>
+              ) : (
+                ""
+              )}
+              <Skeleton speed={0.4} fadeDuration={0} isLoaded={!app.isFeatureLoading("userPoolsMetrics")}>
+                <DataTable colHeaders={colHeadersState.userPoolsColHeaders} rowData={getUserPoolsRowData()} />
+              </Skeleton>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      }
+    />
   );
 };
 
