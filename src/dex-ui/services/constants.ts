@@ -21,6 +21,9 @@ enum ContractNames {
   GovernorTransferToken = "governortransfertoken",
   GovernorTextProposal = "governortextproposal",
   GovernorCreateToken = "governortokencreate",
+  Configuration = "configuration",
+  GodTokenHolderFactory = "godtokenholderfactory",
+  GovernanceDAOFactory = "governancedaofactory",
 }
 
 function getProxyId(contractName: ContractNames): string {
@@ -44,6 +47,9 @@ export const Contracts = {
     CreateToken: {
       ProxyId: getProxyId(ContractNames.GovernorCreateToken),
     },
+  },
+  GovernanceDAOFactory: {
+    ProxyId: getProxyId(ContractNames.GovernanceDAOFactory),
   },
 };
 

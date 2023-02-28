@@ -15,7 +15,7 @@ import { useRef } from "react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { Color, RadioCard, TextIcon, TokenIcon, TrendingUpIcon, WalletIcon } from "../../../dex-ui-components";
 
-const mockNewProposalOptions = [
+const newProposalOptions = [
   {
     name: "new-token",
     type: "New Token",
@@ -72,7 +72,7 @@ export const SelectProposalType = (props: any) => {
         <Text textStyle="h3">What kind of proposal is this?</Text>
         <Spacer padding="1.5rem" />
         <Flex direction="row" gap={6} {...group}>
-          {mockNewProposalOptions.map((option, index) => {
+          {newProposalOptions.map((option, index) => {
             const radio = getRadioProps({ value: option.name });
             return (
               <Box flex="1" width="255px" height="155px">

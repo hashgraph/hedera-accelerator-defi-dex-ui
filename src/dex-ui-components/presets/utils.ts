@@ -1,8 +1,6 @@
 import { isEmpty, isNil, uniqBy } from "ramda";
-import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW, Token, TokenPair } from "../TokenInput";
+import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW, Token, TokenPair } from "./TokenInput";
 import { TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
-import { SwapSettingsInputProps } from "../base";
-import { ChangeEvent } from "react";
 import { TokenState } from "./types";
 import { HBARTokenId } from "../../dex-ui/services";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
@@ -106,40 +104,6 @@ export const getTokenBalance = (tokenId: string, accountBalances: AccountBalance
 
 const isHbarToken = (tokenId: string): boolean => {
   return tokenId === HBARTokenId;
-};
-
-interface GetSwapSettingsPropsParams {
-  swapSettings: {
-    slippage: string;
-    transactionDeadline: string;
-  };
-  onSlippageInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onTransactionDeadlineInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
-}
-
-export const getSwapSettingsProps = ({
-  swapSettings,
-  onSlippageInputChange,
-  onTransactionDeadlineInputChange,
-}: GetSwapSettingsPropsParams): { [key: string]: SwapSettingsInputProps } => {
-  return {
-    slippage: {
-      label: "Slippage",
-      popoverText: `Slippage refers to the difference between the expected 
-  price of a trade and the price at which the trade is executed.`,
-      inputUnit: "%",
-      onInputChange: onSlippageInputChange,
-      value: swapSettings.slippage,
-    },
-    transactionDeadline: {
-      label: "Transaction Deadline",
-      popoverText: `If your transaction is not completed within the deadline, it will revert and your coins
-  (less the fee) will be returned to you.`,
-      inputUnit: "min",
-      onInputChange: onTransactionDeadlineInputChange,
-      value: swapSettings.transactionDeadline,
-    },
-  };
 };
 
 interface GetExchangeRateDisplayParams {

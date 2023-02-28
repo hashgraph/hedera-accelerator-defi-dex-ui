@@ -20,11 +20,15 @@ export const InputStyles: ComponentStyleConfig = {
         borderRadius: 0,
       },
     },
-    settings: {
+    "input-v2": {
       field: {
-        bg: Color.White_02,
-        border: `1px solid ${Color.Grey_01}`,
-        borderRadius: "2px",
+        bg: Color.Grey_Blue._50,
+        border: `1px solid ${Color.Neutral._300}`,
+        borderRadius: "4px",
+        ":placeholder": {
+          ...TextStyles["p small regular"],
+          color: Color.Neutral._400,
+        },
       },
     },
     "form-input": {

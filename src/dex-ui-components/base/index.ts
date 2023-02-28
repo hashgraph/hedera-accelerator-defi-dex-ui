@@ -15,3 +15,4 @@ export * from "./Icons";
 export * from "./Tooltip";
 export * from "./Popover";
 export * from "./Dropdown";
+export * from "./Stepper";

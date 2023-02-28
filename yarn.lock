@@ -6919,6 +6919,11 @@ ccount@^1.0.0:
   resolved "https://registry.yarnpkg.com/ccount/-/ccount-1.1.0.tgz#246687debb6014735131be8abab2d93898f8d043"
   integrity sha512-vlNK021QdI7PNeiUh/lKkC/mNHHfV0m/Ad5JoI0TYtlBnJAslM/JIkm/tGC88bkLIwO6OQ5uV6ztS6kVAtCDlg==
 
+chakra-ui-steps@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/chakra-ui-steps/-/chakra-ui-steps-2.0.4.tgz#f846f0b1fafd2805424d113609174754de90f661"
+  integrity sha512-aImiPsw3hgqvfb9z3TVkt8WK32Hg0OOrJE5g/2Pt/1cA1Wqps2vDcWKShp8JZZQ1nyvNX3rxtrjPoDeRWdBO4A==
+
 chalk@^2.0.0, chalk@^2.4.1:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"

@@ -1,7 +1,7 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Menu, MenuItem, HStack, Box, Text, Center, Flex, Tag } from "@chakra-ui/react";
 import { useDexContext } from "../hooks";
-import { WalletConnection } from "../../dex-ui-components";
+import { Color, WalletConnection } from "../../dex-ui-components";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -12,23 +12,34 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
 
   return (
     <Menu>
-      <Flex padding="2rem 1rem" w="100%" height="84px" alignItems="center">
+      <Flex
+        padding="2rem 1rem"
+        w="100%"
+        height="84px"
+        alignItems="center"
+        bg={Color.Primary._800}
+        borderBottom={`1px solid ${Color.Neutral._200}`}
+      >
         <Box flex="1.5">
           <HStack spacing="0.5rem">
-            <Text textStyle="h3">Hedera Open DEX</Text>
-            <Tag textStyle="b3" size="sm">
+            <Text textStyle="h4 bold" color={Color.Primary._50}>
+              Hedera Open DEX
+            </Text>
+            <Tag textStyle="p xsmall medium" size="sm">
               Pre-Alpha
             </Tag>
           </HStack>
         </Box>
         <Box flex="1">
-          <Center>
+          <Center gap="12">
             {props.menuOptions.map((menuOption, index) => {
               return (
-                <Box flex="1" key={index}>
+                <Box flex="1" key={index} bg={Color.Primary._800}>
                   <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
-                    <MenuItem justifyContent="center" _hover={{ bg: "gray.200" }}>
-                      <Text textStyle="h3">{menuOption}</Text>
+                    <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Primary._700 }}>
+                      <Text textStyle="p medium medium" color={Color.Primary._50}>
+                        {menuOption}
+                      </Text>
                     </MenuItem>
                   </RouterLink>
                 </Box>

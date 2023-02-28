@@ -4,7 +4,7 @@ import { Flex } from "@chakra-ui/layout";
 import { Box, Text } from "@chakra-ui/react";
 import { StepperStyles } from "./StepperStyles";
 import { StepperState, ProposalStateIcon } from "./types";
-import { ActiveStepIcon, CancelledStepIcon, DisbaledStepIcon, CompletedStepIcon } from "../Icons";
+import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon } from "../Icons";
 
 const GetStatusIcon = (iconType: string) => {
   switch (iconType) {
@@ -13,7 +13,7 @@ const GetStatusIcon = (iconType: string) => {
     case ProposalStateIcon.Completed:
       return <CompletedStepIcon />;
     case ProposalStateIcon.Disabled:
-      return <DisbaledStepIcon />;
+      return <DisabledStepIcon />;
     case ProposalStateIcon.Cancelled:
       return <CancelledStepIcon fill={Color.Black_01} fillOpacity="0.54" />;
     default:

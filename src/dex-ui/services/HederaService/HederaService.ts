@@ -15,6 +15,8 @@ import { Contracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, TREASURY_ID } from "../c
 import { PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
+import TokenService from "./TokenService";
+import DAO from "./dao/DAO";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -222,6 +224,8 @@ function createHederaService() {
     removeLiquidity,
     createPool,
     ...GovernorService,
+    ...TokenService,
+    ...DAO,
   };
 }
 
