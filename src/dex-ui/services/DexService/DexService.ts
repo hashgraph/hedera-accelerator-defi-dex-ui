@@ -62,9 +62,9 @@ function createDexService() {
       state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
       timestamp: proposalEvent.timestamp,
       votes: {
-        yes: proposalEvent.votes.forVotes,
-        no: proposalEvent.votes.againstVotes,
-        abstain: proposalEvent.votes.abstainVotes,
+        yes: proposalEvent.votes?.forVotes,
+        no: proposalEvent.votes?.againstVotes,
+        abstain: proposalEvent.votes?.abstainVotes,
         quorum: proposalEvent.quorum,
         max: !isNil(totalGodTokenSupply) ? new BigNumber(totalGodTokenSupply.toString()) : BigNumber(0),
       },
