@@ -12,6 +12,7 @@ import {
   SelectProposalType,
   CreatePoolPage,
   DAOsListPage,
+  CreateADAOPage,
 } from "./pages";
 import { TopMenuBar } from "./layouts/TopMenuBar";
 import {
@@ -22,6 +23,8 @@ import {
   TextStyles,
   SelectStyles,
   TooltipStyles,
+  StepsV2Theme,
+  Color,
 } from "../dex-ui-components";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useWalletConnection } from "./hooks";
@@ -31,6 +34,13 @@ const menuOptions = ["Swap", "Pools", "Governance", "DAOs"];
 const queryClient = new QueryClient();
 
 export const DEXTheme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        background: Color.Primary_Bg,
+      },
+    },
+  },
   textStyles: TextStyles,
   components: {
     Button: ButtonStyles,
@@ -39,6 +49,7 @@ export const DEXTheme = extendTheme({
     Card: CardStyles,
     Select: SelectStyles,
     Tooltip: TooltipStyles,
+    Steps: StepsV2Theme,
   },
 });
 
@@ -52,7 +63,7 @@ const DEX = () => {
           w="100%"
           maxHeight="100%"
           maxWidth="100%"
-          bg="#FFFFFF"
+          bg={Color.Primary_Bg}
           padding="0"
           marginBottom="5rem"
           centerContent
@@ -88,6 +99,7 @@ const DEX = () => {
                     element={<CreateProposal proposalType="contract-upgrade" />}
                   />
                   <Route path="/DAOs" element={<DAOsListPage />} />
+                  <Route path="DAOs/create-a-DAO" element={<CreateADAOPage />} />
                 </Routes>
               </Flex>
             </ScrollToTop>

@@ -4,21 +4,22 @@ import { createHashScanTransactionLink } from "../../../dex-ui/utils";
 
 interface UseNotificationProps {
   successMessage: string;
-  transactionState: TransactionState;
+  transactionState: TransactionState | undefined;
 }
 
 export function useNotification(props: UseNotificationProps) {
-  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const defaultVisibility =
+    Boolean(props.transactionState?.successPayload) &&
+    !props.transactionState?.errorMessage &&
+    !props.transactionState?.transactionWaitingToBeSigned;
+
+  const [isNotificationVisible, setIsNotificationVisible] = useState(defaultVisibility);
   const [successNotificationMessage, setSuccessNotificationMessage] = useState("");
   const hashscanTransactionLink = createHashScanTransactionLink(
-    props.transactionState.successPayload?.transactionId.toString()
+    props.transactionState?.successPayload?.transactionId.toString() ?? ""
   );
 
-  const isSuccessNotificationVisible =
-    props.transactionState.successPayload &&
-    !props.transactionState.errorMessage &&
-    !props.transactionState.transactionWaitingToBeSigned &&
-    isNotificationVisible;
+  const isSuccessNotificationVisible = defaultVisibility && isNotificationVisible;
 
   useEffect(() => {
     setSuccessNotificationMessage(props.successMessage);

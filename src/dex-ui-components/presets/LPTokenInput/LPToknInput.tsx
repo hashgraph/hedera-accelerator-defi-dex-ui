@@ -21,6 +21,7 @@ interface LPTokenInputProps<T extends FieldValues> {
   onTokenAmountChanged?: (updatedToken: LPTokenState) => void;
 }
 
+/** TODO: Merge with TokenInput Component to create single component. */
 export function LPTokenInput<T extends FieldValues>(props: LPTokenInputProps<T>) {
   const errors = props.form.formState.errors?.[props.fieldValue];
   const formValues = structuredClone(props.form.getValues());

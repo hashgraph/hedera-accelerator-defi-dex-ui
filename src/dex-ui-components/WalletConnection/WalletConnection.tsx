@@ -1,6 +1,5 @@
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import {
-  HStack,
   Grid,
   Text,
   Center,
@@ -150,19 +149,21 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
     <Grid templateColumns="repeat(2, 1fr)">
       <Flex justifyContent="center" alignItems="center">
         <Skeleton width="100%" padding="0.5em 1em" speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
-          <Text textStyle="h3">{formattedHbarAmount}</Text>
+          <Text textStyle="p medium medium" color={Color.Primary._50}>
+            {formattedHbarAmount}
+          </Text>
         </Skeleton>
       </Flex>
       <Popover>
         <PopoverTrigger>
-          <Button bg="black" color="white" padding="0.5em 1em" borderRadius="0.5rem">
-            <HStack>
+          <Button bg={Color.Primary._900} color={Color.White} padding="0.5em 1em" borderRadius="0.5rem">
+            <Flex direction="row" alignItems="center" gap="2">
               <Circle size="1em" bg={connectionStatusColor} />
-              <Text textStyle="h3" color="white">
+              <Text textStyle="p medium semibold" color={Color.White}>
                 {accountId}
               </Text>
-              <ChevronDownIcon textStyle="h3" />
-            </HStack>
+              <ChevronDownIcon textStyle="p medium semibold" />
+            </Flex>
           </Button>
         </PopoverTrigger>
         <PopoverContent

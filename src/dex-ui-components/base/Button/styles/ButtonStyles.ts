@@ -3,18 +3,24 @@ import { TextStyles } from "../..";
 import { Color } from "../../../themes";
 
 const primary = {
-  bg: Color.Teal_01,
-  color: "white",
-  height: "44px",
-  padding: "16px",
-  borderRadius: "2px",
-  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+  ...TextStyles["p small semibold"],
+  bg: Color.Primary._500,
+  color: Color.White,
+  padding: "0 24px",
+  borderRadius: "4px",
+  ":hover": {
+    bg: Color.Primary._600,
+  },
+  ":focus": {
+    bg: Color.Primary._500,
+  },
   ":disabled": {
-    bg: Color.Grey_01,
-    opacity: 1,
+    bg: Color.Neutral._200,
+    color: Color.Neutral._600,
   },
   ":hover:disabled": {
-    bg: Color.Grey_01,
+    bg: Color.Neutral._400,
+    color: Color.Neutral._800,
   },
 };
 
@@ -28,11 +34,25 @@ export const ButtonStyles: ComponentStyleConfig = {
       ...primary,
     },
     secondary: {
-      bg: Color.White_01,
-      height: "44px",
-      border: `0.25px solid ${Color.Grey_01}`,
-      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
-      borderRadius: "2px",
+      ...TextStyles["p small semibold"],
+      bg: Color.Grey_Blue._100,
+      color: Color.Grey_Blue._600,
+      padding: "0 24px",
+      borderRadius: "4px",
+      ":hover": {
+        bg: Color.Grey_Blue._200,
+      },
+      ":focus": {
+        bg: Color.Grey_Blue._100,
+      },
+      ":disabled": {
+        bg: Color.Neutral._200,
+        color: Color.Neutral._600,
+      },
+      ":hover:disabled": {
+        bg: Color.Neutral._400,
+        color: Color.Neutral._800,
+      },
     },
     ternary: {
       bg: Color.Black_01,

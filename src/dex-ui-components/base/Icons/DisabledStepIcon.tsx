@@ -1,11 +1,11 @@
 import { Icon } from "@chakra-ui/react";
 import { Color } from "../..";
 
-interface DisbaledStepIconProps<T> {
+interface DisabledStepIconProps<T> {
   options?: T;
 }
 
-export function DisbaledStepIcon<T>(props: DisbaledStepIconProps<T>) {
+export function DisabledStepIcon<T>(props: DisabledStepIconProps<T>) {
   const { options } = props;
   return (
     <Icon width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" {...options}>

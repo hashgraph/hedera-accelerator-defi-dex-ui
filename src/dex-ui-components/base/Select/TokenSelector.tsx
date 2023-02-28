@@ -1,6 +1,6 @@
 import { ChangeEvent, cloneElement } from "react";
 import { Select } from "@chakra-ui/react";
-import { Token } from "../../TokenInput/types";
+import { Token } from "../../presets/TokenInput/types";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { ArrowDropDownIcon } from "../";
 import { isEmpty } from "ramda";

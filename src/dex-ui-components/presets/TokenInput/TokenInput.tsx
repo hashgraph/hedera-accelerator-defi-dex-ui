@@ -7,7 +7,7 @@ import { TokenPair } from "../SwapTokensForm/types";
 import { formulaTypes, TokenState } from "../types";
 import { formatTokenBalance, getTokenBalance, getTokenData, halfOf } from "../utils";
 import { ChangeEvent, useEffect } from "react";
-import { Token as TokenInputType } from "../../TokenInput";
+import { Token as TokenInputType } from "./types";
 import { InitialTokenState } from "../constants";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 

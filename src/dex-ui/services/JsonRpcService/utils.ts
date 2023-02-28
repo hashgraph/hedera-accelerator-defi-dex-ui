@@ -40,3 +40,13 @@ export function createContract(contractId: string, abi: any[]): ethers.Contract 
   const solidityAddress = ContractId.fromString(contractId).toSolidityAddress();
   return new ethers.Contract(solidityAddress, abi, JsonRpcSigner);
 }
+
+/**
+ * Creates an ethers.Contract object with a given signer.
+ * @param address - Solidity address of the contract.
+ * @param abi - ABI for the contract.
+ * @returns An ethers.Contract representation of the provided contract data.
+ */
+export function createContractWithSolidityAddress(address: string, abi: any[]): ethers.Contract {
+  return new ethers.Contract(address, abi, JsonRpcSigner);
+}

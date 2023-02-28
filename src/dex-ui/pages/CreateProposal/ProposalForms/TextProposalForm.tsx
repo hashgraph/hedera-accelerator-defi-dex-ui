@@ -52,7 +52,7 @@ function TextProposalForm() {
             control={control}
             rules={{
               required: { value: true, message: "Description is required." },
-              minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
+              minLength: { value: 107, message: "Please enter at least 100 characters in the description." },
             }}
             render={({ field }) => (
               <TextEditor
