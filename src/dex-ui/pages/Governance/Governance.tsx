@@ -19,7 +19,7 @@ import { useInput } from "../../hooks/useInput";
 import { useDateRange } from "../../hooks/useDateRange";
 import { FormattedProposal } from "./types";
 
-const PageLimit = 20;
+const PageLimit = 10;
 
 const VOTING_KEYS: { value: string; color: string }[] = [
   { value: "Yes", color: "#79B54B" },

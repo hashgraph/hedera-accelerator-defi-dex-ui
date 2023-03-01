@@ -188,14 +188,7 @@ function createMirrorNodeService() {
     proposalType: string,
     contractId: string
   ): Promise<MirrorNodeDecodedProposalEvent[]> => {
-    /*
-     Currently, each proposal requires multiple additional calls to the smart contract
-     to get all of the desired data for the UI. This is an expensive action that costs a large
-     amount of hbar. We are only fetching the latest proposal for the time being to reduce
-     the query overhead. A solution is being built on the smart contract to enable a single
-     query to get all proposal data.
-
-     const response = await fetchNextBatch<{ logs: [] }>(
+    const response = await fetchNextBatch<MirrorNodeProposalEventLog>(
       `/api/v1/contracts/${contractId.toString()}/results/logs`,
       "logs",
       {
@@ -204,15 +197,8 @@ function createMirrorNodeService() {
         },
       }
     );
-    */
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
-      params: {
-        order: "desc",
-        limit: 100,
-      },
-    });
 
-    const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
+    const allEvents = decodeLog(governorAbiSignatureMap, response);
     const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
@@ -250,7 +236,21 @@ function createMirrorNodeService() {
       textProposalEventsResults,
       contractUpgradeEventsResults,
     ]);
-    const proposalEvents = getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
+    /*
+     Currently, each proposal requires multiple additional calls to the smart contract
+     to get all of the desired data for the UI. This is an expensive action that costs a large
+     amount of hbar. We are only fetching data for the latest proposals for the time being to reduce
+     the query overhead. A solution is being built on the smart contract to enable a single
+     query to get all proposal data.
+    */
+    const proposalEvents = getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults)
+      .sort((a: MirrorNodeDecodedProposalEvent, b: MirrorNodeDecodedProposalEvent) => {
+        const aTimestamp = a.timestamp ?? "";
+        const bTimestamp = b.timestamp ?? "";
+        return BigNumber(bTimestamp).comparedTo(aTimestamp);
+      })
+      .slice(0, 10);
+
     return proposalEvents;
   };
 

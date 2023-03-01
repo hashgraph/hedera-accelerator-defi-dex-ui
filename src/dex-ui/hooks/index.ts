@@ -6,3 +6,4 @@ export * from "./usePoolsData";
 export * from "./governance";
 export * from "./useTabFilters";
 export * from "./useLocalStorage";
+export * from "./pair";
