@@ -85,7 +85,7 @@ export function useCreateProposal() {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(GovernanceQueries.FetchAllProposals);
+        queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
       },
     }
   );

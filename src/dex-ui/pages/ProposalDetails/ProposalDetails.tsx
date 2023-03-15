@@ -35,10 +35,12 @@ import { useProposalDetails } from "./useProposalDetails";
 import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
 import { ProposalDetailsControls } from "./ProposalDetailsControls";
 import { StepperUI } from "../../../dex-ui-components/base/Stepper";
+import { formatProposal } from "../Governance/formatter";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
   const proposalDetails = useProposalDetails(id);
+
   const {
     proposal,
     castVote,
@@ -55,7 +57,9 @@ export const ProposalDetails = () => {
     proposalStatus,
   } = proposalDetails;
 
-  if (!proposal.isLoading && isNil(proposal.data)) {
+  const formattedProposal = proposal.data ? formatProposal(proposal.data) : undefined;
+
+  if (!proposal.isLoading && isNil(proposal)) {
     return <span>{`Proposal with id: ${id} not found.`}</span>;
   }
 
@@ -85,7 +89,7 @@ export const ProposalDetails = () => {
 
   return (
     <>
-      <Grid templateColumns="repeat(4, 1fr)" gap="4" width="100%" minHeight="500px">
+      <Grid templateColumns="repeat(4, 1fr)" gap="4" width="100%" minHeight="500px" paddingTop="1.5rem">
         <GridItem colSpan={3}>
           <Flex direction="column" gap={10} height="100%">
             <Breadcrumb>
@@ -109,7 +113,7 @@ export const ProposalDetails = () => {
             <Box>
               <Skeleton speed={0.4} fadeDuration={0} width="fit-content" isLoaded={!proposal.isLoading}>
                 <Text textStyle="h2" paddingRight="0.25rem">
-                  {proposal.data?.title}
+                  {formattedProposal?.title}
                 </Text>
               </Skeleton>
               <Spacer padding="0.25rem" />
@@ -118,7 +122,7 @@ export const ProposalDetails = () => {
                   Type:
                 </Text>
                 <Tag textStyle="b3" size="sm" padding="0.3rem">
-                  {proposal.data?.type}
+                  {formattedProposal?.type}
                 </Tag>
               </Flex>
               <Spacer padding="0.25rem" />
@@ -135,13 +139,13 @@ export const ProposalDetails = () => {
                     href={hashScanAccountLink}
                     isExternal
                   >
-                    <Text textDecoration="underline">{proposal.data?.author}</Text>
+                    <Text textDecoration="underline">{formattedProposal?.author}</Text>
                     <ExternalLinkIcon margin="0rem 0.125rem" />
                   </Link>
                 </Skeleton>
               </Flex>
             </Box>
-            {proposal.data?.state === ProposalState.Executed && (
+            {formattedProposal?.state === ProposalState.Executed && (
               <Tag textStyle="b3" size="sm" bg={Color.Green_01_Opaque} padding="0.3rem" width="fit-content">
                 {ProposalState.Executed}
               </Tag>
@@ -150,7 +154,7 @@ export const ProposalDetails = () => {
               <Text textStyle="h3">Description</Text>
               <Spacer padding="0.25rem" />
               <SkeletonText speed={0.4} fadeDuration={0} noOfLines={12} isLoaded={!proposal.isLoading}>
-                <DisplayHTMLContent value={proposal.data?.description ?? ""} />
+                <DisplayHTMLContent value={formattedProposal?.description ?? ""} />
               </SkeletonText>
             </Box>
             <Flex gap="4" direction="column">
@@ -186,15 +190,15 @@ export const ProposalDetails = () => {
                   <Text textStyle="h3">Votes</Text>
                   <Flex padding="0.8rem" direction="column" gap="4">
                     <HorizontalStackBarChart
-                      quorum={proposal.data?.votes.quorum}
+                      quorum={formattedProposal?.votes.quorum}
                       data={[
-                        { value: proposal.data?.votes.yes ?? 0, bg: Color.Blue_01 },
-                        { value: proposal.data?.votes.no ?? 0, bg: Color.Red_03 },
-                        { value: proposal.data?.votes.abstain ?? 0, bg: Color.Grey_03 },
-                        { value: proposal.data?.votes.remaining ?? 0, bg: Color.Grey_01 },
+                        { value: formattedProposal?.votes.yes ?? 0, bg: Color.Blue_01 },
+                        { value: formattedProposal?.votes.no ?? 0, bg: Color.Red_03 },
+                        { value: formattedProposal?.votes.abstain ?? 0, bg: Color.Grey_03 },
+                        { value: formattedProposal?.votes.remaining ?? 0, bg: Color.Grey_01 },
                       ]}
                     />
-                    {Number(proposal.data?.votes.yes) < Number(proposal.data?.votes.quorum) ? (
+                    {Number(formattedProposal?.votes.yes) < Number(formattedProposal?.votes.quorum) ? (
                       <Text textStyle="h4">Quorum Not Met</Text>
                     ) : (
                       <></>
@@ -205,17 +209,17 @@ export const ProposalDetails = () => {
                         data={[
                           {
                             label: "Yes",
-                            value: proposal.data?.votes.yes ?? 0,
+                            value: formattedProposal?.votes.yes ?? 0,
                             icon: <CompletedStepIcon />,
                           },
                           {
                             label: "No",
-                            value: proposal.data?.votes.no ?? 0,
+                            value: formattedProposal?.votes.no ?? 0,
                             icon: <CancelledStepIcon fill={Color.Red_03} />,
                           },
                           {
                             label: "Abstain",
-                            value: proposal.data?.votes.abstain ?? 0,
+                            value: formattedProposal?.votes.abstain ?? 0,
                             icon: <CircleMinusIcon fill={Color.Black_01} fillOpacity="0.54" />,
                           },
                         ]}

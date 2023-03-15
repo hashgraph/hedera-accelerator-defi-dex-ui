@@ -12,10 +12,10 @@ import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusCo
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const proposal = useProposal(proposalId);
-  const castVote = useCastVote();
-  const cancelProposal = useCancelProposal();
+  const castVote = useCastVote(proposalId);
+  const cancelProposal = useCancelProposal(proposalId);
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
-  const executeProposal = useExecuteProposal();
+  const executeProposal = useExecuteProposal(proposalId);
 
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
   const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;
@@ -80,7 +80,11 @@ export function useProposalDetails(proposalId: string | undefined) {
       case ProposalState.Active:
         return [
           { status: "Review", iconType: ProposalStateIcon.Completed },
-          { status: "Active", iconType: ProposalStateIcon.Active, timeRemaining: proposal.data.timeRemaining },
+          {
+            status: "Active",
+            iconType: ProposalStateIcon.Active,
+            timeRemaining: proposal.data.timeRemaining?.toString(),
+          },
           { status: "Queued To Execute", iconType: ProposalStateIcon.Disabled },
           { status: "Executed", iconType: ProposalStateIcon.Disabled },
         ];

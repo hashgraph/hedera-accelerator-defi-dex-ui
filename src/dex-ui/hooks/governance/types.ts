@@ -7,7 +7,7 @@ export enum GovernanceMutations {
 }
 
 export enum GovernanceQueries {
-  FetchAllProposals = "fetchAllProposals",
+  Proposals = "proposals",
   FetchHasVoted = "hasVoted",
 }
 

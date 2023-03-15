@@ -208,7 +208,19 @@ function createMirrorNodeService() {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
-        limit: 100,
+        /**
+         * Every proposal fetched from the mirror node logs requires an additional hashio
+         * JSON RPC call to fetch the remaining details for the UI. Some of these calls are failing
+         * with a "HBAR rate limit exceeded" error resulting in the UI displaying an error. This is due to
+         * our queries exceeding the global rate limit for the JSON RPC service.
+         *
+         * To reduce the frequency at which this error occurs a temporary limit has been put in place. A
+         * max of 5 proposal details for each type of proposal will be fetched from the proposal logs.
+         *
+         * @see {@link file://./../../../../architecture/05_Event_Based_Historical_Queries.md} for more details
+         * regarding a long term solution.
+         */
+        limit: 5,
       },
     });
 

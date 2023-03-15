@@ -3,6 +3,7 @@ import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, useQueryClient } from "react-query";
 import { DexService } from "../../services";
+import { isNil } from "ramda";
 
 interface UseExecuteProposalParams {
   contractId: string;
@@ -10,16 +11,23 @@ interface UseExecuteProposalParams {
   signer: HashConnectSigner;
 }
 
-export function useExecuteProposal() {
+export function useExecuteProposal(id: string | undefined) {
   const queryClient = useQueryClient();
-  return useMutation<TransactionResponse, Error, UseExecuteProposalParams, GovernanceMutations.ExecuteProposal>(
-    (params: UseExecuteProposalParams) => {
+  return useMutation<
+    TransactionResponse | undefined,
+    Error,
+    UseExecuteProposalParams,
+    GovernanceMutations.ExecuteProposal
+  >(
+    async (params: UseExecuteProposalParams) => {
+      if (isNil(id)) return;
       const { contractId, title, signer } = params;
       return DexService.executeProposal({ contractId, title, signer });
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(GovernanceQueries.FetchAllProposals);
+        queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
+        queryClient.invalidateQueries([GovernanceQueries.Proposals, "detail", id]);
       },
     }
   );

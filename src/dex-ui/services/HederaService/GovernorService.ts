@@ -107,7 +107,8 @@ const sendCreateTransferTokenProposalTransaction = async (
     .addAddress(transferFromAddress)
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
-    .addInt256(amountToTransfer);
+    .addInt256(amountToTransfer)
+    .addAddress(transferFromAddress);
 
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(transferTokenContractId)

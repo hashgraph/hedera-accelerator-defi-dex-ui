@@ -530,19 +530,6 @@
     {
       "inputs": [
         {
-          "internalType": "address",
-          "name": "delegatee",
-          "type": "address"
-        }
-      ],
-      "name": "delegateTo",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address[]",
           "name": "targets",
           "type": "address[]"
@@ -594,6 +581,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "getGODTokenAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -604,23 +604,58 @@
       "name": "getProposalDetails",
       "outputs": [
         {
+          "internalType": "uint256",
+          "name": "quorumValue",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isQuorumReached",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum IGovernorUpgradeable.ProposalState",
+          "name": "proposalState",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "voted",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "againstVotes",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "forVotes",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "abstainVotes",
+          "type": "uint256"
+        },
+        {
           "internalType": "address",
-          "name": "",
+          "name": "creator",
           "type": "address"
         },
         {
           "internalType": "string",
-          "name": "",
+          "name": "title",
           "type": "string"
         },
         {
           "internalType": "string",
-          "name": "",
+          "name": "descripition",
           "type": "string"
         },
         {
           "internalType": "string",
-          "name": "",
+          "name": "link",
           "type": "string"
         }
       ],
@@ -759,6 +794,16 @@
           "internalType": "contract IBaseHTS",
           "name": "_tokenService",
           "type": "address"
+        },
+        {
+          "internalType": "contract IGODHolder",
+          "name": "_godHolder",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quorumThresholdInBsp",
+          "type": "uint256"
         }
       ],
       "name": "initialize",
@@ -1009,7 +1054,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "blockNumber",
+          "name": "",
           "type": "uint256"
         }
       ],

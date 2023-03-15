@@ -9,6 +9,7 @@ import { VoteType } from "./types";
 import { useDexContext } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../dex-ui-components";
+import { formatProposal } from "../Governance/formatter";
 
 type UseProposalDetailsData = ReturnType<typeof useProposalDetails>;
 
@@ -39,9 +40,11 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     doesUserHaveGodTokens,
   } = props.proposalDetails;
 
+  const formattedProposal = proposal.data ? formatProposal(proposal.data) : undefined;
+
   let isUserProposalCreator = false;
   try {
-    isUserProposalCreator = proposal.data?.author === wallet.getSigner().getAccountId().toString();
+    isUserProposalCreator = formattedProposal?.author === wallet.getSigner().getAccountId().toString();
   } catch (error) {
     console.log(error);
   }
@@ -122,7 +125,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     return (
       <Flex flexDirection="row" gap="1rem" alignItems="start">
         <CancelProposalModalButton
-          proposal={proposal.data}
+          proposal={formattedProposal}
           cancelProposal={cancelProposal}
           governanceTokenId={GovernanceTokenId}
           isOpenDialogButtonDisabled={proposal === undefined}
