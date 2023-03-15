@@ -31,7 +31,25 @@ import { useWalletConnection } from "./hooks";
 import { ScrollToTop } from "./utils";
 
 const menuOptions = ["Swap", "Pools", "Governance", "DAOs"];
-const queryClient = new QueryClient();
+const SEVEN_SECONDS = 7 * 1000;
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      /**
+       * All React Queries will reference cached data for 7 seconds before
+       * refetching the latest set of data (unless `staleTime` is overridden in a specific query).
+       * Note that refreshing the page or refocusing the browser tab that contains the application
+       * will always cause a refetch. This is a temporary default to reduce the volume of
+       * calls we make to the hashio JSON RPC service.
+       *
+       * @see {@link file://./../../architecture/05_Event_Based_Historical_Queries.md} for more details
+       * regarding a long term solution to reduce our hashio JSON RPC service hbar usage.
+       */
+      staleTime: SEVEN_SECONDS,
+    },
+  },
+});
 
 export const DEXTheme = extendTheme({
   styles: {

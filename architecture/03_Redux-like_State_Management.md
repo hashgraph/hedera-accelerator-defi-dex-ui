@@ -1,4 +1,4 @@
-# 03 - React Hooks + Context API: Redux-like State Management
+# 03 - [Deprecated] React Hooks + Context API: Redux-like State Management
 
 ### Status
 `Accepted`

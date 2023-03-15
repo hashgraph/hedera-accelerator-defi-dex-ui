@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Text, Button, Flex, Grid, GridItem, Circle, Input, Spacer } from "@chakra-ui/react";
+import { Text, Button, Flex, Grid, GridItem, Circle, Input, Spacer, Center, Box } from "@chakra-ui/react";
 import { ReactElement, useState } from "react";
 import {
   Notification,
@@ -11,7 +11,7 @@ import {
 } from "../../../dex-ui-components";
 import { CreateProposalLocationProps } from "../CreateProposal";
 import { createHashScanTransactionLink } from "../../utils";
-import { CardListLayout, TabFilter, TabFilters } from "../../layouts";
+import { CardListLayout, Page, PageHeader, TabFilter, TabFilters } from "../../layouts";
 import { useAllProposals, useTabFilters } from "../../hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
@@ -72,88 +72,91 @@ export const Governance = (): ReactElement => {
   const handleClickNewProposalButton = () => navigate("/governance/select-proposal-type");
 
   return (
-    <Grid templateColumns="repeat(1, 1fr)" gap={8} width="100%">
-      <Notification
-        type={NotficationTypes.SUCCESS}
-        message={`You have created ${locationState?.proposalTitle}`}
-        isLinkShown={true}
-        linkText="View in HashScan"
-        linkRef={hashScanLink}
-        isCloseButtonShown={true}
-        isVisible={isNotificationVisible}
-        handleClickClose={handleClickNotificationCloseButton}
-      />
-      <GridItem colSpan={1}>
-        <Flex direction="row">
-          <Text flex="4" textStyle="h1">
-            Governance
-          </Text>
-          <Button
-            flex="1"
-            alignSelf="center"
-            variant="new-proposal"
-            textStyle="h3"
-            data-testid="new-proposal-button"
-            onClick={handleClickNewProposalButton}
-          >
-            New Proposal
-          </Button>
-        </Flex>
-      </GridItem>
-      <GridItem justifySelf="right">
-        <Flex direction="row" gap="4">
-          {VOTING_KEYS.map((metric, index) => (
-            <Flex key={index} gap="1" width="fit-content">
-              <Circle size="1em" bg={metric.color} />
-              <Text textStyle="h4">{metric.value}</Text>
-            </Flex>
-          ))}
-        </Flex>
-      </GridItem>
-      <GridItem colSpan={1}>
-        <CardListLayout
-          onTabChange={handleTabChange}
-          tabFilters={<TabFilters<ProposalStatus> filters={proposalTabFilters} />}
-          inputFilters={
-            <>
-              <RangeDatePicker
-                placeholder="Filter By Date"
-                startDate={startDate}
-                endDate={endDate}
-                onSelection={(dates: any) => {
-                  const [startDate, endDate] = dates;
-                  handleProposalDatesFilterChange(startDate, endDate);
-                }}
+    <Page
+      header={
+        <>
+          <Center>
+            <Box padding="16px 80px 0 80px" maxWidth="fit-content" paddingTop="1rem">
+              <Notification
+                type={NotficationTypes.SUCCESS}
+                message={`You have created ${locationState?.proposalTitle}`}
+                isLinkShown={true}
+                linkText="View in HashScan"
+                linkRef={hashScanLink}
+                isCloseButtonShown={true}
+                isVisible={isNotificationVisible}
+                handleClickClose={handleClickNotificationCloseButton}
               />
-              <Spacer padding="0.5rem" />
-              <Input
-                variant="filter"
-                value={proposalTitleFilter}
-                onChange={handleProposalTitleFilterChange}
-                placeholder="Filter By Name"
-                flex="1"
-                minWidth="300px"
-              />
-            </>
-          }
-          cardLists={proposalTabFilters.map(() => (
-            <CardList error={error} isSuccess={isSuccess} isLoading={isLoading} isError={isError}>
-              {paginatedProposals?.map((proposal, index) => (
-                <ProposalCard proposal={proposal} key={index} />
+            </Box>
+          </Center>
+          <PageHeader
+            leftContent={[<Text textStyle="h2">Governance</Text>]}
+            rightContent={[
+              <Button padding="0px 20px" data-testid="new-proposal-button" onClick={handleClickNewProposalButton}>
+                New Proposal
+              </Button>,
+            ]}
+          />
+        </>
+      }
+      body={
+        <Grid templateColumns="repeat(1, 1fr)" gap={8} width="100%">
+          <GridItem justifySelf="right">
+            <Flex direction="row" gap="4">
+              {VOTING_KEYS.map((metric, index) => (
+                <Flex key={index} gap="1" width="fit-content">
+                  <Circle size="1em" bg={metric.color} />
+                  <Text textStyle="h4">{metric.value}</Text>
+                </Flex>
               ))}
-            </CardList>
-          ))}
-          paginationComponent={
-            <Pagination
-              pageCount={pageCount}
-              isPaginationVisible={isPaginationVisible}
-              isPreviousButtonVisible={isPreviousButtonVisible}
-              isNextButtonVisible={isNextButtonVisible}
-              handlePageClick={handlePageClick}
+            </Flex>
+          </GridItem>
+          <GridItem colSpan={1}>
+            <CardListLayout
+              onTabChange={handleTabChange}
+              tabFilters={<TabFilters<ProposalStatus> filters={proposalTabFilters} />}
+              inputFilters={
+                <>
+                  <RangeDatePicker
+                    placeholder="Filter By Date"
+                    startDate={startDate}
+                    endDate={endDate}
+                    onSelection={(dates: any) => {
+                      const [startDate, endDate] = dates;
+                      handleProposalDatesFilterChange(startDate, endDate);
+                    }}
+                  />
+                  <Spacer padding="0.5rem" />
+                  <Input
+                    variant="filter"
+                    value={proposalTitleFilter}
+                    onChange={handleProposalTitleFilterChange}
+                    placeholder="Filter By Name"
+                    flex="1"
+                    minWidth="300px"
+                  />
+                </>
+              }
+              cardLists={proposalTabFilters.map(() => (
+                <CardList error={error} isSuccess={isSuccess} isLoading={isLoading} isError={isError}>
+                  {paginatedProposals?.map((proposal, index) => (
+                    <ProposalCard proposal={proposal} key={index} />
+                  ))}
+                </CardList>
+              ))}
+              paginationComponent={
+                <Pagination
+                  pageCount={pageCount}
+                  isPaginationVisible={isPaginationVisible}
+                  isPreviousButtonVisible={isPreviousButtonVisible}
+                  isNextButtonVisible={isNextButtonVisible}
+                  handlePageClick={handlePageClick}
+                />
+              }
             />
-          }
-        />
-      </GridItem>
-    </Grid>
+          </GridItem>
+        </Grid>
+      }
+    />
   );
 };

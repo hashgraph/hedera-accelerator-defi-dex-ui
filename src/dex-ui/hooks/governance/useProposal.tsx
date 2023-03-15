@@ -1,14 +1,20 @@
-import { BigNumber } from "bignumber.js";
-import { formatProposal } from "../../pages/Governance/formatter";
-import { FormattedProposal } from "../../pages/Governance/types";
 import { Proposal } from "../../store/governanceSlice";
+import { DexService } from "../../services";
+import { useQuery } from "react-query";
+import { GovernanceQueries } from "./types";
 import { isNil } from "ramda";
-import { useProposalQuery } from "./queries";
+
+type UseProposalQueryKey = [GovernanceQueries.Proposals, "detail", string | undefined];
 
 export function useProposal(id: string | undefined) {
-  const getProposal = (data: Proposal[]) => {
-    const proposal = data.find((proposal: Proposal) => !isNil(id) && BigNumber(id).eq(proposal.id));
-    return proposal ? formatProposal(proposal) : undefined;
-  };
-  return useProposalQuery<FormattedProposal | undefined>(getProposal);
+  return useQuery<Proposal | undefined, Error, Proposal, UseProposalQueryKey>(
+    [GovernanceQueries.Proposals, "detail", id],
+    async () => {
+      if (isNil(id)) return;
+      return DexService.fetchProposal(id);
+    },
+    {
+      keepPreviousData: true,
+    }
+  );
 }

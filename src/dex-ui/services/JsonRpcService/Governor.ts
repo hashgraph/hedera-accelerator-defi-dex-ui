@@ -13,19 +13,6 @@ function createGovernorContract(governorAccountId: string): ethers.Contract {
   return createContract(governorAccountId, Governor.abi);
 }
 
-/**
- * Fetches the current state of a governor proposal.
- * @param governorAccountId - The account id of the governor contract.
- * @param proposalId - The id of the governor proposal.
- * @returns The state of the proposal
- */
-async function fetchProposalState(governorAccountId: string, proposalId: string): Promise<BigNumber> {
-  const preciseProposalId = ethers.BigNumber.from(proposalId);
-  const governorContract = createGovernorContract(governorAccountId);
-  const proposalState: ethers.BigNumber = await governorContract.state(preciseProposalId);
-  return convertEthersBigNumberToBigNumberJS(proposalState);
-}
-
 interface FetchHasVotedParams {
   governorAccountId: string;
   proposalId: string;
@@ -46,39 +33,66 @@ async function fetchHasVoted(params: FetchHasVotedParams): Promise<boolean> {
   return hasVoted;
 }
 
-interface ProposalVotes {
+type RawProposalDetailsResponse = [
+  quorumValue: ethers.BigNumber,
+  isQuorumReached: boolean,
+  proposalState: number,
+  voted: boolean,
+  againstVotes: ethers.BigNumber,
+  forVotes: ethers.BigNumber,
+  abstainVotes: ethers.BigNumber,
+  creator: string,
+  title: string,
+  description: string,
+  link: string
+];
+
+type ProposalDetailsResponse = {
+  quorum: BigNumber;
+  isQuorumReached: boolean;
+  state: number;
+  hasVoted: boolean;
   againstVotes: BigNumber;
   forVotes: BigNumber;
   abstainVotes: BigNumber;
-}
+  creator: string;
+  title: string;
+  description: string;
+  link: string;
+};
 
-/**
- * TODO
- * @param contractId -
- * @param proposalId -
- * @returns
- */
-async function fetchProposalVotes(governorAccountId: string, proposalId: string): Promise<ProposalVotes> {
+async function fetchProposalDetails(governorAccountId: string, proposalId: string): Promise<ProposalDetailsResponse> {
   const preciseProposalId = ethers.BigNumber.from(proposalId);
   const governorContract = createGovernorContract(governorAccountId);
-  const results: ethers.BigNumber[] = await governorContract.proposalVotes(preciseProposalId);
-  const [againstVotes, forVotes, abstainVotes]: BigNumber[] = results.map(convertEthersBigNumberToBigNumberJS);
-  return { againstVotes, forVotes, abstainVotes };
+  const proposalDetails: RawProposalDetailsResponse = await governorContract.getProposalDetails(preciseProposalId);
+  const [
+    quorumValue,
+    isQuorumReached,
+    proposalState,
+    voted,
+    againstVotes,
+    forVotes,
+    abstainVotes,
+    creator,
+    title,
+    description,
+    link,
+  ] = proposalDetails;
+  return {
+    quorum: convertEthersBigNumberToBigNumberJS(quorumValue),
+    isQuorumReached,
+    state: proposalState,
+    hasVoted: voted,
+    againstVotes: convertEthersBigNumberToBigNumberJS(againstVotes),
+    forVotes: convertEthersBigNumberToBigNumberJS(forVotes),
+    abstainVotes: convertEthersBigNumberToBigNumberJS(abstainVotes),
+    creator,
+    title,
+    description,
+    link,
+  };
 }
 
-/**
- * TODO
- * @param contractId -
- * @param blockNumber -
- * @returns
- */
-async function fetchQuorum(governorAccountId: string, blockNumber: string): Promise<BigNumber> {
-  const preciseBlockNumber = ethers.BigNumber.from(blockNumber);
-  const governorContract = createGovernorContract(governorAccountId);
-  const quorum: ethers.BigNumber = await governorContract.quorum(preciseBlockNumber);
-  return convertEthersBigNumberToBigNumberJS(quorum);
-}
-
-const GovernorContract = { fetchProposalState, fetchHasVoted, fetchProposalVotes, fetchQuorum };
+const GovernorContract = { fetchProposalDetails, fetchHasVoted };
 export default GovernorContract;
-export type { ProposalVotes };
+export type { ProposalDetailsResponse };
