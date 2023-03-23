@@ -31,5 +31,8 @@ async function getPair(tokenAAddress: string, secondTokenAddress: string, transa
   return await factoryContract.getPair(tokenAAddress, secondTokenAddress, transactionFee);
 }
 
-const FactoryContract = { fetchAllTokenPairs, getPair };
+const FactoryContract = {
+  fetchAllTokenPairs,
+  getPair,
+};
 export default FactoryContract;

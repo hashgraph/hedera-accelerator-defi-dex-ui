@@ -68,7 +68,9 @@ function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTok
 
 const fetchEachToken = async (evmAddress: string) => {
   const pairData = await DexService.fetchContract(evmAddress);
-  const { tokenATokenId, tokenBTokenId, lpTokenId } = await DexService.fetchPairTokenIds(pairData.data.contract_id);
+  const { tokenATokenId, tokenBTokenId, lpTokenId, poolFee } = await DexService.fetchPairTokenIds(
+    pairData.data.contract_id
+  );
 
   const [tokenAInfo, tokenBInfo, tokenCInfo] = await Promise.all([
     DexService.fetchTokenData(tokenATokenId),
@@ -84,6 +86,7 @@ const fetchEachToken = async (evmAddress: string) => {
     pairLpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
     decimals: tokenCInfo.data.decimals,
+    poolFee,
   };
   const updated: TokenPair = {
     pairToken,
@@ -95,7 +98,6 @@ const fetchEachToken = async (evmAddress: string) => {
 
 const metricesForEachPair = async (pair: TokenPair) => {
   const tokenPairBalance = await DexService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
-  const poolFee = await DexService.fetchFeeWithPrecision(pair.tokenA.tokenMeta.pairAccountId ?? "");
   const timestamp7DaysAgo = getTimestamp7DaysAgo();
   const last7DTransactions = await DexService.fetchAccountTransactions(
     pair.tokenA.tokenMeta.pairAccountId ?? "",
@@ -108,7 +110,7 @@ const metricesForEachPair = async (pair: TokenPair) => {
     last24Transactions,
     last7DTransactions,
     tokenPair: pair,
-    poolFee,
+    poolFee: pair.pairToken.poolFee,
   });
 };
 

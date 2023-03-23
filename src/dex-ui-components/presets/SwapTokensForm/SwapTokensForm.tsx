@@ -48,7 +48,7 @@ interface SwapTokensFormProps {
   connectionStatus: HashConnectConnectionState;
   sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
-  fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
+  fetchPairInfo: (selectedAccountId: string) => Promise<void>;
   connectToWallet: () => void;
 }
 
@@ -254,7 +254,7 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
     swapTokensForm.setValue("tokenToReceive.balance", updatedTokenToReceive.balance);
     swapTokensForm.setValue("tokenToReceive.tokenMeta", updatedTokenToReceive.tokenMeta);
     fetchPoolLiquidity(updatedTokenToTrade, updatedTokenToReceive);
-    props.fetchSpotPrices(updatedTokenToReceive.tokenMeta.pairAccountId ?? "");
+    props.fetchPairInfo(updatedTokenToReceive.tokenMeta.pairAccountId ?? "");
   }
 
   function handleSwapTokenInputsClicked() {
@@ -263,7 +263,7 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
     swapTokensForm.setValue("tokenToTrade", { ...newTokenToTrade });
     swapTokensForm.setValue("tokenToReceive", { ...newTokenToReceive });
     fetchPoolLiquidity(newTokenToTrade, newTokenToReceive);
-    props.fetchSpotPrices(newTokenToReceive.tokenMeta.pairAccountId ?? "");
+    props.fetchPairInfo(newTokenToReceive.tokenMeta.pairAccountId ?? "");
     handleTokenToTradeAmountChanged(newTokenToTrade);
   }
 

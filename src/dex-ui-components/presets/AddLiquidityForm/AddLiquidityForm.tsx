@@ -41,7 +41,7 @@ interface AddLiquidityFormProps {
   transactionState: AddLiquidityState;
   connectionStatus: HashConnectConnectionState;
   connectToWallet: () => void;
-  fetchSpotPrices: (selectedAccountId: string) => Promise<void>;
+  fetchPairInfo: (selectedAccountId: string) => Promise<void>;
   sendAddLiquidityTransaction: ({
     inputToken,
     outputToken,
@@ -221,7 +221,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     addLiquidityForm.setValue("secondToken.symbol", updatedSecondToken.symbol);
     addLiquidityForm.setValue("secondToken.balance", updatedSecondToken.balance);
     addLiquidityForm.setValue("secondToken.tokenMeta", updatedSecondToken.tokenMeta);
-    props.fetchSpotPrices(updatedFirstToken.tokenMeta.pairAccountId ?? "");
+    props.fetchPairInfo(updatedFirstToken.tokenMeta.pairAccountId ?? "");
   }
 
   return (
