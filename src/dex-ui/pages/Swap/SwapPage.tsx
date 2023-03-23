@@ -6,18 +6,17 @@ import { Page, DefiFormContainer } from "../../layouts";
 
 export function SwapPage() {
   const [app, wallet, swap] = useDexContext(({ app, wallet, swap }) => [app, wallet, swap]);
-  const { fee, spotPrices, poolLiquidity } = swap;
+  const { pairInfo, poolLiquidity } = swap;
   const { formattedSpotPrices, formattedPoolLiquidity, formattedFee } = formatSwapPageData({
-    spotPrices,
+    spotPrices: pairInfo.spotPrices,
+    fee: pairInfo.fee,
     poolLiquidity,
-    fee,
   });
 
   const isFormLoading =
-    app.isFeatureLoading("fee") ||
-    app.isFeatureLoading("spotPrices") ||
     app.isFeatureLoading("tokenPairs") ||
-    app.isFeatureLoading("pairedAccountBalance");
+    app.isFeatureLoading("pairedAccountBalance") ||
+    app.isFeatureLoading("pairInfo");
 
   return (
     <Page
@@ -34,7 +33,7 @@ export function SwapPage() {
             connectionStatus={wallet.hashConnectConnectionState}
             sendSwapTransaction={swap.sendSwapTransaction}
             getPoolLiquidity={swap.getPoolLiquidity}
-            fetchSpotPrices={swap.fetchSpotPrices}
+            fetchPairInfo={swap.fetchPairInfo}
             connectToWallet={wallet.connectToWallet}
           />
           <GetTokensButton />

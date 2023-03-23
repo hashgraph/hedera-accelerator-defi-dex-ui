@@ -167,6 +167,7 @@ interface TokenPair {
     pairLpAccountId: string | undefined;
     totalSupply?: Long | null;
     decimals: number;
+    poolFee: BigNumber | undefined;
   };
 }
 

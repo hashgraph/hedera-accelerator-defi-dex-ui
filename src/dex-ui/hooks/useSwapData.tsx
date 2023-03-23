@@ -19,15 +19,10 @@ export const useSwapData = (selectedPairContractId: string, refreshInterval = 0)
     swap,
   }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0];
-  const { transactionState, fetchFee, fetchSpotPrices, getPrecision, fetchTokenPairs } = swap;
+  const { transactionState, fetchTokenPairs, fetchPairInfo } = swap;
 
   async function fetchSwapDataOnLoad() {
-    await Promise.allSettled([
-      fetchFee(selectedPairContractId),
-      fetchSpotPrices(selectedPairContractId),
-      fetchTokenPairs(),
-      getPrecision(selectedPairContractId),
-    ]);
+    await Promise.allSettled([fetchTokenPairs(), fetchPairInfo(selectedPairContractId)]);
   }
 
   /**
@@ -39,7 +34,7 @@ export const useSwapData = (selectedPairContractId: string, refreshInterval = 0)
   }, [walletAccountId]);
 
   async function fetchSwapDataOnInterval() {
-    await fetchSpotPrices(selectedPairContractId);
+    await fetchPairInfo(selectedPairContractId);
   }
   /**
    * Fetches all swap data on a specified interval (milliseconds).
@@ -77,12 +72,7 @@ export const useSwapData = (selectedPairContractId: string, refreshInterval = 0)
     }
     /** need to fetch spot fee and fee on change of pairs */
     async function fetchSwapDataOnEvent() {
-      await Promise.allSettled([
-        wallet.fetchAccountBalance(),
-        fetchFee(selectedPairContractId),
-        fetchSpotPrices(selectedPairContractId),
-        getPrecision(selectedPairContractId),
-      ]);
+      await Promise.allSettled([wallet.fetchAccountBalance(), fetchPairInfo(selectedPairContractId)]);
     }
     fetchSwapDataOnEvent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
