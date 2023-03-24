@@ -1,18 +1,16 @@
-import { Text, SimpleGrid, Box, Link, Flex, Skeleton, Center } from "@chakra-ui/react";
-import { Page, PageHeader } from "../../layouts";
-import { Button, Color, Notification, useNotification, NotficationTypes } from "../../../dex-ui-components";
-import { DAOCard } from "./DAOCard";
-import { useDAOs, useDexContext } from "../../hooks";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { Text, Box, Center } from "@chakra-ui/react";
+import { CardGridLayout, Page, PageHeader } from "../../layouts";
+import { Notification, useNotification, NotficationTypes } from "../../../dex-ui-components";
+import { useDAOs } from "../../hooks";
 import { useLocation, useNavigate } from "react-router-dom";
-import { isEmpty } from "ramda";
 import { DAO } from "../../hooks/dao/types";
-import { DAOType } from "..";
+import { PrimaryHeaderButton } from "../../components";
+import { DAOCard } from "./DAOCard";
+import { DAOType } from "../CreateADAO";
+import { Paths } from "../../DEX";
 
 export function DAOsListPage() {
-  const [wallet] = useDexContext(({ wallet }) => [wallet]);
   const daos = useDAOs();
-  const isWalletPaired = wallet.hashConnectConnectionState === HashConnectConnectionState.Paired;
   const navigate = useNavigate();
   const location = useLocation();
   const notification = useNotification({
@@ -21,74 +19,11 @@ export function DAOsListPage() {
   });
 
   function handleCreateADAOClicked() {
-    navigate("/DAOs/create-a-DAO");
+    navigate(Paths.DAOs.CreateDAO);
   }
 
   function handleLinkClick() {
     handleCreateADAOClicked();
-  }
-
-  /**
-   * TODO: Merge with dex-ui-component card list once the new app patterns are established.
-   */
-  function CardList() {
-    if (daos.isError) {
-      return (
-        <Text textStyle="h2_empty_or_error" margin="auto">
-          Error: {daos.error?.message}
-        </Text>
-      );
-    }
-
-    if (daos.isLoading) {
-      return (
-        <SimpleGrid columns={3} spacingX="3rem" spacingY="2rem">
-          {[...Array(9)].map(() => (
-            <Skeleton height="88px" speed={0.4} fadeDuration={0} />
-          ))}
-        </SimpleGrid>
-      );
-    }
-
-    if (daos.isSuccess && isEmpty(daos.data)) {
-      /** TODO: Create "Not Found" layout component */
-      return (
-        <Box width="fit-content" margin="auto">
-          <Text textStyle="h3" marginBottom="0.5rem">
-            Looks like no DAOs have been created yet.
-          </Text>
-          <Flex alignItems="center">
-            <Text textStyle="b2">Click on this link to&nbsp;</Text>
-            <Link color={Color.Teal_01} onClick={handleLinkClick}>
-              <Text variant="link">create the first DAO</Text>
-            </Link>
-          </Flex>
-        </Box>
-      );
-    }
-
-    return (
-      <SimpleGrid columns={3} spacingX="3rem" spacingY="2rem">
-        {daos.data?.map((DAO: DAO) => {
-          return <DAOCard name={DAO.name} category={DAOType.GovernanceToken} />;
-        })}
-      </SimpleGrid>
-    );
-  }
-
-  function PrimaryHeaderButton() {
-    if (isWalletPaired) {
-      return (
-        <Button padding="0px 20px" onClick={handleCreateADAOClicked}>
-          Create new DAO
-        </Button>
-      );
-    }
-    return (
-      <Button variant="primary" data-testid="connect-wallet-button" onClick={wallet.connectToWallet}>
-        Create new DAO
-      </Button>
-    );
   }
 
   return (
@@ -111,10 +46,25 @@ export function DAOsListPage() {
               </Box>
             </Center>
           )}
-          <PageHeader leftContent={[<Text textStyle="h2">DAOs</Text>]} rightContent={[<PrimaryHeaderButton />]} />
+          <PageHeader
+            leftContent={[<Text textStyle="h2">DAOs</Text>]}
+            rightContent={[<PrimaryHeaderButton name="Create new DAO" route={Paths.DAOs.CreateDAO} />]}
+          />
         </>
       }
-      body={<CardList />}
+      body={
+        <CardGridLayout<DAO>
+          queryResult={daos}
+          message={"It looks like no DAOs have been created yet."}
+          preLinkText={"Click on this link to&nbsp;"}
+          linkText={"create the first DAO"}
+          onLinkClick={handleLinkClick}
+        >
+          {daos.data?.map((dao: DAO, index: number) => {
+            return <DAOCard key={index} name={dao.name} category={DAOType.GovernanceToken} />;
+          })}
+        </CardGridLayout>
+      }
     />
   );
 }
