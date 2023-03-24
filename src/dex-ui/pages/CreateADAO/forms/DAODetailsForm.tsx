@@ -1,15 +1,15 @@
 import { Checkbox, FormControl } from "@chakra-ui/react";
-import { Control, Controller, FieldErrorsImpl, UseFormRegister } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { FormInput } from "../../../../dex-ui-components";
-import { CreateADAOData } from "../CreateADAOPage";
+import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-interface DAODetailsFormProps {
-  register: UseFormRegister<CreateADAOData>;
-  errors: Partial<FieldErrorsImpl<CreateADAOData>>;
-  control: Control<CreateADAOData, any>;
-}
 
-export function DAODetailsForm(props: DAODetailsFormProps) {
+export function DAODetailsForm() {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<CreateADAOForm>();
   return (
     <DAOFormContainer>
       <FormInput<"name">
@@ -19,13 +19,13 @@ export function DAODetailsForm(props: DAODetailsFormProps) {
           type: "text",
           placeholder: "Enter the name of your DAO",
           register: {
-            ...props.register("name", {
+            ...register("name", {
               required: { value: true, message: "A name is required." },
             }),
           },
         }}
-        isInvalid={Boolean(props.errors.name)}
-        errorMessage={props.errors.name && props.errors.name.message}
+        isInvalid={Boolean(errors.name)}
+        errorMessage={errors.name && errors.name.message}
       />
       {/* TODO: For a future version of the form.
         <FormInput<"description">
@@ -51,16 +51,16 @@ export function DAODetailsForm(props: DAODetailsFormProps) {
           type: "text",
           placeholder: "Enter image URL",
           register: {
-            ...props.register("logoUrl", { required: { value: true, message: "A logo url is required." } }),
+            ...register("logoUrl", { required: { value: true, message: "A logo url is required." } }),
           },
         }}
-        isInvalid={Boolean(props.errors.logoUrl)}
-        errorMessage={props.errors.logoUrl && props.errors.logoUrl.message}
+        isInvalid={Boolean(errors.logoUrl)}
+        errorMessage={errors.logoUrl && errors.logoUrl.message}
       />
       {/* TODO: Create independent component for form checkboxes */}
       <FormControl>
         <Controller
-          control={props.control}
+          control={control}
           name="isPublic"
           key="isPublic"
           defaultValue={true}

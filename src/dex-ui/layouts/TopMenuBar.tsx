@@ -1,7 +1,7 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Menu, MenuItem, HStack, Box, Text, Center, Flex, Tag } from "@chakra-ui/react";
 import { useDexContext } from "../hooks";
-import { Color, WalletConnection } from "../../dex-ui-components";
+import { Color, HederaIcon, WalletConnection } from "../../dex-ui-components";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -15,16 +15,15 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
       <Flex
         padding="2rem 1rem"
         w="100%"
-        height="84px"
+        height="4rem"
         alignItems="center"
-        bg={Color.Primary._800}
+        bg={Color.White}
         borderBottom={`1px solid ${Color.Neutral._200}`}
       >
         <Box flex="1.5">
           <HStack spacing="0.5rem">
-            <Text textStyle="h4 bold" color={Color.Primary._50}>
-              Hedera Open DEX
-            </Text>
+            <HederaIcon />
+            <Text textStyle="h4 bold">Hedera Open DEX</Text>
             <Tag textStyle="p xsmall medium" size="sm">
               Pre-Alpha
             </Tag>
@@ -34,12 +33,10 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
           <Center gap="12">
             {props.menuOptions.map((menuOption, index) => {
               return (
-                <Box flex="1" key={index} bg={Color.Primary._800}>
+                <Box flex="1" key={index}>
                   <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
-                    <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Primary._700 }}>
-                      <Text textStyle="p medium medium" color={Color.Primary._50}>
-                        {menuOption}
-                      </Text>
+                    <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Grey_01 }}>
+                      <Text textStyle="p medium medium">{menuOption}</Text>
                     </MenuItem>
                   </RouterLink>
                 </Box>

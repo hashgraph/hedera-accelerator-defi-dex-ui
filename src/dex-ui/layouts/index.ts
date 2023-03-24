@@ -5,3 +5,5 @@ export * from "./PageHeader";
 export * from "./PageBody";
 export * from "./Page";
 export * from "./DefiFormContainer";
+export * from "./CardGridLayout";
+export * from "./NotFoundLayout";

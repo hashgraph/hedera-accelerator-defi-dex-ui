@@ -113,5 +113,5 @@ export const Color = {
     _900: "#661300",
   },
   White: "#FFFFFF",
-  Black: "#0000000",
+  Black: "#000000",
 };
