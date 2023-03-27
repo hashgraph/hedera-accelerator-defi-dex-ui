@@ -11,6 +11,7 @@ import {
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
+  MirrorNodeTokenBalance,
 } from "./types";
 import { ProposalType } from "../../store/governanceSlice";
 import { governorAbiSignatureMap } from "./constants";
@@ -117,6 +118,35 @@ function createMirrorNodeService() {
         limit: 100,
       },
     });
+  };
+
+  const fetchUpdatedAccountBalances = async (accountId: string): Promise<MirrorNodeTokenBalance[]> => {
+    return await fetchNextBatch(`/api/v1/accounts/${accountId}/tokens`, "tokens", {
+      order: "asc",
+      limit: 100,
+    });
+  };
+
+  const fetchUpdatedAccountTokenBalances = async (accountId: string): Promise<MirrorNodeAccountBalance> => {
+    const accountBalance = await fetchUpdatedAccountBalances(accountId);
+    const tokenBalances = await Promise.all(
+      accountBalance.map(async (token) => {
+        const tokenData = await fetchTokenData(token.token_id);
+        const { decimals } = tokenData.data;
+        const balance = BigNumber(token.balance).shiftedBy(-Number(decimals));
+        return {
+          ...token,
+          balance,
+          decimals: String(decimals),
+        };
+      })
+    );
+
+    return {
+      account: accountId,
+      tokens: tokenBalances,
+      balance: BigNumber(0),
+    };
   };
 
   /**
@@ -286,6 +316,7 @@ function createMirrorNodeService() {
     fetchBlock,
     fetchContract,
     fetchTokenData,
+    fetchUpdatedAccountTokenBalances,
   };
 }
 

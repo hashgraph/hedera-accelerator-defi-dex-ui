@@ -264,10 +264,10 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         if (isNil(userAccountId)) {
           throw Error("User Account ID must be defined.");
         }
-        const userTokenBalances = await DexService.fetchAccountTokenBalances(userAccountId);
+        const userTokenBalances = await DexService.fetchUpdatedAccountTokenBalances(userAccountId);
         const pairsAddresses = await DexService.fetchAllTokenPairs();
-        const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
-        const poolTokenPairs = await Promise.all(addressessURlRequest);
+        const addressesURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
+        const poolTokenPairs = await Promise.all(addressesURlRequest);
         const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
           return userTokenBalances.tokens.some(
             (userTokenBalance: MirrorNodeTokenBalance) =>
