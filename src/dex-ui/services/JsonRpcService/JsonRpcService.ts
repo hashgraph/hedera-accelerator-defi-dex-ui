@@ -4,6 +4,7 @@ import { AccountId } from "@hashgraph/sdk";
 import Factory from "./Factory";
 import Governor from "./Governor";
 import DAO from "./DAO";
+import Configuration from "./Configuration";
 import { TOKEN_USER_ID } from "../constants";
 
 const JsonRpcHashioUrl = {
@@ -38,6 +39,7 @@ function createJsonRpcService() {
     ...Pair,
     ...Governor,
     ...DAO,
+    ...Configuration,
   };
 }
 

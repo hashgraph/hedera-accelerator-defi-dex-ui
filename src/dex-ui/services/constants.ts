@@ -51,6 +51,9 @@ export const Contracts = {
   GovernanceDAOFactory: {
     ProxyId: getProxyId(ContractNames.GovernanceDAOFactory),
   },
+  Configuration: {
+    ProxyId: getProxyId(ContractNames.Configuration),
+  },
 };
 
 /** The "hashconnectData" is the string used by the hashconnect lib to modify localStorage */

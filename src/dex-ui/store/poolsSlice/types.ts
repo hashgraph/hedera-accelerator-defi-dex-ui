@@ -23,6 +23,7 @@ enum PoolsActionType {
   RESET_ADD_LIQUIDITY_STATE = "pools/RESET_ADD_LIQUIDITY_STATE",
   RESET_CREATE_POOL_STATE = "pools/RESET_CREATE_POOL_STATE",
 }
+
 interface SendAddLiquidityTransactionParams {
   inputToken: {
     symbol: string;
