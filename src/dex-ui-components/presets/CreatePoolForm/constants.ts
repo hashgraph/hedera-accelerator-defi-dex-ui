@@ -15,9 +15,3 @@ export type CreatePoolFormData = {
   transactionFee: number;
   transactionDeadline: number;
 };
-
-export const DropdownSelectData = [
-  { label: "0.3% (Use for Most Pairs)", value: 30 },
-  { label: "0.05% (Use for Exotic Pairs)", value: 5 },
-  { label: "0.1% (Use for Very Common Pairs)", value: 10 },
-];

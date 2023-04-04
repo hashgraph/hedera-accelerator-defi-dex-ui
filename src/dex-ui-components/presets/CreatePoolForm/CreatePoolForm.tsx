@@ -4,7 +4,7 @@ import { AccountBalanceJson } from "@hashgraph/sdk";
 import { useEffect, useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { Notification, MetricLabel, NotficationTypes, SettingsButton, useNotification, Color } from "../..";
-import { CreatePoolFormData, InitialCreatePoolFormState, DropdownSelectData } from "./constants";
+import { CreatePoolFormData, InitialCreatePoolFormState } from "./constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
 import { DefiFormLayout } from "../layouts";
 import { TokenPair } from "../SwapTokensForm/types";
@@ -26,11 +26,13 @@ import { TransactionStatus } from "../../../dex-ui/store/appSlice";
 import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
 import { useCreatePoolFormData } from "./useCreatePoolForm";
 import { DropdownSelector } from "../../base";
+import { PoolTransactionFee } from "../../../dex-ui/hooks/pool/types";
 
 interface CreatePoolFormProps {
   isLoading: boolean;
   pairedAccountBalance: AccountBalanceJson | null;
   tokenPairs: TokenPair[] | null;
+  transactionFee: PoolTransactionFee[] | undefined;
   allPoolsMetrics: Pool[];
   transactionState: CreatePoolState;
   connectionStatus: HashConnectConnectionState;
@@ -250,8 +252,9 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
           <Flex direction="column" justifyContent="center" gap="5px">
             <Text textStyle="h4">Transaction Fee</Text>
             <DropdownSelector
-              data={DropdownSelectData}
+              data={props.transactionFee}
               value={formValues.transactionFee}
+              isLoading={props.isLoading}
               selectControls={createPoolForm.register("transactionFee" as any, {
                 onChange: handleTransactionfeeClicked,
               })}

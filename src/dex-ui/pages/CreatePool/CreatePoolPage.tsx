@@ -1,10 +1,13 @@
 import { useDexContext } from "../../hooks";
 import { CreatePoolForm } from "../../../dex-ui-components";
 import { Page, DefiFormContainer } from "../../layouts";
+import { useCreatePoolTransactionFee } from "../../hooks/pool";
 
 export function CreatePoolPage() {
   const { app, wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));
-  const isFormLoading = app.isFeatureLoading("pairedAccountBalance") || app.isFeatureLoading("allPoolsMetrics");
+  const { data: transactionFee, isLoading } = useCreatePoolTransactionFee();
+  const isFormLoading =
+    app.isFeatureLoading("pairedAccountBalance") || app.isFeatureLoading("allPoolsMetrics") || isLoading;
 
   return (
     <Page
@@ -12,6 +15,7 @@ export function CreatePoolPage() {
         <DefiFormContainer>
           <CreatePoolForm
             isLoading={isFormLoading}
+            transactionFee={transactionFee}
             pairedAccountBalance={wallet.pairedAccountBalance}
             tokenPairs={pools.tokenPairs}
             allPoolsMetrics={pools.allPoolsMetrics}
