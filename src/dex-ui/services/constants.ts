@@ -24,6 +24,7 @@ enum ContractNames {
   Configuration = "configuration",
   GodTokenHolderFactory = "godtokenholderfactory",
   GovernanceDAOFactory = "governancedaofactory",
+  MultiSigDAOFactory = "multisigdaofactory",
 }
 
 function getProxyId(contractName: ContractNames): string {
@@ -53,6 +54,9 @@ export const Contracts = {
   },
   Configuration: {
     ProxyId: getProxyId(ContractNames.Configuration),
+  },
+  MultiSigDAOFactory: {
+    ProxyId: getProxyId(ContractNames.MultiSigDAOFactory),
   },
 };
 
