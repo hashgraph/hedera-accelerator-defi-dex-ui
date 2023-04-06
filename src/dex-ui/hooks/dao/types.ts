@@ -13,6 +13,7 @@ export interface Social {
 }
 
 export interface DAO {
+  address: string;
   name: string;
   logoUrl: string;
   webLinks: Social[];

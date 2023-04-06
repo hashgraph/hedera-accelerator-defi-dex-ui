@@ -61,7 +61,7 @@ export function DAOsListPage() {
           onLinkClick={handleLinkClick}
         >
           {daos.data?.map((dao: DAO, index: number) => {
-            return <DAOCard key={index} name={dao.name} category={DAOType.GovernanceToken} />;
+            return <DAOCard key={index} address={dao.address} name={dao.name} type={DAOType.MultiSig} />;
           })}
         </CardGridLayout>
       }

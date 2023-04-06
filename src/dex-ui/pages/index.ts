@@ -8,3 +8,4 @@ export * from "./ProposalDetails";
 export * from "./CreatePool";
 export * from "./DAOsListPage";
 export * from "./CreateADAO";
+export * from "./ViewDAODetails";

@@ -13,8 +13,9 @@ import {
   CreatePoolPage,
   DAOsListPage,
   CreateADAOPage,
+  ViewDAODetailsPage,
 } from "./pages";
-import { TopMenuBar } from "./layouts/TopMenuBar";
+import { TopMenuBar } from "./layouts";
 import {
   ButtonStyles,
   CardStyles,
@@ -56,6 +57,7 @@ export const Paths = {
   DAOs: {
     default: "/daos",
     CreateDAO: "/daos/create",
+    ViewDAODetails: "/dao/dashboard",
   },
 };
 
@@ -115,7 +117,7 @@ const DEX = () => {
           <Router>
             <ScrollToTop>
               <TopMenuBar menuOptions={menuOptions} />
-              <Flex width="80rem" justifyContent="center">
+              <Flex width="100%" justifyContent="center">
                 <Routes>
                   <Route path={Paths.Home} element={<Navigate to="/swap" />} />
                   <Route path={Paths.Swap.default} element={<SwapPage />} />
@@ -138,6 +140,7 @@ const DEX = () => {
                   />
                   <Route path={Paths.DAOs.default} element={<DAOsListPage />} />
                   <Route path={Paths.DAOs.CreateDAO} element={<CreateADAOPage />} />
+                  <Route path={`${Paths.DAOs.ViewDAODetails}/:address`} element={<ViewDAODetailsPage />} />
                 </Routes>
               </Flex>
             </ScrollToTop>

@@ -10,6 +10,7 @@ interface Social {
 }
 
 interface DAO {
+  address: string;
   name: string;
   logoUrl: string;
   webLinks: Social[];
@@ -32,17 +33,24 @@ function createBaseDAOContract(daoAddress: string): ethers.Contract {
   return createContractWithSolidityAddress(daoAddress, BaseDAO.abi);
 }
 
+/** TODO: Replace with Mirror Node Event Fetching */
 async function fetchAllDAOs(): Promise<DAO[]> {
   const daosAddresses: string[] = await fetchAllDAOAddresses();
-  return Promise.all(daosAddresses.map((daoAddress: string) => fetchDAODetails(daoAddress)));
+  return Promise.all(
+    daosAddresses.map((daoAddress: string) =>
+      fetchDAODetails(daoAddress).then((data): DAO => ({ ...data, address: daoAddress }))
+    )
+  );
 }
 
+/** TODO: Replace with Mirror Node Event Fetching */
 async function fetchAllDAOAddresses(): Promise<string[]> {
   const governanceDAOFactoryContract = createGovernanceDAOFactoryContract();
   const daoAddresses: Promise<string[]> = governanceDAOFactoryContract.getDAOs();
   return daoAddresses;
 }
 
+/** TODO: Replace with Mirror Node Event Fetching */
 async function fetchDAODetails(baseDaoAddress: string): Promise<DAO> {
   const baseDAOContract = createBaseDAOContract(baseDaoAddress);
   const dao: Promise<DAO> = baseDAOContract.getDaoDetail();
