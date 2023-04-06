@@ -14,7 +14,7 @@ import {
   DAOsListPage,
   CreateADAOPage,
 } from "./pages";
-import { TopMenuBar } from "./layouts/TopMenuBar";
+import { TopMenuBar } from "./layouts";
 import {
   ButtonStyles,
   CardStyles,
@@ -115,7 +115,7 @@ const DEX = () => {
           <Router>
             <ScrollToTop>
               <TopMenuBar menuOptions={menuOptions} />
-              <Flex width="80rem" justifyContent="center">
+              <Flex width="100%" justifyContent="center">
                 <Routes>
                   <Route path={Paths.Home} element={<Navigate to="/swap" />} />
                   <Route path={Paths.Swap.default} element={<SwapPage />} />

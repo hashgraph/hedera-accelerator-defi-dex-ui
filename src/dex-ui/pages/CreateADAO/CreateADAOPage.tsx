@@ -14,12 +14,7 @@ import {
   MultiSigDAOReviewForm,
 } from "./forms";
 import { useNavigate } from "react-router-dom";
-import {
-  CreateADAOForm,
-  CreateATokenDAOForm,
-  /* CreateAMultiSigDAOForm, */
-  DAOType,
-} from "./types";
+import { CreateADAOForm, CreateAMultiSigDAOForm, CreateATokenDAOForm, DAOType } from "./types";
 import { useCreateDAO } from "../../hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -145,7 +140,8 @@ export function CreateADAOPage() {
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
       const { governance, voting } = tokenDAOData;
-      createDAO.mutate({
+      return createDAO.mutate({
+        type: tokenDAOData.type,
         name: tokenDAOData.name,
         logoUrl: tokenDAOData.logoUrl ?? "",
         isPrivate: !tokenDAOData.isPublic,
@@ -156,13 +152,19 @@ export function CreateADAOPage() {
         lockingDuration: voting.lockingPeriod,
       });
     }
-    /*
-     * TODO: Send data to DAO contract to create MultiSig.
-     * if (data.type === DAOType.MultiSig) {
-     *   const multiSigDAOData = data as CreateAMultiSigDAOForm;
-     *   createDAO.mutate({});
-     * }
-     */
+    if (data.type === DAOType.MultiSig) {
+      const multiSigDAOData = data as CreateAMultiSigDAOForm;
+      const { type, name, logoUrl = "", isPublic, governance, voting } = multiSigDAOData;
+      return createDAO.mutate({
+        type,
+        admin: governance.admin,
+        name,
+        logoUrl,
+        owners: governance.owners.map((owner) => owner.value),
+        threshold: voting.threshold,
+        isPrivate: !isPublic,
+      });
+    }
   }
 
   return (

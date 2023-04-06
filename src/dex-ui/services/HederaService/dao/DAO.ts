@@ -14,7 +14,7 @@ import { Contracts } from "../../constants";
 
 const Gas = 900000;
 
-interface SendCreateDAOTransactionParams {
+interface SendCreateGovernanceDAOTransactionParams {
   name: string;
   logoUrl: string;
   isPrivate: boolean;
@@ -26,36 +26,83 @@ interface SendCreateDAOTransactionParams {
   signer: HashConnectSigner;
 }
 
-async function sendCreateDAOTransaction(params: SendCreateDAOTransactionParams): Promise<TransactionResponse> {
+async function sendCreateGovernanceDAOTransaction(
+  params: SendCreateGovernanceDAOTransactionParams
+): Promise<TransactionResponse> {
+  const {
+    name,
+    logoUrl,
+    treasuryWalletAccountId,
+    tokenId,
+    quorum,
+    lockingDuration,
+    votingDuration,
+    isPrivate,
+    signer,
+  } = params;
   const governanceDAOFactoryContractId = ContractId.fromString(Contracts.GovernanceDAOFactory.ProxyId);
-  const daoAdminAddress = AccountId.fromString(params.treasuryWalletAccountId).toSolidityAddress();
-  const tokenAddress = TokenId.fromString(params.tokenId).toSolidityAddress();
-  const preciseQuorum = BigNumber(params.quorum);
-  const preciseLockingDuration = BigNumber(params.lockingDuration);
-  const preciseVotingDuration = BigNumber(params.votingDuration);
+  const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
+  const tokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const preciseQuorum = BigNumber(quorum);
+  const preciseLockingDuration = BigNumber(lockingDuration);
+  const preciseVotingDuration = BigNumber(votingDuration);
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(daoAdminAddress)
-    .addString(params.name)
-    .addString(params.logoUrl)
+    .addString(name)
+    .addString(logoUrl)
     .addAddress(tokenAddress)
     .addUint256(preciseQuorum)
     .addUint256(preciseLockingDuration)
     .addUint256(preciseVotingDuration)
-    .addBool(params.isPrivate);
-  const createDAOTransaction = await new ContractExecuteTransaction()
+    .addBool(isPrivate);
+  const createGovernanceDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(governanceDAOFactoryContractId)
     .setFunction(DAOContractFunctions.CreateDAO, contractFunctionParameters)
     .setGas(Gas)
-    .freezeWithSigner(params.signer);
-  const createDAOResponse = await createDAOTransaction.executeWithSigner(params.signer);
-  checkTransactionResponseForError(createDAOResponse, DAOContractFunctions.CreateDAO);
-  return createDAOResponse;
+    .freezeWithSigner(signer);
+  const createGovernanceDAOResponse = await createGovernanceDAOTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(createGovernanceDAOResponse, DAOContractFunctions.CreateDAO);
+  return createGovernanceDAOResponse;
 }
 
-// Create new function for creating MultiSig DAOs
+interface SendCreateMultiSigDAOTransactionParams {
+  admin: string;
+  name: string;
+  logoUrl: string;
+  owners: string[];
+  threshold: number;
+  isPrivate: boolean;
+  signer: HashConnectSigner;
+}
+
+async function sendCreateMultiSigDAOTransaction(
+  params: SendCreateMultiSigDAOTransactionParams
+): Promise<TransactionResponse> {
+  const { admin, name, logoUrl, owners, threshold, isPrivate, signer } = params;
+  const multiSigDAOFactoryContractId = ContractId.fromString(Contracts.MultiSigDAOFactory.ProxyId);
+  const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
+  const preciseThreshold = BigNumber(threshold);
+  const ownersSolidityAddresses = owners.map((owner) => AccountId.fromString(owner).toSolidityAddress());
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddress(daoAdminAddress)
+    .addString(name)
+    .addString(logoUrl)
+    .addAddressArray(ownersSolidityAddresses)
+    .addUint256(preciseThreshold)
+    .addBool(isPrivate);
+  const createMultiSigDAOTransaction = await new ContractExecuteTransaction()
+    .setContractId(multiSigDAOFactoryContractId)
+    .setFunction(DAOContractFunctions.CreateDAO, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const createMultiSigDAOResponse = await createMultiSigDAOTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(createMultiSigDAOResponse, DAOContractFunctions.CreateDAO);
+  return createMultiSigDAOResponse;
+}
 
 const DAOService = {
-  sendCreateDAOTransaction,
+  sendCreateGovernanceDAOTransaction,
+  sendCreateMultiSigDAOTransaction,
 };
 
 export default DAOService;

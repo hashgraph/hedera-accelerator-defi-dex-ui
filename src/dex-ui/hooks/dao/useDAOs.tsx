@@ -6,7 +6,10 @@ export function useDAOs() {
   return useQuery<DAO[], Error, DAO[], DAOQueries.FetchAllDAOs>(
     DAOQueries.FetchAllDAOs,
     async () => {
-      return DexService.fetchAllDAOs();
+      return Promise.all([
+        ...(await DexService.fetchAllGovernanceDAODetails()),
+        ...(await DexService.fetchAllMultiSigDAODetails()),
+      ]);
     },
     {
       staleTime: 10,

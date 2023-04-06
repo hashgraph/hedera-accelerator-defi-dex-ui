@@ -7,3 +7,4 @@ export * from "./Page";
 export * from "./DefiFormContainer";
 export * from "./CardGridLayout";
 export * from "./NotFoundLayout";
+export * from "./DashboardLayout";
