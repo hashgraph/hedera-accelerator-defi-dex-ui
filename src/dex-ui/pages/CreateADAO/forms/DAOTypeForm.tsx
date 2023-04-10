@@ -1,10 +1,16 @@
 import { Box, Flex, Text, useRadioGroup } from "@chakra-ui/react";
-import { useRef } from "react";
-import { UseFormSetValue } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { RadioCard } from "../../../../dex-ui-components";
-import { CreateADAOData } from "../CreateADAOPage";
-import { DAOType } from "../types";
+import {
+  CreateADAOForm,
+  DAOType,
+  MultiSigDAOGovernanceData,
+  MultiSigDAOVotingData,
+  TokenDAOGovernanceData,
+  TokenDAOVotingData,
+} from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
+import { useEffect } from "react";
 
 const newDAOOptions = [
   {
@@ -13,12 +19,12 @@ const newDAOOptions = [
     description:
       "Governance rights, voting power and quorum are determined by ownership of fungible governance tokens.",
   },
+  {
+    name: DAOType.MultiSig,
+    type: DAOType.MultiSig,
+    description: "Governance rights and voting power are concentrated in a centralized group.",
+  },
   /* TODO: For a future version of the form.  
-    {
-      name: DAOType.MultiSig,
-      type: DAOType.MultiSig,
-      description: "Governance rights and voting power are concentrated in a centralized group.",
-    },
     {
       name: DAOType.NFT,
       type: DAOType.NFT,
@@ -27,22 +33,67 @@ const newDAOOptions = [
   */
 ];
 
-interface DAOTypeFormProps {
-  setValue: UseFormSetValue<CreateADAOData>;
+function getDefaultFormValues(type: DAOType): {
+  governance: TokenDAOGovernanceData | MultiSigDAOGovernanceData;
+  voting: TokenDAOVotingData | MultiSigDAOVotingData;
+} {
+  if (type === DAOType.MultiSig) {
+    return {
+      governance: {
+        admin: "",
+        owners: [],
+      },
+      voting: {
+        threshold: 1,
+      },
+    };
+  }
+  return {
+    governance: {
+      token: {
+        name: "",
+        symbol: "",
+        decimals: 0,
+        logo: "",
+        initialSupply: 0,
+        id: "",
+        treasuryWalletAccountId: "",
+      },
+    },
+    voting: {
+      minProposalDeposit: 0,
+      quorum: 0,
+      duration: 0,
+      lockingPeriod: 0,
+      strategy: "",
+    },
+  };
 }
 
-export function DAOTypeForm(props: DAOTypeFormProps) {
-  const selectedDAOType = useRef<string>(DAOType.GovernanceToken);
+const { governance: defaultGovernance, voting: defaultVoting } = getDefaultFormValues(DAOType.GovernanceToken);
 
-  const handleDAOTypeSelectionChange = (event: DAOType) => {
-    selectedDAOType.current = event;
-    props.setValue("type", event);
-  };
-
+export function DAOTypeForm() {
+  const { getValues, setValue } = useFormContext<CreateADAOForm>();
+  const { type, governance, voting } = getValues();
   const { getRootProps, getRadioProps } = useRadioGroup({
-    defaultValue: DAOType.GovernanceToken,
+    defaultValue: type,
     onChange: handleDAOTypeSelectionChange,
   });
+
+  useEffect(() => {
+    if (governance === undefined && voting === undefined) {
+      setValue("governance", defaultGovernance);
+      setValue("voting", defaultVoting);
+    }
+  }, [governance, voting, setValue]);
+
+  function handleDAOTypeSelectionChange(event: DAOType) {
+    const type = event;
+    setValue("type", type);
+    const defaultFormValues = getDefaultFormValues(type);
+    setValue("governance", defaultFormValues.governance);
+    setValue("voting", defaultFormValues.voting);
+  }
 
   const group = getRootProps();
 
@@ -54,7 +105,7 @@ export function DAOTypeForm(props: DAOTypeFormProps) {
           const radio = getRadioProps({ value: option.name });
           return (
             <Box flex="1" key={index}>
-              <RadioCard key={index} {...radio} padding="0.75rem">
+              <RadioCard key={option.type} {...radio} padding="0.75rem">
                 <Flex flexDirection="column" gap="1">
                   <Text textStyle="p small medium" color="inherit">
                     {option.type}

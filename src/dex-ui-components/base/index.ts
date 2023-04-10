@@ -16,3 +16,4 @@ export * from "./Tooltip";
 export * from "./Popover";
 export * from "./Dropdown";
 export * from "./Stepper";
+export * from "./FormInputList";

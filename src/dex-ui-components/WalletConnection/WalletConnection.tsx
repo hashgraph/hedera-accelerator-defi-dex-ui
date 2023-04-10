@@ -149,14 +149,12 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
     <Grid templateColumns="repeat(2, 1fr)">
       <Flex justifyContent="center" alignItems="center">
         <Skeleton width="100%" padding="0.5em 1em" speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
-          <Text textStyle="p medium medium" color={Color.Primary._50}>
-            {formattedHbarAmount}
-          </Text>
+          <Text textStyle="p medium medium">{formattedHbarAmount}</Text>
         </Skeleton>
       </Flex>
       <Popover>
         <PopoverTrigger>
-          <Button bg={Color.Primary._900} color={Color.White} padding="0.5em 1em" borderRadius="0.5rem">
+          <Button bg={Color.Black_01} color={Color.White} padding="0.5em 1em" borderRadius="0.5rem">
             <Flex direction="row" alignItems="center" gap="2">
               <Circle size="1em" bg={connectionStatusColor} />
               <Text textStyle="p medium semibold" color={Color.White}>
