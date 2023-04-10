@@ -2,19 +2,17 @@ import { Flex, Text, Box, Input as ChakraInput, InputGroup, InputRightElement } 
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
 import { Color } from "../..";
-import React from "react";
 
 export interface InputProps<T extends string> {
   flex?: number | string;
-  pointerEvents?: "all" | "none";
   type: "number" | "text";
   step?: string;
-  label: string | React.ReactElement;
+  label: string;
   placeholder?: string;
   tooltipLabel?: string;
   isTooltipVisible?: boolean;
   id: string;
-  unit?: string | React.ReactElement;
+  unit?: string;
   isError?: boolean;
   isDisabled?: boolean;
   isReadOnly?: boolean;
@@ -23,51 +21,34 @@ export interface InputProps<T extends string> {
 }
 
 export function Input<T extends string>(props: InputProps<T>) {
-  const {
-    flex,
-    label,
-    isTooltipVisible,
-    tooltipLabel,
-    type,
-    step,
-    id,
-    value,
-    placeholder,
-    isDisabled,
-    isError,
-    isReadOnly,
-    unit,
-    register,
-    pointerEvents,
-  } = props;
   return (
-    <Box flex={flex} width="100%">
+    <Box flex={props.flex} width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
-        {React.isValidElement(label) ? label : <Text textStyle="p small medium">{label}</Text>}
-        {isTooltipVisible && <Tooltip label={tooltipLabel ?? ""} />}
+        <Text textStyle="p small medium">{props.label}</Text>
+        {props.isTooltipVisible && <Tooltip label={props.tooltipLabel ?? ""} />}
       </Flex>
       <InputGroup>
         <ChakraInput
           variant="input-v2"
-          type={type}
-          step={step}
-          id={id}
-          value={value}
-          placeholder={placeholder}
-          isDisabled={isDisabled}
-          isReadOnly={isReadOnly}
-          {...register}
-          borderColor={isError ? Color.Destructive._300 : Color.Neutral._300}
+          type={props.type}
+          step={props.step}
+          id={props.id}
+          value={props.value}
+          placeholder={props.placeholder}
+          isDisabled={props.isDisabled}
+          isReadOnly={props.isReadOnly}
+          {...props.register}
+          borderColor={props.isError ? Color.Destructive._300 : Color.Neutral._300}
           /** TODO: Move boxShadow style to theme. */
           sx={{
             _focus: {
-              boxShadow: isError ? `0px 0px 0px 4px ${Color.Destructive._100}` : "none",
+              boxShadow: props.isError ? `0px 0px 0px 4px ${Color.Destructive._100}` : "none",
             },
           }}
         />
         <InputRightElement
-          pointerEvents={pointerEvents ? pointerEvents : "none"}
-          children={React.isValidElement(unit) ? unit : <Text textStyle="p small regular">{unit}</Text>}
+          pointerEvents="none"
+          children={<Text textStyle="p small regular">{props.unit}</Text>}
           width="fit-content"
           padding="0 0.75rem"
         />

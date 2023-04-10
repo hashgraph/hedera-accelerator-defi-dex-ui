@@ -33,32 +33,6 @@ import { ScrollToTop } from "./utils";
 const menuOptions = ["Swap", "Pools", "Governance", "DAOs"];
 const SEVEN_SECONDS = 7 * 1000;
 
-export const Paths = {
-  Home: "/",
-  Swap: {
-    default: "/swap",
-  },
-  Pools: {
-    default: "/pools",
-    AddLiquidity: "/pools/add-liquidity",
-    Withdraw: "/pools/withdraw",
-    CreatePool: "/pools/create-pool",
-  },
-  Governance: {
-    default: "/governance",
-    ProposalDetails: "/governance/proposal-details",
-    SelectProposalType: "/governance/select-proposal-type",
-    CreateNewToken: "/governance/select-proposal-type/new-token",
-    CreateText: "/governance/select-proposal-type/text",
-    CreateTokenTransfer: "/governance/select-proposal-type/token-transfer",
-    CreateContractUpgrade: "/governance/select-proposal-type/contract-upgrade",
-  },
-  DAOs: {
-    default: "/daos",
-    CreateDAO: "/daos/create",
-  },
-};
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -117,27 +91,33 @@ const DEX = () => {
               <TopMenuBar menuOptions={menuOptions} />
               <Flex width="80rem" justifyContent="center">
                 <Routes>
-                  <Route path={Paths.Home} element={<Navigate to="/swap" />} />
-                  <Route path={Paths.Swap.default} element={<SwapPage />} />
-                  <Route path={Paths.Pools.default} element={<Pools />} />
-                  <Route path={Paths.Pools.AddLiquidity} element={<AddLiquidityPage />} />
-                  <Route path={Paths.Pools.Withdraw} element={<WithdrawPage />} />
-                  <Route path={Paths.Pools.CreatePool} element={<CreatePoolPage />} />
-                  <Route path={Paths.Governance.default} element={<Governance />} />
-                  <Route path={`${Paths.Governance.ProposalDetails}/:id`} element={<ProposalDetails />} />
-                  <Route path={Paths.Governance.SelectProposalType} element={<SelectProposalType />} />
-                  <Route path={Paths.Governance.CreateNewToken} element={<CreateProposal proposalType="new-token" />} />
-                  <Route path={Paths.Governance.CreateText} element={<CreateProposal proposalType="text" />} />
+                  <Route path="/" element={<Navigate to="/swap" />} />
+                  <Route path="/swap" element={<SwapPage />} />
+                  <Route path="/pools" element={<Pools />} />
+                  <Route path="/pools/add-liquidity" element={<AddLiquidityPage />} />
+                  <Route path="/pools/withdraw" element={<WithdrawPage />} />
+                  <Route path="/pools/create-pool" element={<CreatePoolPage />} />
+                  <Route path="/governance" element={<Governance />} />
+                  <Route path="/governance/proposal-details/:id" element={<ProposalDetails />} />
+                  <Route path="/governance/select-proposal-type" element={<SelectProposalType />} />
                   <Route
-                    path={Paths.Governance.CreateTokenTransfer}
+                    path="/governance/select-proposal-type/new-token"
+                    element={<CreateProposal proposalType="new-token" />}
+                  />
+                  <Route
+                    path="/governance/select-proposal-type/text"
+                    element={<CreateProposal proposalType="text" />}
+                  />
+                  <Route
+                    path="/governance/select-proposal-type/token-transfer"
                     element={<CreateProposal proposalType="token-transfer" />}
                   />
                   <Route
-                    path={Paths.Governance.CreateContractUpgrade}
+                    path="/governance/select-proposal-type/contract-upgrade"
                     element={<CreateProposal proposalType="contract-upgrade" />}
                   />
-                  <Route path={Paths.DAOs.default} element={<DAOsListPage />} />
-                  <Route path={Paths.DAOs.CreateDAO} element={<CreateADAOPage />} />
+                  <Route path="/DAOs" element={<DAOsListPage />} />
+                  <Route path="DAOs/create-a-DAO" element={<CreateADAOPage />} />
                 </Routes>
               </Flex>
             </ScrollToTop>

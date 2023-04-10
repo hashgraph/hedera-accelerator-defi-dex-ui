@@ -18,7 +18,6 @@ import { ProposalCard } from "./ProposalCard";
 import { useInput } from "../../hooks/useInput";
 import { useDateRange } from "../../hooks/useDateRange";
 import { FormattedProposal } from "./types";
-import { ManageVotingPower } from "./ManageVotingPower";
 
 const PageLimit = 20;
 
@@ -91,14 +90,13 @@ export const Governance = (): ReactElement => {
             </Box>
           </Center>
           <PageHeader
-            leftContent={[<Text textStyle="h2">Proposals</Text>]}
+            leftContent={[<Text textStyle="h2">Governance</Text>]}
             rightContent={[
               <Button padding="0px 20px" data-testid="new-proposal-button" onClick={handleClickNewProposalButton}>
                 New Proposal
               </Button>,
             ]}
           />
-          <ManageVotingPower />
         </>
       }
       body={

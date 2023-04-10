@@ -4,12 +4,12 @@ import { ReactElement } from "react";
 import { Color } from "../../themes";
 import { ActiveStepIcon, CancelledStepIcon, CompletedStepIcon, DisabledStepIcon } from "../Icons";
 
-interface StepData {
+type StepData = {
   label: string;
   content: ReactElement;
   isLoading?: boolean;
   isError?: boolean;
-}
+};
 
 interface StepperV2Props {
   steps: StepData[];
@@ -34,30 +34,28 @@ interface GetStepIconParams {
 }
 
 function getStepIcon(params: GetStepIconParams) {
-  const { isLoading, isError, isActive } = params;
-  if (isLoading) {
+  if (params.isLoading) {
     return PrimarySpinner;
   }
-  if (isError) {
+  if (params.isError) {
     return RedCancelledStepIcon;
   }
-  if (isActive) {
+  if (params.isActive) {
     return ActiveStepIcon;
   }
   return DisabledStepIcon;
 }
 
 export function StepperV2(props: StepperV2Props) {
-  const { steps, activeStep } = props;
   return (
     <Steps
-      activeStep={activeStep}
+      activeStep={props.activeStep}
       trackColor={Color.Blue._500}
       colorScheme={Color.Blue._500}
       checkIcon={CompletedStepIcon}
     >
-      {steps.map(({ label, content, isLoading, isError }, index) => {
-        const isActive = index === activeStep;
+      {props.steps.map(({ label, content, isLoading, isError }, index) => {
+        const isActive = index === props.activeStep;
         const icon = getStepIcon({
           isActive,
           isLoading: Boolean(isLoading),

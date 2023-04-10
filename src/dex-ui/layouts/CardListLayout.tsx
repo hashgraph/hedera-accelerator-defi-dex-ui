@@ -19,8 +19,8 @@ export function CardListLayout(props: CardListLayoutProps) {
           <Flex flex="row">{props.inputFilters}</Flex>
         </Flex>
         <TabPanels>
-          {props.cardLists?.map((cardList: ReactNode, index: number) => (
-            <TabPanel key={index} padding="1rem 0 0 0">
+          {props.cardLists?.map((cardList: ReactNode) => (
+            <TabPanel padding="1rem 0 0 0">
               <Flex direction="column" gap="2" minHeight="500px">
                 {cardList}
               </Flex>

@@ -11,8 +11,3 @@ export * from "./TrendingUpIcon";
 export * from "./WalletIcon";
 export * from "./TokenIcon";
 export * from "./CircleMinusIcon";
-export * from "./LightningBoltIcon";
-export * from "./LockIcon";
-export * from "./TwoLayerSettingsIcon";
-export * from "./SwapIcon";
-export * from "./HederaIcon";

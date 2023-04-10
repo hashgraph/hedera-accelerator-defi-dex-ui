@@ -3,7 +3,6 @@ import { Color } from "../../themes";
 
 interface TooltipIconProps<T> {
   options?: T;
-  fill?: string;
 }
 
 export function TooltipIcon<T>(props: TooltipIconProps<T>) {
@@ -16,7 +15,7 @@ export function TooltipIcon<T>(props: TooltipIconProps<T>) {
         7.66668V5.50001C4.9585 5.20209 5.20225 4.95834 5.50016 4.95834C5.79808 4.95834 6.04183 5.20209 
         6.04183 5.50001V7.66668C6.04183 7.96459 5.79808 8.20834 5.50016 8.20834ZM6.04183 
         3.87501H4.9585V2.79168H6.04183V3.87501Z`}
-        fill={props.fill ?? Color.Black_01}
+        fill={Color.Black_01}
       />
     </Icon>
   );

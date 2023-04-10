@@ -52,8 +52,6 @@ async function sendCreateDAOTransaction(params: SendCreateDAOTransactionParams):
   return createDAOResponse;
 }
 
-// Create new function for creating MultiSig DAOs
-
 const DAOService = {
   sendCreateDAOTransaction,
 };
