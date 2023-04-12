@@ -1,18 +1,22 @@
 import { useQuery } from "react-query";
 import { DexService } from "../../services";
-import { DAO, DAOQueries } from "./types";
+import { DAOQueries } from "./types";
+import { DAO } from "../../services/DexService/dao";
 
-export function useDAOs() {
-  return useQuery<DAO[], Error, DAO[], DAOQueries.FetchAllDAOs>(
-    DAOQueries.FetchAllDAOs,
+type UseDAOsQueryKey = [DAOQueries.DAOs, string];
+
+export function useDAOs(daoAccountId = "all") {
+  return useQuery<DAO[], Error, DAO[], UseDAOsQueryKey>(
+    [DAOQueries.DAOs, daoAccountId],
     async () => {
-      return Promise.all([
-        ...(await DexService.fetchAllGovernanceDAODetails()),
-        ...(await DexService.fetchAllMultiSigDAODetails()),
-      ]);
+      return await DexService.fetchAllDAOs();
     },
     {
-      staleTime: 10,
+      select: (data: DAO[]) => {
+        if (daoAccountId === "all") return data;
+        return data.filter((dao) => dao.accountId === daoAccountId);
+      },
+      staleTime: 5,
       keepPreviousData: true,
     }
   );

@@ -12,12 +12,7 @@ import {
   TokenPair,
   Token,
 } from "./types";
-import {
-  DexService,
-  MirrorNodeTokenBalance,
-  MirrorNodeTokenByIdResponse,
-  MirrorNodeTokenPairResponse,
-} from "../../services";
+import { DexService, MirrorNodeTokenBalance, MirrorNodeTokenById, MirrorNodeTokenPairResponse } from "../../services";
 import { calculatePoolMetrics, calculateUserPoolMetrics } from "./utils";
 import { isNil } from "ramda";
 import { getTimestamp7DaysAgo, getTransactionsFromLast24Hours, isHbarToken } from "../../utils";
@@ -49,7 +44,7 @@ const initialPoolsStore: PoolsState = {
   },
 };
 
-function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
+function getTokenInfoObj(token: MirrorNodeTokenById, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
   return {
     amount: 0.0,
     displayAmount: "",
@@ -86,7 +81,7 @@ const fetchEachToken = async (evmAddress: string) => {
     symbol: tokenCInfo.data.symbol,
     lpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
-    decimals: tokenCInfo.data.decimals,
+    decimals: Number(tokenCInfo.data.decimals),
   };
   const updated: TokenPair = {
     lpTokenMeta,

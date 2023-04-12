@@ -13,6 +13,7 @@ import {
   CreatePoolPage,
   DAOsListPage,
   CreateADAOPage,
+  DAODetailsPage,
 } from "./pages";
 import { TopMenuBar } from "./layouts";
 import {
@@ -56,6 +57,7 @@ export const Paths = {
   DAOs: {
     default: "/daos",
     CreateDAO: "/daos/create",
+    DAODetails: "/dao",
   },
 };
 
@@ -102,20 +104,11 @@ const DEX = () => {
   return (
     <ChakraProvider theme={DEXTheme}>
       <QueryClientProvider client={queryClient}>
-        <Container
-          color="black"
-          w="100%"
-          maxHeight="100%"
-          maxWidth="100%"
-          bg={Color.Primary_Bg}
-          padding="0"
-          marginBottom="5rem"
-          centerContent
-        >
+        <Container color="black" w="100%" maxWidth="100%" height="100vh" bg={Color.White_02} padding="0" margin="0">
           <Router>
             <ScrollToTop>
               <TopMenuBar menuOptions={menuOptions} />
-              <Flex width="100%" justifyContent="center">
+              <Flex width="100%" minHeight="100%" paddingBottom="2rem">
                 <Routes>
                   <Route path={Paths.Home} element={<Navigate to="/swap" />} />
                   <Route path={Paths.Swap.default} element={<SwapPage />} />
@@ -138,6 +131,7 @@ const DEX = () => {
                   />
                   <Route path={Paths.DAOs.default} element={<DAOsListPage />} />
                   <Route path={Paths.DAOs.CreateDAO} element={<CreateADAOPage />} />
+                  <Route path={`${Paths.DAOs.DAODetails}/:accountId`} element={<DAODetailsPage />} />
                 </Routes>
               </Flex>
             </ScrollToTop>

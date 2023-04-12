@@ -1,11 +1,12 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, Spacer, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { LoadingDialog } from "../../../dex-ui-components";
+import { ArrowLeftIcon, Breadcrumb, LoadingDialog } from "../../../dex-ui-components";
 import { useDexContext } from "../../hooks";
 import { TransactionStatus } from "../../store/appSlice";
 import { ProposalForm } from "./ProposalForms";
+import { Page, PageHeader } from "../../layouts";
 
 export interface CreateProposalLocationProps {
   proposalTitle: string | undefined;
@@ -48,37 +49,44 @@ export const CreateProposal = (props: CreateProposalProps) => {
   }, [governance.proposalTransacationState.status]);
 
   return (
-    <>
-      <Flex flexDirection="column" alignItems="left" width="100%" gap="0.5rem">
-        {/* TODO: turn into component */}
-        <Breadcrumb>
-          <BreadcrumbItem>
-            <BreadcrumbLink as={ReachLink} to="/governance/select-proposal-type">
-              <Text textStyle="link">{"< Select Proposal Type"}</Text>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
-        <Text textStyle="h2">Create New Proposal</Text>
-        <Spacer padding="1.5rem" />
-        <Box alignSelf="center" width="600px">
-          <ProposalForm proposalType={proposalType} />
-        </Box>
-      </Flex>
-      <LoadingDialog
-        isOpen={governance.proposalTransacationState.status === TransactionStatus.IN_PROGRESS}
-        message={"Please confirm the proposal creation transaction in your wallet to proceed."}
-      />
-      <LoadingDialog
-        isOpen={governance.proposalTransacationState.status === TransactionStatus.ERROR}
-        message={governance.proposalTransacationState.errorMessage ?? ""}
-        icon={<WarningIcon color="#EF5C5C" h={10} w={10} />}
-        buttonConfig={{
-          text: "Dismiss",
-          onClick: () => {
-            governance.clearProposalTransactionState();
-          },
-        }}
-      />
-    </>
+    <Page
+      header={
+        <PageHeader
+          leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
+          rightContent={[
+            <Breadcrumb
+              to="/governance/select-proposal-type"
+              as={ReachLink}
+              label="Back to Select Proposal Type"
+              leftIcon={<ArrowLeftIcon />}
+            />,
+          ]}
+        />
+      }
+      body={
+        <>
+          <Flex flexDirection="column" alignItems="center" width="100%">
+            <Box width="600px">
+              <ProposalForm proposalType={proposalType} />
+            </Box>
+          </Flex>
+          <LoadingDialog
+            isOpen={governance.proposalTransacationState.status === TransactionStatus.IN_PROGRESS}
+            message={"Please confirm the proposal creation transaction in your wallet to proceed."}
+          />
+          <LoadingDialog
+            isOpen={governance.proposalTransacationState.status === TransactionStatus.ERROR}
+            message={governance.proposalTransacationState.errorMessage ?? ""}
+            icon={<WarningIcon color="#EF5C5C" h={10} w={10} />}
+            buttonConfig={{
+              text: "Dismiss",
+              onClick: () => {
+                governance.clearProposalTransactionState();
+              },
+            }}
+          />
+        </>
+      }
+    />
   );
 };

@@ -3,7 +3,7 @@ import { Color } from "../../dex-ui-components";
 
 export interface TabFilter<T> {
   name: string;
-  filters: T[];
+  filters?: T[];
 }
 
 /**
@@ -23,11 +23,10 @@ export function TabFilters<T>(props: TabFiltersProps<T>) {
             key={index}
             id={filter.name}
             height="fit-content"
-            padding="0"
-            marginRight="1.5rem"
-            textStyle="h3"
-            color={Color.Grey_02}
-            _selected={{ color: Color.Black_01, borderBottom: `4px solid ${Color.Black_01}` }}
+            padding="0.75rem 1.25rem"
+            textStyle="p medium medium"
+            color={Color.Neutral._400}
+            _selected={{ color: Color.Neutral._900, borderBottom: `4px solid ${Color.Primary._500}` }}
           >
             {filter.name}
           </Tab>

@@ -17,7 +17,7 @@ import { PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
 import TokenService from "./TokenService";
-import DAO from "./dao/DAO";
+import DAOService from "./dao";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 
@@ -255,7 +255,7 @@ function createHederaService() {
     fetchCanUserUnlockGODTokenFromQueryContract,
     ...GovernorService,
     ...TokenService,
-    ...DAO,
+    ...DAOService,
   };
 }
 

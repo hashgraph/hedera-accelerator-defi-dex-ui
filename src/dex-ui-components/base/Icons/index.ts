@@ -16,3 +16,4 @@ export * from "./LightningBoltIcon";
 export * from "./LockIcon";
 export * from "./TwoLayerSettingIcon";
 export * from "./SwapIcon";
+export * from "./ArrowLeftIcon";

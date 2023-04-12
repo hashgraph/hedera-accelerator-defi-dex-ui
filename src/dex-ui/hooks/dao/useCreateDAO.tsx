@@ -1,9 +1,8 @@
 import { DAOQueries, DAOMutations } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useMutation, useQueryClient } from "react-query";
-import { DexService } from "../../services";
+import { DexService, DAOType } from "../../services";
 import { useDexContext } from "../useDexContext";
-import { DAOType } from "../../pages";
 import { isNil } from "ramda";
 
 interface UseCreateGovernanceDAOParams {
@@ -51,7 +50,7 @@ export function useCreateDAO(handleCreateDAOSuccess: (transactionResponse: Trans
     {
       onSuccess: (data: TransactionResponse | undefined) => {
         if (isNil(data)) return;
-        queryClient.invalidateQueries(DAOQueries.FetchAllDAOs);
+        queryClient.invalidateQueries(DAOQueries.DAOs);
         handleCreateDAOSuccess(data);
       },
     }

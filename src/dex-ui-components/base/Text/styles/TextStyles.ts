@@ -71,6 +71,15 @@ const baseStyles = {
     color: Color.Neutral._900,
     textTransform: "uppercase",
   },
+  link: {
+    ...fontType,
+    color: Color.Teal_01,
+    ":hover": {
+      textDecoration: "underline",
+      textDecorationColor: Color.Teal_01,
+      webkitTextDecorationColor: Color.Teal_01,
+    },
+  },
 };
 
 /**
@@ -278,6 +287,11 @@ export const TextStyles = {
     ...baseStyles.p_medium,
     fontStyle: "italic",
     fontWeight: fontWeight.Regular,
+  },
+  "p medium semibold link": {
+    ...baseStyles.p_medium,
+    fontWeight: fontWeight.Semibold,
+    ...baseStyles.link,
   },
   /**
    * Paragraph

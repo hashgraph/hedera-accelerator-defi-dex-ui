@@ -1,23 +1,8 @@
-import { DAOType } from "../../pages";
-
 export enum DAOQueries {
-  FetchAllDAOs = "getDAOs",
-  FetchDAODetails = "getDaoDetail",
+  DAOs = "daos",
+  Transactions = "transactions",
 }
 
 export enum DAOMutations {
-  CreateDAO = "createDAO",
-}
-
-export interface Social {
-  key: string;
-  value: string;
-}
-
-export interface DAO {
-  address: string;
-  name: string;
-  logoUrl: string;
-  webLinks: Social[];
-  type: DAOType;
+  CreateDAO = "CreateDAO",
 }

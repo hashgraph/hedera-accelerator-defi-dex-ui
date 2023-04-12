@@ -1,19 +1,17 @@
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Button,
-  Center,
-  Flex,
-  Spacer,
-  Text,
-  useRadioGroup,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Spacer, Text, useRadioGroup } from "@chakra-ui/react";
 import { useRef } from "react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { Color, RadioCard, TextIcon, TokenIcon, TrendingUpIcon, WalletIcon } from "../../../dex-ui-components";
+import {
+  Breadcrumb,
+  ArrowLeftIcon,
+  Color,
+  RadioCard,
+  TextIcon,
+  TokenIcon,
+  TrendingUpIcon,
+  WalletIcon,
+} from "../../../dex-ui-components";
+import { Page, PageHeader } from "../../layouts";
 
 const newProposalOptions = [
   {
@@ -57,48 +55,48 @@ export const SelectProposalType = (props: any) => {
 
   const group = getRootProps();
   return (
-    <VStack alignItems="left" width="100%">
-      <Breadcrumb flex="1">
-        <BreadcrumbItem>
-          <BreadcrumbLink as={ReachLink} to="/governance">
-            <Text textStyle="link">{"< Governance"}</Text>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <Text flex="1" textStyle="h2" paddingBottom="3rem">
-        Create New Proposal
-      </Text>
-      <Center flexDirection="column" alignItems="center">
-        <Text textStyle="h3">What kind of proposal is this?</Text>
-        <Spacer padding="1.5rem" />
-        <Flex direction="row" gap={6} {...group}>
-          {newProposalOptions.map((option, index) => {
-            const radio = getRadioProps({ value: option.name });
-            return (
-              <Box flex="1" width="255px" height="155px">
-                <RadioCard key={index} {...radio} padding="0.75rem">
-                  <Flex height="100%" flexDirection="column" alignItems="center" justifyContent="space-between">
-                    <Text textStyle="h3">{option.type}</Text>
-                    {option.icon}
-                    <Text textStyle="b2">{option.description}</Text>
-                  </Flex>
-                </RadioCard>
-              </Box>
-            );
-          })}
-        </Flex>
-        <Spacer padding="3rem" />
-        <Button
-          width="437px"
-          onClick={() => navigate(`/governance/select-proposal-type/${selectedProposalType.current}`)}
-        >
-          Continue
-        </Button>
-        <Spacer padding="0.25rem" />
-        <Button variant="cancel" width="437px" onClick={() => navigate(`/governance`)}>
-          Cancel
-        </Button>
-      </Center>
-    </VStack>
+    <Page
+      header={
+        <PageHeader
+          leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
+          rightContent={[
+            <Breadcrumb to="/governance" as={ReachLink} label="Back to Proposals" leftIcon={<ArrowLeftIcon />} />,
+          ]}
+        />
+      }
+      body={
+        <Center flexDirection="column" alignItems="center">
+          <Text textStyle="h3">What kind of proposal is this?</Text>
+          <Spacer padding="1.5rem" />
+          <Flex direction="row" gap={6} {...group}>
+            {newProposalOptions.map((option, index) => {
+              const radio = getRadioProps({ value: option.name });
+              return (
+                <Box flex="1" width="255px" height="155px">
+                  <RadioCard key={index} {...radio} padding="0.75rem">
+                    <Flex height="100%" flexDirection="column" alignItems="center" justifyContent="space-between">
+                      <Text textStyle="h3">{option.type}</Text>
+                      {option.icon}
+                      <Text textStyle="b2">{option.description}</Text>
+                    </Flex>
+                  </RadioCard>
+                </Box>
+              );
+            })}
+          </Flex>
+          <Spacer padding="3rem" />
+          <Button
+            width="437px"
+            onClick={() => navigate(`/governance/select-proposal-type/${selectedProposalType.current}`)}
+          >
+            Continue
+          </Button>
+          <Spacer padding="0.25rem" />
+          <Button variant="cancel" width="437px" onClick={() => navigate(`/governance`)}>
+            Cancel
+          </Button>
+        </Center>
+      }
+    />
   );
 };

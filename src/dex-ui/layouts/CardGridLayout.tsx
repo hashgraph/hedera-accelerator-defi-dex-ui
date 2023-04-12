@@ -1,11 +1,15 @@
-import { Text, SimpleGrid, Skeleton } from "@chakra-ui/react";
+import { Text, SimpleGrid } from "@chakra-ui/react";
 import { isEmpty } from "ramda";
 import { PropsWithChildren } from "react";
 import { UseQueryResult } from "react-query";
 import { NotFound } from "./NotFoundLayout";
+import { LoadingSpinnerLayout } from "./LoadingSpinnerLayout";
 
 interface CardGridLayoutProps<QueryResultDataType> extends PropsWithChildren {
-  queryResult: UseQueryResult<Array<QueryResultDataType>, Error>;
+  columns: number;
+  spacingX: string;
+  spacingY: string;
+  queryResult: UseQueryResult<QueryResultDataType, Error>;
   message: string;
   preLinkText: string;
   linkText: string;
@@ -13,7 +17,7 @@ interface CardGridLayoutProps<QueryResultDataType> extends PropsWithChildren {
 }
 
 export function CardGridLayout<QueryResultDataType>(props: CardGridLayoutProps<QueryResultDataType>) {
-  const { message, preLinkText, linkText, onLinkClick, queryResult, children } = props;
+  const { columns, spacingX, spacingY, message, preLinkText, linkText, onLinkClick, queryResult, children } = props;
 
   if (queryResult.isError) {
     return (
@@ -24,13 +28,7 @@ export function CardGridLayout<QueryResultDataType>(props: CardGridLayoutProps<Q
   }
 
   if (queryResult.isLoading) {
-    return (
-      <SimpleGrid columns={3} spacingX="3rem" spacingY="2rem">
-        {[...Array(9)].map(() => (
-          <Skeleton height="88px" speed={0.4} fadeDuration={0} />
-        ))}
-      </SimpleGrid>
-    );
+    return <LoadingSpinnerLayout />;
   }
 
   if (queryResult.isSuccess && isEmpty(queryResult.data)) {
@@ -38,7 +36,7 @@ export function CardGridLayout<QueryResultDataType>(props: CardGridLayoutProps<Q
   }
 
   return (
-    <SimpleGrid columns={3} spacingX="3rem" spacingY="2rem">
+    <SimpleGrid minWidth="100%" columns={columns} spacingX={spacingX} spacingY={spacingY}>
       {children}
     </SimpleGrid>
   );
