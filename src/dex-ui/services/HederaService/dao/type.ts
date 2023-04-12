@@ -1,3 +1,7 @@
-export enum DAOContractFunctions {
+export enum BaseDAOContractFunctions {
   CreateDAO = "createDAO",
+}
+
+export enum MultiSigDAOContractFunctions {
+  ProposeTransferTransaction = "proposeTransferTransaction",
 }

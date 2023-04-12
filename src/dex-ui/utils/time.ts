@@ -47,4 +47,10 @@ export function convertNumberOfMinsToSeconds(mins: number): number {
   return BigNumber(mins).times(SECONDS_IN_A_MINUTE).toNumber();
 }
 
+export function getTimeRemaining(startBlock: string, endBlock: string): BigNumber {
+  /** Each Blocktime is about 12 secs long */
+  const duration = BigNumber(endBlock).minus(BigNumber(startBlock)).times(12);
+  return duration;
+}
+
 export { getCurrentUnixTimestamp, getTimestamp24HoursAgo, getTimestamp7DaysAgo, formatDuration };

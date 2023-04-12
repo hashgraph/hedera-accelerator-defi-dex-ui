@@ -1,22 +1,19 @@
 import axios from "axios";
-import Web3 from "web3";
-import { BigNumber } from "bignumber.js";
 import { isNil, path } from "ramda";
-import { Contracts, DEX_TOKEN_PRECISION_VALUE } from "../constants";
 import {
-  MirrorNodeTokenByIdResponse,
+  MirrorNodeTokenById,
   MirrorNodeAccountBalance,
   MirrorNodeBalanceResponse,
   MirrorNodeTransaction,
-  MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
+  MirrorNodeEventLog,
 } from "./types";
-import { ProposalType } from "../../store/governanceSlice";
-import { governorAbiSignatureMap } from "./constants";
-import { getFulfilledResultsData } from "./utils";
-
-const web3 = new Web3();
+import { ethers } from "ethers";
+import { LogDescription } from "ethers/lib/utils";
+import { AccountId } from "@hashgraph/sdk";
+import { abiSignatures } from "./constants";
+import { decodeLog } from "./utils";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -34,6 +31,7 @@ const testnetMirrorNodeAPI = axios.create({
 const GREATER_THAN = "gte";
 
 type MirrorNodeServiceType = ReturnType<typeof createMirrorNodeService>;
+
 /**
  * A hook that provides access to functions that fetch transaction and account
  * information from a Hedera managed mirror node.
@@ -99,7 +97,7 @@ function createMirrorNodeService() {
    * @param tokenId  - The ID of the token account to return data for.
    * @returns Attributes associated with the provided token ID.
    */
-  const fetchTokenData = async (tokenId: string): Promise<MirrorNodeTokenByIdResponse> => {
+  const fetchTokenData = async (tokenId: string): Promise<MirrorNodeTokenById> => {
     return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}`);
   };
 
@@ -114,39 +112,39 @@ function createMirrorNodeService() {
       params: {
         "account.id": accountId,
         order: "asc",
-        limit: 100,
       },
     });
   };
 
+  interface CallContractParams {
+    block?: string;
+    data: string;
+    estimate?: boolean;
+    from: string;
+    gas?: number;
+    gasPrice?: number;
+    to: string;
+    value?: number;
+  }
   /**
-   * Fetches the HBAR balance and a list of token balances on the Hedera
-   * network for the given account ID. Fetches the decimal precision value for
-   * each token ID and formats the balances with the correct decimal positions.
-   * @param accountId - The ID of the account to return token balances for.
-   * @returns The list of balances (in decimal format) for the given account ID.
+   * Returns the results from a cost-free contract execution such as read-only smart contract queries,
+   * gas estimation, and transient simulation of read-write operations.
+   * @param payload -
+   * @returns Results from a cost-free EVM call to the contract.
    */
-  const fetchAccountTokenBalances = async (accountId: string): Promise<MirrorNodeAccountBalance> => {
-    const accountBalances = await fetchAccountBalances(accountId);
-    const account = accountBalances.filter((accountDetails) => accountDetails.account === accountId)[0];
-    const tokenBalances = await Promise.all(
-      account.tokens.map(async (token) => {
-        const tokenData = await fetchTokenData(token.token_id);
-        const { decimals } = tokenData.data;
-        const balance = BigNumber(token.balance).shiftedBy(-Number(decimals));
-        return {
-          ...token,
-          balance,
-          decimals: String(decimals),
-        };
-      })
-    );
-    return {
-      account: accountId,
-      tokens: tokenBalances,
-      balance: BigNumber(account.balance).shiftedBy(-Number(DEX_TOKEN_PRECISION_VALUE)),
-    };
-  };
+  async function callContract<Response>(payload: CallContractParams): Promise<Response> {
+    const { block, data, estimate, from, gas, gasPrice, to, value } = payload;
+    return testnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
+      block,
+      data,
+      estimate,
+      from: AccountId.fromString(from).toSolidityAddress(),
+      gas,
+      gasPrice,
+      to: AccountId.fromString(to).toSolidityAddress(),
+      value,
+    });
+  }
 
   /**
    * Fetches the list of token balances given a token ID. This represents
@@ -162,28 +160,43 @@ function createMirrorNodeService() {
     });
   };
 
-  function decodeLog(signatureMap: Map<string, any>, logs: MirrorNodeProposalEventLog[]) {
-    const eventsMap = new Map<string, any[]>();
-    for (const log of logs) {
+  /**
+   * Fetchs information about a specific blockNumber.
+   * @param blockNumber - The block number to query.
+   * @returns Information about the block.
+   */
+  const fetchBlock = async (blockNumber: string) => {
+    const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
+    return block.data;
+  };
+
+  async function fetchParsedEventLogs(
+    accountId: string,
+    contractInterface: ethers.utils.Interface,
+    events?: string[]
+  ): Promise<ethers.utils.LogDescription[]> {
+    const shouldParseAllEvents = isNil(events) || events.length === 0;
+    const logs: MirrorNodeEventLog[] = await fetchNextBatch(`/api/v1/contracts/${accountId}/results/logs`, "logs", {
+      params: {
+        order: "desc",
+      },
+    });
+    const parsedEventLogs: LogDescription[] = logs.reduce((logs: LogDescription[], log: MirrorNodeEventLog) => {
       try {
-        const data = log.data;
-        const topics = log.topics;
-        const timeStamp = log.timestamp;
-        const eventAbi = signatureMap.get(topics[0]);
-        if (eventAbi !== undefined && eventAbi.name === "ProposalDetails") {
-          const requiredTopics = eventAbi.anonymous === true ? topics : topics.splice(1);
-          const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
-          event["timestamp"] = timeStamp;
-          const events = eventsMap.get(eventAbi.name) ?? [];
-          eventsMap.set(eventAbi.name, [...events, event]);
+        const parsedLog = contractInterface.parseLog({ data: log.data, topics: log.topics });
+        if (shouldParseAllEvents || events?.includes(parsedLog.name)) {
+          return logs.concat(parsedLog);
+        } else {
+          return logs;
         }
       } catch (e) {
-        console.error(e);
+        return logs;
       }
-    }
-    return eventsMap;
+    }, []);
+    return parsedEventLogs;
   }
 
+  // TODO: Move to Governance Service
   const fetchContractProposalEvents = async (
     proposalType: string,
     contractId: string
@@ -224,7 +237,7 @@ function createMirrorNodeService() {
       },
     });
 
-    const allEvents = decodeLog(governorAbiSignatureMap, response.data.logs);
+    const allEvents = decodeLog(abiSignatures, response.data.logs, ["ProposalDetails"]);
     const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
@@ -232,60 +245,17 @@ function createMirrorNodeService() {
     return proposals;
   };
 
-  /**
-   * Fetches all proposal events emitted by a smart contract. The "ProposalCreated",
-   * "ProposalExecuted", and "ProposalCanceled" are fetched. These events provide data
-   * regarding the contract proposals.
-   * @param contractId - The id of the contract to fetch events from.
-   * @returns An array of proposal event data.
-   */
-  const fetchAllProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
-    const tokenTransferEventsResults = fetchContractProposalEvents(
-      ProposalType.TokenTransfer,
-      Contracts.Governor.TransferToken.ProxyId
-    );
-    const createTokenEventsResults = fetchContractProposalEvents(
-      ProposalType.CreateToken,
-      Contracts.Governor.CreateToken.ProxyId
-    );
-    const textProposalEventsResults = fetchContractProposalEvents(
-      ProposalType.Text,
-      Contracts.Governor.TextProposal.ProxyId
-    );
-    const contractUpgradeEventsResults = fetchContractProposalEvents(
-      ProposalType.ContractUpgrade,
-      Contracts.Governor.ContractUpgrade.ProxyId
-    );
-    const proposalEventsResults = await Promise.allSettled([
-      tokenTransferEventsResults,
-      createTokenEventsResults,
-      textProposalEventsResults,
-      contractUpgradeEventsResults,
-    ]);
-    const proposalEvents = getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
-    return proposalEvents;
-  };
-
-  /**
-   * Fetchs information about a specific blockNumber.
-   * @param blockNumber - The block number to query.
-   * @returns Information about the block.
-   */
-  const fetchBlock = async (blockNumber: string) => {
-    const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
-    return block.data;
-  };
-
   return {
     fetchAccountTransactions,
-    fetchAccountTokenBalances,
     fetchTokenBalances,
     fetchAccountBalances,
-    fetchAllProposalEvents,
-    fetchContractProposalEvents,
     fetchBlock,
     fetchContract,
     fetchTokenData,
+    callContract,
+    fetchParsedEventLogs,
+    // TODO: Decouple from MirrorNodeService and move to GovernanceService
+    fetchContractProposalEvents,
   };
 }
 

@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
-import { DexService, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
+import { DexService, MirrorNodeTokenById, MirrorNodeTokenPairResponse } from "../../services";
 import { getErrorMessage, isHbarToken, withPrecision } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
@@ -20,7 +20,7 @@ const initialSwapState: SwapState = {
   tokenPairs: null,
 };
 
-function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
+function getTokenInfoObj(token: MirrorNodeTokenById, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
   return {
     amount: 0.0,
     displayAmount: "",
@@ -57,7 +57,7 @@ const fetchEachToken = async (evmAddress: string) => {
     symbol: tokenCInfo.data.symbol,
     lpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
-    decimals: tokenCInfo.data.decimals,
+    decimals: Number(tokenCInfo.data.decimals),
   };
   const updated: TokenPair = {
     lpTokenMeta,

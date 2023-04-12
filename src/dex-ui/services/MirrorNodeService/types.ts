@@ -6,13 +6,45 @@ interface MirrorNodeLinks {
   };
 }
 
-interface MirrorNodeTokenByIdResponse {
+interface MirrorNodeTokenById {
   data: {
-    name: string | undefined;
-    symbol: string | undefined;
-    token_id: string | undefined;
-    decimals: number;
+    admin_key: {
+      _type: string;
+      key: string;
+    };
+    auto_renew_account: string;
+    auto_renew_period: number;
+    created_timestamp: string;
+    custom_fees: {
+      created_timestamp: string;
+      fixed_fees: unknown[];
+      fractional_fees: unknown[];
+    };
+    decimals: string;
+    deleted: boolean;
+    expiry_timestamp: number;
+    fee_schedule_key: string | null;
+    freeze_default: boolean;
+    freeze_key: string | null;
+    initial_supply: string | null;
+    kyc_key: string | null;
+    max_supply: string;
+    memo: string;
+    modified_timestamp: string;
+    name: string;
+    pause_key: string | null;
+    pause_status: string;
+    supply_key: {
+      _type: string;
+      key: string;
+    };
+    supply_type: string;
+    symbol: string;
+    token_id: string;
     total_supply: Long | null;
+    treasury_account_id: string;
+    type: string;
+    wipe_key: null;
   };
 }
 
@@ -24,6 +56,8 @@ interface MirrorNodeTokenBalance {
   token_id: string;
   balance: BigNumber;
   decimals?: string;
+  symbol?: string;
+  name?: string;
 }
 
 interface MirrorNodeBalanceResponse {
@@ -82,8 +116,28 @@ interface MirrorNodeDecodedProposalEvent {
   timestamp?: string;
 }
 
+interface MirrorNodeEventLog {
+  address: string;
+  bloom: string;
+  contract_id: string;
+  data: string;
+  index: number;
+  topics: string[];
+  block_hash: string;
+  block_number: number;
+  root_contract_id: string;
+  timestamp: string;
+  transaction_hash: string;
+  transaction_index: number;
+}
+
+/**
+ * TODO: Refactor this to return a single MirrorNode type with other types as properties
+ * i.e. MirrorNode.EventLog, MirrorNode.TokenByIdResponse, etc.
+ */
 export type {
-  MirrorNodeTokenByIdResponse,
+  MirrorNodeEventLog,
+  MirrorNodeTokenById,
   MirrorNodeTokenBalance,
   MirrorNodeTransaction,
   MirrorNodeBalanceResponse,

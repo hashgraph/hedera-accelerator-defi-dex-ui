@@ -3,7 +3,7 @@ import { Color } from "../../themes";
 
 interface MetricLabelProps {
   label: string;
-  value: string;
+  value: string | number;
   isLoading?: boolean;
   labelLeftIcon?: React.ReactElement;
   labelRightIcon?: React.ReactElement;
@@ -49,7 +49,7 @@ export const MetricLabel = (props: MetricLabelProps) => {
         <Flex flexDirection="column" align="flex-start" gap="0px">
           <Flex direction="row" gap="3px" alignItems="center">
             <Text textStyle={valueStyle} color={valueTextColor}>
-              {value}
+              {String(value)}
             </Text>
             {valueUnitSymbol ? (
               <Text textStyle="p medium medium" color={valueUnitSymbolColor}>

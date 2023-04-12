@@ -1,8 +1,6 @@
-type GovernanceEventNames = "ProposalCreated" | "ProposalExecuted" | "ProposalCanceled";
-
 export interface EventAbi {
   type: "event";
   anonymous: boolean;
-  name: GovernanceEventNames;
+  name: any;
   inputs: Array<any>;
 }

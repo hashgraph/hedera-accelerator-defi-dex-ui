@@ -76,20 +76,22 @@ export const Governance = (): ReactElement => {
     <Page
       header={
         <>
-          <Center>
-            <Box padding="16px 80px 0 80px" maxWidth="fit-content" paddingTop="1rem">
-              <Notification
-                type={NotficationTypes.SUCCESS}
-                message={`You have created ${locationState?.proposalTitle}`}
-                isLinkShown={true}
-                linkText="View in HashScan"
-                linkRef={hashScanLink}
-                isCloseButtonShown={true}
-                isVisible={isNotificationVisible}
-                handleClickClose={handleClickNotificationCloseButton}
-              />
-            </Box>
-          </Center>
+          {isNotificationVisible && (
+            <Center>
+              <Box padding="16px 80px 0 80px" maxWidth="fit-content" paddingTop="1rem">
+                <Notification
+                  type={NotficationTypes.SUCCESS}
+                  message={`You have created ${locationState?.proposalTitle}`}
+                  isLinkShown={true}
+                  linkText="View in HashScan"
+                  linkRef={hashScanLink}
+                  isCloseButtonShown={true}
+                  isVisible={isNotificationVisible}
+                  handleClickClose={handleClickNotificationCloseButton}
+                />
+              </Box>
+            </Center>
+          )}
           <PageHeader
             leftContent={[<Text textStyle="h2">Proposals</Text>]}
             rightContent={[

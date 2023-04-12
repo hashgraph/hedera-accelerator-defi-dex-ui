@@ -30,7 +30,7 @@
     "hashconnect": "^0.2.3",
     "immer": "^9.0.15",
     "numeral": "^2.0.6",
-    "ramda": "^0.28.0",
+    "ramda": "^0.29.0",
     "react": "^18.2.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
@@ -96,7 +96,8 @@
         ],
         "rules": {
           "tsdoc/syntax": "warn",
-          "@typescript-eslint/no-explicit-any": "off"
+          "@typescript-eslint/no-explicit-any": "off",
+          "@typescript-eslint/ban-ts-comment": "off"
         }
       },
       {
@@ -154,7 +155,7 @@
     "@testing-library/dom": "^8.16.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.11.43",
-    "@types/ramda": "^0.28.15",
+    "@types/ramda": "^0.29.0",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
