@@ -6,7 +6,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { DAO } from "../../hooks/dao/types";
 import { PrimaryHeaderButton } from "../../components";
 import { DAOCard } from "./DAOCard";
-import { DAOType } from "../CreateADAO";
 import { Paths } from "../../DEX";
 
 export function DAOsListPage() {
@@ -18,12 +17,8 @@ export function DAOsListPage() {
     transactionState: location.state?.transactionState,
   });
 
-  function handleCreateADAOClicked() {
-    navigate(Paths.DAOs.CreateDAO);
-  }
-
   function handleLinkClick() {
-    handleCreateADAOClicked();
+    navigate(Paths.DAOs.CreateDAO);
   }
 
   return (
@@ -61,7 +56,8 @@ export function DAOsListPage() {
           onLinkClick={handleLinkClick}
         >
           {daos.data?.map((dao: DAO, index: number) => {
-            return <DAOCard key={index} address={dao.address} name={dao.name} type={DAOType.MultiSig} />;
+            const { address, name, type } = dao;
+            return <DAOCard key={index} address={address} name={name} type={type} />;
           })}
         </CardGridLayout>
       }

@@ -1,9 +1,7 @@
 import { Text, Box, Grid, GridItem, Flex, Card } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { Color } from "../../../dex-ui-components";
-import { useNavigate } from "react-router-dom";
 import { DAOType } from "../CreateADAO";
-import { Paths } from "../../DEX";
 
 export interface DAOCardProps {
   key: React.Key | null | undefined;
@@ -14,11 +12,11 @@ export interface DAOCardProps {
 }
 
 export function DAOCard(props: DAOCardProps) {
-  const { key, logo, name, type, address } = props;
-  const navigate = useNavigate();
+  const { key, logo, name, type } = props;
 
   function handleDAOCardClicked() {
-    navigate(`${Paths.DAOs.ViewDAODetails}/${address}`);
+    /*  navigate(`${Paths.DAOs.DAODetails}/${address}`); */
+    console.log("TODO: Show DAO Details");
   }
 
   return (

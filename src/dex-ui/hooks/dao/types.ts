@@ -1,3 +1,5 @@
+import { DAOType } from "../../pages";
+
 export enum DAOQueries {
   FetchAllDAOs = "getDAOs",
   FetchDAODetails = "getDaoDetail",
@@ -17,4 +19,5 @@ export interface DAO {
   name: string;
   logoUrl: string;
   webLinks: Social[];
+  type: DAOType;
 }

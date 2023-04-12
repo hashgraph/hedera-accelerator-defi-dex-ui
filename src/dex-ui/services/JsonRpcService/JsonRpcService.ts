@@ -3,7 +3,7 @@ import Pair from "./Pair";
 import { AccountId } from "@hashgraph/sdk";
 import Factory from "./Factory";
 import Governor from "./Governor";
-import DAO from "./DAO";
+import * as DAOService from "./dao";
 import Configuration from "./Configuration";
 import { TOKEN_USER_ID } from "../constants";
 
@@ -38,7 +38,7 @@ function createJsonRpcService() {
     ...Factory,
     ...Pair,
     ...Governor,
-    ...DAO,
+    ...DAOService,
     ...Configuration,
   };
 }

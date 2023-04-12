@@ -13,7 +13,6 @@ import {
   CreatePoolPage,
   DAOsListPage,
   CreateADAOPage,
-  ViewDAODetailsPage,
 } from "./pages";
 import { TopMenuBar } from "./layouts";
 import {
@@ -57,7 +56,6 @@ export const Paths = {
   DAOs: {
     default: "/daos",
     CreateDAO: "/daos/create",
-    ViewDAODetails: "/dao/dashboard",
   },
 };
 
@@ -140,7 +138,6 @@ const DEX = () => {
                   />
                   <Route path={Paths.DAOs.default} element={<DAOsListPage />} />
                   <Route path={Paths.DAOs.CreateDAO} element={<CreateADAOPage />} />
-                  <Route path={`${Paths.DAOs.ViewDAODetails}/:address`} element={<ViewDAODetailsPage />} />
                 </Routes>
               </Flex>
             </ScrollToTop>
