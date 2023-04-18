@@ -24,9 +24,9 @@ enum SwapActionType {
 interface TokenPair {
   tokenA: Token;
   tokenB: Token;
-  pairToken: {
+  lpTokenMeta: {
     symbol: string | undefined;
-    pairLpAccountId: string | undefined;
+    lpAccountId: string | undefined;
     totalSupply?: Long | null;
     decimals: number;
   };
@@ -43,6 +43,7 @@ interface Token {
   tokenMeta: {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
+    fee: BigNumber | undefined;
   };
 }
 interface TransactionState {

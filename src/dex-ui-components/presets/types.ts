@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 export enum formulaTypes {
   MAX = "MAX",
   HALF = "HALF",
@@ -15,16 +16,11 @@ export interface TokenState {
   tokenMeta: {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
+    fee: BigNumber | undefined;
   };
 }
 
 export interface LPTokenState {
-  tokenSymbol: string | undefined;
-  userLpAmount: number | undefined;
-  userLpPercentage: string | undefined;
-  pairAccountId: string | undefined;
-  lpAccountId: string | undefined;
   amount: number;
-  fee: string;
   displayAmount: string;
 }

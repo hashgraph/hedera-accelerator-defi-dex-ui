@@ -2,6 +2,7 @@ import { useDexContext } from "../../hooks";
 import { formatSwapPageData } from "../Swap/formatters";
 import { AddLiquidityForm } from "../../../dex-ui-components";
 import { Page, DefiFormContainer } from "../../layouts";
+import { useParams } from "react-router-dom";
 
 export function AddLiquidityPage() {
   const { app, wallet, swap, pools } = useDexContext(({ app, wallet, swap, pools }) => ({ app, wallet, swap, pools }));
@@ -10,6 +11,8 @@ export function AddLiquidityPage() {
     spotPrices: pairInfo.spotPrices,
     poolLiquidity,
   });
+
+  const { pairId, poolName } = useParams();
 
   const isFormLoading =
     app.isFeatureLoading("pairInfo") ||
@@ -22,6 +25,8 @@ export function AddLiquidityPage() {
         <DefiFormContainer>
           <AddLiquidityForm
             isLoading={isFormLoading}
+            selectedFromPoolPairId={pairId}
+            poolName={poolName}
             pairedAccountBalance={wallet.pairedAccountBalance}
             tokenPairs={swap.tokenPairs}
             spotPrices={formattedSpotPrices}

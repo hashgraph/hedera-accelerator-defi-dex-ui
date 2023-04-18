@@ -49,7 +49,7 @@ const initialPoolsStore: PoolsState = {
   },
 };
 
-function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse) {
+function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
   return {
     amount: 0.0,
     displayAmount: "",
@@ -62,13 +62,14 @@ function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTok
     tokenMeta: {
       pairAccountId: pair.data.contract_id,
       tokenId: token.data.token_id,
+      fee,
     },
   };
 }
 
 const fetchEachToken = async (evmAddress: string) => {
   const pairData = await DexService.fetchContract(evmAddress);
-  const { tokenATokenId, tokenBTokenId, lpTokenId, poolFee } = await DexService.fetchPairTokenIds(
+  const { tokenATokenId, tokenBTokenId, lpTokenId, fee } = await DexService.fetchPairTokenIds(
     pairData.data.contract_id
   );
 
@@ -78,25 +79,24 @@ const fetchEachToken = async (evmAddress: string) => {
     DexService.fetchTokenData(lpTokenId),
   ]);
 
-  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData);
-  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData);
+  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData, fee);
+  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData, fee);
 
-  const pairToken = {
+  const lpTokenMeta = {
     symbol: tokenCInfo.data.symbol,
-    pairLpAccountId: lpTokenId,
+    lpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
     decimals: tokenCInfo.data.decimals,
-    poolFee,
   };
   const updated: TokenPair = {
-    pairToken,
+    lpTokenMeta,
     tokenA: tokenAInfoDetails,
     tokenB: tokenBInfoDetails,
   };
   return updated;
 };
 
-const metricesForEachPair = async (pair: TokenPair) => {
+const metricsForEachPair = async (pair: TokenPair) => {
   const tokenPairBalance = await DexService.fetchAccountTokenBalances(pair.tokenA.tokenMeta.pairAccountId ?? "");
   const timestamp7DaysAgo = getTimestamp7DaysAgo();
   const last7DTransactions = await DexService.fetchAccountTransactions(
@@ -110,7 +110,7 @@ const metricesForEachPair = async (pair: TokenPair) => {
     last24Transactions,
     last7DTransactions,
     tokenPair: pair,
-    poolFee: pair.pairToken.poolFee,
+    poolFee: pair.tokenA.tokenMeta.fee,
   });
 };
 
@@ -223,15 +223,15 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       app.setFeaturesAsLoading(["allPoolsMetrics"]);
       try {
         const pairsAddresses = await DexService.fetchAllTokenPairs();
-        const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
-        const poolTokenPairs = await Promise.all(addressessURlRequest);
-        const addressessURlRequestForMetrices = poolTokenPairs?.map((pair) => metricesForEachPair(pair));
-        const allPoolMetrices = await Promise.all(addressessURlRequestForMetrices);
+        const addressesURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
+        const poolTokenPairs = await Promise.all(addressesURlRequest);
+        const addressesURlRequestForMetrics = poolTokenPairs?.map((pair) => metricsForEachPair(pair));
+        const allPoolMetrics = await Promise.all(addressesURlRequestForMetrics);
         set(
           ({ pools }) => {
             pools.status = "success";
             pools.tokenPairs = poolTokenPairs;
-            pools.allPoolsMetrics = allPoolMetrices;
+            pools.allPoolsMetrics = allPoolMetrics;
           },
           false,
           PoolsActionType.FETCH_ALL_METRICS_SUCCEEDED
@@ -266,19 +266,22 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         }
         const userTokenBalances = await DexService.fetchAccountTokenBalances(userAccountId);
         const pairsAddresses = await DexService.fetchAllTokenPairs();
-        const addressessURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
-        const poolTokenPairs = await Promise.all(addressessURlRequest);
+        const addressesURlRequest = pairsAddresses?.map((address) => fetchEachToken(address)) ?? [];
+        const poolTokenPairs = await Promise.all(addressesURlRequest);
         const userLiquidityPoolTokensList = poolTokenPairs?.filter((poolTokenPair: TokenPair) => {
           return userTokenBalances.tokens.some(
             (userTokenBalance: MirrorNodeTokenBalance) =>
-              userTokenBalance.token_id === poolTokenPair.pairToken.pairLpAccountId
+              userTokenBalance.token_id === poolTokenPair.lpTokenMeta.lpAccountId
           );
         });
         const poolBalanceUrlRequest = userLiquidityPoolTokensList?.map((pair: TokenPair) => getAllPoolBalanceFor(pair));
         const poolTokenBalances = await Promise.all(poolBalanceUrlRequest);
         const userPoolsMetrics = userLiquidityPoolTokensList?.map((userTokenPair: TokenPair) => {
           const fee = get().pools.allPoolsMetrics.find((pool) => {
-            return pool.name === `${userTokenPair.tokenA.symbol}-${userTokenPair.tokenB.symbol}`;
+            return (
+              pool.name === `${userTokenPair.tokenA.symbol}-${userTokenPair.tokenB.symbol}` &&
+              pool.fee?.eq(userTokenPair.tokenA.tokenMeta.fee ?? BigNumber(-1))
+            );
           })?.fee;
           const poolTokenBalance = poolTokenBalances.filter(
             (pair) => pair.account === userTokenPair.tokenA.tokenMeta.pairAccountId

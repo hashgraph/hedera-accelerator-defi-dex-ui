@@ -39,6 +39,7 @@ export interface FormattedPoolDetails {
   totalVolumeLocked: string;
   past24HoursVolume: string;
   past7daysVolume: string;
+  pairAccountId: string | undefined;
   actions?: JSX.Element;
 }
 
@@ -195,7 +196,17 @@ const Pools = (): JSX.Element => {
                 >
                   {userPool ? "Withdraw" : "Swap"}
                 </Link>
-                <Link textDecoration={"underline"} color={"#3078FF"} as={RouterLink} to={"/pools/add-liquidity"}>
+                <Link
+                  textDecoration={"underline"}
+                  color={"#3078FF"}
+                  onClick={() => {
+                    navigate(
+                      `/pools/add-liquidity/${(row as FormattedPoolDetails).pairAccountId}/${
+                        (row as FormattedPoolDetails).name
+                      }`
+                    );
+                  }}
+                >
                   Add Liquidity
                 </Link>
               </>

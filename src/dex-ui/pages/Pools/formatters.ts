@@ -9,13 +9,14 @@ import { formatBigNumberToUSD, formatBigNumberToPercent } from "../../utils";
  * @returns A formatted version of the liquidity pool data.
  */
 const formatPoolMetrics = (poolState: Pool): FormattedPoolDetails => {
-  const { name, fee, totalVolumeLocked, past24HoursVolume, past7daysVolume } = poolState;
+  const { name, fee, totalVolumeLocked, past24HoursVolume, past7daysVolume, pairAccountId } = poolState;
   return {
     name,
     fee: formatBigNumberToPercent(fee),
     totalVolumeLocked: formatBigNumberToUSD(totalVolumeLocked),
     past24HoursVolume: formatBigNumberToUSD(past24HoursVolume),
     past7daysVolume: formatBigNumberToUSD(past7daysVolume),
+    pairAccountId,
   };
 };
 
@@ -33,7 +34,7 @@ const formatUserPoolMetrics = (userPoolState: UserPool): FormattedUserPoolDetail
     liquidity: formatBigNumberToUSD(liquidity),
     percentOfPool: formatBigNumberToPercent(percentOfPool),
     unclaimedFees: formatBigNumberToUSD(unclaimedFees),
-    pairLpAccountId: userTokenPair?.pairToken.pairLpAccountId,
+    pairLpAccountId: userTokenPair?.lpTokenMeta.lpAccountId,
   };
 };
 

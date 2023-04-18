@@ -1,21 +1,20 @@
 import { Text, Input as ChakraInput, FormControl, Skeleton } from "@chakra-ui/react";
 import { FieldValues, UseFormReturn } from "react-hook-form";
-import { AccountBalanceJson } from "@hashgraph/sdk";
 import { Button } from "../../base";
 import { TokenInputLayout } from "../layouts";
 import { formulaTypes, LPTokenState } from "../types";
-import { formatTokenBalance, halfOf } from "../utils";
+import { halfOf } from "../utils";
 import { ChangeEvent } from "react";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { CONNECT_TO_VIEW } from "../TokenInput";
 
 interface LPTokenInputProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   fieldValue: string;
   label: string;
   isReadOnly?: boolean;
-  selectedTokenId: string;
+  balance: number;
   walletConnectionStatus: HashConnectConnectionState;
-  pairedAccountBalance: AccountBalanceJson | null;
   isLoading: boolean;
   isHalfAndMaxButtonsVisible?: boolean;
   onTokenAmountChanged?: (updatedToken: LPTokenState) => void;
@@ -26,11 +25,13 @@ export function LPTokenInput<T extends FieldValues>(props: LPTokenInputProps<T>)
   const errors = props.form.formState.errors?.[props.fieldValue];
   const formValues = structuredClone(props.form.getValues());
 
-  const formattedBalance = formatTokenBalance({
-    symbol: formValues[props.fieldValue].lpAccountId ?? "",
-    balance: formValues[props.fieldValue].userLpAmount ?? 0,
-    walletConnectionStatus: props.walletConnectionStatus,
-  });
+  function formattedBalance() {
+    if (props.walletConnectionStatus !== HashConnectConnectionState.Paired) {
+      return CONNECT_TO_VIEW;
+    } else {
+      return String(props.balance);
+    }
+  }
 
   function handleTokenAmountChange(event: ChangeEvent<HTMLInputElement>) {
     const inputElement = event?.target as HTMLInputElement;
@@ -40,12 +41,13 @@ export function LPTokenInput<T extends FieldValues>(props: LPTokenInputProps<T>)
       amount: tokenAmount,
     };
     props.form.setValue(`${props.fieldValue}.amount` as any, tokenAmount as any);
+    props.form.setValue(`${props.fieldValue}.displayAmount` as any, String(updatedToken.amount) as any);
     props.onTokenAmountChanged?.(updatedToken);
   }
 
   function setInputAmountWithFormula(formula: formulaTypes = formulaTypes.MAX) {
-    const tokenBalance = formValues[props.fieldValue].userLpAmount;
-    if (tokenBalance === undefined) {
+    const tokenBalance = props.balance;
+    if (!tokenBalance) {
       return;
     }
     const tokenInputAmount = formula === formulaTypes.MAX ? tokenBalance : halfOf(tokenBalance);
@@ -87,7 +89,7 @@ export function LPTokenInput<T extends FieldValues>(props: LPTokenInputProps<T>)
       userTokenBalance={
         <Skeleton speed={0.4} fadeDuration={0} isLoaded={!props.isLoading}>
           <Text textStyle="h4" marginRight="0.5rem">
-            {formattedBalance}
+            {formattedBalance()}
           </Text>
         </Skeleton>
       }

@@ -21,7 +21,7 @@ type TokenPairAddressResponse = {
   tokenATokenId: string;
   tokenBTokenId: string;
   lpTokenId: string;
-  poolFee: BigNumber;
+  fee: BigNumber;
 };
 
 type RawTokenPairAddressResponse = [
@@ -51,7 +51,7 @@ async function fetchPairTokenIds(pairAccountId: string): Promise<TokenPairAddres
     tokenATokenId,
     tokenBTokenId,
     lpTokenId,
-    poolFee: fee.dividedBy(feePrecision).shiftedBy(-2),
+    fee: fee.dividedBy(feePrecision).shiftedBy(-2),
   };
 }
 
@@ -90,7 +90,7 @@ type RawPairInfoResponse = [
   }
 ];
 
-type PairInfo = {
+type PairInfoResponse = {
   tokenATokenId: string;
   tokenBTokenId: string;
   tokenASpotPrice: BigNumber;
@@ -99,31 +99,20 @@ type PairInfo = {
   feeWithPrecision: BigNumber;
 };
 
-async function getPairInfo(pairAccountId: string): Promise<PairInfo> {
+async function getPairInfo(pairAccountId: string): Promise<PairInfoResponse> {
   const pairContract = createPairContract(pairAccountId);
   const pairResponse: RawPairInfoResponse = await pairContract.getPairInfo();
   const [tokenPairIds, tokenPairDetails] = pairResponse;
-
   checkIfTokenAddressesAreValid([tokenPairIds.tokenA.tokenAddress, tokenPairIds.tokenB.tokenAddress]);
-  const [tokenATokenId, tokenBTokenId] = [tokenPairIds.tokenA.tokenAddress, tokenPairIds.tokenB.tokenAddress].map(
-    solidityAddressToTokenIdString
-  );
-
-  const tokenASpotPrice = convertEthersBigNumberToBigNumberJS(tokenPairDetails.tokenASpotPrice);
-  const tokenBSpotPrice = convertEthersBigNumberToBigNumberJS(tokenPairDetails.tokenBSpotPrice);
-  const precision = convertEthersBigNumberToBigNumberJS(tokenPairDetails.precision);
   const feePrecision = convertEthersBigNumberToBigNumberJS(tokenPairDetails.feePrecision);
   const fee = convertEthersBigNumberToBigNumberJS(tokenPairDetails.fee);
-  /** NOTE: shiftedBy(-2) is added to return the fee as a numeric representation of a percentage value. */
-  const feeWithPrecision = fee.dividedBy(feePrecision).shiftedBy(-2);
-
   return {
-    tokenASpotPrice,
-    tokenBSpotPrice,
-    tokenATokenId,
-    tokenBTokenId,
-    precision,
-    feeWithPrecision,
+    tokenASpotPrice: convertEthersBigNumberToBigNumberJS(tokenPairDetails.tokenASpotPrice),
+    tokenBSpotPrice: convertEthersBigNumberToBigNumberJS(tokenPairDetails.tokenBSpotPrice),
+    tokenATokenId: solidityAddressToTokenIdString(tokenPairIds.tokenA.tokenAddress),
+    tokenBTokenId: solidityAddressToTokenIdString(tokenPairIds.tokenB.tokenAddress),
+    precision: convertEthersBigNumberToBigNumberJS(tokenPairDetails.precision),
+    feeWithPrecision: fee.dividedBy(feePrecision).shiftedBy(-2),
   };
 }
 

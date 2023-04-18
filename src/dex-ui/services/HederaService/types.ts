@@ -16,9 +16,9 @@ enum PairContractFunctions {
 interface TokenPair {
   tokenA: Token;
   tokenB: Token;
-  pairToken: {
+  lpTokenMeta: {
     symbol: string | undefined;
-    pairLpAccountId: string | undefined;
+    lpAccountId: string | undefined;
     totalSupply?: Long | null;
     decimals: number;
   };
