@@ -61,7 +61,7 @@ export function TokenInput<T extends FieldValues>(props: TokenInputProps<T>) {
   function handleTokenSymbolChange(event: ChangeEvent<HTMLInputElement>) {
     const inputElement = event?.target as HTMLInputElement;
     const tokenId = inputElement.value;
-    const token = getTokenData(tokenId, props.tokenPairs ?? []);
+    const token = getTokenData(tokenId, props.selectableTokens);
     const balance = getTokenBalance(tokenId, props.pairedAccountBalance as any);
     const updatedToken: TokenState = {
       ...formValues[props.fieldValue],

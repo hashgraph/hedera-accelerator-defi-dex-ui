@@ -51,7 +51,6 @@ export function WithdrawPage() {
       body={
         <DefiFormContainer>
           <WithdrawForm
-            pairedAccountBalance={wallet.pairedAccountBalance}
             isLoading={isFormLoading}
             poolLpDetails={withdrawState.poolLpDetails}
             poolLiquidityDetails={{ firstToken: withdrawState.firstToken, secondToken: withdrawState.secondToken }}

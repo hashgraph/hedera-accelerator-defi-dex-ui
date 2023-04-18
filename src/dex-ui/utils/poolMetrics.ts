@@ -8,6 +8,7 @@ import {
 import { TokenPair } from "../store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
 import { HBARTokenId } from "../services";
+import { getTransactionFeeRateDisplay } from "../../dex-ui-components/presets/utils";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;
@@ -167,10 +168,10 @@ const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFro
   const {
     userTokenBalances,
     tokenPair: {
-      pairToken: { pairLpAccountId, totalSupply, decimals },
+      lpTokenMeta: { lpAccountId, totalSupply, decimals },
     },
   } = params;
-  const userLPTokenBalance = getUserTokenBalance(userTokenBalances, pairLpAccountId ?? "");
+  const userLPTokenBalance = getUserTokenBalance(userTokenBalances, lpAccountId ?? "");
   if (isNil(userLPTokenBalance)) {
     console.error("Cannot find mirror node balance for LP token account ID.");
     return BigNumber(0);
@@ -185,6 +186,22 @@ const isHbarToken = (TokenID: string): boolean => {
   return TokenID === HBARTokenId;
 };
 
+interface getAllPoolTransactionFeeParams {
+  tokenPairs: TokenPair[] | null;
+  poolSymbol: string | undefined;
+}
+
+const getAllPoolTransactionFee = (params: getAllPoolTransactionFeeParams) => {
+  return (
+    params.tokenPairs
+      ?.filter((pair) => pair?.lpTokenMeta.symbol === params.poolSymbol)
+      .flatMap((pair) => ({
+        label: getTransactionFeeRateDisplay(pair.tokenA.tokenMeta.fee?.toNumber()),
+        value: pair.tokenA.tokenMeta.fee?.toNumber() ?? 0,
+      })) ?? []
+  );
+};
+
 export {
   calculateTotalValueLockedForPool,
   calculateVolume,
@@ -193,4 +210,5 @@ export {
   getTransactionsFromLast24Hours,
   calculatePercentOfPoolFromTotalSupply,
   isHbarToken,
+  getAllPoolTransactionFee,
 };

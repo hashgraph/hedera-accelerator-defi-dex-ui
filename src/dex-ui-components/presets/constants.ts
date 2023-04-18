@@ -26,5 +26,6 @@ export const InitialTokenState: TokenState = {
   tokenMeta: {
     pairAccountId: undefined,
     tokenId: undefined,
+    fee: undefined,
   },
 };

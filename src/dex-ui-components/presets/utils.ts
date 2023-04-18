@@ -31,6 +31,50 @@ export const getTokenExchangeAmount = (tokenAmount: number, spotPrice: number | 
   }
 };
 
+interface GetSwapFeeParams {
+  tokenAId: string | undefined;
+  tokenBId: string | undefined;
+  fee: string | undefined;
+}
+
+/**
+ *
+ * @param tokenAId - Token A Address
+ * @param tokenBId - Token A Address
+ * @param fee - Transaction fee for that Pair
+ * @returns
+ */
+export const getSwapFee = (params: GetSwapFeeParams) => {
+  const { tokenAId, tokenBId, fee } = params;
+  if (tokenAId && tokenBId && fee) {
+    return fee;
+  } else {
+    return "-.-%";
+  }
+};
+
+interface GetPriceImpactParams {
+  tokenToTradeAmount: number;
+  tokenToReceiveAmount: number;
+  slippage: number | undefined;
+}
+
+/**
+ *
+ * @param tokenToTradeAmount - Token A Amount
+ * @param tokenToReceiveAmount - Token B Amount
+ * @param slippage - slippage for that Pair
+ * @returns
+ */
+export const getPriceImpact = (params: GetPriceImpactParams) => {
+  const { tokenToTradeAmount, tokenToReceiveAmount, slippage } = params;
+  if (tokenToTradeAmount && tokenToReceiveAmount && slippage) {
+    return slippage;
+  } else {
+    return 0;
+  }
+};
+
 /**
  *
  * @param tokenPairs - Array of token Pairs
@@ -42,36 +86,39 @@ export const getTokensByUniqueAccountIds = (tokenPairs: TokenPair[]): Token[] =>
   return uniqueTokens;
 };
 
+const pairedUniqTokens = (pairedTokens: Token[]): Token[] => {
+  return [...new Map(pairedTokens.map((token) => [token.tokenMeta.tokenId, token])).values()];
+};
+
 /**
  * @param tokenId - Token Account Id
  * @param tokenPairs - - Array of token Pairs
  */
-export const getPairedTokens = (tokenId: string, pairAccountId: string, tokenPairs: TokenPair[]): Token[] => {
+export const getPairedTokens = (tokenId: string, tokenPairs: TokenPair[]): Token[] => {
   const pairedTokens = tokenPairs.reduce<Token[]>((pairedTokens, tokenPair) => {
     const { tokenA, tokenB } = tokenPair;
     if (tokenA.tokenMeta.tokenId === tokenId) {
-      return [tokenB, ...pairedTokens];
+      return pairedUniqTokens([tokenB, ...pairedTokens]);
     }
     if (tokenB.tokenMeta.tokenId === tokenId) {
-      return [tokenA, ...pairedTokens];
+      return pairedUniqTokens([tokenA, ...pairedTokens]);
     }
     return pairedTokens;
   }, []);
   return pairedTokens;
 };
 
-export const getTokenData = (tokenId: string, tokenPairs: TokenPair[]) => {
-  const token = tokenPairs
-    ?.map((token) => {
-      if (token.tokenA.tokenMeta.tokenId === tokenId) {
-        return token.tokenA;
-      } else if (token.tokenB.tokenMeta.tokenId === tokenId) {
-        return token.tokenB;
-      }
-      return undefined;
-    })
-    .filter((entry) => entry !== undefined)[0];
-  return token;
+export const getTokenData = (tokenId: string, selectableTokens?: Token[]) => {
+  return selectableTokens?.find((obj) => obj.tokenMeta.tokenId === tokenId);
+};
+
+export const getSwapPairData = (pairId: string, tokenPairs: TokenPair[], tokenToReceiveId: string) => {
+  const selectedPair = tokenPairs.find((token) => token.tokenA.tokenMeta.pairAccountId === pairId);
+  if (selectedPair?.tokenA.tokenMeta.tokenId === tokenToReceiveId) {
+    return { tokenToTradeData: selectedPair.tokenB, tokenToReceiveData: selectedPair.tokenA };
+  } else {
+    return { tokenToTradeData: selectedPair?.tokenA, tokenToReceiveData: selectedPair?.tokenB };
+  }
 };
 
 interface PairTokenData {
@@ -79,12 +126,24 @@ interface PairTokenData {
   tokenToReceiveData: Token | undefined;
 }
 
-export const getPairedTokenData = (tokenId: string, receiveTokenId: string, tokenPairs: TokenPair[]): PairTokenData => {
+export const getPairedTokenData = (
+  tokenId: string,
+  updatedToken: TokenState,
+  tokenPairs: TokenPair[]
+): PairTokenData => {
   const data = tokenPairs
     ?.map((pair: TokenPair) => {
-      if (pair.tokenA.tokenMeta.tokenId === tokenId && pair.tokenB.tokenMeta.tokenId === receiveTokenId) {
+      if (
+        pair.tokenA.tokenMeta.tokenId === tokenId &&
+        pair.tokenB.tokenMeta.tokenId === updatedToken.tokenMeta.tokenId &&
+        updatedToken.tokenMeta.pairAccountId === pair.tokenA.tokenMeta.pairAccountId
+      ) {
         return { tokenToTradeData: pair.tokenA, tokenToReceiveData: pair.tokenB };
-      } else if (pair.tokenA.tokenMeta.tokenId === receiveTokenId && pair.tokenB.tokenMeta.tokenId === tokenId) {
+      } else if (
+        pair.tokenA.tokenMeta.tokenId === updatedToken.tokenMeta.tokenId &&
+        pair.tokenB.tokenMeta.tokenId === tokenId &&
+        updatedToken.tokenMeta.pairAccountId === pair.tokenB.tokenMeta.pairAccountId
+      ) {
         return { tokenToTradeData: pair.tokenB, tokenToReceiveData: pair.tokenA };
       } else {
         return undefined;
@@ -315,4 +374,12 @@ export const getCreatePoolExchangeRate = ({ firstToken, secondToken }: CreatePoo
   }
   const exchangeRatio = Number(secondToken?.displayAmount) / Number(firstToken?.displayAmount);
   return `1 ${firstToken?.symbol} = ${exchangeRatio} ${secondToken?.symbol}`;
+};
+
+export const getTransactionFeeRateDisplay = (transactionFee: number | undefined) => {
+  if (transactionFee === undefined || transactionFee === 0) {
+    return "-.-%";
+  }
+
+  return `${transactionFee * 100}%`;
 };

@@ -1,7 +1,7 @@
 import { useDexContext } from "../../hooks";
 import { CreatePoolForm } from "../../../dex-ui-components";
 import { Page, DefiFormContainer } from "../../layouts";
-import { useCreatePoolTransactionFee } from "../../hooks/pool";
+import { useCreatePoolTransactionFee } from "../../hooks";
 
 export function CreatePoolPage() {
   const { app, wallet, pools } = useDexContext(({ app, wallet, pools }) => ({ app, wallet, pools }));

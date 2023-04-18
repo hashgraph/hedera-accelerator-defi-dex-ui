@@ -27,7 +27,7 @@ interface CalculateUserPoolMetricsParams {
  */
 const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserPool => {
   const { poolTokenBalances, userTokenBalances, userTokenPair, fee } = params;
-  const { tokenA, tokenB, pairToken } = userTokenPair;
+  const { tokenA, tokenB, lpTokenMeta } = userTokenPair;
   const totalVolumeLocked = calculateTotalValueLockedForPool({
     poolTokenBalances,
     tokenAAccountId: tokenA.tokenMeta.tokenId ?? "",
@@ -40,7 +40,7 @@ const calculateUserPoolMetrics = (params: CalculateUserPoolMetricsParams): UserP
   });
   const userLiquidity = calculateUserPoolLiquidity(percentOfPool, totalVolumeLocked);
   return {
-    name: pairToken.symbol ?? `${tokenA.symbol}-${tokenB.symbol}`,
+    name: lpTokenMeta.symbol ?? `${tokenA.symbol}-${tokenB.symbol}`,
     fee,
     liquidity: userLiquidity,
     percentOfPool,
@@ -90,7 +90,7 @@ interface CalculatePoolMetricsParams {
  */
 const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
   const { poolAccountId, poolTokenBalances, poolFee, last24Transactions, last7DTransactions, tokenPair } = params;
-  const { tokenA, tokenB, pairToken } = tokenPair;
+  const { tokenA, tokenB, lpTokenMeta } = tokenPair;
   const tokenAId = tokenA.tokenMeta.tokenId ?? "";
   const tokenBId = tokenB.tokenMeta.tokenId ?? "";
   const tokenADecimals = getTokenDecimals(poolTokenBalances, tokenAId, tokenBId);
@@ -112,12 +112,13 @@ const calculatePoolMetrics = (params: CalculatePoolMetricsParams): Pool => {
     accountTransactions: last7DTransactions,
   });
   return {
-    name: pairToken.symbol ?? `${tokenA.symbol}-${tokenB.symbol}`,
+    name: lpTokenMeta.symbol ?? `${tokenA.symbol}-${tokenB.symbol}`,
     fee: poolFee,
     totalVolumeLocked,
     past24HoursVolume,
     tokensId: `${tokenAId}-${tokenBId}`,
     past7daysVolume,
+    pairAccountId: tokenA.tokenMeta.pairAccountId,
   };
 };
 

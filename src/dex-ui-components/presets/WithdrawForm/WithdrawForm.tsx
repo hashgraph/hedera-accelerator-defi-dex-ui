@@ -1,29 +1,25 @@
 import { Text, Button, Flex, Spacer } from "@chakra-ui/react";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Notification, MetricLabel, NotficationTypes, SettingsButton, Color } from "../..";
-import { WithdrawFormData } from "./constants";
+import { InitialWithdrawFormState, WithdrawFormData } from "./constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
 import { DefiFormLayout } from "../layouts";
 import { isEmpty, isNil } from "ramda";
 import { LPTokenDetails, PoolLiquidityDetails } from "./types";
-import { AccountBalanceJson } from "@hashgraph/sdk";
 import { SendWithdrawTransactionParams, WithdrawState } from "../../../dex-ui/store/poolsSlice";
 import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
 import { AlertDialog, LoadingDialog } from "../../base";
 import { TransactionStatus } from "../../../dex-ui/store/appSlice";
 import { WarningIcon } from "@chakra-ui/icons";
 import { LPTokenInput } from "../LPTokenInput";
-import { getTokenBalance } from "../utils";
-import { InitialTransactionDeadline } from "../constants";
 
 interface WithdrawFormProps {
   isLoading: boolean;
   poolLpDetails: LPTokenDetails;
   poolLiquidityDetails: PoolLiquidityDetails;
   transactionState: WithdrawState;
-  pairedAccountBalance: AccountBalanceJson | null;
   connectionStatus: HashConnectConnectionState;
   connectToWallet: () => void;
   sendWithdrawTransaction: (params: SendWithdrawTransactionParams) => Promise<void>;
@@ -34,24 +30,9 @@ export function WithdrawForm(props: WithdrawFormProps) {
   const title = "Withdraw";
   const withdrawForm = useForm<WithdrawFormData>({
     defaultValues: {
-      lpToken: { ...props.poolLpDetails },
-      transactionDeadline: InitialTransactionDeadline,
+      ...InitialWithdrawFormState,
     },
   });
-
-  //TODO: The default values does not refresh when page reloads so manually updating the value here
-  withdrawForm.setValue("lpToken.tokenSymbol", props.poolLpDetails.tokenSymbol);
-  withdrawForm.setValue("lpToken.userLpAmount", props.poolLpDetails.userLpAmount);
-  withdrawForm.setValue("lpToken.userLpPercentage", props.poolLpDetails.userLpPercentage);
-  withdrawForm.setValue("lpToken.lpAccountId", props.poolLpDetails.lpAccountId);
-  withdrawForm.setValue("lpToken.pairAccountId", props.poolLpDetails.pairAccountId);
-  withdrawForm.setValue("lpToken.fee", props.poolLpDetails.fee);
-
-  useEffect(() => {
-    const useLpBalance = getTokenBalance(props.poolLpDetails.lpAccountId ?? "", props.pairedAccountBalance);
-    withdrawForm.setValue("lpToken.userLpAmount", useLpBalance);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(props.pairedAccountBalance)]);
 
   const formValues: WithdrawFormData = structuredClone(withdrawForm.getValues());
 
@@ -65,15 +46,17 @@ export function WithdrawForm(props: WithdrawFormProps) {
 
   const isWalletPaired = props.connectionStatus === HashConnectConnectionState.Paired;
 
-  const confirmMessage = `Please confirm ${formValues.lpToken.tokenSymbol} withdrawal in your wallet to proceed.`;
+  const confirmMessage = `Please confirm ${props.poolLpDetails.tokenSymbol} withdrawal in your wallet to proceed.`;
 
   const fullPoolWithdrawalMessage = `You are removing all your remaining liquidity from this pool.\n
                                         This withdrawal will also include the following unclaimed fees: 
                                         ${props.poolLpDetails.unclaimedFees}`;
 
-  const isFullPoolWithdrawMessageVisible = formValues.lpToken.amount === props.poolLpDetails.userLpAmount;
+  const isFullPoolWithdrawMessageVisible = formValues.lpToken.amount
+    ? formValues.lpToken.amount === props.poolLpDetails.userLpAmount
+    : false;
 
-  const thresholdBreached = "You cannot withdraw more than the balance";
+  const thresholdBreached = "Cannot withdraw more than the balance";
   const isThresholdBreached = formValues.lpToken.amount > props.poolLpDetails.userLpAmount;
 
   const isSubmitButtonDisabled =
@@ -91,10 +74,10 @@ export function WithdrawForm(props: WithdrawFormProps) {
     props.sendWithdrawTransaction({
       lpTokenAmount: data.lpToken.amount,
       transactionDeadline: transactionDeadlineInSeconds,
-      fee: `${data.lpToken.fee}`,
-      pairAcountId: data.lpToken.pairAccountId ?? "",
-      tokenSymbol: data.lpToken.tokenSymbol ?? "",
-      lpAccountId: data.lpToken.lpAccountId ?? "",
+      fee: `${props.poolLpDetails.fee}`,
+      pairAcountId: props.poolLpDetails.pairAccountId ?? "",
+      tokenSymbol: props.poolLpDetails.tokenSymbol ?? "",
+      lpAccountId: props.poolLpDetails.lpAccountId ?? "",
     });
   }
 
@@ -124,11 +107,10 @@ export function WithdrawForm(props: WithdrawFormProps) {
           <Text>{props.poolLpDetails?.tokenSymbol}</Text>,
           <LPTokenInput
             form={withdrawForm}
+            balance={props.poolLpDetails.userLpAmount}
             label="Token to Receive"
             fieldValue="lpToken"
             walletConnectionStatus={props.connectionStatus}
-            pairedAccountBalance={props.pairedAccountBalance}
-            selectedTokenId={props.poolLpDetails.lpAccountId}
             isHalfAndMaxButtonsVisible
             isLoading={props.isLoading}
           />,

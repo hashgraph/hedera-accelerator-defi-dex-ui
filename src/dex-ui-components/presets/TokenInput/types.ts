@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 export const SELECT_TOKEN_TO_VIEW = "Select Token To View";
 export const CONNECT_TO_VIEW = "Connect to View";
 interface Token {
@@ -8,15 +10,16 @@ interface Token {
   tokenMeta: {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
+    fee: BigNumber | undefined;
   };
 }
 
 interface TokenPair {
   tokenA: Token;
   tokenB: Token;
-  pairToken: {
+  lpTokenMeta: {
     symbol: string | undefined;
-    pairLpAccountId: string | undefined;
+    lpAccountId: string | undefined;
     totalSupply?: Long | null;
     decimals: number;
   };

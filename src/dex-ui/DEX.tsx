@@ -120,7 +120,7 @@ const DEX = () => {
                   <Route path={Paths.Home} element={<Navigate to="/swap" />} />
                   <Route path={Paths.Swap.default} element={<SwapPage />} />
                   <Route path={Paths.Pools.default} element={<Pools />} />
-                  <Route path={Paths.Pools.AddLiquidity} element={<AddLiquidityPage />} />
+                  <Route path={`${Paths.Pools.AddLiquidity}/:pairId/:poolName`} element={<AddLiquidityPage />} />
                   <Route path={Paths.Pools.Withdraw} element={<WithdrawPage />} />
                   <Route path={Paths.Pools.CreatePool} element={<CreatePoolPage />} />
                   <Route path={Paths.Governance.default} element={<Governance />} />

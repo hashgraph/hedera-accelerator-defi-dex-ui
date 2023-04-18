@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
 import { DexService, MirrorNodeTokenByIdResponse, MirrorNodeTokenPairResponse } from "../../services";
-import { getErrorMessage, isHbarToken, valueToPercentAsNumberWithPrecision, withPrecision } from "../../utils";
+import { getErrorMessage, isHbarToken, withPrecision } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 
 const initialSwapState: SwapState = {
@@ -20,7 +20,7 @@ const initialSwapState: SwapState = {
   tokenPairs: null,
 };
 
-function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse) {
+function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
   return {
     amount: 0.0,
     displayAmount: "",
@@ -33,13 +33,16 @@ function getTokenInfoObj(token: MirrorNodeTokenByIdResponse, pair: MirrorNodeTok
     tokenMeta: {
       pairAccountId: pair.data.contract_id,
       tokenId: token.data.token_id,
+      fee,
     },
   };
 }
 
 const fetchEachToken = async (evmAddress: string) => {
   const pairData = await DexService.fetchContract(evmAddress);
-  const { tokenATokenId, tokenBTokenId, lpTokenId } = await DexService.fetchPairTokenIds(pairData.data.contract_id);
+  const { tokenATokenId, tokenBTokenId, lpTokenId, fee } = await DexService.fetchPairTokenIds(
+    pairData.data.contract_id
+  );
 
   const [tokenAInfo, tokenBInfo, tokenCInfo] = await Promise.all([
     DexService.fetchTokenData(tokenATokenId),
@@ -47,17 +50,17 @@ const fetchEachToken = async (evmAddress: string) => {
     DexService.fetchTokenData(lpTokenId),
   ]);
 
-  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData);
-  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData);
+  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData, fee);
+  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData, fee);
 
-  const pairToken = {
+  const lpTokenMeta = {
     symbol: tokenCInfo.data.symbol,
-    pairLpAccountId: lpTokenId,
+    lpAccountId: lpTokenId,
     totalSupply: tokenCInfo.data.total_supply,
     decimals: tokenCInfo.data.decimals,
   };
   const updated: TokenPair = {
-    pairToken,
+    lpTokenMeta,
     tokenA: tokenAInfoDetails,
     tokenB: tokenBInfoDetails,
   };
@@ -233,7 +236,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       if (swap.pairInfo.precision === undefined) {
         throw Error("Precision not found");
       }
-      const preciseSlippage = valueToPercentAsNumberWithPrecision(slippageTolerance, swap.pairInfo.precision);
+      // const preciseSlippage = valueToPercentAsNumberWithPrecision(slippageTolerance, swap.pairInfo.precision);
+      const preciseSlippage = BigNumber(slippageTolerance).times(swap.pairInfo.precision);
       try {
         // Sometimes (on first run throughout it seems) the AcknowledgeMessageEvent from hashpack does not fire
         // so we need to manually dispatch the action here indicating that transaction is waiting to be signed

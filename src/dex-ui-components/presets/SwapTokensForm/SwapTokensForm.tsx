@@ -19,14 +19,14 @@ import { SwapConfirmation, SwapConfirmationStep } from "./SwapConfirmation";
 import { TokenInput } from "../TokenInput";
 import {
   getExchangeRateDisplay,
-  getPairedTokenData,
   getPairedTokens,
   getPoolLiquidityForTokenId,
-  calculatePriceImpact,
-  calculateTokenAmountToReceive,
   getSpotPrice,
   getTokenBalance,
   getTokensByUniqueAccountIds,
+  getSwapPairData,
+  getSwapFee,
+  getPriceImpact,
 } from "../utils";
 import { InitialTokenState } from "../constants";
 import { InitialSwapFormState } from "./constants";
@@ -35,6 +35,7 @@ import { useSwapData } from "../../../dex-ui/hooks";
 import { REFRESH_INTERVAL } from "../../../dex-ui/hooks/constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
 import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
+import { PairDataResponse } from "../../../dex-ui/hooks/swap/types";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 interface SwapTokensFormProps {
@@ -46,6 +47,8 @@ interface SwapTokensFormProps {
   poolLiquidity: Record<string, number | undefined>;
   transactionState: TransactionState;
   connectionStatus: HashConnectConnectionState;
+  swapPairData: PairDataResponse | undefined;
+  fetchPairForSwap: (tokenAAddress: string, tokenBAddress: string, tokenAQty: number) => Promise<void>;
   sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
   fetchPairInfo: (selectedAccountId: string) => Promise<void>;
@@ -72,7 +75,8 @@ export function SwapTokensForm(props: SwapTokensFormProps) {
     "tokenToReceive.poolLiquidity",
   ]);
 
-  const selectedPairContractId = formValues.tokenToReceive.tokenMeta.pairAccountId ?? "";
+  const { swapPairData } = props;
+  const selectedPairContractId = swapPairData?.pair ?? "";
   useSwapData(selectedPairContractId, REFRESH_INTERVAL);
 
   const successMessage = `Swapped
@@ -88,16 +92,16 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
     tokenToReceive: formValues.tokenToReceive,
   });
 
-  const priceImpact = calculatePriceImpact({
-    tokenToTrade: {
-      tokenId: formValues.tokenToTrade.tokenMeta.tokenId ?? "",
-      amount: formValues.tokenToTrade.amount ?? 0,
-      poolLiquidity: formValues.tokenToTrade.poolLiquidity ?? 0,
-    },
-    tokenToReceive: {
-      tokenId: formValues.tokenToReceive.tokenMeta.tokenId ?? "",
-      poolLiquidity: formValues.tokenToReceive.poolLiquidity ?? 0,
-    },
+  const transactionFee = getSwapFee({
+    tokenAId: formValues.tokenToTrade.tokenMeta.tokenId,
+    tokenBId: formValues.tokenToReceive.tokenMeta.tokenId,
+    fee: props.fee,
+  });
+
+  const priceImpact = getPriceImpact({
+    tokenToTradeAmount: formValues.tokenToTrade.amount,
+    tokenToReceiveAmount: formValues.tokenToReceive.amount,
+    slippage: swapPairData?.slippage.toNumber(),
   });
 
   const formSettings = useFormSettings({
@@ -122,7 +126,6 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
 
   const tokensPairedWithTradeToken = getPairedTokens(
     formValues.tokenToTrade?.tokenMeta?.tokenId ?? "",
-    formValues.tokenToTrade?.tokenMeta?.pairAccountId ?? "",
     props.tokenPairs ?? []
   );
 
@@ -158,28 +161,58 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
     };
     swapTokensForm.setValue("tokenToTrade.poolLiquidity", updatedTokenToTrade.poolLiquidity);
     swapTokensForm.setValue("tokenToReceive.poolLiquidity", updatedTokenToReceive.poolLiquidity);
-    if (updatedTokenToTrade.amount > 0) {
-      const tokenToReceiveAmount = calculateTokenAmountToReceive({
-        tokenToTradeAmount: updatedTokenToTrade.amount,
-        tokenToTradeLiquidity: updatedTokenToTrade.poolLiquidity ?? 0,
-        tokenToReceiveLiquidity: updatedTokenToReceive.poolLiquidity ?? 0,
-      });
-      const updatedAmount = tokenToReceiveAmount.toNumber();
-      const updatedDisplayAmount = tokenToReceiveAmount.gt(0) ? tokenToReceiveAmount.toString() : "";
-      updateTokenToReceiveAmounts(updatedAmount, updatedDisplayAmount);
-    } else {
-      updateTokenToReceiveAmounts(
-        InitialSwapFormState.tokenToReceive.amount,
-        InitialSwapFormState.tokenToReceive.displayAmount
-      );
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.poolLiquidity]);
+
+  useEffect(() => {
+    const swapQty = swapPairData?.swappedQty.toNumber() ?? 0;
+    if (swapQty > 0) {
+      updateTokenToReceiveAmounts(swapQty ?? 0, `${swapQty ?? 0}`);
+      const { tokenToTradeData, tokenToReceiveData } = getSwapPairData(
+        swapPairData?.pair ?? "",
+        props.tokenPairs ?? [],
+        swapPairData?.token ?? ""
+      );
+      const tokenToTradeBalance = getTokenBalance(
+        tokenToTradeData?.tokenMeta.tokenId ?? "",
+        props.pairedAccountBalance
+      );
+      const updatedTokenToTrade = {
+        ...formValues.tokenToTrade,
+        tokenMeta: tokenToTradeData?.tokenMeta ?? formValues.tokenToTrade.tokenMeta,
+        symbol: tokenToTradeData?.symbol ?? formValues.tokenToTrade.symbol,
+        balance: tokenToTradeBalance,
+      };
+      swapTokensForm.setValue("tokenToTrade.symbol", updatedTokenToTrade.symbol);
+      swapTokensForm.setValue("tokenToTrade.balance", updatedTokenToTrade.balance);
+      swapTokensForm.setValue("tokenToTrade.tokenMeta", updatedTokenToTrade.tokenMeta);
+      const tokenToReceiveBalance = getTokenBalance(
+        tokenToReceiveData?.tokenMeta.tokenId ?? "",
+        props.pairedAccountBalance
+      );
+      const updatedTokenToReceive = {
+        ...formValues.tokenToReceive,
+        symbol: tokenToReceiveData?.symbol,
+        tokenMeta: tokenToReceiveData?.tokenMeta ?? DefaultTokenMeta,
+        balance: tokenToReceiveBalance,
+      };
+      swapTokensForm.setValue("tokenToReceive.symbol", updatedTokenToReceive.symbol);
+      swapTokensForm.setValue("tokenToReceive.balance", updatedTokenToReceive.balance);
+      swapTokensForm.setValue("tokenToReceive.tokenMeta", updatedTokenToReceive.tokenMeta);
+      fetchPoolLiquidity(updatedTokenToTrade, updatedTokenToReceive);
+      props.fetchPairInfo(updatedTokenToReceive.tokenMeta.pairAccountId ?? "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swapPairData]);
 
   function fetchPoolLiquidity(tokenToTrade: TokenState, tokenToReceive: TokenState) {
     if (tokenToTrade.tokenMeta.tokenId && tokenToReceive.tokenMeta.tokenId) {
       props.getPoolLiquidity(tokenToTrade, tokenToReceive);
     }
+  }
+
+  function fetchSwapPair(tokenAAddress: string, tokenBAddress: string, tokenAQty: number) {
+    props.fetchPairForSwap(tokenAAddress, tokenBAddress, tokenAQty);
   }
 
   function onSubmit(data: SwapTokensFormData) {
@@ -207,17 +240,17 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
   }
 
   function handleTokenToTradeAmountChanged(updatedToken: TokenState) {
-    const tokenToReceiveAmount = calculateTokenAmountToReceive({
-      tokenToTradeAmount: updatedToken.amount,
-      tokenToTradeLiquidity: updatedToken.poolLiquidity ?? 0,
-      tokenToReceiveLiquidity: formValues.tokenToReceive.poolLiquidity ?? 0,
-    });
-    const updatedTokenToReceive = {
-      ...formValues.tokenToReceive,
-      amount: tokenToReceiveAmount.toNumber(),
-      displayAmount: tokenToReceiveAmount.gt(0) ? String(tokenToReceiveAmount) : "",
-    };
-    updateTokenToReceiveAmounts(updatedTokenToReceive.amount, updatedTokenToReceive.displayAmount);
+    const tokenToTradeQty = updatedToken.amount;
+    if (tokenToTradeQty) {
+      fetchSwapPair(
+        updatedToken.tokenMeta.tokenId ?? "",
+        formValues.tokenToReceive.tokenMeta.tokenId ?? "",
+        updatedToken.amount === 0 ? 1 : updatedToken.amount
+      );
+    } else {
+      swapTokensForm.setValue("tokenToReceive.amount", 0);
+      swapTokensForm.setValue("tokenToReceive.displayAmount", "");
+    }
   }
 
   function handleTokenToTradeSymbolChanged(updatedToken: TokenState) {
@@ -225,36 +258,19 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
   }
 
   function handleTokenToReceiveSymbolChanged(updatedToken: TokenState) {
-    const { tokenToTradeData, tokenToReceiveData } = getPairedTokenData(
+    fetchSwapPair(
       formValues.tokenToTrade.tokenMeta.tokenId ?? "",
       updatedToken.tokenMeta.tokenId ?? "",
-      props.tokenPairs ?? []
+      formValues.tokenToTrade.amount === 0 ? 1 : formValues.tokenToTrade.amount
     );
-    const tokenToTradeBalance = getTokenBalance(tokenToTradeData?.tokenMeta.tokenId ?? "", props.pairedAccountBalance);
-    const updatedTokenToTrade = {
-      ...formValues.tokenToTrade,
-      tokenMeta: tokenToTradeData?.tokenMeta ?? formValues.tokenToTrade.tokenMeta,
-      symbol: tokenToTradeData?.symbol ?? formValues.tokenToTrade.symbol,
-      balance: tokenToTradeBalance,
-    };
-    swapTokensForm.setValue("tokenToTrade.symbol", updatedTokenToTrade.symbol);
-    swapTokensForm.setValue("tokenToTrade.balance", updatedTokenToTrade.balance);
-    swapTokensForm.setValue("tokenToTrade.tokenMeta", updatedTokenToTrade.tokenMeta);
-    const tokenToReceiveBalance = getTokenBalance(
-      tokenToReceiveData?.tokenMeta.tokenId ?? "",
-      props.pairedAccountBalance
-    );
-    const updatedTokenToReceive = {
-      ...formValues.tokenToReceive,
-      symbol: tokenToReceiveData?.symbol,
-      tokenMeta: tokenToReceiveData?.tokenMeta ?? DefaultTokenMeta,
-      balance: tokenToReceiveBalance,
-    };
-    swapTokensForm.setValue("tokenToReceive.symbol", updatedTokenToReceive.symbol);
-    swapTokensForm.setValue("tokenToReceive.balance", updatedTokenToReceive.balance);
-    swapTokensForm.setValue("tokenToReceive.tokenMeta", updatedTokenToReceive.tokenMeta);
-    fetchPoolLiquidity(updatedTokenToTrade, updatedTokenToReceive);
-    props.fetchPairInfo(updatedTokenToReceive.tokenMeta.pairAccountId ?? "");
+
+    /* TODO: This is done as a design approach with SC team meanwhile 
+    SC team is trying merge fetchPairInfo and SwapPairFetch into single one. */
+
+    if (formValues.tokenToTrade.amount === 0) {
+      swapTokensForm.setValue("tokenToTrade.amount", 1);
+      swapTokensForm.setValue("tokenToTrade.displayAmount", "1");
+    }
   }
 
   function handleSwapTokenInputsClicked() {
@@ -262,9 +278,11 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
     const newTokenToTrade = formValues.tokenToReceive;
     swapTokensForm.setValue("tokenToTrade", { ...newTokenToTrade });
     swapTokensForm.setValue("tokenToReceive", { ...newTokenToReceive });
-    fetchPoolLiquidity(newTokenToTrade, newTokenToReceive);
-    props.fetchPairInfo(newTokenToReceive.tokenMeta.pairAccountId ?? "");
-    handleTokenToTradeAmountChanged(newTokenToTrade);
+    fetchSwapPair(
+      newTokenToTrade.tokenMeta.tokenId ?? "",
+      newTokenToReceive.tokenMeta.tokenId ?? "",
+      newTokenToTrade.amount === 0 ? 1 : newTokenToTrade.amount
+    );
   }
 
   function handleCloseSwapConfirmationButtonClicked() {
@@ -343,7 +361,7 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
           />,
         ]}
         metrics={[
-          <MetricLabel label="Transaction Fee" value={props.fee} isLoading={props.isLoading} />,
+          <MetricLabel label="Transaction Fee" value={transactionFee} isLoading={props.isLoading} />,
           <MetricLabel label="Price Impact" value={`${priceImpact.toFixed(2)}%`} isLoading={props.isLoading} />,
           <MetricLabel label="Exchange Rate" value={exchangeRate} isLoading={props.isLoading} />,
         ]}

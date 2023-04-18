@@ -5,4 +5,6 @@ export interface AddLiquidityState {
   secondToken: TokenState;
   slippage: number | undefined;
   transactionDeadline: number | undefined;
+  fee: number | undefined;
+  poolName: string | undefined;
 }

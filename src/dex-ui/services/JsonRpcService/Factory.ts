@@ -1,7 +1,31 @@
 import { ethers } from "ethers";
-import { Contracts } from "../constants";
+import { Contracts, DEX_PRECISION, DEX_TOKEN_PRECISION_VALUE } from "../constants";
 import Factory from "../abi/Factory.json";
-import { createContract } from "./utils";
+import { convertEthersBigNumberToBigNumberJS, createContract, solidityAddressToTokenIdString } from "./utils";
+import { TokenId } from "@hashgraph/sdk";
+import BigNumber from "bignumber.js";
+
+type RawPairDataResponse = [
+  pair: string,
+  token: string,
+  swappedQty: ethers.BigNumber,
+  fee: ethers.BigNumber,
+  slippage: ethers.BigNumber
+];
+
+type PairDataResponse = {
+  pair: string;
+  token: string;
+  swappedQty: BigNumber;
+  fee: BigNumber;
+  slippage: BigNumber;
+};
+
+interface GetBestSwapPairAvailableProps {
+  tokenAAddress: string;
+  tokenBAddress: string;
+  tokenAQty: number;
+}
 
 /**
  * Creates an ethers.Contract representation of the Factory contract.
@@ -31,8 +55,34 @@ async function getPair(tokenAAddress: string, secondTokenAddress: string, transa
   return await factoryContract.getPair(tokenAAddress, secondTokenAddress, transactionFee);
 }
 
+/**
+ * Fetches the best pair available for swap.
+ * @returns A pair contract addresses.
+ */
+async function getBestSwapPairAvailable(params: GetBestSwapPairAvailableProps): Promise<PairDataResponse | undefined> {
+  const { tokenAAddress, tokenBAddress, tokenAQty } = params;
+  const tokenToTradeAmount = BigNumber(tokenAQty).times(DEX_PRECISION).toString();
+
+  const factoryContract = createFactoryContract();
+  const pairData: RawPairDataResponse = await factoryContract.recommendedPairToSwap(
+    TokenId.fromString(tokenAAddress).toSolidityAddress(),
+    TokenId.fromString(tokenBAddress).toSolidityAddress(),
+    ethers.BigNumber.from(tokenToTradeAmount)
+  );
+
+  const [pair, token, swappedQty, fee, slippage] = pairData;
+  return {
+    pair: solidityAddressToTokenIdString(pair),
+    token: solidityAddressToTokenIdString(token),
+    swappedQty: convertEthersBigNumberToBigNumberJS(swappedQty).shiftedBy(-DEX_TOKEN_PRECISION_VALUE),
+    fee: convertEthersBigNumberToBigNumberJS(fee),
+    slippage: convertEthersBigNumberToBigNumberJS(slippage).shiftedBy(-DEX_TOKEN_PRECISION_VALUE),
+  };
+}
+
 const FactoryContract = {
   fetchAllTokenPairs,
   getPair,
+  getBestSwapPairAvailable,
 };
 export default FactoryContract;

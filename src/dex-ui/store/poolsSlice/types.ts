@@ -76,6 +76,7 @@ interface Pool {
   past24HoursVolume: BigNumber;
   past7daysVolume: BigNumber;
   tokensId: string | undefined;
+  pairAccountId: string | undefined;
 }
 
 interface UserPool {
@@ -163,12 +164,11 @@ interface PoolsActions {
 interface TokenPair {
   tokenA: Token;
   tokenB: Token;
-  pairToken: {
+  lpTokenMeta: {
     symbol: string | undefined;
-    pairLpAccountId: string | undefined;
+    lpAccountId: string | undefined;
     totalSupply?: Long | null;
     decimals: number;
-    poolFee: BigNumber | undefined;
   };
 }
 
@@ -184,6 +184,7 @@ interface Token {
   tokenMeta: {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
+    fee: BigNumber | undefined;
   };
 }
 

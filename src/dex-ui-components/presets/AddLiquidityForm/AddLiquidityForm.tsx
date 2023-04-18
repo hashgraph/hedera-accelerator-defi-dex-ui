@@ -1,7 +1,7 @@
 import { Text, Button, Flex, Spacer } from "@chakra-ui/react";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { AccountBalanceJson } from "@hashgraph/sdk";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Notification, MetricLabel, NotficationTypes, SettingsButton, useNotification, Color } from "../..";
 import { AddLiquidityFormData, InitialAddLiquidityFormState } from "./constants";
@@ -25,15 +25,17 @@ import {
 } from "../utils";
 import { InitialTokenState } from "../constants";
 import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "../../../dex-ui/store/poolsSlice";
-import { AlertDialog, LoadingDialog } from "../../base";
+import { AlertDialog, DropdownSelector, LoadingDialog } from "../../base";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionStatus } from "../../../dex-ui/store/appSlice";
-import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
+import { convertNumberOfMinsToSeconds, getAllPoolTransactionFee } from "../../../dex-ui/utils";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 
 interface AddLiquidityFormProps {
   isLoading: boolean;
+  selectedFromPoolPairId?: string | undefined;
+  poolName: string | undefined;
   pairedAccountBalance: AccountBalanceJson | null;
   tokenPairs: TokenPair[] | null;
   spotPrices: Record<string, number | undefined>;
@@ -64,9 +66,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     slippage: formValues.slippage,
     transactionDeadline: formValues.transactionDeadline,
   });
-  addLiquidityForm.watch("firstToken.displayAmount");
-  addLiquidityForm.watch("firstToken.symbol");
-  addLiquidityForm.watch("secondToken.symbol");
+  addLiquidityForm.watch(["firstToken.displayAmount", "firstToken.symbol", "secondToken.symbol", "fee", "poolName"]);
 
   const [isConfirmAddLiquidityDialogOpen, setIsConfirmAddLiquidityDialogOpen] = useState(false);
 
@@ -115,27 +115,56 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     tokenToReceiveSymbol: formValues.secondToken.symbol,
   });
 
+  const allPoolFee = getAllPoolTransactionFee({
+    tokenPairs: props.tokenPairs,
+    poolSymbol: formValues.poolName,
+  });
+
   const tokensWithPairs = getTokensByUniqueAccountIds(props.tokenPairs ?? []);
   const tokensPairedWithFirstToken = getPairedTokens(
     formValues.firstToken?.tokenMeta?.tokenId ?? "",
-    formValues.firstToken?.tokenMeta?.pairAccountId ?? "",
     props.tokenPairs ?? []
   );
 
-  /** Update Balances */
-  useEffect(() => {
-    const firstTokenBalance = getTokenBalance(
-      formValues.firstToken.tokenMeta.tokenId ?? "",
-      props.pairedAccountBalance
-    );
-    const secondTokenBalance = getTokenBalance(
-      formValues.secondToken.tokenMeta.tokenId ?? "",
-      props.pairedAccountBalance
-    );
+  const updateBalances = (firstTokenId: string, secondTokenId: string) => {
+    const firstTokenBalance = getTokenBalance(firstTokenId, props.pairedAccountBalance);
+    const secondTokenBalance = getTokenBalance(secondTokenId, props.pairedAccountBalance);
     addLiquidityForm.setValue("firstToken.balance", firstTokenBalance);
     addLiquidityForm.setValue("secondToken.balance", secondTokenBalance);
+  };
+
+  /** Update Balances */
+  useEffect(() => {
+    updateBalances(formValues.firstToken.tokenMeta.tokenId ?? "", formValues.secondToken.tokenMeta.tokenId ?? "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(props.pairedAccountBalance)]);
+
+  useEffect(() => {
+    const selectedPair = props.tokenPairs?.find(
+      (tokenPair) => tokenPair.tokenA.tokenMeta.pairAccountId === props.selectedFromPoolPairId
+    );
+    if (selectedPair) {
+      addLiquidityForm.setValue("firstToken", selectedPair.tokenA);
+      addLiquidityForm.setValue("secondToken", selectedPair.tokenB);
+      addLiquidityForm.setValue("fee", selectedPair.tokenA.tokenMeta.fee?.toNumber() ?? 0);
+      addLiquidityForm.setValue("poolName", props.poolName ?? "");
+      updateBalances(selectedPair.tokenA.tokenMeta.tokenId ?? "", selectedPair.tokenB.tokenMeta.tokenId ?? "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.selectedFromPoolPairId, props.tokenPairs]);
+
+  function handleTransactionFeeChanged(event: ChangeEvent<HTMLInputElement>) {
+    const inputElement = event?.target as HTMLInputElement;
+    const fee = inputElement.value;
+    addLiquidityForm.setValue("fee", Number(fee));
+
+    const selectedPair = props.tokenPairs?.find(
+      (pair) =>
+        (pair.tokenA.tokenMeta.fee?.toNumber() ?? 0) === Number(fee) && formValues.poolName === pair.lpTokenMeta.symbol
+    );
+    addLiquidityForm.setValue("firstToken.tokenMeta", selectedPair?.tokenA?.tokenMeta ?? DefaultTokenMeta);
+    addLiquidityForm.setValue("secondToken.tokenMeta", selectedPair?.tokenB?.tokenMeta ?? DefaultTokenMeta);
+  }
 
   function onSubmit(data: AddLiquidityFormData) {
     if (data.firstToken.symbol === undefined || data.secondToken.symbol === undefined) {
@@ -177,6 +206,8 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
 
   function handleFirstTokenSymbolChanged(updatedToken: TokenState) {
     addLiquidityForm.setValue("secondToken", InitialAddLiquidityFormState.secondToken);
+    addLiquidityForm.setValue("poolName", "");
+    addLiquidityForm.setValue("fee", 0);
   }
 
   function handleSecondTokenAmountChanged(updatedToken: TokenState) {
@@ -198,7 +229,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
   function handleSecondTokenSymbolChanged(updatedToken: TokenState) {
     const { tokenToTradeData: firstTokenData, tokenToReceiveData: secondTokenData } = getPairedTokenData(
       formValues.firstToken.tokenMeta.tokenId ?? "",
-      updatedToken.tokenMeta.tokenId ?? "",
+      updatedToken,
       props.tokenPairs ?? []
     );
     const firstTokenBalance = getTokenBalance(firstTokenData?.tokenMeta.tokenId ?? "", props.pairedAccountBalance);
@@ -221,6 +252,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     addLiquidityForm.setValue("secondToken.symbol", updatedSecondToken.symbol);
     addLiquidityForm.setValue("secondToken.balance", updatedSecondToken.balance);
     addLiquidityForm.setValue("secondToken.tokenMeta", updatedSecondToken.tokenMeta);
+    addLiquidityForm.setValue("poolName", `${updatedFirstToken.symbol}-${updatedSecondToken.symbol}`);
     props.fetchPairInfo(updatedFirstToken.tokenMeta.pairAccountId ?? "");
   }
 
@@ -293,6 +325,20 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
             onTokenSymbolChanged={handleSecondTokenSymbolChanged}
             onSetInputAmountWithFormula={handleSecondTokenAmountChanged}
           />,
+          <Spacer padding="0.4rem" />,
+          allPoolFee.length > 1 ? (
+            <Flex direction="column" justifyContent="center" gap="5px">
+              <Text textStyle="h4">Transaction Fee</Text>
+              <DropdownSelector
+                isLoading={props.isLoading}
+                data={allPoolFee}
+                value={formValues.fee}
+                selectControls={addLiquidityForm.register("transactionFee" as any, {
+                  onChange: handleTransactionFeeChanged,
+                })}
+              />
+            </Flex>
+          ) : null,
         ]}
         metrics={[
           <MetricLabel label="Share of Pool" value={poolRatio} isLoading={props.isLoading} />,

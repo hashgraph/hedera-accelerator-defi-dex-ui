@@ -25,7 +25,7 @@ export function formatWithdrawDataPoints(pools: PoolsStore, selectedPoolMetrics:
   const { poolTokenBalances, userTokenBalances } = pools;
 
   const pairAccountId = selectedPoolMetrics?.userTokenPair?.tokenA.tokenMeta.pairAccountId ?? "";
-  const lpAccountId = selectedPoolMetrics?.userTokenPair?.pairToken.pairLpAccountId ?? "";
+  const lpAccountId = selectedPoolMetrics?.userTokenPair?.lpTokenMeta.lpAccountId ?? "";
   const pairAccount = poolTokenBalances.find((pool) => pool.account === pairAccountId);
   const [firstPairToken, secondPairToken] = pairAccount?.tokens ?? [];
 
