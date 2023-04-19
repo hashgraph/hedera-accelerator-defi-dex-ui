@@ -117,7 +117,8 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
 
   const allPoolFee = getAllPoolTransactionFee({
     tokenPairs: props.tokenPairs,
-    poolSymbol: formValues.poolName,
+    tokenAId: formValues.firstToken.tokenMeta.tokenId,
+    tokenBId: formValues.secondToken.tokenMeta.tokenId,
   });
 
   const tokensWithPairs = getTokensByUniqueAccountIds(props.tokenPairs ?? []);
@@ -160,7 +161,11 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
 
     const selectedPair = props.tokenPairs?.find(
       (pair) =>
-        (pair.tokenA.tokenMeta.fee?.toNumber() ?? 0) === Number(fee) && formValues.poolName === pair.lpTokenMeta.symbol
+        (pair.tokenA.tokenMeta.fee?.toNumber() ?? 0) === Number(fee) &&
+        ((formValues.firstToken.tokenMeta.tokenId === pair.tokenA.tokenMeta.tokenId &&
+          formValues.secondToken.tokenMeta.tokenId === pair.tokenB.tokenMeta.tokenId) ||
+          (formValues.secondToken.tokenMeta.tokenId === pair.tokenA.tokenMeta.tokenId &&
+            formValues.firstToken.tokenMeta.tokenId === pair.tokenB.tokenMeta.tokenId))
     );
     addLiquidityForm.setValue("firstToken.tokenMeta", selectedPair?.tokenA?.tokenMeta ?? DefaultTokenMeta);
     addLiquidityForm.setValue("secondToken.tokenMeta", selectedPair?.tokenB?.tokenMeta ?? DefaultTokenMeta);

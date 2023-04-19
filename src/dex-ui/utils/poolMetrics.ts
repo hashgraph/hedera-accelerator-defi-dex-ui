@@ -188,13 +188,18 @@ const isHbarToken = (TokenID: string): boolean => {
 
 interface getAllPoolTransactionFeeParams {
   tokenPairs: TokenPair[] | null;
-  poolSymbol: string | undefined;
+  tokenAId: string | undefined;
+  tokenBId: string | undefined;
 }
 
 const getAllPoolTransactionFee = (params: getAllPoolTransactionFeeParams) => {
   return (
     params.tokenPairs
-      ?.filter((pair) => pair?.lpTokenMeta.symbol === params.poolSymbol)
+      ?.filter(
+        (pair) =>
+          (pair?.tokenA.tokenMeta.tokenId === params.tokenAId && pair?.tokenB.tokenMeta.tokenId === params.tokenBId) ||
+          (pair?.tokenB.tokenMeta.tokenId === params.tokenAId && pair?.tokenA.tokenMeta.tokenId === params.tokenBId)
+      )
       .flatMap((pair) => ({
         label: getTransactionFeeRateDisplay(pair.tokenA.tokenMeta.fee?.toNumber()),
         value: pair.tokenA.tokenMeta.fee?.toNumber() ?? 0,
