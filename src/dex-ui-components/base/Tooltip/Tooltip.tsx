@@ -4,6 +4,7 @@ import { TooltipIcon } from "../Icons";
 
 interface TooltipProps {
   label: string;
+  fill?: string;
   placement?: PlacementWithLogical;
 }
 
@@ -17,7 +18,7 @@ export function Tooltip(props: TooltipProps) {
       bg={Color.White_02}
     >
       <Flex alignItems="center">
-        <TooltipIcon />
+        <TooltipIcon fill={props.fill} />
       </Flex>
     </ChakraTooltip>
   );

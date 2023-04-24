@@ -16,7 +16,7 @@ interface DropdownSelectProps {
 }
 
 const DropdownSelector = (props: DropdownSelectProps) => {
-  const { value, onChangeHandler, data, selectControls, isLoading } = props;
+  const { value, onChangeHandler, data, selectControls, isLoading = false } = props;
 
   return cloneElement(
     <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>

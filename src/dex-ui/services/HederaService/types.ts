@@ -5,6 +5,8 @@ enum GovernorContractFunctions {
   ClaimGODToken = "claimGODToken",
   DeployABIFile = "deployABIFile",
   CancelProposal = "cancelProposal",
+  LockGODToken = "grabTokensFromUser",
+  UnLockGODToken = "revertTokensForVoter",
 }
 
 enum PairContractFunctions {

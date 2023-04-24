@@ -5,6 +5,7 @@ import Factory from "./Factory";
 import Governor from "./Governor";
 import * as DAOService from "./dao";
 import Configuration from "./Configuration";
+import GODHolder from "./GodHolder";
 import { TOKEN_USER_ID } from "../constants";
 
 const JsonRpcHashioUrl = {
@@ -40,6 +41,7 @@ function createJsonRpcService() {
     ...Governor,
     ...DAOService,
     ...Configuration,
+    ...GODHolder,
   };
 }
 

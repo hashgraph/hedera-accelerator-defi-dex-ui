@@ -52,6 +52,9 @@ export const Contracts = {
   GovernanceDAOFactory: {
     ProxyId: getProxyId(ContractNames.GovernanceDAOFactory),
   },
+  GODHolder: {
+    ProxyId: getProxyId(ContractNames.GodHolder),
+  },
   Configuration: {
     ProxyId: getProxyId(ContractNames.Configuration),
   },

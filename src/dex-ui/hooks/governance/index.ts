@@ -7,3 +7,7 @@ export * from "./useClaimGODTokens";
 export * from "./useCreateProposal";
 export * from "./useDeployContract";
 export * from "./useCancelProposal";
+export * from "./useFetchLockedGovToken";
+export * from "./useCanUserUnlockGODToken";
+export * from "./useLockGODToken";
+export * from "./useUnlockGODToken";

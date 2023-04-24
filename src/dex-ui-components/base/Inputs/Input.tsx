@@ -1,18 +1,20 @@
 import { Flex, Text, Box, Input as ChakraInput, InputGroup, InputRightElement } from "@chakra-ui/react";
+import React from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
 import { Color } from "../..";
 
 export interface InputProps<T extends string> {
   flex?: number | string;
+  pointerEvents?: "all" | "none";
   type: "number" | "text";
   step?: string;
-  label: string;
+  label: string | React.ReactElement;
   placeholder?: string;
   tooltipLabel?: string;
   isTooltipVisible?: boolean;
   id: string;
-  unit?: string;
+  unit?: string | React.ReactElement;
   isError?: boolean;
   isDisabled?: boolean;
   isReadOnly?: boolean;
@@ -35,12 +37,13 @@ export function Input<T extends string>(props: InputProps<T>) {
     isError,
     isReadOnly,
     unit,
+    pointerEvents,
     register,
   } = props;
   return (
     <Box flex={flex} width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
-        <Text textStyle="p small medium">{label}</Text>
+        {React.isValidElement(label) ? label : <Text textStyle="p small medium">{label}</Text>}
         {isTooltipVisible && <Tooltip label={tooltipLabel ?? ""} />}
       </Flex>
       <InputGroup>
@@ -63,8 +66,8 @@ export function Input<T extends string>(props: InputProps<T>) {
           }}
         />
         <InputRightElement
-          pointerEvents="none"
-          children={<Text textStyle="p small regular">{unit}</Text>}
+          pointerEvents={pointerEvents ? pointerEvents : "none"}
+          children={React.isValidElement(unit) ? unit : <Text textStyle="p small regular">{unit}</Text>}
           width="fit-content"
           padding="0 0.75rem"
         />

@@ -11,7 +11,7 @@ import {
   FileAppendTransaction,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { Contracts, TOKEN_USER_PUB_KEY } from "../constants";
+import { Contracts, DEX_TOKEN_PRECISION_VALUE, TOKEN_USER_PUB_KEY } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError, client } from "./utils";
@@ -230,6 +230,48 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
   return claimGODTokenresponse;
 };
 
+interface SendLockGODTokenTransactionParams {
+  accountId: string;
+  tokenAmount: number;
+  signer: HashConnectSigner;
+}
+
+const sendLockGODTokenTransaction = async (params: SendLockGODTokenTransactionParams) => {
+  const { accountId, tokenAmount, signer } = params;
+  const godHolderContractId = ContractId.fromString(Contracts.GODHolder.ProxyId);
+  const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
+  const accountAddress = AccountId.fromString(accountId).toSolidityAddress();
+  const contractFunctionParameters = new ContractFunctionParameters().addAddress(accountAddress).addUint256(amount);
+  const executeSendLockGODTokenTransaction = await new ContractExecuteTransaction()
+    .setContractId(godHolderContractId)
+    .setFunction(GovernorContractFunctions.LockGODToken, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const sendLockGODTokenResponse = await executeSendLockGODTokenTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendLockGODTokenResponse, GovernorContractFunctions.LockGODToken);
+  return sendLockGODTokenResponse;
+};
+
+interface SendUnLockGODTokenTransactionParams {
+  tokenAmount: number;
+  signer: HashConnectSigner;
+}
+
+const sendUnLockGODTokenTransaction = async (params: SendUnLockGODTokenTransactionParams) => {
+  const { tokenAmount, signer } = params;
+  const godHolderContractId = ContractId.fromString(Contracts.GODHolder.ProxyId);
+  const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(amount);
+  const executeSendUnLockGODTokenTransaction = await new ContractExecuteTransaction()
+    .setContractId(godHolderContractId)
+    .setFunction(GovernorContractFunctions.UnLockGODToken, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const sendUnLockGODTokenResponse = await executeSendUnLockGODTokenTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendUnLockGODTokenResponse, GovernorContractFunctions.UnLockGODToken);
+  return sendUnLockGODTokenResponse;
+};
+
 /**
  * TODO
  * @param params -
@@ -278,6 +320,8 @@ const GovernorService = {
   executeProposal,
   deployABIFile,
   sendCreateContractUpgradeProposalTransaction,
+  sendLockGODTokenTransaction,
+  sendUnLockGODTokenTransaction,
 };
 
 export default GovernorService;

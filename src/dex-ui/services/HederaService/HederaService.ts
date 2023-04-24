@@ -10,6 +10,7 @@ import {
   TokenAssociateTransaction,
   TransactionResponse,
   Hbar,
+  ContractCallQuery,
 } from "@hashgraph/sdk";
 import { Contracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, TREASURY_ID } from "../constants";
 import { PairContractFunctions } from "./types";
@@ -215,6 +216,33 @@ function createHederaService() {
     return transactionResponse;
   };
 
+  const queryContract = async (
+    contractId: ContractId,
+    functionName: string,
+    queryParams?: ContractFunctionParameters
+  ) => {
+    const gas = 50000;
+    const query = new ContractCallQuery().setContractId(contractId).setGas(gas).setFunction(functionName, queryParams);
+    const queryPayment = await query.getCost(client);
+    query.setMaxQueryPayment(queryPayment);
+    return await query.execute(client);
+  };
+
+  const fetchLockedGODTokensFromQueryContract = async (accountId: string) => {
+    const queryParams = new ContractFunctionParameters().addAddress(
+      AccountId.fromString(accountId).toSolidityAddress()
+    );
+    const result = await queryContract(ContractId.fromString("0.0.4166838"), "balanceOfVoter", queryParams);
+    const tokenAQty = result?.getInt256(0);
+    return tokenAQty;
+  };
+
+  const fetchCanUserUnlockGODTokenFromQueryContract = async () => {
+    const result = await queryContract(ContractId.fromString("0.0.4166838"), "canUserClaimTokens");
+    const canUserFetchGODTokens = result?.getBool(0);
+    return canUserFetchGODTokens;
+  };
+
   return {
     initHederaService,
     get1000L49ABCDTokens,
@@ -223,6 +251,8 @@ function createHederaService() {
     addLiquidity,
     removeLiquidity,
     createPool,
+    fetchLockedGODTokensFromQueryContract,
+    fetchCanUserUnlockGODTokenFromQueryContract,
     ...GovernorService,
     ...TokenService,
     ...DAO,
