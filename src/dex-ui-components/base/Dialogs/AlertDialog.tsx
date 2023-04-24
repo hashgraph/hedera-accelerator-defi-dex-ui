@@ -23,11 +23,16 @@ interface AlertDialogProps {
   openDialogButtonText?: string;
   isOpenDialogButtonDisabled?: boolean;
   alertDialogOpen?: boolean;
+  size?: string;
+  dialogWidth?: string;
   onAlertDialogOpen?: () => void;
   onAlertDialogClose?: () => void;
   modalButtonText?: string;
   onModalButtonClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
+
+const DEFAULT_DIALOG_WIDTH = "370px";
+const DEFAULT_DIALOG_SIZE = "md";
 
 /**
  * <AlertDialog>
@@ -49,6 +54,8 @@ const AlertDialogBase = (props: AlertDialogProps) => {
     openModalComponent,
     body,
     footer,
+    size,
+    dialogWidth,
     openDialogButtonStyles,
     openDialogButtonText,
     isOpenDialogButtonDisabled,
@@ -104,10 +111,11 @@ const AlertDialogBase = (props: AlertDialogProps) => {
         onOverlayClick={closeDialog}
         isOpen={isOpen}
         isCentered
+        size={size ?? DEFAULT_DIALOG_SIZE}
       >
         <AlertDialogOverlay />
         <AlertDialogContent
-          width="370px"
+          width={dialogWidth ?? DEFAULT_DIALOG_WIDTH}
           gap="20px"
           padding="20px"
           boxShadow="0px 4px 15px rgba(0, 0, 0, 0.15)"

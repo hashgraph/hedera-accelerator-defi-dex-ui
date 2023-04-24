@@ -28,12 +28,12 @@
   },
   {
     "name": "godholder",
-    "id": "0.0.9136",
-    "address": "0x00000000000000000000000000000000000023b0",
-    "timestamp": "2023-01-27T10:27:45.392Z",
-    "hash": "4e634fcde2567f8d719a976326be7385",
-    "transparentProxyAddress": "0x00000000000000000000000000000000000023b5",
-    "transparentProxyId": "0.0.9141"
+    "id": "0.0.4166829",
+    "address": "0x00000000000000000000000000000000003f94ad",
+    "timestamp": "2023-04-17T06:59:03.632Z",
+    "hash": "ca56025c3ffd8dd1b77c34d55fb40505",
+    "transparentProxyAddress": "0x00000000000000000000000000000000003f94b6",
+    "transparentProxyId": "0.0.4166838"
   },
   {
     "name": "governortransfertoken",

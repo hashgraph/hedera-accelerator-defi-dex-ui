@@ -9,6 +9,8 @@ export enum GovernanceMutations {
 export enum GovernanceQueries {
   Proposals = "proposals",
   FetchHasVoted = "hasVoted",
+  FetchLockGODToken = "fetchLockGODToken",
+  FetchCanUnlockGODToken = "fetchCanUnlockGODToken",
 }
 
 export enum CreateProposalType {
