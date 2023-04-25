@@ -30,7 +30,8 @@ export function useManageVotingPower() {
 
   const isFormLoading = govTokenBalance.isLoading || lockedGOVToken.isLoading || canClaimGODTokens.isLoading;
   const isLoading = lockGODTokenSubmit.isLoading || unLockGODTokenSubmit.isLoading;
-  const canUserClaimGODTokens = canClaimGODTokens.data;
+  //TODO: Change the static true condition to canClaimGODTokens.data once JSON RPC issue is resolved
+  const canUserClaimGODTokens = true;
 
   // For Now the SWAP button to show we are keeping to the -4 precision value to match with UI
   const doesUserHaveGOVTokensToLockAndUnlock = isWalletConnected && totalGodToken > 0.0001;

@@ -89,7 +89,15 @@ export const ProposalDetails = () => {
 
   return (
     <>
-      <Grid templateColumns="repeat(4, 1fr)" gap="4" width="100%" minHeight="500px" paddingTop="1.5rem">
+      <Grid
+        templateColumns="repeat(4, 1fr)"
+        gap="4"
+        width="100%"
+        minHeight="500px"
+        paddingTop="1.5rem"
+        paddingLeft="5rem"
+        paddingRight="5rem"
+      >
         <GridItem colSpan={3}>
           <Flex direction="column" gap={10} height="100%">
             <Breadcrumb>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Divider, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import { Divider, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import {
   AlertDialog,
   Button,
@@ -116,15 +116,24 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
       : isEmpty(formValues.unLockAmount) || !isUnlockButtonEnabled;
 
   return (
-    <Flex flexDirection="column" margin="0px 10px 0px 10px">
+    <Flex flexDirection="column" margin="0px 10px 0px 10px" height="fit-content">
       <Divider marginBottom="20px" />
-      <GOVTokenDetails
-        lockedGODToken={props.lockedGODToken}
-        totalGODTokenBalance={props.totalGODTokenBalance}
-        availableGODTokenBalance={props.availableGODTokenBalance}
-        hidePendingStatus
-        isLoading={props.isLoading}
-      />
+      <HStack
+        height="96px"
+        padding="8px 24px"
+        gap="40px"
+        justify="right"
+        borderRadius="8px"
+        background={Color.Neutral._50}
+      >
+        <GOVTokenDetails
+          lockedGODToken={props.lockedGODToken}
+          totalGODTokenBalance={props.totalGODTokenBalance}
+          availableGODTokenBalance={props.availableGODTokenBalance}
+          hidePendingStatus
+          isLoading={props.isLoading}
+        />
+      </HStack>
       <Tabs onChange={handleTabChange} index={tabIndex}>
         <TabList>
           <Tab isDisabled={isLockTabDisabled}>Lock</Tab>
