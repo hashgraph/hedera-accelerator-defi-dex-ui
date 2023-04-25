@@ -1,6 +1,6 @@
 import { Checkbox, FormControl } from "@chakra-ui/react";
 import { Controller, useFormContext } from "react-hook-form";
-import { FormInput } from "../../../../../dex-ui-components";
+import { FormInput } from "@dex-ui-components";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 

@@ -1,5 +1,5 @@
 import { Flex, SimpleGrid, Tag, Text } from "@chakra-ui/react";
-import { Color, HashScanLink, HashscanData } from "../../../../../dex-ui-components";
+import { Color, HashScanLink, HashscanData } from "@dex-ui-components";
 import * as R from "ramda";
 import { Member } from "./MultiSigDAODashboard";
 

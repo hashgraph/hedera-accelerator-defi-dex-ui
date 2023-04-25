@@ -1,12 +1,12 @@
 import { Text, Box, Center } from "@chakra-ui/react";
-import { CardGridLayout, Page, PageHeader } from "../../../layouts";
-import { Notification, useNotification, NotficationTypes } from "../../../../dex-ui-components";
-import { useDAOs } from "../../../hooks";
+import { CardGridLayout, Page, PageHeader } from "@layouts";
+import { Notification, useNotification, NotficationTypes } from "@dex-ui-components";
+import { useDAOs } from "@hooks";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PrimaryHeaderButton } from "../../../components";
+import { PrimaryHeaderButton } from "@components";
 import { DAOCard } from "./DAOCard";
-import { Paths } from "../../../DEX";
-import { DAO } from "../../../services";
+import { Paths } from "@routes";
+import { DAO } from "@services";
 
 export function DAOsListPage() {
   const daos = useDAOs();

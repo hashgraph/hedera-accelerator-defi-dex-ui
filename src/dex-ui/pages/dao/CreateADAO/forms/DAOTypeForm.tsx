@@ -1,6 +1,6 @@
 import { Box, Flex, Text, useRadioGroup } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
-import { RadioCard } from "../../../../../dex-ui-components";
+import { RadioCard } from "@dex-ui-components";
 import {
   CreateADAOForm,
   MultiSigDAOGovernanceData,
@@ -10,7 +10,7 @@ import {
 } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useEffect } from "react";
-import { DAOType } from "../../../../services";
+import { DAOType } from "@services";
 
 const newDAOOptions = [
   {

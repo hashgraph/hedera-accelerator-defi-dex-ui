@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import { FormInput } from "../../../../../dex-ui-components";
+import { FormInput } from "@dex-ui-components";
 import { CreateATokenDAOForm } from "../types";
 import { DAOReviewForm } from "./DAOReviewForm";
 

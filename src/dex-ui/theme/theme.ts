@@ -1,20 +1,32 @@
 import { extendTheme } from "@chakra-ui/react";
 import {
+  Color,
   TextStyles,
   ButtonStyles,
   NumberInputStyles,
   InputStyles,
   CardStyles,
-  TabsStyles,
-} from "../../dex-ui-components/base";
+  SelectStyles,
+  TooltipStyles,
+  StepsV2Theme,
+} from "@dex-ui-components";
 
 export const DEXTheme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        background: Color.Primary_Bg,
+      },
+    },
+  },
   textStyles: TextStyles,
   components: {
     Button: ButtonStyles,
     NumberInput: NumberInputStyles,
     Input: InputStyles,
     Card: CardStyles,
-    Tabs: TabsStyles,
+    Select: SelectStyles,
+    Tooltip: TooltipStyles,
+    Steps: StepsV2Theme,
   },
 });

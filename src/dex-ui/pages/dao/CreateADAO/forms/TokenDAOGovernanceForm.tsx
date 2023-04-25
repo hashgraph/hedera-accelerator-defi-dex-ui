@@ -2,15 +2,8 @@ import { Text, Flex, Divider, Center, Button } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import {
-  Notification,
-  FormInput,
-  NotficationTypes,
-  useNotification,
-  LoadingDialog,
-  Color,
-} from "../../../../../dex-ui-components";
-import { useCreateToken } from "../../../../hooks";
+import { Notification, FormInput, NotficationTypes, useNotification, LoadingDialog, Color } from "@dex-ui-components";
+import { useCreateToken } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 
 export function TokenDAOGovernanceForm() {

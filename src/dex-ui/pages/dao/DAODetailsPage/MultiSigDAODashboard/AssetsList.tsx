@@ -1,7 +1,7 @@
 import { Box, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
-import { Button, Color, HashScanLink, HashscanData, MetricLabel } from "../../../../../dex-ui-components";
+import { Button, Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
 import * as R from "ramda";
-import { TokenBalance } from "../../../../hooks";
+import { TokenBalance } from "@hooks";
 interface AssetsListProps {
   assets: TokenBalance[];
   totalAssetValue: number;

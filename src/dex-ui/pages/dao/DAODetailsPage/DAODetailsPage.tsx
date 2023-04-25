@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { MultiSigDAODashboard } from "./MultiSigDAODashboard";
-import { useDAOs } from "../../../hooks";
-import { LoadingSpinnerLayout, NotFound } from "../../../layouts";
+import { useDAOs } from "@hooks";
+import { LoadingSpinnerLayout, NotFound } from "@layouts";
 import { Text, Flex } from "@chakra-ui/react";
-import { Color } from "../../../../dex-ui-components";
-import { Paths } from "../../../DEX";
+import { Color } from "@dex-ui-components";
+import { Paths } from "@routes";
 import { isNil, isNotNil } from "ramda";
-import { DAOType } from "../../../services";
+import { DAOType } from "@services";
 
 export function DAODetailsPage() {
   const navigate = useNavigate();

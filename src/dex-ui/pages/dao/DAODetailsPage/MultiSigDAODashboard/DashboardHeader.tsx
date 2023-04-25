@@ -1,8 +1,8 @@
 import { Text, Flex, HStack, Tag } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
-import { Button, Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData } from "../../../../../dex-ui-components";
-import { DexService, DAOType } from "../../../../services";
-import { useDexContext } from "../../../../hooks";
+import { Button, Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData } from "@dex-ui-components";
+import { DexService, DAOType } from "@services";
+import { useDexContext } from "@hooks";
 
 /**
  * TODO: For demo and testing purposes only. Remove this constant once the send transcation flow

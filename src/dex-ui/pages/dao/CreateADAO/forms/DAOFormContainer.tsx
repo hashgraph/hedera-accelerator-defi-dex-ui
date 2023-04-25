@@ -1,6 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { Color } from "../../../../../dex-ui-components";
+import { Color } from "@dex-ui-components";
 
 interface DAOFormContainerProps extends PropsWithChildren {
   rest?: any;

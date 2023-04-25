@@ -1,7 +1,7 @@
 import { Text, Flex, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel } from "@chakra-ui/react";
-import { Color } from "../../../../../dex-ui-components";
+import { Color } from "@dex-ui-components";
 import BigNumber from "bignumber.js";
-import { Transaction } from "../../../../hooks";
+import { Transaction } from "@hooks";
 interface TransactionDetailsProps extends Transaction {
   threshold: number;
   index: number;
