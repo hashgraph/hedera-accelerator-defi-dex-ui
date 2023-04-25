@@ -5,6 +5,7 @@ import {
   useExecuteProposal,
   useProposal,
   useCancelProposal,
+  useFetchLockedGovToken,
 } from "../../hooks";
 import { ProposalState, ProposalStatus, ProposalStates, ProposalStateIcon } from "../../store/governanceSlice";
 import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "../../utils";
@@ -16,6 +17,7 @@ export function useProposalDetails(proposalId: string | undefined) {
   const cancelProposal = useCancelProposal(proposalId);
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
   const executeProposal = useExecuteProposal(proposalId);
+  const fetchLockGODTokens = useFetchLockedGovToken(wallet.savedPairingData?.accountIds[0]);
 
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
   const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;
@@ -29,6 +31,7 @@ export function useProposalDetails(proposalId: string | undefined) {
 
   const isWalletConnected = wallet.isPaired();
   const doesUserHaveGodTokens = wallet.doesUserHaveGODTokensToVote();
+  const votingPower = `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`;
 
   function getLoadingDialogMessage(): string {
     if (castVote.isLoading) return "Please confirm the vote in your wallet to proceed.";
@@ -147,5 +150,6 @@ export function useProposalDetails(proposalId: string | undefined) {
     isWalletConnected,
     doesUserHaveGodTokens,
     proposalStatus,
+    votingPower,
   };
 }

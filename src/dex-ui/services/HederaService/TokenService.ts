@@ -1,9 +1,10 @@
-import { AccountId, TokenCreateTransaction } from "@hashgraph/sdk";
+import { AccountId, TokenCreateTransaction, AccountAllowanceApproveTransaction } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
 
 export enum TokenServiceFunctions {
   CreateToken = "createToken",
+  SetTokenAllowance = "setTokenAllowance",
 }
 
 /**
@@ -44,8 +45,34 @@ async function createToken(params: CreateTokenParams) {
   return response;
 }
 
+interface SetTokenAllowanceParams {
+  tokenId: string;
+  spenderContractId: string;
+  tokenAmount: number;
+  walletId: string;
+  signer: HashConnectSigner;
+}
+
+/**
+ * TODO
+ * @param params -
+ * @returns
+ */
+async function setTokenAllowance(params: SetTokenAllowanceParams) {
+  const tokenAllowanceTxn = new AccountAllowanceApproveTransaction().approveTokenAllowance(
+    params.tokenId,
+    params.walletId,
+    params.spenderContractId,
+    params.tokenAmount
+  );
+  const tokenAllowanceSignedTx = await tokenAllowanceTxn.freezeWithSigner(params.signer);
+  const response = await tokenAllowanceSignedTx.executeWithSigner(params.signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
+}
+
 const TokenService = {
   createToken,
+  setTokenAllowance,
 };
 
 export default TokenService;

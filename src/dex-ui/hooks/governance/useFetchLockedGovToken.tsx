@@ -15,9 +15,7 @@ export function useFetchLockedGovToken(accountId: string | undefined) {
     [GovernanceQueries.FetchLockGODToken, accountId],
     async () => {
       if (isNil(accountId)) return;
-      /** For now calling with query contract since JSON-RPC is down */
-      // return DexService.fetchLockedGODTokens(accountId);
-      return DexService.fetchLockedGODTokensFromQueryContract(accountId);
+      return DexService.fetchLockedGODTokens(accountId);
     },
     {
       enabled: !!accountId,
