@@ -1,7 +1,7 @@
 import { ContractId, TokenId } from "@hashgraph/sdk";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
-import { JsonRpcSigner } from "./JsonRpcService";
+import { DexService } from "..";
 
 export const solidityAddressToTokenIdString = (address: string): string =>
   TokenId.fromSolidityAddress(address).toString();
@@ -38,6 +38,7 @@ export function convertEthersBigNumberToBigNumberJS(ethersBigNumber: ethers.BigN
  */
 export function createContract(contractId: string, abi: any[]): ethers.Contract {
   const solidityAddress = ContractId.fromString(contractId).toSolidityAddress();
+  const { JsonRpcSigner } = DexService.getJsonRpcProviderAndSigner();
   return new ethers.Contract(solidityAddress, abi, JsonRpcSigner);
 }
 
@@ -48,5 +49,6 @@ export function createContract(contractId: string, abi: any[]): ethers.Contract 
  * @returns An ethers.Contract representation of the provided contract data.
  */
 export function createContractWithSolidityAddress(address: string, abi: any[]): ethers.Contract {
+  const { JsonRpcSigner } = DexService.getJsonRpcProviderAndSigner();
   return new ethers.Contract(address, abi, JsonRpcSigner);
 }

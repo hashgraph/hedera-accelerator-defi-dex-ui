@@ -116,16 +116,9 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
       : isEmpty(formValues.unLockAmount) || !isUnlockButtonEnabled;
 
   return (
-    <Flex flexDirection="column" margin="0px 10px 0px 10px" height="fit-content">
+    <Flex flexDirection="column" height="fit-content">
       <Divider marginBottom="20px" />
-      <HStack
-        height="96px"
-        padding="8px 24px"
-        gap="40px"
-        justify="right"
-        borderRadius="8px"
-        background={Color.Neutral._50}
-      >
+      <HStack height="120px" justify="center" borderRadius="8px" background={Color.Neutral._50}>
         <GOVTokenDetails
           lockedGODToken={props.lockedGODToken}
           totalGODTokenBalance={props.totalGODTokenBalance}
@@ -140,7 +133,7 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
           <Tab isDisabled={isUnlockTabDisabled}>Unlock</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
+          <TabPanel padding="1rem 0">
             <FormInput<"lockAmount">
               inputProps={{
                 isReadOnly: isLockTabDisabled,
@@ -167,7 +160,7 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
               errorMessage={props.errors.lockAmount && props.errors.lockAmount?.message}
             />
           </TabPanel>
-          <TabPanel>
+          <TabPanel padding="1rem 0">
             <FormInput<"unLockAmount">
               inputProps={{
                 id: "unLockAmount",
@@ -217,7 +210,6 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
             ? props.form.handleSubmit(props.onLockButtonClick)
             : props.form.handleSubmit(props.onUnlockButtonClick)
         }
-        margin="0px 15px 0px 15px"
       >
         {tabIndex === ManageVotingPowerTabType.Lock
           ? formValues.lockAmount.length !== 0

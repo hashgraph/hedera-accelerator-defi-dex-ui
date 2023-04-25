@@ -20,7 +20,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
   const toolTipString = `Pending amount of token unlocks until
     the in-progress proposals are either complete or canceled`;
   return (
-    <Flex height="96px" alignItems="center" justify="center" gap="3rem">
+    <Flex height="96px" alignItems="center" justify="center" gap="40px">
       <MetricLabel
         isLoading={props.isLoading}
         label="TOTAL BALANCE"

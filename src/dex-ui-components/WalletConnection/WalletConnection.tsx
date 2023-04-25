@@ -20,6 +20,8 @@ import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { Color, AlertDialog, Button } from "../";
 import { formatWalletConnectionData } from "./formatter";
+import { DexService, TOKEN_USER_ID } from "../../dex-ui/services";
+import { isEmpty } from "ramda";
 
 /** TODO: Replace this with the real terms and service agreement. */
 const TermsAndServices = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
@@ -84,6 +86,10 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
       setIsConnecting(false);
     }
   }, [hasPaired]);
+
+  useEffect(() => {
+    DexService.setJsonRpcProviderAndSigner(isEmpty(accountId) ? TOKEN_USER_ID : accountId);
+  }, [accountId]);
 
   useEffect(() => {
     if (isConnecting) {
