@@ -10,9 +10,7 @@ export function useCanUserUnlockGODToken(accountId: string | undefined) {
     [GovernanceQueries.FetchCanUnlockGODToken, accountId],
     async () => {
       if (isNil(accountId)) return false;
-      /** For now calling with query contract since JSON-RPC is down */
-      // return DexService.fetchCanUserUnlockGODToken();
-      return DexService.fetchCanUserUnlockGODTokenFromQueryContract();
+      return DexService.fetchCanUserUnlockGODToken();
     },
     {
       enabled: !!accountId,

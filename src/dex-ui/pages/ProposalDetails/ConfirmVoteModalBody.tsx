@@ -1,17 +1,11 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Color } from "../../../dex-ui-components";
-import { useDexContext } from "../../hooks";
 
 interface ConfirmVoteModalBodyProps {
-  governanceTokenId: string;
+  votingPower: string;
 }
 
 const ConfirmVoteModalBody = (props: ConfirmVoteModalBodyProps) => {
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  /** TODO: Consider refactoring to use react-query to get a balances by ids. */
-  const governanceTokenBalance = Number(
-    wallet.pairedAccountBalance?.tokens.find((token) => token.tokenId === props.governanceTokenId)?.balance ?? 0
-  );
   return (
     <Flex direction="column" gap="1.25rem">
       <Flex>
@@ -19,7 +13,7 @@ const ConfirmVoteModalBody = (props: ConfirmVoteModalBodyProps) => {
           Your Voting Power
         </Text>
         <Text flex="1" textAlign="right" textStyle="b1">
-          {governanceTokenBalance}
+          {props.votingPower}
         </Text>
       </Flex>
       <Flex direction="column" gap="0.667rem">
@@ -29,7 +23,7 @@ const ConfirmVoteModalBody = (props: ConfirmVoteModalBodyProps) => {
             DexCoins
           </Text>
           <Text flex="1" textStyle="b3" textAlign="right">
-            {governanceTokenBalance}
+            {props.votingPower}
           </Text>
         </Flex>
       </Flex>

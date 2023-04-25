@@ -1,4 +1,4 @@
-import { DexService } from "../../services";
+import { Contracts, DexService, DEX_PRECISION, GovernanceTokenId } from "../../services";
 import { getErrorMessage } from "../../utils";
 import { TransactionStatus } from "../appSlice";
 import {
@@ -48,6 +48,14 @@ const createGovernanceSlice: GovernanceSlice = (set, get): GovernanceStore => {
         const getResult = async () => {
           if (type === ProposalType.Text) {
             const createTextProposal = data as CreateTextProposalData;
+            const response = await DexService.setTokenAllowance({
+              tokenId: GovernanceTokenId,
+              walletId: wallet.savedPairingData?.accountIds[0] ?? "",
+              spenderContractId: Contracts.Governor.TextProposal.ProxyId,
+              tokenAmount: 1 * DEX_PRECISION,
+              signer: wallet.getSigner(),
+            });
+            console.log("Token Allowance response", response);
             return DexService.sendCreateTextProposalTransaction(
               createTextProposal.title,
               createTextProposal.description,

@@ -4,8 +4,8 @@ import { UseCancelProposalResult, useDexContext } from "../../hooks";
 import { FormattedProposal } from "../Governance/types";
 
 interface CancelProposalModalButtonProps {
-  governanceTokenId: string;
   proposal: FormattedProposal | undefined;
+  votingPower: string;
   cancelProposal: UseCancelProposalResult;
   isOpenDialogButtonDisabled: boolean;
   isOpenDialogButtonVisible: boolean;
@@ -17,10 +17,6 @@ interface CancelProposalModalButtonProps {
 
 export function CancelProposalModalButton(props: CancelProposalModalButtonProps) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  /** TODO: Consider refactoring to use react-query to get a balances by ids. */
-  const governanceTokenBalance = Number(
-    wallet.pairedAccountBalance?.tokens.find((token) => token.tokenId === props.governanceTokenId)?.balance ?? 0
-  );
 
   function closeAlertDialog() {
     props.onAlertDialogClose();
@@ -66,7 +62,7 @@ export function CancelProposalModalButton(props: CancelProposalModalButtonProps)
               DexCoins Refunded to You
             </Text>
             <Text flex="1" textStyle="b3" textAlign="right">
-              {governanceTokenBalance}
+              {props.votingPower}
             </Text>
           </Flex>
         </Flex>

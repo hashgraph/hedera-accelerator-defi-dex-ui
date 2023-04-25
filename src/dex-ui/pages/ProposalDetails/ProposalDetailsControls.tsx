@@ -1,6 +1,5 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { AlertDialog, NotficationTypes, Notification } from "../../../dex-ui-components";
-import { GovernanceTokenId } from "../../services";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { CancelProposalModalButton } from "./CancelProposalModalButton";
 import { useState } from "react";
@@ -38,6 +37,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     isExecuteButtonVisible,
     isWalletConnected,
     doesUserHaveGodTokens,
+    votingPower,
   } = props.proposalDetails;
 
   const formattedProposal = proposal.data ? formatProposal(proposal.data) : undefined;
@@ -127,7 +127,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
         <CancelProposalModalButton
           proposal={formattedProposal}
           cancelProposal={cancelProposal}
-          governanceTokenId={GovernanceTokenId}
+          votingPower={votingPower}
           isOpenDialogButtonDisabled={proposal === undefined}
           isOpenDialogButtonVisible={isUserProposalCreator}
           isAlertDialogOpen={dialogState.isCancelProposalOpen}
@@ -183,7 +183,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
             openDialogButtonText="Yes"
             isOpenDialogButtonDisabled={proposal === undefined}
             title="Confirm Vote"
-            body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
+            body={<ConfirmVoteModalBody votingPower={votingPower} />}
             footer={
               <Button flex="1" onClick={handleVoteYesClicked}>
                 Confirm Vote Yes
@@ -198,7 +198,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
             openDialogButtonText="No"
             isOpenDialogButtonDisabled={proposal === undefined}
             title="Confirm Vote"
-            body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
+            body={<ConfirmVoteModalBody votingPower={votingPower} />}
             footer={
               <Button flex="1" onClick={handleVoteNoClicked}>
                 Confirm Vote No
@@ -213,7 +213,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
             openDialogButtonText="Abstain"
             isOpenDialogButtonDisabled={proposal === undefined}
             title="Confirm Vote"
-            body={<ConfirmVoteModalBody governanceTokenId={GovernanceTokenId} />}
+            body={<ConfirmVoteModalBody votingPower={votingPower} />}
             footer={
               <Button flex="1" onClick={handleVoteAbstainClicked}>
                 Confirm Vote Abstain
