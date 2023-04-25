@@ -1,13 +1,13 @@
 import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
-import { LoadingSpinnerLayout, Page, PageLayout } from "../../../../layouts";
-import { Color } from "../../../../../dex-ui-components";
-import { useAccountTokenBalances, useTabFilters } from "../../../../hooks";
+import { LoadingSpinnerLayout, Page, PageLayout } from "@layouts";
+import { Color } from "@dex-ui-components";
+import { useAccountTokenBalances, useTabFilters } from "@hooks";
 import { TransactionsList } from "./TransactionsList";
 import { MembersList } from "./MembersList";
 import { AssetsList } from "./AssetsList";
 import { DashboardOverview } from "./DashboardOverview";
 import { DashboardHeader } from "./DashboardHeader";
-import { MultiSigDAODetails } from "../../../../services";
+import { MultiSigDAODetails } from "@services";
 
 export interface Member {
   name: string;

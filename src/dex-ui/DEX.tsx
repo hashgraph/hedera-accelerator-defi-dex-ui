@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import { ChakraProvider, Container, extendTheme, Flex } from "@chakra-ui/react";
+import { ChakraProvider, Container, Flex } from "@chakra-ui/react";
 import {
   SwapPage,
   AddLiquidityPage,
@@ -14,52 +14,17 @@ import {
   DAOsListPage,
   CreateADAOPage,
   DAODetailsPage,
-} from "./pages";
-import { TopMenuBar } from "./layouts";
-import {
-  ButtonStyles,
-  CardStyles,
-  InputStyles,
-  NumberInputStyles,
-  TextStyles,
-  SelectStyles,
-  TooltipStyles,
-  StepsV2Theme,
-  Color,
-} from "../dex-ui-components";
+} from "@pages";
+import { TopMenuBar } from "@layouts";
+import { Color } from "@dex-ui-components";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useWalletConnection } from "./hooks";
-import { ScrollToTop } from "./utils";
+import { useWalletConnection } from "@hooks";
+import { ScrollToTop } from "@utils";
+import { DEXTheme } from "@theme";
+import { Paths } from "@routes";
 
 const menuOptions = ["Swap", "Pools", "Governance", "DAOs"];
 const SEVEN_SECONDS = 7 * 1000;
-
-export const Paths = {
-  Home: "/",
-  Swap: {
-    default: "/swap",
-  },
-  Pools: {
-    default: "/pools",
-    AddLiquidity: "/pools/add-liquidity",
-    Withdraw: "/pools/withdraw",
-    CreatePool: "/pools/create-pool",
-  },
-  Governance: {
-    default: "/governance",
-    ProposalDetails: "/governance/proposal-details",
-    SelectProposalType: "/governance/select-proposal-type",
-    CreateNewToken: "/governance/select-proposal-type/new-token",
-    CreateText: "/governance/select-proposal-type/text",
-    CreateTokenTransfer: "/governance/select-proposal-type/token-transfer",
-    CreateContractUpgrade: "/governance/select-proposal-type/contract-upgrade",
-  },
-  DAOs: {
-    default: "/daos",
-    CreateDAO: "/daos/create",
-    DAODetails: "/dao",
-  },
-};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,26 +41,6 @@ const queryClient = new QueryClient({
        */
       staleTime: SEVEN_SECONDS,
     },
-  },
-});
-
-export const DEXTheme = extendTheme({
-  styles: {
-    global: {
-      body: {
-        background: Color.Primary_Bg,
-      },
-    },
-  },
-  textStyles: TextStyles,
-  components: {
-    Button: ButtonStyles,
-    NumberInput: NumberInputStyles,
-    Input: InputStyles,
-    Card: CardStyles,
-    Select: SelectStyles,
-    Tooltip: TooltipStyles,
-    Steps: StepsV2Theme,
   },
 });
 

@@ -1,8 +1,8 @@
 import { Button, Flex, Spacer, Text } from "@chakra-ui/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useSteps } from "chakra-ui-steps";
-import { Color, LoadingDialog, StepperV2 } from "../../../../dex-ui-components";
-import { Page } from "../../../layouts";
+import { Color, LoadingDialog, StepperV2 } from "@dex-ui-components";
+import { Page } from "@layouts";
 import {
   DAODetailsForm,
   DAOTypeForm,
@@ -15,11 +15,11 @@ import {
 } from "./forms";
 import { useNavigate } from "react-router-dom";
 import { CreateADAOForm, CreateAMultiSigDAOForm, CreateATokenDAOForm } from "./types";
-import { useCreateDAO } from "../../../hooks";
+import { useCreateDAO } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { Paths } from "../../../DEX";
-import { DAOType } from "../../../services";
+import { Paths } from "@routes";
+import { DAOType } from "@services";
 
 export function CreateADAOPage() {
   const stepProps = useSteps({

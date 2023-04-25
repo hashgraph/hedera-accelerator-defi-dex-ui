@@ -1,5 +1,5 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { FormInput, FormInputList } from "../../../../../dex-ui-components";
+import { FormInput, FormInputList } from "@dex-ui-components";
 import { CreateAMultiSigDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 

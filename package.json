@@ -47,9 +47,9 @@
     "zustand": "^4.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --coverage",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test --coverage",
     "test:jest": "jest -c jest.config.js --watch",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
@@ -161,6 +161,7 @@
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
     "babel-plugin-named-exports-order": "^0.0.2",
+    "craco": "^0.0.3",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^7.0.1",

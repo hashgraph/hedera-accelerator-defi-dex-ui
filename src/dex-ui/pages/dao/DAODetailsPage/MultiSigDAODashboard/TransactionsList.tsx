@@ -1,7 +1,7 @@
 import { Text, Accordion } from "@chakra-ui/react";
-import { CardListLayout, LoadingSpinnerLayout, TabFilters } from "../../../../layouts";
+import { CardListLayout, LoadingSpinnerLayout, TabFilters } from "@layouts";
 import { TransactionDetails } from "./TransactionDetails";
-import { TransactionStatus, useDAOTransactions, useTabFilters } from "../../../../hooks";
+import { TransactionStatus, useDAOTransactions, useTabFilters } from "@hooks";
 
 const transactionTabFilters = [[TransactionStatus.Pending], [TransactionStatus.Success, TransactionStatus.Failed]];
 const defaultTransactionFilters = [TransactionStatus.Pending, TransactionStatus.Success, TransactionStatus.Failed];

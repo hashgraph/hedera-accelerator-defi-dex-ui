@@ -1,5 +1,5 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { Color, MetricLabel } from "../../../../../dex-ui-components";
+import { Color, MetricLabel } from "@dex-ui-components";
 
 interface DashboardProps {
   totalAssetValue: number;

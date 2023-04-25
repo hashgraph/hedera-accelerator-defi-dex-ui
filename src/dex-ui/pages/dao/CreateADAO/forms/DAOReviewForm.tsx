@@ -10,9 +10,9 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { ReactElement, cloneElement } from "react";
-import { FormInput } from "../../../../../dex-ui-components";
+import { FormInput } from "@dex-ui-components";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { DAOType } from "../../../../services";
+import { DAOType } from "@services";
 
 interface DAOReviewFormProps {
   details: {

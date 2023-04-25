@@ -1,5 +1,5 @@
 import { SimpleGrid } from "@chakra-ui/react";
-import { FormInput } from "../../../../../dex-ui-components";
+import { FormInput } from "@dex-ui-components";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
