@@ -19,7 +19,7 @@ export function CancelledStepIcon<T>(props: CancelledStepIconProps<T>) {
         9.3875C7.1375 8.9 7.1375 8.1125 7.625 7.625C8.1125 7.1375 8.9 7.1375 9.3875 7.625L13
         11.2375L16.6125 7.625C17.1 7.1375 17.8875 7.1375 18.375 7.625C18.8625 8.1125
         18.8625 8.9 18.375 9.3875L14.7625 13L18.375 16.6125C18.85 17.0875 18.85 17.8875 18.375 18.375Z`}
-        fill-opacity={fillOpacity}
+        fillOpacity={fillOpacity}
       />
     </Icon>
   );

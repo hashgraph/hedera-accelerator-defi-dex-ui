@@ -1,4 +1,4 @@
-import { HStack } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { Color } from "../../../../dex-ui-components/themes";
 import { LockIcon } from "../../../../dex-ui-components/base/Icons";
 import { Divider } from "@material-ui/core";
@@ -20,7 +20,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
   const toolTipString = `Pending amount of token unlocks until
     the in-progress proposals are either complete or canceled`;
   return (
-    <HStack height="96px" alignItems="center" justify="center" gap="40px">
+    <Flex height="96px" alignItems="center" justify="center" gap="2rem">
       <MetricLabel
         isLoading={props.isLoading}
         label="TOTAL BALANCE"
@@ -82,6 +82,6 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
           amountLabelColor={Color.Neutral._500}
         />
       ) : null}
-    </HStack>
+    </Flex>
   );
 };
