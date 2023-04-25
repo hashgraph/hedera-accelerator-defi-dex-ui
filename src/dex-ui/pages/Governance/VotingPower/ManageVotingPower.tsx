@@ -81,8 +81,8 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
           ? Number(props.availableGODTokenBalance)
           : Number(props.lockedGODToken)
         : tabIndex === ManageVotingPowerTabType.Lock
-          ? halfOf(Number(props.availableGODTokenBalance))
-          : halfOf(Number(props.lockedGODToken));
+        ? halfOf(Number(props.availableGODTokenBalance))
+        : halfOf(Number(props.lockedGODToken));
 
     if (tabIndex === ManageVotingPowerTabType.Lock) {
       props.form.setValue("lockAmount", `${godTokenAmount}`);
@@ -215,8 +215,8 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
             ? `Lock ${formValues.lockAmount} GOV`
             : "Lock"
           : formValues.unLockAmount.length !== 0
-            ? `Unlock ${formValues.unLockAmount} GOV`
-            : "Unlock"}
+          ? `Unlock ${formValues.unLockAmount} GOV`
+          : "Unlock"}
       </Button>
     </Flex>
   );
