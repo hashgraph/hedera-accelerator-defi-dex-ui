@@ -13,35 +13,43 @@ const JsonRpcHashioUrl = {
   previewnet: "https://previewnet.hashio.io/api",
 };
 
-type JsonRpcServiceType = ReturnType<typeof createJsonRpcService>;
+export type JsonRpcServiceType = ReturnType<typeof createJsonRpcService>;
 
-function getProviderAndSigner(): {
-  JsonRpcProvider: ethers.providers.JsonRpcProvider;
-  JsonRpcSigner: ethers.providers.JsonRpcSigner;
-} {
-  const JsonRpcProvider = new ethers.providers.JsonRpcProvider(JsonRpcHashioUrl.testnet);
-  /**
-   * getSigner() requires any solidity address to be passed in as a parameter.
-   * Otherwise, the following error is throw in the console:
-   * unknown account #0 (operation="getAddress", code=UNSUPPORTED_OPERATION, version=providers/5.6.4)
-   * The root cause of this behavior has not yet been identified.
-   */
-  const placeholderAddress = AccountId.fromString(TOKEN_USER_ID).toSolidityAddress();
-  const JsonRpcSigner = JsonRpcProvider.getSigner(placeholderAddress);
-  return { JsonRpcProvider, JsonRpcSigner };
+export function createJsonRpcService(walletAccountId: string = TOKEN_USER_ID) {
+  let JsonRpcProvider: ethers.providers.JsonRpcProvider;
+  let JsonRpcSigner: ethers.providers.JsonRpcSigner;
+
+  function init(walletAccountId: string = TOKEN_USER_ID) {
+    setJsonRpcProviderAndSigner(walletAccountId);
+    return {
+      ...Factory,
+      ...Pair,
+      ...Governor,
+      ...Configuration,
+      ...GODHolder,
+      getJsonRpcProviderAndSigner,
+      setJsonRpcProviderAndSigner,
+    };
+  }
+
+  function getJsonRpcProviderAndSigner(): {
+    JsonRpcProvider: ethers.providers.JsonRpcProvider;
+    JsonRpcSigner: ethers.providers.JsonRpcSigner;
+  } {
+    return { JsonRpcProvider, JsonRpcSigner };
+  }
+
+  function setJsonRpcProviderAndSigner(walletAccountId: string = TOKEN_USER_ID) {
+    JsonRpcProvider = new ethers.providers.JsonRpcProvider(JsonRpcHashioUrl.testnet);
+    /**
+     * getSigner() requires any solidity address to be passed in as a parameter.
+     * Otherwise, the following error is throw in the console:
+     * unknown account #0 (operation="getAddress", code=UNSUPPORTED_OPERATION, version=providers/5.6.4)
+     * The root cause of this behavior has not yet been identified.
+     */
+    const walletAddress = AccountId.fromString(walletAccountId).toSolidityAddress();
+    JsonRpcSigner = JsonRpcProvider.getSigner(walletAddress);
+  }
+
+  return init(walletAccountId);
 }
-
-const { JsonRpcProvider, JsonRpcSigner } = getProviderAndSigner();
-
-function createJsonRpcService() {
-  return {
-    ...Factory,
-    ...Pair,
-    ...Governor,
-    ...Configuration,
-    ...GODHolder,
-  };
-}
-
-export type { JsonRpcServiceType };
-export { createJsonRpcService, JsonRpcProvider, JsonRpcSigner };

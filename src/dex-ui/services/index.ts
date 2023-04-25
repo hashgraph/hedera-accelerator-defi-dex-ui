@@ -14,15 +14,16 @@ const MirrorNodeService = createMirrorNodeService();
 const WalletService = createWalletService();
 const HederaService = createHederaService();
 const JsonRpcService = createJsonRpcService();
-/** TODO: Replace with React Queries */
-const QueryService = createDexService();
+const DexAPIService = createDexService();
 
 const initializeServices = async () => {
   await HederaService.initHederaService();
 };
 
+/** Should renamed to dexAPI */
 const DexService = {
-  ...QueryService,
+  /** Should be renamed to DexService */
+  ...DexAPIService,
   ...WalletService,
   ...JsonRpcService,
   ...MirrorNodeService,

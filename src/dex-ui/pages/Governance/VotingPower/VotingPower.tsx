@@ -67,7 +67,7 @@ export const VotingPower = () => {
   }
 
   return (
-    <Flex direction="column" maxWidth="100%" padding="0px 80px 0px">
+    <Flex direction="column" maxWidth="100%" padding="16px 80px 0 80px">
       <Notification
         type={NotficationTypes.SUCCESS}
         message={successMessage}
@@ -81,7 +81,7 @@ export const VotingPower = () => {
       <Flex
         direction="row"
         alignItems="center"
-        height="88px"
+        height="120px"
         paddingTop={isNotificationVisible ? "30px" : "0px"}
         maxWidth="100%"
       >
@@ -99,14 +99,7 @@ export const VotingPower = () => {
           amount="$--.--"
         />
         <Spacer />
-        <HStack
-          height="96px"
-          padding="8px 24px"
-          gap="40px"
-          justify="right"
-          borderRadius="8px"
-          background={Color.Neutral._50}
-        >
+        <HStack padding="8px 24px" gap="40px" justify="right" borderRadius="8px" background={Color.Neutral._50}>
           <GOVTokenDetails
             lockedGODToken={godToken.locked}
             totalGODTokenBalance={godToken.total}
