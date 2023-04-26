@@ -58,7 +58,8 @@ export function GetTokensButton() {
       <Notification
         type={NotficationTypes.SUCCESS}
         textStyle="b3"
-        message={`1000 L49A, L49B, L49C, and L49D Tokens sent to the connected wallet (${receivingAccountId}).`}
+        message={`1000 LAB49A (0.0.8579), LAB49B (0.0.8581), and LAB49C (0.0.8583) 
+        Tokens sent to the connected wallet (${receivingAccountId}).`}
         isLinkShown={true}
         linkText="View in HashScan"
         linkRef={createHashScanTransactionLink(getL49Tokens.data?.transactionId.toString())}
@@ -68,12 +69,13 @@ export function GetTokensButton() {
       />
       <Link width="fit-content" color="#0180FF" onClick={handleClickSendL49TokensToWallet}>
         <Text variant="link" textDecoration="underline">
-          Send 1000 of each L49 Token to Wallet
+          Send 1000 of each LAB49 Token to Wallet
         </Text>
       </Link>
       <LoadingDialog
         isOpen={getL49Tokens.isLoading}
-        message={`Sending 1000 L49A, L49B, L49C, and L49D Tokens to the connected wallet (${receivingAccountId}).`}
+        message={`Sending 1000 LAB49A (0.0.8579), LAB49B (0.0.8581), and LAB49C (0.0.8583) 
+        Tokens to the connected wallet (${receivingAccountId}).`}
       />
       <LoadingDialog
         isOpen={getL49Tokens.isError}
