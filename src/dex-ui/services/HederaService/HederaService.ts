@@ -2,7 +2,6 @@ import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { BigNumber } from "bignumber.js";
 import {
   AccountId,
-  TokenId,
   ContractId,
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -11,7 +10,7 @@ import {
   TransactionResponse,
   Hbar,
 } from "@hashgraph/sdk";
-import { Contracts, Tokens, TOKEN_SYMBOL_TO_ACCOUNT_ID, TREASURY_ID } from "../constants";
+import { Contracts, Tokens, TREASURY_ID } from "../constants";
 import { PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
@@ -141,18 +140,10 @@ function createHederaService() {
     signer: HashConnectSigner
   ) => {
     const tokenQuantity = withPrecision(1000).toNumber();
-    const L49ATokenId = TokenId.fromString(Tokens.TokenAAccountId);
-    const L49BTokenId = TokenId.fromString(Tokens.TokenBAccountId);
-    const L49CTokenId = TokenId.fromString(Tokens.TokenCAccountId);
-    const L49DTokenId = TokenId.fromString(Tokens.TokenDAccountId);
     const targetAccountId = AccountId.fromString(receivingAccountId);
+    const tokenAccountIds = [Tokens.TokenBAccountId, Tokens.TokenBAccountId, Tokens.TokenCAccountId];
 
-    const tokensToAssociate = [
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenASymbol),
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenBSymbol),
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenCSymbol),
-      TOKEN_SYMBOL_TO_ACCOUNT_ID.get(Tokens.TokenDSymbol),
-    ].reduce((_tokensToAssociate: string[], tokenId: string | undefined) => {
+    const tokensToAssociate = tokenAccountIds.reduce((_tokensToAssociate: string[], tokenId: string | undefined) => {
       if (associatedTokenIds && !associatedTokenIds.includes(tokenId ?? "")) {
         _tokensToAssociate.push(tokenId || "");
       }
@@ -168,14 +159,12 @@ function createHederaService() {
     }
 
     const transaction = new TransferTransaction()
-      .addTokenTransfer(L49ATokenId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(L49ATokenId, targetAccountId, tokenQuantity)
-      .addTokenTransfer(L49BTokenId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(L49BTokenId, targetAccountId, tokenQuantity)
-      .addTokenTransfer(L49CTokenId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(L49CTokenId, targetAccountId, tokenQuantity)
-      .addTokenTransfer(L49DTokenId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(L49DTokenId, targetAccountId, tokenQuantity)
+      .addTokenTransfer(Tokens.TokenAAccountId, treasuryId, -tokenQuantity)
+      .addTokenTransfer(Tokens.TokenAAccountId, targetAccountId, tokenQuantity)
+      .addTokenTransfer(Tokens.TokenBAccountId, treasuryId, -tokenQuantity)
+      .addTokenTransfer(Tokens.TokenBAccountId, targetAccountId, tokenQuantity)
+      .addTokenTransfer(Tokens.TokenCAccountId, treasuryId, -tokenQuantity)
+      .addTokenTransfer(Tokens.TokenCAccountId, targetAccountId, tokenQuantity)
       .freezeWith(client);
 
     const signTx = await transaction.sign(treasuryKey);
