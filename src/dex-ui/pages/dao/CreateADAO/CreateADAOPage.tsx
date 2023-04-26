@@ -140,12 +140,12 @@ export function CreateADAOPage() {
   async function onSubmit(data: CreateADAOForm) {
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
-      const { governance, voting } = tokenDAOData;
+      const { governance, voting, type, name, logoUrl = "", isPublic } = tokenDAOData;
       return createDAO.mutate({
-        type: tokenDAOData.type,
-        name: tokenDAOData.name,
-        logoUrl: tokenDAOData.logoUrl ?? "",
-        isPrivate: !tokenDAOData.isPublic,
+        type,
+        name,
+        logoUrl,
+        isPrivate: !isPublic,
         tokenId: governance.token.id,
         treasuryWalletAccountId: governance.token.treasuryWalletAccountId,
         quorum: voting.quorum,

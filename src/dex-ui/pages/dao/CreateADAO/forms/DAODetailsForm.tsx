@@ -51,7 +51,7 @@ export function DAODetailsForm() {
           type: "text",
           placeholder: "Enter image URL",
           register: {
-            ...register("logoUrl", { required: { value: true, message: "A logo url is required." } }),
+            ...register("logoUrl"),
           },
         }}
         isInvalid={Boolean(errors.logoUrl)}
