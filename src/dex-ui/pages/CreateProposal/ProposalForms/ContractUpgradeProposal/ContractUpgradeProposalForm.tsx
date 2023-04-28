@@ -1,12 +1,11 @@
-import { FormControl, Input, FormErrorMessage, Flex, Button, Spacer, Text } from "@chakra-ui/react";
+import { FormControl, Input, FormErrorMessage, Flex, Button, Spacer } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
-import { ReactElement, useState, useEffect } from "react";
+import { ReactElement } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Color, TextEditor } from "../../../../../dex-ui-components";
-import { FileUploader, LoadingDialog } from "../../../../../dex-ui-components";
+import { TextEditor } from "../../../../../dex-ui-components";
+import { LoadingDialog } from "../../../../../dex-ui-components";
 import { CreateProposalType } from "../../../../hooks/governance/types";
-import { useDexContext } from "../../../../hooks";
 import { useContractUpgradeProposalDetails } from "./useContractUpgradeProposalDetails";
 import { CreateProposalLocationProps } from "../../CreateProposal";
 import { isValidUrl } from "../../utils";
@@ -26,8 +25,6 @@ export function ContractUpgradeProposalForm(): ReactElement {
   const {
     handleSubmit,
     register,
-    setValue,
-    reset,
     getValues,
     control,
     formState: { errors, isSubmitting },
@@ -35,27 +32,10 @@ export function ContractUpgradeProposalForm(): ReactElement {
 
   const handleCancelClick = () => navigate("/governance");
 
-  const {
-    deployContract,
-    createProposal,
-    isLoadingDialogOpen,
-    loadingDialogMessage,
-    isErrorDialogOpen,
-    errorDialogMessage,
-  } = useContractUpgradeProposalDetails();
-
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const [fileName, setFileName] = useState("");
-
-  const onFileReadAction = (file: string, fileName: string) => {
-    resetServerState();
-    setFileName(fileName);
-    deployContract.mutate({ abiFile: file });
-  };
+  const { createProposal, isLoadingDialogOpen, loadingDialogMessage, isErrorDialogOpen, errorDialogMessage } =
+    useContractUpgradeProposalDetails();
 
   async function onSubmit(data: ContractUpgradeProposalFormData) {
-    resetServerState();
-    const signer = wallet.getSigner();
     createProposal.mutate({
       type: CreateProposalType.ContractUpgrade,
       proposalData: {
@@ -64,27 +44,12 @@ export function ContractUpgradeProposalForm(): ReactElement {
         linkToDiscussion: data.linkToDiscussion,
         implementationAddress: data.newImplementationAddress,
         proxyAddress: data.proxyAddress,
-        signer,
       },
     });
   }
 
   function handleErrorDialogDismissButtonClicked() {
-    resetServerState();
-    resetFormValues();
-  }
-
-  function resetServerState() {
-    deployContract.reset();
     createProposal.reset();
-  }
-
-  function resetFormValues() {
-    setFileName("");
-    reset({
-      newImplementationAddress: "",
-      proxyAddress: "",
-    });
   }
 
   /**
@@ -101,21 +66,6 @@ export function ContractUpgradeProposalForm(): ReactElement {
     };
     navigate("/governance", createProposalLocationProps);
   }
-
-  /**
-   *  TODO: Setting the Disabled Form New Implementation Address field once the deploy contract return id
-   *        Hard Coded the Value for Proxy Address for now, need to change once the flow is decided.
-   *        Use Effect is needed here since we updating the component and Validating too with `shouldValidate` property
-   *        it re-renders the form again and can stuck in infinite loop.
-   */
-  useEffect(() => {
-    if (deployContract.data?.id) {
-      setValue("newImplementationAddress", deployContract.data?.id, { shouldValidate: true });
-      // TODO: Hard Coded proxy Address for now, need to discuss the final flow
-      setValue("proxyAddress", "0.0.49078140", { shouldValidate: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployContract.data?.id]);
 
   return (
     <>
@@ -164,25 +114,8 @@ export function ContractUpgradeProposalForm(): ReactElement {
             />
             <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>
           </FormControl>
-          <FormControl>
-            <Flex direction="column" justifyContent="right" gap="0.5rem">
-              <FileUploader
-                id="abiFile"
-                title="Drag and Drop your ABI file"
-                subTitle="or click to browse your files"
-                onHoverTitle="Drop your ABI file here ..."
-                onFileRead={onFileReadAction}
-              />
-              {fileName.length !== 0 ? (
-                <Text textStyle="b3" color={Color.Blue_02}>
-                  {fileName}
-                </Text>
-              ) : null}
-            </Flex>
-          </FormControl>
           <FormControl isInvalid={Boolean(errors.newImplementationAddress)}>
             <Input
-              disabled
               variant="form-input"
               id="newImplementationAddress"
               placeholder="New Implementation Address"

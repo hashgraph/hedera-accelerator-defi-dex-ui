@@ -5,7 +5,6 @@ export * from "./useHasVoted";
 export * from "./useProposal";
 export * from "./useClaimGODTokens";
 export * from "./useCreateProposal";
-export * from "./useDeployContract";
 export * from "./useCancelProposal";
 export * from "./useFetchLockedGovToken";
 export * from "./useCanUserUnlockGODToken";

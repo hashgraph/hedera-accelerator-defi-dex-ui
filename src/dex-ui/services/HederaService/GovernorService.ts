@@ -5,16 +5,12 @@ import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
   TransactionResponse,
-  FileCreateTransaction,
-  PublicKey,
-  ContractCreateTransaction,
-  FileAppendTransaction,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { Contracts, DEX_TOKEN_PRECISION_VALUE, TOKEN_USER_PUB_KEY } from "../constants";
+import { Contracts, DEX_TOKEN_PRECISION_VALUE } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { checkTransactionResponseForError, client } from "./utils";
+import { checkTransactionResponseForError } from "./utils";
 
 /**
  * General format of service calls:
@@ -272,45 +268,6 @@ const sendUnLockGODTokenTransaction = async (params: SendUnLockGODTokenTransacti
   return sendUnLockGODTokenResponse;
 };
 
-/**
- * TODO
- * @param params -
- * @returns
- */
-const deployABIFile = async (abiFile: string) => {
-  const compiledContract = JSON.parse(abiFile);
-  const contractByteCode = compiledContract.bytecode;
-  const userKey = PublicKey.fromString(TOKEN_USER_PUB_KEY);
-
-  const fileCreateTx = await new FileCreateTransaction().setKeys([userKey]).execute(client);
-  const fileCreateRx = await fileCreateTx.getReceipt(client);
-  const bytecodeFileId = fileCreateRx.fileId;
-
-  const fileAppendTx = await new FileAppendTransaction()
-    .setFileId(bytecodeFileId ?? "")
-    .setContents(contractByteCode)
-    .setMaxChunks(100)
-    .execute(client);
-  await fileAppendTx.getReceipt(client);
-
-  const contractCreateTx = await new ContractCreateTransaction()
-    .setAdminKey(userKey)
-    .setBytecodeFileId(bytecodeFileId ?? "")
-    .setConstructorParameters(new ContractFunctionParameters())
-    .setGas(9000000)
-    .execute(client);
-
-  const deployABIFileResponse = await contractCreateTx.getReceipt(client);
-  const contractId = deployABIFileResponse.contractId;
-  // client.close();
-
-  checkTransactionResponseForError(deployABIFileResponse, GovernorContractFunctions.DeployABIFile);
-  return {
-    id: contractId?.toString() ?? "",
-    address: "0x" + contractId?.toSolidityAddress() ?? "",
-  };
-};
-
 const GovernorService = {
   sendClaimGODTokenTransaction,
   castVote,
@@ -318,7 +275,6 @@ const GovernorService = {
   sendCreateTextProposalTransaction,
   sendCreateTransferTokenProposalTransaction,
   executeProposal,
-  deployABIFile,
   sendCreateContractUpgradeProposalTransaction,
   sendLockGODTokenTransaction,
   sendUnLockGODTokenTransaction,
