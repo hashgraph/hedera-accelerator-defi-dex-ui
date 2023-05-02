@@ -3,9 +3,9 @@ import { Color } from "../../dex-ui-components";
 
 interface NotFoundProps {
   message: string;
-  preLinkText: string;
-  linkText: string;
-  onLinkClick: () => void;
+  preLinkText?: string;
+  linkText?: string;
+  onLinkClick?: () => void;
 }
 
 export function NotFound(props: NotFoundProps) {

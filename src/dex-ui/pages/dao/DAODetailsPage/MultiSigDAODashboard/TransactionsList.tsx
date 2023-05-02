@@ -41,8 +41,8 @@ export function TransactionsList(props: TransactionsListProps) {
       <CardListLayout
         onTabChange={handleTabChange}
         tabFilters={<TabFilters filters={transactionTabs} />}
-        cardLists={[0, 0].map(() => (
-          <Accordion allowToggle={true}>
+        cardLists={[<></>, <></>].map((_, index) => (
+          <Accordion key={index} allowToggle={true}>
             {transactions.map((transaction, index) => (
               <TransactionDetails index={index} threshold={threshold} {...transaction} />
             ))}

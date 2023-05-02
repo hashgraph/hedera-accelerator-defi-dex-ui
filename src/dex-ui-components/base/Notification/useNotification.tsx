@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { TransactionState } from "../../../dex-ui/store/swapSlice";
-import { createHashScanTransactionLink } from "../../../dex-ui/utils";
+import { TransactionState } from "@store/swapSlice";
+import { createHashScanTransactionLink } from "@utils";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface UseNotificationProps {
   successMessage: string;
@@ -8,26 +9,39 @@ interface UseNotificationProps {
 }
 
 export function useNotification(props: UseNotificationProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { successMessage, transactionState } = props;
+  const transactionId = transactionState?.successPayload?.transactionId?.toString();
   const defaultVisibility =
-    Boolean(props.transactionState?.successPayload) &&
-    !props.transactionState?.errorMessage &&
-    !props.transactionState?.transactionWaitingToBeSigned;
+    Boolean(transactionState?.successPayload) &&
+    !transactionState?.errorMessage &&
+    !transactionState?.transactionWaitingToBeSigned;
 
   const [isNotificationVisible, setIsNotificationVisible] = useState(defaultVisibility);
   const [successNotificationMessage, setSuccessNotificationMessage] = useState("");
   const hashscanTransactionLink = createHashScanTransactionLink(
-    props.transactionState?.successPayload?.transactionId.toString() ?? ""
+    transactionState?.successPayload?.transactionId.toString() ?? ""
   );
 
   const isSuccessNotificationVisible = defaultVisibility && isNotificationVisible;
 
   useEffect(() => {
-    setSuccessNotificationMessage(props.successMessage);
+    setSuccessNotificationMessage(successMessage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNotificationVisible]);
 
+  useEffect(() => {
+    if (transactionId) {
+      setIsNotificationVisible(true);
+    } else {
+      setIsNotificationVisible(false);
+    }
+  }, [transactionId]);
+
   function handleCloseNotificationButtonClicked() {
     setIsNotificationVisible(false);
+    navigate(location.pathname, {});
   }
 
   return {
