@@ -21,11 +21,12 @@ export function MembersList(props: MembersListProps) {
       </Text>
       <Flex direction="row" minWidth="100%">
         <SimpleGrid minWidth="100%" columns={3} spacingX="2rem" spacingY="2rem">
-          {membersWithAdminFirst?.map((member) => {
+          {membersWithAdminFirst?.map((member, index) => {
             const { accountId } = member;
             const isAdmin = accountId === adminAccountId;
             return (
               <Flex
+                key={index}
                 direction="column"
                 bg={Color.White_02}
                 justifyContent="space-between"

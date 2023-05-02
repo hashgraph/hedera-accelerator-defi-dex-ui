@@ -4,4 +4,5 @@ export enum HTSMutations {
 
 export enum HTSQueries {
   AccountTokenBalances = "accountTokenBalances",
+  Token = "token",
 }

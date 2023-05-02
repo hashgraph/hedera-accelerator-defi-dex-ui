@@ -1,5 +1,5 @@
-import { Box, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
-import { Button, Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
+import { Button, Box, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
 import * as R from "ramda";
 import { TokenBalance } from "@hooks";
 interface AssetsListProps {
@@ -20,34 +20,39 @@ export function AssetsList(props: AssetsListProps) {
       </Text>
       <Flex direction="row" minWidth="100%">
         <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="2rem">
-          {assetsWithHBARFirst.map((asset) => (
-            <Flex
-              direction="column"
-              bg={Color.White_02}
-              justifyContent="space-between"
-              height="177px"
-              border={`1px solid ${Color.Neutral._200}`}
-              borderRadius="4px"
-              padding="1.5rem"
-            >
-              <Flex direction="row" justifyContent="space-between" gap="2">
-                <Box flexGrow="2">
-                  <Text textStyle="p medium semibold">{asset.name}</Text>
-                  <HashScanLink id={asset.tokenId} type={HashscanData.Token} />
-                </Box>
-                <Button isDisabled>Send</Button>
+          {assetsWithHBARFirst.map((asset, index) => {
+            const { name, tokenId, balance, symbol, value } = asset;
+            return (
+              <Flex
+                key={index}
+                direction="column"
+                bg={Color.White_02}
+                justifyContent="space-between"
+                height="177px"
+                border={`1px solid ${Color.Neutral._200}`}
+                borderRadius="4px"
+                padding="1.5rem"
+              >
+                <Flex direction="row" justifyContent="space-between" gap="2">
+                  <Box flexGrow="2">
+                    <Text textStyle="p medium semibold">{name}</Text>
+                    <HashScanLink id={tokenId} type={HashscanData.Token} />
+                  </Box>
+
+                  <Button isDisabled={true}>Send</Button>
+                </Flex>
+                <Divider />
+                <Flex direction="row" justifyContent="space-between">
+                  <Box flex="1">
+                    <MetricLabel label="BALANCE" value={`${balance} ${symbol}`} />
+                  </Box>
+                  <Box flex="1">
+                    <MetricLabel label="VALUE" value={value} />
+                  </Box>
+                </Flex>
               </Flex>
-              <Divider />
-              <Flex direction="row" justifyContent="space-between">
-                <Box flex="1">
-                  <MetricLabel label="BALANCE" value={`${asset.balance} ${asset.symbol}`} />
-                </Box>
-                <Box flex="1">
-                  <MetricLabel label="VALUE" value={asset.value} />
-                </Box>
-              </Flex>
-            </Flex>
-          ))}
+            );
+          })}
         </SimpleGrid>
       </Flex>
     </>

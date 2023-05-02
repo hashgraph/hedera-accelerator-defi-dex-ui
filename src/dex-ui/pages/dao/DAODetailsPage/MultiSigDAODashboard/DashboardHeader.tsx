@@ -1,14 +1,8 @@
 import { Text, Flex, HStack, Tag } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
-import { Button, Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData } from "@dex-ui-components";
-import { DexService, DAOType } from "@services";
-import { useDexContext } from "@hooks";
-
-/**
- * TODO: For demo and testing purposes only. Remove this constant once the send transcation flow
- * is implemented.
- */
-const LAB49_TOKEN = "0.0.8579";
+import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData } from "@dex-ui-components";
+import { DAOType } from "@services";
+import { MultiSigTransactionModal } from "../MultiSigTransactionModal";
 
 interface DashboardHeaderProps {
   daoAccountId: string;
@@ -18,23 +12,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
   const { daoAccountId, safeAccountId, name, type } = props;
-
-  /**
-   * TODO: For demo and testing purposes only. Remove this function and replace with a proper UI flow.
-   */
-  function handleClickSendTransaction() {
-    DexService.sendProposeTransferTransaction({
-      tokenId: LAB49_TOKEN,
-      receiverId: safeAccountId,
-      amount: 1,
-      decimals: 8,
-      multiSigDAOContractId: daoAccountId,
-      signer,
-    });
-  }
 
   return (
     <Flex bg={Color.White_02} direction="column" padding="24px 80px 16px">
@@ -65,9 +43,11 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           <Flex height="40px" alignItems="center">
             <Breadcrumb to="/daos" as={ReachLink} label="Back to DAOs" leftIcon={<ArrowLeftIcon />} />
           </Flex>
-          <Button variant="primary" onClick={handleClickSendTransaction}>
-            {"Send Transaction (Test with 1 LAB49 Token)"}
-          </Button>
+          <MultiSigTransactionModal
+            openDialogButtonText="Send Token"
+            daoAccountId={daoAccountId}
+            safeAccountId={safeAccountId}
+          />
         </Flex>
       </Flex>
     </Flex>

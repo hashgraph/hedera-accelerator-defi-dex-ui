@@ -2,6 +2,7 @@ import { Text, Flex, AccordionItem, AccordionButton, AccordionIcon, AccordionPan
 import { Color } from "@dex-ui-components";
 import BigNumber from "bignumber.js";
 import { Transaction } from "@hooks";
+
 interface TransactionDetailsProps extends Transaction {
   threshold: number;
   index: number;

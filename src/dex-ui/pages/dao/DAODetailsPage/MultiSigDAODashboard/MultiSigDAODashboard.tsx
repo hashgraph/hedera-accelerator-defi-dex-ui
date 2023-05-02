@@ -1,6 +1,6 @@
-import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { LoadingSpinnerLayout, Page, PageLayout } from "@layouts";
-import { Color } from "@dex-ui-components";
+import { Color, Notification, NotficationTypes, useNotification } from "@dex-ui-components";
 import { useAccountTokenBalances, useTabFilters } from "@hooks";
 import { TransactionsList } from "./TransactionsList";
 import { MembersList } from "./MembersList";
@@ -8,6 +8,7 @@ import { AssetsList } from "./AssetsList";
 import { DashboardOverview } from "./DashboardOverview";
 import { DashboardHeader } from "./DashboardHeader";
 import { MultiSigDAODetails } from "@services";
+import { useLocation } from "react-router-dom";
 
 export interface Member {
   name: string;
@@ -23,6 +24,12 @@ interface MultiSigDAODashboardProps {
 export function MultiSigDAODashboard(props: MultiSigDAODashboardProps) {
   const { dao } = props;
   const { handleTabChange } = useTabFilters();
+  const location = useLocation();
+  const notification = useNotification({
+    successMessage: location.state?.createDAOSuccessMessage,
+    transactionState: location.state?.transactionState,
+  });
+
   const useAccountTokenBalancesQueryResults = useAccountTokenBalances(dao?.safeId);
   const { error, isSuccess, isError, isLoading, data: tokenBalances } = useAccountTokenBalancesQueryResults;
 
@@ -46,14 +53,34 @@ export function MultiSigDAODashboard(props: MultiSigDAODashboardProps) {
       accountId: ownerId,
     }));
     const memberCount = members.length;
-    const tokenCount = tokenBalances.length + 1;
+    const tokenCount = tokenBalances.length;
     const totalAssetValue = tokenBalances.reduce((total, token) => total + token.value, 0);
 
     return (
       <Page
         gap={0}
         type={PageLayout.Dashboard}
-        header={<DashboardHeader daoAccountId={accountId} safeAccountId={safeId} name={name} type={type} />}
+        header={
+          <>
+            {notification.isSuccessNotificationVisible && (
+              <Center>
+                <Box padding="16px 80px 0 80px" maxWidth="fit-content" paddingTop="1rem">
+                  <Notification
+                    type={NotficationTypes.SUCCESS}
+                    textStyle="b3"
+                    message={notification.successNotificationMessage}
+                    isLinkShown={true}
+                    linkText="View in HashScan"
+                    linkRef={notification.hashscanTransactionLink}
+                    isCloseButtonShown={true}
+                    handleClickClose={notification.handleCloseNotificationButtonClicked}
+                  />
+                </Box>
+              </Center>
+            )}
+            <DashboardHeader daoAccountId={accountId} safeAccountId={safeId} name={name} type={type} />
+          </>
+        }
         body={
           <Tabs onChange={handleTabChange} isLazy bg={Color.White_02}>
             <Flex flex="row" padding="0px 80px">
