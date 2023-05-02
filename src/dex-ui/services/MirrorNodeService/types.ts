@@ -48,6 +48,14 @@ interface MirrorNodeTokenById {
   };
 }
 
+interface MirrorNodeAccountById {
+  account: string;
+  key: {
+    _type: string;
+    key: string;
+  };
+}
+
 interface MirrorNodeTokenPairResponse {
   data: { contract_id: string };
 }
@@ -146,4 +154,5 @@ export type {
   MirrorNodeProposalEventLog,
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
+  MirrorNodeAccountById,
 };

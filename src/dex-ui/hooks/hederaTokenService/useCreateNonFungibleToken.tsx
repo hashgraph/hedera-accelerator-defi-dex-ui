@@ -4,23 +4,22 @@ import { useMutation } from "react-query";
 import { DexService } from "../../services";
 import { useDexContext } from "../useDexContext";
 
-export interface UseCreateTokenParams {
+export interface UseCreateNFTParams {
   name: string;
   symbol: string;
-  initialSupply: number;
-  decimals: number;
-  supplyKey: string;
+  maxSupply: number;
   treasuryAccountId: string;
+  supplyKey: string;
 }
 
-export function useCreateToken(handleCreateTokenSuccessful: () => void) {
+export function useCreateNonFungibleToken(handleCreateTokenSuccessful: () => void) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
   const signer = wallet.getSigner();
-  return useMutation<TransactionResponse, Error, UseCreateTokenParams, HTSMutations.CreateToken>(
-    (params: UseCreateTokenParams) => {
-      return DexService.createToken({ ...params, signer });
+  return useMutation<TransactionResponse, Error, UseCreateNFTParams, HTSMutations.CreateToken>(
+    (params: UseCreateNFTParams) => {
+      return DexService.createNFT({ ...params, signer });
     },
     {
       onSuccess: () => {

@@ -7,6 +7,7 @@ export interface TokenDAOGovernanceData {
     decimals: number;
     logo: string;
     initialSupply: number;
+    supplyKey: string;
     id: string;
     treasuryWalletAccountId: string;
   };
@@ -23,6 +24,25 @@ export interface TokenDAOVotingData {
 export interface MultiSigDAOGovernanceData {
   admin: string;
   owners: Record<"value", string>[];
+}
+
+export interface NFTDAOGovernanceData {
+  nft: {
+    name: string;
+    symbol: string;
+    logo: string;
+    maxSupply: number;
+    supplyKey: string;
+    id: string;
+    treasuryWalletAccountId: string;
+  };
+}
+
+export interface NFTDAOVotingData {
+  minProposalDeposit: number;
+  quorum: number;
+  duration: number;
+  lockingPeriod: number;
 }
 
 export interface MultiSigDAOVotingData {
@@ -47,4 +67,9 @@ export interface CreateAMultiSigDAOForm extends CreateADAOFormBase {
   voting: MultiSigDAOVotingData;
 }
 
-export type CreateADAOForm = CreateATokenDAOForm | CreateAMultiSigDAOForm;
+export interface CreateANFTDAOForm extends CreateADAOFormBase {
+  governance: NFTDAOGovernanceData;
+  voting: NFTDAOVotingData;
+}
+
+export type CreateADAOForm = CreateATokenDAOForm | CreateAMultiSigDAOForm | CreateANFTDAOForm;

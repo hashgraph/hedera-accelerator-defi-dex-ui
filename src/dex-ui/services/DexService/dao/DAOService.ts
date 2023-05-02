@@ -7,14 +7,17 @@ import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../abi/MultiSigDAO.json";
+
 import {
   MultiSigDAODetails,
   MultiSigDAOCreatedEventArgs,
   DAOType,
   GovernanceDAODetails,
+  NFTDAODetails,
   GovernanceDAOCreatedEventArgs,
   DAO,
   DAOEvents,
+  NFTDAOCreatedEventArgs,
 } from "./types";
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
@@ -65,10 +68,37 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
   });
 }
 
+async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
+  //TODO: Change the ABI to NFTDAOFactory, for now its not working for fetching the NFT logs using NFTDAOFactory ABI
+  const logs = await DexService.fetchParsedEventLogs(
+    Contracts.NFTDAOFactory.ProxyId,
+    new ethers.utils.Interface(GovernanceDAOFactoryJSON.abi),
+    eventTypes
+  );
+  return logs.map((log): NFTDAODetails => {
+    const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args);
+    const { daoAddress, admin, name, logoUrl, isPrivate, tokenAddress, quorumThreshold, votingDelay, votingPeriod } =
+      argsWithName;
+    return {
+      type: DAOType.NFT,
+      accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
+      adminId: AccountId.fromSolidityAddress(admin).toString(),
+      name,
+      logoUrl,
+      isPrivate,
+      tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
+      quorumThreshold: quorumThreshold.toNumber(),
+      votingDelay: votingDelay.toNumber(),
+      votingPeriod: votingPeriod.toNumber(),
+    };
+  });
+}
+
 export async function fetchAllDAOs(): Promise<DAO[]> {
   const daos = await Promise.all([
     fetchMultiSigDAOs([DAOEvents.DAOCreated]),
     fetchGovernanceDAOs([DAOEvents.DAOCreated]),
+    fetchNFTDAOs([DAOEvents.DAOCreated]),
   ]);
   return daos.flat();
 }

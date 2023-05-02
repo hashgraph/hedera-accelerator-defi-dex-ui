@@ -3,6 +3,7 @@ import { BigNumber } from "ethers";
 export enum DAOType {
   GovernanceToken = "Governance Token",
   MultiSig = "MultiSig",
+  NFT = "NFT",
 }
 export interface DAOCreatedEventArgs {
   daoAddress: string;
@@ -13,6 +14,13 @@ export interface DAOCreatedEventArgs {
 }
 
 export interface GovernanceDAOCreatedEventArgs extends DAOCreatedEventArgs {
+  tokenAddress: string;
+  quorumThreshold: BigNumber;
+  votingDelay: BigNumber;
+  votingPeriod: BigNumber;
+}
+
+export interface NFTDAOCreatedEventArgs extends DAOCreatedEventArgs {
   tokenAddress: string;
   quorumThreshold: BigNumber;
   votingDelay: BigNumber;
@@ -38,6 +46,19 @@ export interface GovernanceDAODetails {
   votingPeriod: number;
 }
 
+export interface NFTDAODetails {
+  type: DAOType.NFT;
+  accountId: string;
+  adminId: string;
+  name: string;
+  logoUrl: string;
+  isPrivate: boolean;
+  tokenId: string;
+  quorumThreshold: number;
+  votingDelay: number;
+  votingPeriod: number;
+}
+
 export interface MultiSigDAODetails {
   type: DAOType.MultiSig;
   accountId: string;
@@ -50,7 +71,7 @@ export interface MultiSigDAODetails {
   threshold: number;
 }
 
-export type DAO = MultiSigDAODetails | GovernanceDAODetails;
+export type DAO = MultiSigDAODetails | GovernanceDAODetails | NFTDAODetails;
 
 export enum DAOEvents {
   DAOCreated = "DAOCreated",

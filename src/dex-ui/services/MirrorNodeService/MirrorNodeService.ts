@@ -8,6 +8,7 @@ import {
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
   MirrorNodeEventLog,
+  MirrorNodeAccountById,
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
@@ -245,6 +246,11 @@ function createMirrorNodeService() {
     return proposals;
   };
 
+  const fetchAccountInfo = async (accountAddress: string): Promise<MirrorNodeAccountById> => {
+    const { data: accountData } = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${accountAddress}`);
+    return accountData;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenBalances,
@@ -254,6 +260,7 @@ function createMirrorNodeService() {
     fetchTokenData,
     callContract,
     fetchParsedEventLogs,
+    fetchAccountInfo,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
   };

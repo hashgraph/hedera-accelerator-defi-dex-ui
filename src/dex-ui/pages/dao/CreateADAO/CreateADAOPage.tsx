@@ -12,9 +12,12 @@ import {
   MultiSigDAOGovernanceForm,
   MultiSigDAOVotingForm,
   MultiSigDAOReviewForm,
+  NFTDAOGovernanceForm,
+  NFTDAOVotingForm,
+  NFTDAOReviewForm,
 } from "./forms";
 import { useNavigate } from "react-router-dom";
-import { CreateADAOForm, CreateAMultiSigDAOForm, CreateATokenDAOForm } from "./types";
+import { CreateADAOForm, CreateAMultiSigDAOForm, CreateATokenDAOForm, CreateANFTDAOForm } from "./types";
 import { useCreateDAO } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -60,18 +63,21 @@ export function CreateADAOPage() {
   function GovernanceForm() {
     if (type === DAOType.GovernanceToken) return <TokenDAOGovernanceForm />;
     if (type === DAOType.MultiSig) return <MultiSigDAOGovernanceForm />;
+    if (type === DAOType.NFT) return <NFTDAOGovernanceForm />;
     return <>Please select a DAO type to configure governance rules.</>;
   }
 
   function VotingForm() {
     if (type === DAOType.GovernanceToken) return <TokenDAOVotingForm />;
     if (type === DAOType.MultiSig) return <MultiSigDAOVotingForm />;
+    if (type === DAOType.NFT) return <NFTDAOVotingForm />;
     return <>Please select a DAO type to configure voting rules.</>;
   }
 
   function ReviewForm() {
     if (type === DAOType.GovernanceToken) return <TokenDAOReviewForm />;
     if (type === DAOType.MultiSig) return <MultiSigDAOReviewForm />;
+    if (type === DAOType.NFT) return <NFTDAOReviewForm />;
     return <></>;
   }
 
@@ -118,12 +124,14 @@ export function CreateADAOPage() {
         if (type === DAOType.GovernanceToken)
           return trigger(["governance.token.id", "governance.token.treasuryWalletAccountId"]);
         if (type === DAOType.MultiSig) return trigger(["governance.admin"]);
+        if (type === DAOType.NFT) return trigger(["governance.nft.id", "governance.nft.treasuryWalletAccountId"]);
         return triggerDefaultValidations();
       }
       case 3: {
         if (type === DAOType.GovernanceToken)
           return trigger(["voting.quorum", "voting.duration", "voting.lockingPeriod"]);
         if (type === DAOType.MultiSig) return trigger(["voting.threshold"]);
+        if (type === DAOType.NFT) return trigger(["voting.quorum", "voting.duration", "voting.duration"]);
         return triggerDefaultValidations();
       }
       default: {
@@ -164,6 +172,21 @@ export function CreateADAOPage() {
         owners: governance.owners.map((owner) => owner.value),
         threshold: voting.threshold,
         isPrivate: !isPublic,
+      });
+    }
+    if (data.type === DAOType.NFT) {
+      const nftDAOData = data as CreateANFTDAOForm;
+      const { type, name, logoUrl = "", isPublic, governance, voting } = nftDAOData;
+      return createDAO.mutate({
+        type,
+        name,
+        logoUrl,
+        isPrivate: !isPublic,
+        tokenId: governance.nft.id,
+        treasuryWalletAccountId: governance.nft.treasuryWalletAccountId,
+        quorum: voting.quorum,
+        votingDuration: voting.duration,
+        lockingDuration: voting.lockingPeriod,
       });
     }
   }

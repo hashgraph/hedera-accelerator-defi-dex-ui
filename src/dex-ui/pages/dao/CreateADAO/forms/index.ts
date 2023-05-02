@@ -6,3 +6,6 @@ export * from "./TokenDAOReviewForm";
 export * from "./MultiSigDAOGovernanceForm";
 export * from "./MultiSigDAOVotingForm";
 export * from "./MultiSigDAOReviewForm";
+export * from "./NFTDAOGovernanceForm";
+export * from "./NFTDAOVotingForm";
+export * from "./NFTDAOReviewForm";
