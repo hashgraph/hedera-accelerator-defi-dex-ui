@@ -1,4 +1,11 @@
-import { AccountId, TokenCreateTransaction, AccountAllowanceApproveTransaction } from "@hashgraph/sdk";
+import {
+  AccountId,
+  TokenCreateTransaction,
+  AccountAllowanceApproveTransaction,
+  TokenType,
+  TokenSupplyType,
+  PublicKey,
+} from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
 
@@ -19,6 +26,7 @@ interface CreateTokenParams {
   name: string;
   symbol: string;
   initialSupply: number;
+  supplyKey: string;
   decimals: number;
   treasuryAccountId: string;
   signer: HashConnectSigner;
@@ -31,6 +39,7 @@ interface CreateTokenParams {
  */
 async function createToken(params: CreateTokenParams) {
   const treasury = AccountId.fromString(params.treasuryAccountId);
+  const key = PublicKey.fromString(params.supplyKey);
   const createTokenTransaction = await new TokenCreateTransaction()
     .setTokenName(params.name)
     .setTokenSymbol(params.symbol)
@@ -39,6 +48,11 @@ async function createToken(params: CreateTokenParams) {
     .setTreasuryAccountId(treasury)
     .setAutoRenewAccountId(treasury)
     .setAutoRenewPeriod(7000000)
+    .setAdminKey(key)
+    .setWipeKey(key)
+    .setFreezeKey(key)
+    .setPauseKey(key)
+    .setSupplyKey(key)
     .freezeWithSigner(params.signer);
   const response = await createTokenTransaction.executeWithSigner(params.signer);
   checkTransactionResponseForError(response, TokenServiceFunctions.CreateToken);
@@ -70,9 +84,50 @@ async function setTokenAllowance(params: SetTokenAllowanceParams) {
   checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
 }
 
+interface CreateNFTParams {
+  name: string;
+  symbol: string;
+  maxSupply: number;
+  supplyKey: string;
+  treasuryAccountId: string;
+  signer: HashConnectSigner;
+}
+
+/**
+ * TODO
+ * @param params -
+ * @returns
+ */
+async function createNFT(params: CreateNFTParams) {
+  const treasury = AccountId.fromString(params.treasuryAccountId);
+  const key = PublicKey.fromString(params.supplyKey);
+  const createNFTTransaction = await new TokenCreateTransaction()
+    .setTokenName(params.name)
+    .setTokenSymbol(params.symbol)
+    .setAdminKey(key)
+    .setWipeKey(key)
+    .setFreezeKey(key)
+    .setPauseKey(key)
+    .setSupplyKey(key)
+    .setTokenType(TokenType.NonFungibleUnique)
+    .setDecimals(0)
+    .setInitialSupply(0)
+    .setSupplyType(TokenSupplyType.Finite)
+    .setMaxSupply(params.maxSupply)
+    .setTreasuryAccountId(treasury)
+    .setAutoRenewAccountId(treasury)
+    .setAutoRenewPeriod(7000000)
+    .freezeWithSigner(params.signer);
+
+  const response = await createNFTTransaction.executeWithSigner(params.signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.CreateToken);
+  return response;
+}
+
 const TokenService = {
   createToken,
   setTokenAllowance,
+  createNFT,
 };
 
 export default TokenService;

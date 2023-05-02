@@ -124,5 +124,14 @@
     "hash": "66a7ddd9cc3475d3f866cff82ed53ead",
     "transparentProxyAddress": "0x000000000000000000000000000000000042d9a9",
     "transparentProxyId": "0.0.4381097"
+  },
+  {
+    "name": "nftdaofactory",
+    "id": "0.0.4412393",
+    "address": "0x00000000000000000000000000000000004353e9",
+    "timestamp": "2023-04-26T06:53:35.939Z",
+    "hash": "ae29fcbdb639bdc3a1077c1beb9a059a",
+    "transparentProxyAddress": "0x00000000000000000000000000000000004353f6",
+    "transparentProxyId": "0.0.4412406"
   }
 ]

@@ -1,5 +1,6 @@
 export enum HTSMutations {
   CreateToken = "CreateToken",
+  AccountInfo = "accountInfo",
 }
 
 export enum HTSQueries {

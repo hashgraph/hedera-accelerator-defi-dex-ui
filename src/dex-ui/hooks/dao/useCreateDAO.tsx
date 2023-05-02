@@ -16,6 +16,17 @@ interface UseCreateGovernanceDAOParams {
   lockingDuration: number;
 }
 
+interface UseCreateNFTDAOParams {
+  name: string;
+  logoUrl: string;
+  isPrivate: boolean;
+  treasuryWalletAccountId: string;
+  tokenId: string;
+  quorum: number;
+  votingDuration: number;
+  lockingDuration: number;
+}
+
 interface UseCreateMultiSigDAOParams {
   admin: string;
   name: string;
@@ -25,7 +36,7 @@ interface UseCreateMultiSigDAOParams {
   isPrivate: boolean;
 }
 
-type UseCreateDAOParams = (UseCreateGovernanceDAOParams | UseCreateMultiSigDAOParams) & {
+type UseCreateDAOParams = (UseCreateGovernanceDAOParams | UseCreateMultiSigDAOParams | UseCreateNFTDAOParams) & {
   type: DAOType;
 };
 
@@ -45,6 +56,10 @@ export function useCreateDAO(handleCreateDAOSuccess: (transactionResponse: Trans
       if (type === DAOType.MultiSig) {
         const multiSigDAOData = data as UseCreateMultiSigDAOParams;
         return DexService.sendCreateMultiSigDAOTransaction({ ...multiSigDAOData, signer });
+      }
+      if (type === DAOType.NFT) {
+        const nftDAOData = data as UseCreateNFTDAOParams;
+        return DexService.sendCreateNFTDAOTransaction({ ...nftDAOData, signer });
       }
     },
     {

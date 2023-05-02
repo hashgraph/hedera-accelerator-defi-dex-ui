@@ -5,6 +5,8 @@ import {
   CreateADAOForm,
   MultiSigDAOGovernanceData,
   MultiSigDAOVotingData,
+  NFTDAOGovernanceData,
+  NFTDAOVotingData,
   TokenDAOGovernanceData,
   TokenDAOVotingData,
 } from "../types";
@@ -24,18 +26,16 @@ const newDAOOptions = [
     type: DAOType.MultiSig,
     description: "Governance rights and voting power are concentrated in a centralized group.",
   },
-  /* TODO: For a future version of the form.  
-    {
-      name: DAOType.NFT,
-      type: DAOType.NFT,
-      description: "Governance rights and voting power are determined by ownership of an NFT.",
-    }, 
-  */
+  {
+    name: DAOType.NFT,
+    type: DAOType.NFT,
+    description: "Governance rights and voting power are determined by ownership of an NFT.",
+  },
 ];
 
 function getDefaultFormValues(type: DAOType): {
-  governance: TokenDAOGovernanceData | MultiSigDAOGovernanceData;
-  voting: TokenDAOVotingData | MultiSigDAOVotingData;
+  governance: TokenDAOGovernanceData | MultiSigDAOGovernanceData | NFTDAOGovernanceData;
+  voting: TokenDAOVotingData | MultiSigDAOVotingData | NFTDAOVotingData;
 } {
   if (type === DAOType.MultiSig) {
     return {
@@ -47,15 +47,37 @@ function getDefaultFormValues(type: DAOType): {
         threshold: 1,
       },
     };
+  } else if (type === DAOType.GovernanceToken) {
+    return {
+      governance: {
+        token: {
+          name: "",
+          symbol: "",
+          decimals: 0,
+          supplyKey: "",
+          logo: "",
+          initialSupply: 0,
+          id: "",
+          treasuryWalletAccountId: "",
+        },
+      },
+      voting: {
+        minProposalDeposit: 0,
+        quorum: 0,
+        duration: 0,
+        lockingPeriod: 0,
+        strategy: "",
+      },
+    };
   }
   return {
     governance: {
-      token: {
+      nft: {
         name: "",
         symbol: "",
-        decimals: 0,
+        supplyKey: "",
         logo: "",
-        initialSupply: 0,
+        maxSupply: 0,
         id: "",
         treasuryWalletAccountId: "",
       },
