@@ -27,6 +27,7 @@ import {
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
+import { TokenTransactionDetails } from "@dex-ui/pages/dao/TokenTransactionDetails";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -56,9 +57,7 @@ export const router = createBrowserRouter(
         <Route path={"multisig/:accountId"} element={<MultiSigDAODashboard />}>
           <Route index element={<Navigate to="dashboard" />} />
           <Route path={"dashboard"} element={<DashboardOverview />} />
-          <Route path={"transactions"} element={<TransactionsList />}>
-            {/* TODO: <Route path={":transactionHash"} element={<TransactionDetails />} /> */}
-          </Route>
+          <Route path={"transactions"} element={<TransactionsList />} />
           <Route path={"assets"} element={<AssetsList />} />
           <Route path={"members"} element={<MembersList />} />
           <Route path={"settings"} element={<Settings />} />
@@ -70,6 +69,7 @@ export const router = createBrowserRouter(
         <Route path={"multisig/:accountId/settings/delete-member/:memberId"} element={<DeleteMember />} />
         <Route path={"multisig/:accountId/settings/replace-member/:memberId"} element={<ReplaceMember />} />
         <Route path={"multisig/:accountId/settings/change-threshold"} element={<ChangeThreshold />} />
+        <Route path={"multisig/:accountId/transactions/:transactionHash"} element={<TokenTransactionDetails />} />
       </Route>
       <Route
         path="*"

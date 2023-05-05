@@ -80,3 +80,8 @@ export enum DAOEvents {
   ExecutionSuccess = "ExecutionSuccess",
   ExecutionFailure = "ExecutionFailure",
 }
+
+export enum HederaGnosisSafeFunctions {
+  ApproveHash = "approveHash",
+  ExecuteTransation = "executeTransaction",
+}

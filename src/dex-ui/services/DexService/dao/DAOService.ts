@@ -1,14 +1,13 @@
 import { ethers } from "ethers";
-import { AccountId } from "@hashgraph/sdk";
-import { DexService } from "../..";
-import { Contracts } from "../../constants";
+import { BigNumber } from "bignumber.js";
+import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters } from "@hashgraph/sdk";
+import { DexService } from "@services";
+import { Contracts, Gas } from "../../constants";
 import { getEventArgumentsByName } from "../../utils";
 import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../abi/MultiSigDAO.json";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-
 import {
   MultiSigDAODetails,
   MultiSigDAOCreatedEventArgs,
@@ -19,7 +18,11 @@ import {
   DAO,
   DAOEvents,
   NFTDAOCreatedEventArgs,
+  HederaGnosisSafeFunctions,
 } from "./types";
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { checkTransactionResponseForError } from "@dex-ui/services/HederaService/utils";
+import { convertToByte32 } from "@utils";
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
   const logs = await DexService.fetchParsedEventLogs(
@@ -117,6 +120,7 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
       );
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;
+      eventClone.args.info.hexData = event.args.info.data;
       return eventClone;
     }
     return event;
@@ -221,4 +225,57 @@ export async function proposeChangeThreshold(params: ProposeChangeThresholdParam
     multiSigDAOContractId,
     signer,
   });
+}
+
+export async function sendApproveMultiSigTransaction(
+  safeId: string,
+  transactionHash: string,
+  signer: HashConnectSigner
+) {
+  const safeContractId = ContractId.fromString(safeId);
+  const utf8BytesTransactionHash = convertToByte32(transactionHash);
+  const contractFunctionParameters = new ContractFunctionParameters().addBytes32(utf8BytesTransactionHash);
+  const approveMultiSigTransaction = await new ContractExecuteTransaction()
+    .setContractId(safeContractId)
+    .setFunction(HederaGnosisSafeFunctions.ApproveHash, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const approveMultiSigTransactionResponse = await approveMultiSigTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(approveMultiSigTransactionResponse, HederaGnosisSafeFunctions.ApproveHash);
+  return approveMultiSigTransactionResponse;
+}
+
+interface ExecuteMultiSigTransactionParams {
+  safeId: string;
+  to: string;
+  value: number;
+  hexStringData: string;
+  operation: number;
+  nonce: number;
+  signer: HashConnectSigner;
+}
+
+export async function sendExecuteMultiSigTransaction(params: ExecuteMultiSigTransactionParams) {
+  const { safeId, to, value, hexStringData, operation, nonce, signer } = params;
+  const safeContractId = ContractId.fromString(safeId);
+  const toAddress = AccountId.fromString(to).toSolidityAddress();
+  const preciseValue = BigNumber(value);
+  const byteData = convertToByte32(hexStringData);
+
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddress(toAddress)
+    .addUint256(preciseValue)
+    .addBytes(byteData)
+    .addUint8(operation)
+    .addUint256(nonce);
+
+  const executeMultiSigTransaction = await new ContractExecuteTransaction()
+    .setContractId(safeContractId)
+    .setFunction(HederaGnosisSafeFunctions.ExecuteTransation, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+
+  const executeMultiSigTransactionResponse = await executeMultiSigTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(executeMultiSigTransactionResponse, HederaGnosisSafeFunctions.ExecuteTransation);
+  return executeMultiSigTransactionResponse;
 }

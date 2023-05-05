@@ -4,18 +4,18 @@ import numeral from "numeral";
 export const DefaultAmount = "--";
 export const DefaultPercent = "-.-%";
 
-const formatToUSD = (number: number) => (number ? numeral(number).format("$0,0.00") : DefaultAmount);
+export const formatToUSD = (number: number) => (number ? numeral(number).format("$0,0.00") : DefaultAmount);
 
-const formatToPercent = (number: number) => (number ? numeral(number).format("0.00%") : DefaultPercent);
+export const formatToPercent = (number: number) => (number ? numeral(number).format("0.00%") : DefaultPercent);
 
-const formatBigNumberToUSD = (bigNumber: BigNumber | undefined) => {
+export const formatBigNumberToUSD = (bigNumber: BigNumber | undefined) => {
   if (bigNumber === undefined) {
     return DefaultAmount;
   }
   return formatToUSD(bigNumber.toNumber());
 };
 
-const formatBigNumberToPercent = (bigNumber: BigNumber | undefined) => {
+export const formatBigNumberToPercent = (bigNumber: BigNumber | undefined) => {
   if (bigNumber === undefined) {
     return DefaultPercent;
   }
@@ -38,4 +38,6 @@ export function valueToPercentAsNumberWithPrecision(inputValue: number, precisio
   return percentAsNumber.shiftedBy(Math.log10(precision.toNumber()));
 }
 
-export { formatBigNumberToUSD, formatToUSD, formatBigNumberToPercent, formatToPercent };
+export function formatTokenAmountWithDecimal(amount: number, decimals: number): number {
+  return BigNumber(amount).shiftedBy(-decimals).toNumber();
+}

@@ -1,18 +1,20 @@
 import { Flex, Text, Skeleton } from "@chakra-ui/react";
 import { Color } from "../../themes";
+import { ReactElement, isValidElement } from "react";
+import { isNotNil } from "ramda";
 
 interface MetricLabelProps {
   label: string;
-  value: string | number;
+  value: string | number | ReactElement;
   isLoading?: boolean;
-  labelLeftIcon?: React.ReactElement;
-  labelRightIcon?: React.ReactElement;
+  labelLeftIcon?: ReactElement;
+  labelRightIcon?: ReactElement;
   labelTextColor?: string;
   labelTextStyle?: string;
   labelOpacity?: string;
   valueTextColor?: string;
   valueStyle?: string;
-  valueUnitSymbol?: string;
+  valueUnitSymbol?: string | ReactElement;
   valueUnitSymbolColor?: string;
   amount?: string;
   amountLabelColor?: string;
@@ -49,9 +51,11 @@ export const MetricLabel = (props: MetricLabelProps) => {
         <Flex flexDirection="column" align="flex-start" gap="0px">
           <Flex direction="row" gap="3px" alignItems="center">
             <Text textStyle={valueStyle} color={valueTextColor}>
-              {String(value)}
+              {isValidElement(value) ? value : String(value)}
             </Text>
-            {valueUnitSymbol ? (
+            {isValidElement(valueUnitSymbol) ? (
+              valueUnitSymbol
+            ) : isNotNil(valueUnitSymbol) ? (
               <Text textStyle="p medium medium" color={valueUnitSymbolColor}>
                 {valueUnitSymbol}
               </Text>

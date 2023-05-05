@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 /**
  * Determines whether the given `value` is iterable.
  * @param value - The value to check.
@@ -8,4 +10,8 @@ export function isIterable(value: any): boolean {
     return false;
   }
   return typeof value[Symbol.iterator] === "function";
+}
+
+export function convertToByte32(hexString: string): Uint8Array {
+  return ethers.utils.arrayify(ethers.utils.hexlify(hexString));
 }

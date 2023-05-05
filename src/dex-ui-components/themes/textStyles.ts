@@ -1,4 +1,4 @@
-import { Color } from "../../../themes/constants";
+import { Color } from "./color";
 
 const fontType = {
   // fontFamily: "Inter",

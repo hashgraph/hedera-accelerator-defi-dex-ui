@@ -82,6 +82,7 @@ export function MultiSigTransactionModal(props: MultiSigTransactionModalProps) {
       receiverId: recipientAccountId,
       amount: Number(amount),
       decimals,
+      safeId: safeAccountId,
       multiSigDAOContractId: daoAccountId,
     });
   }

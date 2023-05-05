@@ -182,9 +182,11 @@ function createMirrorNodeService() {
         order: "desc",
       },
     });
+
     const parsedEventLogs: LogDescription[] = logs.reduce((logs: LogDescription[], log: MirrorNodeEventLog) => {
       try {
         const parsedLog = contractInterface.parseLog({ data: log.data, topics: log.topics });
+
         if (shouldParseAllEvents || events?.includes(parsedLog.name)) {
           return logs.concat(parsedLog);
         } else {

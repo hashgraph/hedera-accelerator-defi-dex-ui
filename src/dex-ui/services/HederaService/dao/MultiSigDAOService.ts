@@ -12,6 +12,7 @@ import { BaseDAOContractFunctions, MultiSigDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
 import { Contracts } from "../../constants";
 import { ethers } from "ethers";
+import { DexService } from "@services";
 
 const Gas = 9000000;
 
@@ -56,14 +57,22 @@ interface SendProposeTransferTransaction {
   amount: number;
   decimals: number;
   multiSigDAOContractId: string;
+  safeId: string;
   signer: HashConnectSigner;
 }
 
 async function sendProposeTransferTransaction(params: SendProposeTransferTransaction) {
-  const { tokenId, receiverId, amount, decimals, multiSigDAOContractId, signer } = params;
+  const { tokenId, receiverId, safeId, amount, decimals, multiSigDAOContractId, signer } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
   const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
+  await DexService.setTokenAllowance({
+    tokenId,
+    walletId: signer.getAccountId().toString(),
+    spenderContractId: safeId,
+    tokenAmount: preciseAmount.toNumber(),
+    signer,
+  });
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(tokenSolidityAddress)
     .addAddress(receiverSolidityAddress)

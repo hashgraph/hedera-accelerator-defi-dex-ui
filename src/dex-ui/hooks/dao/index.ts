@@ -6,4 +6,6 @@ export * from "./useCreateAddMemberTransaction";
 export * from "./useCreateDeleteMemberTransaction";
 export * from "./useCreateReplaceMemberTransaction";
 export * from "./useCreateChangeThresholdTransaction";
+export * from "./useApproveTransaction";
+export * from "./useExecuteTransaction";
 export * from "./types";

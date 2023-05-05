@@ -1,5 +1,4 @@
-import { Color } from "../../themes";
-import { TextStyles } from "../Text";
+import { TextStyles, Color } from "../../themes";
 
 export const PaginationStyles = {
   ".pagination": {

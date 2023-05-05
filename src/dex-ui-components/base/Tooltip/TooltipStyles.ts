@@ -1,6 +1,5 @@
 import { defineStyleConfig } from "@chakra-ui/react";
-import { Color } from "../../themes/constants";
-import { TextStyles } from "../Text";
+import { Color, TextStyles } from "../../themes";
 
 const baseStyle = {
   ...TextStyles.b3,

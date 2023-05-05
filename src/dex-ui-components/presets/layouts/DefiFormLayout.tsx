@@ -1,16 +1,6 @@
 import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
 import { isEmpty } from "ramda";
 
-const defiFormLayoutStyles = {
-  templateColumns: "repeat(2, 1fr)",
-  bg: "white",
-  borderRadius: "15px",
-  maxWidth: "550px",
-  minWidth: "410px",
-  padding: "1.25rem",
-  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
-};
-
 interface DefiFormLayoutProps {
   title: React.ReactNode;
   settingsButton: React.ReactNode;
@@ -28,7 +18,7 @@ export function DefiFormLayout(props: DefiFormLayoutProps) {
   return (
     <Grid
       data-testid="defi-form-component" // use dynamic id here from props
-      sx={defiFormLayoutStyles}
+      layerStyle="defi-form"
     >
       <GridItem marginBottom={gridGap} colSpan={1}>
         {props.title}

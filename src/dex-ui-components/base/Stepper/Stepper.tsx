@@ -1,9 +1,9 @@
-import { Stepper, Step, StepLabel } from "@material-ui/core";
+import { Stepper, Step, StepLabel, Orientation } from "@material-ui/core";
 import { Color } from "../../themes";
 import { Flex } from "@chakra-ui/layout";
 import { Box, Text } from "@chakra-ui/react";
 import { StepperStyles } from "./StepperStyles";
-import { StepperState, ProposalStateIcon } from "./types";
+import { ProposalStateIcon, ProposalState } from "./types";
 import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon } from "../Icons";
 
 const GetStatusIcon = (iconType: string) => {
@@ -21,11 +21,16 @@ const GetStatusIcon = (iconType: string) => {
   }
 };
 
-function StepperUI(props: StepperState) {
-  const { states } = props;
+interface StepperUIProps {
+  states: ProposalState[];
+  orientation?: Orientation;
+}
+
+function StepperUI(props: StepperUIProps) {
+  const { orientation = "vertical", states } = props;
   return (
     <Box sx={StepperStyles} marginLeft="-10px">
-      <Stepper orientation="vertical">
+      <Stepper orientation={orientation}>
         {states.length !== 0 &&
           states.map((state) => {
             return (
