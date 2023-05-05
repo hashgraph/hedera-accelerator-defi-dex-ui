@@ -1,22 +1,19 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Color, MetricLabel } from "@dex-ui-components";
+import { useOutletContext } from "react-router-dom";
+import { MultiSigDAODetailsContext } from "./types";
 
-interface DashboardProps {
-  totalAssetValue: number;
-  tokenCount: number;
-  memberCount: number;
-  threshold: number;
-}
+export function DashboardOverview() {
+  const { dao, totalAssetValue, memberCount, tokenCount } = useOutletContext<MultiSigDAODetailsContext>();
+  const { threshold } = dao;
 
-export function DashboardOverview(props: DashboardProps) {
-  const { totalAssetValue, tokenCount, memberCount, threshold } = props;
   const totalAssetDisplay = totalAssetValue;
   const tokenCountDisplay = tokenCount;
   const memberCountDisplay = String(memberCount);
   const thresholdDisplay = `${String(threshold)} / ${String(memberCount)}`;
 
   return (
-    <Flex gap="8" direction="column">
+    <Flex gap="8" direction="column" paddingTop="1rem">
       <Flex gap="4" direction="column">
         <Text textStyle="h4 medium">Overview</Text>
         <Flex direction="row" gap="2">

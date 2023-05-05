@@ -1,14 +1,11 @@
 import { Button, Box, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
 import * as R from "ramda";
-import { TokenBalance } from "@hooks";
-interface AssetsListProps {
-  assets: TokenBalance[];
-  totalAssetValue: number;
-}
+import { useOutletContext } from "react-router-dom";
+import { MultiSigDAODetailsContext } from "./types";
 
-export function AssetsList(props: AssetsListProps) {
-  const { assets, totalAssetValue } = props;
+export function AssetsList() {
+  const { tokenBalances: assets, totalAssetValue } = useOutletContext<MultiSigDAODetailsContext>();
   // change to token id match
   const hbarIndex = assets?.findIndex((asset) => asset.name === "HBAR");
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap

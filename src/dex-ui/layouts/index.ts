@@ -7,3 +7,5 @@ export * from "./DefiFormContainer";
 export * from "./CardGridLayout";
 export * from "./NotFoundLayout";
 export * from "./LoadingSpinnerLayout";
+export * from "./AppLayout";
+export * from "./ErrorLayout";

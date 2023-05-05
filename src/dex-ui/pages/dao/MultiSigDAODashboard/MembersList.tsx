@@ -1,19 +1,17 @@
 import { Flex, SimpleGrid, Tag, Text } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData } from "@dex-ui-components";
 import * as R from "ramda";
-import { Member } from "./MultiSigDAODashboard";
+import { Member, MultiSigDAODetailsContext } from "./types";
+import { useOutletContext } from "react-router-dom";
 
-interface MembersListProps {
-  adminAccountId: string;
-  members: Member[];
-  memberCount: number;
-}
+export function MembersList() {
+  const { dao, memberCount, members } = useOutletContext<MultiSigDAODetailsContext>();
+  const { adminId } = dao;
 
-export function MembersList(props: MembersListProps) {
-  const { members, adminAccountId, memberCount } = props;
-  const adminIndex = members?.findIndex((member) => member.accountId === adminAccountId);
+  const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const membersWithAdminFirst: Member[] = R.swap(0, adminIndex, members);
+
   return (
     <>
       <Text textStyle="p medium medium" marginBottom="1rem">
@@ -23,7 +21,7 @@ export function MembersList(props: MembersListProps) {
         <SimpleGrid minWidth="100%" columns={3} spacingX="2rem" spacingY="2rem">
           {membersWithAdminFirst?.map((member, index) => {
             const { accountId } = member;
-            const isAdmin = accountId === adminAccountId;
+            const isAdmin = accountId === adminId;
             return (
               <Flex
                 key={index}
