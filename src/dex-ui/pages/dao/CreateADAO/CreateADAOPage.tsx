@@ -46,7 +46,7 @@ export function CreateADAOPage() {
   function handleCreateDAOSuccess(transactionResponse: TransactionResponse) {
     const createDAOSuccessMessage = `Created new 
     ${isPublic ? "public" : "private"} ${type} DAO "${name}".`;
-    navigate(Paths.DAOs.default, {
+    navigate(Paths.DAOs.absolute, {
       state: {
         createDAOSuccessMessage,
         transactionState: {
@@ -111,7 +111,7 @@ export function CreateADAOPage() {
 
   function handleCancelClicked() {
     reset();
-    navigate(Paths.DAOs.default);
+    navigate(Paths.DAOs.absolute);
   }
 
   async function validateStep(activeStep: number): Promise<boolean> {

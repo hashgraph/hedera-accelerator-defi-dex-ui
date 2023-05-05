@@ -110,7 +110,7 @@ export function MultiSigTransactionModal(props: MultiSigTransactionModalProps) {
     reset();
     setDialogsOpenState(false);
     const createDAOSuccessMessage = `Created new multisig transaction`;
-    navigate(`${Paths.DAOs.DAODetails}/${daoAccountId}`, {
+    navigate(`${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`, {
       state: {
         createDAOSuccessMessage,
         transactionState: {

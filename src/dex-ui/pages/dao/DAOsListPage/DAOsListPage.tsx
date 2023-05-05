@@ -18,7 +18,7 @@ export function DAOsListPage() {
   });
 
   function handleLinkClick() {
-    navigate(Paths.DAOs.CreateDAO);
+    navigate(Paths.DAOs.Create);
   }
 
   return (
@@ -43,7 +43,7 @@ export function DAOsListPage() {
           )}
           <PageHeader
             leftContent={[<Text textStyle="h2">DAOs</Text>]}
-            rightContent={[<PrimaryHeaderButton name="Create new DAO" route={Paths.DAOs.CreateDAO} />]}
+            rightContent={[<PrimaryHeaderButton name="Create new DAO" route={Paths.DAOs.Create} />]}
           />
         </>
       }

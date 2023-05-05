@@ -2,7 +2,6 @@ import { Text, Grid, GridItem, Flex, Card } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { Color } from "@dex-ui-components";
 import { useNavigate } from "react-router-dom";
-import { Paths } from "@routes";
 import { DAOType } from "@services";
 
 export interface DAOCardProps {
@@ -18,7 +17,8 @@ export function DAOCard(props: DAOCardProps) {
   const navigate = useNavigate();
 
   function handleDAOCardClicked() {
-    navigate(`${Paths.DAOs.DAODetails}/${accountId}`);
+    const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
+    navigate(`${daoTypePath}/${accountId}`);
   }
 
   return (

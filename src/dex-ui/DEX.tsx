@@ -1,29 +1,10 @@
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import { ChakraProvider, Container, Flex } from "@chakra-ui/react";
-import {
-  SwapPage,
-  AddLiquidityPage,
-  WithdrawPage,
-  Pools,
-  Governance,
-  ProposalDetails,
-  CreateProposal,
-  SelectProposalType,
-  CreatePoolPage,
-  DAOsListPage,
-  CreateADAOPage,
-  DAODetailsPage,
-} from "@pages";
-import { TopMenuBar } from "@layouts";
-import { Color } from "@dex-ui-components";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useWalletConnection } from "@hooks";
-import { ScrollToTop } from "@utils";
+import { ChakraProvider } from "@chakra-ui/react";
+import { RouterProvider } from "react-router-dom";
 import { DEXTheme } from "@theme";
-import { Paths } from "@routes";
+import { router } from "@routes";
 
-const menuOptions = ["Swap", "Pools", "Governance", "DAOs"];
 const SEVEN_SECONDS = 7 * 1000;
 
 const queryClient = new QueryClient({
@@ -45,43 +26,10 @@ const queryClient = new QueryClient({
 });
 
 const DEX = () => {
-  useWalletConnection();
   return (
     <ChakraProvider theme={DEXTheme}>
       <QueryClientProvider client={queryClient}>
-        <Container color="black" w="100%" maxWidth="100%" height="100vh" bg={Color.White_02} padding="0" margin="0">
-          <Router>
-            <ScrollToTop>
-              <TopMenuBar menuOptions={menuOptions} />
-              <Flex width="100%" minHeight="100%" paddingBottom="2rem">
-                <Routes>
-                  <Route path={Paths.Home} element={<Navigate to="/swap" />} />
-                  <Route path={Paths.Swap.default} element={<SwapPage />} />
-                  <Route path={Paths.Pools.default} element={<Pools />} />
-                  <Route path={`${Paths.Pools.AddLiquidity}/:pairId/:poolName`} element={<AddLiquidityPage />} />
-                  <Route path={Paths.Pools.Withdraw} element={<WithdrawPage />} />
-                  <Route path={Paths.Pools.CreatePool} element={<CreatePoolPage />} />
-                  <Route path={Paths.Governance.default} element={<Governance />} />
-                  <Route path={`${Paths.Governance.ProposalDetails}/:id`} element={<ProposalDetails />} />
-                  <Route path={Paths.Governance.SelectProposalType} element={<SelectProposalType />} />
-                  <Route path={Paths.Governance.CreateNewToken} element={<CreateProposal proposalType="new-token" />} />
-                  <Route path={Paths.Governance.CreateText} element={<CreateProposal proposalType="text" />} />
-                  <Route
-                    path={Paths.Governance.CreateTokenTransfer}
-                    element={<CreateProposal proposalType="token-transfer" />}
-                  />
-                  <Route
-                    path={Paths.Governance.CreateContractUpgrade}
-                    element={<CreateProposal proposalType="contract-upgrade" />}
-                  />
-                  <Route path={Paths.DAOs.default} element={<DAOsListPage />} />
-                  <Route path={Paths.DAOs.CreateDAO} element={<CreateADAOPage />} />
-                  <Route path={`${Paths.DAOs.DAODetails}/:accountId`} element={<DAODetailsPage />} />
-                </Routes>
-              </Flex>
-            </ScrollToTop>
-          </Router>
-        </Container>
+        <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={true} />
       </QueryClientProvider>
     </ChakraProvider>

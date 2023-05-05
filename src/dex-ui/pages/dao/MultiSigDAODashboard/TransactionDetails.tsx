@@ -1,7 +1,9 @@
-import { Text, Flex, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel } from "@chakra-ui/react";
+import { Text, Flex, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Button } from "@chakra-ui/react";
 import { Color } from "@dex-ui-components";
 import BigNumber from "bignumber.js";
 import { Transaction } from "@hooks";
+import { useNavigate } from "react-router-dom";
+import { Paths } from "@routes";
 
 interface TransactionDetailsProps extends Transaction {
   threshold: number;
@@ -9,7 +11,9 @@ interface TransactionDetailsProps extends Transaction {
 }
 
 export function TransactionDetails(props: TransactionDetailsProps) {
-  const { nonce, to, approvals, threshold, type, timestamp, status, amount, token } = props;
+  const { nonce, to, transactionHash, approvals, threshold, type, timestamp, status, amount, token } = props;
+  const navigate = useNavigate();
+
   const amountDisplay = BigNumber(amount)
     .shiftedBy(-Number(token?.data?.decimals ?? 0))
     .toString();
@@ -49,6 +53,7 @@ export function TransactionDetails(props: TransactionDetailsProps) {
           <Text flex="1" textStyle="p medium regular">
             Approvals: {approvals}/{threshold}
           </Text>
+          <Button onClick={() => navigate(`${Paths.DAOs.TransactionDetails}/${transactionHash}`)}></Button>
         </Flex>
       </AccordionPanel>
     </AccordionItem>

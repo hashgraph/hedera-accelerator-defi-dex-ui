@@ -1,1 +1,1 @@
-export * from "./DAODetailsPage";
+export * from "../MultiSigDAODashboard";

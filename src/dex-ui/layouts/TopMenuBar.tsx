@@ -1,7 +1,7 @@
-import { Link as RouterLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Menu, MenuItem, HStack, Box, Text, Center, Flex, Tag } from "@chakra-ui/react";
-import { useDexContext } from "../hooks";
-import { Color, HederaIcon, WalletConnection } from "../../dex-ui-components";
+import { useDexContext } from "@hooks";
+import { Color, HederaIcon, WalletConnection } from "@dex-ui-components";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -34,11 +34,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
             {props.menuOptions.map((menuOption, index) => {
               return (
                 <Box flex="1" key={index}>
-                  <RouterLink key={menuOption} to={`/${menuOption.toLowerCase()}`}>
+                  <NavLink key={menuOption} to={`${menuOption.toLowerCase()}`}>
                     <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Grey_01 }}>
                       <Text textStyle="p medium medium">{menuOption}</Text>
                     </MenuItem>
-                  </RouterLink>
+                  </NavLink>
                 </Box>
               );
             })}
