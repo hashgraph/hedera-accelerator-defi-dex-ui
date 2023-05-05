@@ -77,6 +77,7 @@ export function MultiSigDAODashboard() {
   if (isDAOFound && isSuccess) {
     const { accountId, type, adminId, name, safeId, ownerIds } = dao;
 
+    const ownerCount = ownerIds.length;
     const members: Member[] = [adminId, ...ownerIds].map((ownerId: string) => ({
       name: "-",
       logo: "",
@@ -134,8 +135,8 @@ export function MultiSigDAODashboard() {
                 })}
               </TabList>
             </Flex>
-            <Box bg={Color.Primary_Bg} padding="1rem 80px 16px" minHeight="80vh">
-              <Outlet context={{ dao, tokenBalances, members, memberCount, tokenCount, totalAssetValue }} />
+            <Box bg={Color.Primary_Bg} padding="2rem 80px 16px" minHeight="80vh">
+              <Outlet context={{ dao, tokenBalances, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
             </Box>
           </Tabs>
         }

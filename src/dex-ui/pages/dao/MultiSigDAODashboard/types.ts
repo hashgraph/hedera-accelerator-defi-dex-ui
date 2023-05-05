@@ -10,6 +10,7 @@ export interface Member {
 export type MultiSigDAODetailsContext = {
   dao: MultiSigDAODetails;
   tokenBalances: TokenBalance[];
+  ownerCount: number;
   members: Member[];
   memberCount: number;
   tokenCount: number;

@@ -1,5 +1,5 @@
 export * from "./CreateADAO";
 export * from "./DAOsListPage";
-export * from "./DAODetailsPage";
+export * from "./MultiSigDAODashboard";
 export * from "./GovernanceDAODashboard";
 export * from "./NFTDAODashboard";

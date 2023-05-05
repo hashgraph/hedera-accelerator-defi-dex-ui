@@ -1,6 +1,5 @@
 import { theme, ComponentStyleConfig } from "@chakra-ui/react";
-import { TextStyles } from "../..";
-import { Color } from "../../../themes";
+import { Color, TextStyles } from "../../../themes";
 
 const primary = {
   ...TextStyles["p small semibold"],

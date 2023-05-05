@@ -1,4 +1,4 @@
-import { TextStyles } from "./../../Text/styles/TextStyles";
+import { TextStyles } from "../../../themes/textStyles";
 import { ComponentStyleConfig } from "@chakra-ui/react";
 import { Color } from "../../../themes";
 

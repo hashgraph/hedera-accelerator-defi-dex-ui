@@ -10,4 +10,6 @@ export enum DAOMutations {
   CreateDeleteMemberTransaction = "CreateDeleteMemberTransaction",
   CreateReplaceMemberTransaction = "CreateReplaceMemberTransaction",
   CreateChangeThresholdTransaction = "CreateChangeThresholdTransaction",
+  ApproveTransaction = "ApproveTransaction",
+  ExecuteTransaction = "ExecuteTransaction",
 }

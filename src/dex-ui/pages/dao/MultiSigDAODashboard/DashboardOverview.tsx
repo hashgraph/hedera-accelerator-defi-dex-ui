@@ -4,16 +4,16 @@ import { useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 
 export function DashboardOverview() {
-  const { dao, totalAssetValue, memberCount, tokenCount } = useOutletContext<MultiSigDAODetailsContext>();
+  const { dao, totalAssetValue, memberCount, ownerCount, tokenCount } = useOutletContext<MultiSigDAODetailsContext>();
   const { threshold } = dao;
 
   const totalAssetDisplay = totalAssetValue;
   const tokenCountDisplay = tokenCount;
   const memberCountDisplay = String(memberCount);
-  const thresholdDisplay = `${String(threshold)} / ${String(memberCount)}`;
+  const thresholdDisplay = `${String(threshold)} / ${String(ownerCount)}`;
 
   return (
-    <Flex gap="8" direction="column" paddingTop="1rem">
+    <Flex gap="8" direction="column">
       <Flex gap="4" direction="column">
         <Text textStyle="h4 medium">Overview</Text>
         <Flex direction="row" gap="2">

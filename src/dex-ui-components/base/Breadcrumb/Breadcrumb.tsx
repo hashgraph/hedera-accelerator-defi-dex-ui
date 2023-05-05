@@ -10,11 +10,12 @@ interface BreadcrumbProps {
 
 export function Breadcrumb(props: BreadcrumbProps) {
   const { to, as, label, leftIcon } = props;
+
   return (
     <ChakraBreadcrumb>
       <BreadcrumbItem>
         <BreadcrumbLink as={as} to={to}>
-          <Flex direction="row" align="center" gap="2">
+          <Flex direction="row" alignItems="center" gap="2" width="max-content">
             {leftIcon}
             <Text textStyle="p medium semibold link">{label}</Text>
           </Flex>

@@ -6,6 +6,8 @@ import {
   proposeRemoveOwnerWithThreshold,
   proposeSwapOwnerWithThreshold,
   proposeChangeThreshold,
+  sendApproveMultiSigTransaction,
+  sendExecuteMultiSigTransaction,
 } from "./dao";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
@@ -38,6 +40,8 @@ function createDexService() {
     proposeRemoveOwnerWithThreshold,
     proposeSwapOwnerWithThreshold,
     proposeChangeThreshold,
+    sendApproveMultiSigTransaction,
+    sendExecuteMultiSigTransaction,
   };
 }
 

@@ -1,5 +1,5 @@
 import { ComponentStyleConfig } from "@chakra-ui/react";
-
+import { Color } from "../../themes";
 /**
  * Base Chakra UI styles and variants for the Hedera DEX NumberInput components
  * and sub-component parts.
@@ -7,19 +7,14 @@ import { ComponentStyleConfig } from "@chakra-ui/react";
 export const CardStyles: ComponentStyleConfig = {
   baseStyle: {
     height: "max-content",
-    bg: "white",
-    boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
-    borderRadius: "8px",
+    bg: Color.White,
+    borderRadius: "4px",
+    border: `1px solid ${Color.Neutral._200}`,
+    padding: "1rem",
+    width: "100%",
   },
   sizes: {},
   variants: {
-    "proposal-card": {
-      bg: "#FFFFFF",
-      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.15)",
-      border: "0.25px solid #DBDEDF",
-      borderRadius: "0px",
-      width: "100%",
-    },
     "file-uploader": {
       body: {
         bg: "#FFFFFF",

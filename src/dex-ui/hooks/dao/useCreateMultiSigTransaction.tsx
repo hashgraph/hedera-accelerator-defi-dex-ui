@@ -11,6 +11,7 @@ interface UseCreateMultiSigTransactionParams {
   amount: number;
   decimals: number;
   multiSigDAOContractId: string;
+  safeId: string;
 }
 
 export function useCreateMultiSigTransaction(
@@ -27,13 +28,14 @@ export function useCreateMultiSigTransaction(
     DAOMutations.CreateMultiSigTransaction
   >(
     async (params: UseCreateMultiSigTransactionParams) => {
-      const { tokenId, receiverId, amount, decimals, multiSigDAOContractId } = params;
+      const { tokenId, safeId, receiverId, amount, decimals, multiSigDAOContractId } = params;
       return DexService.sendProposeTransferTransaction({
         tokenId,
         receiverId,
         amount,
         decimals,
         multiSigDAOContractId,
+        safeId,
         signer,
       });
     },

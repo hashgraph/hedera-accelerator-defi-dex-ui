@@ -2,6 +2,7 @@ import { extendTheme } from "@chakra-ui/react";
 import {
   Color,
   TextStyles,
+  LayerStyles,
   ButtonStyles,
   NumberInputStyles,
   InputStyles,
@@ -9,6 +10,7 @@ import {
   SelectStyles,
   TooltipStyles,
   StepsV2Theme,
+  TagStyles,
 } from "@dex-ui-components";
 
 export const DEXTheme = extendTheme({
@@ -20,6 +22,7 @@ export const DEXTheme = extendTheme({
     },
   },
   textStyles: TextStyles,
+  layerStyles: LayerStyles,
   components: {
     Button: ButtonStyles,
     NumberInput: NumberInputStyles,
@@ -28,5 +31,6 @@ export const DEXTheme = extendTheme({
     Select: SelectStyles,
     Tooltip: TooltipStyles,
     Steps: StepsV2Theme,
+    Tag: TagStyles,
   },
 });
