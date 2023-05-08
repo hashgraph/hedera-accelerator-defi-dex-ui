@@ -9,6 +9,7 @@ import { DashboardOverview } from "./DashboardOverview";
 import { DashboardHeader } from "./DashboardHeader";
 import { MultiSigDAODetails } from "@services";
 import { useLocation } from "react-router-dom";
+import { Settings } from "./Settings";
 
 export interface Member {
   name: string;
@@ -119,6 +120,9 @@ export function MultiSigDAODashboard(props: MultiSigDAODashboardProps) {
               </TabPanel>
               <TabPanel key={3} padding="2rem 0 0">
                 <MembersList members={members} memberCount={memberCount} adminAccountId={adminId} />
+              </TabPanel>
+              <TabPanel key={4} padding="2rem 0 0">
+                <Settings daoDetails={dao} />
               </TabPanel>
             </TabPanels>
           </Tabs>

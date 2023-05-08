@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { TextEditor } from "../../../../dex-ui-components";
 import { useDexContext } from "../../../hooks";
 import { ProposalType } from "../../../store/governanceSlice";
-import { isValidUrl } from "../utils";
+import { isValidUrl } from "@pages";
 
 interface TokenTransferProposalFormData {
   title: string;

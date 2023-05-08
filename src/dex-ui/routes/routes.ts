@@ -22,5 +22,9 @@ export const Paths = {
     default: "/daos",
     CreateDAO: "/daos/create",
     DAODetails: "/dao",
+    AddNewMember: "/dao/add-member",
+    RemoveMember: "/dao/remove-member",
+    ReplaceMember: "/dao/replace-member",
+    ChangeThreshold: "/dao/change-threshold",
   },
 };

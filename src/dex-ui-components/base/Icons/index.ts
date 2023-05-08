@@ -17,3 +17,4 @@ export * from "./LockIcon";
 export * from "./TwoLayerSettingIcon";
 export * from "./SwapIcon";
 export * from "./ArrowLeftIcon";
+export * from "./RefreshIcon";

@@ -14,6 +14,7 @@ import {
   DAOsListPage,
   CreateADAOPage,
   DAODetailsPage,
+  MemberUpdate,
 } from "@pages";
 import { TopMenuBar } from "@layouts";
 import { Color } from "@dex-ui-components";
@@ -77,6 +78,13 @@ const DEX = () => {
                   <Route path={Paths.DAOs.default} element={<DAOsListPage />} />
                   <Route path={Paths.DAOs.CreateDAO} element={<CreateADAOPage />} />
                   <Route path={`${Paths.DAOs.DAODetails}/:accountId`} element={<DAODetailsPage />} />
+                  <Route path={Paths.DAOs.AddNewMember} element={<MemberUpdate operationType="add-member" />} />
+                  <Route path={Paths.DAOs.RemoveMember} element={<MemberUpdate operationType="remove-member" />} />
+                  <Route path={Paths.DAOs.ReplaceMember} element={<MemberUpdate operationType="replace-member" />} />
+                  <Route
+                    path={Paths.DAOs.ChangeThreshold}
+                    element={<MemberUpdate operationType="change-threshold" />}
+                  />
                 </Routes>
               </Flex>
             </ScrollToTop>

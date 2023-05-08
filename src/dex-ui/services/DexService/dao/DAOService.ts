@@ -7,6 +7,7 @@ import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../abi/MultiSigDAO.json";
+import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 
 import {
   MultiSigDAODetails,
@@ -107,7 +108,6 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
   const contractInterface = new ethers.utils.Interface(MultiSigDAOJSON.abi);
   const abiCoder = ethers.utils.defaultAbiCoder;
   const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
-
   const parsedEventsWithData = parsedEvents.map((event) => {
     if (event.name === DAOEvents.TransactionCreated) {
       const parsedData = abiCoder.decode(
@@ -126,4 +126,98 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
 export async function fetchHederaGnosisSafeLogs(safeAccountId: string) {
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   return DexService.fetchParsedEventLogs(safeAccountId, contractInterface);
+}
+
+export interface ProposeAddOwnerWithThresholdParams {
+  safeAccountId: string;
+  newMemberAddress: string;
+  multiSigDAOContractId: string;
+  threshold: number;
+  signer: HashConnectSigner;
+}
+
+export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithThresholdParams) {
+  const { newMemberAddress, threshold, safeAccountId, multiSigDAOContractId, signer } = params;
+  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+  const newOwnerData = contractInterface.encodeFunctionData("addOwnerWithThreshold", [
+    AccountId.fromString(newMemberAddress).toSolidityAddress(),
+    threshold,
+  ]);
+
+  return DexService.sendProposeTransaction({
+    safeAccountId,
+    data: newOwnerData,
+    multiSigDAOContractId,
+    signer,
+  });
+}
+
+export interface ProposeRemoveOwnerWithThresholdParams {
+  safeAccountId: string;
+  memberAddress: string;
+  multiSigDAOContractId: string;
+  threshold: number;
+  signer: HashConnectSigner;
+}
+
+export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwnerWithThresholdParams) {
+  const { memberAddress, threshold, safeAccountId, multiSigDAOContractId, signer } = params;
+  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+  const removeOwnerData = contractInterface.encodeFunctionData("removeOwner", [
+    AccountId.fromString(memberAddress).toSolidityAddress(),
+    AccountId.fromString(memberAddress).toSolidityAddress(),
+    threshold,
+  ]);
+
+  return DexService.sendProposeTransaction({
+    safeAccountId,
+    data: removeOwnerData,
+    multiSigDAOContractId,
+    signer,
+  });
+}
+
+export interface ProposeSwapOwnerWithThresholdParams {
+  safeAccountId: string;
+  oldMemberAddress: string;
+  newMemberAddress: string;
+  multiSigDAOContractId: string;
+  signer: HashConnectSigner;
+}
+
+export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWithThresholdParams) {
+  const { newMemberAddress, safeAccountId, multiSigDAOContractId, oldMemberAddress, signer } = params;
+  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+  const removeOwnerData = contractInterface.encodeFunctionData("swapOwner", [
+    AccountId.fromString(oldMemberAddress).toSolidityAddress(),
+    AccountId.fromString(oldMemberAddress).toSolidityAddress(),
+    AccountId.fromString(newMemberAddress).toSolidityAddress(),
+  ]);
+
+  return DexService.sendProposeTransaction({
+    safeAccountId,
+    data: removeOwnerData,
+    multiSigDAOContractId,
+    signer,
+  });
+}
+
+export interface ProposeChangeThresholdParams {
+  safeAccountId: string;
+  threshold: number;
+  multiSigDAOContractId: string;
+  signer: HashConnectSigner;
+}
+
+export async function proposeChangeThreshold(params: ProposeChangeThresholdParams) {
+  const { safeAccountId, multiSigDAOContractId, threshold, signer } = params;
+  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+  const changeThresholdData = contractInterface.encodeFunctionData("changeThreshold", [threshold]);
+
+  return DexService.sendProposeTransaction({
+    safeAccountId,
+    data: changeThresholdData,
+    multiSigDAOContractId,
+    signer,
+  });
 }

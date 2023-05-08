@@ -7,3 +7,4 @@ export * from "./CreateProposal";
 export * from "./ProposalDetails";
 export * from "./CreatePool";
 export * from "./dao";
+export * from "./utils";
