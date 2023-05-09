@@ -19,6 +19,11 @@ import {
   MultiSigDAODashboard,
   GovernanceDAODashboard,
   NFTDAODashboard,
+  Settings,
+  AddMember,
+  DeleteMember,
+  ReplaceMember,
+  ChangeThreshold,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -56,10 +61,15 @@ export const router = createBrowserRouter(
           </Route>
           <Route path={"assets"} element={<AssetsList />} />
           <Route path={"members"} element={<MembersList />} />
-          <Route path={"settings"} element={<>Settings</>} />
+          <Route path={"settings"} element={<Settings />} />
         </Route>
         <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />} />
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />} />
+        {/* TODO: Include below Member Operations in multisig hierarchy */}
+        <Route path={"multisig/:accountId/settings/add-member"} element={<AddMember />} />
+        <Route path={"multisig/:accountId/settings/delete-member/:memberId"} element={<DeleteMember />} />
+        <Route path={"multisig/:accountId/settings/replace-member/:memberId"} element={<ReplaceMember />} />
+        <Route path={"multisig/:accountId/settings/change-threshold"} element={<ChangeThreshold />} />
       </Route>
       <Route
         path="*"

@@ -2,4 +2,8 @@ export * from "./useDAOs";
 export * from "./useCreateDAO";
 export * from "./useDAOTransactions";
 export * from "./useCreateMultiSigTransaction";
+export * from "./useCreateAddMemberTransaction";
+export * from "./useCreateDeleteMemberTransaction";
+export * from "./useCreateReplaceMemberTransaction";
+export * from "./useCreateChangeThresholdTransaction";
 export * from "./types";

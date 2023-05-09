@@ -11,6 +11,7 @@ import {
 import { BaseDAOContractFunctions, MultiSigDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
 import { Contracts } from "../../constants";
+import { ethers } from "ethers";
 
 const Gas = 9000000;
 
@@ -80,4 +81,29 @@ async function sendProposeTransferTransaction(params: SendProposeTransferTransac
   return sendProposeTransferTransactionResponse;
 }
 
-export { sendCreateMultiSigDAOTransaction, sendProposeTransferTransaction };
+interface SendProposeTransaction {
+  safeAccountId: string;
+  data: string;
+  multiSigDAOContractId: string;
+  signer: HashConnectSigner;
+}
+
+async function sendProposeTransaction(params: SendProposeTransaction) {
+  const { safeAccountId, data, signer, multiSigDAOContractId } = params;
+  const safeSolidityAddress = ContractId.fromString(safeAccountId).toSolidityAddress();
+  const ownerData = ethers.utils.arrayify(data);
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddress(safeSolidityAddress)
+    .addBytes(ownerData)
+    .addUint8(0);
+  const sendProposeTransaction = await new ContractExecuteTransaction()
+    .setContractId(multiSigDAOContractId)
+    .setFunction(MultiSigDAOContractFunctions.ProposeTransaction, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeTransactionResponse = await sendProposeTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendProposeTransactionResponse, MultiSigDAOContractFunctions.ProposeTransaction);
+  return sendProposeTransactionResponse;
+}
+
+export { sendCreateMultiSigDAOTransaction, sendProposeTransferTransaction, sendProposeTransaction };

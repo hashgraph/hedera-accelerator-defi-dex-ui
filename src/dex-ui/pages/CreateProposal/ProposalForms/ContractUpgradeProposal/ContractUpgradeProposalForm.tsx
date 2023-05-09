@@ -8,7 +8,7 @@ import { LoadingDialog } from "../../../../../dex-ui-components";
 import { CreateProposalType } from "../../../../hooks/governance/types";
 import { useContractUpgradeProposalDetails } from "./useContractUpgradeProposalDetails";
 import { CreateProposalLocationProps } from "../../CreateProposal";
-import { isValidUrl } from "../../utils";
+import { isValidUrl } from "@utils";
 
 interface ContractUpgradeProposalFormData {
   title: string;
