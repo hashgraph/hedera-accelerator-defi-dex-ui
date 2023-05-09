@@ -6,4 +6,8 @@ export enum DAOQueries {
 export enum DAOMutations {
   CreateDAO = "CreateDAO",
   CreateMultiSigTransaction = "CreateMultiSigTransaction",
+  CreateAddMemberTransaction = "CreateAddMemberTransaction",
+  CreateDeleteMemberTransaction = "CreateDeleteMemberTransaction",
+  CreateReplaceMemberTransaction = "CreateReplaceMemberTransaction",
+  CreateChangeThresholdTransaction = "CreateChangeThresholdTransaction",
 }
