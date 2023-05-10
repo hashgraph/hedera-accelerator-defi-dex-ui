@@ -1,9 +1,9 @@
-import { Text, Flex, Divider, Tag } from "@chakra-ui/react";
-import { Card, Color, ProgressBar } from "@dex-ui-components";
+import { Text, Flex, Divider } from "@chakra-ui/react";
+import { Card, Color, PeopleIcon, ProgressBar, Tag } from "@dex-ui-components";
 import BigNumber from "bignumber.js";
-import { Transaction } from "@hooks";
+import { Transaction, TransactionStatus } from "@hooks";
 import { useNavigate } from "react-router-dom";
-
+import { TransactionStatusAsTagVariant } from "../constants";
 interface TransactionCardProps extends Transaction {
   threshold: number;
   index: number;
@@ -18,6 +18,10 @@ export function TransactionCard(props: TransactionCardProps) {
     .shiftedBy(-Number(token?.data?.decimals ?? 0))
     .toString();
   const progressBarValue = approvalCount > 0 ? (approvalCount / threshold) * 100 : 0;
+  const isThresholdReached = approvalCount >= threshold;
+  /** TODO: Update contracts to support a "queued" status. */
+  const transactionStatus =
+    status === TransactionStatus.Pending && isThresholdReached ? TransactionStatus.Queued : status;
 
   function handleTransactionCardClicked() {
     navigate(transactionHash);
@@ -31,19 +35,9 @@ export function TransactionCard(props: TransactionCardProps) {
             <Text textStyle="p small semibold" marginRight="0.25rem">
               {nonce}
             </Text>
-            <Tag textStyle="p small semibold" variant="status">
-              {type}
-            </Tag>
+            <Tag label={type} />
           </Flex>
-          <Tag
-            textStyle="p small semibold"
-            color={Color.Grey_Blue._700}
-            bg={Color.Grey_Blue._100}
-            borderRadius="4px"
-            padding="6px 16px"
-          >
-            {status}
-          </Tag>
+          <Tag variant={TransactionStatusAsTagVariant[transactionStatus]} />
         </Flex>
         <Divider />
         <Flex direction="row" justifyContent="space-between">
@@ -58,7 +52,10 @@ export function TransactionCard(props: TransactionCardProps) {
               value={progressBarValue}
               progressBarColor={Color.Grey_Blue._300}
             />
-            <Text textStyle="p medium regular">{`${approvalCount}/${threshold}`}</Text>
+            <Flex direction="row" alignItems="center" gap="2">
+              <Text textStyle="p small semibold">{`${approvalCount}/${threshold}`}</Text>
+              <PeopleIcon boxSize={3.5} />
+            </Flex>
           </Flex>
         </Flex>
       </Flex>

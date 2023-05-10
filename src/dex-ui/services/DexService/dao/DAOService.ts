@@ -120,7 +120,7 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
       );
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;
-      eventClone.args.info.hexData = event.args.info.data;
+      eventClone.args.info.hexStringData = event.args.info.data;
       return eventClone;
     }
     return event;
@@ -247,8 +247,11 @@ export async function sendApproveMultiSigTransaction(
 
 interface ExecuteMultiSigTransactionParams {
   safeId: string;
-  to: string;
-  value: number;
+  /**
+   * The hbar value sent when creating the transaction. This value is needed to
+   * compute the correct hash value when executing the transaction in the HederaGnosisSafe contract.
+   **/
+  msgValue: number;
   hexStringData: string;
   operation: number;
   nonce: number;
@@ -256,11 +259,11 @@ interface ExecuteMultiSigTransactionParams {
 }
 
 export async function sendExecuteMultiSigTransaction(params: ExecuteMultiSigTransactionParams) {
-  const { safeId, to, value, hexStringData, operation, nonce, signer } = params;
+  const { safeId, msgValue, hexStringData, operation, nonce, signer } = params;
   const safeContractId = ContractId.fromString(safeId);
-  const toAddress = AccountId.fromString(to).toSolidityAddress();
-  const preciseValue = BigNumber(value);
-  const byteData = convertToByte32(hexStringData);
+  const toAddress = AccountId.fromString(safeId).toSolidityAddress();
+  const preciseValue = BigNumber(msgValue);
+  const byteData = ethers.utils.arrayify(hexStringData);
 
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(toAddress)

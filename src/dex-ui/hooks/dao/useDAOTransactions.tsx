@@ -7,9 +7,10 @@ import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
 export enum TransactionStatus {
+  Pending = "Pending",
+  Queued = "Queued",
   Success = "Success",
   Failed = "Failed",
-  Pending = "Pending",
 }
 
 export enum TransactionEvent {
@@ -30,7 +31,6 @@ export interface Transaction {
   transactionHash: string;
   amount: number;
   type: TransactionType;
-  name: string;
   approvalCount: number;
   approvers: string[];
   event: TransactionEvent;
@@ -39,9 +39,14 @@ export interface Transaction {
   tokenId: string;
   token: MirrorNodeTokenById | null | undefined;
   receiver: string;
-  to: string;
+  safeId: string;
   operation: number;
-  hexData: string;
+  hexStringData: string;
+  /**
+   * The hbar value sent when creating the transaction. This value is needed to
+   * compute the correct hash value when executing the transaction in the HederaGnosisSafe contract.
+   **/
+  msgValue: number;
 }
 
 const AllFilters = [TransactionStatus.Success, TransactionStatus.Failed, TransactionStatus.Pending];
@@ -83,9 +88,8 @@ export function useDAOTransactions(
       const transactions: Transaction[] = await Promise.all(
         groupedTransactionEntries.map(async ([transactionHash, transactionLogs]) => {
           const transactionInfo = transactionLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
-          const { nonce, to, value, data, operation, hexData } = transactionInfo;
+          const { nonce, to, value, data, operation, hexStringData } = transactionInfo;
           const { amount, receiver, token } = data;
-          const name = BigNumber.from(value).toString();
 
           const approvers = transactionLogs
             .filter((log) => log.name === DAOEvents.ApproveHash)
@@ -110,8 +114,6 @@ export function useDAOTransactions(
             amount: BigNumber.from(amount).toNumber(),
             transactionHash,
             type: TransactionType.SendToken,
-            // TODO: Add real value for name
-            name,
             approvalCount,
             approvers,
             event: TransactionEvent.Sent,
@@ -121,9 +123,10 @@ export function useDAOTransactions(
             tokenId,
             token: tokenData,
             receiver: AccountId.fromSolidityAddress(receiver).toString(),
-            to: AccountId.fromSolidityAddress(to).toString(),
+            safeId: AccountId.fromSolidityAddress(to).toString(),
             operation,
-            hexData,
+            hexStringData,
+            msgValue: BigNumber.from(value).toNumber(),
           };
         })
       );

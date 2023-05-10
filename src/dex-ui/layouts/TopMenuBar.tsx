@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { Menu, MenuItem, HStack, Box, Text, Center, Flex, Tag } from "@chakra-ui/react";
+import { Menu, MenuItem, Box, Text, Center, Flex } from "@chakra-ui/react";
 import { useDexContext } from "@hooks";
-import { Color, HederaIcon, WalletConnection } from "@dex-ui-components";
+import { Color, HederaIcon, WalletConnection, Tag } from "@dex-ui-components";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -21,13 +21,11 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
         borderBottom={`1px solid ${Color.Neutral._200}`}
       >
         <Box flex="1.5">
-          <HStack spacing="0.5rem">
+          <Flex direction="row" gap="2" alignItems="center">
             <HederaIcon />
             <Text textStyle="h4 bold">Hedera Open DEX</Text>
-            <Tag textStyle="p xsmall medium" size="sm">
-              Pre-Alpha
-            </Tag>
-          </HStack>
+            <Tag label="Pre-Alpha" />
+          </Flex>
         </Box>
         <Box flex="1">
           <Center gap="12">

@@ -1,7 +1,7 @@
-import { Button, Divider, Flex, SimpleGrid, Tag, Text, IconButton, Image } from "@chakra-ui/react";
+import { Button, Divider, Flex, SimpleGrid, Text, IconButton, Image } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useForm } from "react-hook-form";
-import { FormInput, RefreshIcon, Color } from "@dex-ui-components";
+import { FormInput, RefreshIcon, Color, Tag } from "@dex-ui-components";
 import * as R from "ramda";
 import { Member, MultiSigDAODetailsContext } from "./types";
 import { MultiSigDAODetails } from "@services";
@@ -104,13 +104,7 @@ export function Settings() {
                       fontSize="17px"
                       icon={<CopyIcon color={Color.Neutral._500} />}
                     />
-                    {isAdmin ? (
-                      <Tag textStyle="p small medium" color={Color.Grey_Blue._500}>
-                        Admin
-                      </Tag>
-                    ) : (
-                      <></>
-                    )}
+                    {isAdmin ? <Tag label="Admin" /> : <></>}
                   </Flex>
                   <Flex direction="row" gap="4" alignItems="center" height="20px">
                     <IconButton

@@ -12,17 +12,18 @@ export enum HashscanData {
 interface HashScanLinkProps {
   id: string;
   type: HashscanData;
+  withParentheses?: boolean;
 }
 
 export function HashScanLink(props: HashScanLinkProps) {
-  const { id, type } = props;
+  const { id, type, withParentheses } = props;
   if (!id) return null;
 
   const hashscanLink = createHashScanLink(id, type);
 
   return (
-    <Flex direction="row">
-      <Text textStyle="p small regular">{id}</Text>
+    <Flex direction="row" alignItems="center">
+      <Text textStyle={`p small ${withParentheses ? "parentheses" : "regular"}`}>{id}</Text>
       <Link
         width="fit-content"
         display="flex"

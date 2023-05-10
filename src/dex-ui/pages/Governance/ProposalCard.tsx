@@ -1,11 +1,9 @@
-import { Text, Box, Flex, Spacer, VStack, Tag } from "@chakra-ui/react";
+import { Text, Box, Flex, Spacer, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { Card, HorizontalStackBarChart } from "../../../dex-ui-components";
-import { Color } from "../../../dex-ui-components/themes";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { getStatusColor, getShortDescription } from "../../utils";
 import { FormattedProposal } from "./types";
-import { Popover } from "../../../dex-ui-components";
+import { Popover, Tag, Card, HorizontalStackBarChart, Color } from "@dex-ui-components";
 
 interface ProposalCardProps {
   proposal: FormattedProposal;
@@ -51,9 +49,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                 >
                   {proposal.title}
                 </Text>
-                <Tag textStyle="b3" size="sm" minWidth="fit-content" height="fit-content">
-                  {proposal.type}
-                </Tag>
+                <Tag label={proposal.type} />
               </Flex>
               <Spacer flex="1" />
               <Text flex="4" textAlign="right" textStyle="b2">{`Author ${proposal.author.toString()}`}</Text>

@@ -1,4 +1,3 @@
-export * from "./SettingsIcon";
 export * from "./SwitchIcon";
 export * from "./ArrowDropDownIcon";
 export * from "./TooltipIcon";
@@ -19,3 +18,7 @@ export * from "./SwapIcon";
 export * from "./ArrowLeftIcon";
 export * from "./RefreshIcon";
 export * from "./PeopleIcon";
+export * from "./CogIcon";
+export * from "./CheckCircleIcon";
+export * from "./XIcon";
+export * from "./ClockIcon";
