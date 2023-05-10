@@ -1,5 +1,5 @@
 import { Icon } from "@chakra-ui/react";
-import { Color } from "@dex-ui-components/themes";
+import { Color } from "../../themes";
 
 interface RefreshProps<T> {
   fill?: string;

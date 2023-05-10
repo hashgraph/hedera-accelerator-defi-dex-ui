@@ -319,6 +319,12 @@ export const TextStyles = {
     fontStyle: "italic",
     fontWeight: fontWeight.Regular,
   },
+  "p small parentheses": {
+    ...baseStyles.p_small,
+    fontWeight: fontWeight.Regular,
+    _before: { content: `"("` },
+    _after: { content: `")"` },
+  },
   /**
    * Paragraph
    * Size: XSmall

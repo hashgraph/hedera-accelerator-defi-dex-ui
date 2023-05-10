@@ -1,5 +1,5 @@
-import { Flex, SimpleGrid, Tag, Text } from "@chakra-ui/react";
-import { Color, HashScanLink, HashscanData } from "@dex-ui-components";
+import { Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Color, HashScanLink, HashscanData, Tag } from "@dex-ui-components";
 import * as R from "ramda";
 import { Member, MultiSigDAODetailsContext } from "./types";
 import { useOutletContext } from "react-router-dom";
@@ -34,13 +34,7 @@ export function MembersList() {
               >
                 <Flex direction="row" justifyContent="space-between" gap="4">
                   <HashScanLink id={accountId} type={HashscanData.Account} />
-                  {isAdmin ? (
-                    <Tag textStyle="p small medium" color={Color.Grey_Blue._500}>
-                      Admin
-                    </Tag>
-                  ) : (
-                    <></>
-                  )}
+                  {isAdmin ? <Tag label="Admin" /> : <></>}
                 </Flex>
               </Flex>
             );

@@ -1,6 +1,6 @@
-import { Text, Flex, HStack, Tag } from "@chakra-ui/react";
+import { Text, Flex, HStack } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
-import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData } from "@dex-ui-components";
+import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData, Tag } from "@dex-ui-components";
 import { DAOType } from "@services";
 import { MultiSigTransactionModal } from "../MultiSigTransactionModal";
 
@@ -20,9 +20,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
         <Flex bg={Color.White_02} direction="column" gap="2">
           <HStack>
             <Text textStyle="h3 medium">{name}</Text>
-            <Tag textStyle="p small medium" color={Color.Grey_Blue._500}>
-              {type}
-            </Tag>
+            <Tag label={type} />
           </HStack>
           <HStack>
             <HStack>

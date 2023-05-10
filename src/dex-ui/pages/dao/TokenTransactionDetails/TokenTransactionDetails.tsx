@@ -10,13 +10,15 @@ import {
   PeopleIcon,
   Breadcrumb,
   ArrowLeftIcon,
+  Tag,
 } from "@dex-ui-components";
 import { ErrorLayout, LoadingSpinnerLayout, ProposalDetailsLayout } from "@layouts";
-import { useDAOTransactions, useDAOs, useApproveTransaction, useExecuteTransaction } from "@hooks";
+import { useDAOTransactions, useDAOs, useApproveTransaction, useExecuteTransaction, TransactionStatus } from "@hooks";
 import { MultiSigDAODetails } from "@services";
 import { isNotNil } from "ramda";
 import { formatTokenAmountWithDecimal } from "@utils";
 import { Link as ReachLink } from "react-router-dom";
+import { TransactionStatusAsTagVariant } from "../constants";
 
 export function TokenTransactionDetails() {
   const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
@@ -35,16 +37,15 @@ export function TokenTransactionDetails() {
 
   interface HandleClickExecuteTransactionParams {
     safeId: string;
-    to: string;
-    value: number;
+    msgValue: number;
     hexStringData: string;
     operation: number;
     nonce: number;
   }
 
   async function handleClickExecuteTransaction(params: HandleClickExecuteTransactionParams) {
-    const { safeId, to, value, hexStringData, operation, nonce } = params;
-    executeTransactionMutation.mutate({ safeId, to, value, hexStringData, operation, nonce });
+    const { safeId, msgValue, hexStringData, operation, nonce } = params;
+    executeTransactionMutation.mutate({ safeId, msgValue, hexStringData, operation, nonce });
   }
 
   if (isError) {
@@ -56,18 +57,20 @@ export function TokenTransactionDetails() {
   }
 
   if (isSuccess && isNotNil(dao) && isNotNil(transaction)) {
-    const { safeId, threshold, ownerIds } = dao;
+    const { threshold, ownerIds } = dao;
     const {
       approvers,
       approvalCount,
       transactionHash,
       amount,
-      to,
+      safeId,
+      receiver,
       token,
       event,
       status,
       type,
-      hexData,
+      hexStringData,
+      msgValue,
       operation,
       nonce,
     } = transaction;
@@ -77,10 +80,62 @@ export function TokenTransactionDetails() {
     const notConfirmedCount = memberCount - (approvalCount ?? 0);
     const isThresholdReached = approvalCount >= threshold;
 
+    /** TODO: Update contracts to support a "queued" status. */
+    const transactionStatus =
+      status === TransactionStatus.Pending && isThresholdReached ? TransactionStatus.Queued : status;
+
+    const ApproversList =
+      approvalCount === 0 ? (
+        <Text textStyle="p small italic">This transaction has not yet been confirmed by an owner.</Text>
+      ) : (
+        <>
+          {approvers.map((approver) => (
+            <HashScanLink id={approver} type={HashscanData.Account} />
+          ))}
+        </>
+      );
+
+    const TokenIdWithLink = token?.data.token_id ? (
+      <HashScanLink id={token.data.token_id} type={HashscanData.Token} withParentheses />
+    ) : (
+      <></>
+    );
+
+    const ConfirmationDetailsAction: Readonly<{ [key in TransactionStatus]: JSX.Element }> = {
+      [TransactionStatus.Pending]: (
+        <Flex direction="column" gap="2">
+          <Button variant="primary" onClick={() => handleClickConfirmTransaction(safeId, transactionHash)}>
+            Confirm
+          </Button>
+          <Button variant="secondary">Cancel Transaction</Button>
+        </Flex>
+      ),
+      [TransactionStatus.Queued]: (
+        <Button
+          variant="primary"
+          onClick={() =>
+            handleClickExecuteTransaction({
+              safeId,
+              msgValue,
+              hexStringData,
+              operation,
+              nonce,
+            })
+          }
+        >
+          Execute
+        </Button>
+      ),
+      [TransactionStatus.Success]: <></>,
+      [TransactionStatus.Failed]: <></>,
+    };
+
     return (
       <ProposalDetailsLayout
         title={type}
-        status={status}
+        statusComponent={
+          <MetricLabel label="Status" value={<Tag variant={TransactionStatusAsTagVariant[transactionStatus]} />} />
+        }
         rightNavigationComponent={
           <Breadcrumb
             to={`/daos/multisig/${daoAccountId}/transactions`}
@@ -92,26 +147,27 @@ export function TokenTransactionDetails() {
         details={
           <Flex direction="column" gap="4" width="100%">
             <Flex direction="row" gap="16">
-              <MetricLabel label={event} value={`${amountDisplay} ${token?.data.symbol}`} />
-              <MetricLabel label={"To"} value={<HashScanLink id={to} type={HashscanData.Account} />} />
+              <MetricLabel
+                label={event}
+                value={
+                  <Flex direction="row" gap="2" alignItems="center">
+                    <Text textStyle="p medium regular">
+                      {amountDisplay} {token?.data.symbol}
+                    </Text>
+                    {TokenIdWithLink}
+                  </Flex>
+                }
+              />
+              <MetricLabel label={"To"} value={<HashScanLink id={receiver} type={HashscanData.Account} />} />
             </Flex>
             <Divider />
-            <MetricLabel
-              label={"Voted on"}
-              value={
-                <>
-                  {approvers.map((approver) => (
-                    <HashScanLink id={approver} type={HashscanData.Account} />
-                  ))}
-                </>
-              }
-            />
+            <MetricLabel label={"Confirmations from"} value={ApproversList} />
             <Divider />
             <MetricLabel label={"Transaction Hash"} value={transactionHash} />
           </Flex>
         }
         rightPanel={
-          <Flex direction="column" gap="8" minWidth="250px">
+          <Flex direction="column" gap="8" minWidth="250px" height="100%">
             <Text textStyle="h5 medium">Confirmation details</Text>
             <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
               <Flex direction="row" alignItems="center" gap="4">
@@ -124,7 +180,7 @@ export function TokenTransactionDetails() {
                 />
                 <Flex direction="row" alignItems="center" gap="2">
                   <Text textStyle="p small semibold">{`${approvalCount}/${threshold}`}</Text>
-                  <PeopleIcon options={{ width: "14px", height: "12px" }} />
+                  <PeopleIcon boxSize={3.5} />
                 </Flex>
               </Flex>
               <Flex direction="row" justifyContent="space-between" gap="4">
@@ -133,49 +189,18 @@ export function TokenTransactionDetails() {
                   label="Confirmed"
                   value={approvalCount ?? ""}
                   valueStyle="p small semibold"
-                  valueUnitSymbol={
-                    <PeopleIcon options={{ width: "14px", height: "12px" }} stroke={Color.Neutral._400} />
-                  }
+                  valueUnitSymbol={<PeopleIcon boxSize={3.5} stroke={Color.Neutral._400} />}
                 />
                 <MetricLabel
                   labelLeftIcon={<Box bg={Color.Neutral._200} width="0.75rem" height="0.75rem" />}
                   label="Not Confirmed"
                   value={notConfirmedCount}
                   valueStyle="p small semibold"
-                  valueUnitSymbol={
-                    <PeopleIcon options={{ width: "14px", height: "12px" }} stroke={Color.Neutral._400} />
-                  }
+                  valueUnitSymbol={<PeopleIcon boxSize={3.5} stroke={Color.Neutral._400} />}
                 />
               </Flex>
             </Flex>
-            <Flex direction="column" gap="2">
-              {isThresholdReached ? (
-                <Button
-                  variant="primary"
-                  // TODO: Fix issue with transaction execution and enable button.
-                  isDisabled
-                  onClick={() =>
-                    handleClickExecuteTransaction({
-                      safeId,
-                      to,
-                      value: amount,
-                      hexStringData: hexData,
-                      operation,
-                      nonce,
-                    })
-                  }
-                >
-                  Execute (Under Development)
-                </Button>
-              ) : (
-                <>
-                  <Button variant="primary" onClick={() => handleClickConfirmTransaction(safeId, transactionHash)}>
-                    Confirm
-                  </Button>
-                  <Button variant="secondary">Cancel Transaction</Button>
-                </>
-              )}
-            </Flex>
+            {ConfirmationDetailsAction[transactionStatus]}
           </Flex>
         }
       />

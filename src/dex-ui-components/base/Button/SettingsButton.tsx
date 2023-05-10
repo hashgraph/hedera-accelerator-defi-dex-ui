@@ -1,6 +1,6 @@
 import { Text } from "@chakra-ui/react";
 import { Color } from "../..";
-import { SettingsIcon } from "../Icons";
+import { CogIcon } from "../Icons";
 import { Button } from "./Button";
 
 interface SettingsButtonProps {
@@ -15,7 +15,7 @@ export function SettingsButton(props: SettingsButtonProps) {
       data-testid="settings-button"
       variant="settings"
       aria-label="Open and close settings modal."
-      leftIcon={<SettingsIcon />}
+      leftIcon={<CogIcon />}
       borderColor={props.isError ? Color.Red_01 : Color.Text_Primary}
       onClick={props.onClick}
     >

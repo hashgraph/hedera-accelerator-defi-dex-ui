@@ -19,3 +19,4 @@ export * from "./FormInputList";
 export * from "./Breadcrumb";
 export * from "./Links";
 export * from "./ProgressBar";
+export * from "./Tag";

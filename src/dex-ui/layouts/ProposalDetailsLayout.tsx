@@ -1,25 +1,25 @@
-import { Text, Grid, Flex, GridItem, Tag } from "@chakra-ui/react";
-import { BreadcrumbText, Color, MetricLabel } from "@dex-ui-components";
+import { Text, Grid, Flex, GridItem } from "@chakra-ui/react";
+import { BreadcrumbText, Color } from "@dex-ui-components";
 import { ReactElement } from "react";
 
 export interface ProposalDetailsLayoutProps {
-  title?: string;
+  title: string;
   author?: string;
+  statusComponent: ReactElement;
   rightNavigationComponent: ReactElement;
-  status?: string;
-  details?: ReactElement;
-  rightPanel?: ReactElement;
+  details: ReactElement;
+  rightPanel: ReactElement;
 }
 
 export function ProposalDetailsLayout(props: ProposalDetailsLayoutProps) {
-  const { title, rightNavigationComponent, status, details, rightPanel } = props;
+  const { title, statusComponent, rightNavigationComponent, details, rightPanel } = props;
 
   return (
     <Grid
       templateColumns="repeat(4, 1fr)"
       gap="4"
       width="100%"
-      minHeight="500px"
+      height="100%"
       paddingTop="1.5rem"
       paddingLeft="5rem"
       paddingRight="5rem"
@@ -40,17 +40,7 @@ export function ProposalDetailsLayout(props: ProposalDetailsLayoutProps) {
               <HashScanLink id={author} type={HashscanData.Account} />
             </Flex> */}
           </Flex>
-          <Flex layerStyle="content-box">
-            <MetricLabel
-              label="Status"
-              value={
-                <Tag textStyle="p small semibold" variant="status">
-                  {status}
-                </Tag>
-              }
-              valueStyle="p small semibold"
-            />
-          </Flex>
+          <Flex layerStyle="content-box">{statusComponent}</Flex>
           <Flex direction="column" gap="2">
             <Text textStyle="p medium medium" color={Color.Grey_Blue._800}>
               Details
@@ -60,7 +50,7 @@ export function ProposalDetailsLayout(props: ProposalDetailsLayoutProps) {
         </Flex>
       </GridItem>
       <GridItem colSpan={1}>
-        <Flex layerStyle="content-box" direction="column">
+        <Flex layerStyle="content-box" direction="column" height="100%">
           {rightPanel}
         </Flex>
       </GridItem>

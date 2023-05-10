@@ -14,8 +14,8 @@ import {
   Spacer,
   Skeleton,
   SkeletonText,
-  Tag,
   CardBody,
+  Tag as ChakraTag,
 } from "@chakra-ui/react";
 import { isNil } from "ramda";
 import { Link as ReachLink, useParams } from "react-router-dom";
@@ -29,7 +29,8 @@ import {
   Metrics,
   NotficationTypes,
   Notification,
-} from "../../../dex-ui-components";
+  Tag,
+} from "@dex-ui-components";
 import { ProposalState } from "../../store/governanceSlice";
 import { useProposalDetails } from "./useProposalDetails";
 import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
@@ -129,9 +130,7 @@ export const ProposalDetails = () => {
                 <Text alignSelf="center" textStyle="b2" paddingRight="0.25rem">
                   Type:
                 </Text>
-                <Tag textStyle="b3" size="sm" padding="0.3rem">
-                  {formattedProposal?.type}
-                </Tag>
+                <Tag label={formattedProposal?.type} />
               </Flex>
               <Spacer padding="0.25rem" />
               <Flex flexWrap="wrap" width="100%">
@@ -154,9 +153,10 @@ export const ProposalDetails = () => {
               </Flex>
             </Box>
             {formattedProposal?.state === ProposalState.Executed && (
-              <Tag textStyle="b3" size="sm" bg={Color.Green_01_Opaque} padding="0.3rem" width="fit-content">
+              /** TODO: Update to use Tag from dex-ui-components */
+              <ChakraTag textStyle="b3" size="sm" bg={Color.Green_01_Opaque} padding="0.3rem" width="fit-content">
                 {ProposalState.Executed}
-              </Tag>
+              </ChakraTag>
             )}
             <Box flexGrow="1">
               <Text textStyle="h3">Description</Text>
