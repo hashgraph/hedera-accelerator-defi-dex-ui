@@ -22,3 +22,4 @@ export * from "./CogIcon";
 export * from "./CheckCircleIcon";
 export * from "./XIcon";
 export * from "./ClockIcon";
+export * from "./CheckCircleUnfilledIcon";

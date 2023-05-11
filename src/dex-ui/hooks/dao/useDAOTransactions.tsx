@@ -14,8 +14,8 @@ export enum TransactionStatus {
 }
 
 export enum TransactionEvent {
-  Sent = "Sent",
-  Received = "Received",
+  Send = "Send",
+  Receive = "Receive",
   Governance = "Governance",
   SafeCreated = "Safe Created",
 }
@@ -74,6 +74,26 @@ export function useDAOTransactions(
     return transactionEntries;
   }
 
+  function getApprovers(transactionLogs: LogDescription[]): string[] {
+    const approverCache = new Set<string>();
+    transactionLogs.forEach((log: LogDescription) => {
+      if (log?.name === DAOEvents.ApproveHash && !approverCache.has(log?.args.owner)) {
+        const { args } = log;
+        const ownerId = AccountId.fromSolidityAddress(args.owner).toString();
+        approverCache.add(ownerId);
+      }
+    });
+    return Array.from(approverCache);
+  }
+
+  function getTransactionStatus(transactionLogs: LogDescription[]): TransactionStatus {
+    return transactionLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
+      ? TransactionStatus.Success
+      : transactionLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
+      ? TransactionStatus.Failed
+      : TransactionStatus.Pending;
+  }
+
   return useQuery<Transaction[], Error, Transaction[], UseDAOQueryKey>(
     [DAOQueries.DAOs, DAOQueries.Transactions, daoAccountId, safeAccountId],
     async () => {
@@ -91,19 +111,12 @@ export function useDAOTransactions(
           const { nonce, to, value, data, operation, hexStringData } = transactionInfo;
           const { amount, receiver, token } = data;
 
-          const approvers = transactionLogs
-            .filter((log) => log.name === DAOEvents.ApproveHash)
-            .map((log) => AccountId.fromSolidityAddress(log?.args.owner).toString());
-
+          const approvers = getApprovers(transactionLogs);
           const approvalCount = approvers.length;
 
-          const status = transactionLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
-            ? TransactionStatus.Success
-            : transactionLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-            ? TransactionStatus.Failed
-            : TransactionStatus.Pending;
-          const tokenId = AccountId.fromSolidityAddress(token).toString();
+          const status = getTransactionStatus(transactionLogs);
 
+          const tokenId = AccountId.fromSolidityAddress(token).toString();
           if (!tokenDataCache.has(tokenId)) {
             tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
           }
@@ -116,7 +129,7 @@ export function useDAOTransactions(
             type: TransactionType.SendToken,
             approvalCount,
             approvers,
-            event: TransactionEvent.Sent,
+            event: TransactionEvent.Send,
             status: status,
             // TODO: Add real value for timestamp
             timestamp: "",
