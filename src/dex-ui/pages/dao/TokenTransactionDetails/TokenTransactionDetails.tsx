@@ -11,9 +11,17 @@ import {
   Breadcrumb,
   ArrowLeftIcon,
   Tag,
+  CheckCircleUnfilledIcon,
 } from "@dex-ui-components";
 import { ErrorLayout, LoadingSpinnerLayout, ProposalDetailsLayout } from "@layouts";
-import { useDAOTransactions, useDAOs, useApproveTransaction, useExecuteTransaction, TransactionStatus } from "@hooks";
+import {
+  useDAOTransactions,
+  useDAOs,
+  useApproveTransaction,
+  useExecuteTransaction,
+  TransactionStatus,
+  useDexContext,
+} from "@hooks";
 import { MultiSigDAODetails } from "@services";
 import { isNotNil } from "ramda";
 import { formatTokenAmountWithDecimal } from "@utils";
@@ -22,6 +30,8 @@ import { TransactionStatusAsTagVariant } from "../constants";
 
 export function TokenTransactionDetails() {
   const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const connectedWalletId = wallet.getSigner().getAccountId().toString();
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao: MultiSigDAODetails) => dao.accountId === daoAccountId);
@@ -79,7 +89,7 @@ export function TokenTransactionDetails() {
     const memberCount = ownerIds.length;
     const notConfirmedCount = memberCount - (approvalCount ?? 0);
     const isThresholdReached = approvalCount >= threshold;
-
+    const hasConnectedWalletVoted = approvers.includes(connectedWalletId);
     /** TODO: Update contracts to support a "queued" status. */
     const transactionStatus =
       status === TransactionStatus.Pending && isThresholdReached ? TransactionStatus.Queued : status;
@@ -101,14 +111,15 @@ export function TokenTransactionDetails() {
       <></>
     );
 
-    const ConfirmationDetailsAction: Readonly<{ [key in TransactionStatus]: JSX.Element }> = {
-      [TransactionStatus.Pending]: (
-        <Flex direction="column" gap="2">
-          <Button variant="primary" onClick={() => handleClickConfirmTransaction(safeId, transactionHash)}>
-            Confirm
-          </Button>
-          <Button variant="secondary">Cancel Transaction</Button>
-        </Flex>
+    const ConfirmationDetailsButtons: Readonly<{ [key in TransactionStatus]: JSX.Element }> = {
+      [TransactionStatus.Pending]: hasConnectedWalletVoted ? (
+        <Button isDisabled leftIcon={<CheckCircleUnfilledIcon boxSize={4} />}>
+          Confirmed by you
+        </Button>
+      ) : (
+        <Button variant="primary" onClick={() => handleClickConfirmTransaction(safeId, transactionHash)}>
+          Confirm
+        </Button>
       ),
       [TransactionStatus.Queued]: (
         <Button
@@ -200,7 +211,7 @@ export function TokenTransactionDetails() {
                 />
               </Flex>
             </Flex>
-            {ConfirmationDetailsAction[transactionStatus]}
+            {ConfirmationDetailsButtons[transactionStatus]}
           </Flex>
         }
       />
