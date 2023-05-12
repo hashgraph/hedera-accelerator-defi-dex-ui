@@ -7,10 +7,11 @@ import {
   TransactionResponse,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { Contracts, DEX_TOKEN_PRECISION_VALUE } from "../constants";
+import { Contracts, DEX_PRECISION, DEX_TOKEN_PRECISION_VALUE, GovernanceTokenId } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
+import { DexService } from "@services";
 
 /**
  * General format of service calls:
@@ -96,6 +97,14 @@ const sendCreateTransferTokenProposalTransaction = async (
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
   const tokenToTransferAddress = TokenId.fromString(tokenToTransfer).toSolidityAddress();
   const transferTokenContractId = ContractId.fromString(Contracts.Governor.TransferToken.ProxyId);
+  const walletId = signer.getAccountId().toString();
+  await DexService.setTokenAllowance({
+    tokenId: GovernanceTokenId,
+    walletId,
+    spenderContractId: Contracts.Governor.TransferToken.ProxyId,
+    tokenAmount: 1 * DEX_PRECISION,
+    signer,
+  });
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
@@ -115,12 +124,12 @@ const sendCreateTransferTokenProposalTransaction = async (
   return proposalTransactionResponse;
 };
 
-interface CreateContratctUpgradeProposalParams {
+interface CreateContractUpgradeProposalParams {
   title: string;
   description: string;
   linkToDiscussion: string;
-  contarctId: string;
-  proxyId: string;
+  contractToUpgrade: string;
+  newContractProxyId: string;
   signer: HashConnectSigner;
 }
 
@@ -130,19 +139,26 @@ interface CreateContratctUpgradeProposalParams {
  * @returns
  */
 const sendCreateContractUpgradeProposalTransaction = async (
-  params: CreateContratctUpgradeProposalParams
+  params: CreateContractUpgradeProposalParams
 ): Promise<TransactionResponse> => {
-  const { title, linkToDiscussion, description, contarctId, proxyId, signer } = params;
-  const upgradeProposalContractId = ContractId.fromString(contarctId).toSolidityAddress();
-  const upgradeProposalProxyId = ContractId.fromString(proxyId).toSolidityAddress();
+  const { title, linkToDiscussion, description, contractToUpgrade, newContractProxyId, signer } = params;
+  const contractIdToUpgrade = ContractId.fromString(contractToUpgrade).toSolidityAddress();
+  const upgradeProposalProxyId = ContractId.fromString(newContractProxyId).toSolidityAddress();
   const contractUpgradeContractId = ContractId.fromString(Contracts.Governor.ContractUpgrade.ProxyId);
+  const walletId = signer.getAccountId().toString();
+  await DexService.setTokenAllowance({
+    tokenId: GovernanceTokenId,
+    walletId,
+    spenderContractId: Contracts.Governor.ContractUpgrade.ProxyId,
+    tokenAmount: 1 * DEX_PRECISION,
+    signer,
+  });
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
     .addAddress(upgradeProposalProxyId)
-    .addAddress(upgradeProposalContractId);
-
+    .addAddress(contractIdToUpgrade);
   const createUpgradeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(contractUpgradeContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
@@ -153,19 +169,29 @@ const sendCreateContractUpgradeProposalTransaction = async (
   return proposalTransactionResponse;
 };
 
+interface CreateTextProposalParams {
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  signer: HashConnectSigner;
+}
 /**
  * TODO
  * @param description -
  * @param signer -
  * @returns
  */
-const sendCreateTextProposalTransaction = async (
-  title: string,
-  description: string,
-  linkToDiscussion: string,
-  signer: HashConnectSigner
-): Promise<TransactionResponse> => {
+const sendCreateTextProposalTransaction = async (params: CreateTextProposalParams): Promise<TransactionResponse> => {
+  const { title, linkToDiscussion, description, signer } = params;
   const textProposalContractId = ContractId.fromString(Contracts.Governor.TextProposal.ProxyId);
+  const walletId = signer.getAccountId().toString();
+  await DexService.setTokenAllowance({
+    tokenId: GovernanceTokenId,
+    walletId,
+    spenderContractId: Contracts.Governor.TextProposal.ProxyId,
+    tokenAmount: 1 * DEX_PRECISION,
+    signer,
+  });
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
@@ -179,6 +205,7 @@ const sendCreateTextProposalTransaction = async (
   checkTransactionResponseForError(proposalTransactionResponse, GovernorContractFunctions.CreateProposal);
   return proposalTransactionResponse;
 };
+
 interface ExecuteProposalParams {
   contractId: string;
   title: string;

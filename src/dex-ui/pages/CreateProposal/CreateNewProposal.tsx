@@ -1,4 +1,5 @@
 import { Box, Button, Center, Flex, Spacer, Text, useRadioGroup } from "@chakra-ui/react";
+import { Paths } from "@routes";
 import { useRef } from "react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import {
@@ -10,8 +11,8 @@ import {
   TokenIcon,
   TrendingUpIcon,
   WalletIcon,
-} from "../../../dex-ui-components";
-import { Page, PageHeader } from "../../layouts";
+} from "@dex-ui-components";
+import { Page, PageHeader } from "@layouts";
 
 const newProposalOptions = [
   {
@@ -40,7 +41,7 @@ const newProposalOptions = [
   },
 ];
 
-export const SelectProposalType = (props: any) => {
+export const CreateNewProposal = (props: any) => {
   const selectedProposalType = useRef<string>("new-token");
   const navigate = useNavigate();
 
@@ -60,7 +61,12 @@ export const SelectProposalType = (props: any) => {
         <PageHeader
           leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
           rightContent={[
-            <Breadcrumb to="/governance" as={ReachLink} label="Back to Proposals" leftIcon={<ArrowLeftIcon />} />,
+            <Breadcrumb
+              to={Paths.Governance.absolute}
+              as={ReachLink}
+              label="Back to Proposals"
+              leftIcon={<ArrowLeftIcon />}
+            />,
           ]}
         />
       }
@@ -85,14 +91,11 @@ export const SelectProposalType = (props: any) => {
             })}
           </Flex>
           <Spacer padding="3rem" />
-          <Button
-            width="437px"
-            onClick={() => navigate(`/governance/select-proposal-type/${selectedProposalType.current}`)}
-          >
+          <Button width="437px" onClick={() => navigate(`${selectedProposalType.current}`)}>
             Continue
           </Button>
           <Spacer padding="0.25rem" />
-          <Button variant="cancel" width="437px" onClick={() => navigate(`/governance`)}>
+          <Button variant="cancel" width="437px" onClick={() => navigate(Paths.Governance.absolute)}>
             Cancel
           </Button>
         </Center>

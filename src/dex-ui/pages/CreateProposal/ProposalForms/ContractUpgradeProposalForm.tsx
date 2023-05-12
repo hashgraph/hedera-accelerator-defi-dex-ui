@@ -1,16 +1,17 @@
-import { Button, Flex, FormControl, FormErrorMessage, Input, Spacer, Text, Box } from "@chakra-ui/react";
+import { FormControl, Input, FormErrorMessage, Flex, Button, Spacer, Text, Box } from "@chakra-ui/react";
+import { WarningIcon } from "@chakra-ui/icons";
+import { ReactElement } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate, Link as ReachLink } from "react-router-dom";
-import { ArrowLeftIcon, TextEditor, Breadcrumb, LoadingDialog } from "@dex-ui-components";
-import { CreateProposalLocationProps, TextProposalFormData } from "./types";
+import { LoadingDialog, TextEditor, Breadcrumb, ArrowLeftIcon } from "@dex-ui-components";
 import { isValidUrl } from "@utils";
-import { Page, PageHeader } from "@layouts";
-import { Paths } from "@routes";
-import { useCreateTextProposal } from "@hooks";
+import { ContractUpgradeProposalFormData, CreateProposalLocationProps } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { WarningIcon } from "@chakra-ui/icons";
+import { useCreateContractUpgradeProposal } from "@hooks";
+import { Paths } from "@routes";
+import { Page, PageHeader } from "@layouts";
 
-export function TextProposalForm() {
+export function ContractUpgradeProposalForm(): ReactElement {
   const navigate = useNavigate();
   const {
     handleSubmit,
@@ -19,16 +20,16 @@ export function TextProposalForm() {
     reset,
     getValues,
     formState: { errors },
-  } = useForm<TextProposalFormData>();
+  } = useForm<ContractUpgradeProposalFormData>();
 
-  const createTextProposalMutationResults = useCreateTextProposal(handleSendProposesSuccess);
+  const createContractUpgradeMutationResults = useCreateContractUpgradeProposal(handleSendProposesSuccess);
   const {
     isLoading,
     isError,
     error,
     mutate,
-    reset: resetCreateTextProposalTransaction,
-  } = createTextProposalMutationResults;
+    reset: resetCreateContractUpgradeTransaction,
+  } = createContractUpgradeMutationResults;
 
   function handleSendProposesSuccess(transactionResponse: TransactionResponse) {
     const createProposalLocationProps = {
@@ -47,11 +48,13 @@ export function TextProposalForm() {
     navigate(Paths.Governance.absolute);
   }
 
-  async function onSubmit(data: TextProposalFormData) {
+  async function onSubmit(data: ContractUpgradeProposalFormData) {
     mutate({
       title: data.title,
       description: data.description,
       linkToDiscussion: data.linkToDiscussion,
+      newContractProxyId: data.newContractProxyId,
+      contractToUpgrade: data.contractToUpgrade,
     });
   }
 
@@ -75,7 +78,7 @@ export function TextProposalForm() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Flex flexDirection="column" alignItems="center" width="100%">
               <Box width="600px">
-                <Text textStyle="h3">Text Proposal</Text>
+                <Text textStyle="h3">Contract Upgrade</Text>
                 <Spacer padding="0.5rem" />
                 <Flex direction="column" gap="0.5rem">
                   <FormControl isInvalid={Boolean(errors.title)}>
@@ -95,7 +98,7 @@ export function TextProposalForm() {
                       control={control}
                       rules={{
                         required: { value: true, message: "Description is required." },
-                        minLength: { value: 107, message: "Please enter at least 100 characters in the description." },
+                        minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
                       }}
                       render={({ field }) => (
                         <TextEditor
@@ -121,12 +124,43 @@ export function TextProposalForm() {
                     />
                     <FormErrorMessage>{errors.linkToDiscussion && errors.linkToDiscussion.message}</FormErrorMessage>
                   </FormControl>
+                  <FormControl isInvalid={Boolean(errors.newContractProxyId)}>
+                    <Input
+                      variant="form-input"
+                      id="newContractProxyId"
+                      placeholder="New Implementation Address"
+                      {...register("newContractProxyId", {
+                        required: { value: true, message: "Address is required." },
+                      })}
+                    />
+                    <FormErrorMessage>
+                      {errors.newContractProxyId && errors.newContractProxyId.message}
+                    </FormErrorMessage>
+                  </FormControl>
+                  <FormControl isInvalid={Boolean(errors.contractToUpgrade)}>
+                    <Input
+                      variant="form-input"
+                      id="contractToUpgrade"
+                      placeholder="Proxy Address"
+                      {...register("contractToUpgrade", {
+                        required: { value: true, message: "Proxy Address is required." },
+                      })}
+                    />
+                    <FormErrorMessage>{errors.contractToUpgrade && errors.contractToUpgrade.message}</FormErrorMessage>
+                  </FormControl>
                   <Spacer padding="0.5rem" />
                   <Flex direction="row" justifyContent="right" gap="0.5rem">
                     <Button variant="secondary" padding="10px 27px" height="40px" onClick={handleCancelClick}>
                       Cancel
                     </Button>
-                    <Button type="submit" variant="primary" padding="10px 27px" height="40px" isLoading={isLoading}>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      padding="10px 27px"
+                      height="40px"
+                      isLoading={isLoading}
+                      alignSelf="end"
+                    >
                       Publish
                     </Button>
                   </Flex>
@@ -145,7 +179,7 @@ export function TextProposalForm() {
             buttonConfig={{
               text: "Dismiss",
               onClick: () => {
-                resetCreateTextProposalTransaction();
+                resetCreateContractUpgradeTransaction();
               },
             }}
           />

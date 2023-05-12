@@ -1,13 +1,12 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { AlertDialog, NotficationTypes, Notification } from "../../../dex-ui-components";
+import { AlertDialog, NotficationTypes, Notification, Button } from "@dex-ui-components";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { CancelProposalModalButton } from "./CancelProposalModalButton";
 import { useState } from "react";
 import { useProposalDetails } from "./useProposalDetails";
 import { VoteType } from "./types";
-import { useDexContext } from "../../hooks";
+import { useDexContext } from "@hooks";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../dex-ui-components";
 import { formatProposal } from "../Governance/formatter";
 
 type UseProposalDetailsData = ReturnType<typeof useProposalDetails>;

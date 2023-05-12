@@ -2,8 +2,11 @@ export enum GovernanceMutations {
   CastVote = "castVote",
   ExecuteProposal = "executeProposal",
   ClaimGODToken = "claimGODToken",
-  DeployContract = "deployContract",
   CancelProposal = "cancelProposal",
+  CreateTextProposal = "createTextProposal",
+  CreateNewTokenProposal = "createNewTokenProposal",
+  CreateTokenTransferProposal = "createTokenTransferProposal",
+  CreateContractUpgradeProposal = "createContractUpgradeProposal",
 }
 
 export enum GovernanceQueries {

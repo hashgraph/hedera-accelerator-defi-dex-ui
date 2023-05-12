@@ -12,12 +12,12 @@ export const Paths = {
   Governance: {
     absolute: "/governance",
     default: "governance",
-    ProposalDetails: "governance/proposal-details",
-    SelectProposalType: "governance/select-proposal-type",
-    CreateNewToken: "governance/select-proposal-type/new-token",
-    CreateText: "governance/select-proposal-type/text",
-    CreateTokenTransfer: "governance/select-proposal-type/token-transfer",
-    CreateContractUpgrade: "governance/select-proposal-type/contract-upgrade",
+    ProposalDetails: "proposal-details",
+    CreateNewProposal: "create-new-proposal",
+    CreateNewToken: "new-token",
+    CreateText: "text",
+    CreateTokenTransfer: "token-transfer",
+    CreateContractUpgrade: "contract-upgrade",
   },
   DAOs: {
     absolute: "/daos",

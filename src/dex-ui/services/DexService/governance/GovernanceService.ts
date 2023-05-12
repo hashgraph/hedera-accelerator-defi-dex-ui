@@ -2,14 +2,36 @@ import { BigNumber } from "bignumber.js";
 import { AccountId } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 import { DexService } from "../..";
-import { ContractProposalState, Proposal, ProposalState, ProposalType } from "../../../store/governanceSlice";
-import { getStatus } from "../../../store/governanceSlice/utils";
-import { getTimeRemaining } from "../../../utils";
+import {
+  ContractProposalState,
+  Proposal,
+  ProposalState,
+  ProposalType,
+  ProposalStatus,
+} from "../../../store/governanceSlice";
+import { getTimeRemaining } from "@utils";
 import { MirrorNodeDecodedProposalEvent } from "../../MirrorNodeService";
 import { getFulfilledResultsData } from "../../MirrorNodeService/utils";
 import { Contracts, GovernanceTokenId } from "../../constants";
 import { ProposalData } from "./type";
 
+/**
+ * Converts a proposal state into a corresponding status.
+ * @param state - A proposal state.
+ * @returns The corresponding proposal status.
+ */
+const getStatus = (state: ProposalState): ProposalStatus | undefined => {
+  if (state === ProposalState.Active || state === ProposalState.Pending) {
+    return ProposalStatus.Active;
+  }
+  if (state === ProposalState.Queued || state === ProposalState.Succeeded || state === ProposalState.Executed) {
+    return ProposalStatus.Passed;
+  }
+  if (state === ProposalState.Canceled || state === ProposalState.Defeated || state === ProposalState.Expired) {
+    return ProposalStatus.Failed;
+  }
+  return undefined;
+};
 /**
  * Fetches all proposal events emitted by a smart contract. The "ProposalCreated",
  * "ProposalExecuted", and "ProposalCanceled" are fetched. These events provide data
