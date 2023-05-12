@@ -30,13 +30,14 @@ import {
   NotficationTypes,
   Notification,
   Tag,
+  DisplayHTMLContent,
+  StepperUI,
 } from "@dex-ui-components";
 import { ProposalState } from "../../store/governanceSlice";
 import { useProposalDetails } from "./useProposalDetails";
-import { DisplayHTMLContent } from "../../../dex-ui-components/base/Inputs/DisplayHTMLContent";
 import { ProposalDetailsControls } from "./ProposalDetailsControls";
-import { StepperUI } from "../../../dex-ui-components/base/Stepper";
 import { formatProposal } from "../Governance/formatter";
+import { Paths } from "@routes";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
@@ -103,7 +104,7 @@ export const ProposalDetails = () => {
           <Flex direction="column" gap={10} height="100%">
             <Breadcrumb>
               <BreadcrumbItem>
-                <BreadcrumbLink as={ReachLink} to="/governance">
+                <BreadcrumbLink as={ReachLink} to={Paths.Governance.absolute}>
                   <Text textStyle="link">{"< Governance"}</Text>
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -158,14 +159,14 @@ export const ProposalDetails = () => {
                 {ProposalState.Executed}
               </ChakraTag>
             )}
-            <Box flexGrow="1">
+            <Box height="fit-content" width="80%">
               <Text textStyle="h3">Description</Text>
               <Spacer padding="0.25rem" />
               <SkeletonText speed={0.4} fadeDuration={0} noOfLines={12} isLoaded={!proposal.isLoading}>
                 <DisplayHTMLContent value={formattedProposal?.description ?? ""} />
               </SkeletonText>
             </Box>
-            <Flex gap="4" direction="column">
+            <Flex gap="4" direction="column" width="80%">
               <ProposalDetailsControls proposalDetails={proposalDetails} resetServerState={resetServerState} />
             </Flex>
           </Flex>

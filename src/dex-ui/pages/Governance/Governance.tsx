@@ -8,17 +8,18 @@ import {
   Pagination,
   usePagination,
   RangeDatePicker,
-} from "../../../dex-ui-components";
-import { CreateProposalLocationProps } from "../CreateProposal";
-import { createHashScanTransactionLink } from "../../utils";
-import { CardListLayout, Page, PageHeader, TabFilter, TabFilters } from "../../layouts";
-import { useAllProposals, useTabFilters } from "../../hooks";
+} from "@dex-ui-components";
+import { createHashScanTransactionLink } from "@utils";
+import { CardListLayout, Page, PageHeader, TabFilter, TabFilters } from "@layouts";
+import { useAllProposals, useTabFilters } from "@hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
 import { useInput } from "../../hooks/useInput";
 import { useDateRange } from "../../hooks/useDateRange";
 import { FormattedProposal } from "./types";
 import { VotingPower } from "./VotingPower";
+import { Paths } from "@routes";
+import { CreateProposalLocationProps } from "../CreateProposal";
 
 const PageLimit = 20;
 
@@ -70,7 +71,7 @@ export const Governance = (): ReactElement => {
   );
   const hashScanLink = createHashScanTransactionLink(locationState?.proposalTransactionId);
   const handleClickNotificationCloseButton = () => setIsNotificationVisible(false);
-  const handleClickNewProposalButton = () => navigate("/governance/select-proposal-type");
+  const handleClickNewProposalButton = () => navigate(Paths.Governance.CreateNewProposal);
 
   return (
     <Page

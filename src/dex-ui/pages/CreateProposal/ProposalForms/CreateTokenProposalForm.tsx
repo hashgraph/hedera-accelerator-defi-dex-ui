@@ -1,4 +1,8 @@
-import { FormControl, Input } from "@chakra-ui/react";
+import { FormControl, Input, Text, Flex, Box, Spacer, Button } from "@chakra-ui/react";
+import { Breadcrumb, ArrowLeftIcon } from "@dex-ui-components";
+import { Page, PageHeader } from "@layouts";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
+import { Paths } from "@routes";
 
 /**
  * TODO: Update input fields to match full proposal creation feature set.
@@ -6,11 +10,53 @@ import { FormControl, Input } from "@chakra-ui/react";
  * components and react-form-hooks to create a form.
  */
 export function CreateTokenProposalForm() {
+  const navigate = useNavigate();
+
+  function handleCancelClick() {
+    navigate(Paths.Governance.absolute);
+  }
+
   return (
-    <form>
-      <FormControl>
-        <Input variant="form-input" id="title" placeholder="Proposal Title" />
-      </FormControl>
-    </form>
+    <Page
+      header={
+        <PageHeader
+          leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
+          rightContent={[
+            <Breadcrumb
+              to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
+              as={ReachLink}
+              label="Back to Select Proposal Type"
+              leftIcon={<ArrowLeftIcon />}
+            />,
+          ]}
+        />
+      }
+      body={
+        <>
+          <form>
+            <Flex flexDirection="column" alignItems="center" width="100%">
+              <Box width="600px">
+                <Text textStyle="h3">New Token</Text>
+                <Spacer padding="0.5rem" />
+                <Flex direction="column" gap="0.5rem">
+                  <FormControl>
+                    <Input variant="form-input" id="title" placeholder="Proposal Title" />
+                  </FormControl>
+                  <Spacer padding="0.5rem" />
+                  <Flex direction="row" justifyContent="right" gap="0.5rem">
+                    <Button variant="secondary" padding="10px 27px" height="40px" onClick={handleCancelClick}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" variant="primary" padding="10px 27px" height="40px" alignSelf="end">
+                      Publish
+                    </Button>
+                  </Flex>
+                </Flex>
+              </Box>
+            </Flex>
+          </form>
+        </>
+      }
+    />
   );
 }

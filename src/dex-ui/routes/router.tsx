@@ -8,8 +8,7 @@ import {
   CreatePoolPage,
   Governance,
   ProposalDetails,
-  SelectProposalType,
-  CreateProposal,
+  CreateNewProposal,
   CreateADAOPage,
   DAOsListPage,
   DashboardOverview,
@@ -24,6 +23,10 @@ import {
   DeleteMember,
   ReplaceMember,
   ChangeThreshold,
+  TextProposalForm,
+  ContractUpgradeProposalForm,
+  TokenTransferProposalForm,
+  CreateTokenProposalForm,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -39,17 +42,17 @@ export const router = createBrowserRouter(
       <Route path={`${Paths.Pools.AddLiquidity}/:pairId/:poolName`} element={<AddLiquidityPage />} />
       <Route path={Paths.Pools.Withdraw} element={<WithdrawPage />} />
       <Route path={Paths.Pools.CreatePool} element={<CreatePoolPage />} />
-      {/* TODO: Create governance route heirarchy. */}
-      <Route path={Paths.Governance.default} element={<Governance />} />
-      <Route path={`${Paths.Governance.ProposalDetails}/:id`} element={<ProposalDetails />} />
-      <Route path={Paths.Governance.SelectProposalType} element={<SelectProposalType />} />
-      <Route path={Paths.Governance.CreateNewToken} element={<CreateProposal proposalType="new-token" />} />
-      <Route path={Paths.Governance.CreateText} element={<CreateProposal proposalType="text" />} />
-      <Route path={Paths.Governance.CreateTokenTransfer} element={<CreateProposal proposalType="token-transfer" />} />
-      <Route
-        path={Paths.Governance.CreateContractUpgrade}
-        element={<CreateProposal proposalType="contract-upgrade" />}
-      />
+      <Route path={Paths.Governance.default}>
+        <Route index element={<Governance />} />
+        <Route path={`${Paths.Governance.ProposalDetails}/:id`} element={<ProposalDetails />} />
+        <Route path={Paths.Governance.CreateNewProposal}>
+          <Route index element={<CreateNewProposal />} />
+          <Route path={Paths.Governance.CreateNewToken} element={<CreateTokenProposalForm />} />
+          <Route path={Paths.Governance.CreateText} element={<TextProposalForm />} />
+          <Route path={Paths.Governance.CreateTokenTransfer} element={<TokenTransferProposalForm />} />
+          <Route path={Paths.Governance.CreateContractUpgrade} element={<ContractUpgradeProposalForm />} />
+        </Route>
+      </Route>
       {/* TODO: Create DAO route heirarchy. */}
       <Route path={Paths.DAOs.default}>
         <Route index element={<DAOsListPage />} />

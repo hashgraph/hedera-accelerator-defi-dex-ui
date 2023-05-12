@@ -17,7 +17,8 @@ export function useProposalDetails(proposalId: string | undefined) {
   const cancelProposal = useCancelProposal(proposalId);
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
   const executeProposal = useExecuteProposal(proposalId);
-  const fetchLockGODTokens = useFetchLockedGovToken(wallet.savedPairingData?.accountIds[0]);
+  const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
+  const fetchLockGODTokens = useFetchLockedGovToken(walletId);
 
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
   const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;
@@ -75,7 +76,7 @@ export function useProposalDetails(proposalId: string | undefined) {
     }
   }
   const hashScanTransactionLink = getHashScanLink();
-  const hashScanAccountLink = createHashScanAccountIdLink(wallet.getSigner().getAccountId().toString());
+  const hashScanAccountLink = createHashScanAccountIdLink(walletId);
 
   function getProposalStatus(): ProposalStates[] | undefined {
     switch (proposal.data?.state) {

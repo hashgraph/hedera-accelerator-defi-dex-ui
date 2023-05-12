@@ -23,7 +23,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
       minHeight="99px"
       borderRadius="0px"
       padding="0.25rem"
-      onClick={() => navigate(`/governance/proposal-details/${proposal.id}`)}
+      onClick={() => navigate(`proposal-details/${proposal.id}`)}
     >
       <Flex gap="8" alignItems="center" height="100%">
         <Box bg={statusColor} width="0.25rem" height="100%"></Box>

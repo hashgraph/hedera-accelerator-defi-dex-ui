@@ -1,8 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { TransactionResponse, AccountId } from "@hashgraph/sdk";
-import { StateCreator } from "zustand";
-import { DEXState } from "..";
-import { TransactionStatus } from "../appSlice";
+import { AccountId } from "@hashgraph/sdk";
 
 enum ProposalType {
   Text = "Text",
@@ -76,77 +73,5 @@ interface Proposal {
   };
 }
 
-enum SEND_CREATE_PROPOSAL {
-  Started = "governance/SEND_CREATE_PROPOSAL_Started",
-  Succeeded = "governance/SEND_CREATE_PROPOSAL_Succeeded",
-  Failed = "governance/SEND_CREATE_PROPOSALL_Failed",
-}
-
-const GovernanceActionType = {
-  SEND_CREATE_PROPOSAL,
-  SIGN_TRANSACTION: "governance/SIGN_TRANSACTION",
-  CLEAR_PROPOSAL_TRANSACTION_STATE: "governance/CLEAR_PROPOSAL_TRANSACTION_STATE",
-};
-
-interface ProposalTransacationState {
-  status: TransactionStatus;
-  successPayload: {
-    proposal?: {
-      title: string;
-    };
-    transactionResponse: TransactionResponse | null;
-  };
-  errorMessage: string;
-}
-
-interface GovernanceState {
-  errorMessage: string | null;
-  proposalTransacationState: ProposalTransacationState;
-}
-
-interface CreateNewTokenProposalData {
-  title: string;
-}
-
-interface CreateTextProposalData {
-  title: string;
-  description: string;
-  linkToDiscussion: string;
-}
-
-interface CreateTransferTokenProposalData {
-  title: string;
-  description: string;
-  linkToDiscussion: string;
-  accountToTransferTo: string;
-  tokenToTransfer: string;
-  amountToTransfer: number;
-}
-
-type CreateProposalData = CreateNewTokenProposalData | CreateTextProposalData | CreateTransferTokenProposalData;
-interface GovernanceActions {
-  createProposal: (type: ProposalType, data: CreateProposalData) => Promise<void>;
-  clearProposalTransactionState: () => void;
-}
-
-type GovernanceStore = GovernanceState & GovernanceActions;
-
-type GovernanceSlice = StateCreator<
-  DEXState,
-  [["zustand/devtools", never], ["zustand/immer", never]],
-  [],
-  GovernanceStore
->;
-
-export { GovernanceActionType, ProposalType, ContractProposalState, ProposalState, ProposalStatus, ProposalStateIcon };
-export type {
-  CreateProposalData,
-  CreateTextProposalData,
-  CreateTransferTokenProposalData,
-  GovernanceSlice,
-  GovernanceStore,
-  GovernanceState,
-  GovernanceActions,
-  Proposal,
-  ProposalStates,
-};
+export { ProposalType, ContractProposalState, ProposalState, ProposalStatus, ProposalStateIcon };
+export type { Proposal, ProposalStates };
