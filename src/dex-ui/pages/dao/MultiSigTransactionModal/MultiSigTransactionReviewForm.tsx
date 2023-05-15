@@ -14,7 +14,7 @@ interface MultiSigTransactionReviewFormProps {
 export function MultiSigTransactionReviewForm(props: MultiSigTransactionReviewFormProps) {
   const { safeAccountId } = props;
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const walletAccountId = wallet.getSigner().getAccountId().toString();
+  const walletAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { setValue, getValues } = useFormContext<CreateMultiSigTransactionForm>();
   const formValues = getValues();
   const { tokenId, amount, recipientAccountId } = formValues;

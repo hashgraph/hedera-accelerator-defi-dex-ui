@@ -31,7 +31,7 @@ import { TransactionStatusAsTagVariant } from "../constants";
 export function TokenTransactionDetails() {
   const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const connectedWalletId = wallet.getSigner().getAccountId().toString();
+  const connectedWalletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao: MultiSigDAODetails) => dao.accountId === daoAccountId);

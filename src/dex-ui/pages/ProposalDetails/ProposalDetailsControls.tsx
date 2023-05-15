@@ -44,7 +44,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
 
   let isUserProposalCreator = false;
   try {
-    isUserProposalCreator = formattedProposal?.author === wallet.getSigner().getAccountId().toString();
+    isUserProposalCreator = formattedProposal?.author === wallet.savedPairingData?.accountIds[0] ?? "";
   } catch (error) {
     console.log(error);
   }
