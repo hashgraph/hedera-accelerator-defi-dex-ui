@@ -141,7 +141,7 @@ function createHederaService() {
   ) => {
     const tokenQuantity = withPrecision(1000).toNumber();
     const targetAccountId = AccountId.fromString(receivingAccountId);
-    const tokenAccountIds = [Tokens.TokenBAccountId, Tokens.TokenBAccountId, Tokens.TokenCAccountId];
+    const tokenAccountIds = [Tokens.TokenAAccountId, Tokens.TokenBAccountId, Tokens.TokenCAccountId];
 
     const tokensToAssociate = tokenAccountIds.reduce((_tokensToAssociate: string[], tokenId: string | undefined) => {
       if (associatedTokenIds && !associatedTokenIds.includes(tokenId ?? "")) {
