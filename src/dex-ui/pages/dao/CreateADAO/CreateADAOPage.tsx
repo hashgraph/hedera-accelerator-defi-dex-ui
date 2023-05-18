@@ -17,7 +17,14 @@ import {
   NFTDAOReviewForm,
 } from "./forms";
 import { useNavigate } from "react-router-dom";
-import { CreateADAOForm, CreateAMultiSigDAOForm, CreateATokenDAOForm, CreateANFTDAOForm } from "./types";
+import {
+  CreateADAOForm,
+  CreateAMultiSigDAOForm,
+  CreateATokenDAOForm,
+  CreateANFTDAOForm,
+  TokenDAOGovernanceData,
+  DAOGovernanceTokenType,
+} from "./types";
 import { useCreateDAO } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -41,7 +48,7 @@ export function CreateADAOPage() {
   });
   const { getValues, trigger, handleSubmit, formState } = createDAOPageForm;
 
-  const { isPublic, type, name } = getValues();
+  const { isPublic, type, name, governance } = getValues();
 
   function handleCreateDAOSuccess(transactionResponse: TransactionResponse) {
     const createDAOSuccessMessage = `Created new 
@@ -121,8 +128,16 @@ export function CreateADAOPage() {
         return trigger(["name", "logoUrl", "isPublic"]);
       }
       case 2: {
-        if (type === DAOType.GovernanceToken)
-          return trigger(["governance.token.id", "governance.token.treasuryWalletAccountId"]);
+        if (
+          type === DAOType.GovernanceToken &&
+          (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.NewToken
+        )
+          return trigger(["governance.newToken.id", "governance.newToken.treasuryWalletAccountId"]);
+        if (
+          type === DAOType.GovernanceToken &&
+          (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.ExistingToken
+        )
+          return trigger(["governance.existingToken.id", "governance.existingToken.treasuryWalletAccountId"]);
         if (type === DAOType.MultiSig) return trigger(["governance.admin"]);
         if (type === DAOType.NFT) return trigger(["governance.nft.id", "governance.nft.treasuryWalletAccountId"]);
         return triggerDefaultValidations();
@@ -154,8 +169,14 @@ export function CreateADAOPage() {
         name,
         logoUrl,
         isPrivate: !isPublic,
-        tokenId: governance.token.id,
-        treasuryWalletAccountId: governance.token.treasuryWalletAccountId,
+        tokenId:
+          governance.tokenType === DAOGovernanceTokenType.NewToken
+            ? governance.newToken.id
+            : governance.existingToken.id,
+        treasuryWalletAccountId:
+          governance.tokenType === DAOGovernanceTokenType.NewToken
+            ? governance.newToken.treasuryWalletAccountId
+            : governance.existingToken.treasuryWalletAccountId,
         quorum: voting.quorum,
         votingDuration: voting.duration,
         lockingDuration: voting.lockingPeriod,

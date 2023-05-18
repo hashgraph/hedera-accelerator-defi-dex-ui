@@ -15,3 +15,7 @@ export function isIterable(value: any): boolean {
 export function convertToByte32(hexString: string): Uint8Array {
   return ethers.utils.arrayify(ethers.utils.hexlify(hexString));
 }
+
+export function checkForValidTokenId(tokenId: string): boolean {
+  return /^\d+\.\d+\.\d+$/.test(tokenId);
+}

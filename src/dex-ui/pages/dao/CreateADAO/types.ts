@@ -1,7 +1,13 @@
 import { DAOType } from "../../../services";
 
+export enum DAOGovernanceTokenType {
+  NewToken = "New Token",
+  ExistingToken = "Existing Token",
+}
+
 export interface TokenDAOGovernanceData {
-  token: {
+  tokenType: DAOGovernanceTokenType;
+  newToken: {
     name: string;
     symbol: string;
     decimals: number;
@@ -10,6 +16,17 @@ export interface TokenDAOGovernanceData {
     supplyKey: string;
     id: string;
     treasuryWalletAccountId: string;
+  };
+  existingToken: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    logo: string;
+    initialSupply: number;
+    supplyKey: string;
+    id: string;
+    treasuryWalletAccountId: string;
+    mirrorNodeTokenId: string | undefined;
   };
 }
 

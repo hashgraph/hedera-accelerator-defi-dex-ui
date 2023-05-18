@@ -253,6 +253,16 @@ function createMirrorNodeService() {
     return accountData;
   };
 
+  /**
+   * Fetches transaction details / records on Hedera network for a given TransactionId
+   * @param transactionId - The ID of the transactions.
+   * @returns The list of transactions for the given associated with given TransactionId
+   */
+  const fetchTransactionRecord = async (transactionId: string): Promise<MirrorNodeTransaction[]> => {
+    const { data: transactions } = await testnetMirrorNodeAPI.get(`/api/v1/transactions/${transactionId}`);
+    return transactions.transactions;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenBalances,
@@ -263,6 +273,7 @@ function createMirrorNodeService() {
     callContract,
     fetchParsedEventLogs,
     fetchAccountInfo,
+    fetchTransactionRecord,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
   };
