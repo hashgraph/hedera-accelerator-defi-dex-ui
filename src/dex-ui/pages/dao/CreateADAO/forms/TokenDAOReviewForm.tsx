@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { FormInput } from "@dex-ui-components";
-import { CreateATokenDAOForm } from "../types";
+import { CreateATokenDAOForm, DAOGovernanceTokenType } from "../types";
 import { DAOReviewForm } from "./DAOReviewForm";
 
 export function TokenDAOReviewForm() {
@@ -21,8 +21,11 @@ export function TokenDAOReviewForm() {
             id: "governance.token.name",
             label: "Token name",
             type: "text",
-            value: governance.token.name,
             isReadOnly: true,
+            value:
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.name
+                : governance.existingToken.name,
           }}
         />,
         <FormInput<"governance.token.symbol">
@@ -30,8 +33,11 @@ export function TokenDAOReviewForm() {
             id: "governance.token.symbol",
             label: "Token symbol",
             type: "text",
-            value: governance.token.symbol,
             isReadOnly: true,
+            value:
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.symbol
+                : governance.existingToken.symbol,
           }}
         />,
         <FormInput<"governance.token.id">
@@ -39,8 +45,11 @@ export function TokenDAOReviewForm() {
             id: "governance.token.id",
             label: "Token id",
             type: "text",
-            value: governance.token.id,
             isReadOnly: true,
+            value:
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.id
+                : governance.existingToken.id,
           }}
         />,
         <FormInput<"governance.token.decimals">
@@ -48,8 +57,12 @@ export function TokenDAOReviewForm() {
             id: "governance.token.decimals",
             label: "Decimals",
             type: "number",
-            value: String(governance.token.decimals),
             isReadOnly: true,
+            value: String(
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.decimals
+                : governance.existingToken.decimals
+            ),
           }}
         />,
         <FormInput<"governance.token.initialSupply">
@@ -57,9 +70,16 @@ export function TokenDAOReviewForm() {
             id: "governance.token.initialSupply",
             label: "Initial token supply",
             type: "number",
-            unit: governance.token.symbol,
-            value: String(governance.token.initialSupply),
             isReadOnly: true,
+            unit:
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.symbol
+                : governance.existingToken.symbol,
+            value: String(
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.initialSupply
+                : governance.existingToken.initialSupply
+            ),
           }}
         />,
         <FormInput<"governance.token.treasuryWalletAccountId">
@@ -67,8 +87,11 @@ export function TokenDAOReviewForm() {
             id: "governance.token.treasuryWalletAccountId",
             label: "Treasury wallet account id",
             type: "text",
-            value: governance.token.treasuryWalletAccountId,
             isReadOnly: true,
+            value:
+              governance.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance.newToken.treasuryWalletAccountId
+                : governance.existingToken.treasuryWalletAccountId,
           }}
         />,
       ]}

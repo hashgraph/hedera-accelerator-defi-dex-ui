@@ -3,6 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { RadioCard } from "@dex-ui-components";
 import {
   CreateADAOForm,
+  DAOGovernanceTokenType,
   MultiSigDAOGovernanceData,
   MultiSigDAOVotingData,
   NFTDAOGovernanceData,
@@ -50,7 +51,17 @@ function getDefaultFormValues(type: DAOType): {
   } else if (type === DAOType.GovernanceToken) {
     return {
       governance: {
-        token: {
+        newToken: {
+          name: "",
+          symbol: "",
+          decimals: 8,
+          supplyKey: "",
+          logo: "",
+          initialSupply: 0,
+          id: "",
+          treasuryWalletAccountId: "",
+        },
+        existingToken: {
           name: "",
           symbol: "",
           decimals: 0,
@@ -59,7 +70,9 @@ function getDefaultFormValues(type: DAOType): {
           initialSupply: 0,
           id: "",
           treasuryWalletAccountId: "",
+          mirrorNodeTokenId: undefined,
         },
+        tokenType: DAOGovernanceTokenType.NewToken,
       },
       voting: {
         minProposalDeposit: 0,
