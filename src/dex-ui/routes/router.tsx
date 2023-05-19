@@ -27,6 +27,9 @@ import {
   ContractUpgradeProposalForm,
   TokenTransferProposalForm,
   CreateTokenProposalForm,
+  SendTokenWizard,
+  SendTokenDetailsForm,
+  SendTokenReviewForm,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -67,7 +70,11 @@ export const router = createBrowserRouter(
         </Route>
         <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />} />
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />} />
-        {/* TODO: Include below Member Operations in multisig hierarchy */}
+        <Route path="multisig/:accountId/send-token" element={<SendTokenWizard />}>
+          <Route index element={<Navigate to="details" />} />
+          <Route path="details" element={<SendTokenDetailsForm />} />
+          <Route path="review" element={<SendTokenReviewForm />} />
+        </Route>
         <Route path={"multisig/:accountId/settings/add-member"} element={<AddMember />} />
         <Route path={"multisig/:accountId/settings/delete-member/:memberId"} element={<DeleteMember />} />
         <Route path={"multisig/:accountId/settings/replace-member/:memberId"} element={<ReplaceMember />} />

@@ -3,3 +3,4 @@ export * from "./DAOsListPage";
 export * from "./MultiSigDAODashboard";
 export * from "./GovernanceDAODashboard";
 export * from "./NFTDAODashboard";
+export * from "./SendTokenWizard";

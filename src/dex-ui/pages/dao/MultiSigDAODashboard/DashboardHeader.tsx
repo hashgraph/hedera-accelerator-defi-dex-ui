@@ -1,8 +1,7 @@
-import { Text, Flex, HStack } from "@chakra-ui/react";
-import { Link as ReachLink } from "react-router-dom";
+import { Text, Flex, HStack, Button } from "@chakra-ui/react";
+import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData, Tag } from "@dex-ui-components";
 import { DAOType } from "@services";
-import { MultiSigTransactionModal } from "../MultiSigTransactionModal";
 
 interface DashboardHeaderProps {
   daoAccountId: string;
@@ -13,6 +12,11 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader(props: DashboardHeaderProps) {
   const { daoAccountId, safeAccountId, name, type } = props;
+  const navigate = useNavigate();
+
+  function handleNewTokenClicked() {
+    navigate("send-token");
+  }
 
   return (
     <Flex bg={Color.White_02} direction="column" padding="24px 80px 16px">
@@ -41,11 +45,9 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           <Flex height="40px" alignItems="center">
             <Breadcrumb to="/daos" as={ReachLink} label="Back to DAOs" leftIcon={<ArrowLeftIcon />} />
           </Flex>
-          <MultiSigTransactionModal
-            openDialogButtonText="Send Token"
-            daoAccountId={daoAccountId}
-            safeAccountId={safeAccountId}
-          />
+          <Button variant="primary" onClick={handleNewTokenClicked}>
+            Send Token
+          </Button>
         </Flex>
       </Flex>
     </Flex>
