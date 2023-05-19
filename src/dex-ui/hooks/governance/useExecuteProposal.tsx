@@ -9,6 +9,9 @@ interface UseExecuteProposalParams {
   contractId: string;
   title: string;
   signer: HashConnectSigner;
+  transfersFromAccount?: string;
+  tokenId?: string;
+  tokenAmount?: number;
 }
 
 export function useExecuteProposal(id: string | undefined) {
@@ -21,8 +24,7 @@ export function useExecuteProposal(id: string | undefined) {
   >(
     async (params: UseExecuteProposalParams) => {
       if (isNil(id)) return;
-      const { contractId, title, signer } = params;
-      return DexService.executeProposal({ contractId, title, signer });
+      return DexService.executeProposal({ ...params });
     },
     {
       onSuccess: () => {

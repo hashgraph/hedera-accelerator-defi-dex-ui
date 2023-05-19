@@ -122,6 +122,7 @@ interface MirrorNodeDecodedProposalEvent {
   title?: string;
   link?: string;
   timestamp?: string;
+  data?: string;
 }
 
 interface MirrorNodeEventLog {

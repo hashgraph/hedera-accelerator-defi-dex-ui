@@ -64,6 +64,10 @@ interface Proposal {
   timeRemaining: BigNumber | undefined;
   state: ProposalState | undefined;
   timestamp: string | undefined;
+  transferFromAccount?: string | undefined;
+  transferToAccount?: string | undefined;
+  tokenToTransfer?: string | undefined;
+  transferTokenAmount?: number | undefined;
   votes: {
     yes: BigNumber | undefined;
     no: BigNumber | undefined;

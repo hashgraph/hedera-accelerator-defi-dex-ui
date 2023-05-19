@@ -53,7 +53,14 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
   async function handleExecuteClicked() {
     props.resetServerState();
     const signer = wallet.getSigner();
-    executeProposal.mutate({ contractId: proposal.data?.contractId ?? "", title: proposal.data?.title ?? "", signer });
+    executeProposal.mutate({
+      contractId: proposal.data?.contractId ?? "",
+      title: proposal.data?.title ?? "",
+      signer,
+      transfersFromAccount: proposal.data?.transferFromAccount,
+      tokenId: proposal.data?.tokenToTransfer,
+      tokenAmount: proposal.data?.transferTokenAmount,
+    });
   }
 
   function handleCancelProposalClicked() {

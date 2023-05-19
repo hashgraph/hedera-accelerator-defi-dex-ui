@@ -166,7 +166,7 @@ export function TokenTransferProposalForm(): ReactElement {
                         {...register("amountToTransfer", {
                           valueAsNumber: true,
                           required: { value: true, message: "A token amount is required." },
-                          min: { value: 0, message: "A token amount must be greater than 0." },
+                          validate: (value) => value > 0 || "A token amount must be greater than 0.",
                         })}
                       />
                       <FormErrorMessage>{errors.amountToTransfer && errors.amountToTransfer.message}</FormErrorMessage>

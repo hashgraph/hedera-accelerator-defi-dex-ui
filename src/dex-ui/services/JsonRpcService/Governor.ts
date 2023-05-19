@@ -59,6 +59,10 @@ type ProposalDetailsResponse = {
   title: string;
   description: string;
   link: string;
+  transferFromAccount?: string | undefined;
+  transferToAccount?: string | undefined;
+  tokenToTransfer?: string | undefined;
+  transferTokenAmount?: number | undefined;
 };
 
 async function fetchProposalDetails(governorAccountId: string, proposalId: string): Promise<ProposalDetailsResponse> {
