@@ -14,6 +14,35 @@ import { MirrorNodeDecodedProposalEvent } from "../../MirrorNodeService";
 import { getFulfilledResultsData } from "../../MirrorNodeService/utils";
 import { Contracts, GovernanceTokenId } from "../../constants";
 import { ProposalData } from "./type";
+import { ethers } from "ethers";
+import { solidityAddressToTokenIdString, convertEthersBigNumberToBigNumberJS } from "../..";
+
+const DefaultTokenTransferDetails = {
+  transferFromAccount: undefined,
+  transferToAccount: undefined,
+  tokenToTransfer: undefined,
+  transferTokenAmount: undefined,
+};
+
+const getTokenTransferDetailsFromHexData = (data: string | undefined) => {
+  if (isNil(data)) return { ...DefaultTokenTransferDetails };
+  const abiCoder = ethers.utils.defaultAbiCoder;
+  const parsedData = abiCoder.decode(
+    [
+      "address transferFromAccount",
+      "address transferToAccount",
+      "address tokenToTransfer",
+      "uint256 transferTokenAmount",
+    ],
+    data
+  );
+  return {
+    transferFromAccount: solidityAddressToTokenIdString(parsedData.transferFromAccount),
+    transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+    tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
+    transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
+  };
+};
 
 /**
  * Converts a proposal state into a corresponding status.
@@ -88,6 +117,10 @@ const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: 
         : undefined,
     state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
     timestamp: proposalData.timestamp,
+    transferFromAccount: proposalData.transferFromAccount,
+    transferToAccount: proposalData.transferToAccount,
+    tokenToTransfer: proposalData.tokenToTransfer,
+    transferTokenAmount: proposalData.transferTokenAmount,
     votes: {
       yes: proposalData?.forVotes,
       no: proposalData?.againstVotes,
@@ -131,7 +164,8 @@ async function fetchProposalDetails(proposalEvent: MirrorNodeDecodedProposalEven
    * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
    * proposalDetails should override the same field found in the proposalEvent.
    */
-  return { ...proposalEvent, ...proposalDetails };
+  const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
+  return { ...proposalEvent, ...proposalDetails, ...tokenTransferDetails };
 }
 
 export async function fetchProposal(id: string): Promise<Proposal> {

@@ -210,6 +210,10 @@ interface ExecuteProposalParams {
   contractId: string;
   title: string;
   signer: HashConnectSigner;
+  transfersFromAccount?: string;
+  transfersToAccount?: string;
+  tokenId?: string;
+  tokenAmount?: number;
 }
 
 /**
@@ -218,10 +222,20 @@ interface ExecuteProposalParams {
  * @returns
  */
 const executeProposal = async (params: ExecuteProposalParams) => {
-  const { contractId, title, signer } = params;
+  const { contractId, title, signer, transfersFromAccount, tokenId, tokenAmount } = params;
   const governorContractId = ContractId.fromString(contractId);
   /** This parameter is named 'description' on the contract function */
   const contractFunctionParameters = new ContractFunctionParameters().addString(title);
+
+  if (tokenId && transfersFromAccount && tokenAmount) {
+    await DexService.setTokenAllowance({
+      tokenId,
+      walletId: transfersFromAccount,
+      spenderContractId: contractId,
+      tokenAmount,
+      signer: signer,
+    });
+  }
   const executeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.ExecuteProposal, contractFunctionParameters)
