@@ -1,9 +1,15 @@
 import { createContext, useContext } from "react";
 import { FieldValues, UseFormReturn } from "react-hook-form";
 
-export interface WizardStep {
+export interface WizardStepProps {
   label: string;
+  /**
+   * The last path in the 'route' URL must match the 'label' field for the
+   * stepper work as intended. Letter casing does not impact the matching logic
+   * between the 'label' and last path since .toLowerCase() is used. */
   route: string;
+  isLoading?: boolean;
+  isError?: boolean;
   validate?: () => Promise<boolean>;
 }
 export interface WizardContextProps<FormType> {
@@ -12,7 +18,7 @@ export interface WizardContextProps<FormType> {
   backTo: string;
   stepper: {
     activeStep: number;
-    steps: WizardStep[];
+    steps: WizardStepProps[];
     nextStep: () => void;
     prevStep: () => void;
   };

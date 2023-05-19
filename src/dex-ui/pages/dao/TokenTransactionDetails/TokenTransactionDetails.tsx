@@ -12,6 +12,8 @@ import {
   ArrowLeftIcon,
   Tag,
   CheckCircleUnfilledIcon,
+  Steps,
+  StepProps,
 } from "@dex-ui-components";
 import { ErrorLayout, LoadingSpinnerLayout, ProposalDetailsLayout } from "@layouts";
 import {
@@ -27,6 +29,21 @@ import { isNotNil } from "ramda";
 import { formatTokenAmountWithDecimal } from "@utils";
 import { Link as ReachLink } from "react-router-dom";
 import { TransactionStatusAsTagVariant } from "../constants";
+
+export enum StepperTransactionStatus {
+  Created = "Created",
+  Active = "Active",
+  Queued = "Queued to execute",
+  Executed = "Executed",
+  Failed = "Failed",
+}
+
+export const TransactionStatusAsStep: Readonly<{ [key in TransactionStatus]: number }> = {
+  [TransactionStatus.Pending]: 1,
+  [TransactionStatus.Queued]: 2,
+  [TransactionStatus.Failed]: 3,
+  [TransactionStatus.Success]: 4,
+};
 
 export function TokenTransactionDetails() {
   const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
@@ -94,6 +111,31 @@ export function TokenTransactionDetails() {
     const transactionStatus =
       status === TransactionStatus.Pending && isThresholdReached ? TransactionStatus.Queued : status;
 
+    const steps: StepProps[] = [
+      {
+        label: StepperTransactionStatus.Created,
+      },
+      {
+        label: StepperTransactionStatus.Active,
+        isLoading: approveTransactionMutation.isLoading,
+        isError: approveTransactionMutation.isError,
+      },
+      {
+        label: StepperTransactionStatus.Queued,
+        isLoading: executeTransactionMutation.isLoading,
+        isError: executeTransactionMutation.isError,
+      },
+      {
+        label:
+          transactionStatus === TransactionStatus.Failed
+            ? StepperTransactionStatus.Failed
+            : StepperTransactionStatus.Executed,
+        isError: transactionStatus === TransactionStatus.Failed,
+      },
+    ];
+
+    const activeStep = TransactionStatusAsStep[transactionStatus];
+
     const ApproversList =
       approvalCount === 0 ? (
         <Text textStyle="p small italic">This transaction has not yet been confirmed by an owner.</Text>
@@ -144,10 +186,8 @@ export function TokenTransactionDetails() {
     return (
       <ProposalDetailsLayout
         title={type}
-        statusComponent={
-          <MetricLabel label="Status" value={<Tag variant={TransactionStatusAsTagVariant[transactionStatus]} />} />
-        }
-        rightNavigationComponent={
+        statusStepper={<Steps activeStep={activeStep} steps={steps} />}
+        rightNavigation={
           <Breadcrumb
             to={`/daos/multisig/${daoAccountId}/transactions`}
             as={ReachLink}
@@ -179,7 +219,10 @@ export function TokenTransactionDetails() {
         }
         rightPanel={
           <Flex direction="column" gap="8" minWidth="250px" height="100%">
-            <Text textStyle="h5 medium">Confirmation details</Text>
+            <Flex justifyContent="space-between">
+              <Text textStyle="h5 medium">Confirmation details</Text>
+              <Tag variant={TransactionStatusAsTagVariant[transactionStatus]} />
+            </Flex>
             <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
               <Flex direction="row" alignItems="center" gap="4">
                 <ProgressBar

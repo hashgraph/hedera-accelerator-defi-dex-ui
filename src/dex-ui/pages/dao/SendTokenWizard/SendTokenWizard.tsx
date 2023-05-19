@@ -1,6 +1,6 @@
 import { useCreateMultiSigTransaction, useDAOs } from "@hooks";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SendTokenForm } from "./types";
 import { WarningIcon } from "@chakra-ui/icons";
 import { Color, LoadingDialog } from "@dex-ui-components";
@@ -10,13 +10,11 @@ import { Wizard } from "@components";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { MultiSigDAODetails } from "@services";
 import { isNil, isNotNil } from "ramda";
-import { useSteps } from "chakra-ui-steps";
-import { getLastPathInRoute } from "@utils";
-import { getCurrentStepIndexByRoute } from "@components";
 
 export function SendTokenWizard() {
   const navigate = useNavigate();
   const { accountId: daoAccountId = "", tokenId = "" } = useParams();
+  const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
@@ -46,16 +44,8 @@ export function SendTokenWizard() {
       route: `${Paths.DAOs.absolute}/multisig/${daoAccountId}/send-token/details`,
       validate: async () => trigger(["recipientAccountId", "tokenId", "amount"]),
     },
-    { label: "Review", route: `${Paths.DAOs.absolute}/multisig/${daoAccountId}/send-token/review` },
+    { label: "Review", route: `${Paths.DAOs.absolute}/multisig/${daoAccountId}/send-token/review`, isError, isLoading },
   ];
-
-  const location = useLocation();
-  const lastPath = getLastPathInRoute(location.pathname);
-  const intialStep = getCurrentStepIndexByRoute(steps, lastPath);
-  const stepProps = useSteps({
-    initialStep: intialStep > 0 ? intialStep : 0,
-  });
-  const { activeStep, nextStep, prevStep } = stepProps;
 
   async function onSubmit(data: SendTokenForm) {
     const { recipientAccountId, tokenId, amount, decimals } = data;
@@ -90,7 +80,7 @@ export function SendTokenWizard() {
   }
 
   function onBackToDAOLinkClick() {
-    navigate(`${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`);
+    navigate(backTo);
   }
 
   if (daosQueryResults.isLoading) {
@@ -121,12 +111,9 @@ export function SendTokenWizard() {
               context={{
                 title: "Send Token",
                 backLabel: "Back to DAOs",
-                backTo: `${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`,
+                backTo,
                 stepper: {
-                  activeStep,
                   steps,
-                  nextStep,
-                  prevStep,
                 },
                 form: {
                   id: "multisig-send-token",

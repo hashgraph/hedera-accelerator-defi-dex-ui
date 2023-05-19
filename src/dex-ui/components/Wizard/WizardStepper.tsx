@@ -1,14 +1,19 @@
-import { StepData, StepperV2 } from "@dex-ui-components";
-import { useWizardContext } from "./WizardContext";
+import { Steps, StepProps } from "@dex-ui-components";
+import { WizardStepProps, useWizardContext } from "./WizardContext";
 import { Flex } from "@chakra-ui/react";
 
 export function WizardStepper() {
   const { stepper } = useWizardContext();
-  const { activeStep, steps } = stepper;
+  const { activeStep, steps: wizardSteps } = stepper;
+
+  const steps: StepProps[] = wizardSteps.map((step: WizardStepProps) => {
+    const { label, isLoading, isError } = step;
+    return { label, isLoading, isError };
+  });
+
   return (
     <Flex width={steps.length === 2 ? "50%" : "100%"}>
-      {/** Using temporary type casting for 'steps' props until the Stepper component is refactored. */}
-      <StepperV2 activeStep={activeStep} steps={steps as StepData[]} />
+      <Steps activeStep={activeStep} steps={steps} />
     </Flex>
   );
 }
