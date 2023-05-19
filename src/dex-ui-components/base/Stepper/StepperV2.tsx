@@ -4,18 +4,20 @@ import { ReactElement } from "react";
 import { Color } from "../../themes";
 import { ActiveStepIcon, CancelledStepIcon, CompletedStepIcon, DisabledStepIcon } from "../Icons";
 
-interface StepData {
+export interface StepData {
   label: string;
-  content: ReactElement;
+  content?: ReactElement;
   isLoading?: boolean;
   isError?: boolean;
+  route?: string;
+  validate?: () => Promise<boolean>;
 }
 
 interface StepperV2Props {
   steps: StepData[];
-  nextStep: () => void;
-  prevStep: () => void;
-  reset: () => void;
+  nextStep?: () => void;
+  prevStep?: () => void;
+  reset?: () => void;
   activeStep: number;
 }
 

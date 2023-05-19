@@ -1,18 +1,15 @@
 import { Text, Flex, Divider } from "@chakra-ui/react";
 import { HashScanLink, HashscanData, FormInput } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateMultiSigTransactionForm } from "./types";
+import { useOutletContext } from "react-router-dom";
+import { SendTokenForm, SendTokenWizardContext } from "./types";
 
-interface MultiSigTransactionDetailsFormProps {
-  safeAccountId: string;
-}
-
-export function MultiSigTransactionDetailsForm(props: MultiSigTransactionDetailsFormProps) {
-  const { safeAccountId } = props;
+export function SendTokenDetailsForm() {
+  const { safeAccountId } = useOutletContext<SendTokenWizardContext>();
   const {
     register,
     formState: { errors },
-  } = useFormContext<CreateMultiSigTransactionForm>();
+  } = useFormContext<SendTokenForm>();
   return (
     <Flex direction="column" gap="4" width="100%">
       <Flex direction="column" alignItems="left" gap="1">

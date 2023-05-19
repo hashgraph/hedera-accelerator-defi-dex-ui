@@ -23,3 +23,5 @@ export * from "./CheckCircleIcon";
 export * from "./XIcon";
 export * from "./ClockIcon";
 export * from "./CheckCircleUnfilledIcon";
+export * from "./ChevronLeftIcon";
+export * from "./ChevronRightIcon";
