@@ -5,20 +5,15 @@
   "private": true,
   "license": "MIT",
   "main": "src/index.tsx",
-  "jest": {
-    "transformIgnorePatterns": [
-      "!node_modules/"
-    ]
-  },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.4",
     "@chakra-ui/react": "^2.2.3",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@material-ui/core": "^4.12.4",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/numeral": "^2.0.2",
     "@types/quill": "^2.0.9",
     "@types/react-datepicker": "^4.8.0",
@@ -27,7 +22,7 @@
     "chakra-ui-steps": "^2.0.4",
     "ethers": "^5.7.2",
     "framer-motion": "^6.5.0",
-    "hashconnect": "^0.2.3",
+    "hashconnect": "^0.2.4",
     "immer": "^9.0.15",
     "numeral": "^2.0.6",
     "ramda": "^0.29.0",
@@ -50,8 +45,9 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test --coverage",
-    "test:jest": "jest -c jest.config.js --watch",
+    "test": "vitest watch",
+    "test:no-watch": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build:storybook": "build-storybook -o docs",
@@ -105,17 +101,12 @@
         "files": [
           "**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)"
         ],
-        "env": {
-          "jest/globals": true
-        },
+        
         "plugins": [
-          "testing-library",
-          "jest"
+          "testing-library"
         ],
         "extends": [
-          "react-app/jest",
-          "plugin:testing-library/react",
-          "plugin:jest/recommended"
+          "plugin:testing-library/react"
         ]
       },
       {
@@ -141,6 +132,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.21.8",
     "@storybook/addon-actions": "^6.5.12",
     "@storybook/addon-docs": "^6.5.12",
     "@storybook/addon-essentials": "^6.5.12",
@@ -154,19 +146,19 @@
     "@storybook/testing-library": "^0.0.13",
     "@storybook/theming": "^6.5.12",
     "@testing-library/dom": "^8.16.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^16.11.43",
     "@types/ramda": "^0.29.0",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
+    "@vitejs/plugin-react": "^4.0.0",
     "babel-plugin-named-exports-order": "^0.0.2",
+    "c8": "^7.13.0",
     "craco": "^0.0.3",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-storybook": "^0.6.6",
@@ -174,9 +166,11 @@
     "eslint-plugin-tsdoc": "^0.2.16",
     "gh-pages": "^4.0.0",
     "husky": "^8.0.0",
+    "jsdom": "^22.0.0",
     "lint-staged": "^13.0.3",
     "prop-types": "^15.8.1",
     "typescript": "^4.7.4",
+    "vitest": "^0.31.0",
     "webpack": "^5.76.0"
   }
 }
