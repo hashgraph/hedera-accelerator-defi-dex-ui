@@ -1,6 +1,6 @@
 import { Text, Box, Center } from "@chakra-ui/react";
 import { CardGridLayout, Page, PageHeader } from "@layouts";
-import { Notification, useNotification, NotficationTypes } from "@dex-ui-components";
+import { Notification, useNotification, NotficationTypes } from "@dex-ui-components/base";
 import { useDAOs } from "@hooks";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PrimaryHeaderButton } from "@components";
