@@ -5,14 +5,14 @@ import { ReactElement } from "react";
 export interface ProposalDetailsLayoutProps {
   title: string;
   author?: string;
-  statusComponent: ReactElement;
-  rightNavigationComponent: ReactElement;
+  statusStepper: ReactElement;
+  rightNavigation: ReactElement;
   details: ReactElement;
   rightPanel: ReactElement;
 }
 
 export function ProposalDetailsLayout(props: ProposalDetailsLayoutProps) {
-  const { title, statusComponent, rightNavigationComponent, details, rightPanel } = props;
+  const { title, statusStepper, rightNavigation, details, rightPanel } = props;
 
   return (
     <Grid
@@ -28,7 +28,7 @@ export function ProposalDetailsLayout(props: ProposalDetailsLayoutProps) {
         <Flex direction="column" gap="8">
           <Flex direction="row" justifyContent="space-between">
             <BreadcrumbText />
-            {rightNavigationComponent}
+            {rightNavigation}
           </Flex>
           <Flex direction="column" gap="2">
             <Text textStyle="h3 medium">{title}</Text>
@@ -40,7 +40,7 @@ export function ProposalDetailsLayout(props: ProposalDetailsLayoutProps) {
               <HashScanLink id={author} type={HashscanData.Account} />
             </Flex> */}
           </Flex>
-          <Flex layerStyle="content-box">{statusComponent}</Flex>
+          <Flex layerStyle="content-box">{statusStepper}</Flex>
           <Flex direction="column" gap="2">
             <Text textStyle="p medium medium" color={Color.Grey_Blue._800}>
               Details

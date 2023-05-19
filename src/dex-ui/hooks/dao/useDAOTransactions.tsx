@@ -130,7 +130,7 @@ export function useDAOTransactions(
             approvalCount,
             approvers,
             event: TransactionEvent.Send,
-            status: status,
+            status,
             // TODO: Add real value for timestamp
             timestamp: "",
             tokenId,
