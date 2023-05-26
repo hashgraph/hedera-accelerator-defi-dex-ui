@@ -6,7 +6,7 @@ import { useFetchTokenData } from "@hooks";
 import { debounce } from "ts-debounce";
 import { Flex, Text, Divider, CircularProgress } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
-import { MirrorNodeTokenById } from "@dex-ui/services";
+import { DEBOUNCE_TIME, MirrorNodeTokenById } from "@services";
 import { checkForValidTokenId } from "@utils";
 import { ChangeEvent } from "react";
 
@@ -78,7 +78,7 @@ export function ExistingTokenDAOGovernanceForm() {
                 ...register("governance.existingToken.id", {
                   required: { value: true, message: "A token id is required." },
                   validate: () => isTokenIdValid() || "Enter a Valid Token Id.",
-                  onChange: debounce(handleTokenIdChange, 500),
+                  onChange: debounce(handleTokenIdChange, DEBOUNCE_TIME),
                 }),
               },
             }}

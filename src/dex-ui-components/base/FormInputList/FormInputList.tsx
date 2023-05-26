@@ -8,13 +8,16 @@ import {
   UseFieldArrayRemove,
   UseFormRegister,
 } from "react-hook-form";
-import { Button, FormInput } from "../..";
-import { Flex } from "@chakra-ui/react";
+import { Button, FormInput, CancelledStepIcon, Color } from "../..";
+import { Flex, IconButton } from "@chakra-ui/react";
 
 interface FormInputListProps<FormType extends FieldValues, FormPath extends ArrayPath<FormType>> {
   fields: FieldArrayWithId<FormType, FormPath, "id">[];
   defaultFieldValue: FieldArray<FormType, FormPath> | FieldArray<FormType, FormPath>[];
   formPath: FormPath;
+  fieldLabel: string;
+  fieldPlaceholder: string;
+  fieldButtonText: string;
   append: UseFieldArrayAppend<FormType, FormPath>;
   remove: UseFieldArrayRemove;
   register: UseFormRegister<FormType>;
@@ -23,7 +26,17 @@ interface FormInputListProps<FormType extends FieldValues, FormPath extends Arra
 export function FormInputList<FormType extends FieldValues, FormPath extends ArrayPath<FormType>>(
   props: FormInputListProps<FormType, FormPath>
 ) {
-  const { fields, defaultFieldValue, formPath, register, append, remove } = props;
+  const {
+    fields,
+    defaultFieldValue,
+    formPath,
+    register,
+    append,
+    remove,
+    fieldLabel,
+    fieldPlaceholder,
+    fieldButtonText,
+  } = props;
   function handleAddInputClicked() {
     append(defaultFieldValue);
   }
@@ -36,26 +49,32 @@ export function FormInputList<FormType extends FieldValues, FormPath extends Arr
     <>
       {fields.map((field, index) => {
         return (
-          <Flex key={index} alignItems="end">
+          <Flex key={index} alignItems="end" gap="0.5rem" paddingRight="0.5rem">
             <FormInput
               flex="5"
               inputProps={{
                 id: field.id,
                 type: "text",
-                label: "Member wallet address",
-                placeholder: "Enter URL",
+                label: fieldLabel,
+                placeholder: fieldPlaceholder,
                 register: { ...register(`${formPath}.${index}.value` as Path<FormType>) },
               }}
             />
-            <Button marginLeft="0.25rem" marginBottom="0.5rem" onClick={() => handleRemoveInputClicked(index)}>
-              Remove
-            </Button>
+            <IconButton
+              size="xs"
+              variant="link"
+              marginLeft="0.25rem"
+              marginBottom="1.2rem"
+              aria-label="remove-multisig-member"
+              onClick={() => handleRemoveInputClicked(index)}
+              icon={<CancelledStepIcon boxSize="6" color={Color.Grey_Blue._500} />}
+            />
           </Flex>
         );
       })}
-      <Flex>
-        <Button onClick={handleAddInputClicked}>+ Add</Button>
-      </Flex>
+      <Button paddingLeft="0.5rem" variant="link" onClick={handleAddInputClicked}>
+        {fieldButtonText}
+      </Button>
     </>
   );
 }

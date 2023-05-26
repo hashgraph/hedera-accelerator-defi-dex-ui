@@ -8,11 +8,15 @@ import {
   Box,
   SimpleGrid,
   Checkbox,
+  Flex,
+  Image,
 } from "@chakra-ui/react";
 import { ReactElement, cloneElement } from "react";
-import { FormInput } from "@dex-ui-components";
+import { FormInput, Tag } from "@dex-ui-components";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { DAOType } from "@services";
+import { DefaultLogoIcon, Color } from "@dex-ui-components";
+import { isValidUrl } from "@dex-ui/utils";
 
 interface DAOReviewFormProps {
   details: {
@@ -30,63 +34,61 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
   const { details, governance, voting } = props;
   return (
     <DAOFormContainer>
-      <Accordion defaultIndex={[0]} allowMultiple>
-        <AccordionItem>
+      <Accordion defaultIndex={[0]} allowMultiple padding={"0.2rem"}>
+        <AccordionItem border="none">
           <Text textStyle="p medium medium">
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
-                Details
+                Details & Type
               </Box>
               <AccordionIcon />
             </AccordionButton>
           </Text>
           <AccordionPanel pb={4}>
-            <SimpleGrid columns={2} spacingX="1rem" spacingY="0.75rem">
-              <FormInput<"name">
-                inputProps={{
-                  id: "name",
-                  label: "Name",
-                  type: "text",
-                  value: details.name,
-                  isReadOnly: true,
-                }}
-              />
-              <FormInput<"logoUrl">
-                inputProps={{
-                  id: "logoUrl",
-                  label: "Logo URL",
-                  type: "text",
-                  value: details.logoUrl,
-                  isReadOnly: true,
-                }}
-              />
-              <Checkbox isChecked={details.isPublic} isReadOnly>
-                List DAO publicly
-              </Checkbox>
-            </SimpleGrid>
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <Text textStyle="p medium medium">
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                Type
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </Text>
-          <AccordionPanel pb={4}>
-            <SimpleGrid columns={2} spacingX="1rem" spacingY="0.75rem">
-              <FormInput<"type">
-                inputProps={{
-                  id: "type",
-                  label: "DAO Type",
-                  type: "text",
-                  value: details.type,
-                  isReadOnly: true,
-                }}
-              />
-            </SimpleGrid>
+            <Flex direction="row" flex="7" alignItems="top" gap="1">
+              <Flex flex="1" alignItems="top">
+                {isValidUrl(details.logoUrl) ? (
+                  <Image
+                    src={details.logoUrl}
+                    objectFit="scale-down"
+                    alt="Logo URl"
+                    boxSize="64px"
+                    borderRadius="32px"
+                  />
+                ) : (
+                  <DefaultLogoIcon boxSize="65" color={Color.Grey_Blue._100} />
+                )}
+              </Flex>
+              <Flex direction="column" flex="6" gap="4" alignItems="start">
+                <FormInput<"name">
+                  inputProps={{
+                    id: "name",
+                    label: "Name",
+                    type: "text",
+                    value: details.name,
+                    isReadOnly: true,
+                  }}
+                />
+                <FormInput<"description">
+                  inputProps={{
+                    id: "description",
+                    label: "Description",
+                    type: "text",
+                    value: details.description,
+                    isReadOnly: true,
+                  }}
+                />
+                <Checkbox isChecked={details.isPublic} isReadOnly>
+                  List DAO publicly
+                </Checkbox>
+                <Flex direction="column" gap="0.2rem">
+                  <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
+                    TYPE
+                  </Text>
+                  <Tag label={details.type} />
+                </Flex>
+              </Flex>
+            </Flex>
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem>

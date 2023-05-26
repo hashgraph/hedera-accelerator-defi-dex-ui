@@ -8,7 +8,7 @@ export interface UseCreateNFTParams {
   name: string;
   symbol: string;
   maxSupply: number;
-  treasuryAccountId: string;
+  tokenWalletAddress: string;
   supplyKey: string;
 }
 

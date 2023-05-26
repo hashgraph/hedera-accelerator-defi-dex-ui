@@ -1,7 +1,7 @@
 import { Button, Divider, Flex, SimpleGrid, Text, IconButton, Image } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { useForm } from "react-hook-form";
-import { FormInput, RefreshIcon, Color, Tag } from "@dex-ui-components";
+import { FormInput, RefreshIcon, Color, Tag, CopyTextButton } from "@dex-ui-components";
 import * as R from "ramda";
 import { Member, MultiSigDAODetailsContext } from "./types";
 import { MultiSigDAODetails } from "@services";
@@ -36,6 +36,10 @@ export function Settings() {
 
   function onSubmit(data: MultiSigDAODetails) {
     console.log("Details", data);
+  }
+
+  function handleCopyMemberId() {
+    console.log("copy text to clipboard");
   }
 
   function handleAddNewMemberClicked() {
@@ -97,13 +101,7 @@ export function Settings() {
                     <Text textStyle="p small regular" color={Color.Neutral._500}>
                       {accountId}
                     </Text>
-                    <IconButton
-                      size="xs"
-                      variant="link"
-                      aria-label="copy-member-id"
-                      fontSize="17px"
-                      icon={<CopyIcon color={Color.Neutral._500} />}
-                    />
+                    <CopyTextButton onClick={handleCopyMemberId} />
                     {isAdmin ? <Tag label="Admin" /> : <></>}
                   </Flex>
                   <Flex direction="row" gap="4" alignItems="center" height="20px">
@@ -111,7 +109,6 @@ export function Settings() {
                       size="xs"
                       variant="link"
                       aria-label="refresh-member"
-                      fontSize="17px"
                       onClick={() => handleReplaceMemberClick(member.accountId)}
                       icon={<RefreshIcon />}
                     />
@@ -121,7 +118,6 @@ export function Settings() {
                         onClick={() => handleDeleteMemberClick(member.accountId)}
                         variant="link"
                         aria-label="delete-member-id"
-                        fontSize="17px"
                         icon={<DeleteIcon color={Color.Teal_01} />}
                       />
                     ) : undefined}

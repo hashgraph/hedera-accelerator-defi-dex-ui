@@ -28,7 +28,7 @@ interface CreateTokenParams {
   initialSupply: number;
   supplyKey: string;
   decimals: number;
-  treasuryAccountId: string;
+  tokenWalletAddress: string;
   signer: HashConnectSigner;
 }
 
@@ -38,7 +38,7 @@ interface CreateTokenParams {
  * @returns
  */
 async function createToken(params: CreateTokenParams) {
-  const treasury = AccountId.fromString(params.treasuryAccountId);
+  const treasury = AccountId.fromString(params.tokenWalletAddress);
   const key = PublicKey.fromString(params.supplyKey);
   const createTokenTransaction = await new TokenCreateTransaction()
     .setTokenName(params.name)
@@ -89,7 +89,7 @@ interface CreateNFTParams {
   symbol: string;
   maxSupply: number;
   supplyKey: string;
-  treasuryAccountId: string;
+  tokenWalletAddress: string;
   signer: HashConnectSigner;
 }
 
@@ -99,7 +99,7 @@ interface CreateNFTParams {
  * @returns
  */
 async function createNFT(params: CreateNFTParams) {
-  const treasury = AccountId.fromString(params.treasuryAccountId);
+  const treasury = AccountId.fromString(params.tokenWalletAddress);
   const key = PublicKey.fromString(params.supplyKey);
   const createNFTTransaction = await new TokenCreateTransaction()
     .setTokenName(params.name)

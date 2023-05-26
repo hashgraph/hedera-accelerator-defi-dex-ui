@@ -3,6 +3,7 @@ import { CreateANFTDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
 import { SimpleGrid } from "@chakra-ui/react";
+import { DAOToolTips } from "./constants";
 
 export function NFTDAOVotingForm() {
   const {
@@ -17,6 +18,9 @@ export function NFTDAOVotingForm() {
             id: "voting.quorum",
             label: "Quorum",
             type: "text",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.quorum,
+            toolTipLabelPlacement: "top",
             placeholder: "Enter amount",
             unit: "%",
             register: {
@@ -33,6 +37,9 @@ export function NFTDAOVotingForm() {
             id: "voting.duration",
             label: "Voting duration",
             type: "number",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.duration,
+            toolTipLabelPlacement: "top",
             placeholder: "Enter amount",
             unit: "Days",
             register: {
@@ -48,6 +55,9 @@ export function NFTDAOVotingForm() {
           inputProps={{
             id: "voting.lockingPeriod",
             label: "Locking period",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.lockingPeriod,
+            toolTipLabelPlacement: "top",
             type: "number",
             placeholder: "Enter amount",
             unit: "Days",

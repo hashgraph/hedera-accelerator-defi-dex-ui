@@ -10,7 +10,7 @@ export interface UseCreateTokenParams {
   initialSupply: number;
   decimals: number;
   supplyKey: string;
-  treasuryAccountId: string;
+  tokenWalletAddress: string;
 }
 
 export function useCreateToken(handleCreateTokenSuccessful: () => void) {

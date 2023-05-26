@@ -78,6 +78,7 @@ export const TOKEN_USER_KEY = "0bf5b9ac3f3066f6046a778409891e9f2081c349b4cf8688d
 
 export const DEX_TOKEN_PRECISION_VALUE = 8;
 export const DEX_PRECISION = 100000000;
+export const DEBOUNCE_TIME = 500;
 
 export const Tokens = Object.freeze({
   TokenASymbol: "LAB49A",

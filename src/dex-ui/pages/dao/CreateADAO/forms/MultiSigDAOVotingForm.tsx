@@ -2,6 +2,7 @@ import { useFormContext } from "react-hook-form";
 import { FormInput } from "@dex-ui-components";
 import { CreateAMultiSigDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
+import { DAOToolTips } from "./constants";
 
 export function MultiSigDAOVotingForm() {
   const {
@@ -21,9 +22,12 @@ export function MultiSigDAOVotingForm() {
       <FormInput<"voting.threshold">
         inputProps={{
           id: "voting.threshold",
+          isTooltipVisible: true,
+          tooltipLabel: DAOToolTips.threshold,
           label: "Threshold",
           type: "number",
           placeholder: "Enter amount",
+          toolTipLabelPlacement: "top",
           unit: `out of ${maxThreshold} Members`,
           register: {
             ...register("voting.threshold", {

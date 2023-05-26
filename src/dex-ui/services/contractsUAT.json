@@ -109,12 +109,12 @@
   },
   {
     "name": "multisigdaofactory",
-    "id": "0.0.4548226",
-    "address": "0x0000000000000000000000000000000000456682",
-    "timestamp": "2023-05-03T15:07:01.234Z",
-    "hash": "187ce11701c43929ea8e30e7c41e7b58",
-    "transparentProxyAddress": "0x00000000000000000000000000000000004353f2",
-    "transparentProxyId": "0.0.4412402"
+    "id": "0.0.4643241",
+    "address": "0x000000000000000000000000000000000046d9a9",
+    "timestamp": "2023-05-12T10:36:28.234Z",
+    "hash": "07932521763e5fa1b97125bb2d8d3212",
+    "transparentProxyAddress": "0x000000000000000000000000000000000046d9bb",
+    "transparentProxyId": "0.0.4643259"
   },
   {
     "name": "governancedaofactory",

@@ -2,10 +2,12 @@ import { Notification, FormInput, NotficationTypes, useNotification, LoadingDial
 import { CreateANFTDAOForm } from "../types";
 import { useFormContext } from "react-hook-form";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { useCreateNonFungibleToken, useFetchAccountInfo } from "@hooks";
+import { useCreateNonFungibleToken, useFetchAccountInfo, useFetchTransactionDetails } from "@hooks";
 import { Button, Center, Divider, Flex, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
+import { isNil } from "ramda";
+import { checkForValidAccountId } from "@utils";
 
 export function NFTDAOGovernanceForm() {
   const {
@@ -18,30 +20,33 @@ export function NFTDAOGovernanceForm() {
 
   const formValues = getValues();
   const { governance } = formValues;
-  const createNFT = useCreateNonFungibleToken(handleCreateTokenSuccessful);
-  const accountInfo = useFetchAccountInfo();
-  const supplyKey = accountInfo.data?.key.key ?? "";
-  const { data: tokenData } = createNFT;
 
-  const isLoadingDialogOpen = createNFT.isLoading || accountInfo.isLoading;
-  const isErrorDialogOpen = createNFT.isError || accountInfo.isError;
+  const {
+    data: createNFTData,
+    error: createNFTError,
+    isError: isCreateNFTFailed,
+    isLoading: isCreateNFTLoading,
+    mutateAsync: createNFT,
+    reset: resetCreateNFT,
+  } = useCreateNonFungibleToken(handleCreateTokenSuccessful);
 
-  function getLoadingDialogMessage(): string {
-    if (createNFT.isLoading)
-      return `Please confirm the create ${governance.nft.name} 
-    NFT transaction in your wallet to proceed.`;
-    if (accountInfo.isLoading) return "Please wait while we get your account public key";
-    return "";
-  }
+  const {
+    mutateAsync: getAccountDetails,
+    isLoading: isGetAccountDetailsLoading,
+    isError: isGetAccountDetailsFailed,
+    error: getAccountDetailsError,
+    reset: resetGetAccountDetails,
+  } = useFetchAccountInfo();
 
-  function getErrorDialogMessage(): string {
-    if (accountInfo.isError) return accountInfo.error?.message;
-    if (createNFT.isError) return createNFT.error?.message;
-    return "";
-  }
+  const {
+    data: transactionDetails,
+    isLoading: isTransactionDetailsLoading,
+    isError: isTransactionDetailsFailed,
+    error: transactionDetailsError,
+  } = useFetchTransactionDetails(createNFTData?.transactionId.toString() ?? "");
 
-  const loadingDialogMessage = getLoadingDialogMessage();
-  const errorDialogMessage = getErrorDialogMessage();
+  const isLoadingDialogOpen = isCreateNFTLoading || isGetAccountDetailsLoading || isTransactionDetailsLoading;
+  const isErrorDialogOpen = isCreateNFTFailed || isGetAccountDetailsFailed || isTransactionDetailsFailed;
 
   const {
     setIsNotificationVisible,
@@ -53,24 +58,40 @@ export function NFTDAOGovernanceForm() {
     successMessage: `${governance?.nft?.symbol} NFT was successfully created`,
     transactionState: {
       transactionWaitingToBeSigned: false,
-      successPayload: tokenData ?? null,
-      errorMessage: createNFT.error?.message ?? "",
+      successPayload: createNFTData ?? null,
+      errorMessage: createNFTError?.message ?? "",
     },
   });
 
+  function getLoadingDialogMessage(): string {
+    if (isLoadingDialogOpen)
+      return `Please confirm the create ${governance.nft.name} 
+    NFT transaction in your wallet to proceed.`;
+    return "";
+  }
+
+  function getErrorDialogMessage(): string {
+    if (isGetAccountDetailsFailed) return getAccountDetailsError?.message;
+    if (isCreateNFTFailed) return createNFTError?.message;
+    if (isTransactionDetailsFailed) return transactionDetailsError?.message;
+    return "";
+  }
+
+  const loadingDialogMessage = getLoadingDialogMessage();
+  const errorDialogMessage = getErrorDialogMessage();
+
   useEffect(() => {
-    if (supplyKey) {
-      setValue("governance.nft.supplyKey", supplyKey, { shouldValidate: true });
+    if (!isNil(transactionDetails)) {
+      setValue("governance.nft.id", transactionDetails[0].entity_id, { shouldValidate: true });
+      setValue("governance.nft.treasuryWalletAccountId", governance.nft.tokenWalletAddress, {
+        shouldValidate: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supplyKey]);
+  }, [transactionDetails]);
 
   function handleCreateTokenSuccessful() {
     setIsNotificationVisible(true);
-  }
-
-  function handleGetAccountInfoClick() {
-    accountInfo.mutate(undefined);
   }
 
   async function createNewToken() {
@@ -78,22 +99,26 @@ export function NFTDAOGovernanceForm() {
       "governance.nft.name",
       "governance.nft.symbol",
       "governance.nft.maxSupply",
-      "governance.nft.supplyKey",
-      "governance.nft.treasuryWalletAccountId",
+      "governance.nft.tokenWalletAddress",
     ]);
     if (isCreateTokenDataValid) {
       const nftDAOFormData = formValues as CreateANFTDAOForm;
       const {
         governance: {
-          nft: { name, symbol, maxSupply, supplyKey, treasuryWalletAccountId },
+          nft: { name, symbol, maxSupply, tokenWalletAddress },
         },
       } = nftDAOFormData;
-      createNFT.mutate({
+
+      const {
+        key: { key },
+      } = await getAccountDetails(undefined);
+
+      createNFT({
         name,
         symbol,
         maxSupply,
-        supplyKey,
-        treasuryAccountId: treasuryWalletAccountId,
+        supplyKey: key,
+        tokenWalletAddress,
       });
     }
   }
@@ -111,134 +136,129 @@ export function NFTDAOGovernanceForm() {
           handleClickClose={handleCloseNotificationButtonClicked}
         />
       )}
-      <DAOFormContainer>
-        <FormInput<"governance.nft.id">
-          inputProps={{
-            id: "governance.nft.id",
-            label: "NFT ID",
-            type: "text",
-            placeholder: "Enter NFT Id",
-            register: {
-              ...register("governance.nft.id", {
-                required: { value: true, message: "A NFT id is required." },
-              }),
-            },
-          }}
-          isInvalid={Boolean(errors.governance?.nft?.id)}
-          errorMessage={errors.governance?.nft?.id && errors.governance?.nft.id.message}
-        />
-      </DAOFormContainer>
-      <DAOFormContainer>
-        <Flex direction="row" gap="4">
-          <FormInput<"governance.nft.name">
-            flex="3"
+      <Flex gap="1.5rem" direction="column" width="100%">
+        <DAOFormContainer>
+          <FormInput<"governance.nft.id">
             inputProps={{
-              id: "governance.nft.name",
-              flex: 3,
-              label: "NFT Name",
+              id: "governance.nft.id",
+              label: "NFT ID",
               type: "text",
-              placeholder: "Enter Name",
+              placeholder: "Enter NFT Id",
               register: {
-                ...register("governance.nft.name", {
-                  required: { value: true, message: "NFT name is required." },
+                ...register("governance.nft.id", {
+                  required: { value: true, message: "A NFT id is required." },
+                  validate: (value) =>
+                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
                 }),
               },
             }}
-            isInvalid={Boolean(errors.governance?.nft?.name)}
-            errorMessage={errors.governance?.nft?.name && errors.governance?.nft?.name.message}
+            isInvalid={Boolean(errors.governance?.nft?.id)}
+            errorMessage={errors.governance?.nft?.id && errors.governance?.nft.id.message}
           />
-          <Center height="64px">
-            <Divider orientation="vertical" />
-          </Center>
-          <FormInput<"governance.nft.symbol">
-            flex="2"
+        </DAOFormContainer>
+        <DAOFormContainer>
+          <Flex direction="row" gap="4">
+            <FormInput<"governance.nft.name">
+              flex="3"
+              inputProps={{
+                id: "governance.nft.name",
+                flex: 3,
+                label: "NFT Name",
+                type: "text",
+                placeholder: "Enter Name",
+                register: {
+                  ...register("governance.nft.name", {
+                    required: { value: true, message: "NFT name is required." },
+                  }),
+                },
+              }}
+              isInvalid={Boolean(errors.governance?.nft?.name)}
+              errorMessage={errors.governance?.nft?.name && errors.governance?.nft?.name.message}
+            />
+            <Center height="64px">
+              <Divider orientation="vertical" />
+            </Center>
+            <FormInput<"governance.nft.symbol">
+              flex="2"
+              inputProps={{
+                flex: 2,
+                id: "governance.nft.symbol",
+                label: "NFT Symbol",
+                type: "text",
+                placeholder: "Enter NFT Symbol",
+                register: {
+                  ...register("governance.nft.symbol", {
+                    required: { value: true, message: "A token symbol is required." },
+                  }),
+                },
+              }}
+              isInvalid={Boolean(errors.governance?.nft?.symbol)}
+              errorMessage={errors.governance?.nft?.symbol && errors.governance?.nft?.symbol.message}
+            />
+          </Flex>
+          <FormInput<"governance.nft.maxSupply">
             inputProps={{
-              flex: 2,
-              id: "governance.nft.symbol",
-              label: "NFT Symbol",
-              type: "text",
-              placeholder: "Enter NFT Symbol",
+              id: "governance.nft.maxSupply",
+              label: "Max supply",
+              type: "number",
+              placeholder: "Enter Max Supply",
               register: {
-                ...register("governance.nft.symbol", {
-                  required: { value: true, message: "A token symbol is required." },
+                ...register("governance.nft.maxSupply", {
+                  required: { value: true, message: "Max supply is required." },
+                  validate: (value) => value >= 0 || "Invalid max supply.",
                 }),
               },
             }}
-            isInvalid={Boolean(errors.governance?.nft?.symbol)}
-            errorMessage={errors.governance?.nft?.symbol && errors.governance?.nft?.symbol.message}
+            isInvalid={Boolean(errors.governance?.nft?.maxSupply)}
+            errorMessage={errors.governance?.nft?.maxSupply && errors.governance?.nft?.maxSupply?.message}
           />
-        </Flex>
-        <FormInput<"governance.nft.maxSupply">
-          inputProps={{
-            id: "governance.nft.maxSupply",
-            label: "Max supply",
-            type: "number",
-            placeholder: "Enter Max Supply",
-            register: {
-              ...register("governance.nft.maxSupply", {
-                required: { value: true, message: "Max supply is required." },
-              }),
-            },
-          }}
-          isInvalid={Boolean(errors.governance?.nft?.maxSupply)}
-          errorMessage={errors.governance?.nft?.maxSupply && errors.governance?.nft?.maxSupply?.message}
-        />
-        <Flex direction="row" gap="4" alignItems="flex-end">
-          <FormInput<"governance.nft.supplyKey">
-            flex="5"
+          <FormInput<"governance.nft.tokenWalletAddress">
             inputProps={{
-              flex: 5,
-              id: "governance.nft.supplyKey",
-              label: "Supply Key",
+              id: "governance.nft.tokenWalletAddress",
+              label: "Token wallet address",
               type: "text",
-              isReadOnly: true,
-              value: supplyKey,
-              placeholder: "Enter Supply Key",
+              placeholder: "Enter wallet address",
               register: {
-                ...register("governance.nft.supplyKey", {
-                  required: { value: true, message: "Supply key is required." },
+                ...register("governance.nft.tokenWalletAddress", {
+                  required: { value: true, message: "Token wallet address is required." },
+                  validate: (value) =>
+                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
                 }),
               },
             }}
-            isInvalid={Boolean(errors.governance?.nft?.supplyKey)}
-            errorMessage={errors.governance?.nft?.supplyKey && errors.governance?.nft?.supplyKey?.message}
+            isInvalid={Boolean(errors.governance?.nft?.tokenWalletAddress)}
+            errorMessage={
+              errors.governance?.nft?.tokenWalletAddress && errors.governance?.nft?.tokenWalletAddress?.message
+            }
           />
-          <Button key="get-nft-supply-key" onClick={handleGetAccountInfoClick} flex="1" marginBottom="8px">
-            Get Supply Key
-          </Button>
-        </Flex>
-      </DAOFormContainer>
-      <Text textStyle="p large regular">Initial token distribution</Text>
-      <DAOFormContainer>
-        <FormInput<"governance.nft.treasuryWalletAccountId">
-          inputProps={{
-            id: "governance.nft.treasuryWalletAccountId",
-            label: "Treasury wallet account id",
-            type: "text",
-            placeholder: "Enter wallet account id",
-            register: {
-              ...register("governance.nft.treasuryWalletAccountId", {
-                required: { value: true, message: "A treasury account id is required." },
-              }),
-            },
-          }}
-          isInvalid={Boolean(errors.governance?.nft?.treasuryWalletAccountId)}
-          errorMessage={
-            errors.governance?.nft?.treasuryWalletAccountId && errors.governance?.nft?.treasuryWalletAccountId.message
-          }
-        />
-      </DAOFormContainer>
-      <Flex gap="4" alignItems="center">
-        <Notification
-          type={NotficationTypes.WARNING}
-          textStyle="b3"
-          message={`If you create a new NFT you will need to manually enter 
-                    the id of that NFT in this form. NFT details can be found using the 
-                    hashscan link provided after a successful NFT creation.`}
-        />
-        <Button key="create-nft" onClick={createNewToken}>
-          Create New NFT
-        </Button>
+          <Flex gap="4" justifyContent="flex-end">
+            <Button key="create-token" onClick={createNewToken}>
+              Create New NFT
+            </Button>
+          </Flex>
+        </DAOFormContainer>
+        <Text textStyle="p large regular">Initial token distribution</Text>
+        <DAOFormContainer>
+          <FormInput<"governance.nft.treasuryWalletAccountId">
+            inputProps={{
+              id: "governance.nft.treasuryWalletAccountId",
+              label: "Treasury wallet account id",
+              type: "text",
+              placeholder: "Enter wallet account id",
+              register: {
+                ...register("governance.nft.treasuryWalletAccountId", {
+                  required: { value: true, message: "A treasury account id is required." },
+                  validate: (value) =>
+                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+                }),
+              },
+            }}
+            isInvalid={Boolean(errors.governance?.nft?.treasuryWalletAccountId)}
+            errorMessage={
+              errors.governance?.nft?.treasuryWalletAccountId && errors.governance?.nft?.treasuryWalletAccountId.message
+            }
+          />
+        </DAOFormContainer>
       </Flex>
       <LoadingDialog isOpen={isLoadingDialogOpen} message={loadingDialogMessage} />
       <LoadingDialog
@@ -248,8 +268,8 @@ export function NFTDAOGovernanceForm() {
         buttonConfig={{
           text: "Dismiss",
           onClick: () => {
-            accountInfo.reset();
-            createNFT.reset();
+            resetCreateNFT();
+            resetGetAccountDetails();
           },
         }}
       />
