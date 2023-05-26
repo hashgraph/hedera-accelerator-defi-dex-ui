@@ -16,7 +16,7 @@ import { FormInput, Tag } from "@dex-ui-components";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { DAOType } from "@services";
 import { DefaultLogoIcon, Color } from "@dex-ui-components";
-import { isValidUrl } from "@dex-ui/utils";
+import { isValidUrl } from "@utils";
 
 interface DAOReviewFormProps {
   details: {

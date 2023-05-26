@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateReplaceMemberTransaction, useDAOs } from "@hooks";
+import { useCreateReplaceMemberTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { ReplaceMemberForm } from "./types";
 import { Page } from "@layouts";
@@ -12,13 +12,13 @@ import { MultiSigDAODetails } from "@services";
 import { DefaultMultiSigDAODetails } from "../types";
 
 export function ReplaceMember() {
-  const navigate = useNavigate();
   const { accountId: daoAccountId = "", memberId = "" } = useParams();
   const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { safeId, accountId } = dao ?? DefaultMultiSigDAODetails;
+  const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const replaceMemberForm = useForm<ReplaceMemberForm>({
     defaultValues: {
@@ -32,7 +32,7 @@ export function ReplaceMember() {
     formState: { isSubmitting },
   } = replaceMemberForm;
 
-  const sendReplaceMemberTransactionMutationResults = useCreateReplaceMemberTransaction(handleSendProposesSuccess);
+  const sendReplaceMemberTransactionMutationResults = useCreateReplaceMemberTransaction(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
@@ -60,19 +60,10 @@ export function ReplaceMember() {
     resetSendProposeTransaction();
   }
 
-  function handleSendProposesSuccess(transactionResponse: TransactionResponse) {
+  function handleCreateProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
-    const createSuccessMessage = "Proposal has been submitted.";
-    navigate(`${Paths.DAOs.absolute}/multisig/${accountId}/dashboard`, {
-      state: {
-        createSuccessMessage,
-        transactionState: {
-          transactionWaitingToBeSigned: false,
-          successPayload: transactionResponse,
-          errorMessage: "",
-        },
-      },
-    });
+    const message = "Replace Member proposal has been submitted.";
+    handleTransactionSuccess(transactionResponse, message, backTo);
   }
 
   async function onSubmit(data: ReplaceMemberForm) {

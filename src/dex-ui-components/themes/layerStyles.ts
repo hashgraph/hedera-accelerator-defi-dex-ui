@@ -7,20 +7,20 @@ const base = {
   borderRadius: "4px",
 };
 
-export const LayerStyles = {
-  base: {
-    ...base,
+const ToastLayerStyles = {
+  toast__body: {
+    direction: "row",
+    alignItems: "center",
+    padding: "0.75rem",
+    gap: 2,
+    bg: Color.White_01,
+    border: `1px solid ${Color.Neutral._200}`,
+    borderRadius: "5px",
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.06)",
   },
-  "content-box": {
-    ...base,
-  },
-  "defi-form": {
-    ...base,
-    templateColumns: "repeat(2, 1fr)",
-    borderRadius: "15px",
-    maxWidth: "550px",
-    minWidth: "410px",
-  },
+};
+
+const WizardLayerStyles = {
   wizard__container: {
     flexDirection: "column",
     alignItems: "center",
@@ -53,6 +53,23 @@ export const LayerStyles = {
   wizard__footer: {
     width: "100%",
   },
+};
+
+export const LayerStyles = {
+  base: {
+    ...base,
+  },
+  "content-box": {
+    ...base,
+  },
+  "defi-form": {
+    ...base,
+    templateColumns: "repeat(2, 1fr)",
+    borderRadius: "15px",
+    maxWidth: "550px",
+    minWidth: "410px",
+  },
+
   "dao-dashboard__card": {
     ...base,
     flexDirection: "column",
@@ -61,4 +78,6 @@ export const LayerStyles = {
     height: "100%",
     gap: "8",
   },
+  ...WizardLayerStyles,
+  ...ToastLayerStyles,
 };

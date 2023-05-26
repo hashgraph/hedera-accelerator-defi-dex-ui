@@ -1,7 +1,6 @@
 import { useQuery } from "react-query";
-import { DexService } from "../../services";
+import { DexService, DAO } from "@services";
 import { DAOQueries } from "./types";
-import { DAO } from "../../services/DexService/dao";
 
 type UseDAOsQueryKey = [DAOQueries.DAOs, string];
 

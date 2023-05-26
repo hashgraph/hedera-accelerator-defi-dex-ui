@@ -1,17 +1,6 @@
-import { Box, Center, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { Box, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@layouts";
-import {
-  Color,
-  Notification,
-  NotficationTypes,
-  useNotification,
-  LayoutIcon,
-  TransactionIcon,
-  BoxIcon,
-  LockIcon2,
-  UsersIcon,
-  SettingsIcon,
-} from "@dex-ui-components";
+import { Color, LayoutIcon, TransactionIcon, BoxIcon, LockIcon2, UsersIcon, SettingsIcon } from "@dex-ui-components";
 import { useTabFilters } from "@hooks";
 import { useLocation, NavLink, useNavigate, useParams } from "react-router-dom";
 import { PropsWithChildren } from "react";
@@ -68,11 +57,6 @@ export function DAODashboard(props: DAODashboardProps) {
   const intialTabIndex = tabIndexByRoute === -1 ? 0 : tabIndexByRoute;
   const { handleTabChange } = useTabFilters(intialTabIndex);
 
-  const notification = useNotification({
-    successMessage: location.state?.createDAOSuccessMessage,
-    transactionState: location.state?.transactionState,
-  });
-
   function onBackToDAOsLinkClick() {
     navigate(Paths.DAOs.absolute);
   }
@@ -114,27 +98,7 @@ export function DAODashboard(props: DAODashboardProps) {
       <Page
         gap={0}
         type={PageLayout.Dashboard}
-        header={
-          <>
-            {notification.isSuccessNotificationVisible && (
-              <Center>
-                <Box padding="16px 80px 0 80px" maxWidth="fit-content" paddingTop="1rem">
-                  <Notification
-                    type={NotficationTypes.SUCCESS}
-                    textStyle="b3"
-                    message={notification.successNotificationMessage}
-                    isLinkShown={true}
-                    linkText="View in HashScan"
-                    linkRef={notification.hashscanTransactionLink}
-                    isCloseButtonShown={true}
-                    handleClickClose={notification.handleCloseNotificationButtonClicked}
-                  />
-                </Box>
-              </Center>
-            )}
-            <DashboardHeader daoAccountId={accountId} name={name} type={type} />
-          </>
-        }
+        header={<DashboardHeader daoAccountId={accountId} name={name} type={type} />}
         body={
           <Tabs
             defaultIndex={intialTabIndex}

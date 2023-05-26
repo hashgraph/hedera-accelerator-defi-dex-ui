@@ -1,5 +1,6 @@
 import { Text, Flex, Divider, Box } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
+import { TransactionResponse } from "@hashgraph/sdk";
 import {
   Color,
   HashScanLink,
@@ -23,6 +24,7 @@ import {
   useExecuteTransaction,
   TransactionStatus,
   useDexContext,
+  useHandleTransactionSuccess,
 } from "@hooks";
 import { MultiSigDAODetails } from "@services";
 import { isNotNil } from "ramda";
@@ -55,8 +57,21 @@ export function TokenTransactionDetails() {
   const daoTransactionsQueryResults = useDAOTransactions(daoAccountId, dao?.safeId ?? "");
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
   const transaction = transactions?.find((transaction) => transaction.transactionHash === transactionHash);
-  const approveTransactionMutation = useApproveTransaction();
-  const executeTransactionMutation = useExecuteTransaction();
+  const handleTransactionSuccess = useHandleTransactionSuccess();
+  const approveTransactionMutation = useApproveTransaction(handleApproveTransactionSuccess);
+  const executeTransactionMutation = useExecuteTransaction(handleExecuteTransactionSuccess);
+
+  function handleApproveTransactionSuccess(transactionResponse: TransactionResponse) {
+    approveTransactionMutation.reset();
+    const message = "Transaction has been confirmed.";
+    handleTransactionSuccess(transactionResponse, message);
+  }
+
+  function handleExecuteTransactionSuccess(transactionResponse: TransactionResponse) {
+    executeTransactionMutation.reset();
+    const message = "Transaction has been executed.";
+    handleTransactionSuccess(transactionResponse, message);
+  }
 
   async function handleClickConfirmTransaction(safeId: string, transactionHash: string) {
     approveTransactionMutation.mutate({ safeId, transactionHash });

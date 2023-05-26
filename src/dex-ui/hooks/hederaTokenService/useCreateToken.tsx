@@ -1,8 +1,9 @@
 import { HTSMutations } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useMutation } from "react-query";
-import { DexService } from "../../services";
+import { DexService } from "@services";
 import { useDexContext } from "../useDexContext";
+import { HandleOnSuccess } from "@hooks";
 
 export interface UseCreateTokenParams {
   name: string;
@@ -13,7 +14,7 @@ export interface UseCreateTokenParams {
   tokenWalletAddress: string;
 }
 
-export function useCreateToken(handleCreateTokenSuccessful: () => void) {
+export function useCreateToken(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
@@ -23,8 +24,8 @@ export function useCreateToken(handleCreateTokenSuccessful: () => void) {
       return DexService.createToken({ ...params, signer });
     },
     {
-      onSuccess: () => {
-        handleCreateTokenSuccessful();
+      onSuccess: (transactionResponse: TransactionResponse) => {
+        handleOnSuccess(transactionResponse);
       },
     }
   );

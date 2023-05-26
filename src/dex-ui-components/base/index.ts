@@ -21,3 +21,4 @@ export * from "./Links";
 export * from "./ProgressBar";
 export * from "./Tag";
 export * from "./TextArea";
+export * from "./Toast";

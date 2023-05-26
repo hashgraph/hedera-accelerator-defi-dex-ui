@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@services";
-import { useDexContext } from "@hooks";
+import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
 interface ChangeThresholdForm {
@@ -11,9 +11,7 @@ interface ChangeThresholdForm {
   multiSigDAOContractId: string;
 }
 
-export function useCreateChangeThresholdTransaction(
-  handleSendProposesSuccess: (transactionResponse: TransactionResponse) => void
-) {
+export function useCreateChangeThresholdTransaction(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -28,10 +26,10 @@ export function useCreateChangeThresholdTransaction(
       return DexService.proposeChangeThreshold({ ...params, signer });
     },
     {
-      onSuccess: (data: TransactionResponse | undefined) => {
-        if (isNil(data)) return;
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
-        handleSendProposesSuccess(data);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

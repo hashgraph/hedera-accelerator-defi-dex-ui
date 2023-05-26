@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@services";
-import { useDexContext } from "@hooks";
+import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
 interface ReplaceMemberForm {
@@ -12,9 +12,7 @@ interface ReplaceMemberForm {
   multiSigDAOContractId: string;
 }
 
-export function useCreateReplaceMemberTransaction(
-  handleSendProposesSuccess: (transactionResponse: TransactionResponse) => void
-) {
+export function useCreateReplaceMemberTransaction(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -29,10 +27,10 @@ export function useCreateReplaceMemberTransaction(
       return DexService.proposeSwapOwnerWithThreshold({ ...params, signer });
     },
     {
-      onSuccess: (data: TransactionResponse | undefined) => {
-        if (isNil(data)) return;
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
-        handleSendProposesSuccess(data);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

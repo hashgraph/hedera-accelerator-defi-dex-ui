@@ -16,7 +16,7 @@ import { Controller, useFormContext, useFieldArray } from "react-hook-form";
 import { FormInput, FormTextArea, SelectImageIcon, FormInputList } from "@dex-ui-components";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { isValidUrl } from "@dex-ui/utils";
+import { isValidUrl } from "@utils";
 import { useState } from "react";
 
 export function DAODetailsForm() {

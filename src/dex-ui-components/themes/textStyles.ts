@@ -73,11 +73,12 @@ const baseStyles = {
   },
   link: {
     ...fontType,
-    color: Color.Teal_01,
+    color: Color.Primary._500,
+    textDecoration: "none",
     ":hover": {
       textDecoration: "underline",
-      textDecorationColor: Color.Teal_01,
-      webkitTextDecorationColor: Color.Teal_01,
+      textDecorationColor: Color.Primary._500,
+      webkitTextDecorationColor: Color.Primary._500,
     },
   },
 };
@@ -349,6 +350,11 @@ export const TextStyles = {
   "p xsmall italic": {
     ...baseStyles.p_xsmall,
     fontStyle: "italic",
+    fontWeight: fontWeight.Regular,
+  },
+  "p xsmall regular link": {
+    ...baseStyles.p_xsmall,
+    ...baseStyles.link,
     fontWeight: fontWeight.Regular,
   },
   /**

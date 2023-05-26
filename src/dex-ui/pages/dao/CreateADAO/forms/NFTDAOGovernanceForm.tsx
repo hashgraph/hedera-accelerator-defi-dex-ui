@@ -1,8 +1,14 @@
-import { Notification, FormInput, NotficationTypes, useNotification, LoadingDialog, Color } from "@dex-ui-components";
+import { FormInput, LoadingDialog, Color } from "@dex-ui-components";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateANFTDAOForm } from "../types";
 import { useFormContext } from "react-hook-form";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { useCreateNonFungibleToken, useFetchAccountInfo, useFetchTransactionDetails } from "@hooks";
+import {
+  useCreateNonFungibleToken,
+  useFetchAccountInfo,
+  useFetchTransactionDetails,
+  useHandleTransactionSuccess,
+} from "@hooks";
 import { Button, Center, Divider, Flex, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
@@ -21,6 +27,8 @@ export function NFTDAOGovernanceForm() {
   const formValues = getValues();
   const { governance } = formValues;
 
+  const handleTransactionSuccess = useHandleTransactionSuccess();
+
   const {
     data: createNFTData,
     error: createNFTError,
@@ -28,7 +36,7 @@ export function NFTDAOGovernanceForm() {
     isLoading: isCreateNFTLoading,
     mutateAsync: createNFT,
     reset: resetCreateNFT,
-  } = useCreateNonFungibleToken(handleCreateTokenSuccessful);
+  } = useCreateNonFungibleToken(handleCreateNFTSuccess);
 
   const {
     mutateAsync: getAccountDetails,
@@ -47,21 +55,6 @@ export function NFTDAOGovernanceForm() {
 
   const isLoadingDialogOpen = isCreateNFTLoading || isGetAccountDetailsLoading || isTransactionDetailsLoading;
   const isErrorDialogOpen = isCreateNFTFailed || isGetAccountDetailsFailed || isTransactionDetailsFailed;
-
-  const {
-    setIsNotificationVisible,
-    isSuccessNotificationVisible,
-    successNotificationMessage,
-    hashscanTransactionLink,
-    handleCloseNotificationButtonClicked,
-  } = useNotification({
-    successMessage: `${governance?.nft?.symbol} NFT was successfully created`,
-    transactionState: {
-      transactionWaitingToBeSigned: false,
-      successPayload: createNFTData ?? null,
-      errorMessage: createNFTError?.message ?? "",
-    },
-  });
 
   function getLoadingDialogMessage(): string {
     if (isLoadingDialogOpen)
@@ -90,8 +83,9 @@ export function NFTDAOGovernanceForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionDetails]);
 
-  function handleCreateTokenSuccessful() {
-    setIsNotificationVisible(true);
+  function handleCreateNFTSuccess(transactionResponse: TransactionResponse) {
+    const message = `${governance?.nft?.symbol} NFT was successfully created`;
+    handleTransactionSuccess(transactionResponse, message);
   }
 
   async function createNewToken() {
@@ -124,18 +118,6 @@ export function NFTDAOGovernanceForm() {
   }
   return (
     <>
-      {isSuccessNotificationVisible && (
-        <Notification
-          type={NotficationTypes.SUCCESS}
-          textStyle="b3"
-          message={successNotificationMessage}
-          isLinkShown={true}
-          linkText="View in HashScan"
-          linkRef={hashscanTransactionLink}
-          isCloseButtonShown={true}
-          handleClickClose={handleCloseNotificationButtonClicked}
-        />
-      )}
       <Flex gap="1.5rem" direction="column" width="100%">
         <DAOFormContainer>
           <FormInput<"governance.nft.id">

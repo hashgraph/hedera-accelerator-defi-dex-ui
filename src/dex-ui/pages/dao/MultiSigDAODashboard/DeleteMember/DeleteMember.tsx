@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateDeleteMemberTransaction, useDAOs } from "@hooks";
+import { useCreateDeleteMemberTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { DeleteMemberForm } from "./types";
 import { Page } from "@layouts";
@@ -12,15 +12,14 @@ import { Wizard } from "@components";
 import { DefaultMultiSigDAODetails } from "../types";
 
 export function DeleteMember() {
-  const navigate = useNavigate();
   const { accountId: daoAccountId = "", memberId = "" } = useParams();
   const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
-
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { ownerIds, safeId, accountId, threshold } = dao ?? DefaultMultiSigDAODetails;
   const membersCount = ownerIds.length;
+  const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const deleteMemberForm = useForm<DeleteMemberForm>({
     defaultValues: {
@@ -33,7 +32,7 @@ export function DeleteMember() {
     formState: { isSubmitting },
   } = deleteMemberForm;
 
-  const sendDeleteMemberTransactionMutationResults = useCreateDeleteMemberTransaction(handleSendProposesSuccess);
+  const sendDeleteMemberTransactionMutationResults = useCreateDeleteMemberTransaction(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
@@ -61,19 +60,10 @@ export function DeleteMember() {
     resetSendProposeTransaction();
   }
 
-  function handleSendProposesSuccess(transactionResponse: TransactionResponse) {
+  function handleCreateProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
-    const createSuccessMessage = "Proposal has been submitted.";
-    navigate(`${Paths.DAOs.absolute}/multisig/${accountId}/dashboard`, {
-      state: {
-        createSuccessMessage,
-        transactionState: {
-          transactionWaitingToBeSigned: false,
-          successPayload: transactionResponse,
-          errorMessage: "",
-        },
-      },
-    });
+    const message = "Delete Member proposal has been submitted.";
+    handleTransactionSuccess(transactionResponse, message, backTo);
   }
 
   async function onSubmit(data: DeleteMemberForm) {

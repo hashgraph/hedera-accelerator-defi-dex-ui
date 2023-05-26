@@ -1,4 +1,4 @@
-import { useCreateMultiSigTransaction, useDAOs } from "@hooks";
+import { useCreateMultiSigTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { SendTokenForm } from "./types";
@@ -13,6 +13,7 @@ import { isNil, isNotNil } from "ramda";
 
 export function SendTokenWizard() {
   const navigate = useNavigate();
+  const handleTransactionSuccess = useHandleTransactionSuccess();
   const { accountId: daoAccountId = "", tokenId = "" } = useParams();
   const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
@@ -66,17 +67,9 @@ export function SendTokenWizard() {
 
   function handleCreateDAOSuccess(transactionResponse: TransactionResponse) {
     reset();
-    const createDAOSuccessMessage = `Created new multisig transaction`;
-    navigate(`${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`, {
-      state: {
-        createDAOSuccessMessage,
-        transactionState: {
-          transactionWaitingToBeSigned: false,
-          successPayload: transactionResponse,
-          errorMessage: "",
-        },
-      },
-    });
+    const message = `Created new multisig transaction.`;
+    const pathTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`;
+    handleTransactionSuccess(transactionResponse, message, pathTo);
   }
 
   function onBackToDAOLinkClick() {
