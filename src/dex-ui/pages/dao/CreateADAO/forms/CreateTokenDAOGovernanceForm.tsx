@@ -1,9 +1,10 @@
-import { Text, Flex, Divider, Center, Button, Link } from "@chakra-ui/react";
+import { Text, Flex, Divider, Center, Button } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { FormInput, useNotification, LoadingDialog, Color, CopyTextButton, SuccessCheckIcon } from "@dex-ui-components";
-import { useCreateToken, useFetchAccountInfo, useFetchTransactionDetails } from "@hooks";
+import { FormInput, LoadingDialog, Color } from "@dex-ui-components";
+import { useCreateToken, useFetchAccountInfo, useFetchTransactionDetails, useHandleTransactionSuccess } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { isNil, isNotNil } from "ramda";
@@ -21,6 +22,8 @@ export function CreateTokenDAOGovernanceForm() {
   const formValues = getValues();
   const { governance } = isNotNil(formValues.governance) ? formValues : DefaultCreateATokenDAOFormData;
 
+  const handleTransactionSuccess = useHandleTransactionSuccess();
+
   const {
     data: createTokenData,
     error: createTokenError,
@@ -28,7 +31,7 @@ export function CreateTokenDAOGovernanceForm() {
     isLoading: isCreateTokenLoading,
     mutateAsync: createToken,
     reset: resetCreateToken,
-  } = useCreateToken(handleCreateTokenSuccessful);
+  } = useCreateToken(handleCreateTokenSuccess);
 
   const {
     mutateAsync: getAccountDetails,
@@ -47,15 +50,6 @@ export function CreateTokenDAOGovernanceForm() {
 
   const isFormInReadOnlyMode = governance?.newToken?.id?.length > 0;
 
-  const { setIsNotificationVisible, isSuccessNotificationVisible, hashscanTransactionLink } = useNotification({
-    successMessage: `${governance?.newToken?.symbol} token was successfully created`,
-    transactionState: {
-      transactionWaitingToBeSigned: false,
-      successPayload: createTokenData ?? null,
-      errorMessage: createTokenError?.message ?? "",
-    },
-  });
-
   const isLoadingDialogOpen = isCreateTokenLoading || isGetAccountDetailsLoading || isTransactionDetailsLoading;
   const isErrorDialogOpen = isCreateTokenFailed || isGetAccountDetailsFailed || isTransactionDetailsFailed;
 
@@ -73,10 +67,6 @@ export function CreateTokenDAOGovernanceForm() {
     return "";
   }
 
-  function handleCopyTextButtonTapped() {
-    console.log("Copy the text to clipboard");
-  }
-
   const loadingDialogMessage = getLoadingDialogMessage();
   const errorDialogMessage = getErrorDialogMessage();
 
@@ -90,8 +80,9 @@ export function CreateTokenDAOGovernanceForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionDetails]);
 
-  function handleCreateTokenSuccessful() {
-    setIsNotificationVisible(true);
+  function handleCreateTokenSuccess(transactionResponse: TransactionResponse) {
+    const message = `${governance?.newToken?.symbol} token was successfully created`;
+    handleTransactionSuccess(transactionResponse, message);
   }
 
   async function createNewToken() {
@@ -266,28 +257,6 @@ export function CreateTokenDAOGovernanceForm() {
               Create Token
             </Button>
           </Flex>
-          {isSuccessNotificationVisible ? (
-            <Flex justifyContent="space-between">
-              <Flex direction="column" gap="2">
-                <Text textStyle="p small medium">Token ID</Text>
-                <Flex gap="2" alignItems="center">
-                  <Text textStyle="p medium regular">{governance.newToken.id}</Text>
-                  <CopyTextButton onClick={handleCopyTextButtonTapped} />
-                </Flex>
-              </Flex>
-              <Flex direction="column" gap="2" alignItems="flex-end">
-                <Flex alignItems="center" gap="1">
-                  <SuccessCheckIcon boxSize="4" />
-                  <Text textStyle="p small medium"> HEY token was successfully created.</Text>
-                </Flex>
-                <Link href={hashscanTransactionLink} isExternal flexDirection="row">
-                  <Text variant="p small semibold" color={Color.Primary._500}>
-                    View in HashScan
-                  </Text>
-                </Link>
-              </Flex>
-            </Flex>
-          ) : undefined}
         </DAOFormContainer>
         <Text textStyle="p large regular">Initial token distribution</Text>
         <DAOFormContainer>

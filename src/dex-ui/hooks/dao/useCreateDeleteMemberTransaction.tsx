@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@services";
-import { useDexContext } from "@hooks";
+import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
 interface DeleteMemberForm {
@@ -12,9 +12,7 @@ interface DeleteMemberForm {
   multiSigDAOContractId: string;
 }
 
-export function useCreateDeleteMemberTransaction(
-  handleSendProposesSuccess: (transactionResponse: TransactionResponse) => void
-) {
+export function useCreateDeleteMemberTransaction(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -29,10 +27,10 @@ export function useCreateDeleteMemberTransaction(
       return DexService.proposeRemoveOwnerWithThreshold({ ...params, signer });
     },
     {
-      onSuccess: (data: TransactionResponse | undefined) => {
-        if (isNil(data)) return;
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
-        handleSendProposesSuccess(data);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

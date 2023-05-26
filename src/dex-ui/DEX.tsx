@@ -4,6 +4,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { RouterProvider } from "react-router-dom";
 import { DEXTheme } from "@theme";
 import { router } from "@routes";
+import { ToastContainer } from "@dex-ui-components";
 
 const SEVEN_SECONDS = 7 * 1000;
 
@@ -29,6 +30,7 @@ const DEX = () => {
   return (
     <ChakraProvider theme={DEXTheme}>
       <QueryClientProvider client={queryClient}>
+        <ToastContainer />
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={true} />
       </QueryClientProvider>

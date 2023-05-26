@@ -1,7 +1,7 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateAddMemberTransaction, useDAOs } from "@hooks";
 import { useForm } from "react-hook-form";
+import { useDAOs, useCreateAddMemberTransaction, useHandleTransactionSuccess } from "@hooks";
 import { AddMemberForm } from "./types";
 import { Page } from "@layouts";
 import { Color, LoadingDialog } from "@dex-ui-components";
@@ -12,7 +12,6 @@ import { MultiSigDAODetails } from "@services";
 import { DefaultMultiSigDAODetails } from "../types";
 
 export function AddMember() {
-  const navigate = useNavigate();
   const { accountId: daoAccountId = "" } = useParams();
   const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
@@ -20,6 +19,7 @@ export function AddMember() {
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { ownerIds, safeId, accountId, threshold } = dao ?? DefaultMultiSigDAODetails;
   const membersCount = ownerIds.length;
+  const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const addMemberForm = useForm<AddMemberForm>({
     defaultValues: {
@@ -33,7 +33,7 @@ export function AddMember() {
     formState: { isSubmitting },
   } = addMemberForm;
 
-  const sendAddMemberTransactionMutationResults = useCreateAddMemberTransaction(handleSendProposesSuccess);
+  const sendAddMemberTransactionMutationResults = useCreateAddMemberTransaction(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
@@ -61,19 +61,10 @@ export function AddMember() {
     resetSendProposeTransaction();
   }
 
-  function handleSendProposesSuccess(transactionResponse: TransactionResponse) {
+  function handleCreateProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
-    const createSuccessMessage = "Proposal has been submitted.";
-    navigate(`${Paths.DAOs.absolute}/multisig/${accountId}/dashboard`, {
-      state: {
-        createSuccessMessage,
-        transactionState: {
-          transactionWaitingToBeSigned: false,
-          successPayload: transactionResponse,
-          errorMessage: "",
-        },
-      },
-    });
+    const message = "Add Member proposal has been submitted.";
+    handleTransactionSuccess(transactionResponse, message, backTo);
   }
 
   async function onSubmit(data: AddMemberForm) {

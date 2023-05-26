@@ -13,6 +13,7 @@ import {
   TagStyles,
   TextAreaStyles,
   TabsStyles,
+  LinkStyles,
 } from "@dex-ui-components";
 
 export const DEXTheme = extendTheme({
@@ -36,5 +37,6 @@ export const DEXTheme = extendTheme({
     Tag: TagStyles,
     Textarea: TextAreaStyles,
     Tabs: TabsStyles,
+    Link: LinkStyles,
   },
 });

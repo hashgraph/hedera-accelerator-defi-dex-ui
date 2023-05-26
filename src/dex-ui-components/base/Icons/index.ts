@@ -39,3 +39,6 @@ export * from "./GlobeIcon";
 export * from "./InstagramIcon";
 export * from "./TwitterIcon";
 export * from "./CopyIcon";
+export * from "./ToastSuccessIcon";
+export * from "./ToastErrorIcon";
+export * from "./ToastInfoIcon";

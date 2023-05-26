@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { DexService, DAOType } from "../../services";
 import { useDexContext } from "../useDexContext";
 import { isNil } from "ramda";
+import { HandleOnSuccess } from "@hooks";
 
 interface UseCreateGovernanceDAOParams {
   name: string;
@@ -40,7 +41,7 @@ type UseCreateDAOParams = (UseCreateGovernanceDAOParams | UseCreateMultiSigDAOPa
   type: DAOType;
 };
 
-export function useCreateDAO(handleCreateDAOSuccess: (transactionResponse: TransactionResponse) => void) {
+export function useCreateDAO(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
@@ -63,10 +64,10 @@ export function useCreateDAO(handleCreateDAOSuccess: (transactionResponse: Trans
       }
     },
     {
-      onSuccess: (data: TransactionResponse | undefined) => {
-        if (isNil(data)) return;
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries(DAOQueries.DAOs);
-        handleCreateDAOSuccess(data);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

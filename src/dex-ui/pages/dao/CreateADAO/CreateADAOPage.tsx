@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { Color, LoadingDialog } from "@dex-ui-components";
 import { Page } from "@layouts";
-import { useNavigate } from "react-router-dom";
 import {
   CreateADAOForm,
   CreateAMultiSigDAOForm,
@@ -10,7 +9,7 @@ import {
   TokenDAOGovernanceData,
   DAOGovernanceTokenType,
 } from "./types";
-import { useCreateDAO } from "@hooks";
+import { useCreateDAO, useHandleTransactionSuccess } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { Paths } from "@routes";
@@ -18,8 +17,9 @@ import { DAOType } from "@services";
 import { Wizard } from "@components";
 
 export function CreateADAOPage() {
-  const navigate = useNavigate();
   const backTo = `${Paths.DAOs.absolute}`;
+  const handleTransactionSuccess = useHandleTransactionSuccess();
+
   const createDAOPageForm = useForm<CreateADAOForm>({
     defaultValues: {
       name: "",
@@ -51,18 +51,8 @@ export function CreateADAOPage() {
   });
 
   function handleCreateDAOSuccess(transactionResponse: TransactionResponse) {
-    const createDAOSuccessMessage = `Created new 
-    ${isPublic ? "public" : "private"} ${type} DAO "${name}".`;
-    navigate(Paths.DAOs.absolute, {
-      state: {
-        createDAOSuccessMessage,
-        transactionState: {
-          transactionWaitingToBeSigned: false,
-          successPayload: transactionResponse,
-          errorMessage: "",
-        },
-      },
-    });
+    const message = `Created new ${isPublic ? "public" : "private"} ${type} DAO "${name}".`;
+    handleTransactionSuccess(transactionResponse, message, backTo);
   }
 
   const createDAO = useCreateDAO(handleCreateDAOSuccess);

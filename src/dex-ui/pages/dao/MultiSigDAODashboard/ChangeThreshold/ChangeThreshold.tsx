@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateChangeThresholdTransaction, useDAOs } from "@hooks";
+import { useCreateChangeThresholdTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { ChangeThresholdForm } from "./types";
 import { Page } from "@layouts";
@@ -12,7 +12,6 @@ import { Wizard } from "@components";
 import { DefaultMultiSigDAODetails } from "../types";
 
 export function ChangeThreshold() {
-  const navigate = useNavigate();
   const { accountId: daoAccountId = "" } = useParams();
   const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
@@ -20,6 +19,7 @@ export function ChangeThreshold() {
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { ownerIds, safeId, accountId, threshold } = dao ?? DefaultMultiSigDAODetails;
   const membersCount = ownerIds.length;
+  const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const changeThresholdForm = useForm<ChangeThresholdForm>({
     defaultValues: {
@@ -32,7 +32,8 @@ export function ChangeThreshold() {
     formState: { isSubmitting },
   } = changeThresholdForm;
 
-  const sendChangeThresholdTransactionMutationResults = useCreateChangeThresholdTransaction(handleSendProposesSuccess);
+  const sendChangeThresholdTransactionMutationResults =
+    useCreateChangeThresholdTransaction(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
@@ -60,19 +61,10 @@ export function ChangeThreshold() {
     resetSendProposeTransaction();
   }
 
-  function handleSendProposesSuccess(transactionResponse: TransactionResponse) {
+  function handleCreateProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
-    const createSuccessMessage = "Proposal has been submitted.";
-    navigate(`${Paths.DAOs.absolute}/multisig/${accountId}/dashboard`, {
-      state: {
-        createSuccessMessage,
-        transactionState: {
-          transactionWaitingToBeSigned: false,
-          successPayload: transactionResponse,
-          errorMessage: "",
-        },
-      },
-    });
+    const message = "Change Threshold proposal has been submitted.";
+    handleTransactionSuccess(transactionResponse, message, backTo);
   }
 
   async function onSubmit(data: ChangeThresholdForm) {

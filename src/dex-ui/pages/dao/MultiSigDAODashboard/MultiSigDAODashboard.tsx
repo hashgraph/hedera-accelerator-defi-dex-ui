@@ -1,6 +1,6 @@
-import { Box, Center, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { Box, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@layouts";
-import { Color, Notification, NotficationTypes, useNotification } from "@dex-ui-components";
+import { Color } from "@dex-ui-components";
 import { TokenBalance, useAccountTokenBalances, useDAOs, useTabFilters } from "@hooks";
 import { DashboardHeader } from "./DashboardHeader";
 import { MultiSigDAODetails } from "@services";
@@ -24,11 +24,6 @@ export function MultiSigDAODashboard() {
   const tabIndexByRoute = daoNavigationTabs.map((tab) => tab.toLowerCase()).indexOf(currentTabNameByRoute);
   const intialTabIndex = tabIndexByRoute === -1 ? 0 : tabIndexByRoute;
   const { handleTabChange } = useTabFilters(intialTabIndex);
-
-  const notification = useNotification({
-    successMessage: location.state?.createDAOSuccessMessage,
-    transactionState: location.state?.transactionState,
-  });
 
   const accountTokenBalancesQueryResults = useAccountTokenBalances(dao?.safeId ?? "");
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
@@ -91,27 +86,7 @@ export function MultiSigDAODashboard() {
       <Page
         gap={0}
         type={PageLayout.Dashboard}
-        header={
-          <>
-            {notification.isSuccessNotificationVisible && (
-              <Center>
-                <Box padding="16px 80px 0 80px" maxWidth="fit-content" paddingTop="1rem">
-                  <Notification
-                    type={NotficationTypes.SUCCESS}
-                    textStyle="b3"
-                    message={notification.successNotificationMessage}
-                    isLinkShown={true}
-                    linkText="View in HashScan"
-                    linkRef={notification.hashscanTransactionLink}
-                    isCloseButtonShown={true}
-                    handleClickClose={notification.handleCloseNotificationButtonClicked}
-                  />
-                </Box>
-              </Center>
-            )}
-            <DashboardHeader daoAccountId={accountId} safeAccountId={safeId} name={name} type={type} />
-          </>
-        }
+        header={<DashboardHeader daoAccountId={accountId} safeAccountId={safeId} name={name} type={type} />}
         body={
           <Tabs defaultIndex={intialTabIndex} onChange={handleTabChange} isLazy bg={Color.White_02}>
             <Flex flex="row" padding="0px 80px">

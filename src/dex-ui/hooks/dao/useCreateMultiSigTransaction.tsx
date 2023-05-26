@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@services";
-import { useDexContext } from "@hooks";
+import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
 interface UseCreateMultiSigTransactionParams {
@@ -14,9 +14,7 @@ interface UseCreateMultiSigTransactionParams {
   safeId: string;
 }
 
-export function useCreateMultiSigTransaction(
-  handleCreateDAOSuccess: (transactionResponse: TransactionResponse) => void
-) {
+export function useCreateMultiSigTransaction(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -40,10 +38,10 @@ export function useCreateMultiSigTransaction(
       });
     },
     {
-      onSuccess: (data: TransactionResponse | undefined) => {
-        if (isNil(data)) return;
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
-        handleCreateDAOSuccess(data);
+        handleOnSuccess(transactionResponse);
       },
     }
   );
