@@ -113,8 +113,8 @@ export function CreateADAOPage() {
   const { nextStep, prevStep, reset, activeStep } = stepProps;
   const isLastStep = activeStep === steps.length - 1;
   const isFirstStep = activeStep === 0;
-  const previousStepLabel = isFirstStep ? "Cancel" : `< ${steps.at(activeStep - 1)?.label}`;
-  const nextStepLabel = isLastStep ? "Create DAO" : `${steps.at(activeStep + 1)?.label} >`;
+  const previousStepLabel = isFirstStep ? "Cancel" : "Back";
+  const nextStepLabel = isLastStep ? "Create DAO" : "Next >";
 
   function handleCancelClicked() {
     reset();
@@ -125,7 +125,7 @@ export function CreateADAOPage() {
     const triggerDefaultValidations = (): Promise<boolean> => Promise.resolve(true);
     switch (activeStep) {
       case 0: {
-        return trigger(["name", "logoUrl", "isPublic"]);
+        return trigger(["name", "logoUrl", "isPublic", "description"]);
       }
       case 2: {
         if (
@@ -160,6 +160,7 @@ export function CreateADAOPage() {
     if (isStepDataValid) nextStep();
   }
 
+  /* TODO: Send Description and Links once the SC is ready */
   async function onSubmit(data: CreateADAOForm) {
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;

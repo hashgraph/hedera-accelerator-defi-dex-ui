@@ -11,6 +11,7 @@ import {
   TooltipStyles,
   StepsV2Theme,
   TagStyles,
+  TextAreaStyles,
 } from "@dex-ui-components";
 
 export const DEXTheme = extendTheme({
@@ -32,5 +33,6 @@ export const DEXTheme = extendTheme({
     Tooltip: TooltipStyles,
     Steps: StepsV2Theme,
     Tag: TagStyles,
+    Textarea: TextAreaStyles,
   },
 });

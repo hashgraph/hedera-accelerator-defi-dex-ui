@@ -20,3 +20,4 @@ export * from "./Breadcrumb";
 export * from "./Links";
 export * from "./ProgressBar";
 export * from "./Tag";
+export * from "./TextArea";

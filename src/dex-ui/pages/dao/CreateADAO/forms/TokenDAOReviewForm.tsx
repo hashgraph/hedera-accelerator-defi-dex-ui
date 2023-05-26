@@ -99,7 +99,7 @@ export function TokenDAOReviewForm() {
         <FormInput<"voting.quorum">
           inputProps={{
             id: "voting.quorum",
-            label: "Quorum",
+            label: "QUORUM",
             type: "number",
             unit: "%",
             value: String(voting.quorum),
@@ -109,7 +109,7 @@ export function TokenDAOReviewForm() {
         <FormInput<"voting.duration">
           inputProps={{
             id: "voting.duration",
-            label: "Voting duration",
+            label: "VOTING DURATION",
             type: "number",
             unit: "Days",
             value: String(voting.duration),
@@ -119,7 +119,7 @@ export function TokenDAOReviewForm() {
         <FormInput<"voting.lockingPeriod">
           inputProps={{
             id: "voting.lockingPeriod",
-            label: "Locking period",
+            label: "LOCKING PERIOD",
             type: "number",
             unit: "Days",
             value: String(voting.lockingPeriod),

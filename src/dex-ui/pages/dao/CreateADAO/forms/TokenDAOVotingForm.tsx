@@ -3,6 +3,7 @@ import { FormInput } from "@dex-ui-components";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
+import { DAOToolTips } from "./constants";
 
 export function TokenDAOVotingForm() {
   const {
@@ -34,6 +35,9 @@ export function TokenDAOVotingForm() {
           inputProps={{
             id: "voting.quorum",
             label: "Quorum",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.quorum,
+            toolTipLabelPlacement: "top",
             type: "text",
             placeholder: "Enter amount",
             unit: "%",
@@ -50,6 +54,9 @@ export function TokenDAOVotingForm() {
           inputProps={{
             id: "voting.duration",
             label: "Voting duration",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.duration,
+            toolTipLabelPlacement: "top",
             type: "number",
             placeholder: "Enter amount",
             unit: "Days",
@@ -67,6 +74,9 @@ export function TokenDAOVotingForm() {
             id: "voting.lockingPeriod",
             label: "Locking period",
             type: "number",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.lockingPeriod,
+            toolTipLabelPlacement: "top",
             placeholder: "Enter amount",
             unit: "Days",
             register: {

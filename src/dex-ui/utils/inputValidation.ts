@@ -1,9 +1,12 @@
-export const isValidUrl = (urlString: string) => {
+import { isNil } from "ramda";
+
+export const isValidUrl = (urlString: string | undefined): boolean => {
+  if (isNil(urlString)) return false;
   try {
     const url = new URL(urlString);
     return url.protocol === "http:" || url.protocol === "https:";
   } catch (_) {
-    return urlString.length === 0 ? true : false;
+    return false;
   }
 };
 

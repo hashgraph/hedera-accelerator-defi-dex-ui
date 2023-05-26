@@ -224,7 +224,7 @@ export const ProposalDetails = () => {
                           {
                             label: "No",
                             value: formattedProposal?.votes.no ?? 0,
-                            icon: <CancelledStepIcon fill={Color.Red_03} />,
+                            icon: <CancelledStepIcon color={Color.Red_03} boxSize="8" />,
                           },
                           {
                             label: "Abstain",

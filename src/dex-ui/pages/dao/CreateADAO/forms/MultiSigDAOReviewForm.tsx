@@ -19,7 +19,7 @@ export function MultiSigDAOReviewForm() {
         <FormInput<"governance.admin">
           inputProps={{
             id: "governance.admin",
-            label: "Admin Wallet",
+            label: "ADMIN WALLET",
             type: "text",
             value: governance.admin,
             isReadOnly: true,
@@ -31,7 +31,7 @@ export function MultiSigDAOReviewForm() {
             <FormInput<typeof formInputId>
               inputProps={{
                 id: formInputId,
-                label: "Member Wallet",
+                label: "MEMBER WALLET",
                 type: "text",
                 value: owner.value,
                 isReadOnly: true,
@@ -44,7 +44,7 @@ export function MultiSigDAOReviewForm() {
         <FormInput<"voting.threshold">
           inputProps={{
             id: "voting.threshold",
-            label: "Threshold",
+            label: "THRESHOLD",
             type: "number",
             unit: "Members",
             value: String(voting.threshold),

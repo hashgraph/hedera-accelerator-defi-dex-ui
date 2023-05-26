@@ -1,15 +1,45 @@
-import { Checkbox, FormControl } from "@chakra-ui/react";
-import { Controller, useFormContext } from "react-hook-form";
-import { FormInput } from "@dex-ui-components";
+import {
+  FormControl,
+  Flex,
+  Image,
+  Text,
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  SimpleGrid,
+  Checkbox,
+} from "@chakra-ui/react";
+import { Controller, useFormContext, useFieldArray } from "react-hook-form";
+import { FormInput, FormTextArea, SelectImageIcon, FormInputList } from "@dex-ui-components";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
+import { isValidUrl } from "@dex-ui/utils";
+import { useState } from "react";
 
 export function DAODetailsForm() {
   const {
     control,
     register,
+    getValues,
     formState: { errors },
   } = useFormContext<CreateADAOForm>();
+  const daoDetails = getValues();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "daoLinks",
+  });
+
+  const [imageUrl, setImageUrl] = useState(() => {
+    return daoDetails.logoUrl ?? "";
+  });
+
+  function handleLogoUrlChange(event: any) {
+    setImageUrl(event.target.value);
+  }
+
   return (
     <DAOFormContainer>
       <FormInput<"name">
@@ -27,36 +57,50 @@ export function DAODetailsForm() {
         isInvalid={Boolean(errors.name)}
         errorMessage={errors.name && errors.name.message}
       />
-      {/* TODO: For a future version of the form.
-        <FormInput<"description">
+      <FormTextArea<"description">
+        textAreaProps={{
+          id: "description",
+          label: "Description",
+          placeholder: "Add a description for your DAO",
+          register: {
+            ...register("description", {
+              required: { value: true, message: "A description is required." },
+              validate: (value) => value.length <= 240 || "Maximum character count for the description is 240.",
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors.description)}
+        errorMessage={errors.description && errors.description.message}
+      />
+      <Flex direction="row" gap="10px" justifyContent="flex-end">
+        <FormInput<"logoUrl">
           inputProps={{
-            id: "description",
-            label: "Description",
+            id: "logoUrl",
+            label: "Logo",
             type: "text",
-            placeholder: "Add a description for your DAO",
+            placeholder: "Enter image URL",
             register: {
-              ...props.register("description", {
-                required: { value: true, message: "A description is required." },
+              ...register("logoUrl", {
+                onChange: handleLogoUrlChange,
               }),
             },
           }}
-          isInvalid={Boolean(props.errors.description)}
-          errorMessage={props.errors.description && props.errors.description.message}
-        /> 
-      */}
-      <FormInput<"logoUrl">
-        inputProps={{
-          id: "logoUrl",
-          label: "Logo",
-          type: "text",
-          placeholder: "Enter image URL",
-          register: {
-            ...register("logoUrl"),
-          },
-        }}
-        isInvalid={Boolean(errors.logoUrl)}
-        errorMessage={errors.logoUrl && errors.logoUrl.message}
-      />
+          isInvalid={Boolean(errors.logoUrl)}
+          errorMessage={errors.logoUrl && errors.logoUrl.message}
+        />
+        {isValidUrl(imageUrl) ? (
+          <Image
+            src={imageUrl}
+            objectFit="scale-down"
+            alt="Logo URl"
+            alignSelf="end"
+            boxSize="60px"
+            borderRadius="30px"
+          />
+        ) : (
+          <SelectImageIcon options={{ alignSelf: "end" }} />
+        )}
+      </Flex>
       {/* TODO: Create independent component for form checkboxes */}
       <FormControl>
         <Controller
@@ -73,6 +117,33 @@ export function DAODetailsForm() {
           }}
         />
       </FormControl>
+      <Accordion defaultIndex={[0]} allowMultiple>
+        <AccordionItem>
+          <Text textStyle="p medium medium">
+            <AccordionButton>
+              <Box as="span" flex="1" textAlign="left">
+                DAO Links
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+          </Text>
+          <AccordionPanel pb={4}>
+            <SimpleGrid row={1} spacingX="1rem" spacingY="0.75rem">
+              <FormInputList<CreateADAOForm, "daoLinks">
+                fields={fields}
+                defaultFieldValue={{ value: "" }}
+                formPath="daoLinks"
+                fieldPlaceholder="Enter URL"
+                fieldLabel=""
+                fieldButtonText="+ Add Link"
+                append={append}
+                remove={remove}
+                register={register}
+              />
+            </SimpleGrid>
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
     </DAOFormContainer>
   );
 }

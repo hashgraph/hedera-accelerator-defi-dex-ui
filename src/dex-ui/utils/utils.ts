@@ -1,4 +1,6 @@
 import { ethers } from "ethers";
+import { AccountId } from "@hashgraph/sdk";
+import { isNotNil } from "ramda";
 
 /**
  * Determines whether the given `value` is iterable.
@@ -18,4 +20,12 @@ export function convertToByte32(hexString: string): Uint8Array {
 
 export function checkForValidTokenId(tokenId: string): boolean {
   return /^\d+\.\d+\.\d+$/.test(tokenId);
+}
+
+export function checkForValidAccountId(accountId: string): boolean {
+  try {
+    return isNotNil(AccountId.fromString(accountId));
+  } catch {
+    return false;
+  }
 }

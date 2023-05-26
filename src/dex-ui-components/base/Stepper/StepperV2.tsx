@@ -22,7 +22,7 @@ interface StepperV2Props {
 }
 
 function RedCancelledStepIcon() {
-  return <CancelledStepIcon fill={Color.Destructive._500} />;
+  return <CancelledStepIcon color={Color.Destructive._500} boxSize="8" />;
 }
 
 function PrimarySpinner() {

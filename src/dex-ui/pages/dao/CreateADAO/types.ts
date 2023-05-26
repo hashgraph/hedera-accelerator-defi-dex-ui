@@ -13,8 +13,8 @@ export interface TokenDAOGovernanceData {
     decimals: number;
     logo: string;
     initialSupply: number;
-    supplyKey: string;
     id: string;
+    tokenWalletAddress: string;
     treasuryWalletAccountId: string;
   };
   existingToken: {
@@ -49,8 +49,8 @@ export interface NFTDAOGovernanceData {
     symbol: string;
     logo: string;
     maxSupply: number;
-    supplyKey: string;
     id: string;
+    tokenWalletAddress: string;
     treasuryWalletAccountId: string;
   };
 }
@@ -71,6 +71,7 @@ export interface CreateADAOFormBase {
   description: string;
   logoUrl?: string;
   isPublic?: boolean;
+  daoLinks: Record<"value", string>[];
   type: DAOType;
 }
 

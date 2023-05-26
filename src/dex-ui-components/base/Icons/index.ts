@@ -25,3 +25,6 @@ export * from "./ClockIcon";
 export * from "./CheckCircleUnfilledIcon";
 export * from "./ChevronLeftIcon";
 export * from "./ChevronRightIcon";
+export * from "./SelectImageIcon";
+export * from "./DefaultLogoIcon";
+export * from "./SuccessCheckIcon";

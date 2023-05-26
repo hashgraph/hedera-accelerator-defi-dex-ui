@@ -1,12 +1,13 @@
-import { Text, Flex, Divider, Center, Button, Spacer } from "@chakra-ui/react";
+import { Text, Flex, Divider, Center, Button, Link } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { Notification, FormInput, NotficationTypes, useNotification, LoadingDialog, Color } from "@dex-ui-components";
+import { FormInput, useNotification, LoadingDialog, Color, CopyTextButton, SuccessCheckIcon } from "@dex-ui-components";
 import { useCreateToken, useFetchAccountInfo, useFetchTransactionDetails } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { isNil } from "ramda";
+import { checkForValidAccountId } from "@utils";
 
 export function CreateTokenDAOGovernanceForm() {
   const {
@@ -18,66 +19,79 @@ export function CreateTokenDAOGovernanceForm() {
   } = useFormContext<CreateATokenDAOForm>();
   const formValues = getValues();
   const { governance } = formValues;
-  const createToken = useCreateToken(handleCreateTokenSuccessful);
-  const accountInfo = useFetchAccountInfo();
-  const supplyKey = accountInfo.data?.key.key ?? "";
-  const { data: tokenData, error, reset } = createToken;
 
-  const isFormInReadOnlyMode = governance?.newToken?.id?.length > 0;
+  register("governance.newToken.id", {
+    required: {
+      value: true,
+      message: "A token ID is require. To generate the token ID, please define the inputs above.",
+    },
+  });
+
+  const {
+    data: createTokenData,
+    error: createTokenError,
+    isError: isCreateTokenFailed,
+    isLoading: isCreateTokenLoading,
+    mutateAsync: createToken,
+    reset: resetCreateToken,
+  } = useCreateToken(handleCreateTokenSuccessful);
+
+  const {
+    mutateAsync: getAccountDetails,
+    isLoading: isGetAccountDetailsLoading,
+    isError: isGetAccountDetailsFailed,
+    error: getAccountDetailsError,
+    reset: resetGetAccountDetails,
+  } = useFetchAccountInfo();
 
   const {
     data: transactionDetails,
     isLoading: isTransactionDetailsLoading,
     isError: isTransactionDetailsFailed,
     error: transactionDetailsError,
-  } = useFetchTransactionDetails(tokenData?.transactionId.toString() ?? "");
+  } = useFetchTransactionDetails(createTokenData?.transactionId.toString() ?? "");
 
-  const {
-    setIsNotificationVisible,
-    isSuccessNotificationVisible,
-    successNotificationMessage,
-    hashscanTransactionLink,
-    handleCloseNotificationButtonClicked,
-  } = useNotification({
+  const isFormInReadOnlyMode = governance?.newToken?.id?.length > 0;
+
+  const { setIsNotificationVisible, isSuccessNotificationVisible, hashscanTransactionLink } = useNotification({
     successMessage: `${governance?.newToken?.symbol} token was successfully created`,
     transactionState: {
       transactionWaitingToBeSigned: false,
-      successPayload: tokenData ?? null,
-      errorMessage: error?.message ?? "",
+      successPayload: createTokenData ?? null,
+      errorMessage: createTokenError?.message ?? "",
     },
   });
 
-  const isLoadingDialogOpen = createToken.isLoading || accountInfo.isLoading || isTransactionDetailsLoading;
-  const isErrorDialogOpen = createToken.isError || accountInfo.isError || isTransactionDetailsFailed;
+  const isLoadingDialogOpen = isCreateTokenLoading || isGetAccountDetailsLoading || isTransactionDetailsLoading;
+  const isErrorDialogOpen = isCreateTokenFailed || isGetAccountDetailsFailed || isTransactionDetailsFailed;
 
   function getLoadingDialogMessage(): string {
-    if (createToken.isLoading || isTransactionDetailsLoading)
+    if (isLoadingDialogOpen)
       return `Please confirm the create ${governance.newToken.name} 
       token transaction in your wallet to proceed.`;
-    if (accountInfo.isLoading) return "Please wait while we get your account public key";
     return "";
   }
 
   function getErrorDialogMessage(): string {
-    if (accountInfo.isError) return accountInfo.error?.message;
-    if (createToken.isError) return createToken.error?.message;
+    if (isGetAccountDetailsFailed) return getAccountDetailsError?.message;
+    if (isCreateTokenFailed) return createTokenError?.message;
     if (isTransactionDetailsFailed) return transactionDetailsError?.message;
     return "";
+  }
+
+  function handleCopyTextButtonTapped() {
+    console.log("Copy the text to clipboard");
   }
 
   const loadingDialogMessage = getLoadingDialogMessage();
   const errorDialogMessage = getErrorDialogMessage();
 
   useEffect(() => {
-    if (supplyKey) {
-      setValue("governance.newToken.supplyKey", supplyKey, { shouldValidate: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supplyKey]);
-
-  useEffect(() => {
     if (!isNil(transactionDetails)) {
       setValue("governance.newToken.id", transactionDetails[0].token_transfers[0].token_id, { shouldValidate: true });
+      setValue("governance.newToken.treasuryWalletAccountId", governance.newToken.tokenWalletAddress, {
+        shouldValidate: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionDetails]);
@@ -86,74 +100,45 @@ export function CreateTokenDAOGovernanceForm() {
     setIsNotificationVisible(true);
   }
 
-  function handleGetAccountInfoClick() {
-    accountInfo.mutate(undefined);
-  }
-
   async function createNewToken() {
     const isCreateTokenDataValid = await trigger([
       "governance.newToken.name",
       "governance.newToken.symbol",
       "governance.newToken.decimals",
       "governance.newToken.initialSupply",
-      "governance.newToken.supplyKey",
-      "governance.newToken.treasuryWalletAccountId",
+      "governance.newToken.tokenWalletAddress",
     ]);
     if (isCreateTokenDataValid) {
       const tokenDAOFormData = formValues as CreateATokenDAOForm;
       const {
         governance: {
-          newToken: { name, symbol, initialSupply, decimals, treasuryWalletAccountId, supplyKey },
+          newToken: { name, symbol, initialSupply, decimals, tokenWalletAddress },
         },
       } = tokenDAOFormData;
-      createToken.mutate({
+
+      const {
+        key: { key },
+      } = await getAccountDetails(undefined);
+
+      createToken({
         name,
         symbol,
         initialSupply,
-        supplyKey,
+        supplyKey: key,
         decimals,
-        treasuryAccountId: treasuryWalletAccountId,
+        tokenWalletAddress,
       });
     }
   }
 
   return (
     <>
-      {isSuccessNotificationVisible && (
-        <>
-          <Notification
-            type={NotficationTypes.SUCCESS}
-            textStyle="b3"
-            message={successNotificationMessage}
-            isLinkShown={true}
-            linkText="View in HashScan"
-            linkRef={hashscanTransactionLink}
-            isCloseButtonShown={true}
-            handleClickClose={handleCloseNotificationButtonClicked}
-          />
-          <Spacer paddingBottom="1.5rem" />
-        </>
-      )}
       <Flex gap="1.5rem" direction="column">
         <DAOFormContainer>
-          <FormInput<"governance.newToken.id">
-            inputProps={{
-              id: "governance.newToken.id",
-              label: "Token ID",
-              type: "text",
-              placeholder: "Token Id",
-              isReadOnly: true,
-              register: {
-                ...register("governance.newToken.id", {
-                  required: { value: true, message: "A token id is required." },
-                }),
-              },
-            }}
-            isInvalid={Boolean(errors.governance?.newToken?.id)}
-            errorMessage={errors.governance?.newToken?.id && errors.governance?.newToken?.id.message}
-          />
-        </DAOFormContainer>
-        <DAOFormContainer>
+          <Text textStyle="p small medium" paddingBottom="0.4rem">
+            To generate the token ID, define the following inputs. Once the token is created, the token's ID will be
+            automatically displayed.
+          </Text>
           <Flex direction="row" gap="4">
             <FormInput<"governance.newToken.name">
               flex="3"
@@ -162,7 +147,7 @@ export function CreateTokenDAOGovernanceForm() {
                 label: "Name",
                 type: "text",
                 placeholder: "Enter token name",
-                isReadOnly: isFormInReadOnlyMode,
+                isDisabled: isFormInReadOnlyMode,
                 register: {
                   ...register("governance.newToken.name", {
                     required: { value: true, message: "A token name is required." },
@@ -182,7 +167,7 @@ export function CreateTokenDAOGovernanceForm() {
                 id: "governance.newToken.symbol",
                 label: "Symbol",
                 type: "text",
-                isReadOnly: isFormInReadOnlyMode,
+                isDisabled: isFormInReadOnlyMode,
                 placeholder: "Enter Symbol",
                 register: {
                   ...register("governance.newToken.symbol", {
@@ -203,8 +188,9 @@ export function CreateTokenDAOGovernanceForm() {
                 id: "governance.newToken.decimals",
                 label: "Decimals",
                 type: "number",
+                value: `${governance.newToken.decimals}`,
                 placeholder: "",
-                isReadOnly: true,
+                isDisabled: true,
                 register: {
                   ...register("governance.newToken.decimals", {
                     required: { value: true, message: "Decimals are required." },
@@ -220,7 +206,7 @@ export function CreateTokenDAOGovernanceForm() {
               id: "governance.newToken.logo",
               label: "Logo",
               type: "text",
-              isReadOnly: isFormInReadOnlyMode,
+              isDisabled: isFormInReadOnlyMode,
               placeholder: "Enter image URL",
               register: {
                 ...register("governance.newToken.logo", {
@@ -238,10 +224,11 @@ export function CreateTokenDAOGovernanceForm() {
               type: "number",
               placeholder: "Enter amount",
               unit: "$TOKEN",
-              isReadOnly: isFormInReadOnlyMode,
+              isDisabled: isFormInReadOnlyMode,
               register: {
                 ...register("governance.newToken.initialSupply", {
                   required: { value: true, message: "An initial token supply is required." },
+                  validate: (value) => value >= 0 || "Invalid initial token supply.",
                 }),
               },
             }}
@@ -251,29 +238,62 @@ export function CreateTokenDAOGovernanceForm() {
               errors.governance?.newToken?.initialSupply && errors.governance?.newToken?.initialSupply.message
             }
           />
-          <Flex direction="row" gap="4" alignItems="flex-end">
-            <FormInput<"governance.newToken.supplyKey">
-              flex="5"
-              inputProps={{
-                flex: 5,
-                id: "governance.newToken.supplyKey",
-                label: "Supply Key",
-                type: "text",
-                isReadOnly: true,
-                placeholder: "Enter Supply Key",
-                register: {
-                  ...register("governance.newToken.supplyKey", {
-                    required: { value: true, message: "Supply key is required." },
-                  }),
-                },
-              }}
-              isInvalid={Boolean(errors.governance?.newToken?.supplyKey)}
-              errorMessage={errors.governance?.newToken?.supplyKey && errors.governance?.newToken?.supplyKey?.message}
-            />
-            <Button key="token-supply-key" onClick={handleGetAccountInfoClick} flex="1" marginBottom="8px">
-              Get Supply Key
+          <FormInput<"governance.newToken.tokenWalletAddress">
+            flex="3"
+            inputProps={{
+              id: "governance.newToken.tokenWalletAddress",
+              label: "Token wallet address",
+              type: "text",
+              placeholder: "Enter wallet address",
+              isDisabled: isFormInReadOnlyMode,
+              register: {
+                ...register("governance.newToken.tokenWalletAddress", {
+                  required: { value: true, message: "Token wallet address is required." },
+                  validate: (value) =>
+                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+                }),
+              },
+            }}
+            isInvalid={Boolean(errors.governance?.newToken?.tokenWalletAddress)}
+            errorMessage={
+              errors.governance?.newToken?.tokenWalletAddress && errors.governance?.newToken?.tokenWalletAddress.message
+            }
+          />
+          <Flex gap="4" justifyContent="flex-end">
+            {errors.governance?.newToken?.id ? (
+              <Flex gap="1" alignItems="top" direction="row">
+                <WarningIcon color={Color.Destructive._500} marginTop="0.3rem" boxSize="3" />
+                <Text textStyle="p small regular" color={Color.Destructive._500}>
+                  {errors.governance?.newToken?.id?.message}
+                </Text>
+              </Flex>
+            ) : undefined}
+            <Button key="create-token" onClick={createNewToken} isDisabled={isFormInReadOnlyMode}>
+              Create Token
             </Button>
           </Flex>
+          {isSuccessNotificationVisible ? (
+            <Flex justifyContent="space-between">
+              <Flex direction="column" gap="2">
+                <Text textStyle="p small medium">Token ID</Text>
+                <Flex gap="2" alignItems="center">
+                  <Text textStyle="p medium regular">{governance.newToken.id}</Text>
+                  <CopyTextButton onClick={handleCopyTextButtonTapped} />
+                </Flex>
+              </Flex>
+              <Flex direction="column" gap="2" alignItems="flex-end">
+                <Flex alignItems="center" gap="1">
+                  <SuccessCheckIcon boxSize="4" />
+                  <Text textStyle="p small medium"> HEY token was successfully created.</Text>
+                </Flex>
+                <Link href={hashscanTransactionLink} isExternal flexDirection="row">
+                  <Text variant="p small semibold" color={Color.Primary._500}>
+                    View in HashScan
+                  </Text>
+                </Link>
+              </Flex>
+            </Flex>
+          ) : undefined}
         </DAOFormContainer>
         <Text textStyle="p large regular">Initial token distribution</Text>
         <DAOFormContainer>
@@ -283,10 +303,11 @@ export function CreateTokenDAOGovernanceForm() {
               label: "Treasury wallet account id",
               type: "text",
               placeholder: "Enter wallet account id",
-              isReadOnly: isFormInReadOnlyMode,
               register: {
                 ...register("governance.newToken.treasuryWalletAccountId", {
                   required: { value: true, message: "A treasury account id is required." },
+                  validate: (value) =>
+                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
                 }),
               },
             }}
@@ -297,11 +318,6 @@ export function CreateTokenDAOGovernanceForm() {
             }
           />
         </DAOFormContainer>
-        <Flex gap="4" justifyContent="flex-end">
-          <Button key="create-token" onClick={createNewToken}>
-            Create Token
-          </Button>
-        </Flex>
       </Flex>
       <LoadingDialog isOpen={isLoadingDialogOpen} message={loadingDialogMessage} />
       <LoadingDialog
@@ -311,8 +327,8 @@ export function CreateTokenDAOGovernanceForm() {
         buttonConfig={{
           text: "Dismiss",
           onClick: () => {
-            reset();
-            accountInfo.reset();
+            resetCreateToken();
+            resetGetAccountDetails();
           },
         }}
       />

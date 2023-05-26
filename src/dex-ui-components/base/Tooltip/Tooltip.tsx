@@ -9,16 +9,11 @@ interface TooltipProps {
 }
 
 export function Tooltip(props: TooltipProps) {
+  const { label, fill, placement = "bottom" } = props;
   return (
-    <ChakraTooltip
-      hasArrow
-      label={props.label}
-      placement={props.placement ? props.placement : "bottom"}
-      arrowShadowColor={Color.Grey_01}
-      bg={Color.White_02}
-    >
+    <ChakraTooltip hasArrow label={label} placement={placement} arrowShadowColor={Color.Grey_01} bg={Color.White_02}>
       <Flex alignItems="center">
-        <TooltipIcon fill={props.fill} />
+        <TooltipIcon color={fill} boxSize="4" />
       </Flex>
     </ChakraTooltip>
   );
