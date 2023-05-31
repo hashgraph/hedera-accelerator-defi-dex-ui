@@ -2,7 +2,6 @@ export * from "./MultiSigDAODashboard";
 export * from "./TransactionsList";
 export * from "./DashboardOverview";
 export * from "./AssetsList";
-export * from "./MembersList";
 export * from "./Settings";
 export * from "./AddMember";
 export * from "./DeleteMember";

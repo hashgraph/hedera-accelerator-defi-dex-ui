@@ -44,6 +44,7 @@ export interface GovernanceDAODetails {
   quorumThreshold: number;
   votingDelay: number;
   votingPeriod: number;
+  minimumProposalDeposit?: number;
 }
 
 export interface NFTDAODetails {

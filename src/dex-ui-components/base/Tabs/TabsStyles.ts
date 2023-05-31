@@ -11,16 +11,7 @@ const baseStyle = definePartsStyle({
   tabList: {
     borderBottom: "0",
   },
-  tab: {
-    height: "fit-content",
-    padding: "0",
-    marginRight: "1.5rem",
-    color: Color.Grey_02,
-    _selected: {
-      color: Color.Black_01,
-      borderBottom: `4px solid ${Color.Black_01}`,
-    },
-  },
+  tab: {},
 });
 
 /**
@@ -30,6 +21,25 @@ const baseStyle = definePartsStyle({
 export const TabsStyles = defineMultiStyleConfig({
   baseStyle,
   sizes: {},
-  variants: {},
+  variants: {
+    "dao-dashboard-tab": {
+      tab: {
+        height: "fit-content",
+        padding: "0",
+        textStyle: "p medium medium",
+        color: Color.Neutral._400,
+        stroke: Color.Neutral._400,
+        _selected: {
+          color: Color.Neutral._900,
+          borderBottom: `4px solid ${Color.Primary._500}`,
+          stroke: Color.Primary._500,
+        },
+        _hover: {
+          color: Color.Neutral._900,
+        },
+      },
+    },
+    defaultProps: {},
+  },
   defaultProps: {},
 });

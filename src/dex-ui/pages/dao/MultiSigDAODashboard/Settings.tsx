@@ -149,7 +149,7 @@ export function Settings() {
                   <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
                     THRESHOLD
                   </Text>
-                  <Text textStyle="p large medium">{`${threshold} / ${memberCount}`}</Text>
+                  <Text textStyle="p large medium">{`${threshold ?? 0} / ${memberCount}`}</Text>
                 </Flex>
                 <Button
                   type="button"

@@ -30,6 +30,7 @@ import {
   SendTokenWizard,
   SendTokenDetailsForm,
   SendTokenReviewForm,
+  GovernanceDAODashboardOverview,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -62,13 +63,24 @@ export const router = createBrowserRouter(
         <Route path={Paths.DAOs.Create} element={<CreateADAOPage />} />
         <Route path={"multisig/:accountId"} element={<MultiSigDAODashboard />}>
           <Route index element={<Navigate to="dashboard" />} />
-          <Route path={"dashboard"} element={<DashboardOverview />} />
-          <Route path={"transactions"} element={<TransactionsList />} />
-          <Route path={"assets"} element={<AssetsList />} />
-          <Route path={"members"} element={<MembersList />} />
-          <Route path={"settings"} element={<Settings />} />
+          <Route path={Paths.DAOs.Dashboard} element={<DashboardOverview />} />
+          <Route path={Paths.DAOs.TransactionDetails} element={<TransactionsList />} />
+          <Route path={Paths.DAOs.Assets} element={<AssetsList />} />
+          <Route path={Paths.DAOs.Members} element={<MembersList />} />
+          <Route path={Paths.DAOs.Settings} element={<Settings />} />
         </Route>
-        <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />} />
+        <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />}>
+          <Route index element={<Navigate to="dashboard" />} />
+          <Route path={Paths.DAOs.Dashboard} element={<GovernanceDAODashboardOverview />} />
+          <Route
+            path={Paths.DAOs.TransactionDetails}
+            element={<NotFound message={`The transactions page is under construction`} />}
+          />
+          <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
+          <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
+          <Route path={Paths.DAOs.Members} element={<MembersList />} />
+          <Route path={Paths.DAOs.Settings} element={<Settings />} />
+        </Route>
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />} />
         <Route path="multisig/:accountId/send-token" element={<SendTokenWizard />}>
           <Route index element={<Navigate to="details" />} />

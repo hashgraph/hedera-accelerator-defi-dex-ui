@@ -6,9 +6,9 @@ export const CheckCircleUnfilledIcon = createIcon({
   viewBox: "0 0 16 16",
   path: (
     <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="1.67"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.67"
       d="m5.667 8 1.555 1.556 3.111-3.112M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
     />
   ),
