@@ -24,6 +24,11 @@ export const Paths = {
     default: "daos",
     Create: "create",
     DAODetails: "daos",
+    Dashboard: "dashboard",
     TransactionDetails: "transactions",
+    Assets: "assets",
+    Members: "members",
+    Settings: "settings",
+    Staking: "staking",
   },
 };

@@ -12,6 +12,7 @@ import {
   StepsV2Theme,
   TagStyles,
   TextAreaStyles,
+  TabsStyles,
 } from "@dex-ui-components";
 
 export const DEXTheme = extendTheme({
@@ -34,5 +35,6 @@ export const DEXTheme = extendTheme({
     Steps: StepsV2Theme,
     Tag: TagStyles,
     Textarea: TextAreaStyles,
+    Tabs: TabsStyles,
   },
 });
