@@ -1,6 +1,5 @@
 import { IconButton } from "@chakra-ui/react";
-import { CopyIcon } from "@chakra-ui/icons";
-import { Color } from "@dex-ui-components";
+import { CopyIcon, Color } from "@dex-ui-components";
 
 interface CopyTextButtonProps {
   onClick: () => void;

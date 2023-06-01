@@ -23,9 +23,9 @@ export function TokenDAOReviewForm() {
             type: "text",
             isReadOnly: true,
             value:
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.name
-                : governance.existingToken.name,
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.name ?? ""
+                : governance?.existingToken?.name ?? "",
           }}
         />,
         <FormInput<"governance.token.symbol">
@@ -35,9 +35,9 @@ export function TokenDAOReviewForm() {
             type: "text",
             isReadOnly: true,
             value:
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.symbol
-                : governance.existingToken.symbol,
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.symbol ?? ""
+                : governance?.existingToken?.symbol ?? "",
           }}
         />,
         <FormInput<"governance.token.id">
@@ -47,9 +47,9 @@ export function TokenDAOReviewForm() {
             type: "text",
             isReadOnly: true,
             value:
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.id
-                : governance.existingToken.id,
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.id ?? ""
+                : governance?.existingToken?.id ?? "",
           }}
         />,
         <FormInput<"governance.token.decimals">
@@ -59,9 +59,9 @@ export function TokenDAOReviewForm() {
             type: "number",
             isReadOnly: true,
             value: String(
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.decimals
-                : governance.existingToken.decimals
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.decimals ?? 0
+                : governance?.existingToken?.decimals ?? 0
             ),
           }}
         />,
@@ -72,13 +72,13 @@ export function TokenDAOReviewForm() {
             type: "number",
             isReadOnly: true,
             unit:
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.symbol
-                : governance.existingToken.symbol,
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.symbol ?? ""
+                : governance?.existingToken?.symbol ?? "",
             value: String(
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.initialSupply
-                : governance.existingToken.initialSupply
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.initialSupply ?? ""
+                : governance?.existingToken?.initialSupply ?? ""
             ),
           }}
         />,
@@ -89,9 +89,9 @@ export function TokenDAOReviewForm() {
             type: "text",
             isReadOnly: true,
             value:
-              governance.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance.newToken.treasuryWalletAccountId
-                : governance.existingToken.treasuryWalletAccountId,
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.treasuryWalletAccountId ?? ""
+                : governance?.existingToken?.treasuryWalletAccountId ?? "",
           }}
         />,
       ]}
@@ -102,7 +102,7 @@ export function TokenDAOReviewForm() {
             label: "QUORUM",
             type: "number",
             unit: "%",
-            value: String(voting.quorum),
+            value: String(voting?.quorum ?? 0),
             isReadOnly: true,
           }}
         />,
@@ -112,7 +112,7 @@ export function TokenDAOReviewForm() {
             label: "VOTING DURATION",
             type: "number",
             unit: "Days",
-            value: String(voting.duration),
+            value: String(voting?.duration ?? 0),
             isReadOnly: true,
           }}
         />,
@@ -122,7 +122,7 @@ export function TokenDAOReviewForm() {
             label: "LOCKING PERIOD",
             type: "number",
             unit: "Days",
-            value: String(voting.lockingPeriod),
+            value: String(voting?.lockingPeriod ?? 0),
             isReadOnly: true,
           }}
         />,

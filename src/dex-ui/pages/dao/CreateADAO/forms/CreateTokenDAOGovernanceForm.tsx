@@ -6,8 +6,9 @@ import { FormInput, useNotification, LoadingDialog, Color, CopyTextButton, Succe
 import { useCreateToken, useFetchAccountInfo, useFetchTransactionDetails } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
-import { isNil } from "ramda";
+import { isNil, isNotNil } from "ramda";
 import { checkForValidAccountId } from "@utils";
+import { DefaultCreateATokenDAOFormData } from "./constants";
 
 export function CreateTokenDAOGovernanceForm() {
   const {
@@ -18,14 +19,7 @@ export function CreateTokenDAOGovernanceForm() {
     formState: { errors },
   } = useFormContext<CreateATokenDAOForm>();
   const formValues = getValues();
-  const { governance } = formValues;
-
-  register("governance.newToken.id", {
-    required: {
-      value: true,
-      message: "A token ID is require. To generate the token ID, please define the inputs above.",
-    },
-  });
+  const { governance } = isNotNil(formValues.governance) ? formValues : DefaultCreateATokenDAOFormData;
 
   const {
     data: createTokenData,

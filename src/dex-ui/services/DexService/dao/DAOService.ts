@@ -19,6 +19,7 @@ import {
   DAOEvents,
   NFTDAOCreatedEventArgs,
   HederaGnosisSafeFunctions,
+  MultiSigProposeTransactionType,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "@dex-ui/services/HederaService/utils";
@@ -153,6 +154,7 @@ export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithTh
     safeAccountId,
     data: newOwnerData,
     multiSigDAOContractId,
+    transactionType: MultiSigProposeTransactionType.AddMember,
     signer,
   });
 }
@@ -178,6 +180,7 @@ export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwner
     safeAccountId,
     data: removeOwnerData,
     multiSigDAOContractId,
+    transactionType: MultiSigProposeTransactionType.DeleteMember,
     signer,
   });
 }
@@ -203,6 +206,7 @@ export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWith
     safeAccountId,
     data: removeOwnerData,
     multiSigDAOContractId,
+    transactionType: MultiSigProposeTransactionType.ReplaceMember,
     signer,
   });
 }
@@ -223,6 +227,7 @@ export async function proposeChangeThreshold(params: ProposeChangeThresholdParam
     safeAccountId,
     data: changeThresholdData,
     multiSigDAOContractId,
+    transactionType: MultiSigProposeTransactionType.ChangeThreshold,
     signer,
   });
 }
