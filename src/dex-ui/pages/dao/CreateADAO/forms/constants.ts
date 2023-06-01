@@ -8,3 +8,41 @@ export const DAOToolTips = Object.freeze({
     Quadratic voting, etc.`,
   lockingPeriod: `The time period that token deposits from proposal submitters are locked.`,
 });
+
+export const DefaultTokenDAOGovernanceData = {
+  tokenType: "",
+  newToken: {
+    name: "",
+    symbol: "",
+    decimals: 8,
+    logo: "",
+    initialSupply: 0,
+    id: "",
+    tokenWalletAddress: "",
+    treasuryWalletAccountId: "",
+  },
+  existingToken: {
+    name: "",
+    symbol: "",
+    decimals: 0,
+    logo: "",
+    initialSupply: 0,
+    supplyKey: "",
+    id: "",
+    treasuryWalletAccountId: "",
+    mirrorNodeTokenId: "",
+  },
+};
+
+export const DefaultTokenDAOVotingData = {
+  minProposalDeposit: 0,
+  quorum: 0,
+  duration: 0,
+  lockingPeriod: 0,
+  strategy: "",
+};
+
+export const DefaultCreateATokenDAOFormData = {
+  governance: DefaultTokenDAOGovernanceData,
+  voting: DefaultTokenDAOVotingData,
+};

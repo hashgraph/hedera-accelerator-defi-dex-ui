@@ -16,3 +16,10 @@ export type MultiSigDAODetailsContext = {
   tokenCount: number;
   totalAssetValue: number;
 };
+
+export const DefaultMultiSigDAODetails = {
+  accountId: "",
+  safeId: "",
+  ownerIds: [],
+  threshold: 0,
+};

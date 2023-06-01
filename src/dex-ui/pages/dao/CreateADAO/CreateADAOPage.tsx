@@ -1,21 +1,6 @@
-import { Button, Flex, Spacer, Text } from "@chakra-ui/react";
-import { FormProvider, useForm } from "react-hook-form";
-import { useSteps } from "chakra-ui-steps";
-import { Color, LoadingDialog, StepperV2 } from "@dex-ui-components";
+import { useForm } from "react-hook-form";
+import { Color, LoadingDialog } from "@dex-ui-components";
 import { Page } from "@layouts";
-import {
-  DAODetailsForm,
-  DAOTypeForm,
-  TokenDAOGovernanceForm,
-  TokenDAOVotingForm,
-  TokenDAOReviewForm,
-  MultiSigDAOGovernanceForm,
-  MultiSigDAOVotingForm,
-  MultiSigDAOReviewForm,
-  NFTDAOGovernanceForm,
-  NFTDAOVotingForm,
-  NFTDAOReviewForm,
-} from "./forms";
 import { useNavigate } from "react-router-dom";
 import {
   CreateADAOForm,
@@ -30,13 +15,11 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { Paths } from "@routes";
 import { DAOType } from "@services";
+import { Wizard } from "@components";
 
 export function CreateADAOPage() {
-  const stepProps = useSteps({
-    initialStep: 0,
-  });
   const navigate = useNavigate();
-
+  const backTo = `${Paths.DAOs.absolute}`;
   const createDAOPageForm = useForm<CreateADAOForm>({
     defaultValues: {
       name: "",
@@ -46,9 +29,26 @@ export function CreateADAOPage() {
       type: DAOType.GovernanceToken,
     },
   });
-  const { getValues, trigger, handleSubmit, formState } = createDAOPageForm;
-
+  const {
+    getValues,
+    trigger,
+    watch,
+    register,
+    formState: { isSubmitting },
+  } = createDAOPageForm;
   const { isPublic, type, name, governance } = getValues();
+  watch("type");
+
+  const isNewTokenIdRequired =
+    type === DAOType.GovernanceToken &&
+    (governance as TokenDAOGovernanceData)?.tokenType === DAOGovernanceTokenType.NewToken;
+
+  register("governance.newToken.id", {
+    required: {
+      value: isNewTokenIdRequired,
+      message: "A token ID is require. To generate the token ID, please define the inputs above.",
+    },
+  });
 
   function handleCreateDAOSuccess(transactionResponse: TransactionResponse) {
     const createDAOSuccessMessage = `Created new 
@@ -67,98 +67,78 @@ export function CreateADAOPage() {
 
   const createDAO = useCreateDAO(handleCreateDAOSuccess);
 
-  function GovernanceForm() {
-    if (type === DAOType.GovernanceToken) return <TokenDAOGovernanceForm />;
-    if (type === DAOType.MultiSig) return <MultiSigDAOGovernanceForm />;
-    if (type === DAOType.NFT) return <NFTDAOGovernanceForm />;
-    return <>Please select a DAO type to configure governance rules.</>;
+  function GovernanceForm(): string {
+    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/multi-sig`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft`;
+    return `${Paths.DAOs.absolute}`;
   }
 
-  function VotingForm() {
-    if (type === DAOType.GovernanceToken) return <TokenDAOVotingForm />;
-    if (type === DAOType.MultiSig) return <MultiSigDAOVotingForm />;
-    if (type === DAOType.NFT) return <NFTDAOVotingForm />;
-    return <>Please select a DAO type to configure voting rules.</>;
+  function VotingForm(): string {
+    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token/voting`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/multi-sig/voting`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft/voting`;
+    return `${Paths.DAOs.absolute}`;
   }
 
-  function ReviewForm() {
-    if (type === DAOType.GovernanceToken) return <TokenDAOReviewForm />;
-    if (type === DAOType.MultiSig) return <MultiSigDAOReviewForm />;
-    if (type === DAOType.NFT) return <NFTDAOReviewForm />;
-    return <></>;
+  function ReviewForm(): string {
+    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token/review`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/multi-sig/review`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft/review`;
+    return `${Paths.DAOs.absolute}`;
+  }
+
+  async function ValidateGovernanceForm(): Promise<boolean> {
+    if (
+      type === DAOType.GovernanceToken &&
+      (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.NewToken
+    )
+      return trigger(["governance.newToken.id", "governance.newToken.treasuryWalletAccountId"]);
+    if (
+      type === DAOType.GovernanceToken &&
+      (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.ExistingToken
+    )
+      return trigger(["governance.existingToken.id", "governance.existingToken.treasuryWalletAccountId"]);
+    if (type === DAOType.MultiSig) return trigger(["governance.admin"]);
+    if (type === DAOType.NFT) return trigger(["governance.nft.id", "governance.nft.treasuryWalletAccountId"]);
+    return Promise.resolve(true);
+  }
+
+  async function ValidateVotingForm(): Promise<boolean> {
+    if (type === DAOType.GovernanceToken) return trigger(["voting.quorum", "voting.duration", "voting.lockingPeriod"]);
+    if (type === DAOType.MultiSig) return trigger(["voting.threshold"]);
+    if (type === DAOType.NFT) return trigger(["voting.quorum", "voting.duration", "voting.duration"]);
+    return Promise.resolve(true);
   }
 
   const steps = [
     {
       label: "Details",
-      content: <DAODetailsForm />,
+      route: `${Paths.DAOs.absolute}/create/details`,
+      validate: async () => trigger(["name", "logoUrl", "isPublic", "description"]),
     },
-    { label: "Type", content: <DAOTypeForm /> },
+    {
+      label: "Type",
+      route: `${Paths.DAOs.absolute}/create/type`,
+      validate: async () => trigger(["type"]),
+    },
     {
       label: "Governance",
-      content: GovernanceForm(),
+      route: GovernanceForm(),
+      validate: async () => ValidateGovernanceForm(),
     },
     {
       label: "Voting",
-      content: VotingForm(),
+      route: VotingForm(),
+      validate: async () => ValidateVotingForm(),
     },
     {
       label: "Review",
-      content: ReviewForm(),
+      route: ReviewForm(),
       isLoading: createDAO.isLoading,
       isError: createDAO.isError,
     },
   ];
-
-  const { nextStep, prevStep, reset, activeStep } = stepProps;
-  const isLastStep = activeStep === steps.length - 1;
-  const isFirstStep = activeStep === 0;
-  const previousStepLabel = isFirstStep ? "Cancel" : "Back";
-  const nextStepLabel = isLastStep ? "Create DAO" : "Next >";
-
-  function handleCancelClicked() {
-    reset();
-    navigate(Paths.DAOs.absolute);
-  }
-
-  async function validateStep(activeStep: number): Promise<boolean> {
-    const triggerDefaultValidations = (): Promise<boolean> => Promise.resolve(true);
-    switch (activeStep) {
-      case 0: {
-        return trigger(["name", "logoUrl", "isPublic", "description"]);
-      }
-      case 2: {
-        if (
-          type === DAOType.GovernanceToken &&
-          (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.NewToken
-        )
-          return trigger(["governance.newToken.id", "governance.newToken.treasuryWalletAccountId"]);
-        if (
-          type === DAOType.GovernanceToken &&
-          (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.ExistingToken
-        )
-          return trigger(["governance.existingToken.id", "governance.existingToken.treasuryWalletAccountId"]);
-        if (type === DAOType.MultiSig) return trigger(["governance.admin"]);
-        if (type === DAOType.NFT) return trigger(["governance.nft.id", "governance.nft.treasuryWalletAccountId"]);
-        return triggerDefaultValidations();
-      }
-      case 3: {
-        if (type === DAOType.GovernanceToken)
-          return trigger(["voting.quorum", "voting.duration", "voting.lockingPeriod"]);
-        if (type === DAOType.MultiSig) return trigger(["voting.threshold"]);
-        if (type === DAOType.NFT) return trigger(["voting.quorum", "voting.duration", "voting.duration"]);
-        return triggerDefaultValidations();
-      }
-      default: {
-        return triggerDefaultValidations();
-      }
-    }
-  }
-
-  async function handleNextClicked() {
-    const isStepDataValid = await validateStep(activeStep);
-    if (isStepDataValid) nextStep();
-  }
 
   /* TODO: Send Description and Links once the SC is ready */
   async function onSubmit(data: CreateADAOForm) {
@@ -172,15 +152,15 @@ export function CreateADAOPage() {
         isPrivate: !isPublic,
         tokenId:
           governance.tokenType === DAOGovernanceTokenType.NewToken
-            ? governance.newToken.id
-            : governance.existingToken.id,
+            ? governance?.newToken?.id ?? ""
+            : governance?.existingToken?.id ?? "",
         treasuryWalletAccountId:
           governance.tokenType === DAOGovernanceTokenType.NewToken
-            ? governance.newToken.treasuryWalletAccountId
-            : governance.existingToken.treasuryWalletAccountId,
-        quorum: voting.quorum,
-        votingDuration: voting.duration,
-        lockingDuration: voting.lockingPeriod,
+            ? governance?.newToken?.treasuryWalletAccountId ?? ""
+            : governance?.existingToken?.treasuryWalletAccountId ?? "",
+        quorum: voting?.quorum ?? 0,
+        votingDuration: voting?.duration ?? 0,
+        lockingDuration: voting?.lockingPeriod ?? 0,
       });
     }
     if (data.type === DAOType.MultiSig) {
@@ -214,53 +194,46 @@ export function CreateADAOPage() {
   }
 
   return (
-    <FormProvider {...createDAOPageForm}>
+    <>
       <Page
         body={
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Flex direction="column" alignItems="center" maxWidth="624px" margin="auto" gap="8" paddingTop="2rem">
-              <Text textStyle="h4 medium">Create a DAO</Text>
-              <StepperV2 steps={steps} {...stepProps} />
-              <Flex width="100%">
-                {isFirstStep ? (
-                  <Button key="cancel" variant="secondary" onClick={handleCancelClicked}>
-                    {previousStepLabel}
-                  </Button>
-                ) : (
-                  <Button type="button" key="back" variant="secondary" onClick={prevStep}>
-                    {previousStepLabel}
-                  </Button>
-                )}
-                <Spacer />
-                {isLastStep ? (
-                  <Button key="submit" type="submit" isDisabled={formState.isSubmitting}>
-                    {nextStepLabel}
-                  </Button>
-                ) : (
-                  <Button type="button" onClick={handleNextClicked}>
-                    {nextStepLabel}
-                  </Button>
-                )}
-              </Flex>
-            </Flex>
-            <LoadingDialog
-              isOpen={formState.isSubmitting || createDAO.isLoading}
-              message={`Please confirm the "${name}" DAO creation transaction in your wallet to proceed.`}
-            />
-            <LoadingDialog
-              isOpen={createDAO.isError}
-              message={createDAO.error?.message ?? ""}
-              icon={<WarningIcon color={Color.Destructive._500} h={10} w={10} />}
-              buttonConfig={{
-                text: "Dismiss",
-                onClick: () => {
-                  createDAO.reset();
-                },
-              }}
-            />
-          </form>
+          <Wizard<CreateADAOForm>
+            context={{
+              title: "Create a DAO",
+              backLabel: "Back to DAOs",
+              backTo,
+              stepper: {
+                steps,
+              },
+              form: {
+                id: "create-dao",
+                context: {},
+                ...createDAOPageForm,
+              },
+              onSubmit,
+            }}
+            header={<Wizard.Header />}
+            stepper={<Wizard.Stepper />}
+            form={<Wizard.Form layerStyle="dao-wizard__form" />}
+            footer={<Wizard.Footer />}
+          />
         }
       />
-    </FormProvider>
+      <LoadingDialog
+        isOpen={isSubmitting || createDAO.isLoading}
+        message={`Please confirm the "${name}" DAO creation transaction in your wallet to proceed.`}
+      />
+      <LoadingDialog
+        isOpen={createDAO.isError}
+        message={createDAO.error?.message ?? ""}
+        icon={<WarningIcon color={Color.Destructive._500} h={10} w={10} />}
+        buttonConfig={{
+          text: "Dismiss",
+          onClick: () => {
+            createDAO.reset();
+          },
+        }}
+      />
+    </>
   );
 }

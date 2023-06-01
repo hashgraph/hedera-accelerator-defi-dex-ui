@@ -13,7 +13,7 @@ export type MultiSigDaoSettingForm = MultiSigDAODetails;
 
 export function Settings() {
   const navigate = useNavigate();
-  const { dao, memberCount, members } = useOutletContext<MultiSigDAODetailsContext>();
+  const { dao, ownerCount, members } = useOutletContext<MultiSigDAODetailsContext>();
   const { adminId, threshold } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
@@ -43,35 +43,19 @@ export function Settings() {
   }
 
   function handleAddNewMemberClicked() {
-    navigate(`add-member`, {
-      state: {
-        ...dao,
-      },
-    });
+    navigate(`add-member`);
   }
 
   function handleDeleteMemberClick(member: string) {
-    navigate(`delete-member/${member}`, {
-      state: {
-        ...dao,
-      },
-    });
+    navigate(`delete-member/${member}`);
   }
 
   function handleReplaceMemberClick(member: string) {
-    navigate(`replace-member/${member}`, {
-      state: {
-        ...dao,
-      },
-    });
+    navigate(`replace-member/${member}`);
   }
 
   function handleChangeThresholdClick() {
-    navigate("change-threshold", {
-      state: {
-        ...dao,
-      },
-    });
+    navigate("change-threshold");
   }
 
   return (
@@ -86,7 +70,7 @@ export function Settings() {
             <Divider />
           </Flex>
           <Flex direction="row" alignItems="center" marginBottom="0.4rem" justifyContent="space-between">
-            <Text textStyle="p small regular">{memberCount} Members</Text>
+            <Text textStyle="p small regular">{members.length} Members</Text>
             <Button type="button" variant="primary" onClick={handleAddNewMemberClicked}>
               + Add Member
             </Button>
@@ -101,7 +85,7 @@ export function Settings() {
                     <Text textStyle="p small regular" color={Color.Neutral._500}>
                       {accountId}
                     </Text>
-                    <CopyTextButton onClick={handleCopyMemberId} />
+                    <CopyTextButton onClick={handleCopyMemberId} iconSize="17" />
                     {isAdmin ? <Tag label="Admin" /> : <></>}
                   </Flex>
                   <Flex direction="row" gap="4" alignItems="center" height="20px">
@@ -110,7 +94,7 @@ export function Settings() {
                       variant="link"
                       aria-label="refresh-member"
                       onClick={() => handleReplaceMemberClick(member.accountId)}
-                      icon={<RefreshIcon />}
+                      icon={<RefreshIcon boxSize="17" color={Color.Teal_01} />}
                     />
                     {!isAdmin ? (
                       <IconButton
@@ -118,7 +102,7 @@ export function Settings() {
                         onClick={() => handleDeleteMemberClick(member.accountId)}
                         variant="link"
                         aria-label="delete-member-id"
-                        icon={<DeleteIcon color={Color.Teal_01} />}
+                        icon={<DeleteIcon color={Color.Teal_01} boxSize="17" />}
                       />
                     ) : undefined}
                   </Flex>
@@ -149,7 +133,7 @@ export function Settings() {
                   <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
                     THRESHOLD
                   </Text>
-                  <Text textStyle="p large medium">{`${threshold ?? 0} / ${memberCount}`}</Text>
+                  <Text textStyle="p large medium">{`${threshold ?? 0} / ${ownerCount}`}</Text>
                 </Flex>
                 <Button
                   type="button"

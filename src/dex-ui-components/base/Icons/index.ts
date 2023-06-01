@@ -38,3 +38,4 @@ export * from "./SettingsIcon";
 export * from "./GlobeIcon";
 export * from "./InstagramIcon";
 export * from "./TwitterIcon";
+export * from "./CopyIcon";

@@ -94,17 +94,19 @@ interface SendProposeTransaction {
   safeAccountId: string;
   data: string;
   multiSigDAOContractId: string;
+  transactionType: number;
   signer: HashConnectSigner;
 }
 
 async function sendProposeTransaction(params: SendProposeTransaction) {
-  const { safeAccountId, data, signer, multiSigDAOContractId } = params;
+  const { safeAccountId, data, signer, multiSigDAOContractId, transactionType } = params;
   const safeSolidityAddress = ContractId.fromString(safeAccountId).toSolidityAddress();
   const ownerData = ethers.utils.arrayify(data);
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(safeSolidityAddress)
     .addBytes(ownerData)
-    .addUint8(0);
+    .addUint8(0)
+    .addUint256(transactionType);
   const sendProposeTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOContractId)
     .setFunction(MultiSigDAOContractFunctions.ProposeTransaction, contractFunctionParameters)

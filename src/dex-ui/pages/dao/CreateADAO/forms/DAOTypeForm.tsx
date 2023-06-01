@@ -115,6 +115,10 @@ export function DAOTypeForm() {
     onChange: handleDAOTypeSelectionChange,
   });
 
+  const defaultFormValues = getDefaultFormValues(type);
+  setValue("governance", defaultFormValues.governance);
+  setValue("voting", defaultFormValues.voting);
+
   useEffect(() => {
     if (governance === undefined && voting === undefined) {
       setValue("governance", defaultGovernance);
@@ -125,9 +129,6 @@ export function DAOTypeForm() {
   function handleDAOTypeSelectionChange(event: DAOType) {
     const type = event;
     setValue("type", type);
-    const defaultFormValues = getDefaultFormValues(type);
-    setValue("governance", defaultFormValues.governance);
-    setValue("voting", defaultFormValues.voting);
   }
 
   const group = getRootProps();

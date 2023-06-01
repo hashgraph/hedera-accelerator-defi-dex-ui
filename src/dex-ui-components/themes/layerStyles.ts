@@ -44,6 +44,12 @@ export const LayerStyles = {
     width: "100%",
     gap: "0.75rem",
   },
+  "dao-wizard__form": {
+    flexDirection: "column",
+    backgroundColor: Color.White,
+    width: "100%",
+    gap: "0.75rem",
+  },
   wizard__footer: {
     width: "100%",
   },

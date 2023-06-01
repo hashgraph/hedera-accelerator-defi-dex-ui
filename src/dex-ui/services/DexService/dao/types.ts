@@ -86,3 +86,10 @@ export enum HederaGnosisSafeFunctions {
   ApproveHash = "approveHash",
   ExecuteTransation = "executeTransaction",
 }
+
+export enum MultiSigProposeTransactionType {
+  AddMember = 2,
+  DeleteMember,
+  ReplaceMember,
+  ChangeThreshold,
+}

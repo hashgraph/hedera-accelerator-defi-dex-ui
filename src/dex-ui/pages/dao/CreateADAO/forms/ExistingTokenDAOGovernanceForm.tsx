@@ -9,6 +9,8 @@ import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DEBOUNCE_TIME, MirrorNodeTokenById } from "@services";
 import { checkForValidTokenId } from "@utils";
 import { ChangeEvent } from "react";
+import { DefaultCreateATokenDAOFormData } from "./constants";
+import { isNotNil } from "ramda";
 
 export function ExistingTokenDAOGovernanceForm() {
   const {
@@ -19,9 +21,9 @@ export function ExistingTokenDAOGovernanceForm() {
     formState: { errors },
   } = useFormContext<CreateATokenDAOForm>();
   const formValues = getValues();
-  const { governance } = formValues;
+  const { governance } = isNotNil(formValues.governance) ? formValues : DefaultCreateATokenDAOFormData;
   const { refetch, isFetching, isSuccess } = useFetchTokenData({
-    tokenId: governance.existingToken.id,
+    tokenId: governance?.existingToken?.id,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
   });

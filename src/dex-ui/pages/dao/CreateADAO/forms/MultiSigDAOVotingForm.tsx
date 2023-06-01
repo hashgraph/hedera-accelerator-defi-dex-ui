@@ -10,11 +10,9 @@ export function MultiSigDAOVotingForm() {
     register,
     formState: { errors },
   } = useFormContext<CreateAMultiSigDAOForm>();
-  const {
-    governance: { owners },
-  } = getValues();
+  const { governance } = getValues();
 
-  const maxThreshold = owners.length + 1;
+  const maxThreshold = (governance?.owners?.length ?? 0) + 1;
   const minThreshold = 1;
 
   return (

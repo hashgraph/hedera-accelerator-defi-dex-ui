@@ -25,7 +25,7 @@ export function MultiSigDAOReviewForm() {
             isReadOnly: true,
           }}
         />,
-        ...governance.owners.map((owner: Record<"value", string>, index: number) => {
+        ...(governance?.owners ?? []).map((owner: Record<"value", string>, index: number) => {
           const formInputId = `governance.owners.${index}`;
           return (
             <FormInput<typeof formInputId>
@@ -47,7 +47,7 @@ export function MultiSigDAOReviewForm() {
             label: "THRESHOLD",
             type: "number",
             unit: "Members",
-            value: String(voting.threshold),
+            value: String(voting?.threshold ?? 0),
             isReadOnly: true,
           }}
         />,
