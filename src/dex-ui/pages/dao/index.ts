@@ -6,3 +6,4 @@ export * from "./NFTDAODashboard";
 export * from "./SendTokenWizard";
 export * from "./MembersList";
 export * from "./DAOSettings";
+export * from "./ProposalDetailsPage";

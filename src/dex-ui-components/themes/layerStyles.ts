@@ -80,4 +80,12 @@ export const LayerStyles = {
   },
   ...WizardLayerStyles,
   ...ToastLayerStyles,
+  "proposal-details__page": {
+    gap: "4",
+    width: "100%",
+    height: "100%",
+    paddingTop: "1.5rem",
+    paddingLeft: "5rem",
+    paddingRight: "5rem",
+  },
 };

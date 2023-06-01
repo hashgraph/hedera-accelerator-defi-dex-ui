@@ -1,10 +1,10 @@
 import { Text, Flex, Divider } from "@chakra-ui/react";
 import { Card, Color, PeopleIcon, ProgressBar, Tag } from "@dex-ui-components";
 import BigNumber from "bignumber.js";
-import { Transaction, TransactionStatus } from "@hooks";
+import { Proposal, ProposalStatus } from "@hooks";
 import { useNavigate } from "react-router-dom";
-import { TransactionStatusAsTagVariant } from "../constants";
-interface TransactionCardProps extends Transaction {
+import { ProposalStatusAsTagVariant } from "../constants";
+interface TransactionCardProps extends Proposal {
   threshold: number;
   index: number;
 }
@@ -20,8 +20,7 @@ export function TransactionCard(props: TransactionCardProps) {
   const progressBarValue = approvalCount > 0 ? (approvalCount / threshold) * 100 : 0;
   const isThresholdReached = approvalCount >= threshold;
   /** TODO: Update contracts to support a "queued" status. */
-  const transactionStatus =
-    status === TransactionStatus.Pending && isThresholdReached ? TransactionStatus.Queued : status;
+  const transactionStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
 
   function handleTransactionCardClicked() {
     navigate(transactionHash);
@@ -37,7 +36,7 @@ export function TransactionCard(props: TransactionCardProps) {
             </Text>
             <Tag label={type} />
           </Flex>
-          <Tag variant={TransactionStatusAsTagVariant[transactionStatus]} />
+          <Tag variant={ProposalStatusAsTagVariant[transactionStatus]} />
         </Flex>
         <Divider />
         <Flex direction="row" justifyContent="space-between">

@@ -22,7 +22,7 @@ export function DeleteMemberReviewForm() {
       </Flex>
       <Divider />
       <Flex direction="row" gap="2" alignItems="center">
-        <Text textStyle="p small medium">Transaction threshold confirmation changes to</Text>
+        <Text textStyle="p small medium">Proposal threshold confirmation changes to</Text>
         <Text textStyle="p medium semibold">{`${newThreshold} / ${membersCount - 1} members`}</Text>
       </Flex>
       <Divider />

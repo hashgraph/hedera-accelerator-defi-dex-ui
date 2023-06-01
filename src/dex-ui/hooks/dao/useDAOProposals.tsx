@@ -6,35 +6,36 @@ import { groupBy, isNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
-export enum TransactionStatus {
+export enum ProposalStatus {
   Pending = "Pending",
   Queued = "Queued",
   Success = "Success",
   Failed = "Failed",
 }
 
-export enum TransactionEvent {
+export enum ProposalEvent {
   Send = "Send",
   Receive = "Receive",
   Governance = "Governance",
   SafeCreated = "Safe Created",
 }
 
-export enum TransactionType {
-  SendToken = "Send Token",
+export enum ProposalType {
+  TokenTransfer = "Token Transfer",
   AddNewMember = "Add New Member",
   RemoveMember = "Remove Member",
+  ReplaceMember = "Replace Member",
 }
 
-export interface Transaction {
+export interface Proposal {
   nonce: number;
   transactionHash: string;
   amount: number;
-  type: TransactionType;
+  type: ProposalType;
   approvalCount: number;
   approvers: string[];
-  event: TransactionEvent;
-  status: TransactionStatus;
+  event: ProposalEvent;
+  status: ProposalStatus;
   timestamp: string;
   tokenId: string;
   token: MirrorNodeTokenById | null | undefined;
@@ -43,22 +44,22 @@ export interface Transaction {
   operation: number;
   hexStringData: string;
   /**
-   * The hbar value sent when creating the transaction. This value is needed to
-   * compute the correct hash value when executing the transaction in the HederaGnosisSafe contract.
+   * The hbar value sent when creating the proposal. This value is needed to
+   * compute the correct hash value when executing the proposal in the HederaGnosisSafe contract.
    **/
   msgValue: number;
 }
 
-const AllFilters = [TransactionStatus.Success, TransactionStatus.Failed, TransactionStatus.Pending];
-type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Transactions, string, string];
+const AllFilters = [ProposalStatus.Success, ProposalStatus.Failed, ProposalStatus.Pending];
+type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
-export function useDAOTransactions(
+export function useDAOProposals(
   daoAccountId: string,
   safeAccountId: string,
-  transactionFilter: TransactionStatus[] = AllFilters
+  proposalFilter: ProposalStatus[] = AllFilters
 ) {
-  function filterTransactionsByStatus(transactions: Transaction[]): Transaction[] {
-    return transactions.filter((transaction) => transactionFilter.includes(transaction.status));
+  function filterProposalsByStatus(proposals: Proposal[]): Proposal[] {
+    return proposals.filter((proposal) => proposalFilter.includes(proposal.status));
   }
 
   const groupByTransactionHash = groupBy(function (log: LogDescription) {
@@ -70,13 +71,13 @@ export function useDAOTransactions(
   function groupLogsByTransactionHash(logs: LogDescription[]): [string, LogDescription[]][] {
     const logsGroupedByTransactionHash = groupByTransactionHash(logs);
     delete logsGroupedByTransactionHash["undefined"];
-    const transactionEntries = Object.entries(logsGroupedByTransactionHash);
-    return transactionEntries;
+    const proposalEntries = Object.entries(logsGroupedByTransactionHash);
+    return proposalEntries;
   }
 
-  function getApprovers(transactionLogs: LogDescription[]): string[] {
+  function getApprovers(proposalLogs: LogDescription[]): string[] {
     const approverCache = new Set<string>();
-    transactionLogs.forEach((log: LogDescription) => {
+    proposalLogs.forEach((log: LogDescription) => {
       if (log?.name === DAOEvents.ApproveHash && !approverCache.has(log?.args.owner)) {
         const { args } = log;
         const ownerId = AccountId.fromSolidityAddress(args.owner).toString();
@@ -86,35 +87,36 @@ export function useDAOTransactions(
     return Array.from(approverCache);
   }
 
-  function getTransactionStatus(transactionLogs: LogDescription[]): TransactionStatus {
-    return transactionLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
-      ? TransactionStatus.Success
-      : transactionLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-      ? TransactionStatus.Failed
-      : TransactionStatus.Pending;
+  function getProposalStatus(proposalLogs: LogDescription[]): ProposalStatus {
+    return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
+      ? ProposalStatus.Success
+      : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
+      ? ProposalStatus.Failed
+      : ProposalStatus.Pending;
   }
 
-  return useQuery<Transaction[], Error, Transaction[], UseDAOQueryKey>(
-    [DAOQueries.DAOs, DAOQueries.Transactions, daoAccountId, safeAccountId],
+  return useQuery<Proposal[], Error, Proposal[], UseDAOQueryKey>(
+    [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId, safeAccountId],
     async () => {
       const logs = await Promise.all([
         DexService.fetchMultiSigDAOLogs(daoAccountId),
         DexService.fetchHederaGnosisSafeLogs(safeAccountId),
       ]);
+
       const daoAndSafeLogs = logs.flat();
-      const groupedTransactionEntries = groupLogsByTransactionHash(daoAndSafeLogs);
+      const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
 
-      const transactions: Transaction[] = await Promise.all(
-        groupedTransactionEntries.map(async ([transactionHash, transactionLogs]) => {
-          const transactionInfo = transactionLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
-          const { nonce, to, value, data, operation, hexStringData } = transactionInfo;
+      const proposals: Proposal[] = await Promise.all(
+        groupedProposalEntries.map(async ([transactionHash, proposalLogs]) => {
+          const proposalInfo = proposalLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
+          const { nonce, to, value, data, operation, hexStringData } = proposalInfo;
           const { amount, receiver, token } = data;
 
-          const approvers = getApprovers(transactionLogs);
+          const approvers = getApprovers(proposalLogs);
           const approvalCount = approvers.length;
 
-          const status = getTransactionStatus(transactionLogs);
+          const status = getProposalStatus(proposalLogs);
 
           const tokenId = AccountId.fromSolidityAddress(token).toString();
           if (!tokenDataCache.has(tokenId)) {
@@ -126,10 +128,10 @@ export function useDAOTransactions(
             nonce: BigNumber.from(nonce).toNumber(),
             amount: BigNumber.from(amount).toNumber(),
             transactionHash,
-            type: TransactionType.SendToken,
+            type: ProposalType.TokenTransfer,
             approvalCount,
             approvers,
-            event: TransactionEvent.Send,
+            event: ProposalEvent.Send,
             status,
             // TODO: Add real value for timestamp
             timestamp: "",
@@ -144,11 +146,11 @@ export function useDAOTransactions(
         })
       );
 
-      return transactions;
+      return proposals;
     },
     {
       enabled: !!daoAccountId && !!safeAccountId,
-      select: filterTransactionsByStatus,
+      select: filterProposalsByStatus,
       staleTime: 5,
       keepPreviousData: true,
     }

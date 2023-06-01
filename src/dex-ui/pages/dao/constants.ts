@@ -1,9 +1,9 @@
 import { TagVariant } from "@dex-ui-components";
-import { TransactionStatus } from "@hooks";
+import { ProposalStatus } from "@hooks";
 
-export const TransactionStatusAsTagVariant: Readonly<{ [key in TransactionStatus]: TagVariant }> = {
-  [TransactionStatus.Pending]: TagVariant.Active,
-  [TransactionStatus.Queued]: TagVariant.Queued,
-  [TransactionStatus.Success]: TagVariant.Succeeded,
-  [TransactionStatus.Failed]: TagVariant.Failed,
+export const ProposalStatusAsTagVariant: Readonly<{ [key in ProposalStatus]: TagVariant }> = {
+  [ProposalStatus.Pending]: TagVariant.Active,
+  [ProposalStatus.Queued]: TagVariant.Queued,
+  [ProposalStatus.Success]: TagVariant.Succeeded,
+  [ProposalStatus.Failed]: TagVariant.Failed,
 };

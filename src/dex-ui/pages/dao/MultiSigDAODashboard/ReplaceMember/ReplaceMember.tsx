@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateReplaceMemberTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
+import { useCreateReplaceMemberProposal, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { ReplaceMemberForm } from "./types";
 import { Page } from "@layouts";
@@ -32,14 +32,14 @@ export function ReplaceMember() {
     formState: { isSubmitting },
   } = replaceMemberForm;
 
-  const sendReplaceMemberTransactionMutationResults = useCreateReplaceMemberTransaction(handleCreateProposalSuccess);
+  const sendReplaceMemberProposalMutationResults = useCreateReplaceMemberProposal(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
     error,
     mutate,
     reset: resetSendProposeTransaction,
-  } = sendReplaceMemberTransactionMutationResults;
+  } = sendReplaceMemberProposalMutationResults;
 
   const steps = [
     {
@@ -104,7 +104,7 @@ export function ReplaceMember() {
       />
       <LoadingDialog
         isOpen={isSubmitting || isLoading}
-        message={"Please confirm the Replace Member transaction in your wallet to proceed."}
+        message={"Please confirm the Propose Replace Member transaction in your wallet to proceed."}
       />
       <LoadingDialog
         isOpen={isError}

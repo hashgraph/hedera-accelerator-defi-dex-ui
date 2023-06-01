@@ -6,8 +6,8 @@ interface ContractMetaData {
   address: string;
   timestamp: string;
   hash: string;
-  transparentProxyAddress: string;
-  transparentProxyId: string;
+  transparentProxyAddress?: string;
+  transparentProxyId?: string;
 }
 
 enum ContractNames {

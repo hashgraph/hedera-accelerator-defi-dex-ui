@@ -2,7 +2,7 @@ import {
   useDexContext,
   useHasVoted,
   useCastVote,
-  useExecuteProposal,
+  useExecuteGovernanceProposal,
   useProposal,
   useCancelProposal,
   useFetchLockedGovToken,
@@ -16,7 +16,7 @@ export function useProposalDetails(proposalId: string | undefined) {
   const castVote = useCastVote(proposalId);
   const cancelProposal = useCancelProposal(proposalId);
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
-  const executeProposal = useExecuteProposal(proposalId);
+  const executeProposal = useExecuteGovernanceProposal(proposalId);
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const fetchLockGODTokens = useFetchLockedGovToken(walletId);
 

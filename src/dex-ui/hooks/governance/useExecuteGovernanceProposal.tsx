@@ -14,7 +14,7 @@ interface UseExecuteProposalParams {
   tokenAmount?: number;
 }
 
-export function useExecuteProposal(id: string | undefined) {
+export function useExecuteGovernanceProposal(id: string | undefined) {
   const queryClient = useQueryClient();
   return useMutation<
     TransactionResponse | undefined,

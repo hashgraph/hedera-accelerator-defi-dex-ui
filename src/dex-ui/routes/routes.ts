@@ -35,7 +35,7 @@ export const Paths = {
     NFT: "nft",
     NFTVoting: "nft/voting",
     NFTReview: "nft/review",
-    TransactionDetails: "transactions",
+    Proposals: "proposals",
     Assets: "assets",
     Members: "members",
     Settings: "settings",

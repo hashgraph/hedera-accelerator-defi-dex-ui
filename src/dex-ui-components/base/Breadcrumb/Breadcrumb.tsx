@@ -12,10 +12,10 @@ export function Breadcrumb(props: BreadcrumbProps) {
   const { to, as, label, leftIcon } = props;
 
   return (
-    <ChakraBreadcrumb>
+    <ChakraBreadcrumb width="fit-content">
       <BreadcrumbItem>
         <BreadcrumbLink as={as} to={to}>
-          <Flex direction="row" alignItems="center" gap="2" width="max-content">
+          <Flex direction="row" alignItems="center" gap="2" width="fit-content">
             {leftIcon}
             <Text textStyle="p medium semibold link">{label}</Text>
           </Flex>

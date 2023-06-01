@@ -26,7 +26,7 @@ export function DeleteMemberDetailsForm() {
       <Flex direction="column" gap="1" width="100%">
         <Flex direction="row" gap="1" alignItems="center">
           <Text textStyle="p medium regular" color={Color.Neutral._500}>
-            Transaction threshold confirmation requirement is
+            Proposal threshold confirmation requirement is
           </Text>
           <Text textStyle="p medium semibold">{`${threshold} / ${membersCount} members`}</Text>
         </Flex>

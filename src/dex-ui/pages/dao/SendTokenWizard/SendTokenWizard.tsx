@@ -1,4 +1,4 @@
-import { useCreateMultiSigTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
+import { useCreateMultiSigProposal, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { SendTokenForm } from "./types";
@@ -22,7 +22,7 @@ export function SendTokenWizard() {
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
 
-  const sendTokenMutationResults = useCreateMultiSigTransaction(handleCreateDAOSuccess);
+  const sendTokenMutationResults = useCreateMultiSigProposal(handleCreateDAOSuccess);
   const { isLoading, isError, error, mutate, reset: resetSendTokenTransaction } = sendTokenMutationResults;
 
   const sendTokenForm = useForm<SendTokenForm>({

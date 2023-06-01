@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateChangeThresholdTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
+import { useCreateChangeThresholdProposal, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { ChangeThresholdForm } from "./types";
 import { Page } from "@layouts";
@@ -32,15 +32,14 @@ export function ChangeThreshold() {
     formState: { isSubmitting },
   } = changeThresholdForm;
 
-  const sendChangeThresholdTransactionMutationResults =
-    useCreateChangeThresholdTransaction(handleCreateProposalSuccess);
+  const sendChangeThresholdProposalMutationResults = useCreateChangeThresholdProposal(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
     error,
     mutate,
     reset: resetSendProposeTransaction,
-  } = sendChangeThresholdTransactionMutationResults;
+  } = sendChangeThresholdProposalMutationResults;
 
   const steps = [
     {
@@ -104,7 +103,7 @@ export function ChangeThreshold() {
       />
       <LoadingDialog
         isOpen={isSubmitting || isLoading}
-        message={"Please confirm the Change Threshold transaction in your wallet to proceed."}
+        message={"Please confirm the Propose Change Threshold transaction in your wallet to proceed."}
       />
       <LoadingDialog
         isOpen={isError}
