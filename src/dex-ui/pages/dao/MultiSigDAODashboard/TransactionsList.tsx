@@ -1,11 +1,11 @@
 import { CardListLayout, ErrorLayout, LoadingSpinnerLayout, TabFilters } from "@layouts";
 import { TransactionCard } from "./TransactionCard";
-import { TransactionStatus, useDAOTransactions, useTabFilters } from "@hooks";
+import { ProposalStatus, useDAOProposals, useTabFilters } from "@hooks";
 import { useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 
-const transactionTabFilters = [[TransactionStatus.Pending], [TransactionStatus.Success, TransactionStatus.Failed]];
-const defaultTransactionFilters = [TransactionStatus.Pending, TransactionStatus.Success, TransactionStatus.Failed];
+const transactionTabFilters = [[ProposalStatus.Pending], [ProposalStatus.Success, ProposalStatus.Failed]];
+const defaultTransactionFilters = [ProposalStatus.Pending, ProposalStatus.Success, ProposalStatus.Failed];
 
 const transactionTabs = [
   { name: "Active", filter: [] },
@@ -18,7 +18,7 @@ export function TransactionsList() {
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  const daoTransactionsQueryResults = useDAOTransactions(daoAccountId, safeAccountId, transactionFilters);
+  const daoTransactionsQueryResults = useDAOProposals(daoAccountId, safeAccountId, transactionFilters);
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
 
   if (isError) {

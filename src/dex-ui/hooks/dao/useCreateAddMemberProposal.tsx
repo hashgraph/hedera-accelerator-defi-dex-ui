@@ -12,19 +12,19 @@ interface AddMemberForm {
   multiSigDAOContractId: string;
 }
 
-export function useCreateAddMemberTransaction(handleOnSuccess: HandleOnSuccess) {
+export function useCreateAddMemberProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
 
-  return useMutation<TransactionResponse | undefined, Error, AddMemberForm, DAOMutations.CreateAddMemberTransaction>(
+  return useMutation<TransactionResponse | undefined, Error, AddMemberForm, DAOMutations.CreateAddMemberProposal>(
     async (params: AddMemberForm) => {
       return DexService.proposeAddOwnerWithThreshold({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
         if (isNil(transactionResponse)) return;
-        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
+        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Proposals]);
         handleOnSuccess(transactionResponse);
       },
     }

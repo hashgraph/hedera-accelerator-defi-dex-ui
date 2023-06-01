@@ -1,10 +1,16 @@
-import { useMutation, useQueryClient } from "react-query";
+import { UseMutationResult, useMutation, useQueryClient } from "react-query";
 import { DAOMutations, DAOQueries, HandleOnSuccess, useDexContext } from "@hooks";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DexService } from "@services";
 import { isNil } from "ramda";
 
-interface UseExecuteTransactionParams {
+export type UseExecuteProposalMutationResult = UseMutationResult<
+  TransactionResponse | undefined,
+  Error,
+  UseExecuteProposalParams,
+  DAOMutations.ExecuteProposal
+>;
+interface UseExecuteProposalParams {
   safeId: string;
   msgValue: number;
   hexStringData: string;
@@ -12,26 +18,21 @@ interface UseExecuteTransactionParams {
   nonce: number;
 }
 
-export function useExecuteTransaction(handleOnSuccess: HandleOnSuccess) {
+export function useExecuteProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
   const signer = wallet.getSigner();
-  return useMutation<
-    TransactionResponse | undefined,
-    Error,
-    UseExecuteTransactionParams,
-    DAOMutations.ExecuteTransaction
-  >(
-    async (params: UseExecuteTransactionParams) => {
+  return useMutation<TransactionResponse | undefined, Error, UseExecuteProposalParams, DAOMutations.ExecuteProposal>(
+    async (params: UseExecuteProposalParams) => {
       const { safeId, msgValue, hexStringData, operation, nonce } = params;
       return DexService.sendExecuteMultiSigTransaction({ safeId, msgValue, hexStringData, operation, nonce, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
         if (isNil(transactionResponse)) return;
-        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
+        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Proposals]);
         handleOnSuccess(transactionResponse);
       },
     }

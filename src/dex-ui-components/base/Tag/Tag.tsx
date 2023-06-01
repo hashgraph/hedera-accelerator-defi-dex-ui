@@ -35,7 +35,7 @@ interface TagProps {
 export function Tag(props: TagProps) {
   const { variant = TagVariant.Primary, label } = props;
   return (
-    <ChakraTag variant={variant}>
+    <ChakraTag variant={variant} height="fit-content">
       {TagIcon[variant]}
       <ChakraTagLabel>{label ?? TagLabel[variant]}</ChakraTagLabel>
     </ChakraTag>

@@ -16,7 +16,7 @@ export function ChangeThresholdDetailsForm() {
     <Flex direction="column" gap="1.3rem">
       <Flex direction="row" gap="1" alignItems="center">
         <Text textStyle="p medium regular" color={Color.Neutral._500}>
-          Current transaction threshold confirmation requirement is
+          Current proposal threshold confirmation requirement is
         </Text>
         <Text textStyle="p medium semibold">{`${threshold} / ${membersCount} members`}</Text>
       </Flex>

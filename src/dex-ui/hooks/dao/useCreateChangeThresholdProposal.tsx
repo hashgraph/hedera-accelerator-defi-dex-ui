@@ -5,16 +5,13 @@ import { DexService } from "@services";
 import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
-interface UseCreateMultiSigTransactionParams {
-  tokenId: string;
-  receiverId: string;
-  amount: number;
-  decimals: number;
+interface ChangeThresholdForm {
+  threshold: number;
+  safeAccountId: string;
   multiSigDAOContractId: string;
-  safeId: string;
 }
 
-export function useCreateMultiSigTransaction(handleOnSuccess: HandleOnSuccess) {
+export function useCreateChangeThresholdProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -22,25 +19,16 @@ export function useCreateMultiSigTransaction(handleOnSuccess: HandleOnSuccess) {
   return useMutation<
     TransactionResponse | undefined,
     Error,
-    UseCreateMultiSigTransactionParams,
-    DAOMutations.CreateMultiSigTransaction
+    ChangeThresholdForm,
+    DAOMutations.CreateChangeThresholdProposal
   >(
-    async (params: UseCreateMultiSigTransactionParams) => {
-      const { tokenId, safeId, receiverId, amount, decimals, multiSigDAOContractId } = params;
-      return DexService.sendProposeTransferTransaction({
-        tokenId,
-        receiverId,
-        amount,
-        decimals,
-        multiSigDAOContractId,
-        safeId,
-        signer,
-      });
+    async (params: ChangeThresholdForm) => {
+      return DexService.proposeChangeThreshold({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
         if (isNil(transactionResponse)) return;
-        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
+        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Proposals]);
         handleOnSuccess(transactionResponse);
       },
     }

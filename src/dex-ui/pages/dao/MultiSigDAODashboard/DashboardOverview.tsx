@@ -53,7 +53,7 @@ export function DashboardOverview() {
         </Flex>
       </Flex>
       <Flex gap="4" direction="column">
-        <Text textStyle="h4 medium">Recent Transactions</Text>
+        <Text textStyle="h4 medium">Recent Proposals</Text>
       </Flex>
     </Flex>
   );

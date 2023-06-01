@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useForm } from "react-hook-form";
-import { useDAOs, useCreateAddMemberTransaction, useHandleTransactionSuccess } from "@hooks";
+import { useDAOs, useCreateAddMemberProposal, useHandleTransactionSuccess } from "@hooks";
 import { AddMemberForm } from "./types";
 import { Page } from "@layouts";
 import { Color, LoadingDialog } from "@dex-ui-components";
@@ -33,14 +33,14 @@ export function AddMember() {
     formState: { isSubmitting },
   } = addMemberForm;
 
-  const sendAddMemberTransactionMutationResults = useCreateAddMemberTransaction(handleCreateProposalSuccess);
+  const sendAddMemberProposalMutationResults = useCreateAddMemberProposal(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
     error,
     mutate,
     reset: resetSendProposeTransaction,
-  } = sendAddMemberTransactionMutationResults;
+  } = sendAddMemberProposalMutationResults;
 
   const steps = [
     {
@@ -105,7 +105,7 @@ export function AddMember() {
       />
       <LoadingDialog
         isOpen={isSubmitting || isLoading}
-        message={"Please confirm the Add Member transaction in your wallet to proceed."}
+        message={"Please confirm the Propose Add Member transaction in your wallet to proceed."}
       />
       <LoadingDialog
         isOpen={isError}

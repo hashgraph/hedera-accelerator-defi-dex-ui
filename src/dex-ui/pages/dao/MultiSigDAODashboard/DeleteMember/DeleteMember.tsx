@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useCreateDeleteMemberTransaction, useDAOs, useHandleTransactionSuccess } from "@hooks";
+import { useCreateDeleteMemberProposal, useDAOs, useHandleTransactionSuccess } from "@hooks";
 import { useForm } from "react-hook-form";
 import { DeleteMemberForm } from "./types";
 import { Page } from "@layouts";
@@ -32,14 +32,14 @@ export function DeleteMember() {
     formState: { isSubmitting },
   } = deleteMemberForm;
 
-  const sendDeleteMemberTransactionMutationResults = useCreateDeleteMemberTransaction(handleCreateProposalSuccess);
+  const sendDeleteMemberProposalMutationResults = useCreateDeleteMemberProposal(handleCreateProposalSuccess);
   const {
     isLoading,
     isError,
     error,
     mutate,
     reset: resetSendProposeTransaction,
-  } = sendDeleteMemberTransactionMutationResults;
+  } = sendDeleteMemberProposalMutationResults;
 
   const steps = [
     {
@@ -104,7 +104,7 @@ export function DeleteMember() {
       />
       <LoadingDialog
         isOpen={isSubmitting || isLoading}
-        message={"Please confirm the Delete Member transaction in your wallet to proceed."}
+        message={"Please confirm the Propose Delete Member transaction in your wallet to proceed."}
       />
       <LoadingDialog
         isOpen={isError}

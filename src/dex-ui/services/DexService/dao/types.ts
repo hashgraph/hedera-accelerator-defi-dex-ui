@@ -85,7 +85,7 @@ export enum DAOEvents {
 
 export enum HederaGnosisSafeFunctions {
   ApproveHash = "approveHash",
-  ExecuteTransation = "executeTransaction",
+  ExecuteTransaction = "executeTransaction",
 }
 
 export enum MultiSigProposeTransactionType {

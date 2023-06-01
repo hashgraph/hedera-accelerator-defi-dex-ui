@@ -279,11 +279,11 @@ export async function sendExecuteMultiSigTransaction(params: ExecuteMultiSigTran
 
   const executeMultiSigTransaction = await new ContractExecuteTransaction()
     .setContractId(safeContractId)
-    .setFunction(HederaGnosisSafeFunctions.ExecuteTransation, contractFunctionParameters)
+    .setFunction(HederaGnosisSafeFunctions.ExecuteTransaction, contractFunctionParameters)
     .setGas(Gas)
     .freezeWithSigner(signer);
 
   const executeMultiSigTransactionResponse = await executeMultiSigTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(executeMultiSigTransactionResponse, HederaGnosisSafeFunctions.ExecuteTransation);
+  checkTransactionResponseForError(executeMultiSigTransactionResponse, HederaGnosisSafeFunctions.ExecuteTransaction);
   return executeMultiSigTransactionResponse;
 }

@@ -15,7 +15,7 @@ const daoNavigationTabs = [
   },
   {
     icon: <TransactionIcon boxSize="5" />,
-    title: "Transactions",
+    title: "Proposals",
   },
   {
     icon: <BoxIcon boxSize="5" />,

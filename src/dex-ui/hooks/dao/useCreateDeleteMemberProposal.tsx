@@ -5,31 +5,26 @@ import { DexService } from "@services";
 import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
-interface ReplaceMemberForm {
-  newMemberAddress: string;
-  oldMemberAddress: string;
+interface DeleteMemberForm {
+  memberAddress: string;
   safeAccountId: string;
+  threshold: number;
   multiSigDAOContractId: string;
 }
 
-export function useCreateReplaceMemberTransaction(handleOnSuccess: HandleOnSuccess) {
+export function useCreateDeleteMemberProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
 
-  return useMutation<
-    TransactionResponse | undefined,
-    Error,
-    ReplaceMemberForm,
-    DAOMutations.CreateReplaceMemberTransaction
-  >(
-    async (params: ReplaceMemberForm) => {
-      return DexService.proposeSwapOwnerWithThreshold({ ...params, signer });
+  return useMutation<TransactionResponse | undefined, Error, DeleteMemberForm, DAOMutations.CreateDeleteMemberProposal>(
+    async (params: DeleteMemberForm) => {
+      return DexService.proposeRemoveOwnerWithThreshold({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
         if (isNil(transactionResponse)) return;
-        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Transactions]);
+        queryClient.invalidateQueries([DAOQueries.DAOs, DAOQueries.Proposals]);
         handleOnSuccess(transactionResponse);
       },
     }
