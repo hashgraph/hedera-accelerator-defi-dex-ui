@@ -1,8 +1,9 @@
 import { Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData, Tag } from "@dex-ui-components";
 import * as R from "ramda";
-import { Member, MultiSigDAODetailsContext } from "./MultiSigDAODashboard/types";
+import { MultiSigDAODetailsContext } from "./MultiSigDAODashboard/types";
 import { useOutletContext } from "react-router-dom";
+import { Member } from "@services";
 
 export function MembersList() {
   const { dao, memberCount, members } = useOutletContext<MultiSigDAODetailsContext>();

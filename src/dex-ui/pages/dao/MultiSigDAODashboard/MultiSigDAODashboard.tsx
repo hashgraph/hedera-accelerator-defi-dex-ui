@@ -3,9 +3,8 @@ import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@
 import { Color } from "@dex-ui-components";
 import { TokenBalance, useAccountTokenBalances, useDAOs, useTabFilters } from "@hooks";
 import { DashboardHeader } from "./DashboardHeader";
-import { MultiSigDAODetails } from "@services";
+import { Member, MultiSigDAODetails } from "@services";
 import { useLocation, Outlet, NavLink, useNavigate, useParams } from "react-router-dom";
-import { Member } from "./types";
 import { Paths } from "@routes";
 import { isNil, isNotNil } from "ramda";
 

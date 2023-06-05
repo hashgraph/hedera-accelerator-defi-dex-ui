@@ -92,13 +92,13 @@ export function DAODashboard(props: DAODashboardProps) {
   }
 
   if (dao && isDAOFound && isSuccess) {
-    const { accountId, type, name } = dao;
+    const { accountId, type, name, logoUrl } = dao;
 
     return (
       <Page
         gap={0}
         type={PageLayout.Dashboard}
-        header={<DashboardHeader daoAccountId={accountId} name={name} type={type} />}
+        header={<DashboardHeader daoAccountId={accountId} name={name} type={type} logoUrl={logoUrl} />}
         body={
           <Tabs
             defaultIndex={intialTabIndex}

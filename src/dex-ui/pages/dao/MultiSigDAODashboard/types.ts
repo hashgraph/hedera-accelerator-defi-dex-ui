@@ -1,11 +1,5 @@
 import { TokenBalance } from "@hooks";
-import { MultiSigDAODetails } from "@services";
-
-export interface Member {
-  name: string;
-  logo: string;
-  accountId: string;
-}
+import { Member, MultiSigDAODetails } from "@services";
 
 export type MultiSigDAODetailsContext = {
   dao: MultiSigDAODetails;

@@ -1,8 +1,8 @@
-import { GovernanceDAODetails, Member } from "@services";
+import { Member, NFTDAODetails } from "@services";
 import { TokenBalance } from "@hooks";
 
-export type GovernanceDAODetailsContext = {
-  dao: GovernanceDAODetails;
+export type NFTDAODetailsContext = {
+  dao: NFTDAODetails;
   tokenBalances: TokenBalance[];
   ownerCount: number;
   members: Member[];
