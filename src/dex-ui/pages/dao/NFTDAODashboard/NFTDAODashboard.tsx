@@ -1,12 +1,12 @@
 import { Outlet, useParams } from "react-router-dom";
-import { GovernanceDAODetails, Member } from "@services";
+import { Member, NFTDAODetails } from "@services";
 import { TokenBalance, useAccountTokenBalances, useDAOs } from "@hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 
-export function GovernanceDAODashboard() {
+export function NFTDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
-  const daosQueryResults = useDAOs<GovernanceDAODetails>(daoAccountId);
+  const daosQueryResults = useDAOs<NFTDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
 
@@ -23,7 +23,6 @@ export function GovernanceDAODashboard() {
   if (dao) {
     const { adminId } = dao;
     const ownerCount = 0;
-    //TODO: members flow need to be updated for governance dao, if would depend on who possesses the token.
     const members: Member[] = [adminId].map((ownerId: string) => ({
       name: "-",
       logo: "",

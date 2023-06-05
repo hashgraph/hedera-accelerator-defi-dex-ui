@@ -19,8 +19,12 @@ export function DAOsListPage() {
     <Page
       header={
         <PageHeader
-          leftContent={[<Text textStyle="h2">DAOs</Text>]}
-          rightContent={[<PrimaryHeaderButton name="Create new DAO" route={Paths.DAOs.Create} />]}
+          leftContent={[
+            <Text textStyle="h2" key="daos">
+              DAOs
+            </Text>,
+          ]}
+          rightContent={[<PrimaryHeaderButton name="Create new DAO" route={Paths.DAOs.Create} key="create-new-dao" />]}
         />
       }
       body={

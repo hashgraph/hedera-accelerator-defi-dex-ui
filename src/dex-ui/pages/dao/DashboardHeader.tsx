@@ -1,21 +1,26 @@
-import { Text, Flex, HStack, Button } from "@chakra-ui/react";
+import { Text, Flex, HStack, Button, Image } from "@chakra-ui/react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData, Tag } from "@dex-ui-components";
 import { DAOType } from "@services";
+import { isValidUrl } from "@utils";
 
 interface DashboardHeaderProps {
   daoAccountId: string;
   name: string;
   type: DAOType;
+  logoUrl?: string;
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { daoAccountId, name, type } = props;
+  const { daoAccountId, name, type, logoUrl } = props;
   const navigate = useNavigate();
 
   return (
     <Flex bg={Color.White_02} direction="column" padding="24px 80px 16px">
       <Flex bg={Color.White_02} direction="row" gap="4">
+        {isValidUrl(logoUrl) ? (
+          <Image src={logoUrl} boxSize="64px" objectFit="cover" alt="Logo Url" marginRight="0.5rem" />
+        ) : undefined}
         <Flex bg={Color.White_02} direction="column" gap="2">
           <HStack>
             <Text textStyle="h3 medium">{name}</Text>

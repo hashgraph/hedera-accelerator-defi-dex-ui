@@ -50,6 +50,8 @@ import {
   NFTDAOGovernanceForm,
   NFTDAOVotingForm,
   NFTDAOReviewForm,
+  NFTDAODashboardOverview,
+  DAOSettings,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -111,9 +113,20 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
-          <Route path={Paths.DAOs.Settings} element={<Settings />} />
+          <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
         </Route>
-        <Route path={"nft/:accountId"} element={<NFTDAODashboard />} />
+        <Route path={"nft/:accountId"} element={<NFTDAODashboard />}>
+          <Route index element={<Navigate to="dashboard" />} />
+          <Route path={Paths.DAOs.Dashboard} element={<NFTDAODashboardOverview />} />
+          <Route
+            path={Paths.DAOs.TransactionDetails}
+            element={<NotFound message={`The transactions page is under construction`} />}
+          />
+          <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
+          <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
+          <Route path={Paths.DAOs.Members} element={<MembersList />} />
+          <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
+        </Route>
         <Route path="multisig/:accountId/send-token" element={<SendTokenWizard />}>
           <Route index element={<Navigate to="details" />} />
           <Route path="details" element={<SendTokenDetailsForm />} />

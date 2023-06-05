@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { DAOType } from "@services";
 
 export interface DAOCardProps {
-  key: React.Key | null | undefined;
   accountId: string;
   name: string;
   type: DAOType;
@@ -13,7 +12,7 @@ export interface DAOCardProps {
 }
 
 export function DAOCard(props: DAOCardProps) {
-  const { key, name, type, accountId } = props;
+  const { name, type, accountId } = props;
   const navigate = useNavigate();
 
   function handleDAOCardClicked() {
@@ -22,7 +21,7 @@ export function DAOCard(props: DAOCardProps) {
   }
 
   return (
-    <Card key={key} variant="dao-card" onClick={handleDAOCardClicked}>
+    <Card variant="dao-card" onClick={handleDAOCardClicked}>
       <Grid
         templateRows="repeat(2, 1fr)"
         templateColumns="repeat(5, 1fr)"

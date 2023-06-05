@@ -58,6 +58,7 @@ export interface NFTDAODetails {
   quorumThreshold: number;
   votingDelay: number;
   votingPeriod: number;
+  minimumProposalDeposit?: number;
 }
 
 export interface MultiSigDAODetails {
@@ -92,4 +93,10 @@ export enum MultiSigProposeTransactionType {
   DeleteMember,
   ReplaceMember,
   ChangeThreshold,
+}
+// TODO: if members are not present in Governance and NFT DAOs, then move it back with Multisig types
+export interface Member {
+  name: string;
+  logo: string;
+  accountId: string;
 }
