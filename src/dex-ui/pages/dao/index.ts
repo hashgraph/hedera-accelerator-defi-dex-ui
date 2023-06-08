@@ -7,3 +7,4 @@ export * from "./SendTokenWizard";
 export * from "./MembersList";
 export * from "./DAOSettings";
 export * from "./ProposalDetailsPage";
+export * from "./DAOProposals";

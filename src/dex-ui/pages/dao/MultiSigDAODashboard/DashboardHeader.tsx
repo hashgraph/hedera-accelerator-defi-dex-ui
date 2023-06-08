@@ -2,6 +2,7 @@ import { Text, Flex, HStack, Button } from "@chakra-ui/react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData, Tag } from "@dex-ui-components";
 import { DAOType } from "@services";
+import { Paths } from "@routes";
 
 interface DashboardHeaderProps {
   daoAccountId: string;
@@ -14,8 +15,8 @@ export function DashboardHeader(props: DashboardHeaderProps) {
   const { daoAccountId, safeAccountId, name, type } = props;
   const navigate = useNavigate();
 
-  function handleNewTokenClicked() {
-    navigate("send-token");
+  function handleNewProposalClicked() {
+    navigate(Paths.DAOs.CreateDAOProposal);
   }
 
   return (
@@ -45,8 +46,8 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           <Flex height="40px" alignItems="center">
             <Breadcrumb to="/daos" as={ReachLink} label="Back to DAOs" leftIcon={<ArrowLeftIcon />} />
           </Flex>
-          <Button variant="primary" onClick={handleNewTokenClicked}>
-            Send Token
+          <Button variant="primary" onClick={handleNewProposalClicked}>
+            New Proposal
           </Button>
         </Flex>
       </Flex>
