@@ -35,10 +35,10 @@ import {
   ContractUpgradeProposalForm,
   TokenTransferProposalForm,
   CreateTokenProposalForm,
+  GovernanceDAODashboardOverview,
   SendTokenWizard,
   SendTokenDetailsForm,
   SendTokenReviewForm,
-  GovernanceDAODashboardOverview,
   DAODetailsForm,
   DAOTypeForm,
   TokenDAOGovernanceForm,
@@ -53,6 +53,20 @@ import {
   NFTDAODashboardOverview,
   DAOSettings,
   ProposalDetailsPage,
+  CreateDAOProposal,
+  DAOProposalTypeForm,
+  DAOTextProposalDetailsForm,
+  DAOTextProposalReviewForm,
+  DAOTokenTransferDetailsForm,
+  DAOTokenTransferReviewForm,
+  DAOAddMemberDetailsForm,
+  DAOAddMemberReviewForm,
+  DAODeleteMemberDetailsForm,
+  DAODeleteMemberReviewForm,
+  DAOReplaceMemberDetailsForm,
+  DAOReplaceMemberReviewForm,
+  DAOUpgradeThresholdDetailsForm,
+  DAOUpgradeThresholdReviewForm,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -115,6 +129,12 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
         </Route>
+        <Route path="governance-token/:accountId/new-proposal" element={<CreateDAOProposal />}>
+          <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
+          <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
+          <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
+        </Route>
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />}>
           <Route index element={<Navigate to="dashboard" />} />
           <Route path={Paths.DAOs.Dashboard} element={<NFTDAODashboardOverview />} />
@@ -131,6 +151,28 @@ export const router = createBrowserRouter(
           <Route index element={<Navigate to="details" />} />
           <Route path="details" element={<SendTokenDetailsForm />} />
           <Route path="review" element={<SendTokenReviewForm />} />
+        </Route>
+        <Route path="nft/:accountId/new-proposal" element={<CreateDAOProposal />}>
+          <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
+          <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
+          <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
+        </Route>
+        <Route path="multisig/:accountId/new-proposal" element={<CreateDAOProposal />}>
+          <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
+          <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
+          <Route path={Paths.DAOs.DAOTextProposalDetails} element={<DAOTextProposalDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTextProposalReview} element={<DAOTextProposalReviewForm />} />
+          <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
+          <Route path={Paths.DAOs.DAOAddMemberDetails} element={<DAOAddMemberDetailsForm />} />
+          <Route path={Paths.DAOs.DAOAddMemberReview} element={<DAOAddMemberReviewForm />} />
+          <Route path={Paths.DAOs.DAODeleteMemberDetails} element={<DAODeleteMemberDetailsForm />} />
+          <Route path={Paths.DAOs.DAODeleteMemberReview} element={<DAODeleteMemberReviewForm />} />
+          <Route path={Paths.DAOs.DAOReplaceMemberDetails} element={<DAOReplaceMemberDetailsForm />} />
+          <Route path={Paths.DAOs.DAOReplaceMemberReview} element={<DAOReplaceMemberReviewForm />} />
+          <Route path={Paths.DAOs.DAOUpgradeThresholdDetails} element={<DAOUpgradeThresholdDetailsForm />} />
+          <Route path={Paths.DAOs.DAOUpgradeThresholdReview} element={<DAOUpgradeThresholdReviewForm />} />
         </Route>
         <Route path={"multisig/:accountId/settings/add-member"} element={<AddMember />}>
           <Route index element={<Navigate to={Paths.DAOs.DetailsStep} />} />

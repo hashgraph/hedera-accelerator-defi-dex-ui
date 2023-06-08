@@ -248,7 +248,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
     <form>
       <AlertDialog
         title="Manage GOV token"
-        size="xl"
+        size={["xl", "xxl"]}
         dialogWidth="623px"
         openModalComponent={
           <Button

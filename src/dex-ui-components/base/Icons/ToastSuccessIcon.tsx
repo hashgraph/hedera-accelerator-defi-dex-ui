@@ -11,8 +11,8 @@ export const ToastSuccessIcon = createIcon({
         d="m16.727 9-6 6L8 12.273"
         stroke={Color.Success._700}
         stroke-width="1.09091"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </>
   ),

@@ -42,3 +42,7 @@ export * from "./CopyIcon";
 export * from "./ToastSuccessIcon";
 export * from "./ToastErrorIcon";
 export * from "./ToastInfoIcon";
+export * from "./TextProposalIcon";
+export * from "./NewTokenIcon";
+export * from "./MessageIcon";
+export * from "./MemberIcon";

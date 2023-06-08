@@ -23,7 +23,7 @@ interface AlertDialogProps {
   openDialogButtonText?: string;
   isOpenDialogButtonDisabled?: boolean;
   alertDialogOpen?: boolean;
-  size?: string;
+  size?: string[] | string | undefined;
   dialogWidth?: string;
   onAlertDialogOpen?: () => void;
   onAlertDialogClose?: () => void;
