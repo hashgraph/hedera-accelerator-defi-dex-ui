@@ -4,7 +4,7 @@ import { Color } from "../../themes";
 import { ActiveStepIcon, CancelledStepIcon, CompletedStepIcon, DisabledStepIcon } from "../Icons";
 
 function RedCancelledStepIcon() {
-  return <CancelledStepIcon fill={Color.Destructive._500} />;
+  return <CancelledStepIcon fill={Color.Destructive._500} boxSize="8" />;
 }
 
 function PrimarySpinner() {

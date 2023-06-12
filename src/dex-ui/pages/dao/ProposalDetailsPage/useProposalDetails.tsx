@@ -25,5 +25,9 @@ export function useProposalDetails(daoAccountId: string, transactionHash: string
     isLoading: daosQueryResults.isLoading || daoProposalsQueryResults.isLoading,
     isError: daosQueryResults.isError || daoProposalsQueryResults.isError,
     error: daosQueryResults.error || daoProposalsQueryResults.error,
+    refetch: () => {
+      daosQueryResults.refetch();
+      daoProposalsQueryResults.refetch();
+    },
   };
 }

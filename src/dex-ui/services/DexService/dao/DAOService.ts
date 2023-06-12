@@ -24,6 +24,7 @@ import {
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "@dex-ui/services/HederaService/utils";
 import { convertToByte32 } from "@utils";
+import { LogDescription } from "ethers/lib/utils";
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
   const logs = await DexService.fetchParsedEventLogs(
@@ -113,19 +114,24 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
   const abiCoder = ethers.utils.defaultAbiCoder;
   const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
 
-  const parsedEventsWithData = parsedEvents.map((event) => {
+  const parsedEventsWithData = parsedEvents.reduce((parsedEvents: LogDescription[], event: LogDescription) => {
     if (event.name === DAOEvents.TransactionCreated) {
-      const parsedData = abiCoder.decode(
-        ["address token", "address receiver", "uint256 amount"],
-        ethers.utils.hexDataSlice(event.args.info.data, 4)
-      );
-      const eventClone: ethers.utils.LogDescription = structuredClone(event);
-      eventClone.args.info.data = parsedData;
-      eventClone.args.info.hexStringData = event.args.info.data;
-      return eventClone;
+      try {
+        const parsedData = abiCoder.decode(
+          ["address token", "address receiver", "uint256 amount"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
+        const eventClone: ethers.utils.LogDescription = structuredClone(event);
+        eventClone.args.info.data = parsedData;
+        eventClone.args.info.hexStringData = event.args.info.data;
+        return [...parsedEvents, eventClone];
+      } catch (error) {
+        console.error(error, event);
+      }
     }
-    return event;
-  });
+    return parsedEvents;
+  }, []);
+
   return parsedEventsWithData;
 }
 
