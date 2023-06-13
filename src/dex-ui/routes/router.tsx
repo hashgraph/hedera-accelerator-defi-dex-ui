@@ -120,10 +120,7 @@ export const router = createBrowserRouter(
         <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />}>
           <Route index element={<Navigate to="dashboard" />} />
           <Route path={Paths.DAOs.Dashboard} element={<GovernanceDAODashboardOverview />} />
-          <Route
-            path={Paths.DAOs.Proposals}
-            element={<NotFound message={`The proposals page is under construction`} />}
-          />
+          <Route path={Paths.DAOs.Proposals} element={<TransactionsList />} />
           <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
@@ -138,10 +135,7 @@ export const router = createBrowserRouter(
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />}>
           <Route index element={<Navigate to="dashboard" />} />
           <Route path={Paths.DAOs.Dashboard} element={<NFTDAODashboardOverview />} />
-          <Route
-            path={Paths.DAOs.Proposals}
-            element={<NotFound message={`The proposals page is under construction`} />}
-          />
+          <Route path={Paths.DAOs.Proposals} element={<TransactionsList />} />
           <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />

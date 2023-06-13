@@ -108,7 +108,8 @@ export enum HederaGnosisSafeFunctions {
 }
 
 export enum MultiSigProposeTransactionType {
-  AddMember = 2,
+  TokenTransfer = 1,
+  AddMember,
   DeleteMember,
   ReplaceMember,
   ChangeThreshold,

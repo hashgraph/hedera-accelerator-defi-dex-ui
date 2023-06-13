@@ -46,3 +46,4 @@ export * from "./TextProposalIcon";
 export * from "./NewTokenIcon";
 export * from "./MessageIcon";
 export * from "./MemberIcon";
+export * from "./SendTokenIcon";

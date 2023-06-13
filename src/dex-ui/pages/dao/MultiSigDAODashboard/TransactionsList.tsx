@@ -1,8 +1,8 @@
 import { CardListLayout, ErrorLayout, LoadingSpinnerLayout, TabFilters } from "@layouts";
-import { TransactionCard } from "./TransactionCard";
 import { ProposalStatus, useDAOProposals, useTabFilters } from "@hooks";
 import { useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
+import { ProposalCard } from "../ProposalCard";
 
 const transactionTabFilters = [[ProposalStatus.Pending], [ProposalStatus.Success, ProposalStatus.Failed]];
 const defaultTransactionFilters = [ProposalStatus.Pending, ProposalStatus.Success, ProposalStatus.Failed];
@@ -14,11 +14,11 @@ const transactionTabs = [
 
 export function TransactionsList() {
   const { dao } = useOutletContext<MultiSigDAODetailsContext>();
-  const { accountId: daoAccountId, safeId: safeAccountId, threshold } = dao;
+  const { accountId: daoAccountId, safeId: safeAccountId } = dao;
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  const daoTransactionsQueryResults = useDAOProposals(daoAccountId, safeAccountId, transactionFilters);
+  const daoTransactionsQueryResults = useDAOProposals(daoAccountId, dao.type, safeAccountId, transactionFilters);
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
 
   if (isError) {
@@ -35,9 +35,7 @@ export function TransactionsList() {
         onTabChange={handleTabChange}
         tabFilters={<TabFilters filters={transactionTabs} />}
         cardLists={[<></>, <></>].map(() =>
-          transactions?.map((transaction, index) => (
-            <TransactionCard index={index} threshold={threshold} {...transaction} />
-          ))
+          transactions?.map((transaction, index) => <ProposalCard proposal={transaction} dao={dao} key={index} />)
         )}
       />
     );
