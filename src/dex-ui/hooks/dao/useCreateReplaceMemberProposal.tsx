@@ -7,6 +7,8 @@ import { isNil } from "ramda";
 
 interface ReplaceMemberForm {
   newMemberAddress: string;
+  title: string;
+  description: string;
   oldMemberAddress: string;
   safeAccountId: string;
   multiSigDAOContractId: string;

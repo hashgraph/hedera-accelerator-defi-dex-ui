@@ -23,6 +23,8 @@ export function ReplaceMember() {
   const replaceMemberForm = useForm<ReplaceMemberForm>({
     defaultValues: {
       memberAddress: "",
+      title: "",
+      description: "",
     },
   });
 
@@ -45,7 +47,7 @@ export function ReplaceMember() {
     {
       label: "Details",
       route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/replace-member/${memberId}/details`,
-      validate: async () => trigger(["memberAddress"]),
+      validate: async () => trigger(["memberAddress", "description", "title"]),
     },
     {
       label: "Review",
@@ -67,8 +69,10 @@ export function ReplaceMember() {
   }
 
   async function onSubmit(data: ReplaceMemberForm) {
-    const { memberAddress } = data;
+    const { memberAddress, title, description } = data;
     return mutate({
+      title,
+      description,
       newMemberAddress: memberAddress,
       oldMemberAddress: memberId ?? "",
       safeAccountId: safeId,

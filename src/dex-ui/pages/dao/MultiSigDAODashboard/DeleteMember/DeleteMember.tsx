@@ -24,6 +24,8 @@ export function DeleteMember() {
   const deleteMemberForm = useForm<DeleteMemberForm>({
     defaultValues: {
       newThreshold: threshold,
+      title: "",
+      description: "",
     },
   });
   const {
@@ -45,7 +47,7 @@ export function DeleteMember() {
     {
       label: "Details",
       route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/delete-member/${memberId}/details`,
-      validate: async () => trigger(["newThreshold"]),
+      validate: async () => trigger(["newThreshold", "description", "title"]),
     },
     {
       label: "Review",
@@ -67,8 +69,10 @@ export function DeleteMember() {
   }
 
   async function onSubmit(data: DeleteMemberForm) {
-    const { newThreshold } = data;
+    const { newThreshold, title, description } = data;
     return mutate({
+      title,
+      description,
       memberAddress: memberId ?? "",
       safeAccountId: safeId,
       multiSigDAOContractId: accountId,

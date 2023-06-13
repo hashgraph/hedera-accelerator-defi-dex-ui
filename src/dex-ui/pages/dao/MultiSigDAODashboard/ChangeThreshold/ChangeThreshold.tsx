@@ -24,6 +24,8 @@ export function ChangeThreshold() {
   const changeThresholdForm = useForm<ChangeThresholdForm>({
     defaultValues: {
       newThreshold: threshold,
+      title: "",
+      description: "",
     },
   });
   const {
@@ -45,7 +47,7 @@ export function ChangeThreshold() {
     {
       label: "Details",
       route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/change-threshold/details`,
-      validate: async () => trigger(["newThreshold"]),
+      validate: async () => trigger(["newThreshold", "description", "title"]),
     },
     {
       label: "Review",
@@ -67,8 +69,10 @@ export function ChangeThreshold() {
   }
 
   async function onSubmit(data: ChangeThresholdForm) {
-    const { newThreshold } = data;
+    const { newThreshold, title, description } = data;
     return mutate({
+      title,
+      description,
       threshold: newThreshold,
       safeAccountId: safeId,
       multiSigDAOContractId: accountId,

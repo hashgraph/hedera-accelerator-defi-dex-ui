@@ -8,6 +8,8 @@ import { HandleOnSuccess } from "@hooks";
 
 interface UseCreateGovernanceDAOParams {
   name: string;
+  description: string;
+  daoLinks: string[];
   logoUrl: string;
   isPrivate: boolean;
   treasuryWalletAccountId: string;
@@ -20,6 +22,8 @@ interface UseCreateGovernanceDAOParams {
 interface UseCreateNFTDAOParams {
   name: string;
   logoUrl: string;
+  description: string;
+  daoLinks: string[];
   isPrivate: boolean;
   treasuryWalletAccountId: string;
   tokenId: string;
@@ -31,6 +35,8 @@ interface UseCreateNFTDAOParams {
 interface UseCreateMultiSigDAOParams {
   admin: string;
   name: string;
+  description: string;
+  daoLinks: string[];
   logoUrl: string;
   owners: string[];
   threshold: number;

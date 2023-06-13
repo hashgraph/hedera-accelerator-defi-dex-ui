@@ -49,9 +49,11 @@ export function SendTokenWizard() {
   ];
 
   async function onSubmit(data: SendTokenForm) {
-    const { recipientAccountId, tokenId, amount, decimals } = data;
+    const { recipientAccountId, tokenId, amount, decimals, title = "", description = "" } = data;
     mutate({
       tokenId,
+      title,
+      description,
       receiverId: recipientAccountId,
       amount: Number(amount),
       decimals,
