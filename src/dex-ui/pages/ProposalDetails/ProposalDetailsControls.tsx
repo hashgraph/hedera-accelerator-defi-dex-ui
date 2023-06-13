@@ -9,7 +9,7 @@ import { useDexContext } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { formatProposal } from "../Governance/formatter";
 
-type UseProposalDetailsData = ReturnType<typeof useProposalDetails>;
+export type UseProposalDetailsData = ReturnType<typeof useProposalDetails>;
 
 interface ProposalDetailsControlsProps {
   proposalDetails: UseProposalDetailsData;

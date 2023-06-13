@@ -3,7 +3,6 @@ import { ProposalConfirmationDetails } from "./ProposalConfirmationDetails";
 import { ProposalDetails } from "./ProposalDetails";
 import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
 import { ProposalDetailsStepper } from "./ProposalDetailsStepper";
-import { ProposalVoteDetails } from "./ProposalVoteDetails";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useExecuteProposal, ProposalStatus, useApproveProposal, useHandleTransactionSuccess } from "@hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
@@ -11,11 +10,11 @@ import { Grid, GridItem, Flex } from "@chakra-ui/react";
 import { DAOType } from "@services";
 import { isNil, isNotNil } from "ramda";
 import { Paths } from "@routes";
-import { useProposalDetails } from "./useProposalDetails";
+import { useMultiSigProposalDetails } from "./useMultiSigProposalDetails";
 import { Color, LoadingDialog } from "@dex-ui-components";
 import { WarningIcon } from "@chakra-ui/icons";
 
-function ProposalDetailsPage() {
+export function MultiSigProposalDetailsPage() {
   const navigate = useNavigate();
   const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
   const {
@@ -25,7 +24,7 @@ function ProposalDetailsPage() {
     isError: isErrorFetchingProposalDetails,
     error,
     refetch,
-  } = useProposalDetails(daoAccountId, transactionHash);
+  } = useMultiSigProposalDetails(daoAccountId, transactionHash);
   const approveProposalMutation = useApproveProposal(handleApproveProposalSuccess);
   const executeProposalMutation = useExecuteProposal(handleExecuteProposalSuccess);
   const handleTransactionSuccess = useHandleTransactionSuccess();
@@ -79,12 +78,10 @@ function ProposalDetailsPage() {
       msgValue,
       operation,
       nonce,
-      daoType,
       threshold,
       ownerIds,
     } = proposalDetails;
 
-    const isMultiSigProposal = daoType === DAOType.MultiSig;
     const isThresholdReached = approvalCount >= threshold;
     const memberCount = ownerIds.length;
 
@@ -96,7 +93,7 @@ function ProposalDetailsPage() {
         <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
           <GridItem colSpan={3}>
             <Flex direction="column" gap="8">
-              <ProposalDetailsHeader daoAccountId={daoAccountId} title={type} />
+              <ProposalDetailsHeader daoAccountId={daoAccountId} title={type} author="" type={DAOType.MultiSig} />
               <ProposalDetailsStepper
                 status={proposalStatus}
                 isThresholdReached={isThresholdReached}
@@ -115,29 +112,26 @@ function ProposalDetailsPage() {
                 approvers={approvers}
                 approvalCount={approvalCount}
                 transactionHash={transactionHash}
+                created="-"
               />
             </Flex>
           </GridItem>
           <GridItem colSpan={1}>
-            {isMultiSigProposal ? (
-              <ProposalConfirmationDetails
-                safeId={safeId}
-                approvalCount={approvalCount}
-                approvers={approvers}
-                memberCount={memberCount}
-                threshold={threshold}
-                status={proposalStatus}
-                transactionHash={transactionHash}
-                hexStringData={hexStringData}
-                msgValue={msgValue}
-                operation={operation}
-                nonce={nonce}
-                approveProposalMutation={approveProposalMutation}
-                executeProposalMutation={executeProposalMutation}
-              />
-            ) : (
-              <ProposalVoteDetails />
-            )}
+            <ProposalConfirmationDetails
+              safeId={safeId}
+              approvalCount={approvalCount}
+              approvers={approvers}
+              memberCount={memberCount}
+              threshold={threshold}
+              status={proposalStatus}
+              transactionHash={transactionHash}
+              hexStringData={hexStringData}
+              msgValue={msgValue}
+              operation={operation}
+              nonce={nonce}
+              approveProposalMutation={approveProposalMutation}
+              executeProposalMutation={executeProposalMutation}
+            />
           </GridItem>
         </Grid>
         <LoadingDialog
@@ -170,5 +164,3 @@ function ProposalDetailsPage() {
 
   return <></>;
 }
-
-export { ProposalDetailsPage };

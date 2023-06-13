@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { DexService } from "@services";
-import { useDexContext } from "@hooks";
+import { HandleOnSuccess, useDexContext } from "@hooks";
 import { isNil } from "ramda";
 
 interface CreateTokenTransferProposalData {
@@ -14,9 +14,7 @@ interface CreateTokenTransferProposalData {
   amountToTransfer: number;
 }
 
-export function useCreateTokenTransferProposal(
-  handleSendProposesSuccess: (transactionResponse: TransactionResponse) => void
-) {
+export function useCreateTokenTransferProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -39,10 +37,10 @@ export function useCreateTokenTransferProposal(
       });
     },
     {
-      onSuccess: (data: TransactionResponse | undefined) => {
-        if (isNil(data)) return;
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
-        handleSendProposesSuccess(data);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

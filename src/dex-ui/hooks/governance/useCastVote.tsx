@@ -1,9 +1,17 @@
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { useMutation, useQueryClient } from "react-query";
-import { DexService } from "../../services";
+import { UseMutationResult, useMutation, useQueryClient } from "react-query";
+import { DexService } from "@services";
 import { isNil } from "ramda";
+import { HandleOnSuccess } from "@utils";
+
+export type UseCastVoteProposalMutationResult = UseMutationResult<
+  TransactionResponse | undefined,
+  Error,
+  UseCastVoteParams,
+  GovernanceMutations.ExecuteProposal
+>;
 
 interface UseCastVoteParams {
   contractId: string;
@@ -12,7 +20,7 @@ interface UseCastVoteParams {
   signer: HashConnectSigner;
 }
 
-export function useCastVote(id: string | undefined) {
+export function useCastVote(id: string | undefined, handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   return useMutation<TransactionResponse | undefined, Error, UseCastVoteParams, GovernanceMutations.CastVote>(
     async (params: UseCastVoteParams) => {
@@ -21,10 +29,12 @@ export function useCastVote(id: string | undefined) {
       return DexService.castVote({ contractId, proposalId, voteType, signer });
     },
     {
-      onSuccess: () => {
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "detail", id]);
         queryClient.invalidateQueries(GovernanceQueries.FetchHasVoted);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

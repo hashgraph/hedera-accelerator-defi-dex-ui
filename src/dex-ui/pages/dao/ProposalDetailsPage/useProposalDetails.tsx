@@ -1,33 +1,17 @@
-import { useDAOs, useDAOProposals } from "@hooks";
-import { MultiSigDAODetails } from "@services";
-import { isNotNil } from "ramda";
+import { useDAOs } from "@hooks";
+import { GovernanceDAODetails } from "@services";
+import { useProposalDetails } from "@dex-ui/pages/ProposalDetails/useProposalDetails";
 
-export function useProposalDetails(daoAccountId: string, transactionHash: string) {
-  const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
+export function useGovernanceTokenProposalDetails(/* daoAccountId: string,  */ proposalId: string) {
+  /*   const daosQueryResults = useDAOs<GovernanceDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao: MultiSigDAODetails) => dao.accountId === daoAccountId);
-  const daoProposalsQueryResults = useDAOProposals(daoAccountId, dao?.safeId ?? "");
-  const { data: proposals } = daoProposalsQueryResults;
-  const proposal = proposals?.find((proposal) => proposal.transactionHash === transactionHash);
-  const isDataFetched =
-    daosQueryResults.isSuccess && daoProposalsQueryResults.isSuccess && isNotNil(dao) && isNotNil(proposal);
+  const dao = daos?.find((dao: GovernanceDAODetails) => dao.accountId === daoAccountId); */
+
+  const proposalDetails = useProposalDetails(proposalId);
 
   return {
-    proposalDetails: isDataFetched
-      ? {
-          ...proposal,
-          daoType: dao?.type,
-          threshold: dao?.threshold,
-          ownerIds: dao?.ownerIds,
-        }
-      : undefined,
-    isSuccess: daosQueryResults.isSuccess && daoProposalsQueryResults.isSuccess,
-    isLoading: daosQueryResults.isLoading || daoProposalsQueryResults.isLoading,
-    isError: daosQueryResults.isError || daoProposalsQueryResults.isError,
-    error: daosQueryResults.error || daoProposalsQueryResults.error,
-    refetch: () => {
-      daosQueryResults.refetch();
-      daoProposalsQueryResults.refetch();
-    },
+    /*     dao,
+    daosQueryResults, */
+    proposalDetails,
   };
 }

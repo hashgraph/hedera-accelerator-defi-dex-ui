@@ -1,8 +1,11 @@
-import { chakra, Grid, GridItem, HStack, Spacer, Text } from "@chakra-ui/react";
+import { Box, chakra, Grid, GridItem } from "@chakra-ui/react";
+import { MetricLabel } from "../";
+
 interface Metric {
   label: string;
   value: number;
   icon?: React.ReactNode;
+  color?: string;
 }
 
 interface MetricsProps {
@@ -16,18 +19,12 @@ const MetricsBase = (props: MetricsProps) => {
     <Grid templateColumns={`repeat(${data.length}, 1fr)`} gap="5">
       {data.map((metric, index) => (
         <GridItem key={index} colSpan={rows}>
-          <HStack width="100%">
-            {metric.icon ? (
-              <HStack gap="1">
-                {metric.icon}
-                <Text textStyle="b4">{metric.label}</Text>
-              </HStack>
-            ) : (
-              <Text textStyle="b4">{metric.label}</Text>
-            )}
-            <Spacer />
-            <Text textStyle="b1">{metric.value}</Text>
-          </HStack>
+          <MetricLabel
+            labelLeftIcon={<Box bg={metric.color} width="0.75rem" height="0.75rem" />}
+            label={metric.label}
+            value={metric.value}
+            valueStyle="p small semibold"
+          />
         </GridItem>
       ))}
     </Grid>

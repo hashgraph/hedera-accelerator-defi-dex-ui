@@ -2,8 +2,9 @@ import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, UseMutationResult, useQueryClient } from "react-query";
-import { DexService } from "../../services";
+import { DexService } from "@services";
 import { isNil } from "ramda";
+import { HandleOnSuccess } from "@utils";
 
 export type UseCancelProposalResult = UseMutationResult<
   TransactionResponse | undefined,
@@ -17,7 +18,7 @@ interface UseCancelProposalParams {
   signer: HashConnectSigner;
 }
 
-export function useCancelProposal(id: string | undefined) {
+export function useCancelProposal(id: string | undefined, handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   return useMutation<
     TransactionResponse | undefined,
@@ -31,9 +32,11 @@ export function useCancelProposal(id: string | undefined) {
       return DexService.cancelProposal({ contractId, title, signer });
     },
     {
-      onSuccess: () => {
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "detail", id]);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

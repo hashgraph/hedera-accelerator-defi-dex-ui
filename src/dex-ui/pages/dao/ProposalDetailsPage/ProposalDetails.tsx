@@ -17,13 +17,15 @@ interface ProposalDetailsProps {
   tokenDecimals: string;
   event: ProposalEvent;
   type: ProposalType;
-  approvers: string[];
-  approvalCount: number;
+  approvers?: string[];
+  approvalCount?: number;
   transactionHash: string;
+  created: string;
 }
 
 export function ProposalDetails(props: ProposalDetailsProps) {
   const {
+    description,
     amount,
     receiver,
     tokenId,
@@ -34,11 +36,8 @@ export function ProposalDetails(props: ProposalDetailsProps) {
     approvers,
     approvalCount,
     transactionHash,
+    created,
   } = props;
-
-  /** TODO: Add 'description' and 'created' values to contract event. */
-  const description = ["-"];
-  const created = "-";
 
   return (
     <Flex direction="column" gap="2">
@@ -57,8 +56,12 @@ export function ProposalDetails(props: ProposalDetailsProps) {
           event={event}
           type={type}
         />
-        <Divider />
-        <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
+        {approvers && approvalCount && (
+          <>
+            <Divider />
+            <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
+          </>
+        )}
         <Divider />
         <ProposalTransactionDetails transactionHash={transactionHash} created={created} />
       </Flex>

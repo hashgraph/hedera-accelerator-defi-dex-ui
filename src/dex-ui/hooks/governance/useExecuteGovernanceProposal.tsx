@@ -1,9 +1,17 @@
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { useMutation, useQueryClient } from "react-query";
-import { DexService } from "../../services";
+import { UseMutationResult, useMutation, useQueryClient } from "react-query";
+import { DexService } from "@services";
 import { isNil } from "ramda";
+import { HandleOnSuccess } from "@utils";
+
+export type UseExecuteGovernanceProposalMutationResult = UseMutationResult<
+  TransactionResponse | undefined,
+  Error,
+  UseExecuteProposalParams,
+  GovernanceMutations.ExecuteProposal
+>;
 
 interface UseExecuteProposalParams {
   contractId: string;
@@ -14,7 +22,7 @@ interface UseExecuteProposalParams {
   tokenAmount?: number;
 }
 
-export function useExecuteGovernanceProposal(id: string | undefined) {
+export function useExecuteGovernanceProposal(id: string | undefined, handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   return useMutation<
     TransactionResponse | undefined,
@@ -27,9 +35,11 @@ export function useExecuteGovernanceProposal(id: string | undefined) {
       return DexService.executeProposal({ ...params });
     },
     {
-      onSuccess: () => {
+      onSuccess: (transactionResponse: TransactionResponse | undefined) => {
+        if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "detail", id]);
+        handleOnSuccess(transactionResponse);
       },
     }
   );

@@ -6,19 +6,40 @@ import {
   useProposal,
   useCancelProposal,
   useFetchLockedGovToken,
-} from "../../hooks";
+  useHandleTransactionSuccess,
+} from "@hooks";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { ProposalState, ProposalStatus, ProposalStates, ProposalStateIcon } from "../../store/governanceSlice";
 import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "../../utils";
 
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const proposal = useProposal(proposalId);
-  const castVote = useCastVote(proposalId);
-  const cancelProposal = useCancelProposal(proposalId);
+  const castVote = useCastVote(proposalId, handleCastVoteSuccess);
+  const cancelProposal = useCancelProposal(proposalId, handleCancelProposalSuccess);
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
-  const executeProposal = useExecuteGovernanceProposal(proposalId);
+  const executeProposal = useExecuteGovernanceProposal(proposalId, handleExecuteProposalSuccess);
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const fetchLockGODTokens = useFetchLockedGovToken(walletId);
+  const handleTransactionSuccess = useHandleTransactionSuccess();
+
+  function handleCastVoteSuccess(transactionResponse: TransactionResponse) {
+    castVote.reset();
+    const message = "Proposal has been voted on.";
+    handleTransactionSuccess(transactionResponse, message);
+  }
+
+  function handleCancelProposalSuccess(transactionResponse: TransactionResponse) {
+    cancelProposal.reset();
+    const message = "Proposal has been canceled.";
+    handleTransactionSuccess(transactionResponse, message);
+  }
+
+  function handleExecuteProposalSuccess(transactionResponse: TransactionResponse) {
+    executeProposal.reset();
+    const message = "Proposal has been executed.";
+    handleTransactionSuccess(transactionResponse, message);
+  }
 
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
   const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;

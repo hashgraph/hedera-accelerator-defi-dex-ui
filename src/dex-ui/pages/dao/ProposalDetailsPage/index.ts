@@ -1,1 +1,2 @@
-export * from "./ProposalDetailsPage";
+export * from "./MultiSigProposalDetailsPage";
+export * from "./GovernanceTokenProposalDetailsPage";
