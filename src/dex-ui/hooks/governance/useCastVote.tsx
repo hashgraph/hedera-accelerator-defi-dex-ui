@@ -4,7 +4,7 @@ import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { UseMutationResult, useMutation, useQueryClient } from "react-query";
 import { DexService } from "@services";
 import { isNil } from "ramda";
-import { HandleOnSuccess } from "@utils";
+import { HandleOnSuccess } from "@hooks";
 
 export type UseCastVoteProposalMutationResult = UseMutationResult<
   TransactionResponse | undefined,
