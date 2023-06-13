@@ -13,6 +13,7 @@ import { checkTransactionResponseForError } from "../utils";
 import { Contracts } from "../../constants";
 import { ethers } from "ethers";
 import { DexService } from "@services";
+import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 
 const Gas = 9000000;
 
@@ -21,6 +22,8 @@ interface SendCreateMultiSigDAOTransactionParams {
   name: string;
   logoUrl: string;
   owners: string[];
+  description: string;
+  daoLinks: string[];
   threshold: number;
   isPrivate: boolean;
   signer: HashConnectSigner;
@@ -29,21 +32,26 @@ interface SendCreateMultiSigDAOTransactionParams {
 async function sendCreateMultiSigDAOTransaction(
   params: SendCreateMultiSigDAOTransactionParams
 ): Promise<TransactionResponse> {
-  const { admin, name, logoUrl, owners, threshold, isPrivate, signer } = params;
+  const { admin, name, logoUrl, owners, threshold, isPrivate, signer, description, daoLinks } = params;
   const multiSigDAOFactoryContractId = ContractId.fromString(Contracts.MultiSigDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
   const preciseThreshold = BigNumber(threshold);
   const ownersSolidityAddresses = owners.map((owner) => AccountId.fromString(owner).toSolidityAddress());
-  const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(daoAdminAddress)
-    .addString(name)
-    .addString(logoUrl)
-    .addAddressArray(ownersSolidityAddresses)
-    .addUint256(preciseThreshold)
-    .addBool(isPrivate);
+  const createDaoParams: any[] = [
+    daoAdminAddress,
+    name,
+    logoUrl,
+    ownersSolidityAddresses,
+    preciseThreshold.toNumber(),
+    isPrivate,
+    description,
+    daoLinks,
+  ];
+  const contractInterface = new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi);
+  const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
   const createMultiSigDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOFactoryContractId)
-    .setFunction(BaseDAOContractFunctions.CreateDAO, contractFunctionParameters)
+    .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
     .freezeWithSigner(signer);
   const createMultiSigDAOResponse = await createMultiSigDAOTransaction.executeWithSigner(signer);
@@ -53,6 +61,9 @@ async function sendCreateMultiSigDAOTransaction(
 
 interface SendProposeTransferTransaction {
   tokenId: string;
+  title: string;
+  description: string;
+  linkToDiscussion?: string;
   receiverId: string;
   amount: number;
   decimals: number;
@@ -62,7 +73,18 @@ interface SendProposeTransferTransaction {
 }
 
 async function sendProposeTransferTransaction(params: SendProposeTransferTransaction) {
-  const { tokenId, receiverId, safeId, amount, decimals, multiSigDAOContractId, signer } = params;
+  const {
+    tokenId,
+    receiverId,
+    safeId,
+    amount,
+    decimals,
+    multiSigDAOContractId,
+    signer,
+    title,
+    description,
+    linkToDiscussion = "",
+  } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
   const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
@@ -76,7 +98,10 @@ async function sendProposeTransferTransaction(params: SendProposeTransferTransac
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(tokenSolidityAddress)
     .addAddress(receiverSolidityAddress)
-    .addUint256(preciseAmount);
+    .addUint256(preciseAmount)
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
   const sendProposeTransferTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOContractId)
     .setFunction(MultiSigDAOContractFunctions.ProposeTransferTransaction, contractFunctionParameters)
@@ -94,19 +119,34 @@ interface SendProposeTransaction {
   safeAccountId: string;
   data: string;
   multiSigDAOContractId: string;
+  title: string;
+  description: string;
+  linkToDiscussion?: string;
   transactionType: number;
   signer: HashConnectSigner;
 }
 
 async function sendProposeTransaction(params: SendProposeTransaction) {
-  const { safeAccountId, data, signer, multiSigDAOContractId, transactionType } = params;
+  const {
+    safeAccountId,
+    data,
+    signer,
+    multiSigDAOContractId,
+    transactionType,
+    title,
+    description,
+    linkToDiscussion = "",
+  } = params;
   const safeSolidityAddress = ContractId.fromString(safeAccountId).toSolidityAddress();
   const ownerData = ethers.utils.arrayify(data);
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(safeSolidityAddress)
     .addBytes(ownerData)
     .addUint8(0)
-    .addUint256(transactionType);
+    .addUint256(transactionType)
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
   const sendProposeTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOContractId)
     .setFunction(MultiSigDAOContractFunctions.ProposeTransaction, contractFunctionParameters)

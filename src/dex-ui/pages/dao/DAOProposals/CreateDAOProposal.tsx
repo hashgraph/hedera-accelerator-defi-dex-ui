@@ -12,10 +12,11 @@ import { useForm } from "react-hook-form";
 import { Wizard } from "@components";
 import { Color, LoadingDialog } from "@dex-ui-components";
 import { WarningIcon } from "@chakra-ui/icons";
-import { MultiSigDAODetails } from "@services";
+import { DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails } from "@services";
 import {
   useCreateAddMemberProposal,
   useCreateChangeThresholdProposal,
+  useCreateDAOTokenTransferProposal,
   useCreateDeleteMemberProposal,
   useCreateMultiSigProposal,
   useCreateReplaceMemberProposal,
@@ -48,24 +49,35 @@ export function CreateDAOProposal() {
   const navigate = useNavigate();
   const currentDaoType = location.pathname.split("/").at(2) ?? "";
   const backTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/dashboard`;
-  const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
+  const daosQueryResults = useDAOs(daoAccountId);
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
-  const { ownerIds, safeId: safeAccountId = "", threshold } = dao ?? {};
+  const { ownerIds, safeId: safeAccountId = "", threshold } = (dao as MultiSigDAODetails) ?? {};
+  const { governanceAddress = "", tokenId: governanceTokenId = "" } =
+    (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const transferFrom = currentDaoType === "multisig" ? safeAccountId : walletId;
-  const sendTokenMutationResults = useCreateMultiSigProposal(handleCreateDAOProposalSuccess);
+  const sendMultisigTokenMutationResults = useCreateMultiSigProposal(handleCreateDAOProposalSuccess);
   const {
-    isLoading: isCreateTokenTransferLoading,
-    isError: isCreateTokenTransferFailed,
-    error: createTokenTransferError,
-    mutate: createTokenTransferProposal,
-    reset: resetTransferTokenTransaction,
-  } = sendTokenMutationResults;
+    isLoading: isCreateMultisigTokenTransferLoading,
+    isError: isCreateMultisigTokenTransferFailed,
+    error: createMultisigTokenTransferError,
+    mutate: createMultisigTokenTransferProposal,
+    reset: resetMultisigTransferTokenTransaction,
+  } = sendMultisigTokenMutationResults;
+
+  const sendGOVTokenMutationResults = useCreateDAOTokenTransferProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateGOVTokenTransferLoading,
+    isError: isCreateGOVTokenTransferFailed,
+    error: createGOVTokenTransferError,
+    mutate: createGOVTokenTransferProposal,
+    reset: resetGOVTransferTokenTransaction,
+  } = sendGOVTokenMutationResults;
   const sendAddMemberTransactionMutationResults = useCreateAddMemberProposal(handleCreateDAOProposalSuccess);
   const {
     isLoading: isAddMemberLoading,
@@ -101,14 +113,16 @@ export function CreateDAOProposal() {
   } = sendChangeThresholdTransactionMutationResults;
 
   const isLoading =
-    isCreateTokenTransferLoading ||
+    isCreateMultisigTokenTransferLoading ||
+    isCreateGOVTokenTransferLoading ||
     isAddMemberLoading ||
     isDeleteMemberLoading ||
     isReplaceMemberLoading ||
     isChangeThresholdLoading;
 
   const isError =
-    isCreateTokenTransferFailed ||
+    isCreateMultisigTokenTransferFailed ||
+    isCreateGOVTokenTransferFailed ||
     isAddMemberFailed ||
     isDeleteMemberFailed ||
     isReplaceMemberFailed ||
@@ -134,7 +148,8 @@ export function CreateDAOProposal() {
   ];
 
   function resetTransactions() {
-    resetTransferTokenTransaction();
+    resetMultisigTransferTokenTransaction();
+    resetGOVTransferTokenTransaction();
     resetSendAddMemberTransaction();
     resetDeleteMemberTransaction();
     resetReplaceMemberTransaction();
@@ -147,7 +162,8 @@ export function CreateDAOProposal() {
   }
 
   function GetFormErrorMessage(): string {
-    if (createTokenTransferError) return createTokenTransferError.message;
+    if (createMultisigTokenTransferError) return createMultisigTokenTransferError.message;
+    if (createGOVTokenTransferError) return createGOVTokenTransferError.message;
     if (addMemberError) return addMemberError.message;
     if (deleteMemberError) return deleteMemberError.message;
     if (isReplaceMemberError) return isReplaceMemberError.message;
@@ -171,19 +187,47 @@ export function CreateDAOProposal() {
   async function onSubmit(data: CreateDAOProposalForm) {
     switch (type) {
       case DAOProposalType.TokenTransfer: {
-        const { recipientAccountId, tokenId, amount, decimals } = data as CreateDAOTokenTransferForm;
-        return createTokenTransferProposal({
+        const {
+          recipientAccountId,
           tokenId,
-          receiverId: recipientAccountId,
-          amount: Number(amount),
+          amount,
           decimals,
-          safeId: dao?.safeId ?? "",
-          multiSigDAOContractId: daoAccountId,
-        });
+          title,
+          description,
+          linkToDiscussion = "",
+        } = data as CreateDAOTokenTransferForm;
+        switch (currentDaoType) {
+          case DAOType.MultiSig.toLowerCase():
+            return createMultisigTokenTransferProposal({
+              tokenId,
+              receiverId: recipientAccountId,
+              amount: Number(amount),
+              decimals,
+              title,
+              description,
+              safeId: safeAccountId,
+              multiSigDAOContractId: daoAccountId,
+            });
+          default:
+            return createGOVTokenTransferProposal({
+              tokenId,
+              title,
+              linkToDiscussion,
+              governanceAddress,
+              governanceTokenId,
+              daoContractId: daoAccountId,
+              description,
+              receiverId: recipientAccountId,
+              amount: Number(amount),
+              decimals,
+            });
+        }
       }
       case DAOProposalType.AddMember: {
-        const { newThreshold, memberAddress } = data as CreateDAOMemberOperationForm;
+        const { newThreshold, memberAddress, title, description } = data as CreateDAOMemberOperationForm;
         return createAddMemberProposal({
+          title,
+          description,
           safeAccountId,
           newMemberAddress: memberAddress,
           multiSigDAOContractId: daoAccountId,
@@ -191,8 +235,10 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.RemoveMember: {
-        const { newThreshold, memberAddress } = data as CreateDAOMemberOperationForm;
+        const { newThreshold, memberAddress, title, description } = data as CreateDAOMemberOperationForm;
         return createDeleteMemberProposal({
+          title,
+          description,
           memberAddress,
           safeAccountId,
           multiSigDAOContractId: daoAccountId,
@@ -200,8 +246,10 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.ReplaceMember: {
-        const { memberAddress, newMemberAddress } = data as CreateDAOMemberOperationForm;
+        const { memberAddress, newMemberAddress, title, description } = data as CreateDAOMemberOperationForm;
         return createReplaceMemberProposal({
+          title,
+          description,
           newMemberAddress: newMemberAddress,
           oldMemberAddress: memberAddress,
           safeAccountId,
@@ -209,8 +257,10 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.UpgradeThreshold: {
-        const { newThreshold } = data as CreateDAOUpgradeThresholdForm;
+        const { newThreshold, title, description } = data as CreateDAOUpgradeThresholdForm;
         return createChangeThresholdProposal({
+          title,
+          description,
           threshold: newThreshold,
           safeAccountId,
           multiSigDAOContractId: daoAccountId,

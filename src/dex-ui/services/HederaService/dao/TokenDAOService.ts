@@ -1,4 +1,5 @@
 import { BigNumber } from "bignumber.js";
+import { ethers } from "ethers";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import {
   AccountId,
@@ -8,9 +9,11 @@ import {
   ContractFunctionParameters,
   TransactionResponse,
 } from "@hashgraph/sdk";
-import { BaseDAOContractFunctions } from "./type";
+import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
-import { Contracts } from "../../constants";
+import { Contracts, DEX_PRECISION } from "../../constants";
+import { DexService } from "@services";
+import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
 
 const Gas = 9000000;
 
@@ -18,6 +21,8 @@ interface SendCreateGovernanceDAOTransactionParams {
   name: string;
   logoUrl: string;
   isPrivate: boolean;
+  description: string;
+  daoLinks: string[];
   tokenId: string;
   treasuryWalletAccountId: string;
   quorum: number;
@@ -39,6 +44,8 @@ async function sendCreateGovernanceDAOTransaction(
     votingDuration,
     isPrivate,
     signer,
+    description,
+    daoLinks,
   } = params;
   const governanceDAOFactoryContractId = ContractId.fromString(Contracts.GovernanceDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
@@ -46,18 +53,24 @@ async function sendCreateGovernanceDAOTransaction(
   const preciseQuorum = BigNumber(quorum);
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
-  const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(daoAdminAddress)
-    .addString(name)
-    .addString(logoUrl)
-    .addAddress(tokenAddress)
-    .addUint256(preciseQuorum)
-    .addUint256(preciseLockingDuration)
-    .addUint256(preciseVotingDuration)
-    .addBool(isPrivate);
+  const createDaoParams: any[] = [
+    daoAdminAddress,
+    name,
+    logoUrl,
+    tokenAddress,
+    preciseQuorum.toNumber(),
+    preciseLockingDuration.toNumber(),
+    preciseVotingDuration.toNumber(),
+    isPrivate,
+    description,
+    daoLinks,
+  ];
+  const contractInterface = new ethers.utils.Interface(GovernanceDAOFactoryJSON.abi);
+  const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
+
   const createGovernanceDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(governanceDAOFactoryContractId)
-    .setFunction(BaseDAOContractFunctions.CreateDAO, contractFunctionParameters)
+    .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
     .freezeWithSigner(signer);
   const createGovernanceDAOResponse = await createGovernanceDAOTransaction.executeWithSigner(signer);
@@ -65,4 +78,67 @@ async function sendCreateGovernanceDAOTransaction(
   return createGovernanceDAOResponse;
 }
 
-export { sendCreateGovernanceDAOTransaction };
+interface SendProposeTokenTransferTransaction {
+  tokenId: string;
+  governanceTokenId: string;
+  title: string;
+  governanceAddress: string;
+  linkToDiscussion: string;
+  description: string;
+  receiverId: string;
+  amount: number;
+  decimals: number;
+  daoContractId: string;
+  signer: HashConnectSigner;
+}
+
+async function sendProposeTokenTransferTransaction(params: SendProposeTokenTransferTransaction) {
+  const {
+    tokenId,
+    governanceTokenId,
+    receiverId,
+    amount,
+    decimals,
+    daoContractId,
+    signer,
+    title,
+    description,
+    governanceAddress,
+    linkToDiscussion,
+  } = params;
+  const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
+  const accountSolidityAddress = signer.getAccountId().toSolidityAddress();
+  const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
+  await DexService.setTokenAllowance({
+    tokenId: governanceTokenId,
+    walletId: signer.getAccountId().toString(),
+    spenderContractId: governanceAddress,
+    tokenAmount: 1 * DEX_PRECISION,
+    signer,
+  });
+  const contractCallParams = new ContractFunctionParameters()
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion)
+    .addAddress(accountSolidityAddress)
+    .addAddress(receiverSolidityAddress)
+    .addAddress(tokenSolidityAddress)
+    .addUint256(preciseAmount);
+
+  const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
+    .setContractId(daoContractId)
+    .setFunction(GovernorDAOContractFunctions.CreateProposal, contractCallParams)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeTokenTransferTransactionResponse = await sendProposeTokenTransferTransaction.executeWithSigner(
+    signer
+  );
+  checkTransactionResponseForError(
+    sendProposeTokenTransferTransactionResponse,
+    GovernorDAOContractFunctions.CreateProposal
+  );
+  return sendProposeTokenTransferTransactionResponse;
+}
+
+export { sendCreateGovernanceDAOTransaction, sendProposeTokenTransferTransaction };

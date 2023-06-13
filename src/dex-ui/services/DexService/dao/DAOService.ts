@@ -33,14 +33,29 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
   );
   return logs.map((log): MultiSigDAODetails => {
     const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners"]);
-    const { daoAddress, admin, name, logoUrl, isPrivate, safeAddress, owners, threshold } = argsWithName;
+    const {
+      daoAddress,
+      admin,
+      name,
+      logoUrl,
+      isPrivate,
+      safeAddress,
+      owners,
+      threshold,
+      title,
+      description,
+      webLinks,
+    } = argsWithName;
     return {
       type: DAOType.MultiSig,
       accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
       adminId: AccountId.fromSolidityAddress(admin).toString(),
       name,
       logoUrl,
+      title,
+      description,
       isPrivate,
+      webLinks,
       safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
       ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
       threshold: threshold.toNumber(),
@@ -56,8 +71,22 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
   );
   return logs.map((log): GovernanceDAODetails => {
     const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args);
-    const { daoAddress, admin, name, logoUrl, isPrivate, tokenAddress, quorumThreshold, votingDelay, votingPeriod } =
-      argsWithName;
+    const {
+      daoAddress,
+      admin,
+      name,
+      logoUrl,
+      isPrivate,
+      tokenAddress,
+      quorumThreshold,
+      votingDelay,
+      votingPeriod,
+      title,
+      linkToDiscussion,
+      description,
+      governanceAddress,
+      webLinks,
+    } = argsWithName;
     return {
       type: DAOType.GovernanceToken,
       accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
@@ -65,6 +94,11 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       name,
       logoUrl,
       isPrivate,
+      title,
+      webLinks,
+      description,
+      linkToDiscussion,
+      governanceAddress: AccountId.fromSolidityAddress(governanceAddress).toString(),
       tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
       quorumThreshold: quorumThreshold.toNumber(),
       votingDelay: votingDelay.toNumber(),
@@ -82,13 +116,32 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
   );
   return logs.map((log): NFTDAODetails => {
     const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args);
-    const { daoAddress, admin, name, logoUrl, isPrivate, tokenAddress, quorumThreshold, votingDelay, votingPeriod } =
-      argsWithName;
+    const {
+      daoAddress,
+      admin,
+      name,
+      logoUrl,
+      isPrivate,
+      tokenAddress,
+      quorumThreshold,
+      votingDelay,
+      votingPeriod,
+      title,
+      description,
+      linkToDiscussion,
+      governanceAddress,
+      webLinks,
+    } = argsWithName;
     return {
       type: DAOType.NFT,
       accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
       adminId: AccountId.fromSolidityAddress(admin).toString(),
       name,
+      title,
+      description,
+      webLinks,
+      linkToDiscussion,
+      governanceAddress: AccountId.fromSolidityAddress(governanceAddress).toString(),
       logoUrl,
       isPrivate,
       tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
@@ -139,11 +192,13 @@ export interface ProposeAddOwnerWithThresholdParams {
   newMemberAddress: string;
   multiSigDAOContractId: string;
   threshold: number;
+  title: string;
+  description: string;
   signer: HashConnectSigner;
 }
 
 export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithThresholdParams) {
-  const { newMemberAddress, threshold, safeAccountId, multiSigDAOContractId, signer } = params;
+  const { newMemberAddress, threshold, safeAccountId, multiSigDAOContractId, signer, title, description } = params;
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const newOwnerData = contractInterface.encodeFunctionData("addOwnerWithThreshold", [
     AccountId.fromString(newMemberAddress).toSolidityAddress(),
@@ -155,6 +210,8 @@ export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithTh
     data: newOwnerData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.AddMember,
+    title,
+    description,
     signer,
   });
 }
@@ -162,13 +219,15 @@ export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithTh
 export interface ProposeRemoveOwnerWithThresholdParams {
   safeAccountId: string;
   memberAddress: string;
+  title: string;
+  description: string;
   multiSigDAOContractId: string;
   threshold: number;
   signer: HashConnectSigner;
 }
 
 export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwnerWithThresholdParams) {
-  const { memberAddress, threshold, safeAccountId, multiSigDAOContractId, signer } = params;
+  const { memberAddress, threshold, safeAccountId, multiSigDAOContractId, signer, title, description } = params;
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const removeOwnerData = contractInterface.encodeFunctionData("removeOwner", [
     AccountId.fromString(memberAddress).toSolidityAddress(),
@@ -181,6 +240,8 @@ export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwner
     data: removeOwnerData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.DeleteMember,
+    title,
+    description,
     signer,
   });
 }
@@ -188,13 +249,16 @@ export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwner
 export interface ProposeSwapOwnerWithThresholdParams {
   safeAccountId: string;
   oldMemberAddress: string;
+  title: string;
+  description: string;
   newMemberAddress: string;
   multiSigDAOContractId: string;
   signer: HashConnectSigner;
 }
 
 export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWithThresholdParams) {
-  const { newMemberAddress, safeAccountId, multiSigDAOContractId, oldMemberAddress, signer } = params;
+  const { newMemberAddress, safeAccountId, multiSigDAOContractId, oldMemberAddress, signer, title, description } =
+    params;
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const removeOwnerData = contractInterface.encodeFunctionData("swapOwner", [
     AccountId.fromString(oldMemberAddress).toSolidityAddress(),
@@ -207,19 +271,23 @@ export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWith
     data: removeOwnerData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.ReplaceMember,
+    title,
+    description,
     signer,
   });
 }
 
 export interface ProposeChangeThresholdParams {
   safeAccountId: string;
+  title: string;
+  description: string;
   threshold: number;
   multiSigDAOContractId: string;
   signer: HashConnectSigner;
 }
 
 export async function proposeChangeThreshold(params: ProposeChangeThresholdParams) {
-  const { safeAccountId, multiSigDAOContractId, threshold, signer } = params;
+  const { safeAccountId, multiSigDAOContractId, threshold, signer, title, description } = params;
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const changeThresholdData = contractInterface.encodeFunctionData("changeThreshold", [threshold]);
 
@@ -228,6 +296,8 @@ export async function proposeChangeThreshold(params: ProposeChangeThresholdParam
     data: changeThresholdData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.ChangeThreshold,
+    title,
+    description,
     signer,
   });
 }

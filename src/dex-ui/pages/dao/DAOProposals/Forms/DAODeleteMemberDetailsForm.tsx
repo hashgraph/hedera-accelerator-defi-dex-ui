@@ -47,7 +47,7 @@ export function DAODeleteMemberDetailsForm() {
       <FormInput<"memberAddress">
         inputProps={{
           id: "memberAddress",
-          label: "Remove Address",
+          label: "Remove Member",
           type: "text",
           placeholder: "Enter member address",
           register: {

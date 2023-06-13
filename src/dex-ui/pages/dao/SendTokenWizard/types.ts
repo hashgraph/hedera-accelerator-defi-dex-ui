@@ -7,4 +7,6 @@ export interface SendTokenForm {
   tokenId: string;
   amount: number;
   decimals: number;
+  title: string;
+  description: string;
 }

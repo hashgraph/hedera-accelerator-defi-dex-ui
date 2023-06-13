@@ -8,4 +8,5 @@ export * from "./useCreateReplaceMemberProposal";
 export * from "./useCreateChangeThresholdProposal";
 export * from "./useApproveProposal";
 export * from "./useExecuteProposal";
+export * from "./useCreateDAOTokenTransferProposal";
 export * from "./types";

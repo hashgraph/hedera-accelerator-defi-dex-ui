@@ -7,6 +7,8 @@ import { isNil } from "ramda";
 
 interface ChangeThresholdForm {
   threshold: number;
+  title: string;
+  description: string;
   safeAccountId: string;
   multiSigDAOContractId: string;
 }

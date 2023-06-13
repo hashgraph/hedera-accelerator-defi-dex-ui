@@ -9,6 +9,8 @@ interface AddMemberForm {
   newMemberAddress: string;
   safeAccountId: string;
   threshold: number;
+  title: string;
+  description: string;
   multiSigDAOContractId: string;
 }
 

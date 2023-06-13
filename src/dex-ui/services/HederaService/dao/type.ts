@@ -6,3 +6,7 @@ export enum MultiSigDAOContractFunctions {
   ProposeTransferTransaction = "proposeTransferTransaction",
   ProposeTransaction = "proposeTransaction",
 }
+
+export enum GovernorDAOContractFunctions {
+  CreateProposal = "createProposal",
+}

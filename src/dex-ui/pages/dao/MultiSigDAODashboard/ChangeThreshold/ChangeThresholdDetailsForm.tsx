@@ -1,5 +1,5 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { Color, FormInput } from "@dex-ui-components";
+import { Color, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
 import { ChangeThresholdForm, ChangeThresholdWizardContext } from "./types";
 import { checkForValidPositiveNumber } from "@utils";
@@ -14,6 +14,36 @@ export function ChangeThresholdDetailsForm() {
 
   return (
     <Flex direction="column" gap="1.3rem">
+      <FormInput<"title">
+        inputProps={{
+          id: "title",
+          label: "Title",
+          type: "text",
+          placeholder: "Enter Title",
+          register: {
+            ...register("title", {
+              required: { value: true, message: "A title is required." },
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors?.title)}
+        errorMessage={errors?.title && errors?.title?.message}
+      />
+      <FormTextArea<"description">
+        textAreaProps={{
+          id: "description",
+          label: "Description",
+          placeholder: "Add a description",
+          register: {
+            ...register("description", {
+              required: { value: true, message: "A description is required." },
+              validate: (value) => value.length <= 240 || "Maximum character count for the description is 240.",
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors?.description)}
+        errorMessage={errors?.description && errors?.description?.message}
+      />
       <Flex direction="row" gap="1" alignItems="center">
         <Text textStyle="p medium regular" color={Color.Neutral._500}>
           Current proposal threshold confirmation requirement is
@@ -26,6 +56,8 @@ export function ChangeThresholdDetailsForm() {
           inputProps={{
             id: "newThreshold",
             flex: 4,
+            isTooltipVisible: true,
+            tooltipLabel: "",
             label: "Threshold",
             type: "number",
             unit: "members",
@@ -38,8 +70,8 @@ export function ChangeThresholdDetailsForm() {
               }),
             },
           }}
-          isInvalid={Boolean(errors.newThreshold)}
-          errorMessage={errors.newThreshold && errors.newThreshold.message}
+          isInvalid={Boolean(errors?.newThreshold)}
+          errorMessage={errors?.newThreshold && errors?.newThreshold?.message}
         />
         <Text flex="1" textStyle="p medium semibold" paddingTop="0.8rem">
           {`/ ${membersCount} members`}

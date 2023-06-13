@@ -25,6 +25,8 @@ export function AddMember() {
     defaultValues: {
       memberAddress: "",
       newThreshold: threshold,
+      title: "",
+      description: "",
     },
   });
   const {
@@ -46,7 +48,7 @@ export function AddMember() {
     {
       label: "Details",
       route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/add-member/details`,
-      validate: async () => trigger(["memberAddress", "newThreshold"]),
+      validate: async () => trigger(["memberAddress", "newThreshold", "title", "description"]),
     },
     {
       label: "Review",
@@ -68,8 +70,10 @@ export function AddMember() {
   }
 
   async function onSubmit(data: AddMemberForm) {
-    const { newThreshold, memberAddress } = data as AddMemberForm;
+    const { newThreshold, memberAddress, title, description } = data;
     return mutate({
+      title,
+      description,
       newMemberAddress: memberAddress,
       safeAccountId: safeId,
       multiSigDAOContractId: accountId,

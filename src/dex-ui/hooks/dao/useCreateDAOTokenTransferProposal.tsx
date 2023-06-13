@@ -5,18 +5,20 @@ import { DexService } from "@services";
 import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
-interface UseCreateMultiSigProposalParams {
+interface UseCreateDAOTokenTransferProposalParams {
   tokenId: string;
+  governanceAddress: string;
+  governanceTokenId: string;
   receiverId: string;
+  linkToDiscussion: string;
   amount: number;
   decimals: number;
-  multiSigDAOContractId: string;
+  daoContractId: string;
   title: string;
   description: string;
-  safeId: string;
 }
 
-export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
+export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -24,18 +26,31 @@ export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
   return useMutation<
     TransactionResponse | undefined,
     Error,
-    UseCreateMultiSigProposalParams,
-    DAOMutations.CreateMultiSigProposal
+    UseCreateDAOTokenTransferProposalParams,
+    DAOMutations.CreateTokenTransferProposal
   >(
-    async (params: UseCreateMultiSigProposalParams) => {
-      const { tokenId, safeId, receiverId, amount, decimals, multiSigDAOContractId, title, description } = params;
-      return DexService.sendProposeTransferTransaction({
+    async (params: UseCreateDAOTokenTransferProposalParams) => {
+      const {
         tokenId,
         receiverId,
         amount,
         decimals,
-        multiSigDAOContractId,
-        safeId,
+        daoContractId,
+        title,
+        description,
+        linkToDiscussion,
+        governanceAddress,
+        governanceTokenId,
+      } = params;
+      return DexService.sendProposeTokenTransferTransaction({
+        tokenId,
+        receiverId,
+        amount,
+        decimals,
+        daoContractId,
+        linkToDiscussion,
+        governanceAddress,
+        governanceTokenId,
         title,
         description,
         signer,
