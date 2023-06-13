@@ -2,12 +2,14 @@ import {
   fetchAllDAOs,
   fetchHederaGnosisSafeLogs,
   fetchMultiSigDAOLogs,
+  fetchGovernanceDAOLogs,
   proposeAddOwnerWithThreshold,
   proposeRemoveOwnerWithThreshold,
   proposeSwapOwnerWithThreshold,
   proposeChangeThreshold,
   sendApproveMultiSigTransaction,
   sendExecuteMultiSigTransaction,
+  fetchNFTDAOLogs,
 } from "./dao";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
@@ -35,6 +37,8 @@ function createDexService() {
     fetchAccountTokenBalances,
     fetchAllDAOs,
     fetchMultiSigDAOLogs,
+    fetchGovernanceDAOLogs,
+    fetchNFTDAOLogs,
     fetchHederaGnosisSafeLogs,
     proposeAddOwnerWithThreshold,
     proposeRemoveOwnerWithThreshold,

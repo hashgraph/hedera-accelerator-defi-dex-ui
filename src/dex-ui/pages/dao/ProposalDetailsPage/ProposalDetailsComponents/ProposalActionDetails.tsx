@@ -19,9 +19,10 @@ export function ProposalActionDetails(props: ProposalActionDetailsProps) {
 
   const LabelDisplays: Readonly<{ [key in ProposalType]: string }> = {
     [ProposalType.TokenTransfer]: "To",
-    [ProposalType.AddNewMember]: "New Member",
+    [ProposalType.AddNewMember]: "Add Member",
     [ProposalType.RemoveMember]: "Replace Member",
     [ProposalType.ReplaceMember]: "Remove Member",
+    [ProposalType.ChangeThreshold]: "Upgrade Threshold",
   };
   const label = LabelDisplays[type];
 

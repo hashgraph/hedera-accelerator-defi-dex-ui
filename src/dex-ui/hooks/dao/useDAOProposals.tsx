@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { DAOEvents, DexService, MirrorNodeTokenById } from "../../services";
+import { DAOEvents, DAOType, DexService, MirrorNodeTokenById } from "../../services";
 import { DAOQueries } from "./types";
 import { AccountId } from "@hashgraph/sdk";
 import { groupBy, isNil } from "ramda";
@@ -7,9 +7,9 @@ import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
 export enum ProposalStatus {
-  Pending = "Pending",
+  Pending = "Active",
   Queued = "Queued",
-  Success = "Success",
+  Success = "Passed",
   Failed = "Failed",
 }
 
@@ -22,9 +22,10 @@ export enum ProposalEvent {
 
 export enum ProposalType {
   TokenTransfer = "Token Transfer",
-  AddNewMember = "Add New Member",
+  AddNewMember = "Add Member",
   RemoveMember = "Remove Member",
   ReplaceMember = "Replace Member",
+  ChangeThreshold = "Upgrade Threshold",
 }
 
 export interface Proposal {
@@ -48,6 +49,19 @@ export interface Proposal {
    * compute the correct hash value when executing the proposal in the HederaGnosisSafe contract.
    **/
   msgValue: number;
+  title: string;
+  author: string;
+  description: string;
+  link: string | undefined;
+  threshold: number | undefined;
+  votes?: {
+    yes: number | undefined;
+    no: number | undefined;
+    abstain: number | undefined;
+    quorum: number | undefined;
+    remaining: number | undefined;
+    max: number | undefined;
+  };
 }
 
 const AllFilters = [ProposalStatus.Success, ProposalStatus.Failed, ProposalStatus.Pending];
@@ -55,6 +69,7 @@ type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
 export function useDAOProposals(
   daoAccountId: string,
+  daoType: DAOType,
   safeAccountId: string,
   proposalFilter: ProposalStatus[] = AllFilters
 ) {
@@ -95,53 +110,90 @@ export function useDAOProposals(
       : ProposalStatus.Pending;
   }
 
+  function getProposalType(transactionType: number): ProposalType {
+    switch (transactionType) {
+      case 1:
+        return ProposalType.TokenTransfer;
+      case 2:
+        return ProposalType.AddNewMember;
+      case 3:
+        return ProposalType.RemoveMember;
+      case 4:
+        return ProposalType.ReplaceMember;
+      case 5:
+        return ProposalType.ChangeThreshold;
+      default:
+        return ProposalType.TokenTransfer;
+    }
+  }
+
   return useQuery<Proposal[], Error, Proposal[], UseDAOQueryKey>(
     [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId, safeAccountId],
     async () => {
-      const logs = await Promise.all([
-        DexService.fetchMultiSigDAOLogs(daoAccountId),
-        DexService.fetchHederaGnosisSafeLogs(safeAccountId),
-      ]);
-
-      const daoAndSafeLogs = logs.flat();
+      let logs;
+      if (daoType === DAOType.MultiSig) {
+        logs = await Promise.all([
+          DexService.fetchMultiSigDAOLogs(daoAccountId),
+          DexService.fetchHederaGnosisSafeLogs(safeAccountId),
+        ]);
+      } else if (daoType === DAOType.GovernanceToken) {
+        logs = await Promise.all([DexService.fetchGovernanceDAOLogs(daoAccountId)]);
+      } else if (daoType === DAOType.NFT) {
+        logs = await Promise.all([DexService.fetchNFTDAOLogs(daoAccountId)]);
+      }
+      const daoAndSafeLogs = logs ? logs.flat() : [];
       const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
-
       const proposals: Proposal[] = await Promise.all(
         groupedProposalEntries.map(async ([transactionHash, proposalLogs]) => {
           const proposalInfo = proposalLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
-          const { nonce, to, value, data, operation, hexStringData } = proposalInfo;
-          const { amount, receiver, token } = data;
-
+          const {
+            nonce,
+            to,
+            value,
+            data,
+            operation,
+            hexStringData,
+            title,
+            description,
+            creator,
+            linkToDiscussion,
+            transactionType,
+          } = proposalInfo;
+          const { amount, receiver, token, _threshold } = data;
           const approvers = getApprovers(proposalLogs);
           const approvalCount = approvers.length;
 
           const status = getProposalStatus(proposalLogs);
-
-          const tokenId = AccountId.fromSolidityAddress(token).toString();
+          const proposalType = getProposalType(BigNumber.from(transactionType).toNumber());
+          const tokenId = token ? AccountId.fromSolidityAddress(token).toString() : "";
           if (!tokenDataCache.has(tokenId)) {
             tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
           }
           const tokenData = await tokenDataCache.get(tokenId);
-
           return {
-            nonce: BigNumber.from(nonce).toNumber(),
-            amount: BigNumber.from(amount).toNumber(),
+            nonce: nonce ? BigNumber.from(nonce).toNumber() : 0,
+            amount: amount ? BigNumber.from(amount).toNumber() : 0,
             transactionHash,
-            type: ProposalType.TokenTransfer,
+            type: proposalType,
             approvalCount,
             approvers,
             event: ProposalEvent.Send,
             status,
             // TODO: Add real value for timestamp
             timestamp: "",
-            tokenId,
+            tokenId: tokenId,
             token: tokenData,
-            receiver: AccountId.fromSolidityAddress(receiver).toString(),
-            safeId: AccountId.fromSolidityAddress(to).toString(),
+            receiver: receiver ? AccountId.fromSolidityAddress(receiver).toString() : "",
+            safeId: to ? AccountId.fromSolidityAddress(to).toString() : "",
             operation,
             hexStringData,
-            msgValue: BigNumber.from(value).toNumber(),
+            msgValue: value ? BigNumber.from(value).toNumber() : 0,
+            title: title,
+            author: creator ? AccountId.fromSolidityAddress(creator).toString() : "",
+            description: description,
+            link: linkToDiscussion,
+            threshold: _threshold ? BigNumber.from(_threshold).toNumber() : 0,
           };
         })
       );
@@ -149,7 +201,7 @@ export function useDAOProposals(
       return proposals;
     },
     {
-      enabled: !!daoAccountId && !!safeAccountId,
+      enabled: !!daoAccountId,
       select: filterProposalsByStatus,
       staleTime: 5,
       keepPreviousData: true,

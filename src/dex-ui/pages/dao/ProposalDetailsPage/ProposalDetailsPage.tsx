@@ -100,7 +100,7 @@ function ProposalDetailsPage() {
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}
               tokenSymbol={token?.data.symbol ?? "-"}
-              tokenDecimals={token?.data.decimals ?? "-"}
+              tokenDecimals={token?.data.decimals ?? "0"}
               event={event}
               type={type}
               approvers={approvers}

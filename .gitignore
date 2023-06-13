@@ -25,3 +25,5 @@ yarn-error.log*
 
 // keys & certs
 *.pem
+
+.idea/

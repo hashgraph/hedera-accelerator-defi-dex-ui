@@ -8,6 +8,7 @@ import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../abi/MultiSigDAO.json";
+import GovernorTokenDAOJSON from "../../abi/GovernorTokenDAO.json";
 import {
   MultiSigDAODetails,
   MultiSigDAOCreatedEventArgs,
@@ -163,6 +164,69 @@ export async function fetchAllDAOs(): Promise<DAO[]> {
 
 export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
   const contractInterface = new ethers.utils.Interface(MultiSigDAOJSON.abi);
+  const abiCoder = ethers.utils.defaultAbiCoder;
+  const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
+
+  const parsedEventsWithData = parsedEvents.map((event) => {
+    if (event.name === DAOEvents.TransactionCreated) {
+      const transactionType: MultiSigProposeTransactionType = event.args.info.transactionType.toNumber();
+      let parsedData;
+      if (transactionType === MultiSigProposeTransactionType.AddMember) {
+        parsedData = abiCoder.decode(
+          ["address owner", "uint256 _threshold"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
+      } else if (transactionType === MultiSigProposeTransactionType.DeleteMember) {
+        parsedData = abiCoder.decode(
+          ["address prevOwner", "address owner", "uint256 _threshold"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
+      } else if (transactionType === MultiSigProposeTransactionType.ReplaceMember) {
+        parsedData = abiCoder.decode(
+          ["address prevOwner", "address oldOwner", "address newOwner"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
+      } else if (transactionType === MultiSigProposeTransactionType.ChangeThreshold) {
+        parsedData = abiCoder.decode(["uint256 _threshold"], ethers.utils.hexDataSlice(event.args.info.data, 4));
+      } else if (transactionType === MultiSigProposeTransactionType.TokenTransfer) {
+        parsedData = abiCoder.decode(
+          ["address token", "address receiver", "uint256 amount"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
+      }
+      const eventClone: ethers.utils.LogDescription = structuredClone(event);
+      eventClone.args.info.data = parsedData;
+      eventClone.args.info.hexStringData = event.args.info.data;
+      return eventClone;
+    }
+    return event;
+  });
+  return parsedEventsWithData;
+}
+
+export async function fetchGovernanceDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
+  const contractInterface = new ethers.utils.Interface(GovernorTokenDAOJSON.abi);
+  const abiCoder = ethers.utils.defaultAbiCoder;
+  const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
+
+  const parsedEventsWithData = parsedEvents.map((event) => {
+    if (event.name === DAOEvents.TransactionCreated) {
+      const parsedData = abiCoder.decode(
+        ["address token", "address receiver", "uint256 amount"],
+        ethers.utils.hexDataSlice(event.args.info.data, 4)
+      );
+      const eventClone: ethers.utils.LogDescription = structuredClone(event);
+      eventClone.args.info.data = parsedData;
+      eventClone.args.info.hexStringData = event.args.info.data;
+      return eventClone;
+    }
+    return event;
+  });
+  return parsedEventsWithData;
+}
+
+export async function fetchNFTDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
+  const contractInterface = new ethers.utils.Interface(GovernorTokenDAOJSON.abi);
   const abiCoder = ethers.utils.defaultAbiCoder;
   const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
 
