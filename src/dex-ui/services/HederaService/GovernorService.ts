@@ -270,12 +270,13 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
 interface SendLockGODTokenTransactionParams {
   accountId: string;
   tokenAmount: number;
+  tokenHolderAddress: string;
   signer: HashConnectSigner;
 }
 
 const sendLockGODTokenTransaction = async (params: SendLockGODTokenTransactionParams) => {
-  const { accountId, tokenAmount, signer } = params;
-  const godHolderContractId = ContractId.fromString(Contracts.GODHolder.ProxyId);
+  const { accountId, tokenAmount, signer, tokenHolderAddress } = params;
+  const godHolderContractId = ContractId.fromString(tokenHolderAddress);
   const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
   const accountAddress = AccountId.fromString(accountId).toSolidityAddress();
   const contractFunctionParameters = new ContractFunctionParameters().addAddress(accountAddress).addUint256(amount);
@@ -291,12 +292,13 @@ const sendLockGODTokenTransaction = async (params: SendLockGODTokenTransactionPa
 
 interface SendUnLockGODTokenTransactionParams {
   tokenAmount: number;
+  tokenHolderAddress: string;
   signer: HashConnectSigner;
 }
 
 const sendUnLockGODTokenTransaction = async (params: SendUnLockGODTokenTransactionParams) => {
-  const { tokenAmount, signer } = params;
-  const godHolderContractId = ContractId.fromString(Contracts.GODHolder.ProxyId);
+  const { tokenAmount, signer, tokenHolderAddress } = params;
+  const godHolderContractId = ContractId.fromString(tokenHolderAddress);
   const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
   const contractFunctionParameters = new ContractFunctionParameters().addUint256(amount);
   const executeSendUnLockGODTokenTransaction = await new ContractExecuteTransaction()

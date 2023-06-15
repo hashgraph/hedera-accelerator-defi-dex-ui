@@ -86,6 +86,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       linkToDiscussion,
       description,
       governanceAddress,
+      tokenHolderAddress,
       webLinks,
     } = argsWithName;
     return {
@@ -100,6 +101,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       description,
       linkToDiscussion,
       governanceAddress: AccountId.fromSolidityAddress(governanceAddress).toString(),
+      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderAddress).toString(),
       tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
       quorumThreshold: quorumThreshold.toNumber(),
       votingDelay: votingDelay.toNumber(),
@@ -131,6 +133,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       description,
       linkToDiscussion,
       governanceAddress,
+      tokenHolderAddress,
       webLinks,
     } = argsWithName;
     return {
@@ -143,6 +146,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       webLinks,
       linkToDiscussion,
       governanceAddress: AccountId.fromSolidityAddress(governanceAddress).toString(),
+      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderAddress).toString(),
       logoUrl,
       isPrivate,
       tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),

@@ -5,21 +5,21 @@ import {
   useLockGODToken,
   useTokenBalance,
   useUnlockGODToken,
-} from "../../../hooks";
-import { createHashScanAccountIdLink, createHashScanTransactionLink } from "../../../utils";
-import { GovernanceTokenId } from "../../../services";
+  useHandleTransactionSuccess,
+} from "@hooks";
+import { TransactionResponse } from "@hashgraph/sdk";
 
-export function useManageVotingPower() {
+export function useManageVotingPower(governanceTokenId: string, tokenHolderAddress: string) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const isWalletConnected = wallet.isPaired();
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
 
-  const govTokenBalance = useTokenBalance({ tokenId: GovernanceTokenId });
+  const govTokenBalance = useTokenBalance({ tokenId: governanceTokenId });
 
-  const lockedGOVToken = useFetchLockedGovToken(walletId);
-  const canClaimGODTokens = useCanUserUnlockGODToken(walletId);
-  const lockGODTokenSubmit = useLockGODToken(walletId);
-  const unLockGODTokenSubmit = useUnlockGODToken(walletId);
+  const lockedGOVToken = useFetchLockedGovToken(walletId, tokenHolderAddress);
+  const canClaimGODTokens = useCanUserUnlockGODToken(walletId, tokenHolderAddress);
+  const lockGODTokenSubmit = useLockGODToken(walletId, tokenHolderAddress, handleLockedGODTokenSuccess);
+  const unLockGODTokenSubmit = useUnlockGODToken(walletId, tokenHolderAddress, handleUnLockedGODTokenSuccess);
 
   const totalGodToken = (lockedGOVToken.data ?? 0) + (govTokenBalance.data ?? 0);
   const godToken = {
@@ -27,6 +27,8 @@ export function useManageVotingPower() {
     available: isWalletConnected ? `${govTokenBalance.data?.toFixed(4) ?? 0}` : "-",
     total: isWalletConnected ? `${totalGodToken.toFixed(4)}` : "-",
   };
+
+  const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const isFormLoading = govTokenBalance.isLoading || lockedGOVToken.isLoading || canClaimGODTokens.isLoading;
   const isLoading = lockGODTokenSubmit.isLoading || unLockGODTokenSubmit.isLoading;
@@ -50,33 +52,17 @@ export function useManageVotingPower() {
   }
   const errorDialogMessage = getErrorDialogMessage();
 
-  const isNotificationVisible = lockGODTokenSubmit.isSuccess || unLockGODTokenSubmit.isSuccess;
-
-  function getSuccessMessage(): string {
-    if (lockGODTokenSubmit.isSuccess) return `Successfully Locked GOD Tokens`;
-    if (unLockGODTokenSubmit.isSuccess) return `Successfully UnLocked GOD Tokens`;
-    return "";
+  function handleLockedGODTokenSuccess(transactionResponse: TransactionResponse) {
+    const message = `Successfully Locked GOD Tokens`;
+    handleTransactionSuccess(transactionResponse, message);
   }
-  const successMessage = getSuccessMessage();
 
-  function getHashScanLink(): string | undefined {
-    if (lockGODTokenSubmit.isSuccess) {
-      const lockGODTokenTransactionId = lockGODTokenSubmit.data?.transactionId.toString();
-      return createHashScanTransactionLink(lockGODTokenTransactionId);
-    }
-    if (unLockGODTokenSubmit.isSuccess) {
-      const unLockGODTokenTransactionId = unLockGODTokenSubmit.data?.transactionId.toString();
-      return createHashScanTransactionLink(unLockGODTokenTransactionId);
-    }
+  function handleUnLockedGODTokenSuccess(transactionResponse: TransactionResponse) {
+    const message = `Successfully UnLocked GOD Tokens`;
+    handleTransactionSuccess(transactionResponse, message);
   }
-  const hashScanTransactionLink = getHashScanLink();
-  const hashScanAccountLink = createHashScanAccountIdLink(walletId);
 
   return {
-    successMessage,
-    isNotificationVisible,
-    hashScanTransactionLink,
-    hashScanAccountLink,
     isFormLoading,
     isLoading,
     loadingDialogMessage,
