@@ -1,6 +1,6 @@
 import { TokenQueries } from "./types";
 import { useQuery } from "react-query";
-import { DexService } from "../../services";
+import { DexService } from "@services";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { useDexContext } from "..";
 import { getFormattedTokenBalances } from "../../store/walletSlice/utils";

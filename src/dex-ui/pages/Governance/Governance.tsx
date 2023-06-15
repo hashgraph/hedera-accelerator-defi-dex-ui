@@ -20,6 +20,7 @@ import { FormattedProposal } from "./types";
 import { VotingPower } from "./VotingPower";
 import { Paths } from "@routes";
 import { CreateProposalLocationProps } from "../CreateProposal";
+import { GovernanceTokenId, Contracts } from "@services";
 
 const PageLimit = 20;
 
@@ -101,7 +102,7 @@ export const Governance = (): ReactElement => {
               </Button>,
             ]}
           />
-          <VotingPower />
+          <VotingPower governanceTokenId={GovernanceTokenId} tokenHolderAddress={Contracts.GODHolder.ProxyId} />
         </>
       }
       body={

@@ -6,9 +6,10 @@ import {
   useProposal,
   useCancelProposal,
   useFetchLockedGovToken,
-} from "../../hooks";
+} from "@hooks";
 import { ProposalState, ProposalStatus, ProposalStates, ProposalStateIcon } from "../../store/governanceSlice";
-import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "../../utils";
+import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "@utils";
+import { Contracts } from "@services";
 
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -18,7 +19,7 @@ export function useProposalDetails(proposalId: string | undefined) {
   const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
   const executeProposal = useExecuteGovernanceProposal(proposalId);
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
-  const fetchLockGODTokens = useFetchLockedGovToken(walletId);
+  const fetchLockGODTokens = useFetchLockedGovToken(walletId, Contracts.GODHolder.ProxyId);
 
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
   const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;

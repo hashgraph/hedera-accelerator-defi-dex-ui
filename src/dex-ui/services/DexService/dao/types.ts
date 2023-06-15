@@ -23,6 +23,7 @@ export interface GovernanceDAOCreatedEventArgs extends DAOCreatedEventArgs {
   votingDelay: BigNumber;
   votingPeriod: BigNumber;
   governanceAddress: string;
+  tokenHolderAddress: string;
 }
 
 export interface NFTDAOCreatedEventArgs extends DAOCreatedEventArgs {
@@ -31,6 +32,7 @@ export interface NFTDAOCreatedEventArgs extends DAOCreatedEventArgs {
   votingDelay: BigNumber;
   votingPeriod: BigNumber;
   governanceAddress: string;
+  tokenHolderAddress: string;
 }
 
 export interface MultiSigDAOCreatedEventArgs extends DAOCreatedEventArgs {
@@ -51,6 +53,7 @@ export interface GovernanceDAODetails {
   isPrivate: boolean;
   tokenId: string;
   governanceAddress: string;
+  tokenHolderAddress: string;
   webLinks: string;
   quorumThreshold: number;
   votingDelay: number;
@@ -66,6 +69,7 @@ export interface NFTDAODetails {
   description: string;
   linkToDiscussion: string | undefined;
   governanceAddress: string;
+  tokenHolderAddress: string;
   name: string;
   logoUrl: string;
   isPrivate: boolean;
