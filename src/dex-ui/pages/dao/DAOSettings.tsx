@@ -1,6 +1,6 @@
 import { Button, Divider, Flex, SimpleGrid, Text, Image } from "@chakra-ui/react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { FormInput, Color, MetricLabel, FormTextArea, FormInputList } from "@dex-ui-components";
+import { FormInput, Color, MetricLabel, FormTextArea, FormInputList, DefaultLogoIcon } from "@dex-ui-components";
 import { isValidUrl } from "@utils";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
@@ -21,6 +21,7 @@ export function DAOSettings() {
     getValues,
     handleSubmit,
     register,
+    watch,
     formState: { errors },
   } = daoSettingsForm;
 
@@ -28,6 +29,7 @@ export function DAOSettings() {
     control,
     name: "daoLinks",
   });
+  watch("logoUrl");
   const { logoUrl } = getValues();
 
   function onSubmit(data: DAOSettingsForm) {
@@ -136,13 +138,13 @@ export function DAOSettings() {
             isInvalid={Boolean(errors.name)}
             errorMessage={errors.name && errors.name.message}
           />
-          <Flex direction="row" alignItems="center" gap="10">
+          <Flex direction="row" alignItems="center" gap="2rem">
             <FormInput<"logoUrl">
               inputProps={{
                 id: "logoUrl",
                 label: "Logo URL",
                 type: "text",
-                placeholder: "Enter the logo url of your DAO",
+                placeholder: "Enter the url of your DAO",
                 register: {
                   ...register("logoUrl", {
                     validate: (value) => isValidUrl(value) || "Enter a Valid URL.",
@@ -152,7 +154,13 @@ export function DAOSettings() {
               isInvalid={Boolean(errors.logoUrl)}
               errorMessage={errors.logoUrl && errors.logoUrl.message}
             />
-            {isValidUrl(logoUrl) ? <Image src={logoUrl} boxSize="64px" objectFit="cover" alt="Logo Url" /> : undefined}
+            <Image
+              src={logoUrl}
+              boxSize="4rem"
+              objectFit="contain"
+              alt="Logo Url"
+              fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
+            />
           </Flex>
           <FormTextArea<"description">
             textAreaProps={{

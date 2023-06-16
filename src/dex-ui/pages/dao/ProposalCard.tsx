@@ -1,11 +1,11 @@
 import { Text, Flex, Image, Divider } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { getShortDescription, isValidUrl } from "../../utils";
-import { Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon } from "@dex-ui-components";
-import { DAO, DAOType } from "@dex-ui/services";
+import { getShortDescription } from "@utils";
+import { Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@dex-ui-components";
+import { DAO, DAOType } from "@services";
 import { ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
-import { Proposal, ProposalType } from "@dex-ui/hooks";
+import { Proposal, ProposalType } from "@hooks";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -56,9 +56,13 @@ export const ProposalCard = (props: ProposalCardProps) => {
           <>
             <Flex alignItems="center" justifyContent="space-between">
               <Flex gap="4" alignItems="center">
-                {isValidUrl(dao.logoUrl) ? (
-                  <Image src={dao.logoUrl} boxSize="32px" objectFit="cover" alt="Logo Url" />
-                ) : undefined}
+                <Image
+                  src={dao.logoUrl}
+                  boxSize="2rem"
+                  objectFit="contain"
+                  alt="Logo Url"
+                  fallback={<DefaultLogoIcon boxSize="2rem" color={Color.Grey_Blue._100} />}
+                />
                 <Text textStyle="p medium semibold" color={Color.Neutral._900}>
                   {dao.name}
                 </Text>

@@ -1,6 +1,5 @@
-import { Text, Grid, GridItem, Flex, Card } from "@chakra-ui/react";
-import { ReactNode } from "react";
-import { Color } from "@dex-ui-components";
+import { Text, Grid, GridItem, Flex, Card, Image } from "@chakra-ui/react";
+import { Color, DefaultLogoIcon } from "@dex-ui-components";
 import { useNavigate } from "react-router-dom";
 import { DAOType } from "@services";
 
@@ -8,11 +7,11 @@ export interface DAOCardProps {
   accountId: string;
   name: string;
   type: DAOType;
-  logo?: ReactNode;
+  logoUrl: string;
 }
 
 export function DAOCard(props: DAOCardProps) {
-  const { name, type, accountId } = props;
+  const { name, type, accountId, logoUrl } = props;
   const navigate = useNavigate();
 
   function handleDAOCardClicked() {
@@ -24,21 +23,30 @@ export function DAOCard(props: DAOCardProps) {
     <Card variant="dao-card" onClick={handleDAOCardClicked}>
       <Grid
         templateRows="repeat(2, 1fr)"
-        templateColumns="repeat(5, 1fr)"
+        templateColumns="repeat(6, 1fr)"
         gap={4}
         rowGap={1}
         border={`1px solid ${Color.Grey_01}`}
         borderRadius="4px"
         padding="1rem"
       >
-        <GridItem colSpan={4}>
+        <GridItem rowSpan={2} colSpan={1} maxW="64px">
+          <Image
+            src={logoUrl}
+            objectFit="contain"
+            alt="DAO Logo URl"
+            boxSize="3.5rem"
+            fallback={<DefaultLogoIcon boxSize="3.5rem" color={Color.Grey_Blue._100} />}
+          />
+        </GridItem>
+        <GridItem colSpan={5}>
           <Flex height="100%">
             <Text textStyle="b1" height="fit-content" alignSelf="end">
               {name}
             </Text>
           </Flex>
         </GridItem>
-        <GridItem colSpan={4}>
+        <GridItem colSpan={5}>
           <Text textStyle="b3">{type}</Text>
         </GridItem>
       </Grid>

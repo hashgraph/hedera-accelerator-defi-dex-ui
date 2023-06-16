@@ -1,7 +1,7 @@
 import { Button, Divider, Flex, SimpleGrid, Text, IconButton, Image } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useForm } from "react-hook-form";
-import { FormInput, RefreshIcon, Color, Tag, CopyTextButton } from "@dex-ui-components";
+import { FormInput, RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon } from "@dex-ui-components";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./types";
 import { Member, MultiSigDAODetails } from "@services";
@@ -29,9 +29,11 @@ export function Settings() {
     getValues,
     handleSubmit,
     register,
+    watch,
     formState: { errors },
   } = multiSigDaoSettingsForm;
 
+  watch("logoUrl");
   const { logoUrl } = getValues();
 
   function onSubmit(data: MultiSigDAODetails) {
@@ -171,7 +173,7 @@ export function Settings() {
             isInvalid={Boolean(errors.name)}
             errorMessage={errors.name && errors.name.message}
           />
-          <Flex direction="row" alignItems="center" gap="10">
+          <Flex direction="row" alignItems="center" gap="2rem">
             <FormInput<"logoUrl">
               inputProps={{
                 id: "logoUrl",
@@ -187,7 +189,13 @@ export function Settings() {
               isInvalid={Boolean(errors.logoUrl)}
               errorMessage={errors.logoUrl && errors.logoUrl.message}
             />
-            {isValidUrl(logoUrl) ? <Image src={logoUrl} boxSize="64px" objectFit="cover" alt="Logo Url" /> : undefined}
+            <Image
+              src={logoUrl}
+              boxSize="4rem"
+              objectFit="contain"
+              alt="Logo Url"
+              fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
+            />
           </Flex>
           <Divider marginBottom="0.4rem" />
           <Button
