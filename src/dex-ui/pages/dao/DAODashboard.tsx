@@ -12,7 +12,7 @@ import { VotingPower } from "../Governance/VotingPower";
 const daoNavigationTabs = [
   {
     icon: <LayoutIcon boxSize="5" />,
-    title: "Dashboard",
+    title: "Overview",
   },
   {
     icon: <TransactionIcon boxSize="5" />,

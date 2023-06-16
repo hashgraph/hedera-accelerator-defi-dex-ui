@@ -13,7 +13,7 @@ import { isNil, isNotNil } from "ramda";
 import { Paths } from "@routes";
 import { useProposalDetails } from "./useProposalDetails";
 
-function ProposalDetailsPage() {
+export function ProposalDetailsPage() {
   const navigate = useNavigate();
   const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
   const { proposalDetails, isSuccess, isLoading, isError, error } = useProposalDetails(daoAccountId, transactionHash);
@@ -136,5 +136,3 @@ function ProposalDetailsPage() {
 
   return <></>;
 }
-
-export { ProposalDetailsPage };

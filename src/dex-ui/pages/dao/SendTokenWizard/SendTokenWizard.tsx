@@ -15,7 +15,7 @@ export function SendTokenWizard() {
   const navigate = useNavigate();
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const { accountId: daoAccountId = "", tokenId = "" } = useParams();
-  const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`;
+  const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/${Paths.DAOs.absolute}`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
@@ -70,7 +70,7 @@ export function SendTokenWizard() {
   function handleCreateDAOSuccess(transactionResponse: TransactionResponse) {
     reset();
     const message = `Created new multisig transaction.`;
-    const pathTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/dashboard`;
+    const pathTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/${Paths.DAOs.Overview}`;
     handleTransactionSuccess(transactionResponse, message, pathTo);
   }
 
