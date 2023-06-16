@@ -23,7 +23,7 @@ export const Paths = {
     absolute: "/daos",
     default: "daos",
     Create: "create",
-    Dashboard: "dashboard",
+    Overview: "overview",
     DAODetails: "details",
     type: "type",
     GovernanceToken: "governance-token",

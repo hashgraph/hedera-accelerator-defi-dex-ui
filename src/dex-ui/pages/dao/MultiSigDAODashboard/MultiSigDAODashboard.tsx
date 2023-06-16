@@ -8,7 +8,7 @@ import { useLocation, Outlet, NavLink, useNavigate, useParams } from "react-rout
 import { Paths } from "@routes";
 import { isNil, isNotNil } from "ramda";
 
-const daoNavigationTabs = ["Dashboard", "Proposals", "Assets", "Members", "Settings"];
+const daoNavigationTabs = ["Overview", "Proposals", "Assets", "Members", "Settings"];
 
 export function MultiSigDAODashboard() {
   const navigate = useNavigate();

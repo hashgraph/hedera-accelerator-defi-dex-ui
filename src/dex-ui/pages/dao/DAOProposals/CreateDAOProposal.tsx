@@ -48,7 +48,7 @@ export function CreateDAOProposal() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentDaoType = location.pathname.split("/").at(2) ?? "";
-  const backTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/dashboard`;
+  const backTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/${Paths.DAOs.Overview}`;
   const daosQueryResults = useDAOs(daoAccountId);
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const { data: daos } = daosQueryResults;
@@ -176,7 +176,7 @@ export function CreateDAOProposal() {
   function handleCreateDAOProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
     const message = `Created a new ${type} DAO proposal transaction.`;
-    const pathTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/dashboard`;
+    const pathTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/${Paths.DAOs.Overview}`;
     handleTransactionSuccess(transactionResponse, message, pathTo);
   }
 

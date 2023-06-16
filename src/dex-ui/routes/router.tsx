@@ -110,16 +110,16 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.NFTReview} element={<NFTDAOReviewForm />} />
         </Route>
         <Route path={"multisig/:accountId"} element={<MultiSigDAODashboard />}>
-          <Route index element={<Navigate to="dashboard" />} />
-          <Route path={Paths.DAOs.Dashboard} element={<DashboardOverview />} />
+          <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
+          <Route path={Paths.DAOs.Overview} element={<DashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<TransactionsList />} />
           <Route path={Paths.DAOs.Assets} element={<AssetsList />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<Settings />} />
         </Route>
         <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />}>
-          <Route index element={<Navigate to="dashboard" />} />
-          <Route path={Paths.DAOs.Dashboard} element={<GovernanceDAODashboardOverview />} />
+          <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
+          <Route path={Paths.DAOs.Overview} element={<GovernanceDAODashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<TransactionsList />} />
           <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
@@ -133,8 +133,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
         </Route>
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />}>
-          <Route index element={<Navigate to="dashboard" />} />
-          <Route path={Paths.DAOs.Dashboard} element={<NFTDAODashboardOverview />} />
+          <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
+          <Route path={Paths.DAOs.Overview} element={<NFTDAODashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<TransactionsList />} />
           <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
