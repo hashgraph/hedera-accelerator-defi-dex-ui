@@ -13,10 +13,9 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { Controller, useFormContext, useFieldArray } from "react-hook-form";
-import { FormInput, FormTextArea, SelectImageIcon, FormInputList } from "@dex-ui-components";
+import { FormInput, FormTextArea, FormInputList, DefaultLogoIcon, Color } from "@dex-ui-components";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { isValidUrl } from "@utils";
 import { useState } from "react";
 
 export function DAODetailsForm() {
@@ -88,18 +87,14 @@ export function DAODetailsForm() {
           isInvalid={Boolean(errors.logoUrl)}
           errorMessage={errors.logoUrl && errors.logoUrl.message}
         />
-        {isValidUrl(imageUrl) ? (
-          <Image
-            src={imageUrl}
-            objectFit="scale-down"
-            alt="Logo URl"
-            alignSelf="end"
-            boxSize="60px"
-            borderRadius="30px"
-          />
-        ) : (
-          <SelectImageIcon options={{ alignSelf: "end" }} />
-        )}
+        <Image
+          src={imageUrl}
+          objectFit="contain"
+          alt="Logo URl"
+          alignSelf="end"
+          boxSize="4rem"
+          fallback={<DefaultLogoIcon boxSize="4rem" alignSelf="end" color={Color.Grey_Blue._100} />}
+        />
       </Flex>
       {/* TODO: Create independent component for form checkboxes */}
       <FormControl>

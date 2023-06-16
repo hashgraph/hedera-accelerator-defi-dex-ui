@@ -16,7 +16,6 @@ import { FormInput, Tag } from "@dex-ui-components";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { DAOType } from "@services";
 import { DefaultLogoIcon, Color } from "@dex-ui-components";
-import { isValidUrl } from "@utils";
 
 interface DAOReviewFormProps {
   details: {
@@ -47,17 +46,14 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
           <AccordionPanel pb={4}>
             <Flex direction="row" flex="7" alignItems="top" gap="1">
               <Flex flex="1" alignItems="top">
-                {isValidUrl(details.logoUrl) ? (
-                  <Image
-                    src={details.logoUrl}
-                    objectFit="scale-down"
-                    alt="Logo URl"
-                    boxSize="64px"
-                    borderRadius="32px"
-                  />
-                ) : (
-                  <DefaultLogoIcon boxSize="65" color={Color.Grey_Blue._100} />
-                )}
+                <Image
+                  src={details.logoUrl}
+                  objectFit="contain"
+                  borderRadius="full"
+                  alt="DAO Logo URl"
+                  boxSize="4rem"
+                  fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
+                />
               </Flex>
               <Flex direction="column" flex="6" gap="4" alignItems="start">
                 <FormInput<"name">

@@ -69,7 +69,7 @@ export function MultiSigDAODashboard() {
   }
 
   if (isDAOFound && isSuccess) {
-    const { accountId, type, adminId, name, safeId, ownerIds } = dao;
+    const { accountId, type, adminId, name, safeId, ownerIds, logoUrl } = dao;
 
     const ownerCount = ownerIds.length;
     const members: Member[] = [adminId, ...ownerIds].map((ownerId: string) => ({
@@ -85,7 +85,9 @@ export function MultiSigDAODashboard() {
       <Page
         gap={0}
         type={PageLayout.Dashboard}
-        header={<DashboardHeader daoAccountId={accountId} safeAccountId={safeId} name={name} type={type} />}
+        header={
+          <DashboardHeader daoAccountId={accountId} safeAccountId={safeId} name={name} type={type} logoUrl={logoUrl} />
+        }
         body={
           <Tabs defaultIndex={intialTabIndex} onChange={handleTabChange} isLazy bg={Color.White_02}>
             <Flex flex="row" padding="0px 80px">
