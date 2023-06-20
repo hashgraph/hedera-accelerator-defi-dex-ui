@@ -46,3 +46,4 @@ export * from "./NewTokenIcon";
 export * from "./MessageIcon";
 export * from "./MemberIcon";
 export * from "./SendTokenIcon";
+export * from "./SettingsToolIcon";
