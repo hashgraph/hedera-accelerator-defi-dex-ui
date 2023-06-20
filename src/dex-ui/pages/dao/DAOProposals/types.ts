@@ -7,6 +7,7 @@ export enum DAOProposalType {
   ReplaceMember = "Replace Member",
   RemoveMember = "Remove Member",
   Message = "Message",
+  ContractUpgrade = "Upgrade DAO",
 }
 
 export interface CreateDAOProposalFormBase {
@@ -37,11 +38,18 @@ export interface CreateDAOUpgradeThresholdForm extends CreateDAOProposalFormBase
   newThreshold: number;
 }
 
+export interface CreateDAOContractUpgradeForm extends CreateDAOProposalFormBase {
+  linkToDiscussion: string;
+  newProxyAddress: string;
+  oldProxyAddress: string;
+}
+
 export type CreateDAOProposalForm =
   | CreateDAOTextProposalForm
   | CreateDAOTokenTransferForm
   | CreateDAOMemberOperationForm
-  | CreateDAOUpgradeThresholdForm;
+  | CreateDAOUpgradeThresholdForm
+  | CreateDAOContractUpgradeForm;
 
 export type CreateDAOProposalContext = {
   daoType: string;

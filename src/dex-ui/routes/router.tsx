@@ -67,6 +67,8 @@ import {
   DAOReplaceMemberReviewForm,
   DAOUpgradeThresholdDetailsForm,
   DAOUpgradeThresholdReviewForm,
+  DAOContractUpgradeDetailsForm,
+  DAOContractUpgradeReviewForm,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -131,6 +133,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
+          <Route path={Paths.DAOs.DAOContractUpgradeDetails} element={<DAOContractUpgradeDetailsForm />} />
+          <Route path={Paths.DAOs.DAOContractUpgradeReview} element={<DAOContractUpgradeReviewForm />} />
         </Route>
         <Route path={"nft/:accountId"} element={<NFTDAODashboard />}>
           <Route index element={<Navigate to={Paths.DAOs.Overview} />} />

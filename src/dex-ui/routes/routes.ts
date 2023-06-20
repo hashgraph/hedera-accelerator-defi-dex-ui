@@ -60,5 +60,7 @@ export const Paths = {
     DAOReplaceMemberReview: "replace-member/review",
     DAOUpgradeThresholdDetails: "upgrade-threshold/details",
     DAOUpgradeThresholdReview: "upgrade-threshold/review",
+    DAOContractUpgradeDetails: "contract-upgrade/details",
+    DAOContractUpgradeReview: "contract-upgrade/review",
   },
 };

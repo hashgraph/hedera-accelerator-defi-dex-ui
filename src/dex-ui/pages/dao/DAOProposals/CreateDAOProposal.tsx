@@ -1,5 +1,6 @@
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import {
+  CreateDAOContractUpgradeForm,
   CreateDAOMemberOperationForm,
   CreateDAOProposalForm,
   CreateDAOTokenTransferForm,
@@ -266,6 +267,11 @@ export function CreateDAOProposal() {
           multiSigDAOContractId: daoAccountId,
         });
       }
+      case DAOProposalType.ContractUpgrade: {
+        //TODO: Contract Integration
+        const formData = data as CreateDAOContractUpgradeForm;
+        console.log("Contract Upgrade Data", formData);
+      }
     }
   }
 
@@ -283,6 +289,8 @@ export function CreateDAOProposal() {
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/replace-member/details`;
       case DAOProposalType.UpgradeThreshold:
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/upgrade-threshold/details`;
+      case DAOProposalType.ContractUpgrade:
+        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/contract-upgrade/details`;
       default:
         return "";
     }
@@ -302,25 +310,35 @@ export function CreateDAOProposal() {
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/replace-member/review`;
       case DAOProposalType.UpgradeThreshold:
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/upgrade-threshold/review`;
+      case DAOProposalType.ContractUpgrade:
+        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/contract-upgrade/review`;
       default:
         return "";
     }
   }
 
   async function ValidateDetailsForm(): Promise<boolean> {
-    if (type === DAOProposalType.Text) return trigger(["title", "description", "linkToDiscussion"]);
-    if (type === DAOProposalType.AddMember) return trigger(["memberAddress", "newThreshold", "title", "description"]);
-    if (type === DAOProposalType.RemoveMember)
-      return trigger(["newThreshold", "memberAddress", "title", "description"]);
-    if (type === DAOProposalType.ReplaceMember)
-      return trigger(["memberAddress", "newMemberAddress", "title", "description"]);
-    if (type === DAOProposalType.UpgradeThreshold) return trigger(["newThreshold", "title", "description"]);
-    if (type === DAOProposalType.TokenTransfer) {
-      return currentDaoType === "multisig"
-        ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])
-        : trigger(["title", "description", "linkToDiscussion", "recipientAccountId", "tokenId", "amount"]);
+    switch (type) {
+      case DAOProposalType.Text:
+        return trigger(["title", "description", "linkToDiscussion"]);
+      case DAOProposalType.AddMember:
+        return trigger(["memberAddress", "newThreshold", "title", "description"]);
+      case DAOProposalType.RemoveMember:
+        return trigger(["newThreshold", "memberAddress", "title", "description"]);
+      case DAOProposalType.ReplaceMember:
+        return trigger(["memberAddress", "newMemberAddress", "title", "description"]);
+      case DAOProposalType.UpgradeThreshold:
+        return trigger(["newThreshold", "title", "description"]);
+      case DAOProposalType.ContractUpgrade:
+        return trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newProxyAddress"]);
+      case DAOProposalType.TokenTransfer: {
+        return currentDaoType === "multisig"
+          ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])
+          : trigger(["title", "description", "linkToDiscussion", "recipientAccountId", "tokenId", "amount"]);
+      }
+      default:
+        return Promise.resolve(true);
     }
-    return Promise.resolve(true);
   }
 
   if (daosQueryResults.isLoading) {
