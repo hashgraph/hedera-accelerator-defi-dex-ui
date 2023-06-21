@@ -1,21 +1,33 @@
 import { Button, Box, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
 import * as R from "ramda";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
+import { Paths } from "@routes";
+import { TokenTransferLocationState } from "@pages";
+import { HBARTokenSymbol } from "@services";
 
 export function AssetsList() {
+  const navigate = useNavigate();
+  const { accountId: daoAccountId = "" } = useParams();
   const { tokenBalances: assets, totalAssetValue } = useOutletContext<MultiSigDAODetailsContext>();
   // change to token id match
-  const hbarIndex = assets?.findIndex((asset) => asset.name === "HBAR");
+  const hbarIndex = assets?.findIndex((asset) => asset.name === HBARTokenSymbol);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const assetsWithHBARFirst: Asset[] = R.swap(0, hbarIndex, assets);
+
+  function handleSendTokenClicked(tokenId: string) {
+    navigate(`${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/new-proposal/token-transfer/details`, {
+      state: { tokenId },
+    } as TokenTransferLocationState);
+  }
+
   return (
     <>
-      <Text textStyle="p medium medium" marginBottom="1rem">
-        Total Value: {totalAssetValue} USD
-      </Text>
-      <Flex direction="row" minWidth="100%">
+      <Flex layerStyle="dao-dashboard__content-header">
+        <Text textStyle="p medium medium">Total Value: {totalAssetValue} USD</Text>
+      </Flex>
+      <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="2rem">
           {assetsWithHBARFirst.map((asset, index) => {
             const { name, tokenId, balance, symbol, value } = asset;
@@ -36,7 +48,9 @@ export function AssetsList() {
                     <HashScanLink id={tokenId} type={HashscanData.Token} />
                   </Box>
 
-                  <Button isDisabled={true}>Send</Button>
+                  <Button isDisabled={name === HBARTokenSymbol} onClick={() => handleSendTokenClicked(tokenId)}>
+                    Send
+                  </Button>
                 </Flex>
                 <Divider />
                 <Flex direction="row" justifyContent="space-between">

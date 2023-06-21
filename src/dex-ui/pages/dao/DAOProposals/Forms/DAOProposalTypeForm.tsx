@@ -4,7 +4,6 @@ import { Flex, useRadioGroup, Text, Box } from "@chakra-ui/react";
 import { CreateDAOProposalContext, CreateDAOProposalForm, DAOProposalType } from "../types";
 import {
   Color,
-  MessageIcon,
   NewTokenIcon,
   MemberIcon,
   RadioCard,
@@ -31,11 +30,6 @@ const MultiSigProposals = [
     icon: <TwoLayerSettingsIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
   {
-    title: DAOProposalType.UpgradeVotingDuration,
-    label: "Propose to upgrade the voting duration.",
-    icon: <TwoLayerSettingsIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
     title: DAOProposalType.AddMember,
     label: "Propose to add new member to the team.",
     icon: <MemberIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
@@ -49,11 +43,6 @@ const MultiSigProposals = [
     title: DAOProposalType.RemoveMember,
     label: "Propose to remove a member from the team.",
     icon: <MemberIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.Message,
-    label: "Create a generic message to the DAO members.",
-    icon: <MessageIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
 ];
 

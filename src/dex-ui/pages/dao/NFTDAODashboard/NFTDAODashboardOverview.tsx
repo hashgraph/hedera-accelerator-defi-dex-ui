@@ -8,7 +8,7 @@ export function NFTDAODashboardOverview() {
   const { dao, totalAssetValue, tokenCount } = useOutletContext<NFTDAODetailsContext>();
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   return (
-    <Flex gap="8" direction="column">
+    <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
       <Flex gap="4" direction="column">
         <Text textStyle="h4 medium">Overview</Text>
         <Grid templateColumns="repeat(2, 1fr)" gap={2}>

@@ -1,7 +1,6 @@
 import { Text, Flex, Box } from "@chakra-ui/react";
-import { ArrowLeftIcon, Breadcrumb, BreadcrumbText } from "@dex-ui-components";
+import { Breadcrumb, BreadcrumbText } from "@dex-ui-components";
 import { Paths } from "@routes";
-import { Link as ReachLink } from "react-router-dom";
 
 interface ProposalDetailsHeaderProps {
   daoAccountId: string;
@@ -19,10 +18,8 @@ export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
         </Box>
         <Flex>
           <Breadcrumb
-            to={`/daos/multisig/${daoAccountId}/${Paths.DAOs.Proposals}`}
-            as={ReachLink}
+            to={`/daos/${Paths.DAOs.Multisig}/${daoAccountId}/${Paths.DAOs.Proposals}`}
             label={"Back to Proposals"}
-            leftIcon={<ArrowLeftIcon options={{ w: 3, h: 3 }} />}
           />
         </Flex>
       </Flex>

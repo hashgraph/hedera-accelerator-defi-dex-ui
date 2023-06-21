@@ -26,27 +26,27 @@ export function DAODashboard(props: DAODashboardProps) {
   const navigate = useNavigate();
   const daoTabs = [
     {
-      icon: <LayoutIcon boxSize="5" />,
+      icon: <LayoutIcon boxSize="4" />,
       title: "Overview",
     },
     {
-      icon: <TransactionIcon boxSize="5" />,
+      icon: <TransactionIcon boxSize="4" />,
       title: "Proposals",
     },
     {
-      icon: <BoxIcon boxSize="5" />,
+      icon: <BoxIcon boxSize="4" />,
       title: "Assets",
     },
     {
-      icon: <LockIcon2 boxSize="5" />,
+      icon: <LockIcon2 boxSize="4" />,
       title: "Staking",
     },
     {
-      icon: <UsersIcon boxSize="5" />,
+      icon: <UsersIcon boxSize="4" />,
       title: "Members",
     },
     {
-      icon: <SettingsIcon boxSize="5" />,
+      icon: <SettingsIcon boxSize="4" />,
       title: "Settings",
     },
   ];
@@ -144,7 +144,7 @@ export function DAODashboard(props: DAODashboardProps) {
                     return (
                       <Tab key={index} tabIndex={index}>
                         <NavLink style={{ padding: "0.75rem 1.25rem" }} to={tab.title.toLowerCase()}>
-                          <Flex gap={2.5} alignContent="center" justifyContent="center">
+                          <Flex gap={2.5} alignItems="center" justifyContent="center">
                             {tab.icon}
                             <Box>{tab.title}</Box>
                           </Flex>
@@ -154,7 +154,7 @@ export function DAODashboard(props: DAODashboardProps) {
                   })}
                 </TabList>
               </Flex>
-              <Box bg={Color.Primary_Bg} padding="2rem 80px 16px" minHeight="80vh">
+              <Box bg={Color.Primary_Bg} minHeight="80vh">
                 {props.children}
               </Box>
             </Tabs>

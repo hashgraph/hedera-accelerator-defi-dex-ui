@@ -1,17 +1,8 @@
 import { Box, Button, Center, Flex, Spacer, Text, useRadioGroup } from "@chakra-ui/react";
 import { Paths } from "@routes";
 import { useRef } from "react";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
-import {
-  Breadcrumb,
-  ArrowLeftIcon,
-  Color,
-  RadioCard,
-  TextIcon,
-  TokenIcon,
-  TrendingUpIcon,
-  WalletIcon,
-} from "@dex-ui-components";
+import { useNavigate } from "react-router-dom";
+import { Breadcrumb, Color, RadioCard, TextIcon, TokenIcon, TrendingUpIcon, WalletIcon } from "@dex-ui-components";
 import { Page, PageHeader } from "@layouts";
 
 const newProposalOptions = [
@@ -60,14 +51,7 @@ export const CreateNewProposal = (props: any) => {
       header={
         <PageHeader
           leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
-          rightContent={[
-            <Breadcrumb
-              to={Paths.Governance.absolute}
-              as={ReachLink}
-              label="Back to Proposals"
-              leftIcon={<ArrowLeftIcon />}
-            />,
-          ]}
+          rightContent={[<Breadcrumb to={Paths.Governance.absolute} label="Back to Proposals" />]}
         />
       }
       body={

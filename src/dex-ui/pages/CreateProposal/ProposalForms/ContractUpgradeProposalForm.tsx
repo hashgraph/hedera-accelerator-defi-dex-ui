@@ -2,8 +2,8 @@ import { FormControl, Input, FormErrorMessage, Flex, Button, Spacer, Text, Box }
 import { WarningIcon } from "@chakra-ui/icons";
 import { ReactElement } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate, Link as ReachLink } from "react-router-dom";
-import { LoadingDialog, TextEditor, Breadcrumb, ArrowLeftIcon } from "@dex-ui-components";
+import { useNavigate } from "react-router-dom";
+import { LoadingDialog, TextEditor, Breadcrumb } from "@dex-ui-components";
 import { isValidUrl } from "@utils";
 import { ContractUpgradeProposalFormData, CreateProposalLocationProps } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -66,9 +66,7 @@ export function ContractUpgradeProposalForm(): ReactElement {
           rightContent={[
             <Breadcrumb
               to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
-              as={ReachLink}
               label="Back to Select Proposal Type"
-              leftIcon={<ArrowLeftIcon />}
             />,
           ]}
         />

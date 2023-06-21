@@ -6,6 +6,7 @@ interface CardListLayoutProps {
   tabFilters?: ReactNode;
   inputFilters?: ReactNode;
   cardLists?: ReactNode[];
+  cardListLayerStyles?: string;
   paginationComponent?: ReactNode;
 }
 
@@ -20,7 +21,7 @@ export function CardListLayout(props: CardListLayoutProps) {
         </Flex>
         <TabPanels>
           {props.cardLists?.map((cardList: ReactNode, index: number) => (
-            <TabPanel key={index} padding="1rem 0 0 0">
+            <TabPanel key={index} layerStyle={props.cardListLayerStyles}>
               <Flex direction="column" gap="2" minHeight="500px">
                 {cardList}
               </Flex>

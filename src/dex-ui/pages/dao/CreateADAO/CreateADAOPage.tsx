@@ -58,21 +58,21 @@ export function CreateADAOPage() {
 
   function GovernanceForm(): string {
     if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token`;
-    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/multi-sig`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}`;
     if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft`;
     return `${Paths.DAOs.absolute}`;
   }
 
   function VotingForm(): string {
     if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token/voting`;
-    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/multi-sig/voting`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}/voting`;
     if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft/voting`;
     return `${Paths.DAOs.absolute}`;
   }
 
   function ReviewForm(): string {
     if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token/review`;
-    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/multi-sig/review`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}/review`;
     if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft/review`;
     return `${Paths.DAOs.absolute}`;
   }

@@ -29,7 +29,7 @@ export function DAOsListPage() {
       }
       body={
         <CardGridLayout<DAO[]>
-          columns={3}
+          columns={{ md: 2, lg: 3 }}
           spacingX="3rem"
           spacingY="2rem"
           queryResult={daos}

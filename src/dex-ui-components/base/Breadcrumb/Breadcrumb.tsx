@@ -1,26 +1,28 @@
-import { Text, Breadcrumb as ChakraBreadcrumb, BreadcrumbItem, BreadcrumbLink, As, Flex } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import { Text, Link } from "@chakra-ui/react";
+import { Color } from "@dex-ui-components";
+import { Link as ReachLink } from "react-router-dom";
 
 interface BreadcrumbProps {
   to: string;
-  as: As | undefined;
   label: string;
-  leftIcon?: ReactNode;
 }
 
+// TODO: Change name - this component is not a Breadcrumb
 export function Breadcrumb(props: BreadcrumbProps) {
-  const { to, as, label, leftIcon } = props;
+  const { to, label } = props;
 
   return (
-    <ChakraBreadcrumb width="fit-content">
-      <BreadcrumbItem>
-        <BreadcrumbLink as={as} to={to}>
-          <Flex direction="row" alignItems="center" gap="2" width="fit-content">
-            {leftIcon}
-            <Text textStyle="p medium semibold link">{label}</Text>
-          </Flex>
-        </BreadcrumbLink>
-      </BreadcrumbItem>
-    </ChakraBreadcrumb>
+    <Link
+      as={ReachLink}
+      to={to}
+      _hover={{
+        textDecoration: "underline",
+        textDecorationColor: Color.Primary._500,
+      }}
+    >
+      <Text textStyle="p medium semibold link" _before={{ content: '"‹ "', fontSize: "20px" }}>
+        {label}
+      </Text>
+    </Link>
   );
 }

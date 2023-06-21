@@ -3,6 +3,7 @@ import { ProposalStatus, useDAOProposals, useTabFilters } from "@hooks";
 import { useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 import { ProposalCard } from "../ProposalCard";
+import { Flex } from "@chakra-ui/react";
 
 const transactionTabFilters = [[ProposalStatus.Pending], [ProposalStatus.Success, ProposalStatus.Failed]];
 const defaultTransactionFilters = [ProposalStatus.Pending, ProposalStatus.Success, ProposalStatus.Failed];
@@ -33,7 +34,12 @@ export function TransactionsList() {
     return (
       <CardListLayout
         onTabChange={handleTabChange}
-        tabFilters={<TabFilters filters={transactionTabs} />}
+        tabFilters={
+          <Flex layerStyle="dao-dashboard__content-header--with-tabs">
+            <TabFilters filters={transactionTabs} />
+          </Flex>
+        }
+        cardListLayerStyles="dao-dashboard__content-body"
         cardLists={[<></>, <></>].map(() =>
           transactions?.map((transaction, index) => <ProposalCard proposal={transaction} dao={dao} key={index} />)
         )}
