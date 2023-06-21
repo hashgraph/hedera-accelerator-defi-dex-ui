@@ -20,7 +20,7 @@ export function DAOCard(props: DAOCardProps) {
   }
 
   return (
-    <Card variant="dao-card" onClick={handleDAOCardClicked}>
+    <Card variant="dao-card" onClick={handleDAOCardClicked} cursor="pointer" _hover={{ bg: Color.Neutral._100 }}>
       <Grid
         templateRows="repeat(2, 1fr)"
         templateColumns="repeat(6, 1fr)"
@@ -41,7 +41,7 @@ export function DAOCard(props: DAOCardProps) {
         </GridItem>
         <GridItem colSpan={5}>
           <Flex height="100%">
-            <Text textStyle="b1" height="fit-content" alignSelf="end">
+            <Text textStyle="b1" alignSelf="end" isTruncated>
               {name}
             </Text>
           </Flex>

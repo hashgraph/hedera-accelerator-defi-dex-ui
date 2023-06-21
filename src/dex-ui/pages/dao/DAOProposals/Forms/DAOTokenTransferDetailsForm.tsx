@@ -1,16 +1,29 @@
 import { Text, Flex } from "@chakra-ui/react";
 import { HashScanLink, HashscanData, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { useOutletContext } from "react-router-dom";
-import { CreateDAOTokenTransferForm, CreateDAOProposalContext } from "../types";
+import { useLocation, useOutletContext } from "react-router-dom";
+import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@utils";
 
+export interface TokenTransferLocationState {
+  state: {
+    tokenId: string;
+  };
+}
+
 export function DAOTokenTransferDetailsForm() {
-  const { safeAccountId, daoType } = useOutletContext<CreateDAOProposalContext>();
+  const { state } = useLocation() as TokenTransferLocationState;
+  const { safeAccountId, daoType, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOTokenTransferForm>();
+
+  if (proposalType !== DAOProposalType.TokenTransfer) {
+    setValue("type", DAOProposalType.TokenTransfer);
+  }
+
   return (
     <Flex direction="column" gap="4" width="100%">
       <FormInput<"title">
@@ -90,6 +103,7 @@ export function DAOTokenTransferDetailsForm() {
               required: { value: true, message: "A token ID is required." },
             }),
           },
+          value: state?.tokenId,
         }}
         isInvalid={Boolean(errors?.tokenId)}
         errorMessage={errors?.tokenId && errors?.tokenId?.message}

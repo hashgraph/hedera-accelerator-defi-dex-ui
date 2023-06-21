@@ -13,7 +13,7 @@ import { DefaultMultiSigDAODetails } from "../types";
 
 export function ChangeThreshold() {
   const { accountId: daoAccountId = "" } = useParams();
-  const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
+  const backTo = `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
@@ -46,12 +46,12 @@ export function ChangeThreshold() {
   const steps = [
     {
       label: "Details",
-      route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/change-threshold/details`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${accountId}/settings/change-threshold/details`,
       validate: async () => trigger(["newThreshold", "description", "title"]),
     },
     {
       label: "Review",
-      route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/change-threshold/review`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${accountId}/settings/change-threshold/review`,
       isError,
       isLoading,
     },

@@ -57,4 +57,5 @@ export type CreateDAOProposalContext = {
   safeAccountId: string;
   threshold: number;
   membersCount: number;
+  proposalType: DAOProposalType;
 };

@@ -380,6 +380,7 @@ export function CreateDAOProposal() {
                   safeAccountId: transferFrom,
                   membersCount: ownerIds?.length ?? 0,
                   threshold,
+                  proposalType: type,
                 },
                 ...createDaoProposalForm,
               },

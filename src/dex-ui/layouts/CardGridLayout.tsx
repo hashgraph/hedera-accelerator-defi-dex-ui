@@ -6,7 +6,7 @@ import { NotFound } from "./NotFoundLayout";
 import { LoadingSpinnerLayout } from "./LoadingSpinnerLayout";
 
 interface CardGridLayoutProps<QueryResultDataType> extends PropsWithChildren {
-  columns: number;
+  columns: number | Record<string, number>;
   spacingX: string;
   spacingY: string;
   queryResult: UseQueryResult<QueryResultDataType, Error>;

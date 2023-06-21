@@ -1,8 +1,8 @@
 import { Button, Flex, FormControl, FormErrorMessage, Input, Spacer, Text, Box } from "@chakra-ui/react";
 import { ReactElement } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate, Link as ReachLink } from "react-router-dom";
-import { ArrowLeftIcon, TextEditor, Breadcrumb, LoadingDialog } from "@dex-ui-components";
+import { useNavigate } from "react-router-dom";
+import { TextEditor, Breadcrumb, LoadingDialog } from "@dex-ui-components";
 import { useCreateTokenTransferProposal } from "@hooks";
 import { Page, PageHeader } from "@layouts";
 import { isValidUrl } from "@utils";
@@ -71,9 +71,7 @@ export function TokenTransferProposalForm(): ReactElement {
           rightContent={[
             <Breadcrumb
               to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
-              as={ReachLink}
               label="Back to Select Proposal Type"
-              leftIcon={<ArrowLeftIcon />}
             />,
           ]}
         />

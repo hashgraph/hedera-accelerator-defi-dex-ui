@@ -13,7 +13,7 @@ import { DefaultMultiSigDAODetails } from "../types";
 
 export function AddMember() {
   const { accountId: daoAccountId = "" } = useParams();
-  const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
+  const backTo = `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
@@ -47,12 +47,12 @@ export function AddMember() {
   const steps = [
     {
       label: "Details",
-      route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/add-member/details`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${accountId}/settings/add-member/details`,
       validate: async () => trigger(["memberAddress", "newThreshold", "title", "description"]),
     },
     {
       label: "Review",
-      route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/add-member/review`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${accountId}/settings/add-member/review`,
       isError,
       isLoading,
     },

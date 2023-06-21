@@ -1,6 +1,6 @@
 import { Text, Flex, HStack, Button, Image, VStack } from "@chakra-ui/react";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData, Tag, DefaultLogoIcon } from "@dex-ui-components";
+import { useNavigate } from "react-router-dom";
+import { Breadcrumb, Color, HashScanLink, HashscanData, Tag, DefaultLogoIcon } from "@dex-ui-components";
 import { DAOType } from "@services";
 import { Paths } from "@routes";
 
@@ -56,7 +56,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
         </Flex>
         <Flex bg={Color.White_02} flexGrow="1" justifyContent="right" gap="8">
           <Flex height="40px" alignItems="center">
-            <Breadcrumb to="/daos" as={ReachLink} label="Back to DAOs" leftIcon={<ArrowLeftIcon />} />
+            <Breadcrumb to="/daos" label="Back to DAOs" />
           </Flex>
           <Button variant="primary" onClick={handleNewProposalClicked}>
             New Proposal

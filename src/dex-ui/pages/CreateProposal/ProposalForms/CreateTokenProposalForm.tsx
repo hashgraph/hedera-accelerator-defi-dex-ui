@@ -1,7 +1,7 @@
 import { FormControl, Input, Text, Flex, Box, Spacer, Button } from "@chakra-ui/react";
-import { Breadcrumb, ArrowLeftIcon } from "@dex-ui-components";
+import { Breadcrumb } from "@dex-ui-components";
 import { Page, PageHeader } from "@layouts";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Paths } from "@routes";
 
 /**
@@ -24,9 +24,7 @@ export function CreateTokenProposalForm() {
           rightContent={[
             <Breadcrumb
               to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
-              as={ReachLink}
               label="Back to Select Proposal Type"
-              leftIcon={<ArrowLeftIcon />}
             />,
           ]}
         />

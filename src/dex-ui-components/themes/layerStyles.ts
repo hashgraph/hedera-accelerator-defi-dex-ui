@@ -69,7 +69,6 @@ export const LayerStyles = {
     maxWidth: "550px",
     minWidth: "410px",
   },
-
   "dao-dashboard__card": {
     ...base,
     flexDirection: "column",
@@ -87,5 +86,25 @@ export const LayerStyles = {
     paddingTop: "1.5rem",
     paddingLeft: "5rem",
     paddingRight: "5rem",
+  },
+  "dao-dashboard__content-body": {
+    minWidth: "100%",
+    padding: "1rem 80px 16px",
+  },
+  "dao-dashboard__content-header": {
+    width: "100%",
+    height: "64px",
+    alignItems: "center",
+    padding: "1rem 80px 16px",
+    bg: Color.White,
+    borderBottom: `1px solid ${Color.Neutral._200}`,
+  },
+  "dao-dashboard__content-header--with-tabs": {
+    width: "100%",
+    height: "64px",
+    alignItems: "end",
+    padding: "0 80px 2px",
+    bg: Color.White,
+    borderBottom: `1px solid ${Color.Neutral._200}`,
   },
 };

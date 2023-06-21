@@ -1,7 +1,7 @@
 import { Button, Flex, FormControl, FormErrorMessage, Input, Spacer, Text, Box } from "@chakra-ui/react";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate, Link as ReachLink } from "react-router-dom";
-import { ArrowLeftIcon, TextEditor, Breadcrumb, LoadingDialog } from "@dex-ui-components";
+import { useNavigate } from "react-router-dom";
+import { TextEditor, Breadcrumb, LoadingDialog } from "@dex-ui-components";
 import { CreateProposalLocationProps, TextProposalFormData } from "./types";
 import { isValidUrl } from "@utils";
 import { Page, PageHeader } from "@layouts";
@@ -63,9 +63,7 @@ export function TextProposalForm() {
           rightContent={[
             <Breadcrumb
               to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
-              as={ReachLink}
               label="Back to Select Proposal Type"
-              leftIcon={<ArrowLeftIcon />}
             />,
           ]}
         />

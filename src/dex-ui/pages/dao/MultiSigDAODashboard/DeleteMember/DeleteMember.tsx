@@ -13,7 +13,7 @@ import { DefaultMultiSigDAODetails } from "../types";
 
 export function DeleteMember() {
   const { accountId: daoAccountId = "", memberId = "" } = useParams();
-  const backTo = `${Paths.DAOs.absolute}/multisig/${daoAccountId}/settings`;
+  const backTo = `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
@@ -46,12 +46,12 @@ export function DeleteMember() {
   const steps = [
     {
       label: "Details",
-      route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/delete-member/${memberId}/details`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${accountId}/settings/delete-member/${memberId}/details`,
       validate: async () => trigger(["newThreshold", "description", "title"]),
     },
     {
       label: "Review",
-      route: `${Paths.DAOs.absolute}/multisig/${accountId}/settings/delete-member/${memberId}/review`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${accountId}/settings/delete-member/${memberId}/review`,
       isError,
       isLoading,
     },

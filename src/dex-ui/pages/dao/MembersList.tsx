@@ -15,10 +15,10 @@ export function MembersList() {
 
   return (
     <>
-      <Text textStyle="p medium medium" marginBottom="1rem">
-        {memberCount} Members
-      </Text>
-      <Flex direction="row" minWidth="100%">
+      <Flex layerStyle="dao-dashboard__content-header">
+        <Text textStyle="p medium medium">{memberCount} Members</Text>
+      </Flex>
+      <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={3} spacingX="2rem" spacingY="2rem">
           {membersWithAdminFirst?.map((member, index) => {
             const { accountId } = member;
