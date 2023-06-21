@@ -1,9 +1,20 @@
 import { Text, Flex, HStack, Button, Image, VStack } from "@chakra-ui/react";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { Breadcrumb, ArrowLeftIcon, Color, HashScanLink, HashscanData, Tag, DefaultLogoIcon } from "@dex-ui-components";
+import {
+  Breadcrumb,
+  ArrowLeftIcon,
+  Color,
+  HashScanLink,
+  HashscanData,
+  Tag,
+  DefaultLogoIcon,
+  CheckRightIcon,
+} from "@dex-ui-components";
 import { DAOType } from "@services";
 
 interface DashboardHeaderProps {
+  isMember?: boolean;
+  isAdmin?: boolean;
   daoAccountId: string;
   govTokenId?: string;
   safeId?: string;
@@ -13,7 +24,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { daoAccountId, name, type, logoUrl, govTokenId, safeId } = props;
+  const { daoAccountId, name, type, logoUrl, govTokenId, safeId, isMember, isAdmin } = props;
   const navigate = useNavigate();
 
   return (
@@ -64,14 +75,24 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           <Flex height="40px" alignItems="center">
             <Breadcrumb to="/daos" as={ReachLink} label="Back to DAOs" leftIcon={<ArrowLeftIcon />} />
           </Flex>
-          <Button
-            variant="primary"
-            onClick={() => {
-              navigate("new-proposal");
-            }}
-          >
-            New Proposal
-          </Button>
+          <Flex direction="column" gap="0.6rem">
+            <Button
+              variant="primary"
+              onClick={() => {
+                navigate("new-proposal");
+              }}
+            >
+              New Proposal
+            </Button>
+            {isMember || isAdmin ? (
+              <Flex direction="row" justifyContent="right" gap="0.2rem" alignItems="center">
+                <Text textStyle="p small regular" color={Color.Neutral._500}>
+                  {isMember ? "Member" : "Admin"}
+                </Text>
+                <CheckRightIcon boxSize="4" color={Color.Neutral._500} />
+              </Flex>
+            ) : undefined}
+          </Flex>
         </Flex>
       </Flex>
     </Flex>

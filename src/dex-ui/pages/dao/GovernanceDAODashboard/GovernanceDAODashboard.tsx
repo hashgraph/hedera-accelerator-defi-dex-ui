@@ -1,6 +1,6 @@
 import { Outlet, useParams } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@services";
-import { TokenBalance, useAccountTokenBalances, useDAOs } from "@hooks";
+import { TokenBalance, useAccountTokenBalances, useDAOs, useTokenBalance, useDexContext } from "@hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 
@@ -11,8 +11,12 @@ export function GovernanceDAODashboard() {
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
 
   const accountTokenBalancesQueryResults = useAccountTokenBalances("");
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
-
+  const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
+  const isAdmin = dao?.adminId === walletId;
+  const isMember = daoGovTokenBalance > 0 && !isAdmin;
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
   const isError = daosQueryResults.isError || accountTokenBalancesQueryResults.isError;
@@ -34,6 +38,8 @@ export function GovernanceDAODashboard() {
     const totalAssetValue = tokenBalances?.reduce((total: number, token: TokenBalance) => total + token.value, 0);
     return (
       <DAODashboard
+        isMember={isMember}
+        isAdmin={isAdmin}
         dao={dao}
         isNotFound={isNotFound}
         isDAOFound={isDAOFound}

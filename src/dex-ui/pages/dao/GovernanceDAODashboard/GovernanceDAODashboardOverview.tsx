@@ -1,10 +1,12 @@
-import { Flex, Grid, GridItem, Text } from "@chakra-ui/react";
-import { Color, GlobeIcon, InstagramIcon, MetricLabel, TwitterIcon } from "@dex-ui-components";
+import { Flex, Grid, GridItem, Text, Link } from "@chakra-ui/react";
+import { Color, MetricLabel } from "@dex-ui-components";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./types";
+import { getDAOLinksRecordArray } from "../utils";
 
 export function GovernanceDAODashboardOverview() {
   const { dao, totalAssetValue, tokenCount } = useOutletContext<GovernanceDAODetailsContext>();
+  const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   return (
     <Flex gap="8" direction="column">
       <Flex gap="4" direction="column">
@@ -97,25 +99,28 @@ export function GovernanceDAODashboardOverview() {
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
               <Text textStyle="p medium semibold">About</Text>
-              <Text textStyle="p">{dao.name}</Text>
+              <Text textStyle="p small regular" color={Color.Neutral._700}>
+                {dao.description}
+              </Text>
             </Flex>
           </GridItem>
           <GridItem>
             <Flex layerStyle="dao-dashboard__card" gap={6}>
               <Text textStyle="p medium semibold">Social Channels</Text>
               <Flex direction="column" gap={2} justifyContent="space-between">
-                <Flex direction="row" gap={4}>
-                  <GlobeIcon color={Color.Grey_Blue._400} />
-                  <Text textStyle="p small regular"> Official website</Text>
-                </Flex>
-                <Flex direction="row" gap={4}>
-                  <InstagramIcon color={Color.Grey_Blue._400} />
-                  <Text textStyle="p small regular"> Official Instagram channel</Text>
-                </Flex>
-                <Flex direction="row" gap={4}>
-                  <TwitterIcon color={Color.Grey_Blue._400} />
-                  <Text textStyle="p small regular"> Official Twitter channel</Text>
-                </Flex>
+                {daoLinks.map((link, index) => {
+                  return (
+                    <Link
+                      key={index}
+                      textStyle="p small regular"
+                      color={Color.Neutral._700}
+                      href={link.value}
+                      isExternal
+                    >
+                      {link.value}
+                    </Link>
+                  );
+                })}
               </Flex>
             </Flex>
           </GridItem>

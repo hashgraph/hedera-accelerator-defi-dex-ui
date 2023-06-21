@@ -9,35 +9,10 @@ import { DashboardHeader } from "./DashboardHeader";
 import { Paths } from "@routes";
 import { VotingPower } from "../Governance/VotingPower";
 
-const daoNavigationTabs = [
-  {
-    icon: <LayoutIcon boxSize="5" />,
-    title: "Overview",
-  },
-  {
-    icon: <TransactionIcon boxSize="5" />,
-    title: "Proposals",
-  },
-  {
-    icon: <BoxIcon boxSize="5" />,
-    title: "Assets",
-  },
-  {
-    icon: <LockIcon2 boxSize="5" />,
-    title: "Staking",
-  },
-  {
-    icon: <UsersIcon boxSize="5" />,
-    title: "Members",
-  },
-  {
-    icon: <SettingsIcon boxSize="5" />,
-    title: "Settings",
-  },
-];
-
 interface DAODashboardProps extends PropsWithChildren {
   dao?: DAO;
+  isMember?: boolean;
+  isAdmin?: boolean;
   isNotFound: boolean;
   isDAOFound: boolean;
   isError: boolean;
@@ -47,17 +22,54 @@ interface DAODashboardProps extends PropsWithChildren {
 }
 
 export function DAODashboard(props: DAODashboardProps) {
-  const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess } = props;
-  const navigate = useNavigate();
-  const { accountId: daoAccountId = "" } = useParams();
-
   const location = useLocation();
-
+  const navigate = useNavigate();
+  const daoTabs = [
+    {
+      icon: <LayoutIcon boxSize="5" />,
+      title: "Overview",
+    },
+    {
+      icon: <TransactionIcon boxSize="5" />,
+      title: "Proposals",
+    },
+    {
+      icon: <BoxIcon boxSize="5" />,
+      title: "Assets",
+    },
+    {
+      icon: <LockIcon2 boxSize="5" />,
+      title: "Staking",
+    },
+    {
+      icon: <UsersIcon boxSize="5" />,
+      title: "Members",
+    },
+    {
+      icon: <SettingsIcon boxSize="5" />,
+      title: "Settings",
+    },
+  ];
+  const { accountId: daoAccountId = "" } = useParams();
+  const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin } = props;
+  const { type = "" } = dao ?? {};
   const currentTabNameByRoute = location.pathname.split("/").at(-1) ?? "";
+  const daoNavigationTabs = GetDAONavigationTabs();
   const tabIndexByRoute = daoNavigationTabs.map((tab) => tab.title.toLowerCase()).indexOf(currentTabNameByRoute);
-  const intialTabIndex = tabIndexByRoute === -1 ? 0 : tabIndexByRoute;
-  const { handleTabChange } = useTabFilters(intialTabIndex);
+  const initialTabIndex = tabIndexByRoute === -1 ? 0 : tabIndexByRoute;
+  const { handleTabChange } = useTabFilters(initialTabIndex);
 
+  function GetDAONavigationTabs() {
+    switch (type) {
+      case DAOType.MultiSig:
+        return daoTabs.filter((tab) => tab.title !== "Staking");
+      case DAOType.GovernanceToken:
+      case DAOType.NFT:
+        return daoTabs;
+      default:
+        return [];
+    }
+  }
   function onBackToDAOsLinkClick() {
     navigate(Paths.DAOs.absolute);
   }
@@ -104,6 +116,8 @@ export function DAODashboard(props: DAODashboardProps) {
         type={PageLayout.Dashboard}
         header={
           <DashboardHeader
+            isAdmin={isAdmin}
+            isMember={isMember}
             daoAccountId={accountId}
             name={name}
             type={type}
@@ -118,7 +132,7 @@ export function DAODashboard(props: DAODashboardProps) {
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
             ) : undefined}
             <Tabs
-              defaultIndex={intialTabIndex}
+              defaultIndex={initialTabIndex}
               onChange={handleTabChange}
               isLazy
               bg={Color.White_02}

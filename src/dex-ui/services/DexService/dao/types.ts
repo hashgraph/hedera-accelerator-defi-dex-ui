@@ -96,6 +96,14 @@ export interface MultiSigDAODetails {
   threshold: number;
 }
 
+export interface MultiSigDaoSettingForm {
+  name: string;
+  description: string;
+  logoUrl?: string;
+  isPublic?: boolean;
+  daoLinks: Record<"value", string>[];
+}
+
 export type DAO = MultiSigDAODetails | GovernanceDAODetails | NFTDAODetails;
 
 export enum DAOEvents {
