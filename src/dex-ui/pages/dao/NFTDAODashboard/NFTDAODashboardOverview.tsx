@@ -1,10 +1,12 @@
-import { Flex, Grid, GridItem, Text } from "@chakra-ui/react";
-import { Color, GlobeIcon, InstagramIcon, MetricLabel, TwitterIcon } from "@dex-ui-components";
+import { Flex, Grid, GridItem, Text, Link } from "@chakra-ui/react";
+import { Color, MetricLabel } from "@dex-ui-components";
 import { useOutletContext } from "react-router-dom";
 import { NFTDAODetailsContext } from "./types";
+import { getDAOLinksRecordArray } from "../utils";
 
 export function NFTDAODashboardOverview() {
   const { dao, totalAssetValue, tokenCount } = useOutletContext<NFTDAODetailsContext>();
+  const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   return (
     <Flex gap="8" direction="column">
       <Flex gap="4" direction="column">
@@ -126,7 +128,9 @@ export function NFTDAODashboardOverview() {
               gap="8"
             >
               <Text textStyle="p medium semibold">About</Text>
-              <Text textStyle="p">{dao.name}</Text>
+              <Text textStyle="p small regular" color={Color.Neutral._700}>
+                {dao.description}
+              </Text>
             </Flex>
           </GridItem>
           <GridItem>
@@ -143,18 +147,19 @@ export function NFTDAODashboardOverview() {
             >
               <Text textStyle="p medium semibold">Social Channels</Text>
               <Flex direction="column" gap={2} justifyContent="space-between">
-                <Flex direction="row" gap={4}>
-                  <GlobeIcon />
-                  <Text textStyle="p small regular"> Official website</Text>
-                </Flex>
-                <Flex direction="row" gap={4}>
-                  <InstagramIcon />
-                  <Text textStyle="p small regular"> Official Instagram channel</Text>
-                </Flex>
-                <Flex direction="row" gap={4}>
-                  <TwitterIcon />
-                  <Text textStyle="p small regular"> Official Twitter channel</Text>
-                </Flex>
+                {daoLinks.map((link, index) => {
+                  return (
+                    <Link
+                      key={index}
+                      textStyle="p small regular"
+                      color={Color.Neutral._700}
+                      href={link.value}
+                      isExternal
+                    >
+                      {link.value}
+                    </Link>
+                  );
+                })}
               </Flex>
             </Flex>
           </GridItem>

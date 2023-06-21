@@ -1,15 +1,23 @@
 import { Button, Divider, Flex, SimpleGrid, Text, IconButton, Image } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { useForm } from "react-hook-form";
-import { FormInput, RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon } from "@dex-ui-components";
+import { useFieldArray, useForm } from "react-hook-form";
+import {
+  FormInput,
+  RefreshIcon,
+  Color,
+  Tag,
+  CopyTextButton,
+  DefaultLogoIcon,
+  FormTextArea,
+  FormInputList,
+} from "@dex-ui-components";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./types";
-import { Member, MultiSigDAODetails } from "@services";
+import { Member, MultiSigDaoSettingForm } from "@services";
 import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
 import { isValidUrl } from "@utils";
 import { useNavigate, useOutletContext } from "react-router-dom";
-
-export type MultiSigDaoSettingForm = MultiSigDAODetails;
+import { getDAOLinksRecordArray } from "../utils";
 
 export function Settings() {
   const navigate = useNavigate();
@@ -18,25 +26,32 @@ export function Settings() {
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const membersWithAdminFirst: Member[] = R.swap(0, adminIndex, members);
-
+  const daoLinkRecords = getDAOLinksRecordArray(dao.webLinks);
   const multiSigDaoSettingsForm = useForm<MultiSigDaoSettingForm>({
     defaultValues: {
       ...dao,
+      daoLinks: daoLinkRecords,
     },
   });
 
   const {
     getValues,
     handleSubmit,
+    control,
     register,
     watch,
     formState: { errors },
   } = multiSigDaoSettingsForm;
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "daoLinks",
+  });
+
   watch("logoUrl");
   const { logoUrl } = getValues();
 
-  function onSubmit(data: MultiSigDAODetails) {
+  function onSubmit(data: MultiSigDaoSettingForm) {
     console.log("Details", data);
   }
 
@@ -196,6 +211,37 @@ export function Settings() {
               alt="Logo Url"
               fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
             />
+          </Flex>
+          <FormTextArea<"description">
+            textAreaProps={{
+              id: "description",
+              label: "Description",
+              placeholder: "Add a description for your DAO",
+              register: {
+                ...register("description", {
+                  required: { value: true, message: "A description is required." },
+                  validate: (value) => value.length <= 240 || "Maximum character count for the description is 240.",
+                }),
+              },
+            }}
+            isInvalid={Boolean(errors?.description)}
+            errorMessage={errors?.description && errors?.description?.message}
+          />
+          <Flex direction="column" marginBottom="0.25rem">
+            <Text textStyle="p small medium">Social</Text>
+            <SimpleGrid row={1} spacingX="1rem">
+              <FormInputList<MultiSigDaoSettingForm, "daoLinks">
+                fields={fields}
+                defaultFieldValue={{ value: "" }}
+                formPath="daoLinks"
+                fieldPlaceholder="Enter URL"
+                fieldLabel=""
+                fieldButtonText="+ Add Link"
+                append={append}
+                remove={remove}
+                register={register}
+              />
+            </SimpleGrid>
           </Flex>
           <Divider marginBottom="0.4rem" />
           <Button

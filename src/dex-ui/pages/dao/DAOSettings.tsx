@@ -6,13 +6,16 @@ import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
 import { DAOSettingsForm } from "./CreateADAO/types";
+import { getDAOLinksRecordArray } from "./utils";
 
 export function DAOSettings() {
   const { dao } = useOutletContext<GovernanceDAODetailsContext>();
+  const daoLinkRecords = getDAOLinksRecordArray(dao.webLinks);
 
   const daoSettingsForm = useForm<DAOSettingsForm>({
     defaultValues: {
       ...dao,
+      daoLinks: daoLinkRecords,
     },
   });
 
@@ -177,20 +180,22 @@ export function DAOSettings() {
             isInvalid={Boolean(errors.description)}
             errorMessage={errors.description && errors.description.message}
           />
-          <Text textStyle="p small medium">Social</Text>
-          <SimpleGrid row={1} spacingX="1rem">
-            <FormInputList<DAOSettingsForm, "daoLinks">
-              fields={fields}
-              defaultFieldValue={{ value: "" }}
-              formPath="daoLinks"
-              fieldPlaceholder="Enter URL"
-              fieldLabel=""
-              fieldButtonText="+ Add Link"
-              append={append}
-              remove={remove}
-              register={register}
-            />
-          </SimpleGrid>
+          <Flex direction="column" marginBottom="0.25rem">
+            <Text textStyle="p small medium">Social</Text>
+            <SimpleGrid row={1} spacingX="1rem">
+              <FormInputList<DAOSettingsForm, "daoLinks">
+                fields={fields}
+                defaultFieldValue={{ value: "" }}
+                formPath="daoLinks"
+                fieldPlaceholder="Enter URL"
+                fieldLabel=""
+                fieldButtonText="+ Add Link"
+                append={append}
+                remove={remove}
+                register={register}
+              />
+            </SimpleGrid>
+          </Flex>
           <Divider marginBottom="0.4rem" />
           <Button
             type="submit"
