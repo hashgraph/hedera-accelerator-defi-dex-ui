@@ -132,3 +132,7 @@ export interface Member {
   logo: string;
   accountId: string;
 }
+
+export type DAODetailsContext = {
+  dao: DAO;
+};
