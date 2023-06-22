@@ -1,9 +1,9 @@
 import { CardListLayout, ErrorLayout, LoadingSpinnerLayout, TabFilters } from "@layouts";
 import { ProposalStatus, useDAOProposals, useTabFilters } from "@hooks";
 import { useOutletContext } from "react-router-dom";
-import { MultiSigDAODetailsContext } from "./types";
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
+import { DAODetailsContext, DAOType } from "@services";
 
 const transactionTabFilters = [[ProposalStatus.Pending], [ProposalStatus.Success, ProposalStatus.Failed]];
 const defaultTransactionFilters = [ProposalStatus.Pending, ProposalStatus.Success, ProposalStatus.Failed];
@@ -14,12 +14,30 @@ const transactionTabs = [
 ];
 
 export function TransactionsList() {
-  const { dao } = useOutletContext<MultiSigDAODetailsContext>();
-  const { accountId: daoAccountId, safeId: safeAccountId } = dao;
+  const { dao } = useOutletContext<DAODetailsContext>();
+  const { accountId: daoAccountId } = dao;
+  // TODO: fetch dao keys for proposal for each doa types by typecasting and use respective proposal hook.
+  let safeAccountId = "";
+  let tokenId = "";
+  let governanceAddress = "";
+  if (dao.type === DAOType.MultiSig) {
+    safeAccountId = dao.safeId;
+  } else if (dao.type === DAOType.GovernanceToken) {
+    tokenId = dao.tokenId;
+    governanceAddress = dao.governanceAddress;
+  }
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  const daoTransactionsQueryResults = useDAOProposals(daoAccountId, dao.type, safeAccountId, transactionFilters);
+  // TODO: break dao proposal hooks for each doa types.
+  const daoTransactionsQueryResults = useDAOProposals(
+    daoAccountId,
+    dao.type,
+    safeAccountId,
+    transactionFilters,
+    governanceAddress,
+    tokenId
+  );
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
 
   if (isError) {

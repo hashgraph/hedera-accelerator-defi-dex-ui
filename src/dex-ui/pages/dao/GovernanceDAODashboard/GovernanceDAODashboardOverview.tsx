@@ -1,5 +1,6 @@
 import { Flex, Grid, GridItem, Text, Link } from "@chakra-ui/react";
 import { Color, MetricLabel } from "@dex-ui-components";
+import { convertFromBlocksToDays } from "@utils";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
@@ -63,7 +64,7 @@ export function GovernanceDAODashboardOverview() {
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
-                  value={dao.votingPeriod}
+                  value={convertFromBlocksToDays(dao.votingPeriod)}
                   valueStyle="p large semibold"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="days"
@@ -75,7 +76,7 @@ export function GovernanceDAODashboardOverview() {
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
-                  value={dao.votingDelay}
+                  value={convertFromBlocksToDays(dao.votingDelay)}
                   valueStyle="p large semibold"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="days"

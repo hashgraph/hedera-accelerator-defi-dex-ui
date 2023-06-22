@@ -23,7 +23,7 @@ export function TransactionCard(props: TransactionCardProps) {
   const transactionStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
 
   function handleTransactionCardClicked() {
-    navigate(transactionHash);
+    transactionHash && navigate(transactionHash);
   }
 
   return (

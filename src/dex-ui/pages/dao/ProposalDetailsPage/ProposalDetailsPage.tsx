@@ -105,12 +105,12 @@ export function ProposalDetailsPage() {
               type={type}
               approvers={approvers}
               approvalCount={approvalCount}
-              transactionHash={transactionHash}
+              transactionHash={transactionHash ?? ""}
             />
           </Flex>
         </GridItem>
         <GridItem colSpan={1}>
-          {isMultiSigProposal ? (
+          {isMultiSigProposal && transactionHash ? (
             <ProposalConfirmationDetails
               safeId={safeId}
               approvalCount={approvalCount}

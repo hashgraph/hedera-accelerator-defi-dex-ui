@@ -15,6 +15,7 @@ import { TransactionResponse } from "@hashgraph/sdk";
 import { Paths } from "@routes";
 import { DAOType } from "@services";
 import { Wizard } from "@components";
+import { convertFromDaysToBlocks } from "@utils";
 
 export function CreateADAOPage() {
   const backTo = `${Paths.DAOs.absolute}`;
@@ -150,8 +151,8 @@ export function CreateADAOPage() {
             ? governance?.newToken?.treasuryWalletAccountId ?? ""
             : governance?.existingToken?.treasuryWalletAccountId ?? "",
         quorum: voting?.quorum ?? 0,
-        votingDuration: voting?.duration ?? 0,
-        lockingDuration: voting?.lockingPeriod ?? 0,
+        votingDuration: convertFromDaysToBlocks(voting?.duration ?? 0),
+        lockingDuration: convertFromDaysToBlocks(voting?.lockingPeriod ?? 0),
       });
     }
     if (data.type === DAOType.MultiSig) {
@@ -184,8 +185,8 @@ export function CreateADAOPage() {
         tokenId: governance.nft.id,
         treasuryWalletAccountId: governance.nft.treasuryWalletAccountId,
         quorum: voting.quorum,
-        votingDuration: voting.duration,
-        lockingDuration: voting.lockingPeriod,
+        votingDuration: convertFromDaysToBlocks(voting.duration),
+        lockingDuration: convertFromDaysToBlocks(voting.lockingPeriod),
       });
     }
   }

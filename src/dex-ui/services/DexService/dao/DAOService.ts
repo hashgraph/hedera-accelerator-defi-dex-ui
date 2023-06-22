@@ -1,8 +1,13 @@
 import { ethers } from "ethers";
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters } from "@hashgraph/sdk";
-import { DexService } from "@services";
-import { Contracts, Gas } from "../../constants";
+import {
+  convertEthersBigNumberToBigNumberJS,
+  DexService,
+  MirrorNodeDecodedProposalEvent,
+  solidityAddressToTokenIdString,
+} from "@services";
+import { Contracts, DEX_TOKEN_PRECISION_VALUE, Gas } from "../../constants";
 import { getEventArgumentsByName } from "../../utils";
 import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
@@ -25,6 +30,10 @@ import {
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "@dex-ui/services/HederaService/utils";
 import { convertToByte32 } from "@utils";
+import { ProposalType } from "@dex-ui/hooks";
+import { getFulfilledResultsData } from "@services/MirrorNodeService/utils";
+import { ProposalData } from "../governance/type";
+import { isNil } from "ramda";
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
   const logs = await DexService.fetchParsedEventLogs(
@@ -208,25 +217,66 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
   return parsedEventsWithData;
 }
 
-export async function fetchGovernanceDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
-  const contractInterface = new ethers.utils.Interface(GovernorTokenDAOJSON.abi);
-  const abiCoder = ethers.utils.defaultAbiCoder;
-  const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
+export async function fetchGovernanceDAOLogs(governanceAddress: string): Promise<ProposalData[]> {
+  const DefaultTokenTransferDetails = {
+    transferFromAccount: undefined,
+    transferToAccount: undefined,
+    tokenToTransfer: undefined,
+    transferTokenAmount: undefined,
+  };
 
-  const parsedEventsWithData = parsedEvents.map((event) => {
-    if (event.name === DAOEvents.TransactionCreated) {
-      const parsedData = abiCoder.decode(
-        ["address token", "address receiver", "uint256 amount"],
-        ethers.utils.hexDataSlice(event.args.info.data, 4)
-      );
-      const eventClone: ethers.utils.LogDescription = structuredClone(event);
-      eventClone.args.info.data = parsedData;
-      eventClone.args.info.hexStringData = event.args.info.data;
-      return eventClone;
-    }
-    return event;
-  });
-  return parsedEventsWithData;
+  const getTokenTransferDetailsFromHexData = (data: string | undefined) => {
+    if (isNil(data)) return { ...DefaultTokenTransferDetails };
+    const abiCoder = ethers.utils.defaultAbiCoder;
+    const parsedData = abiCoder.decode(
+      [
+        "address transferFromAccount",
+        "address transferToAccount",
+        "address tokenToTransfer",
+        "uint256 transferTokenAmount",
+      ],
+      data
+    );
+    return {
+      transferFromAccount: solidityAddressToTokenIdString(parsedData.transferFromAccount),
+      transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+      tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
+      transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount)
+        .shiftedBy(-DEX_TOKEN_PRECISION_VALUE)
+        .toNumber(),
+    };
+  };
+  const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
+    const proposalEventsResults = await Promise.allSettled([
+      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governanceAddress),
+    ]);
+    return getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
+  };
+
+  const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
+    const proposalEventsWithDetailsResults = await Promise.allSettled(
+      proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
+        const proposalDetails = await DexService.fetchProposalDetails(
+          proposalEvent.contractId,
+          proposalEvent.proposalId
+        );
+        const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
+        /**
+         * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
+         * proposalDetails should override the same field found in the proposalEvent.
+         */
+        return { ...proposalEvent, ...proposalDetails, ...tokenTransferDetails };
+      })
+    );
+    const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {
+      return event.status === "fulfilled" ? event.value : undefined;
+    });
+    return proposalEventsWithDetails;
+  };
+
+  const proposalEvents = await fetchDAOProposalEvents();
+  const proposalDetails = await fetchDAOProposalData(proposalEvents);
+  return proposalDetails;
 }
 
 export async function fetchNFTDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {

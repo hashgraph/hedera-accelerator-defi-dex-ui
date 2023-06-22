@@ -16,12 +16,14 @@ interface ProposalCardProps {
 
 export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal, dao, showTitle, showTypeTag } = props;
+
   const navigate = useNavigate();
 
   const isMultiSig = dao.type === DAOType.MultiSig;
+  const isGovernance = dao.type === DAOType.GovernanceToken;
   const timeRemaining = "";
   const votingEndTime = "";
-  const { amount, token, transactionHash } = proposal;
+  const { amount, token, transactionHash, proposalId } = proposal;
   let membersCount = 0;
   if (isMultiSig) {
     membersCount = [dao.adminId, ...dao.ownerIds].length;
@@ -49,8 +51,16 @@ export const ProposalCard = (props: ProposalCardProps) => {
     </Flex>
   );
 
+  const goToProposalDetails = () => {
+    if (transactionHash) {
+      navigate(transactionHash);
+    } else if (proposalId) {
+      navigate(proposalId);
+    }
+  };
+
   return (
-    <Card onClick={() => navigate(transactionHash)}>
+    <Card onClick={goToProposalDetails}>
       <Flex direction="column">
         {showTitle && (
           <>
@@ -86,7 +96,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
             <Text textStyle="p small regular" color={Color.Neutral._700} textAlign="start">
               {getShortDescription(proposal.description)}
             </Text>
-            {proposal.link && (
+            {proposal.link && proposal.type !== ProposalType.TokenTransfer && (
               <Text textStyle="p small regular" color={Color.Grey_Blue._400} textAlign="start">
                 {proposal.link}
               </Text>
@@ -125,6 +135,19 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     {`Transaction threshold confirmation changes to ${proposal.threshold}
                  / ${membersCount} members.`}
                   </Text>
+                )}
+              </>
+            )}
+            {isGovernance && (
+              <>
+                {proposal.type === ProposalType.TokenTransfer && (
+                  <Flex alignItems="center">
+                    <HederaIcon />
+                    <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
+                    <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
+                      {amount} {tokenSymbol}
+                    </Text>
+                  </Flex>
                 )}
               </>
             )}
