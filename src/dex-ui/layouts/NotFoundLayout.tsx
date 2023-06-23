@@ -1,7 +1,9 @@
-import { Text, Box, Flex, Link } from "@chakra-ui/react";
+import { Text, Flex, Link, Box } from "@chakra-ui/react";
 import { Color } from "@dex-ui-components";
-
+import { ReactElement } from "react";
+import { Link as ReachLink } from "react-router-dom";
 interface NotFoundProps {
+  icon?: ReactElement;
   message: string;
   preLinkText?: string;
   linkText?: string;
@@ -9,20 +11,21 @@ interface NotFoundProps {
 }
 
 export function NotFound(props: NotFoundProps) {
-  const { message, preLinkText, onLinkClick, linkText } = props;
+  const { icon, message, preLinkText, onLinkClick, linkText } = props;
   return (
-    <Flex width="100%" height="70vh" bg={Color.Primary_Bg} justifyContent="center" alignItems="center">
-      <Box width="fit-content" margin="auto">
+    <Flex width="100%" height="100%" flex="1" bg={Color.Primary_Bg} justifyContent="center" alignItems="center">
+      <Flex direction="column" width="fit-content" margin="auto" alignItems="center">
+        <Box marginBottom="1rem">{icon}</Box>
         <Text textStyle="h3" marginBottom="0.5rem">
           {message}
         </Text>
         <Flex alignItems="center">
-          <Text textStyle="b2">{preLinkText}</Text>
-          <Link color={Color.Teal_01} onClick={onLinkClick}>
-            <Text variant="link">{linkText}</Text>
+          <Text textStyle="p small regular">{preLinkText}</Text>
+          <Link as={ReachLink} textStyle="p small regular link" color={Color.Primary._500} onClick={onLinkClick}>
+            {linkText}
           </Link>
         </Flex>
-      </Box>
+      </Flex>
     </Flex>
   );
 }

@@ -11,22 +11,11 @@ import {
   ListItem,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { useFieldArray, useForm } from "react-hook-form";
-import {
-  FormInput,
-  RefreshIcon,
-  Color,
-  Tag,
-  CopyTextButton,
-  DefaultLogoIcon,
-  FormTextArea,
-  FormInputList,
-} from "@dex-ui-components";
+import { RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon } from "@dex-ui-components";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./types";
-import { Member, MultiSigDaoSettingForm } from "@services";
+import { Member } from "@services";
 import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
-import { isValidUrl } from "@utils";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { getDAOLinksRecordArray } from "../utils";
 import { Link as ReachLink } from "react-router-dom";
@@ -38,34 +27,7 @@ export function Settings() {
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const membersWithAdminFirst: Member[] = R.swap(0, adminIndex, members);
-  const daoLinkRecords = getDAOLinksRecordArray(dao.webLinks);
-  const multiSigDaoSettingsForm = useForm<MultiSigDaoSettingForm>({
-    defaultValues: {
-      ...dao,
-      daoLinks: daoLinkRecords,
-    },
-  });
-
-  const {
-    getValues,
-    handleSubmit,
-    control,
-    register,
-    watch,
-    formState: { errors },
-  } = multiSigDaoSettingsForm;
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "daoLinks",
-  });
-
-  /*  watch("logoUrl");
-  const { logoUrl } = getValues(); */
-
-  function onSubmit(data: MultiSigDaoSettingForm) {
-    console.log("Details", data);
-  }
+  const daoLinkRecords = getDAOLinksRecordArray(webLinks);
 
   function handleCopyMemberId() {
     console.log("copy text to clipboard");
