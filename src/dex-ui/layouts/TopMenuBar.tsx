@@ -33,7 +33,7 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
               return (
                 <Box flex="1" key={index}>
                   <NavLink key={menuOption} to={`${menuOption.toLowerCase()}`}>
-                    <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Grey_01 }}>
+                    <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Neutral._100 }}>
                       <Text textStyle="p medium medium">{menuOption}</Text>
                     </MenuItem>
                   </NavLink>
