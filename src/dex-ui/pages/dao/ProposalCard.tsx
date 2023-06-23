@@ -62,7 +62,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
   };
 
   return (
-    <Card onClick={goToProposalDetails}>
+    <Card onClick={goToProposalDetails} cursor="pointer" _hover={{ bg: Color.Neutral._100 }}>
       <Flex direction="column">
         {showTitle && (
           <>
@@ -84,7 +84,6 @@ export const ProposalCard = (props: ProposalCardProps) => {
             <Divider marginY="1rem" />
           </>
         )}
-
         <Flex justifyContent="space-between">
           <Flex direction="column" alignItems="flex-start" gap={2}>
             <Text
