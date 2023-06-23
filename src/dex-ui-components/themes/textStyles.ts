@@ -326,6 +326,11 @@ export const TextStyles = {
     _before: { content: `"("` },
     _after: { content: `")"` },
   },
+  "p small regular link": {
+    ...baseStyles.p_small,
+    ...baseStyles.link,
+    fontWeight: fontWeight.Regular,
+  },
   /**
    * Paragraph
    * Size: XSmall

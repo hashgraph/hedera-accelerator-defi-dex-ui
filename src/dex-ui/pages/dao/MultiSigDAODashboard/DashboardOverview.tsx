@@ -1,6 +1,6 @@
-import { Flex, Text, Grid, GridItem, Link } from "@chakra-ui/react";
+import { Flex, Text, Grid, GridItem, Link, ListItem, UnorderedList } from "@chakra-ui/react";
 import { Color, MetricLabel } from "@dex-ui-components";
-import { useOutletContext } from "react-router-dom";
+import { Link as ReachLink, useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
 
@@ -48,19 +48,24 @@ export function DashboardOverview() {
             <Flex layerStyle="dao-dashboard__card">
               <Text textStyle="p medium semibold">Social Channels</Text>
               <Flex direction="column" gap={2} justifyContent="space-between">
-                {daoLinks.map((link, index) => {
-                  return (
-                    <Link
-                      key={index}
-                      textStyle="p small regular"
-                      color={Color.Neutral._700}
-                      href={link.value}
-                      isExternal
-                    >
-                      {link.value}
-                    </Link>
-                  );
-                })}
+                <UnorderedList>
+                  {daoLinks.map((link, index) => {
+                    return (
+                      <ListItem>
+                        <Link
+                          key={index}
+                          as={ReachLink}
+                          textStyle="p small regular link"
+                          color={Color.Primary._500}
+                          to={link.value}
+                          isExternal
+                        >
+                          {link.value}
+                        </Link>
+                      </ListItem>
+                    );
+                  })}
+                </UnorderedList>
               </Flex>
             </Flex>
           </GridItem>
