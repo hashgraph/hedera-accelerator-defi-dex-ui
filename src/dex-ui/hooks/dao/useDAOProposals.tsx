@@ -48,6 +48,7 @@ interface Votes {
 }
 
 export interface Proposal {
+  id: number;
   nonce: number;
   transactionHash?: string;
   amount: number;
@@ -188,6 +189,7 @@ export function useDAOProposals(
 
   const convertDataToProposal = (
     proposalData: ProposalData,
+    index: number,
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
   ): Proposal => {
@@ -195,6 +197,7 @@ export function useDAOProposals(
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);
     return {
+      id: index,
       timeRemaining:
         !isNil(proposalData.startBlock) && !isNil(proposalData.endBlock)
           ? getTimeRemaining(proposalData.startBlock, proposalData.endBlock).toString()
@@ -238,7 +241,7 @@ export function useDAOProposals(
         const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
         const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
         const proposals: Proposal[] = await Promise.all(
-          groupedProposalEntries.map(async ([transactionHash, proposalLogs]) => {
+          groupedProposalEntries.map(async ([transactionHash, proposalLogs], index) => {
             const proposalInfo: any = proposalLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
             const {
               nonce,
@@ -265,6 +268,7 @@ export function useDAOProposals(
             }
             const tokenData = await tokenDataCache.get(tokenId);
             return {
+              id: index,
               nonce: nonce ? BigNumber.from(nonce).toNumber() : 0,
               amount: amount
                 ? convertEthersBigNumberToBigNumberJS(amount).shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber()
@@ -300,7 +304,7 @@ export function useDAOProposals(
         ]);
         const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
         const proposals = await Promise.all(
-          data[0].map(async (proposal) => {
+          data[0].map(async (proposal, index) => {
             const tokenId = proposal.tokenToTransfer;
             let tokenData;
             if (tokenId) {
@@ -309,7 +313,7 @@ export function useDAOProposals(
               }
               tokenData = await tokenDataCache.get(tokenId);
             }
-            return convertDataToProposal(proposal, data[1], tokenData);
+            return convertDataToProposal(proposal, index, data[1], tokenData);
           })
         );
         return proposals;

@@ -1,11 +1,12 @@
 import { Text, Flex, Image, Divider } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { getShortDescription } from "@utils";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getShortDescription, replaceLastRoute } from "@utils";
 import { Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@dex-ui-components";
 import { DAO, DAOType } from "@services";
 import { ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
 import { Proposal, ProposalType } from "@hooks";
+import { Paths } from "@dex-ui/routes";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -18,6 +19,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal, dao, showTitle, showTypeTag } = props;
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isMultiSig = dao.type === DAOType.MultiSig;
   const isGovernance = dao.type === DAOType.GovernanceToken;
@@ -53,9 +55,9 @@ export const ProposalCard = (props: ProposalCardProps) => {
 
   const goToProposalDetails = () => {
     if (transactionHash) {
-      navigate(transactionHash);
+      navigate(replaceLastRoute(location.pathname, `${Paths.DAOs.Proposals}/${transactionHash}`));
     } else if (proposalId) {
-      navigate(proposalId);
+      navigate(replaceLastRoute(location.pathname, `${Paths.DAOs.Proposals}/${proposalId}`));
     }
   };
 

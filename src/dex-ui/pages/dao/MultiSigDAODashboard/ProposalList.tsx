@@ -13,7 +13,7 @@ const transactionTabs = [
   { name: "History", filter: [] },
 ];
 
-export function TransactionsList() {
+export function ProposalList() {
   const { dao } = useOutletContext<DAODetailsContext>();
   const { accountId: daoAccountId } = dao;
   // TODO: fetch dao keys for proposal for each doa types by typecasting and use respective proposal hook.
@@ -29,7 +29,7 @@ export function TransactionsList() {
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  // TODO: break dao proposal hooks for each doa types.
+  // TODO: break dao proposal hooks for each dao types.
   const daoTransactionsQueryResults = useDAOProposals(
     daoAccountId,
     dao.type,
