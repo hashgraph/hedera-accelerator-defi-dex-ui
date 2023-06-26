@@ -9,4 +9,6 @@ export * from "./useCreateChangeThresholdProposal";
 export * from "./useApproveProposal";
 export * from "./useExecuteProposal";
 export * from "./useCreateDAOTokenTransferProposal";
+export * from "./useCreateDAOUpgradeProposal";
+export * from "./useCreateDAOTextProposal";
 export * from "./types";

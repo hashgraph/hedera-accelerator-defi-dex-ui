@@ -24,7 +24,8 @@ export function ProposalList() {
     safeAccountId = dao.safeId;
   } else if (dao.type === DAOType.GovernanceToken) {
     tokenId = dao.tokenId;
-    governanceAddress = dao.governanceAddress;
+    //TODO: For Future Proposals Card PR, send all governors contract for fetching all proposal
+    governanceAddress = dao.governors.tokenTransferLogic;
   }
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;

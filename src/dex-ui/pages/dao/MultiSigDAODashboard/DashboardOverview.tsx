@@ -21,7 +21,6 @@ export function DashboardOverview() {
   const thresholdDisplay = `${String(threshold)} / ${String(ownerCount)}`;
   const daoTransactionsQueryResults = useDAOProposals(accountId, type, safeId);
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
-
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
 
   function handleClickCreateProposal() {

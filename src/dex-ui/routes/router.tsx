@@ -116,7 +116,7 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<Settings />} />
         </Route>
-        <Route path={"governance-token/:accountId"} element={<GovernanceDAODashboard />}>
+        <Route path={`${Paths.DAOs.GovernanceToken}/:accountId`} element={<GovernanceDAODashboard />}>
           <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
           <Route path={Paths.DAOs.Overview} element={<GovernanceDAODashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<ProposalList />} />
@@ -125,7 +125,7 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
         </Route>
-        <Route path={"nft/:accountId"} element={<NFTDAODashboard />}>
+        <Route path={`${Paths.DAOs.NFT}/:accountId`} element={<NFTDAODashboard />}>
           <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
           <Route path={Paths.DAOs.Overview} element={<NFTDAODashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<ProposalList />} />
@@ -134,15 +134,17 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
         </Route>
-        <Route path="governance-token/:accountId/new-proposal" element={<CreateDAOProposal />}>
+        <Route path={`${Paths.DAOs.GovernanceToken}/:accountId/new-proposal`} element={<CreateDAOProposal />}>
           <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
           <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
           <Route path={Paths.DAOs.DAOContractUpgradeDetails} element={<DAOContractUpgradeDetailsForm />} />
           <Route path={Paths.DAOs.DAOContractUpgradeReview} element={<DAOContractUpgradeReviewForm />} />
+          <Route path={Paths.DAOs.DAOTextProposalDetails} element={<DAOTextProposalDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTextProposalReview} element={<DAOTextProposalReviewForm />} />
         </Route>
-        <Route path="nft/:accountId/new-proposal" element={<CreateDAOProposal />}>
+        <Route path={`${Paths.DAOs.NFT}/:accountId/new-proposal`} element={<CreateDAOProposal />}>
           <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
           <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />

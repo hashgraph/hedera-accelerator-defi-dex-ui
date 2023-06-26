@@ -1,12 +1,12 @@
 import { Divider, Flex, Text } from "@chakra-ui/react";
 import { Color, CopyTextButton } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateDAOContractUpgradeForm } from "../types";
+import { CreateDAOTextProposalForm } from "../types";
 import { useDexContext } from "@hooks";
 
-export function DAOContractUpgradeReviewForm() {
-  const { getValues } = useFormContext<CreateDAOContractUpgradeForm>();
-  const { title, description, linkToDiscussion, newImplementationAddress, oldProxyAddress } = getValues();
+export function DAOTextProposalReviewForm() {
+  const { getValues } = useFormContext<CreateDAOTextProposalForm>();
+  const { title, description, linkToDiscussion } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
 
@@ -34,20 +34,6 @@ export function DAOContractUpgradeReviewForm() {
         <Text textStyle="p small medium">Link to Discussion</Text>
         <Text textStyle="p small regular" color={Color.Neutral._700}>
           {linkToDiscussion}
-        </Text>
-      </Flex>
-      <Divider />
-      <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">New Implementation Address</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {newImplementationAddress}
-        </Text>
-      </Flex>
-      <Divider />
-      <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">Proxy Address</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {oldProxyAddress}
         </Text>
       </Flex>
       <Divider />

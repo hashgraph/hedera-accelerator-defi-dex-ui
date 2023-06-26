@@ -56,20 +56,20 @@ export function DAOContractUpgradeDetailsForm() {
         isInvalid={Boolean(errors?.linkToDiscussion)}
         errorMessage={errors?.linkToDiscussion && errors?.linkToDiscussion?.message}
       />
-      <FormInput<"newProxyAddress">
+      <FormInput<"newImplementationAddress">
         inputProps={{
           id: "newProxyAddress",
           label: "New implementation address",
           type: "text",
           placeholder: "Enter Implementation address",
           register: {
-            ...register("newProxyAddress", {
+            ...register("newImplementationAddress", {
               required: { value: true, message: "New implementation address is required." },
             }),
           },
         }}
-        isInvalid={Boolean(errors?.newProxyAddress)}
-        errorMessage={errors?.newProxyAddress && errors?.newProxyAddress?.message}
+        isInvalid={Boolean(errors?.newImplementationAddress)}
+        errorMessage={errors?.newImplementationAddress && errors?.newImplementationAddress?.message}
       />
       <FormInput<"oldProxyAddress">
         inputProps={{

@@ -1,6 +1,6 @@
 export * from "./DAOProposalTypeForm";
 export * from "./DAOTextProposalDetailsForm";
-export * from "./DaoTextProposalReviewForm";
+export * from "./DAOTextProposalReviewForm";
 export * from "./DAOTokenTransferDetailsForm";
 export * from "./DAOTokenTransferReviewForm";
 export * from "./DAOAddMemberDetailsForm";
@@ -11,5 +11,5 @@ export * from "./DAOReplaceMemberDetailsForm";
 export * from "./DAOReplaceMemberReviewForm";
 export * from "./DAOUpgradeThresholdDetailsForm";
 export * from "./DAOUpgradeThresholdReviewForm";
-export * from "./DAOContractUpgradeDetailsForm";
 export * from "./DAOContractUpgradeReviewForm";
+export * from "./DAOContractUpgradeDetailsForm";

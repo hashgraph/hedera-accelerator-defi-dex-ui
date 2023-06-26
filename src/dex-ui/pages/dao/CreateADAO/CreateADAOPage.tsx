@@ -131,16 +131,16 @@ export function CreateADAOPage() {
   ];
 
   async function onSubmit(data: CreateADAOForm) {
+    const { type, name, isPublic, description, daoLinks = [], logoUrl = "" } = data;
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
-      const { governance, voting, type, name, isPublic, description, daoLinks = [], logoUrl = "" } = tokenDAOData;
-      const webLinks = daoLinks.map((obj, index) => [`${index}`, obj.value]).flat();
+      const { governance, voting } = tokenDAOData;
       return createDAO.mutate({
         type,
         name,
         logoUrl,
         description,
-        daoLinks: webLinks,
+        daoLinks: daoLinks.map((link) => link.value),
         isPrivate: !isPublic,
         tokenId:
           governance.tokenType === DAOGovernanceTokenType.NewToken
@@ -157,12 +157,11 @@ export function CreateADAOPage() {
     }
     if (data.type === DAOType.MultiSig) {
       const multiSigDAOData = data as CreateAMultiSigDAOForm;
-      const { type, name, isPublic, governance, voting, description, daoLinks = [], logoUrl = "" } = multiSigDAOData;
-      const webLinks = daoLinks.map((obj, index) => [`${index}`, obj.value]).flat();
+      const { governance, voting } = multiSigDAOData;
       return createDAO.mutate({
         type,
         description,
-        daoLinks: webLinks,
+        daoLinks: daoLinks.map((link) => link.value),
         admin: governance.admin,
         name,
         logoUrl,
@@ -173,13 +172,12 @@ export function CreateADAOPage() {
     }
     if (data.type === DAOType.NFT) {
       const nftDAOData = data as CreateANFTDAOForm;
-      const { type, name, isPublic, governance, voting, description, daoLinks = [], logoUrl = "" } = nftDAOData;
-      const webLinks = daoLinks.map((obj, index) => [`${index}`, obj.value]).flat();
+      const { governance, voting } = nftDAOData;
       return createDAO.mutate({
         type,
         name,
         description,
-        daoLinks: webLinks,
+        daoLinks: daoLinks.map((link) => link.value),
         logoUrl,
         isPrivate: !isPublic,
         tokenId: governance.nft.id,
