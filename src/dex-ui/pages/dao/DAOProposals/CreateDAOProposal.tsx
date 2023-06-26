@@ -3,6 +3,7 @@ import {
   CreateDAOContractUpgradeForm,
   CreateDAOMemberOperationForm,
   CreateDAOProposalForm,
+  CreateDAOTextProposalForm,
   CreateDAOTokenTransferForm,
   CreateDAOUpgradeThresholdForm,
   DAOProposalType,
@@ -17,7 +18,9 @@ import { DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails } from
 import {
   useCreateAddMemberProposal,
   useCreateChangeThresholdProposal,
+  useCreateDAOTextProposal,
   useCreateDAOTokenTransferProposal,
+  useCreateDAOUpgradeProposal,
   useCreateDeleteMemberProposal,
   useCreateMultiSigProposal,
   useCreateReplaceMemberProposal,
@@ -56,8 +59,7 @@ export function CreateDAOProposal() {
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const { ownerIds, safeId: safeAccountId = "", threshold } = (dao as MultiSigDAODetails) ?? {};
-  const { governanceAddress = "", tokenId: governanceTokenId = "" } =
-    (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
+  const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
@@ -113,12 +115,32 @@ export function CreateDAOProposal() {
     reset: resetChangeThresholdTransaction,
   } = sendChangeThresholdTransactionMutationResults;
 
+  const sendDAOUpgradeMutationResults = useCreateDAOUpgradeProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateDAOUpgradeLoading,
+    isError: isCreateDAOUpgradeFailed,
+    error: isCreateDAOUpgradeError,
+    mutate: createDAOUpgradeProposal,
+    reset: resetCreateDAOUpgradeProposal,
+  } = sendDAOUpgradeMutationResults;
+
+  const sendDAOTextMutationResults = useCreateDAOTextProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateDAOTextProposalLoading,
+    isError: isCreateDAOTextProposalFailed,
+    error: isCreateDAOTextProposalError,
+    mutate: createDAOTextProposal,
+    reset: resetCreateDAOTextProposal,
+  } = sendDAOTextMutationResults;
+
   const isLoading =
     isCreateMultisigTokenTransferLoading ||
     isCreateGOVTokenTransferLoading ||
     isAddMemberLoading ||
     isDeleteMemberLoading ||
     isReplaceMemberLoading ||
+    isCreateDAOUpgradeLoading ||
+    isCreateDAOTextProposalLoading ||
     isChangeThresholdLoading;
 
   const isError =
@@ -127,6 +149,8 @@ export function CreateDAOProposal() {
     isAddMemberFailed ||
     isDeleteMemberFailed ||
     isReplaceMemberFailed ||
+    isCreateDAOUpgradeFailed ||
+    isCreateDAOTextProposalFailed ||
     isChangeThresholdFailed;
 
   const steps = [
@@ -155,6 +179,8 @@ export function CreateDAOProposal() {
     resetDeleteMemberTransaction();
     resetReplaceMemberTransaction();
     resetChangeThresholdTransaction();
+    resetCreateDAOUpgradeProposal();
+    resetCreateDAOTextProposal();
   }
 
   function reset() {
@@ -169,6 +195,8 @@ export function CreateDAOProposal() {
     if (deleteMemberError) return deleteMemberError.message;
     if (isReplaceMemberError) return isReplaceMemberError.message;
     if (isChangeThresholdError) return isChangeThresholdError.message;
+    if (isCreateDAOUpgradeError) return isCreateDAOUpgradeError.message;
+    if (isCreateDAOTextProposalError) return isCreateDAOTextProposalError.message;
     return "";
   }
 
@@ -214,7 +242,7 @@ export function CreateDAOProposal() {
               tokenId,
               title,
               linkToDiscussion,
-              governanceAddress,
+              governanceAddress: governors.tokenTransferLogic,
               governanceTokenId,
               daoContractId: daoAccountId,
               description,
@@ -268,9 +296,29 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.ContractUpgrade: {
-        //TODO: Contract Integration
-        const formData = data as CreateDAOContractUpgradeForm;
-        console.log("Contract Upgrade Data", formData);
+        const { title, description, linkToDiscussion, oldProxyAddress, newImplementationAddress } =
+          data as CreateDAOContractUpgradeForm;
+        return createDAOUpgradeProposal({
+          title,
+          description,
+          linkToDiscussion,
+          oldProxyAddress,
+          newImplementationAddress,
+          governanceAddress: governors.contractUpgradeLogic,
+          governanceTokenId,
+          daoContractId: daoAccountId,
+        });
+      }
+      case DAOProposalType.Text: {
+        const { title, description, linkToDiscussion } = data as CreateDAOTextProposalForm;
+        return createDAOTextProposal({
+          title,
+          description,
+          linkToDiscussion,
+          governanceAddress: governors.textLogic,
+          governanceTokenId,
+          daoContractId: daoAccountId,
+        });
       }
     }
   }
@@ -330,7 +378,7 @@ export function CreateDAOProposal() {
       case DAOProposalType.UpgradeThreshold:
         return trigger(["newThreshold", "title", "description"]);
       case DAOProposalType.ContractUpgrade:
-        return trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newProxyAddress"]);
+        return trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
       case DAOProposalType.TokenTransfer: {
         return currentDaoType === "multisig"
           ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])

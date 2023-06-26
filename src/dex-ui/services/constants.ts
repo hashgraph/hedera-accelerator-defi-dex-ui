@@ -23,7 +23,7 @@ enum ContractNames {
   GovernorCreateToken = "governortokencreate",
   Configuration = "configuration",
   GodTokenHolderFactory = "godtokenholderfactory",
-  GovernanceDAOFactory = "governancedaofactory",
+  FTDAOFactory = "ftdaofactory",
   MultiSigDAOFactory = "multisigdaofactory",
   NFTDAOFactory = "nftdaofactory",
 }
@@ -50,8 +50,8 @@ export const Contracts = {
       ProxyId: getProxyId(ContractNames.GovernorCreateToken),
     },
   },
-  GovernanceDAOFactory: {
-    ProxyId: getProxyId(ContractNames.GovernanceDAOFactory),
+  FTDAOFactory: {
+    ProxyId: getProxyId(ContractNames.FTDAOFactory),
   },
   GODHolder: {
     ProxyId: getProxyId(ContractNames.GodHolder),

@@ -40,7 +40,7 @@ export interface CreateDAOUpgradeThresholdForm extends CreateDAOProposalFormBase
 
 export interface CreateDAOContractUpgradeForm extends CreateDAOProposalFormBase {
   linkToDiscussion: string;
-  newProxyAddress: string;
+  newImplementationAddress: string;
   oldProxyAddress: string;
 }
 

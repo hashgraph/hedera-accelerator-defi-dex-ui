@@ -9,11 +9,11 @@ import {
 } from "@services";
 import { Contracts, DEX_TOKEN_PRECISION_VALUE, Gas } from "../../constants";
 import { getEventArgumentsByName } from "../../utils";
-import GovernanceDAOFactoryJSON from "../../abi/GovernanceDAOFactory.json";
+import FTDAOFactoryJSON from "../../abi/FTDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../abi/MultiSigDAO.json";
-import GovernorTokenDAOJSON from "../../abi/GovernorTokenDAO.json";
+import FTDAOJSON from "../../abi/FTDAO.json";
 import {
   MultiSigDAODetails,
   MultiSigDAOCreatedEventArgs,
@@ -42,20 +42,9 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     eventTypes
   );
   return logs.map((log): MultiSigDAODetails => {
-    const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners"]);
-    const {
-      daoAddress,
-      admin,
-      name,
-      logoUrl,
-      isPrivate,
-      safeAddress,
-      owners,
-      threshold,
-      title,
-      description,
-      webLinks,
-    } = argsWithName;
+    const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
+    const { daoAddress, safeAddress, inputs } = argsWithName;
+    const { owners, admin, name, logoUrl, isPrivate, threshold, title, description, webLinks } = inputs;
     return {
       type: DAOType.MultiSig,
       accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
@@ -75,14 +64,14 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
 
 async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAODetails[]> {
   const logs = await DexService.fetchParsedEventLogs(
-    Contracts.GovernanceDAOFactory.ProxyId,
-    new ethers.utils.Interface(GovernanceDAOFactoryJSON.abi),
+    Contracts.FTDAOFactory.ProxyId,
+    new ethers.utils.Interface(FTDAOFactoryJSON.abi),
     eventTypes
   );
   return logs.map((log): GovernanceDAODetails => {
-    const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args);
+    const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
+    const { daoAddress, governors, tokenHolderAddress, inputs } = argsWithName;
     const {
-      daoAddress,
       admin,
       name,
       logoUrl,
@@ -94,10 +83,8 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       title,
       linkToDiscussion,
       description,
-      governanceAddress,
-      tokenHolderAddress,
       webLinks,
-    } = argsWithName;
+    } = inputs;
     return {
       type: DAOType.GovernanceToken,
       accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
@@ -109,7 +96,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       webLinks,
       description,
       linkToDiscussion,
-      governanceAddress: AccountId.fromSolidityAddress(governanceAddress).toString(),
+      governors,
       tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderAddress).toString(),
       tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
       quorumThreshold: quorumThreshold.toNumber(),
@@ -123,28 +110,26 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
   //TODO: Change the ABI to NFTDAOFactory, for now its not working for fetching the NFT logs using NFTDAOFactory ABI
   const logs = await DexService.fetchParsedEventLogs(
     Contracts.NFTDAOFactory.ProxyId,
-    new ethers.utils.Interface(GovernanceDAOFactoryJSON.abi),
+    new ethers.utils.Interface(FTDAOFactoryJSON.abi),
     eventTypes
   );
   return logs.map((log): NFTDAODetails => {
-    const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args);
+    const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
+    const { daoAddress, governors, tokenHolderAddress, inputs } = argsWithName;
     const {
-      daoAddress,
       admin,
       name,
       logoUrl,
       isPrivate,
-      tokenAddress,
-      quorumThreshold,
-      votingDelay,
-      votingPeriod,
       title,
       description,
       linkToDiscussion,
-      governanceAddress,
-      tokenHolderAddress,
+      tokenAddress,
       webLinks,
-    } = argsWithName;
+      quorumThreshold,
+      votingDelay,
+      votingPeriod,
+    } = inputs;
     return {
       type: DAOType.NFT,
       accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
@@ -154,7 +139,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       description,
       webLinks,
       linkToDiscussion,
-      governanceAddress: AccountId.fromSolidityAddress(governanceAddress).toString(),
+      governors,
       tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderAddress).toString(),
       logoUrl,
       isPrivate,
@@ -280,7 +265,7 @@ export async function fetchGovernanceDAOLogs(governanceAddress: string): Promise
 }
 
 export async function fetchNFTDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
-  const contractInterface = new ethers.utils.Interface(GovernorTokenDAOJSON.abi);
+  const contractInterface = new ethers.utils.Interface(FTDAOJSON.abi);
   const abiCoder = ethers.utils.defaultAbiCoder;
   const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
 

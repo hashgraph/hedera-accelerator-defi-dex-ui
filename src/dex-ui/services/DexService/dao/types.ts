@@ -6,7 +6,6 @@ export enum DAOType {
   NFT = "NFT",
 }
 export interface DAOCreatedEventArgs {
-  daoAddress: string;
   admin: string;
   name: string;
   logoUrl: string;
@@ -14,31 +13,47 @@ export interface DAOCreatedEventArgs {
   title: string;
   description: string;
   linkToDiscussion: string | undefined;
-  webLinks: string;
+  webLinks: string[];
 }
 
-export interface GovernanceDAOCreatedEventArgs extends DAOCreatedEventArgs {
-  tokenAddress: string;
-  quorumThreshold: BigNumber;
-  votingDelay: BigNumber;
-  votingPeriod: BigNumber;
-  governanceAddress: string;
+interface DAOProposalGovernors {
+  contractUpgradeLogic: string;
+  createTokenLogic: string;
+  textLogic: string;
+  tokenTransferLogic: string;
+}
+
+export interface GovernanceDAOCreatedEventArgs {
+  daoAddress: string;
+  governors: DAOProposalGovernors;
   tokenHolderAddress: string;
+  inputs: DAOCreatedEventArgs & {
+    tokenAddress: string;
+    quorumThreshold: BigNumber;
+    votingDelay: BigNumber;
+    votingPeriod: BigNumber;
+  };
 }
 
-export interface NFTDAOCreatedEventArgs extends DAOCreatedEventArgs {
-  tokenAddress: string;
-  quorumThreshold: BigNumber;
-  votingDelay: BigNumber;
-  votingPeriod: BigNumber;
-  governanceAddress: string;
+export interface NFTDAOCreatedEventArgs {
+  daoAddress: string;
+  governors: DAOProposalGovernors;
   tokenHolderAddress: string;
+  inputs: DAOCreatedEventArgs & {
+    tokenAddress: string;
+    quorumThreshold: BigNumber;
+    votingDelay: BigNumber;
+    votingPeriod: BigNumber;
+  };
 }
 
-export interface MultiSigDAOCreatedEventArgs extends DAOCreatedEventArgs {
+export interface MultiSigDAOCreatedEventArgs {
+  daoAddress: string;
   safeAddress: string;
-  owners: string[];
-  threshold: BigNumber;
+  inputs: DAOCreatedEventArgs & {
+    owners: string[];
+    threshold: BigNumber;
+  };
 }
 
 export interface GovernanceDAODetails {
@@ -52,9 +67,9 @@ export interface GovernanceDAODetails {
   logoUrl: string;
   isPrivate: boolean;
   tokenId: string;
-  governanceAddress: string;
+  governors: DAOProposalGovernors;
   tokenHolderAddress: string;
-  webLinks: string;
+  webLinks: string[];
   quorumThreshold: number;
   votingDelay: number;
   votingPeriod: number;
@@ -68,12 +83,12 @@ export interface NFTDAODetails {
   title: string;
   description: string;
   linkToDiscussion: string | undefined;
-  governanceAddress: string;
+  governors: DAOProposalGovernors;
   tokenHolderAddress: string;
   name: string;
   logoUrl: string;
   isPrivate: boolean;
-  webLinks: string;
+  webLinks: string[];
   tokenId: string;
   quorumThreshold: number;
   votingDelay: number;
@@ -89,7 +104,7 @@ export interface MultiSigDAODetails {
   adminId: string;
   name: string;
   logoUrl: string;
-  webLinks: string;
+  webLinks: string[];
   isPrivate: boolean;
   safeId: string;
   ownerIds: string[];
