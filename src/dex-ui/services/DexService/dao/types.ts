@@ -127,6 +127,9 @@ export enum DAOEvents {
   ApproveHash = "ApproveHash",
   ExecutionSuccess = "ExecutionSuccess",
   ExecutionFailure = "ExecutionFailure",
+  AddedOwner = "AddedOwner",
+  RemovedOwner = "RemovedOwner",
+  ChangedThreshold = "ChangedThreshold",
 }
 
 export enum HederaGnosisSafeFunctions {
