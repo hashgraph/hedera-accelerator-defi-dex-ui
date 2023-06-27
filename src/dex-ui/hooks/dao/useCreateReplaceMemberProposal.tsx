@@ -6,6 +6,7 @@ import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
 interface ReplaceMemberForm {
+  prevMemberAddress: string;
   newMemberAddress: string;
   title: string;
   description: string;

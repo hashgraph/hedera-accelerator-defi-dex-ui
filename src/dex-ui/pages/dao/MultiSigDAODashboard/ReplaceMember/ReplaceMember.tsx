@@ -10,6 +10,7 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { Wizard } from "@components";
 import { MultiSigDAODetails } from "@services";
 import { DefaultMultiSigDAODetails } from "../types";
+import { getPreviousMemberAddress } from "../../utils";
 
 export function ReplaceMember() {
   const { accountId: daoAccountId = "", memberId = "" } = useParams();
@@ -17,7 +18,7 @@ export function ReplaceMember() {
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
-  const { safeId, accountId } = dao ?? DefaultMultiSigDAODetails;
+  const { safeId, accountId, ownerIds } = dao ?? DefaultMultiSigDAODetails;
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const replaceMemberForm = useForm<ReplaceMemberForm>({
@@ -70,9 +71,11 @@ export function ReplaceMember() {
 
   async function onSubmit(data: ReplaceMemberForm) {
     const { memberAddress, title, description } = data;
+    const prevMemberAddress = getPreviousMemberAddress({ owners: ownerIds, memberId });
     return mutate({
       title,
       description,
+      prevMemberAddress,
       newMemberAddress: memberAddress,
       oldMemberAddress: memberId ?? "",
       safeAccountId: safeId,

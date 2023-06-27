@@ -6,6 +6,7 @@ import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
 interface DeleteMemberForm {
+  prevMemberAddress: string;
   memberAddress: string;
   safeAccountId: string;
   title: string;

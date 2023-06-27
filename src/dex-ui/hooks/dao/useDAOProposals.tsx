@@ -108,10 +108,14 @@ export function useDAOProposals(
     return proposalEntries;
   }
 
-  function getApprovers(proposalLogs: LogDescription[]): string[] {
+  function getApprovers(proposalLogs: LogDescription[], transactionHash: string): string[] {
     const approverCache = new Set<string>();
     proposalLogs.forEach((log: LogDescription) => {
-      if (log?.name === DAOEvents.ApproveHash && !approverCache.has(log?.args.owner)) {
+      if (
+        log?.name === DAOEvents.ApproveHash &&
+        !approverCache.has(log?.args.owner) &&
+        transactionHash === log?.args?.approvedHash
+      ) {
         const { args } = log;
         const ownerId = AccountId.fromSolidityAddress(args.owner).toString();
         approverCache.add(ownerId);
@@ -262,7 +266,7 @@ export function useDAOProposals(
             } = proposalInfo;
             const { amount, receiver, token, _threshold } = data;
             const threshold = getThreshold(daoAndSafeLogs, BigNumber.from(_threshold ?? 0));
-            const approvers = getApprovers(proposalLogs);
+            const approvers = getApprovers(proposalLogs, transactionHash);
             const approvalCount = approvers.length;
             const isThresholdReached = approvalCount >= threshold;
             const status = getProposalStatus(proposalLogs, isThresholdReached);

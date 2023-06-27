@@ -30,7 +30,8 @@ import {
 } from "@hooks";
 import { isNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { getLastPathInRoute } from "@dex-ui/utils";
+import { getLastPathInRoute } from "@utils";
+import { getPreviousMemberAddress } from "../utils";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -269,10 +270,12 @@ export function CreateDAOProposal() {
       }
       case DAOProposalType.RemoveMember: {
         const { newThreshold, memberAddress, title, description } = data as CreateDAOMemberOperationForm;
+        const prevMemberAddress = getPreviousMemberAddress({ owners: ownerIds, memberId: memberAddress });
         return createDeleteMemberProposal({
           title,
           description,
           memberAddress,
+          prevMemberAddress,
           safeAccountId,
           multiSigDAOContractId: daoAccountId,
           threshold: newThreshold,
@@ -280,9 +283,11 @@ export function CreateDAOProposal() {
       }
       case DAOProposalType.ReplaceMember: {
         const { memberAddress, newMemberAddress, title, description } = data as CreateDAOMemberOperationForm;
+        const prevMemberAddress = getPreviousMemberAddress({ owners: ownerIds, memberId: memberAddress });
         return createReplaceMemberProposal({
           title,
           description,
+          prevMemberAddress,
           newMemberAddress: newMemberAddress,
           oldMemberAddress: memberAddress,
           safeAccountId,

@@ -95,5 +95,6 @@ export const GovernanceTokenId = "0.0.8576";
 
 export const HBARTokenId = "0.0.8578";
 export const HBARTokenSymbol = "HBAR";
+export const SENTINEL_OWNER = "0.0.1";
 
 export const Gas = 9000000;

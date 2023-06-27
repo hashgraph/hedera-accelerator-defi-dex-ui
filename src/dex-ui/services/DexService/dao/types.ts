@@ -128,6 +128,7 @@ export enum DAOEvents {
   ExecutionSuccess = "ExecutionSuccess",
   ExecutionFailure = "ExecutionFailure",
   AddedOwner = "AddedOwner",
+  SafeSetup = "SafeSetup",
   RemovedOwner = "RemovedOwner",
   ChangedThreshold = "ChangedThreshold",
 }

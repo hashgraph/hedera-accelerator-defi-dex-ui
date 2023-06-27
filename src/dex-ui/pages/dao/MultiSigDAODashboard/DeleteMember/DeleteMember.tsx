@@ -10,6 +10,7 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { MultiSigDAODetails } from "@services";
 import { Wizard } from "@components";
 import { DefaultMultiSigDAODetails } from "../types";
+import { getPreviousMemberAddress } from "../../utils";
 
 export function DeleteMember() {
   const { accountId: daoAccountId = "", memberId = "" } = useParams();
@@ -70,9 +71,11 @@ export function DeleteMember() {
 
   async function onSubmit(data: DeleteMemberForm) {
     const { newThreshold, title, description } = data;
+    const prevMemberAddress = getPreviousMemberAddress({ owners: ownerIds, memberId });
     return mutate({
       title,
       description,
+      prevMemberAddress,
       memberAddress: memberId ?? "",
       safeAccountId: safeId,
       multiSigDAOContractId: accountId,
