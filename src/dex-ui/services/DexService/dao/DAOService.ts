@@ -34,6 +34,27 @@ import { ProposalType } from "@dex-ui/hooks";
 import { getFulfilledResultsData } from "@services/MirrorNodeService/utils";
 import { ProposalData } from "../governance/type";
 import { isNil } from "ramda";
+import { LogDescription } from "ethers/lib/utils";
+
+export function getOwners(proposalLogs: LogDescription[]): string[] {
+  const owners = new Set<string>();
+  proposalLogs.forEach((log: LogDescription) => {
+    if (log?.name === DAOEvents.AddedOwner) {
+      const { args } = log;
+      owners.add(args.owner);
+    }
+    if (log?.name === DAOEvents.RemovedOwner) {
+      const { args } = log;
+      owners.delete(args.owner);
+    }
+  });
+  return Array.from(owners);
+}
+
+export function getThreshold(proposalLogs: LogDescription[], baseThreshold: ethers.BigNumber): number {
+  const latestThresholdlChange = proposalLogs.find((log) => log?.name === DAOEvents.ChangedThreshold);
+  return latestThresholdlChange?.args?.threshold.toNumber() ?? baseThreshold.toNumber();
+}
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
   const logs = await DexService.fetchParsedEventLogs(
@@ -41,25 +62,43 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi),
     eventTypes
   );
-  return logs.map((log): MultiSigDAODetails => {
-    const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
-    const { daoAddress, safeAddress, inputs } = argsWithName;
-    const { owners, admin, name, logoUrl, isPrivate, threshold, title, description, webLinks } = inputs;
-    return {
-      type: DAOType.MultiSig,
-      accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
-      adminId: AccountId.fromSolidityAddress(admin).toString(),
-      name,
-      logoUrl,
-      title,
-      description,
-      isPrivate,
-      webLinks,
-      safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
-      ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
-      threshold: threshold.toNumber(),
-    };
-  });
+
+  return Promise.all([
+    ...logs.map(async (log): Promise<MultiSigDAODetails> => {
+      const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
+      const { daoAddress, safeAddress, inputs } = argsWithName;
+      const {
+        owners: baseOwners,
+        admin,
+        name,
+        logoUrl,
+        isPrivate,
+        threshold: _threshold,
+        title,
+        description,
+        webLinks,
+      } = inputs;
+      const safeLogs = await fetchHederaGnosisSafeLogs(safeAddress);
+      const ownersFromEvents = getOwners(safeLogs);
+      const owners = [...new Set([...ownersFromEvents, ...baseOwners])];
+      const threshold = getThreshold(safeLogs, _threshold);
+
+      return {
+        type: DAOType.MultiSig,
+        accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
+        adminId: AccountId.fromSolidityAddress(admin).toString(),
+        name,
+        logoUrl,
+        title,
+        description,
+        isPrivate,
+        webLinks,
+        safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
+        ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
+        threshold,
+      };
+    }),
+  ]);
 }
 
 async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAODetails[]> {
@@ -199,6 +238,7 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
     }
     return event;
   });
+
   return parsedEventsWithData;
 }
 

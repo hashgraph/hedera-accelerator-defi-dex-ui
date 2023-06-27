@@ -6,6 +6,7 @@ import {
   DexService,
   DEX_TOKEN_PRECISION_VALUE,
   MirrorNodeTokenById,
+  getThreshold,
 } from "@services";
 import { DAOQueries } from "./types";
 import { AccountId } from "@hashgraph/sdk";
@@ -79,7 +80,7 @@ export interface Proposal {
   votes?: Votes;
 }
 
-const AllFilters = [ProposalStatus.Success, ProposalStatus.Failed, ProposalStatus.Pending];
+const AllFilters = [ProposalStatus.Success, ProposalStatus.Failed, ProposalStatus.Pending, ProposalStatus.Queued];
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
 export function useDAOProposals(
@@ -119,11 +120,13 @@ export function useDAOProposals(
     return Array.from(approverCache);
   }
 
-  function getProposalStatus(proposalLogs: LogDescription[]): ProposalStatus {
+  function getProposalStatus(proposalLogs: LogDescription[], isThresholdReached: boolean): ProposalStatus {
     return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
       ? ProposalStatus.Success
       : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
       ? ProposalStatus.Failed
+      : isThresholdReached
+      ? ProposalStatus.Queued
       : ProposalStatus.Pending;
   }
 
@@ -237,6 +240,7 @@ export function useDAOProposals(
           DexService.fetchMultiSigDAOLogs(daoAccountId),
           DexService.fetchHederaGnosisSafeLogs(safeAccountId),
         ]);
+
         const daoAndSafeLogs = logs ? logs.flat() : [];
         const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
         const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
@@ -257,10 +261,11 @@ export function useDAOProposals(
               transactionType,
             } = proposalInfo;
             const { amount, receiver, token, _threshold } = data;
+            const threshold = getThreshold(daoAndSafeLogs, BigNumber.from(_threshold ?? 0));
             const approvers = getApprovers(proposalLogs);
             const approvalCount = approvers.length;
-
-            const status = getProposalStatus(proposalLogs);
+            const isThresholdReached = approvalCount >= threshold;
+            const status = getProposalStatus(proposalLogs, isThresholdReached);
             const proposalType = getProposalType(BigNumber.from(transactionType).toNumber());
             const tokenId = token ? AccountId.fromSolidityAddress(token).toString() : "";
             if (!tokenDataCache.has(tokenId)) {
@@ -292,7 +297,7 @@ export function useDAOProposals(
               author: creator ? AccountId.fromSolidityAddress(creator).toString() : "",
               description: description,
               link: linkToDiscussion,
-              threshold: _threshold ? BigNumber.from(_threshold).toNumber() : 0,
+              threshold,
             };
           })
         );

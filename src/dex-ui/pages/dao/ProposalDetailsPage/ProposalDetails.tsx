@@ -22,10 +22,18 @@ interface ProposalDetailsProps {
 }
 
 export function ProposalDetails(props: ProposalDetailsProps) {
-  const { amount, receiver, tokenId, tokenSymbol, event, type, approvers, approvalCount, transactionHash } = props;
-
-  /** TODO: Add 'description' to contract event. */
-  const description = ["-"];
+  const {
+    description,
+    amount,
+    receiver,
+    tokenId,
+    tokenSymbol,
+    event,
+    type,
+    approvers,
+    approvalCount,
+    transactionHash,
+  } = props;
 
   return (
     <Flex direction="column" gap="2">

@@ -6,7 +6,7 @@ import { DAO, DAOType } from "@services";
 import { ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
 import { Proposal, ProposalType } from "@hooks";
-import { Paths } from "@dex-ui/routes";
+import { Paths } from "@routes";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -17,7 +17,6 @@ interface ProposalCardProps {
 
 export const ProposalCard = (props: ProposalCardProps) => {
   const { proposal, dao, showTitle, showTypeTag } = props;
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,10 +25,6 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const timeRemaining = "";
   const votingEndTime = "";
   const { amount, token, transactionHash, proposalId } = proposal;
-  let membersCount = 0;
-  if (isMultiSig) {
-    membersCount = [dao.adminId, ...dao.ownerIds].length;
-  }
 
   const tokenSymbol = token?.data.symbol;
   const RightContent = () => (
@@ -115,26 +110,22 @@ export const ProposalCard = (props: ProposalCardProps) => {
                 )}
                 {proposal.type === ProposalType.AddNewMember && (
                   <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Transaction threshold confirmation changes to ${proposal.threshold}
-                 / ${membersCount + 1} members.`}
+                    {`Max proposal confirmations will increase by 1.`}
                   </Text>
                 )}
                 {proposal.type === ProposalType.RemoveMember && (
                   <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Transaction threshold confirmation changes to ${proposal.threshold}
-                 / ${membersCount - 1} members.`}
+                    {`Max proposal confirmations will decrease by 1.`}
                   </Text>
                 )}
                 {proposal.type === ProposalType.ReplaceMember && (
                   <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Threshold confirmation requirement changes to ${dao.threshold}
-                 / ${membersCount} members.`}
+                    {`Required proposal threshold confirmations will be updated.`}
                   </Text>
                 )}
                 {proposal.type === ProposalType.ChangeThreshold && (
                   <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Transaction threshold confirmation changes to ${proposal.threshold}
-                 / ${membersCount} members.`}
+                    {`Required proposal threshold confirmations will be updated.`}
                   </Text>
                 )}
               </>

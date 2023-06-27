@@ -208,7 +208,7 @@ export function CreateDAOProposal() {
 
   function handleCreateDAOProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
-    const message = `Created a new ${type} DAO proposal transaction.`;
+    const message = `Created a new '${type}' proposal.`;
     const pathTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/${Paths.DAOs.Overview}`;
     handleTransactionSuccess(transactionResponse, message, pathTo);
   }
