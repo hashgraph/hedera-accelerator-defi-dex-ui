@@ -80,13 +80,15 @@ export function Settings() {
                     {isAdmin ? <Tag label="Admin" /> : <></>}
                   </Flex>
                   <Flex direction="row" gap="4" alignItems="center" height="20px">
-                    <IconButton
-                      size="xs"
-                      variant="link"
-                      aria-label="refresh-member"
-                      onClick={() => handleReplaceMemberClick(member.accountId)}
-                      icon={<RefreshIcon boxSize="17" color={Color.Teal_01} />}
-                    />
+                    {!isAdmin ? (
+                      <IconButton
+                        size="xs"
+                        variant="link"
+                        aria-label="refresh-member"
+                        onClick={() => handleReplaceMemberClick(member.accountId)}
+                        icon={<RefreshIcon boxSize="17" color={Color.Teal_01} />}
+                      />
+                    ) : undefined}
                     {!isAdmin ? (
                       <IconButton
                         size="xs"
