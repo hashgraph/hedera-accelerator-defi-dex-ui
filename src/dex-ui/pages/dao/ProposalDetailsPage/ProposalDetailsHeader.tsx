@@ -1,15 +1,22 @@
 import { Text, Flex, Box } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbText } from "@dex-ui-components";
+import { Breadcrumb, BreadcrumbText, Color, HashscanData, HashScanLink } from "@dex-ui-components";
+import { DAOType } from "@services";
 import { Paths } from "@routes";
 
 interface ProposalDetailsHeaderProps {
   daoAccountId: string;
   title: string;
+  daoType: DAOType;
+  author: string;
   /* author: string; */
 }
 
 export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
-  const { daoAccountId, title } = props;
+  const { daoAccountId, title, daoType, author } = props;
+  let to = `/daos/${Paths.DAOs.Multisig}/${daoAccountId}/${Paths.DAOs.Proposals}`;
+  if (daoType === DAOType.GovernanceToken) {
+    to = `/daos/${Paths.DAOs.GovernanceToken}/${daoAccountId}/${Paths.DAOs.Proposals}`;
+  }
   return (
     <>
       <Flex direction="row" justifyContent="space-between" flexWrap="wrap-reverse" gap="2">
@@ -17,25 +24,17 @@ export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
           <BreadcrumbText />
         </Box>
         <Flex>
-          <Breadcrumb
-            to={`/daos/${Paths.DAOs.Multisig}/${daoAccountId}/${Paths.DAOs.Proposals}`}
-            label={"Back to Proposals"}
-          />
+          <Breadcrumb to={to} label={"Back to Proposals"} />
         </Flex>
       </Flex>
       <Flex direction="column" gap="2">
         <Text textStyle="h3 medium">{title}</Text>
-        {/** TODO: Determine how to get transaction author */}
-        {/**
-         * ```
-         * <Flex direction="row" alignItems="center" gap="2">
-         *    <Text textStyle="p small medium" color={Color.Neutral._500}>
-         *      Author By
-         *    </Text>
-         *    <HashScanLink id={author} type={HashscanData.Account} />
-         * </Flex>
-         * ```
-         */}
+        <Flex direction="row" alignItems="center" gap="2">
+          <Text textStyle="p small medium" color={Color.Neutral._500}>
+            Author By:
+          </Text>
+          <HashScanLink id={author} type={HashscanData.Account} />
+        </Flex>
       </Flex>
     </>
   );

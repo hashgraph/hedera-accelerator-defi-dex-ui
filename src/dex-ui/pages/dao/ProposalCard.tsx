@@ -1,6 +1,6 @@
 import { Text, Flex, Image, Divider } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getShortDescription, replaceLastRoute } from "@utils";
+import { formatTokenAmountWithDecimal, getShortDescription, replaceLastRoute } from "@utils";
 import { Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@dex-ui-components";
 import { DAO, DAOType } from "@services";
 import { ProposalStatusAsTagVariant } from "./constants";
@@ -104,7 +104,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
-                      {amount} {tokenSymbol}
+                      {formatTokenAmountWithDecimal(amount, Number(token?.data.decimals))} {tokenSymbol}
                     </Text>
                   </Flex>
                 )}
@@ -137,7 +137,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
-                      {amount} {tokenSymbol}
+                      {formatTokenAmountWithDecimal(amount, Number(token?.data.decimals))} {tokenSymbol}
                     </Text>
                   </Flex>
                 )}

@@ -1,7 +1,6 @@
 import { Text, Flex } from "@chakra-ui/react";
 import { Color, ProgressBar, PeopleIcon } from "@dex-ui-components";
 import { Proposal } from "@dex-ui/hooks";
-import { getFormattedEndTime } from "@utils";
 import { DAO, DAOType } from "@services";
 
 interface DAOProposalVotingProps {
@@ -16,7 +15,6 @@ export const DAOProposalVoting = (props: DAOProposalVotingProps) => {
   if (isMultiSig && dao.threshold) {
     turnout = Math.round((proposal.approvalCount / dao.threshold) * 100);
   }
-  const votingEndTime = proposal.timestamp ? getFormattedEndTime(proposal.timestamp) : "";
 
   return (
     <>
@@ -50,7 +48,7 @@ export const DAOProposalVoting = (props: DAOProposalVotingProps) => {
                   Voting end time
                 </Text>
                 <Text textStyle="p xsmall semibold" color={Color.Grey_Blue._600} textAlign="start">
-                  {votingEndTime}
+                  {proposal.votingEndTime}
                 </Text>
               </Flex>
               <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">

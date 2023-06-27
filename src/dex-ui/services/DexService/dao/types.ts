@@ -16,7 +16,7 @@ export interface DAOCreatedEventArgs {
   webLinks: string[];
 }
 
-interface DAOProposalGovernors {
+export interface DAOProposalGovernors {
   contractUpgradeLogic: string;
   createTokenLogic: string;
   textLogic: string;

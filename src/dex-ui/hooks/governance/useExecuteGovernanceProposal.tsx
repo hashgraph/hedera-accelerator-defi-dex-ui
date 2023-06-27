@@ -4,8 +4,9 @@ import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, useQueryClient } from "react-query";
 import { DexService } from "../../services";
 import { isNil } from "ramda";
+import { HandleOnSuccess } from "..";
 
-interface UseExecuteProposalParams {
+export interface UseExecuteProposalParams {
   contractId: string;
   title: string;
   signer: HashConnectSigner;
@@ -14,7 +15,7 @@ interface UseExecuteProposalParams {
   tokenAmount?: number;
 }
 
-export function useExecuteGovernanceProposal(id: string | undefined) {
+export function useExecuteGovernanceProposal(id: string | undefined, handleOnSuccess?: HandleOnSuccess) {
   const queryClient = useQueryClient();
   return useMutation<
     TransactionResponse | undefined,
@@ -27,9 +28,12 @@ export function useExecuteGovernanceProposal(id: string | undefined) {
       return DexService.executeProposal({ ...params });
     },
     {
-      onSuccess: () => {
+      onSuccess: (transactionResponse) => {
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "detail", id]);
+        if (handleOnSuccess && transactionResponse) {
+          handleOnSuccess(transactionResponse);
+        }
       },
     }
   );

@@ -36,6 +36,25 @@
       "anonymous": false,
       "inputs": [
         {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": false,
           "internalType": "uint256",
           "name": "proposalId",
@@ -141,21 +160,75 @@
         },
         {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "startBlock",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "endBlock",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
           "internalType": "bytes",
           "name": "data",
           "type": "bytes"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "startBlock",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endBlock",
+              "type": "uint256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct GovernorCountingSimpleInternal.Duration",
+          "name": "duration",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "quorumValue",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "isQuorumReached",
+              "type": "bool"
+            },
+            {
+              "internalType": "enum IGovernorUpgradeable.ProposalState",
+              "name": "proposalState",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bool",
+              "name": "voted",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "votedUser",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "againstVotes",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "forVotes",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "abstainVotes",
+              "type": "uint256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct GovernorCountingSimpleInternal.VotingInformation",
+          "name": "votingInformation",
+          "type": "tuple"
         }
       ],
       "name": "ProposalDetails",
@@ -640,6 +713,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "getHederaServiceVersion",
+      "outputs": [
+        {
+          "internalType": "contract IHederaService",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -705,7 +791,7 @@
           "type": "string"
         }
       ],
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -837,8 +923,8 @@
           "type": "uint256"
         },
         {
-          "internalType": "contract IBaseHTS",
-          "name": "_tokenService",
+          "internalType": "contract IHederaService",
+          "name": "_hederaService",
           "type": "address"
         },
         {
@@ -980,6 +1066,19 @@
         }
       ],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -1158,6 +1257,13 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -1232,6 +1338,32 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IHederaService",
+          "name": "newHederaService",
+          "type": "address"
+        }
+      ],
+      "name": "upgradeHederaService",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {

@@ -14,12 +14,12 @@ export function DashboardOverview() {
   const navigate = useNavigate();
   const location = useLocation();
   const { dao, totalAssetValue, memberCount, ownerCount, tokenCount } = useOutletContext<MultiSigDAODetailsContext>();
-  const { accountId, type, safeId, threshold } = dao;
+  const { accountId, safeId, threshold } = dao;
   const totalAssetDisplay = totalAssetValue;
   const tokenCountDisplay = tokenCount;
   const memberCountDisplay = String(memberCount);
   const thresholdDisplay = `${String(threshold)} / ${String(ownerCount)}`;
-  const daoTransactionsQueryResults = useDAOProposals(accountId, type, safeId);
+  const daoTransactionsQueryResults = useDAOProposals(accountId, safeId);
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
 

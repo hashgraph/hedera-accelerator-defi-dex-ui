@@ -1,9 +1,9 @@
 import { CardListLayout, ErrorLayout, LoadingSpinnerLayout, NotFound, TabFilters } from "@layouts";
-import { ProposalStatus, useDAOProposals, useTabFilters } from "@hooks";
+import { ProposalStatus, useDAOProposals, useGovernanceDAOProposals, useTabFilters } from "@hooks";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
-import { DAODetailsContext, DAOType } from "@services";
+import { DAODetailsContext, DAOType, GovernanceDAODetails, MultiSigDAODetails } from "@services";
 import { TransactionIcon, Color } from "@dex-ui-components";
 import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@utils";
@@ -30,29 +30,23 @@ export function ProposalList() {
   const location = useLocation();
   const { dao } = useOutletContext<DAODetailsContext>();
   const { accountId: daoAccountId } = dao;
-  // TODO: fetch dao keys for proposal for each doa types by typecasting and use respective proposal hook.
-  let safeAccountId = "";
-  let tokenId = "";
-  let governanceAddress = "";
-  if (dao.type === DAOType.MultiSig) {
-    safeAccountId = dao.safeId;
-  } else if (dao.type === DAOType.GovernanceToken) {
-    tokenId = dao.tokenId;
-    //TODO: For Future Proposals Card PR, send all governors contract for fetching all proposal
-    governanceAddress = dao.governors.tokenTransferLogic;
-  }
+  const { safeId: safeAccountId = "" } = dao as MultiSigDAODetails;
+  const { tokenId = "", governors } = dao as GovernanceDAODetails;
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  // TODO: break dao proposal hooks for each dao types.
-  const daoTransactionsQueryResults = useDAOProposals(
+  let daoTransactionsQueryResults = useDAOProposals(daoAccountId, safeAccountId, transactionFilters);
+
+  const governanceDaoTransactionsQueryResults = useGovernanceDAOProposals(
     daoAccountId,
-    dao.type,
-    safeAccountId,
-    transactionFilters,
-    governanceAddress,
-    tokenId
+    tokenId,
+    governors,
+    transactionFilters
   );
+
+  if (dao.type === DAOType.GovernanceToken) {
+    daoTransactionsQueryResults = governanceDaoTransactionsQueryResults;
+  }
   const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
   const hasTransactions = isNotNil(transactions) && !isEmpty(transactions);
 
