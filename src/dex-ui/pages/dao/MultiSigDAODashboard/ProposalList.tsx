@@ -9,8 +9,16 @@ import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@utils";
 import { Paths } from "@routes";
 
-const transactionTabFilters = [[ProposalStatus.Pending], [ProposalStatus.Success, ProposalStatus.Failed]];
-const defaultTransactionFilters = [ProposalStatus.Pending, ProposalStatus.Success, ProposalStatus.Failed];
+const transactionTabFilters = [
+  [ProposalStatus.Pending, ProposalStatus.Queued],
+  [ProposalStatus.Success, ProposalStatus.Failed],
+];
+const defaultTransactionFilters = [
+  ProposalStatus.Pending,
+  ProposalStatus.Queued,
+  ProposalStatus.Success,
+  ProposalStatus.Failed,
+];
 
 const transactionTabs = [
   { name: "Active", filter: [] },

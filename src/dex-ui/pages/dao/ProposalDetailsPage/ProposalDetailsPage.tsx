@@ -57,6 +57,7 @@ export function ProposalDetailsPage() {
 
   if (isSuccess && isNotNil(proposalDetails)) {
     const {
+      description,
       approvers,
       approvalCount,
       transactionHash,
@@ -79,7 +80,6 @@ export function ProposalDetailsPage() {
     const isMultiSigProposal = daoType === DAOType.MultiSig;
     const isThresholdReached = approvalCount >= threshold;
     const memberCount = ownerIds.length;
-
     /** TODO: Update contracts to support a "queued" status. */
     const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
 
@@ -95,7 +95,7 @@ export function ProposalDetailsPage() {
               hasExecutionFailed={hasProposalExecutionFailed}
             />
             <ProposalDetails
-              description={["Description", "-"]}
+              description={[description]}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}
