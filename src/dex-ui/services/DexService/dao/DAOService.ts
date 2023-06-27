@@ -2,12 +2,14 @@ import { ethers } from "ethers";
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters } from "@hashgraph/sdk";
 import {
+  checkTransactionResponseForError,
   convertEthersBigNumberToBigNumberJS,
   DexService,
+  getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
   solidityAddressToTokenIdString,
 } from "@services";
-import { Contracts, DEX_TOKEN_PRECISION_VALUE, Gas } from "../../constants";
+import { Contracts, Gas } from "../../constants";
 import { getEventArgumentsByName } from "../../utils";
 import FTDAOFactoryJSON from "../../abi/FTDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
@@ -26,12 +28,11 @@ import {
   NFTDAOCreatedEventArgs,
   HederaGnosisSafeFunctions,
   MultiSigProposeTransactionType,
+  DAOProposalGovernors,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { checkTransactionResponseForError } from "@dex-ui/services/HederaService/utils";
 import { convertToByte32 } from "@utils";
-import { ProposalType } from "@dex-ui/hooks";
-import { getFulfilledResultsData } from "@services/MirrorNodeService/utils";
+import { ProposalType } from "@hooks";
 import { ProposalData } from "../governance/type";
 import { isNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
@@ -257,7 +258,7 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
   return parsedEventsWithData;
 }
 
-export async function fetchGovernanceDAOLogs(governanceAddress: string): Promise<ProposalData[]> {
+export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): Promise<ProposalData[]> {
   const DefaultTokenTransferDetails = {
     transferFromAccount: undefined,
     transferToAccount: undefined,
@@ -281,14 +282,14 @@ export async function fetchGovernanceDAOLogs(governanceAddress: string): Promise
       transferFromAccount: solidityAddressToTokenIdString(parsedData.transferFromAccount),
       transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
       tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
-      transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount)
-        .shiftedBy(-DEX_TOKEN_PRECISION_VALUE)
-        .toNumber(),
+      transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
     };
   };
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
     const proposalEventsResults = await Promise.allSettled([
-      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governanceAddress),
+      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.tokenTransferLogic),
+      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.textLogic),
+      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.contractUpgradeLogic),
     ]);
     return getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
   };
@@ -296,16 +297,12 @@ export async function fetchGovernanceDAOLogs(governanceAddress: string): Promise
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-        const proposalDetails = await DexService.fetchProposalDetails(
-          proposalEvent.contractId,
-          proposalEvent.proposalId
-        );
         const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
         /**
          * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
          * proposalDetails should override the same field found in the proposalEvent.
          */
-        return { ...proposalEvent, ...proposalDetails, ...tokenTransferDetails };
+        return { ...proposalEvent, ...tokenTransferDetails };
       })
     );
     const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {

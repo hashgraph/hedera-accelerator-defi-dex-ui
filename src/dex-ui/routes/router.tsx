@@ -66,6 +66,7 @@ import {
   DAOUpgradeThresholdReviewForm,
   DAOContractUpgradeDetailsForm,
   DAOContractUpgradeReviewForm,
+  GovernanceProposalDetailsPage,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -189,6 +190,10 @@ export const router = createBrowserRouter(
         <Route
           path={`${Paths.DAOs.Multisig}/:accountId/proposals/:transactionHash`}
           element={<ProposalDetailsPage />}
+        />
+        <Route
+          path={`${Paths.DAOs.GovernanceToken}/:accountId/proposals/:proposalId`}
+          element={<GovernanceProposalDetailsPage />}
         />
       </Route>
       <Route

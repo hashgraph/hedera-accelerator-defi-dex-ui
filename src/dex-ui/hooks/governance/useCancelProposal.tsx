@@ -11,7 +11,7 @@ export type UseCancelProposalResult = UseMutationResult<
   UseCancelProposalParams,
   GovernanceMutations.CancelProposal
 >;
-interface UseCancelProposalParams {
+export interface UseCancelProposalParams {
   contractId: string;
   title: string;
   signer: HashConnectSigner;

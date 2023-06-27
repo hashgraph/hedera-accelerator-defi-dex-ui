@@ -1,12 +1,12 @@
 import { useDAOs, useDAOProposals } from "@hooks";
-import { DAOType, MultiSigDAODetails } from "@services";
+import { MultiSigDAODetails } from "@services";
 import { isNotNil } from "ramda";
 
 export function useProposalDetails(daoAccountId: string, transactionHash: string) {
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao: MultiSigDAODetails) => dao.accountId === daoAccountId);
-  const daoProposalsQueryResults = useDAOProposals(daoAccountId, DAOType.MultiSig, dao?.safeId ?? "");
+  const daoProposalsQueryResults = useDAOProposals(daoAccountId, dao?.safeId ?? "");
   const { data: proposals } = daoProposalsQueryResults;
   const proposal = proposals?.find((proposal) => proposal.transactionHash === transactionHash);
   const isDataFetched =

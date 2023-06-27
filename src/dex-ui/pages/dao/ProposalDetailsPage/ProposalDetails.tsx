@@ -14,11 +14,12 @@ interface ProposalDetailsProps {
   receiver: string;
   tokenId: string;
   tokenSymbol: string;
+  tokenDecimals: number;
   event: ProposalEvent;
   type: ProposalType;
-  approvers: string[];
-  approvalCount: number;
-  transactionHash: string;
+  approvers?: string[];
+  approvalCount?: number;
+  transactionHash?: string;
 }
 
 export function ProposalDetails(props: ProposalDetailsProps) {
@@ -33,6 +34,7 @@ export function ProposalDetails(props: ProposalDetailsProps) {
     approvers,
     approvalCount,
     transactionHash,
+    tokenDecimals,
   } = props;
 
   return (
@@ -41,19 +43,24 @@ export function ProposalDetails(props: ProposalDetailsProps) {
         Details
       </Text>
       <Flex layerStyle="content-box" direction="column" gap="4">
-        <ProposalDetailsDescription description={description} />
-        <Divider />
         <ProposalActionDetails
           amount={amount}
           targetAccountId={receiver}
           tokenId={tokenId}
           tokenSymbol={tokenSymbol}
+          tokenDecimals={tokenDecimals}
           event={event}
           type={type}
         />
         <Divider />
-        <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
+        <ProposalDetailsDescription description={description} />
         <Divider />
+        {approvers && approvalCount && transactionHash && (
+          <>
+            <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
+            <Divider />
+          </>
+        )}
         <ProposalTransactionDetails transactionHash={transactionHash} />
       </Flex>
     </Flex>

@@ -47,6 +47,22 @@ type RawProposalDetailsResponse = [
   link: string
 ];
 
+type Duration = {
+  startBlock: string;
+  endBlock: string;
+};
+
+type VotingInformation = {
+  abstainVotes: BigNumber;
+  againstVotes: BigNumber;
+  forVotes: BigNumber;
+  isQuorumReached: boolean;
+  proposalState: number;
+  quorumValue: BigNumber;
+  voted: boolean;
+  votedUser: string;
+};
+
 type ProposalDetailsResponse = {
   quorum: BigNumber;
   isQuorumReached: boolean;
@@ -63,6 +79,8 @@ type ProposalDetailsResponse = {
   transferToAccount?: string | undefined;
   tokenToTransfer?: string | undefined;
   transferTokenAmount?: number | undefined;
+  votingInformation?: VotingInformation;
+  duration?: Duration;
 };
 
 async function fetchProposalDetails(governorAccountId: string, proposalId: string): Promise<ProposalDetailsResponse> {

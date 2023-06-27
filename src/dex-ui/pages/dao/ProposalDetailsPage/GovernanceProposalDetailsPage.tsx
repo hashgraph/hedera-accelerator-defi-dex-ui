@@ -1,38 +1,33 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { ProposalConfirmationDetails } from "./ProposalConfirmationDetails";
 import { ProposalDetails } from "./ProposalDetails";
 import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
 import { ProposalDetailsStepper } from "./ProposalDetailsStepper";
 import { ProposalVoteDetails } from "./ProposalVoteDetails";
-import { TransactionResponse } from "@hashgraph/sdk";
-import { useExecuteProposal, ProposalStatus, useApproveProposal, useHandleTransactionSuccess } from "@hooks";
+import { ProposalStatus } from "@hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
 import { Grid, GridItem, Flex } from "@chakra-ui/react";
 import { DAOType } from "@services";
 import { isNil, isNotNil } from "ramda";
 import { Paths } from "@routes";
-import { useProposalDetails } from "./useProposalDetails";
+import { useGovernanceProposalDetails } from "./useGovernanceProposalDetails";
+import { GovernanceProposalConfirmationDetails } from "./GovernanceProposalConfirmationDetails";
 
-export function ProposalDetailsPage() {
+export function GovernanceProposalDetailsPage() {
   const navigate = useNavigate();
-  const { accountId: daoAccountId = "", transactionHash = "" } = useParams();
-  const { proposalDetails, isSuccess, isLoading, isError, error } = useProposalDetails(daoAccountId, transactionHash);
-  const approveProposalMutation = useApproveProposal(handleApproveProposalSuccess);
-  const executeProposalMutation = useExecuteProposal(handleExecuteProposalSuccess);
-  const handleTransactionSuccess = useHandleTransactionSuccess();
-  const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposalMutation;
-
-  function handleApproveProposalSuccess(transactionResponse: TransactionResponse) {
-    approveProposalMutation.reset();
-    const message = "Proposal has been confirmed.";
-    handleTransactionSuccess(transactionResponse, message);
-  }
-
-  function handleExecuteProposalSuccess(transactionResponse: TransactionResponse) {
-    executeProposalMutation.reset();
-    const message = "Proposal has been executed.";
-    handleTransactionSuccess(transactionResponse, message);
-  }
+  const { accountId: daoAccountId = "", proposalId = "" } = useParams();
+  const {
+    proposalDetails,
+    isSuccess,
+    isLoading,
+    isError,
+    error,
+    castVote,
+    cancelProposal,
+    executeProposal,
+    votingPower,
+    hasVoted,
+  } = useGovernanceProposalDetails(daoAccountId, proposalId);
+  const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposal;
 
   function onBackToDAODashboardLinkClick() {
     navigate(Paths.DAOs.absolute);
@@ -57,31 +52,24 @@ export function ProposalDetailsPage() {
 
   if (isSuccess && isNotNil(proposalDetails)) {
     const {
-      description,
-      approvers,
-      approvalCount,
-      transactionHash,
       amount,
-      safeId,
       receiver,
       token,
       event,
       status,
       type,
+      author,
       hexStringData,
       msgValue,
       operation,
       nonce,
       daoType,
-      threshold,
-      ownerIds,
-      author,
-      title,
+      votes,
     } = proposalDetails;
 
-    const isMultiSigProposal = daoType === DAOType.MultiSig;
-    const isThresholdReached = approvalCount >= threshold;
-    const memberCount = ownerIds.length;
+    const isGovernanceProposal = daoType === DAOType.GovernanceToken;
+    const isThresholdReached = +(votes?.yes ?? 0) >= +(votes?.quorum ?? 0);
+
     /** TODO: Update contracts to support a "queued" status. */
     const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
 
@@ -89,7 +77,12 @@ export function ProposalDetailsPage() {
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
         <GridItem colSpan={3}>
           <Flex direction="column" gap="8">
-            <ProposalDetailsHeader daoAccountId={daoAccountId} title={title} daoType={daoType} author={author} />
+            <ProposalDetailsHeader
+              daoAccountId={daoAccountId}
+              title={proposalDetails.title}
+              daoType={daoType}
+              author={author}
+            />
             <ProposalDetailsStepper
               status={proposalStatus}
               isThresholdReached={isThresholdReached}
@@ -97,7 +90,7 @@ export function ProposalDetailsPage() {
               hasExecutionFailed={hasProposalExecutionFailed}
             />
             <ProposalDetails
-              description={[description]}
+              description={[proposalDetails.description]}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}
@@ -105,28 +98,23 @@ export function ProposalDetailsPage() {
               tokenDecimals={+(token?.data.decimals ?? 0)}
               event={event}
               type={type}
-              approvers={approvers}
-              approvalCount={approvalCount}
-              transactionHash={transactionHash ?? ""}
             />
           </Flex>
         </GridItem>
         <GridItem colSpan={1}>
-          {isMultiSigProposal && transactionHash ? (
-            <ProposalConfirmationDetails
-              safeId={safeId}
-              approvalCount={approvalCount}
-              approvers={approvers}
-              memberCount={memberCount}
-              threshold={threshold}
+          {isGovernanceProposal ? (
+            <GovernanceProposalConfirmationDetails
+              proposal={proposalDetails}
+              hasConnectedWalletVoted={hasVoted}
               status={proposalStatus}
-              transactionHash={transactionHash}
               hexStringData={hexStringData}
               msgValue={msgValue}
               operation={operation}
               nonce={nonce}
-              approveProposalMutation={approveProposalMutation}
-              executeProposalMutation={executeProposalMutation}
+              votingPower={votingPower}
+              castVote={castVote}
+              executeProposal={executeProposal}
+              cancelProposal={cancelProposal}
             />
           ) : (
             <ProposalVoteDetails />

@@ -2,7 +2,7 @@ import { Text, Flex } from "@chakra-ui/react";
 import { Color } from "@dex-ui-components";
 
 interface ProposalTransactionDetailsProps {
-  transactionHash: string;
+  transactionHash?: string;
 }
 
 export function ProposalTransactionDetails(props: ProposalTransactionDetailsProps) {
@@ -13,9 +13,11 @@ export function ProposalTransactionDetails(props: ProposalTransactionDetailsProp
         <Text textStyle="p small medium">Transaction hash</Text>
       </Flex>
       <Flex flexDirection="column" alignItems="start" gap="2">
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {transactionHash}
-        </Text>
+        {transactionHash && (
+          <Text textStyle="p small regular" color={Color.Neutral._700}>
+            {transactionHash}
+          </Text>
+        )}
       </Flex>
     </Flex>
   );

@@ -10,7 +10,7 @@ import {
   MirrorNodeEventLog,
   MirrorNodeAccountById,
 } from "./types";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
 import { AccountId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
@@ -248,6 +248,22 @@ function createMirrorNodeService() {
     return proposals;
   };
 
+  const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<BigNumber | undefined> => {
+    const accountAddress = AccountId.fromString(userID).toSolidityAddress();
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+      params: {
+        order: "desc",
+      },
+    });
+
+    const allEvents = decodeLog(abiSignatures, response.data.logs, ["UpdatedAmount"]);
+    const amountUpdatedEvents = allEvents.get("UpdatedAmount") ?? [];
+    const lockTokenDetails = amountUpdatedEvents.find(
+      (item) => AccountId.fromSolidityAddress(item.user).toSolidityAddress() === accountAddress
+    );
+    return lockTokenDetails?.idOrAmount;
+  };
+
   const fetchAccountInfo = async (accountAddress: string): Promise<MirrorNodeAccountById> => {
     const { data: accountData } = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${accountAddress}`);
     return accountData;
@@ -276,6 +292,7 @@ function createMirrorNodeService() {
     fetchTransactionRecord,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
+    fetchUpgradeContractEvents,
   };
 }
 

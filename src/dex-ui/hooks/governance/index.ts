@@ -12,3 +12,4 @@ export * from "./useUnlockGODToken";
 export * from "./useCreateTextProposal";
 export * from "./useCreateContractUpgradeProposal";
 export * from "./useCreateTokenTransferProposal";
+export * from "./types";

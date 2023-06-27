@@ -41,6 +41,16 @@ const getTimestampNDaysAgo = (NDaysAgo: number): string => {
   return timestampDaysAgo.toString();
 };
 
+const convertToLocalString = (date: Date) => {
+  return date.toLocaleString([], {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const getTimestamp24HoursAgo = () => getTimestampNDaysAgo(1);
 const getTimestamp7DaysAgo = () => getTimestampNDaysAgo(7);
 
@@ -54,16 +64,12 @@ export function getTimeRemaining(startBlock: string, endBlock: string): BigNumbe
   return duration;
 }
 
+export function getVotingEndTime(startTime: string, duration: string): string {
+  return convertToLocalString(new Date((parseInt(startTime) + parseInt(duration)) * MILLISECONDS_IN_A_SECOND));
+}
+
 export function getFormattedEndTime(timeStamp: string): string {
-  return new Date(parseInt(timeStamp) * MILLISECONDS_IN_A_SECOND)
-    .toLocaleString([], {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-    .replace(",", "");
+  return convertToLocalString(new Date(parseInt(timeStamp) * MILLISECONDS_IN_A_SECOND));
 }
 
 export function convertFromBlocksToDays(blocks: number): number {
