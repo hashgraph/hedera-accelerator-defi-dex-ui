@@ -14,7 +14,6 @@ interface ProposalDetailsProps {
   receiver: string;
   tokenId: string;
   tokenSymbol: string;
-  tokenDecimals: string;
   event: ProposalEvent;
   type: ProposalType;
   approvers: string[];
@@ -23,22 +22,10 @@ interface ProposalDetailsProps {
 }
 
 export function ProposalDetails(props: ProposalDetailsProps) {
-  const {
-    amount,
-    receiver,
-    tokenId,
-    tokenSymbol,
-    tokenDecimals,
-    event,
-    type,
-    approvers,
-    approvalCount,
-    transactionHash,
-  } = props;
+  const { amount, receiver, tokenId, tokenSymbol, event, type, approvers, approvalCount, transactionHash } = props;
 
-  /** TODO: Add 'description' and 'created' values to contract event. */
+  /** TODO: Add 'description' to contract event. */
   const description = ["-"];
-  const created = "-";
 
   return (
     <Flex direction="column" gap="2">
@@ -53,14 +40,13 @@ export function ProposalDetails(props: ProposalDetailsProps) {
           targetAccountId={receiver}
           tokenId={tokenId}
           tokenSymbol={tokenSymbol}
-          tokenDecimals={tokenDecimals}
           event={event}
           type={type}
         />
         <Divider />
         <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
         <Divider />
-        <ProposalTransactionDetails transactionHash={transactionHash} created={created} />
+        <ProposalTransactionDetails transactionHash={transactionHash} />
       </Flex>
     </Flex>
   );
