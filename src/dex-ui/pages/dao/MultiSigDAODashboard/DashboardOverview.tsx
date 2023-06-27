@@ -6,7 +6,7 @@ import { getDAOLinksRecordArray } from "../utils";
 import { useDAOProposals } from "@hooks";
 import { ProposalCard } from "../ProposalCard";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
-import { isNotNil } from "ramda";
+import { isEmpty, isNotNil } from "ramda";
 import { Paths } from "@routes";
 import { replaceLastRoute } from "@utils";
 
@@ -36,7 +36,7 @@ export function DashboardOverview() {
       return <LoadingSpinnerLayout />;
     }
 
-    if (isSuccess && isNotNil(transactions)) {
+    if (isSuccess && isNotNil(transactions) && !isEmpty(transactions)) {
       return transactions
         ?.sort((proposalA, proposalB) => proposalA.id - proposalB.id)
         .slice(0, 3)

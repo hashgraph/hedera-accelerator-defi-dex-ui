@@ -1,5 +1,7 @@
 export const DAOToolTips = Object.freeze({
-  threshold: "This is the minimum number of signers required to validate a transaction.",
+  threshold:
+    "This is the minimum number of signers required to validate a transaction. " +
+    "The Admin is not included in the max threshold count.",
   quorum: `This is the percentage of voting power required in 
     order for a proposal vote to be valid. If quorum is not 
     met, the proposal is cancelled.`,

@@ -1,21 +1,18 @@
 import { Text, Flex } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData } from "@dex-ui-components";
 import { ProposalEvent, ProposalType } from "@hooks";
-import { formatTokenAmountWithDecimal } from "@utils";
 
 interface ProposalActionDetailsProps {
   amount: number;
   targetAccountId: string;
   tokenId: string;
   tokenSymbol: string;
-  tokenDecimals: string;
   event: ProposalEvent;
   type: ProposalType;
 }
 
 export function ProposalActionDetails(props: ProposalActionDetailsProps) {
-  const { amount, targetAccountId, tokenId, tokenSymbol, tokenDecimals, event, type } = props;
-  const amountDisplay = formatTokenAmountWithDecimal(amount, Number(tokenDecimals));
+  const { amount, targetAccountId, tokenId, tokenSymbol, event, type } = props;
 
   const LabelDisplays: Readonly<{ [key in ProposalType]: string }> = {
     [ProposalType.TokenTransfer]: "To",
@@ -33,7 +30,7 @@ export function ProposalActionDetails(props: ProposalActionDetailsProps) {
           <Text textStyle="p small medium">{event}</Text>
           <Flex direction="row" gap="2" alignItems="center">
             <Text textStyle="p medium regular" color={Color.Neutral._700}>
-              {amountDisplay} {tokenSymbol}
+              {amount} {tokenSymbol}
             </Text>
             <HashScanLink id={tokenId} type={HashscanData.Token} withParentheses />
           </Flex>

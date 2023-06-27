@@ -30,12 +30,13 @@ import {
 } from "@hooks";
 import { isNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
+import { getLastPathInRoute } from "@dex-ui/utils";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
   const createDaoProposalForm = useForm<CreateDAOProposalForm>({
     defaultValues: {
-      type: DAOProposalType.Text,
+      type: DAOProposalType.TokenTransfer,
       title: "",
       description: "",
       linkToDiscussion: "",
@@ -52,6 +53,7 @@ export function CreateDAOProposal() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentDaoType = location.pathname.split("/").at(2) ?? "";
+  const currentWizardStep = getLastPathInRoute(location.pathname);
   const backTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/${Paths.DAOs.Overview}`;
   const daosQueryResults = useDAOs(daoAccountId);
   const handleTransactionSuccess = useHandleTransactionSuccess();
@@ -64,6 +66,8 @@ export function CreateDAOProposal() {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const transferFrom = currentDaoType === "multisig" ? safeAccountId : walletId;
+  const wizardTitle = currentWizardStep === "type" ? "New Proposal" : type;
+
   const sendMultisigTokenMutationResults = useCreateMultiSigProposal(handleCreateDAOProposalSuccess);
   const {
     isLoading: isCreateMultisigTokenTransferLoading,
@@ -414,7 +418,7 @@ export function CreateDAOProposal() {
         body={
           <Wizard<CreateDAOProposalForm>
             context={{
-              title: "New Proposal",
+              title: wizardTitle,
               backLabel: "Back to dashboard",
               backTo,
               stepper: {

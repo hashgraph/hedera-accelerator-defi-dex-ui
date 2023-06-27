@@ -14,11 +14,13 @@ import {
 import { useFormContext } from "react-hook-form";
 
 const MultiSigProposals = [
-  {
-    title: DAOProposalType.Text,
-    label: "Create a text only proposal.",
-    icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
+  /* TODO: Enabled Text Proposals for MultiSig DAOs
+    {
+      title: DAOProposalType.Text,
+      label: "Create a text only proposal.",
+      icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+    }, 
+  */
   {
     title: DAOProposalType.TokenTransfer,
     label: "Propose a token transfer.",

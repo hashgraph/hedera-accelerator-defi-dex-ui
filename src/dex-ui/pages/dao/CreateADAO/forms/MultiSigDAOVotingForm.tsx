@@ -12,7 +12,7 @@ export function MultiSigDAOVotingForm() {
   } = useFormContext<CreateAMultiSigDAOForm>();
   const { governance } = getValues();
 
-  const maxThreshold = (governance?.owners?.length ?? 0) + 1;
+  const maxThreshold = governance?.owners?.length ?? 0;
   const minThreshold = 1;
 
   return (
