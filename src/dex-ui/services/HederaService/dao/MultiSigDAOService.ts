@@ -157,4 +157,35 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
   return sendProposeTransactionResponse;
 }
 
-export { sendCreateMultiSigDAOTransaction, sendProposeTransferTransaction, sendProposeTransaction };
+interface UpdateDAODetailsTransactionParams {
+  name: string;
+  description: string;
+  logoUrl: string;
+  webLinks: string[];
+  daoAccountId: string;
+  signer: HashConnectSigner;
+}
+
+async function sendUpdateDAODetailsTransaction(params: UpdateDAODetailsTransactionParams) {
+  const { name, description, logoUrl, webLinks, daoAccountId, signer } = params;
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addString(name)
+    .addString(logoUrl)
+    .addString(description)
+    .addStringArray(webLinks);
+  const sendProposeUpdateDAODetailsTransaction = await new ContractExecuteTransaction()
+    .setContractId(daoAccountId)
+    .setFunction(MultiSigDAOContractFunctions.UpdateDAOInfo, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeUpdateDAODetailsResponse = await sendProposeUpdateDAODetailsTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendProposeUpdateDAODetailsResponse, MultiSigDAOContractFunctions.UpdateDAOInfo);
+  return sendProposeUpdateDAODetailsResponse;
+}
+
+export {
+  sendCreateMultiSigDAOTransaction,
+  sendProposeTransferTransaction,
+  sendProposeTransaction,
+  sendUpdateDAODetailsTransaction,
+};

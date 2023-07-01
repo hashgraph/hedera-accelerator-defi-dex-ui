@@ -56,6 +56,13 @@ export interface MultiSigDAOCreatedEventArgs {
   };
 }
 
+export interface MultiSigDAODetailsInfoEventArgs {
+  name: string;
+  logoUrl: string;
+  description: string;
+  webLinks: string[];
+}
+
 export interface GovernanceDAODetails {
   type: DAOType.GovernanceToken;
   accountId: string;
@@ -111,12 +118,11 @@ export interface MultiSigDAODetails {
   threshold: number;
 }
 
-export interface MultiSigDaoSettingForm {
+export interface MultiSigDaoSettingsDetails {
   name: string;
   description: string;
-  logoUrl?: string;
-  isPublic?: boolean;
-  daoLinks: Record<"value", string>[];
+  logoUrl: string;
+  webLinks: string[];
 }
 
 export type DAO = MultiSigDAODetails | GovernanceDAODetails | NFTDAODetails;
@@ -131,6 +137,7 @@ export enum DAOEvents {
   SafeSetup = "SafeSetup",
   RemovedOwner = "RemovedOwner",
   ChangedThreshold = "ChangedThreshold",
+  DAOInfoUpdated = "DAOInfoUpdated",
 }
 
 export enum HederaGnosisSafeFunctions {

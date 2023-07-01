@@ -13,4 +13,5 @@ export * from "./useCreateDAOTokenTransferProposal";
 export * from "./useCreateDAOUpgradeProposal";
 export * from "./useCreateDAOTextProposal";
 export * from "./useFetchDAOLockedGovToken";
+export * from "./useUpdateDAODetails";
 export * from "./types";

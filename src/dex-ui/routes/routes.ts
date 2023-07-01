@@ -41,6 +41,7 @@ export const Paths = {
     Settings: "settings",
     Staking: "staking",
     AddMember: "add-member",
+    ChangeDAOSettings: "change-dao-details",
     DeleteMember: "delete-member",
     ReplaceMember: "replace-member",
     ChangeThreshold: "change-threshold",

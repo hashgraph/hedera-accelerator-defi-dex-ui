@@ -25,6 +25,7 @@ enum ContractNames {
   GodTokenHolderFactory = "godtokenholderfactory",
   FTDAOFactory = "ftdaofactory",
   MultiSigDAOFactory = "multisigdaofactory",
+  MultiSigDAO = "multisigdao",
   NFTDAOFactory = "nftdaofactory",
 }
 
@@ -61,6 +62,9 @@ export const Contracts = {
   },
   MultiSigDAOFactory: {
     ProxyId: getProxyId(ContractNames.MultiSigDAOFactory),
+  },
+  MultiSigDAO: {
+    ProxyId: getProxyId(ContractNames.MultiSigDAO),
   },
   NFTDAOFactory: {
     ProxyId: getProxyId(ContractNames.NFTDAOFactory),

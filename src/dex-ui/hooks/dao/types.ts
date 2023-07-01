@@ -18,6 +18,7 @@ export enum DAOMutations {
   CreateChangeThresholdProposal = "CreateChangeThresholdProposal",
   ApproveProposal = "ApproveProposal",
   ExecuteProposal = "ExecuteProposal",
+  UpdateDAODetails = "UpdateDAODetails",
 }
 
 export enum ProposalStatus {
