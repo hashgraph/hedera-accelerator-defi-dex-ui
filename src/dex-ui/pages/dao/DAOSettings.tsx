@@ -5,7 +5,7 @@ import { convertFromBlocksToDays, isValidUrl } from "@utils";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
-import { DAOSettingsForm } from "./CreateADAO/types";
+import { DAOSettingsForm } from "./types";
 import { getDAOLinksRecordArray } from "./utils";
 
 export function DAOSettings() {

@@ -19,12 +19,19 @@ import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { getDAOLinksRecordArray } from "../utils";
 import { Link as ReachLink } from "react-router-dom";
+import { useDexContext } from "@hooks";
+import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { Paths } from "@routes";
 
 export function Settings() {
   const navigate = useNavigate();
   const { dao, ownerCount, members } = useOutletContext<MultiSigDAODetailsContext>();
   const { name, logoUrl, description, webLinks, adminId, threshold } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
+  const isAdminWalletPaired =
+    walletId === adminId && wallet.hashConnectConnectionState === HashConnectConnectionState.Paired;
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const membersWithAdminFirst: Member[] = R.swap(0, adminIndex, members);
   const daoLinkRecords = getDAOLinksRecordArray(webLinks);
@@ -34,19 +41,23 @@ export function Settings() {
   }
 
   function handleAddNewMemberClicked() {
-    navigate(`add-member`);
+    navigate(Paths.DAOs.AddMember);
   }
 
   function handleDeleteMemberClick(member: string) {
-    navigate(`delete-member/${member}`);
+    navigate(`${Paths.DAOs.DeleteMember}/${member}`);
   }
 
   function handleReplaceMemberClick(member: string) {
-    navigate(`replace-member/${member}`);
+    navigate(`${Paths.DAOs.ReplaceMember}/${member}`);
   }
 
   function handleChangeThresholdClick() {
-    navigate("change-threshold");
+    navigate(Paths.DAOs.ChangeThreshold);
+  }
+
+  function handleChangeDAODetailsClick() {
+    navigate(Paths.DAOs.ChangeDAOSettings);
   }
 
   return (
@@ -199,24 +210,20 @@ export function Settings() {
               </UnorderedList>
             </Flex>
           </Flex>
-          <Divider marginBottom="0.4rem" />
-          {/*
-           * TODO: Directs the user to the 'Change Details' create proposal wizard with
-           * the 'Change Details' proposal type preselected. Requires the Smart Contracts to
-           * support a 'Change Details' proposal type.
-           */}
-          {/*
-           <Button
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            variant="primary"
-            padding="10px 10px"
-            height="40px"
-            width="123px"
-            alignSelf="end"
-          >
-            Change
-          </Button> */}
+          {isAdminWalletPaired ? (
+            <Flex alignItems="flex-end" gap="1rem" direction="column">
+              <Divider />
+              <Button
+                type="button"
+                variant="primary"
+                padding="10px 15px"
+                height="40px"
+                onClick={handleChangeDAODetailsClick}
+              >
+                Change
+              </Button>
+            </Flex>
+          ) : undefined}
         </DAOFormContainer>
       </Flex>
     </form>

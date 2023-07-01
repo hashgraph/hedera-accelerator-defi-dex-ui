@@ -29,6 +29,8 @@ import {
   HederaGnosisSafeFunctions,
   MultiSigProposeTransactionType,
   DAOProposalGovernors,
+  MultiSigDaoSettingsDetails,
+  MultiSigDAODetailsInfoEventArgs,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { convertToByte32 } from "@utils";
@@ -94,11 +96,15 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     ...logs.map(async (log): Promise<MultiSigDAODetails> => {
       const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
       const { daoAddress, safeAddress, inputs } = argsWithName;
-      const { admin, name, logoUrl, isPrivate, threshold: _threshold, title, description, webLinks } = inputs;
+      const { admin, isPrivate, threshold: _threshold, title } = inputs;
       const safeLogs = await fetchHederaGnosisSafeLogs(safeAddress);
       const owners = getOwners(safeLogs);
       const threshold = getThreshold(safeLogs, _threshold);
 
+      const { name, description, logoUrl, webLinks } = await fetchMultiSigDAOSettingsPageDetails(
+        AccountId.fromSolidityAddress(daoAddress).toString(),
+        [DAOEvents.DAOInfoUpdated]
+      );
       return {
         type: DAOType.MultiSig,
         accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
@@ -115,6 +121,26 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
       };
     }),
   ]);
+}
+
+async function fetchMultiSigDAOSettingsPageDetails(
+  accountId: string,
+  eventTypes?: string[]
+): Promise<MultiSigDaoSettingsDetails> {
+  const log = await DexService.fetchParsedEventLogs(
+    accountId,
+    new ethers.utils.Interface(MultiSigDAOJSON.abi),
+    eventTypes
+  );
+  const argsWithName = getEventArgumentsByName<MultiSigDAODetailsInfoEventArgs>(log[0].args.daoInfo, ["webLinks"]);
+  const { name, logoUrl, description, webLinks } = argsWithName;
+
+  return {
+    name,
+    logoUrl,
+    description,
+    webLinks,
+  };
 }
 
 async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAODetails[]> {

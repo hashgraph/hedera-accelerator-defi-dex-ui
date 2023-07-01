@@ -44,12 +44,12 @@
   },
   {
     "name": "multisigdaofactory",
-    "id": "0.0.14831452",
-    "address": "0x0000000000000000000000000000000000e24f5c",
-    "timestamp": "2023-06-19T11:17:08.467Z",
-    "hash": "afb924258013b08ee73ac386f5c71a23",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e24f7e",
-    "transparentProxyId": "0.0.14831486"
+    "id": "0.0.15003721",
+    "address": "0x0000000000000000000000000000000000e4f049",
+    "timestamp": "2023-06-28T07:09:13.763Z",
+    "hash": "0bda0ada8d6c6aaffe3397cc647a3813",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e4f04b",
+    "transparentProxyId": "0.0.15003723"
   },
   {
     "name": "pair",
