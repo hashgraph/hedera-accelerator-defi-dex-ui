@@ -5,10 +5,10 @@ interface ProgressBarProps extends ProgressProps {
 }
 
 export function ProgressBar(props: ProgressBarProps) {
-  const { progressBarColor } = props;
+  const { progressBarColor, ...rest } = props;
   return (
     <Progress
-      {...props}
+      {...rest}
       bg={Color.Neutral._200}
       sx={{
         "& > div": {
