@@ -7,6 +7,8 @@ import { Paths } from "@routes";
 import { TokenTransferLocationState } from "@pages";
 import { HBARTokenSymbol } from "@services";
 
+const { absolute: AbsolutePath, Multisig, DAOTokenTransferDetails } = Paths.DAOs;
+
 export function AssetsList() {
   const navigate = useNavigate();
   const { accountId: daoAccountId = "" } = useParams();
@@ -17,7 +19,7 @@ export function AssetsList() {
   const assetsWithHBARFirst: Asset[] = R.swap(0, hbarIndex, assets);
 
   function handleSendTokenClicked(tokenId: string) {
-    navigate(`${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/new-proposal/token-transfer/details`, {
+    navigate(`${AbsolutePath}/${Multisig}/${daoAccountId}/new-proposal/${DAOTokenTransferDetails}`, {
       state: { tokenId },
     } as TokenTransferLocationState);
   }

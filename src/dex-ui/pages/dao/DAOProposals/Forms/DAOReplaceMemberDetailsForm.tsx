@@ -1,14 +1,28 @@
 import { Flex } from "@chakra-ui/react";
 import { FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateDAOMemberOperationForm } from "../types";
+import { CreateDAOMemberOperationForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { checkForValidAccountId } from "@utils";
+import { useLocation, useOutletContext } from "react-router-dom";
+
+export interface ReplaceMemberLocationState {
+  state: {
+    memberId: string;
+  };
+}
 
 export function DAOReplaceMemberDetailsForm() {
+  const { state } = useLocation() as ReplaceMemberLocationState;
+  const { proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOMemberOperationForm>();
+
+  if (proposalType !== DAOProposalType.ReplaceMember) {
+    setValue("type", DAOProposalType.ReplaceMember);
+  }
 
   return (
     <Flex direction="column" gap="1.3rem">
@@ -54,6 +68,7 @@ export function DAOReplaceMemberDetailsForm() {
               validate: (value) => checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
             }),
           },
+          value: state?.memberId,
         }}
         isInvalid={Boolean(errors?.memberAddress)}
         errorMessage={errors?.memberAddress && errors?.memberAddress.message}
