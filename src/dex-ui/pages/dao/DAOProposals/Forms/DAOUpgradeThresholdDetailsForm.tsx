@@ -1,16 +1,21 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Color, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateDAOUpgradeThresholdForm, CreateDAOProposalContext } from "../types";
+import { CreateDAOUpgradeThresholdForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { checkForValidPositiveNumber } from "@utils";
 import { useOutletContext } from "react-router-dom";
 
 export function DAOUpgradeThresholdDetailsForm() {
-  const { membersCount, threshold } = useOutletContext<CreateDAOProposalContext>();
+  const { membersCount, threshold, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOUpgradeThresholdForm>();
+
+  if (proposalType !== DAOProposalType.UpgradeThreshold) {
+    setValue("type", DAOProposalType.UpgradeThreshold);
+  }
 
   return (
     <Flex direction="column" gap="1.1rem">

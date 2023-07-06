@@ -3,7 +3,3 @@ export * from "./ProposalList";
 export * from "./DashboardOverview";
 export * from "./AssetsList";
 export * from "./Settings";
-export * from "./AddMember";
-export * from "./DeleteMember";
-export * from "./ReplaceMember";
-export * from "./ChangeThreshold";

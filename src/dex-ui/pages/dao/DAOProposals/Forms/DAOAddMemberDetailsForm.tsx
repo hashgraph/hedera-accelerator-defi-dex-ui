@@ -1,16 +1,22 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Color, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateDAOMemberOperationForm, CreateDAOProposalContext } from "../types";
+import { CreateDAOMemberOperationForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { useOutletContext } from "react-router-dom";
 import { checkForValidAccountId, checkForValidPositiveNumber } from "@utils";
 
 export function DAOAddMemberDetailsForm() {
-  const { threshold, membersCount } = useOutletContext<CreateDAOProposalContext>();
+  const { threshold, membersCount, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOMemberOperationForm>();
+
+  if (proposalType !== DAOProposalType.AddMember) {
+    setValue("type", DAOProposalType.AddMember);
+  }
+
   return (
     <Flex direction="column" gap="1.3rem">
       <FormInput<"title">

@@ -1,16 +1,28 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { Color, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateDAOMemberOperationForm, CreateDAOProposalContext } from "../types";
+import { CreateDAOMemberOperationForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { checkForValidAccountId, checkForValidPositiveNumber } from "@utils";
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
+
+export interface RemoveMemberLocationState {
+  state: {
+    memberId: string;
+  };
+}
 
 export function DAODeleteMemberDetailsForm() {
-  const { membersCount, threshold } = useOutletContext<CreateDAOProposalContext>();
+  const { state } = useLocation() as RemoveMemberLocationState;
+  const { membersCount, threshold, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOMemberOperationForm>();
+
+  if (proposalType !== DAOProposalType.RemoveMember) {
+    setValue("type", DAOProposalType.RemoveMember);
+  }
 
   return (
     <Flex direction="column" gap="1.3rem">
@@ -56,6 +68,7 @@ export function DAODeleteMemberDetailsForm() {
               validate: (value) => checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
             }),
           },
+          value: state?.memberId,
         }}
         isInvalid={Boolean(errors?.memberAddress)}
         errorMessage={errors?.memberAddress && errors?.memberAddress?.message}

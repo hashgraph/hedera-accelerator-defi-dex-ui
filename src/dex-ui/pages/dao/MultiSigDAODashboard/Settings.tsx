@@ -22,11 +22,21 @@ import { Link as ReachLink } from "react-router-dom";
 import { useDexContext } from "@hooks";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { Paths } from "@routes";
+import { RemoveMemberLocationState, ReplaceMemberLocationState } from "@pages";
+
+const {
+  absolute: AbsolutePath,
+  Multisig,
+  DAOAddMemberDetails,
+  DAODeleteMemberDetails,
+  DAOReplaceMemberDetails,
+  DAOUpgradeThresholdDetails,
+} = Paths.DAOs;
 
 export function Settings() {
   const navigate = useNavigate();
   const { dao, ownerCount, members } = useOutletContext<MultiSigDAODetailsContext>();
-  const { name, logoUrl, description, webLinks, adminId, threshold } = dao;
+  const { name, logoUrl, description, webLinks, adminId, threshold, accountId: daoAccountId } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
@@ -41,19 +51,23 @@ export function Settings() {
   }
 
   function handleAddNewMemberClicked() {
-    navigate(Paths.DAOs.AddMember);
+    navigate(`${AbsolutePath}/${Multisig}/${daoAccountId}/new-proposal/${DAOAddMemberDetails}`);
   }
 
-  function handleDeleteMemberClick(member: string) {
-    navigate(`${Paths.DAOs.DeleteMember}/${member}`);
+  function handleDeleteMemberClick(memberId: string) {
+    navigate(`${AbsolutePath}/${Multisig}/${daoAccountId}/new-proposal/${DAODeleteMemberDetails}`, {
+      state: { memberId },
+    } as RemoveMemberLocationState);
   }
 
-  function handleReplaceMemberClick(member: string) {
-    navigate(`${Paths.DAOs.ReplaceMember}/${member}`);
+  function handleReplaceMemberClick(memberId: string) {
+    navigate(`${AbsolutePath}/${Multisig}/${daoAccountId}/new-proposal/${DAOReplaceMemberDetails}`, {
+      state: { memberId },
+    } as ReplaceMemberLocationState);
   }
 
   function handleChangeThresholdClick() {
-    navigate(Paths.DAOs.ChangeThreshold);
+    navigate(`${AbsolutePath}/${Multisig}/${daoAccountId}/new-proposal/${DAOUpgradeThresholdDetails}`);
   }
 
   function handleChangeDAODetailsClick() {
