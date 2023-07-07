@@ -1,6 +1,6 @@
 enum GovernorContractFunctions {
   CreateProposal = "createProposal",
-  CastVote = "castVote",
+  CastVotePublic = "castVotePublic",
   ExecuteProposal = "executeProposal",
   ClaimGODToken = "claimGODToken",
   DeployABIFile = "deployABIFile",

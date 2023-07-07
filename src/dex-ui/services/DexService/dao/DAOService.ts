@@ -313,9 +313,9 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
   };
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
     const proposalEventsResults = await Promise.allSettled([
-      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.tokenTransferLogic),
-      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.textLogic),
-      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.contractUpgradeLogic),
+      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.tokenTransferLogic, false),
+      DexService.fetchContractProposalEvents(ProposalType.TextProposal, governors.textLogic, false),
+      DexService.fetchContractProposalEvents(ProposalType.UpgradeContract, governors.contractUpgradeLogic, false),
     ]);
     return getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
   };

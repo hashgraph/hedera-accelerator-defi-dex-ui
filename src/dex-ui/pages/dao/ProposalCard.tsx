@@ -137,7 +137,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
-                      {formatTokenAmountWithDecimal(amount, Number(token?.data.decimals))} {tokenSymbol}
+                      {formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} {tokenSymbol}
                     </Text>
                   </Flex>
                 )}

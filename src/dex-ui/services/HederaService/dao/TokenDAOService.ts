@@ -50,7 +50,7 @@ async function sendCreateGovernanceDAOTransaction(
   const ftDAOFactoryContractId = ContractId.fromString(Contracts.FTDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
   const tokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
-  const preciseQuorum = BigNumber(quorum);
+  const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
   const createDaoParams: any[] = [

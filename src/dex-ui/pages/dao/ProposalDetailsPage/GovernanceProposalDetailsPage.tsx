@@ -64,14 +64,13 @@ export function GovernanceProposalDetailsPage() {
       operation,
       nonce,
       daoType,
-      votes,
+      isQuorumReached,
     } = proposalDetails;
 
     const isGovernanceProposal = daoType === DAOType.GovernanceToken;
-    const isThresholdReached = +(votes?.yes ?? 0) >= +(votes?.quorum ?? 0);
 
     /** TODO: Update contracts to support a "queued" status. */
-    const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
+    const proposalStatus = status === ProposalStatus.Pending && isQuorumReached ? ProposalStatus.Queued : status;
 
     return (
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
@@ -85,7 +84,7 @@ export function GovernanceProposalDetailsPage() {
             />
             <ProposalDetailsStepper
               status={proposalStatus}
-              isThresholdReached={isThresholdReached}
+              isThresholdReached={isQuorumReached ?? false}
               isExecutionProcessing={isProposalBeingExecuted}
               hasExecutionFailed={hasProposalExecutionFailed}
             />

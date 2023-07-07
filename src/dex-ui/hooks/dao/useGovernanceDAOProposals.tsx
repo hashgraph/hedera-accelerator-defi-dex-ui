@@ -57,24 +57,27 @@ export function useGovernanceDAOProposals(
     const yes = convertVoteNumbers(proposalData.votingInformation?.forVotes, precisionValue);
     const no = convertVoteNumbers(proposalData.votingInformation?.againstVotes, precisionValue);
     const abstain = convertVoteNumbers(proposalData.votingInformation?.abstainVotes, precisionValue);
-    const max = !isNil(totalGodTokenSupply) ? BigNumber.from(totalGodTokenSupply.toString()) : BigNumber.from(0);
+    const max = !isNil(totalGodTokenSupply)
+      ? convertEthersBigNumberToBigNumberJS(BigNumber.from(totalGodTokenSupply.toString()))
+          .shiftedBy(-precisionValue)
+          .toNumber()
+      : 0;
     const totalVotes = yes + no + abstain;
-    const remaining = Number(
-      convertEthersBigNumberToBigNumberJS(max).minus(totalVotes).shiftedBy(-precisionValue).toNumber().toFixed(3)
-    );
-    const quorum = Number(
-      convertEthersBigNumberToBigNumberJS(BigNumber.from(proposalData.votingInformation?.quorumValue ?? 0))
-        .div(convertEthersBigNumberToBigNumberJS(max ?? BigNumber.from(1)))
-        .multipliedBy(convertEthersBigNumberToBigNumberJS(BigNumber.from(100)))
-        .toFixed(3)
-    );
+    const remaining = max - totalVotes;
+    const quorum = max
+      ? convertEthersBigNumberToBigNumberJS(BigNumber.from(proposalData.votingInformation?.quorumValue ?? 0))
+          .shiftedBy(-precisionValue)
+          .toNumber()
+      : 0;
+    const turnout = max ? Math.round(((totalVotes ?? 0) * 100) / max) : 0;
     return {
       yes,
       no,
       abstain,
       quorum,
       remaining,
-      max: convertEthersBigNumberToBigNumberJS(max).shiftedBy(-precisionValue).toNumber(),
+      max,
+      turnout,
     };
   };
 

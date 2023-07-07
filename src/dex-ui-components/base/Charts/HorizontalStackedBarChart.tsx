@@ -9,11 +9,11 @@ interface HorizontalStackedBar {
 interface HorizontalSStackedBarChartProps {
   data: HorizontalStackedBar[];
   quorum?: number;
-  height?: number;
+  stackBarHeight?: number;
 }
 
 const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => {
-  const { data, quorum, height = 12 } = props;
+  const { data, quorum, stackBarHeight = 12 } = props;
 
   const getTotalValue = (): number => {
     return data.reduce((total: number, bar: HorizontalStackedBar) => {
@@ -26,7 +26,7 @@ const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => 
   };
 
   return (
-    <Flex position="relative" borderRadius="20px" height={`${height}px`}>
+    <Flex position="relative" borderRadius="20px" height={`${stackBarHeight}px`}>
       <Flex
         position="absolute"
         left={`${quorum}%`}
@@ -40,7 +40,7 @@ const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => 
             {quorum}%
           </Text>
         </Box>
-        <Box width="0" border={`1px solid ${Color.Black_01}`} height={`${height + 5}px`} />
+        <Box width="0" border={`1px solid ${Color.Black_01}`} height={`${stackBarHeight + 5}px`} />
       </Flex>
       {data.map((bar: HorizontalStackedBar, index) => {
         return <Box width={computeBarWidthPercent(bar.value)} bg={bar.bg} key={index}></Box>;
