@@ -7,6 +7,7 @@ import { useTabFilters } from "@dex-ui/hooks";
 import { DAOFormContainer } from "../../CreateADAO/forms/DAOFormContainer";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { ChangeEvent, useState } from "react";
+import { HIPProposal } from "../../ProposalBuilder";
 
 export function DAOTextProposalDetailsForm() {
   const { tabIndex, handleTabChange } = useTabFilters(0);
@@ -16,9 +17,17 @@ export function DAOTextProposalDetailsForm() {
   } = useFormContext<CreateDAOTextProposalForm>();
   const [markdown, setMarkdown] = useState("");
 
-  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleMarkdownInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
     setMarkdown(inputValue);
+  };
+
+  const [json, setJSON] = useState("");
+
+  const handleJSONInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+    console.log(e, inputValue);
+    setJSON(inputValue);
   };
 
   return (
@@ -98,7 +107,7 @@ export function DAOTextProposalDetailsForm() {
             </Flex>
           </TabPanel>
           <TabPanel padding="1rem 0">
-            <Textarea value={markdown} onChange={handleInputChange} placeholder="Enter markdown" size="sm" />
+            <Textarea value={markdown} onChange={handleMarkdownInputChange} placeholder="Enter markdown" size="sm" />
             <Spacer padding="2rem" />
             <MarkdownPreview
               source={markdown}
@@ -107,7 +116,11 @@ export function DAOTextProposalDetailsForm() {
               }}
             />
           </TabPanel>
-          <TabPanel padding="1rem 0">HIP</TabPanel>
+          <TabPanel padding="1rem 0">
+            <Textarea value={json} onChange={handleJSONInputChange} placeholder="Enter JSON" size="sm" />
+            <Spacer padding="2rem" />
+            <HIPProposal metadata={json} />
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </>

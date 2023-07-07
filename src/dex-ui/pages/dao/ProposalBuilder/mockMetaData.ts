@@ -9,7 +9,7 @@ export const mockHIPMetaData: HIPMetaData = {
   status: HIPStatus.Accepted,
   type: HIPType.StandardsTrack,
   category: HIPCateogry.Application,
-  doesNeedCouncilApproval: false,
+  needsCouncilApproval: false,
   created: "2021-03-13",
   discussionLink: "https://github.com/hashgraph/hedera-improvement-proposal/discussions/56",
   updated: ["2021-05-12", "2021-11-30"],

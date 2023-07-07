@@ -44,7 +44,7 @@ export interface HIPMetaData {
   /** Core | Service | Mirror | Application */
   category: HIPCateogry;
   /** Yes | No */
-  doesNeedCouncilApproval: boolean;
+  needsCouncilApproval: boolean;
   /** date created on */
   created: string;
   /** a URL pointing to the official discussion thread */
@@ -73,5 +73,3 @@ export interface HIPMetaData {
     copyright_license: string;
   };
 }
-
-export type ProposalMetaData = HIPMetaData;
