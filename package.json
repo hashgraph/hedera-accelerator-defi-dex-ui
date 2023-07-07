@@ -18,6 +18,7 @@
     "@types/quill": "^2.0.9",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dropzone": "^5.1.0",
+    "@uiw/react-markdown-preview": "^4.1.13",
     "axios": "^0.27.2",
     "chakra-ui-steps": "^2.0.4",
     "ethers": "^5.7.2",
