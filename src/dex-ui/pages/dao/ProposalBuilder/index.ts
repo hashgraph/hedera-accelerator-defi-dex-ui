@@ -1,1 +1,1 @@
-export * from "./useProposalBuilder";
+export * from "./HIPProposal";
