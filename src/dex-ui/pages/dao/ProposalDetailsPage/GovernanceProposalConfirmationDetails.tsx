@@ -1,5 +1,11 @@
 import { Box, Text, Flex, Button, SimpleGrid } from "@chakra-ui/react";
-import { Color, ProgressBar, CheckCircleUnfilledIcon, LightningBoltIcon, AlertDialog } from "@dex-ui-components";
+import {
+  Color,
+  CheckCircleUnfilledIcon,
+  LightningBoltIcon,
+  AlertDialog,
+  HorizontalStackBarChart,
+} from "@dex-ui-components";
 import { VoteType } from "@pages";
 import { TransactionResponse } from "@hashgraph/sdk";
 import {
@@ -167,30 +173,23 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     [ProposalStatus.Success]: <></>,
     [ProposalStatus.Failed]: <></>,
   };
-  const { yes = 0, no = 0, abstain = 0, max = 0 } = proposal.votes ?? {};
-  const getTurnOut = () => {
-    if (!proposal.votes) {
-      return 0;
-    }
-    if (max === 0) {
-      return 0;
-    }
-    const votesCast = yes + no + abstain;
-    return Math.round((votesCast / max) * 100);
-  };
+  const { yes = 0, no = 0, abstain = 0, max = 0, turnout = 0, remaining = 0, quorum = 0 } = proposal.votes ?? {};
 
   const getVotesPercentage = (votesCount: number) => {
     if (max === 0 || !votesCount) {
       return 0;
     }
-    return Math.round((votesCount / max) * 100);
+    return (votesCount / max) * 100;
   };
 
   const getVotesCount = (votesCount: number) => {
     if (max === 0 || !votesCount) {
       return 0;
     }
-    return Math.round(votesCount / 1000);
+    if (votesCount > 1000) {
+      return `${Math.round(votesCount / 1000).toFixed(2)}K`;
+    }
+    return votesCount;
   };
 
   return (
@@ -214,18 +213,23 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               textOverflow="ellipsis"
               whiteSpace="nowrap"
             >
-              Turnout: {`${getTurnOut()}%`}
+              Turnout: {`${turnout}%`}
             </Text>
           </Flex>
         </Flex>
         <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
-          <ProgressBar
-            width="100%"
-            height="8px"
-            borderRadius="4px"
-            value={getVotesPercentage(yes)}
-            progressBarColor={Color.Grey_Blue._600}
-          />
+          <Box flex="4" margin="auto 1rem auto 0">
+            <HorizontalStackBarChart
+              quorum={getVotesPercentage(quorum)}
+              stackBarHeight={12}
+              data={[
+                { value: yes ?? 0, bg: Color.Grey_Blue._300 },
+                { value: no ?? 0, bg: Color.Grey_Blue._900 },
+                { value: abstain ?? 0, bg: Color.Grey_Blue._600 },
+                { value: remaining ?? 0, bg: Color.Grey_01 },
+              ]}
+            />
+          </Box>
           <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="1.2rem">
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
@@ -235,8 +239,10 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 </Text>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text textStyle="p small semibold" color={Color.Neutral._900}>{`${getVotesPercentage(yes)}%`}</Text>
-                <Text textStyle="p small regular" color={Color.Neutral._400}>{`${getVotesCount(yes)}K`}</Text>
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>{`${getVotesPercentage(yes).toFixed(
+                  2
+                )}%`}</Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>{`${getVotesCount(yes)}`}</Text>
               </Flex>
             </Flex>
             <Flex direction="column">
@@ -247,8 +253,10 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 </Text>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text textStyle="p small semibold" color={Color.Neutral._900}>{`${getVotesPercentage(no)}%`}</Text>
-                <Text textStyle="p small regular" color={Color.Neutral._400}>{`${getVotesCount(no)}K`}</Text>
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>{`${getVotesPercentage(no).toFixed(
+                  2
+                )}%`}</Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>{`${getVotesCount(no)}`}</Text>
               </Flex>
             </Flex>
             <Flex direction="column">
@@ -260,10 +268,26 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               </Flex>
               <Flex gap={1} alignItems="center">
                 <Text textStyle="p small semibold" color={Color.Neutral._900}>
-                  {`${getVotesPercentage(abstain)}%`}
+                  {`${getVotesPercentage(abstain).toFixed(2)}%`}
                 </Text>
                 <Text textStyle="p small regular" color={Color.Neutral._400}>
-                  {`${getVotesCount(abstain)}K`}
+                  {`${getVotesCount(abstain)}`}
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex direction="column">
+              <Flex gap={1} alignItems="center">
+                <Box bg={Color.Grey_01} width="0.75rem" height="0.75rem"></Box>
+                <Text textStyle="p small semibold" color={Color.Neutral._600}>
+                  Remaining
+                </Text>
+              </Flex>
+              <Flex gap={1} alignItems="center">
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>
+                  {`${getVotesPercentage(remaining).toFixed(2)}%`}
+                </Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>
+                  {`${getVotesCount(remaining)}`}
                 </Text>
               </Flex>
             </Flex>

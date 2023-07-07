@@ -6,7 +6,7 @@ import {
   ProposalMemberVotes,
   ProposalTransactionDetails,
 } from "./ProposalDetailsComponents";
-import { Color } from "@dex-ui-components";
+import { Color, Tag, TagVariant } from "@dex-ui-components";
 
 interface ProposalDetailsProps {
   description: string[];
@@ -43,25 +43,37 @@ export function ProposalDetails(props: ProposalDetailsProps) {
         Details
       </Text>
       <Flex layerStyle="content-box" direction="column" gap="4">
-        <ProposalActionDetails
-          amount={amount}
-          targetAccountId={receiver}
-          tokenId={tokenId}
-          tokenSymbol={tokenSymbol}
-          tokenDecimals={tokenDecimals}
-          event={event}
-          type={type}
-        />
-        <Divider />
-        <ProposalDetailsDescription description={description} />
-        <Divider />
-        {approvers && approvalCount && transactionHash && (
+        <Flex direction="column" gap="2" alignItems="flex-start">
+          <Text textStyle="p small medium">Type</Text>
+          <Tag variant={TagVariant.Primary} label={type} />
+        </Flex>
+        {type === ProposalType.TokenTransfer && (
           <>
-            <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
             <Divider />
+            <ProposalActionDetails
+              amount={amount}
+              targetAccountId={receiver}
+              tokenId={tokenId}
+              tokenSymbol={tokenSymbol}
+              tokenDecimals={tokenDecimals}
+              event={event}
+            />
           </>
         )}
-        <ProposalTransactionDetails transactionHash={transactionHash} />
+        <Divider />
+        <ProposalDetailsDescription description={description} />
+        {approvers && approvalCount && (
+          <>
+            <Divider />
+            <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
+          </>
+        )}
+        {transactionHash && (
+          <>
+            <Divider />
+            <ProposalTransactionDetails transactionHash={transactionHash} />
+          </>
+        )}
       </Flex>
     </Flex>
   );

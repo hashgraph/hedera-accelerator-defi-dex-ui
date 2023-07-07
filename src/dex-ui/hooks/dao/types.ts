@@ -41,6 +41,8 @@ export enum ProposalType {
   RemoveMember = "Remove Member",
   ReplaceMember = "Replace Member",
   ChangeThreshold = "Upgrade Threshold",
+  UpgradeContract = "Upgrade Contract",
+  TextProposal = "Text Proposal",
 }
 
 export interface Votes {
@@ -50,6 +52,7 @@ export interface Votes {
   quorum: number | undefined;
   remaining: number | undefined;
   max: number | undefined;
+  turnout: number | undefined;
 }
 
 export interface Proposal {

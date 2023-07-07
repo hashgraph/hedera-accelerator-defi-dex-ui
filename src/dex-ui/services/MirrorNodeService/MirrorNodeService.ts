@@ -1,5 +1,5 @@
 import axios from "axios";
-import { isNil, path } from "ramda";
+import { isNil, path, uniqBy } from "ramda";
 import {
   MirrorNodeTokenById,
   MirrorNodeAccountBalance,
@@ -202,7 +202,8 @@ function createMirrorNodeService() {
   // TODO: Move to Governance Service
   const fetchContractProposalEvents = async (
     proposalType: string,
-    contractId: string
+    contractId: string,
+    limitResults = true
   ): Promise<MirrorNodeDecodedProposalEvent[]> => {
     /*
      Currently, each proposal requires multiple additional calls to the smart contract
@@ -221,23 +222,27 @@ function createMirrorNodeService() {
       }
     );
     */
+    const params: any = {
+      order: "desc",
+      /**
+       * Every proposal fetched from the mirror node logs requires an additional hashio
+       * JSON RPC call to fetch the remaining details for the UI. Some of these calls are failing
+       * with a "HBAR rate limit exceeded" error resulting in the UI displaying an error. This is due to
+       * our queries exceeding the global rate limit for the JSON RPC service.
+       *
+       * To reduce the frequency at which this error occurs a temporary limit has been put in place. A
+       * max of 5 proposal details for each type of proposal will be fetched from the proposal logs.
+       *
+       * @see {@link file://./../../../../architecture/05_Event_Based_Historical_Queries.md} for more details
+       * regarding a long term solution.
+       */
+      limit: 5,
+    };
+    if (!limitResults) {
+      delete params.limit;
+    }
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
-      params: {
-        order: "desc",
-        /**
-         * Every proposal fetched from the mirror node logs requires an additional hashio
-         * JSON RPC call to fetch the remaining details for the UI. Some of these calls are failing
-         * with a "HBAR rate limit exceeded" error resulting in the UI displaying an error. This is due to
-         * our queries exceeding the global rate limit for the JSON RPC service.
-         *
-         * To reduce the frequency at which this error occurs a temporary limit has been put in place. A
-         * max of 5 proposal details for each type of proposal will be fetched from the proposal logs.
-         *
-         * @see {@link file://./../../../../architecture/05_Event_Based_Historical_Queries.md} for more details
-         * regarding a long term solution.
-         */
-        limit: 5,
-      },
+      params,
     });
 
     const allEvents = decodeLog(abiSignatures, response.data.logs, ["ProposalDetails"]);
@@ -245,7 +250,8 @@ function createMirrorNodeService() {
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
     });
-    return proposals;
+    const uniqueProposals = uniqBy((proposal: MirrorNodeDecodedProposalEvent) => proposal.proposalId, proposals);
+    return uniqueProposals;
   };
 
   const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<BigNumber | undefined> => {

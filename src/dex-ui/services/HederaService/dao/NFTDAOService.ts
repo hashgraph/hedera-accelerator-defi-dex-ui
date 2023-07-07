@@ -40,7 +40,7 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   const nftDAOFactoryContractId = ContractId.fromString(Contracts.NFTDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
   const tokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
-  const preciseQuorum = BigNumber(quorum);
+  const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
 

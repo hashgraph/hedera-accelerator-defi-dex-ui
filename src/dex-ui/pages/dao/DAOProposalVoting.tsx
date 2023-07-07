@@ -8,10 +8,10 @@ interface DAOProposalVotingProps {
   dao: DAO;
 }
 
-export const DAOProposalVoting = (props: DAOProposalVotingProps) => {
+export function DAOProposalVoting(props: DAOProposalVotingProps) {
   const { proposal, dao } = props;
   const isMultiSig = dao.type === DAOType.MultiSig;
-  let turnout = 0;
+  let turnout = proposal.votes?.turnout ?? 0;
   if (isMultiSig && dao.threshold) {
     turnout = Math.round((proposal.approvalCount / dao.threshold) * 100);
   }
@@ -68,4 +68,4 @@ export const DAOProposalVoting = (props: DAOProposalVotingProps) => {
       )}
     </>
   );
-};
+}

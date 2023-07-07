@@ -37,14 +37,17 @@ const castVote = async (params: CastVoteParams) => {
   const { contractId, proposalId, voteType, signer } = params;
   const governorContractId = ContractId.fromString(contractId);
   const preciseProposalId = BigNumber(proposalId);
-  const contractFunctionParameters = new ContractFunctionParameters().addUint256(preciseProposalId).addUint8(voteType);
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addUint256(preciseProposalId)
+    .addUint256(0) // Added extra key as castVotePublic needs three keys as opposed to two keys required by castVote
+    .addUint8(voteType);
   const castVoteTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
-    .setFunction(GovernorContractFunctions.CastVote, contractFunctionParameters)
+    .setFunction(GovernorContractFunctions.CastVotePublic, contractFunctionParameters)
     .setGas(1000000)
     .freezeWithSigner(signer);
   const response = await castVoteTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(response, GovernorContractFunctions.CastVote);
+  checkTransactionResponseForError(response, GovernorContractFunctions.CastVotePublic);
   return response;
 };
 
