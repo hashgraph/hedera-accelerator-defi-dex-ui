@@ -1,19 +1,19 @@
 # HIP-898: Proposal Designer
 
-| - | - |
-| ------------- | ------------- |
-| Author | `Damiano Melcarne <damiano.melcarne@lab49.com>` |
-| Working Group | `Nana Essilfie-Conduah <@nana-ec>`, `Danno Ferrin <@shemnon>` |
-| Type | Informational |
-| Category | Application |
-| Needs Council Approval | No |
-| Status | Review |
-| Created | 2023-04-19 |
-| Discussions to | https://github.com/hashgraph/hedera-improvement-proposal/discussions/722 |
-| Updated | 2023-06-07, 2023-06-08 |
-| Requires | HIP-523  |
-| Replaces | HIP-43  |
-| Superseded by | HIP-23 |
+| -                      | -                                                                        |
+| ---------------------- | ------------------------------------------------------------------------ |
+| Author                 | `Damiano Melcarne <damiano.melcarne@lab49.com>`                          |
+| Working Group          | `Nana Essilfie-Conduah <@nana-ec>`, `Danno Ferrin <@shemnon>`            |
+| Type                   | Informational                                                            |
+| Category               | Application                                                              |
+| Needs Council Approval | No                                                                       |
+| Status                 | Review                                                                   |
+| Created                | 2023-04-19                                                               |
+| Discussions to         | https://github.com/hashgraph/hedera-improvement-proposal/discussions/722 |
+| Updated                | 2023-06-07, 2023-06-08                                                   |
+| Requires               | HIP-523                                                                  |
+| Replaces               | HIP-43                                                                   |
+| Superseded by          | HIP-23                                                                   |
 
 ## Abstract
 
@@ -32,7 +32,7 @@ The rationale should provide evidence of consensus within the community and disc
 ## User stories
 
 Provide a list of "user stories" to express how this feature, functionality, improvement, or tool will be used by the end user. Template for user story: “As (user persona), I want (to perform this action) so that (I can accomplish this goal).”
-  
+
 ## Specification
 
 The technical specification should describe the syntax and semantics of any new features. The specification should be detailed enough to allow competing, interoperable implementations for at least the current Hedera ecosystem.
