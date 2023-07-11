@@ -1,6 +1,6 @@
 import { Outlet, useParams } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@services";
-import { TokenBalance, useAccountTokenBalances, useDAOs, useTokenBalance, useDexContext } from "@hooks";
+import { TokenBalance, useAccountTokenBalances, useDAOs, useTokenBalance, usePairedWalletDetails } from "@hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 
@@ -9,14 +9,13 @@ export function GovernanceDAODashboard() {
   const daosQueryResults = useDAOs<GovernanceDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
-
+  const { walletId, isWalletPaired } = usePairedWalletDetails();
   const accountTokenBalancesQueryResults = useAccountTokenBalances("");
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
-  const isAdmin = dao?.adminId === walletId;
-  const isMember = daoGovTokenBalance > 0 && !isAdmin;
+  const isAdmin = dao?.adminId === walletId && isWalletPaired;
+  const isMember = daoGovTokenBalance > 0 && !isAdmin && isWalletPaired;
+
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
   const isError = daosQueryResults.isError || accountTokenBalancesQueryResults.isError;

@@ -21,7 +21,7 @@ export function MultiSigDAOReviewForm() {
             id: "governance.admin",
             label: "ADMIN WALLET",
             type: "text",
-            value: governance.admin,
+            value: governance?.admin,
             isReadOnly: true,
           }}
         />,
