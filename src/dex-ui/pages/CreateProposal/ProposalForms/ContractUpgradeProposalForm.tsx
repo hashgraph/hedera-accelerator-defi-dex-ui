@@ -10,6 +10,7 @@ import { TransactionResponse } from "@hashgraph/sdk";
 import { useCreateContractUpgradeProposal } from "@hooks";
 import { Paths } from "@routes";
 import { Page, PageHeader } from "@layouts";
+import { DEFAULT_NFT_TOKEN_SERIAL_ID } from "@services";
 
 export function ContractUpgradeProposalForm(): ReactElement {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ export function ContractUpgradeProposalForm(): ReactElement {
       linkToDiscussion: data.linkToDiscussion,
       newContractProxyId: data.newContractProxyId,
       contractToUpgrade: data.contractToUpgrade,
+      nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
     });
   }
 

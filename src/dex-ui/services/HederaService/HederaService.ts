@@ -71,8 +71,8 @@ function createHederaService() {
           .addAddress(params.walletAddress)
           .addAddress(params.firstTokenAddress)
           .addAddress(params.secondTokenAddress)
-          .addInt256(params.firstTokenQuantity)
-          .addInt256(params.secondTokenQuantity)
+          .addUint256(params.firstTokenQuantity)
+          .addUint256(params.secondTokenQuantity)
       )
       .setPayableAmount(new Hbar(params.HbarAmount))
       .setTransactionValidDuration(params.transactionDeadline)
@@ -93,7 +93,7 @@ function createHederaService() {
     const accountId = params.signer.getAccountId().toSolidityAddress();
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(accountId)
-      .addInt256(params.lpTokenAmount);
+      .addUint256(params.lpTokenAmount);
     const removeLiquidity = await new ContractExecuteTransaction()
       .setContractId(params.contractId)
       .setGas(5000000)
@@ -121,8 +121,8 @@ function createHederaService() {
     const contractFunctionParams = new ContractFunctionParameters()
       .addAddress(params.walletAddress)
       .addAddress(params.tokenToTradeAddress)
-      .addInt256(params.tokenToTradeAmount)
-      .addInt256(params.slippageTolerance);
+      .addUint256(params.tokenToTradeAmount)
+      .addUint256(params.slippageTolerance);
     const swapTokenTransaction = await new ContractExecuteTransaction()
       .setContractId(params.contractId)
       .setFunction(PairContractFunctions.SwapToken, contractFunctionParams)
@@ -193,7 +193,7 @@ function createHederaService() {
           .addAddress(firstTokenAddress)
           .addAddress(secondTokenAddress)
           .addAddress(ContractId.fromString(TREASURY_ID).toSolidityAddress())
-          .addInt256(transactionFee)
+          .addUint256(transactionFee)
       )
       .setMaxTransactionFee(new Hbar(100))
       .setPayableAmount(new Hbar(100))

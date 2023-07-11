@@ -89,6 +89,7 @@ interface SendProposeTokenTransferTransactionParams {
   amount: number;
   decimals: number;
   daoContractId: string;
+  nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
 
@@ -105,6 +106,7 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     description,
     governanceAddress,
     linkToDiscussion,
+    nftTokenSerialId,
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
@@ -125,7 +127,8 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     .addAddress(accountSolidityAddress)
     .addAddress(receiverSolidityAddress)
     .addAddress(tokenSolidityAddress)
-    .addUint256(preciseAmount);
+    .addUint256(preciseAmount)
+    .addUint256(nftTokenSerialId);
 
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
     .setContractId(daoContractId)
@@ -151,6 +154,7 @@ interface SendDAOContractUpgradeProposalTransactionParams {
   newImplementationAddress: string;
   oldProxyAddress: string;
   daoContractId: string;
+  nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
 async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProposalTransactionParams) {
@@ -164,6 +168,7 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     linkToDiscussion,
     oldProxyAddress,
     newImplementationAddress,
+    nftTokenSerialId,
   } = params;
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
   const proxyContractAddress = ContractId.fromString(newImplementationAddress).toSolidityAddress();
@@ -180,7 +185,8 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     .addString(description)
     .addString(linkToDiscussion)
     .addAddress(proxyContractAddress)
-    .addAddress(proxyToUpgrade);
+    .addAddress(proxyToUpgrade)
+    .addUint256(nftTokenSerialId);
 
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
     .setContractId(daoContractId)
@@ -204,11 +210,21 @@ interface SendDAOTextProposalTransactionParams {
   description: string;
   linkToDiscussion: string;
   daoContractId: string;
+  nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
 
 async function sendTextProposalTransaction(params: SendDAOTextProposalTransactionParams) {
-  const { governanceTokenId, daoContractId, signer, title, description, governanceAddress, linkToDiscussion } = params;
+  const {
+    governanceTokenId,
+    daoContractId,
+    signer,
+    title,
+    description,
+    governanceAddress,
+    linkToDiscussion,
+    nftTokenSerialId,
+  } = params;
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
   await DexService.setTokenAllowance({
     tokenId: governanceTokenId,
@@ -220,7 +236,8 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
-    .addString(linkToDiscussion);
+    .addString(linkToDiscussion)
+    .addUint256(nftTokenSerialId);
 
   const sendProposeTextProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(daoContractId)

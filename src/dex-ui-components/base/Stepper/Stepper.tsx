@@ -1,21 +1,19 @@
 import { Stepper, Step, StepLabel, Orientation } from "@material-ui/core";
-import { Color } from "../../themes";
-import { Flex } from "@chakra-ui/layout";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import { StepperStyles } from "./StepperStyles";
 import { ProposalStateIcon, ProposalState } from "./types";
-import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon } from "../Icons";
+import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon, Color } from "@dex-ui-components";
 
 const GetStatusIcon = (iconType: string) => {
   switch (iconType) {
     case ProposalStateIcon.Active:
-      return <ActiveStepIcon />;
+      return <ActiveStepIcon color={Color.Blue._500} boxSize="7" />;
     case ProposalStateIcon.Completed:
       return <CompletedStepIcon />;
     case ProposalStateIcon.Disabled:
       return <DisabledStepIcon />;
     case ProposalStateIcon.Cancelled:
-      return <CancelledStepIcon color={Color.Black_01} fillOpacity="0.54" boxSize="8" />;
+      return <CancelledStepIcon color={Color.Black_01} fillOpacity="0.54" boxSize="7" />;
     default:
       break;
   }

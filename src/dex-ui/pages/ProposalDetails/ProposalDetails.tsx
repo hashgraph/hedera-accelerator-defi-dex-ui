@@ -38,11 +38,16 @@ import { useProposalDetails } from "./useProposalDetails";
 import { ProposalDetailsControls } from "./ProposalDetailsControls";
 import { formatProposal } from "../Governance/formatter";
 import { Paths } from "@routes";
+//TODO - 1: Remove this call too
+import { DexService } from "@services";
+import { useDexContext } from "@hooks";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
   const proposalDetails = useProposalDetails(id);
-
+  const { wallet } = useDexContext(({ wallet }) => ({
+    wallet,
+  }));
   const {
     proposal,
     castVote,
@@ -87,6 +92,18 @@ export const ProposalDetails = () => {
     if (proposal.data?.link) {
       window.open(proposal.data?.link);
     }
+  }
+
+  /* TODO - 1: As of now once user votes on any Proposal there is no event triggered to get the 
+   latest details of Proposal So we had to Put a Call Detail step which triggers an event to 
+  emit the latest proposal details, This is call will be removed once SC team fixes this issue. */
+  function getLatestProposalDetails() {
+    const signer = wallet.getSigner();
+    DexService.getLatestProposalDetails({
+      proposalId: id ?? "",
+      signer,
+      contractId: formattedProposal?.contractId ?? "",
+    });
   }
 
   return (
@@ -176,6 +193,9 @@ export const ProposalDetails = () => {
             <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
               View Discussion
             </Button>
+            <Button variant="primary" onClick={getLatestProposalDetails}>
+              Get Latest Proposal Status
+            </Button>
             <Card
               bg={Color.White_01}
               border={`0.25px solid ${Color.Grey_01}`}
@@ -224,7 +244,7 @@ export const ProposalDetails = () => {
                           {
                             label: "No",
                             value: formattedProposal?.votes.no ?? 0,
-                            icon: <CancelledStepIcon color={Color.Red_03} boxSize="8" />,
+                            icon: <CancelledStepIcon color={Color.Red_03} boxSize="7" />,
                           },
                           {
                             label: "Abstain",

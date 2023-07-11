@@ -30,8 +30,8 @@ export function useUnlockGODToken(
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
         if (isNil(transactionResponse)) return;
-        queryClient.invalidateQueries([GovernanceQueries.FetchLockGODToken, tokenHolderAddress, accountId]);
-        queryClient.invalidateQueries([GovernanceQueries.FetchCanUnlockGODToken, tokenHolderAddress, accountId]);
+        queryClient.invalidateQueries([GovernanceQueries.FetchLockGODToken, accountId, tokenHolderAddress]);
+        queryClient.invalidateQueries([GovernanceQueries.FetchCanUnlockGODToken, accountId, tokenHolderAddress]);
         handleOnSuccess(transactionResponse);
       },
     }

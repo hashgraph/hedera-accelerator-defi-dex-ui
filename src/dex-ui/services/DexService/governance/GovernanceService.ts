@@ -13,9 +13,11 @@ import { getTimeRemaining } from "@utils";
 import { MirrorNodeDecodedProposalEvent } from "../../MirrorNodeService";
 import { getFulfilledResultsData } from "../../MirrorNodeService/utils";
 import { Contracts, GovernanceTokenId } from "../../constants";
-import { ProposalData } from "./type";
+import { GovernanceEvent, ProposalData } from "./type";
 import { ethers } from "ethers";
 import { solidityAddressToTokenIdString, convertEthersBigNumberToBigNumberJS } from "../..";
+import GODHolderJSON from "../../abi/GODHolder.json";
+import { getEventArgumentsByName } from "../..";
 
 const DefaultTokenTransferDetails = {
   transferFromAccount: undefined,
@@ -96,10 +98,11 @@ export const fetchAllProposalEvents = async (): Promise<MirrorNodeDecodedProposa
 };
 
 const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: Long | null): Proposal => {
-  const proposalState = proposalData.state
-    ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
+  const proposalState = proposalData.votingInformation?.proposalState
+    ? (ContractProposalState[proposalData.votingInformation?.proposalState] as keyof typeof ContractProposalState)
     : undefined;
   const isProposalTypeValid = Object.values(ProposalType).includes(proposalData.type as ProposalType);
+  const { startBlock, endBlock } = proposalData?.duration ?? {};
   return {
     id: proposalData.proposalId,
     contractId: proposalData.contractId,
@@ -111,70 +114,65 @@ const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: 
       ? AccountId.fromSolidityAddress(proposalData.proposer)
       : AccountId.fromString("0.0.34728121"),
     status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
-    timeRemaining:
-      !isNil(proposalData.startBlock) && !isNil(proposalData.endBlock)
-        ? getTimeRemaining(proposalData.startBlock, proposalData.endBlock)
-        : undefined,
+    timeRemaining: !isNil(startBlock) && !isNil(endBlock) ? getTimeRemaining(startBlock, endBlock) : undefined,
     state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
     timestamp: proposalData.timestamp,
     transferFromAccount: proposalData.transferFromAccount,
     transferToAccount: proposalData.transferToAccount,
     tokenToTransfer: proposalData.tokenToTransfer,
     transferTokenAmount: proposalData.transferTokenAmount,
+    voted: proposalData.votingInformation?.voted,
+    votedUser: AccountId.fromSolidityAddress(proposalData.votingInformation?.votedUser ?? "").toString(),
+    isQuorumReached: proposalData.votingInformation?.isQuorumReached,
     votes: {
-      yes: proposalData?.forVotes,
-      no: proposalData?.againstVotes,
-      abstain: proposalData?.abstainVotes,
-      quorum: proposalData.quorum,
+      yes: BigNumber(proposalData?.votingInformation?.forVotes ?? 0),
+      no: BigNumber(proposalData?.votingInformation?.againstVotes ?? 0),
+      abstain: BigNumber(proposalData?.votingInformation?.abstainVotes ?? 0),
+      quorum: BigNumber(proposalData.votingInformation?.quorumValue ?? 0),
       max: !isNil(totalGodTokenSupply) ? new BigNumber(totalGodTokenSupply.toString()) : BigNumber(0),
     },
   };
 };
 
-const fetchAllProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
-  const proposalEventsWithDetailsResults = await Promise.allSettled(
-    proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-      const proposalDetails = await DexService.fetchProposalDetails(proposalEvent.contractId, proposalEvent.proposalId);
-      /**
-       * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
-       * proposalDetails should override the same field found in the proposalEvent.
-       */
-      return { ...proposalEvent, ...proposalDetails };
-    })
-  );
-  const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {
-    return event.status === "fulfilled" ? event.value : undefined;
-  });
-  return proposalEventsWithDetails;
-};
-
 export const fetchAllProposals = async (): Promise<Proposal[]> => {
   const proposalEvents = await fetchAllProposalEvents();
-  const proposalDetails = await fetchAllProposalData(proposalEvents);
   const totalGodTokenSupply = await DexService.fetchTokenData(GovernanceTokenId);
-  const proposals = proposalDetails.map((proposalData) => {
+  const proposals = (proposalEvents as any[]).map((proposalData) => {
     return convertDataToProposal(proposalData, totalGodTokenSupply.data.total_supply);
   });
   return proposals;
 };
-
-async function fetchProposalDetails(proposalEvent: MirrorNodeDecodedProposalEvent) {
-  const proposalDetails = await DexService.fetchProposalDetails(proposalEvent.contractId, proposalEvent.proposalId);
-  /**
-   * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
-   * proposalDetails should override the same field found in the proposalEvent.
-   */
-  const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
-  return { ...proposalEvent, ...proposalDetails, ...tokenTransferDetails };
-}
 
 export async function fetchProposal(id: string): Promise<Proposal> {
   const proposalEvents = await fetchAllProposalEvents();
   const proposalEvent = proposalEvents.find(
     (proposalEvent) => proposalEvent.proposalId === id
   ) as MirrorNodeDecodedProposalEvent;
-  const proposalDetails = await fetchProposalDetails(proposalEvent);
   const totalGodTokenSupply = await DexService.fetchTokenData(GovernanceTokenId);
+  const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
+  const proposalDetails = { ...proposalEvent, ...tokenTransferDetails } as any;
   const proposal = convertDataToProposal(proposalDetails, totalGodTokenSupply.data.total_supply);
   return proposal;
+}
+
+export async function fetchCanUserClaimGODTokens(
+  tokenHolderAddress: string,
+  accountId: string
+): Promise<boolean | undefined> {
+  const logs = await DexService.fetchParsedEventLogs(
+    tokenHolderAddress,
+    new ethers.utils.Interface(GODHolderJSON.abi),
+    [GovernanceEvent.CanClaimAmount]
+  );
+
+  const decodedEvents = logs.map((log) => {
+    return getEventArgumentsByName<{ canClaim: boolean; user: string }>(log.args);
+  });
+
+  /** If events are empty which means user has not participated in any proposal */
+  if (decodedEvents.length === 0) return true;
+  const eventObj = decodedEvents.find(
+    (eventData) => AccountId.fromSolidityAddress(eventData.user).toString() === accountId
+  );
+  return eventObj?.canClaim;
 }

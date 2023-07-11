@@ -110,7 +110,6 @@ interface MirrorNodeProposalEventLog {
   topics: string[];
   timestamp: string;
 }
-
 interface MirrorNodeDecodedProposalEvent {
   proposalId: string;
   contractId: string;
@@ -124,7 +123,6 @@ interface MirrorNodeDecodedProposalEvent {
   timestamp?: string;
   data?: string;
 }
-
 interface MirrorNodeEventLog {
   address: string;
   bloom: string;

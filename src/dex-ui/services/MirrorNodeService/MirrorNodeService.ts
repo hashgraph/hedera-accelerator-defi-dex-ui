@@ -10,7 +10,7 @@ import {
   MirrorNodeEventLog,
   MirrorNodeAccountById,
 } from "./types";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
 import { AccountId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
@@ -236,7 +236,7 @@ function createMirrorNodeService() {
        * @see {@link file://./../../../../architecture/05_Event_Based_Historical_Queries.md} for more details
        * regarding a long term solution.
        */
-      limit: 5,
+      limit: 100,
     };
     if (!limitResults) {
       delete params.limit;
@@ -250,11 +250,12 @@ function createMirrorNodeService() {
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
     });
+
     const uniqueProposals = uniqBy((proposal: MirrorNodeDecodedProposalEvent) => proposal.proposalId, proposals);
     return uniqueProposals;
   };
 
-  const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<BigNumber | undefined> => {
+  const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<number | undefined> => {
     const accountAddress = AccountId.fromString(userID).toSolidityAddress();
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {

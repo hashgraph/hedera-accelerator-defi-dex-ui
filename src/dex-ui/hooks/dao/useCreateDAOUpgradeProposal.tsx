@@ -14,6 +14,7 @@ interface UseCreateDAOUpgradeProposal {
   newImplementationAddress: string;
   oldProxyAddress: string;
   daoContractId: string;
+  nftTokenSerialId: number;
 }
 
 export function useCreateDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
