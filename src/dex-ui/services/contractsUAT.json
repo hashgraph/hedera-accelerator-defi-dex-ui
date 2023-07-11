@@ -44,12 +44,12 @@
   },
   {
     "name": "multisigdaofactory",
-    "id": "0.0.15039913",
-    "address": "0x0000000000000000000000000000000000e57da9",
-    "timestamp": "2023-07-03T11:55:48.871Z",
+    "id": "0.0.15059541",
     "hash": "1a2d33b16efada4ef16ea36480b5ae9c",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e57dab",
-    "transparentProxyId": "0.0.15039915"
+    "address": "0x0000000000000000000000000000000000e5ca55",
+    "timestamp": "2023-07-06T14:54:23.683Z",
+    "transparentProxyId": "0.0.15059564",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca6c"
   },
   {
     "name": "pair",
@@ -116,12 +116,12 @@
   },
   {
     "name": "multisigdao",
-    "id": "0.0.15039898",
-    "address": "0x0000000000000000000000000000000000e57d9a",
-    "timestamp": "2023-07-03T11:52:41.732Z",
+    "id": "0.0.15059540",
     "hash": "6627fc8bbe28b58df6961a8623aca891",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e57d9c",
-    "transparentProxyId": "0.0.15039900"
+    "address": "0x0000000000000000000000000000000000e5ca54",
+    "timestamp": "2023-07-06T14:54:26.168Z",
+    "transparentProxyId": "0.0.15059570",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca72"
   },
   {
     "name": "ftdao",

@@ -1,4 +1,4 @@
-import { TokenBalance, useAccountTokenBalances, useDAOs, useDexContext } from "@hooks";
+import { TokenBalance, useAccountTokenBalances, useDAOs, usePairedWalletDetails } from "@hooks";
 import { Member, MultiSigDAODetails } from "@services";
 import { Outlet, useParams } from "react-router-dom";
 import { isNil, isNotNil } from "ramda";
@@ -9,8 +9,7 @@ export function MultiSigDAODashboard() {
   const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
+  const { isWalletPaired, walletId } = usePairedWalletDetails();
 
   const accountTokenBalancesQueryResults = useAccountTokenBalances(dao?.safeId ?? "");
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
@@ -24,8 +23,8 @@ export function MultiSigDAODashboard() {
 
   if (isDAOFound && isSuccess) {
     const { adminId, ownerIds } = dao;
-    const isAdmin = walletId === adminId;
-    const isMember = ownerIds.includes(walletId);
+    const isAdmin = walletId === adminId && isWalletPaired;
+    const isMember = ownerIds.includes(walletId ?? "") && isWalletPaired;
     const ownerCount = ownerIds.length;
     const members: Member[] = [adminId, ...ownerIds].map((ownerId: string) => ({
       name: "-",
