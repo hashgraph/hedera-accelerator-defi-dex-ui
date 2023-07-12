@@ -9,6 +9,7 @@ import {
   MirrorNodeTokenPairResponse,
   MirrorNodeEventLog,
   MirrorNodeAccountById,
+  MirrorNodeBlocks,
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
@@ -286,6 +287,18 @@ function createMirrorNodeService() {
     return transactions.transactions;
   };
 
+  const fetchLatestBlockNumber = async (timestamp: string): Promise<MirrorNodeBlocks[]> => {
+    const response = await testnetMirrorNodeAPI.get("/api/v1/blocks/", {
+      params: {
+        order: "desc",
+        timestamp: `gte:${timestamp}`,
+        limit: 1,
+      },
+    });
+    const { blocks } = response.data;
+    return blocks;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenBalances,
@@ -297,6 +310,7 @@ function createMirrorNodeService() {
     fetchParsedEventLogs,
     fetchAccountInfo,
     fetchTransactionRecord,
+    fetchLatestBlockNumber,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
     fetchUpgradeContractEvents,

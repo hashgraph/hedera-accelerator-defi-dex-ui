@@ -16,6 +16,7 @@ export function useProposalDetails(proposalId: string | undefined) {
   const castVote = useCastVote(proposalId);
   const cancelProposal = useCancelProposal(proposalId);
   const hasVoted = proposal.data?.voted ?? false;
+  const timestamp = proposal.data?.timestamp ?? "";
   const executeProposal = useExecuteGovernanceProposal(proposalId);
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const { data: lockedGODToken = 0 } = useFetchLockedGovToken(walletId, Contracts.GODHolder.ProxyId);
@@ -152,5 +153,6 @@ export function useProposalDetails(proposalId: string | undefined) {
     doesUserHaveGodTokens,
     proposalStatus,
     votingPower,
+    timestamp,
   };
 }

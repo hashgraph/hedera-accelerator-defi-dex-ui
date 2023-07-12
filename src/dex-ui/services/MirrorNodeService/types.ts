@@ -137,6 +137,12 @@ interface MirrorNodeEventLog {
   transaction_hash: string;
   transaction_index: number;
 }
+interface MirrorNodeBlock {
+  number: number;
+}
+interface MirrorNodeBlocks {
+  blocks: MirrorNodeBlock[];
+}
 
 /**
  * TODO: Refactor this to return a single MirrorNode type with other types as properties
@@ -154,4 +160,5 @@ export type {
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
   MirrorNodeAccountById,
+  MirrorNodeBlocks,
 };

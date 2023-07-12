@@ -1,5 +1,5 @@
 import { createIcon } from "@chakra-ui/react";
-import { Color } from "../..";
+import { Color } from "@dex-ui-components/themes";
 
 export const ActiveStepIcon = createIcon({
   displayName: "CancelledStepIcon",

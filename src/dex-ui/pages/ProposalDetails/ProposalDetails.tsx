@@ -40,11 +40,12 @@ import { formatProposal } from "../Governance/formatter";
 import { Paths } from "@routes";
 //TODO - 1: Remove this call too
 import { DexService } from "@services";
-import { useDexContext } from "@hooks";
+import { useDexContext, useGetLatestBlockNumber } from "@hooks";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
   const proposalDetails = useProposalDetails(id);
+  const num = useGetLatestBlockNumber(id, proposalDetails.timestamp);
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));

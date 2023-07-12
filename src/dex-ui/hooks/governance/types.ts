@@ -14,6 +14,7 @@ export enum GovernanceQueries {
   FetchHasVoted = "hasVoted",
   FetchLockGODToken = "fetchLockGODToken",
   FetchCanUnlockGODToken = "fetchCanUnlockGODToken",
+  GetLatestBlockNumber = "getLatestBlockNumber",
 }
 
 export enum CreateProposalType {
