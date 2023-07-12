@@ -137,11 +137,8 @@ interface MirrorNodeEventLog {
   transaction_hash: string;
   transaction_index: number;
 }
-interface MirrorNodeBlock {
-  number: number;
-}
 interface MirrorNodeBlocks {
-  blocks: MirrorNodeBlock[];
+  number: number;
 }
 
 /**

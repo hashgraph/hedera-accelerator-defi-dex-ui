@@ -71,6 +71,7 @@ interface Proposal {
   votedUser: string | undefined;
   isQuorumReached: boolean | undefined;
   voted: boolean | undefined;
+  endBlock: string | undefined;
   votes: {
     yes: BigNumber | undefined;
     no: BigNumber | undefined;

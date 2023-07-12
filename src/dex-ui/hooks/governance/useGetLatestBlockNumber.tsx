@@ -1,22 +1,22 @@
 import { DexService } from "@services";
 import { useQuery } from "react-query";
 import { GovernanceQueries } from "./types";
-import { isNil } from "ramda";
+import { isEmpty, isNil } from "ramda";
 
 type UseProposalBlockNumberQueryKey = [GovernanceQueries.GetLatestBlockNumber, string | undefined];
 
-export function useGetLatestBlockNumber(id: string | undefined, timestamp: string) {
-  return useQuery<number | undefined, Error, number, UseProposalBlockNumberQueryKey>(
+export function useGetLatestBlockNumber(id: string | undefined, timestamp: string | undefined, enableQuery: boolean) {
+  return useQuery<number | undefined, Error, number | undefined, UseProposalBlockNumberQueryKey>(
     [GovernanceQueries.GetLatestBlockNumber, id],
     async () => {
-      if (isNil(id)) return;
+      if (isNil(timestamp)) return;
       const blocks = await DexService.fetchLatestBlockNumber(timestamp);
-      const asa = blocks[0];
-      return 0;
+      const latestBlock = isEmpty(blocks) ? undefined : blocks[0].number;
+      return latestBlock;
     },
     {
-      keepPreviousData: true,
-      enabled: !!(id && timestamp),
+      enabled: !!enableQuery,
+      refetchInterval: 30000,
     }
   );
 }

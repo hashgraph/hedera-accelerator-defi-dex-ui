@@ -288,7 +288,7 @@ function createMirrorNodeService() {
   };
 
   const fetchLatestBlockNumber = async (timestamp: string): Promise<MirrorNodeBlocks[]> => {
-    const response = await testnetMirrorNodeAPI.get("/api/v1/blocks/", {
+    const response = await testnetMirrorNodeAPI.get("/api/v1/blocks", {
       params: {
         order: "desc",
         timestamp: `gte:${timestamp}`,

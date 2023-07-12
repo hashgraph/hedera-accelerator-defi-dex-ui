@@ -124,6 +124,7 @@ const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: 
     voted: proposalData.votingInformation?.voted,
     votedUser: AccountId.fromSolidityAddress(proposalData.votingInformation?.votedUser ?? "").toString(),
     isQuorumReached: proposalData.votingInformation?.isQuorumReached,
+    endBlock,
     votes: {
       yes: BigNumber(proposalData?.votingInformation?.forVotes ?? 0),
       no: BigNumber(proposalData?.votingInformation?.againstVotes ?? 0),

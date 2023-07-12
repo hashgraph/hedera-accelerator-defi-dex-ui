@@ -38,14 +38,12 @@ import { useProposalDetails } from "./useProposalDetails";
 import { ProposalDetailsControls } from "./ProposalDetailsControls";
 import { formatProposal } from "../Governance/formatter";
 import { Paths } from "@routes";
-//TODO - 1: Remove this call too
 import { DexService } from "@services";
-import { useDexContext, useGetLatestBlockNumber } from "@hooks";
+import { useDexContext } from "@hooks";
 
 export const ProposalDetails = () => {
   const { id } = useParams();
   const proposalDetails = useProposalDetails(id);
-  const num = useGetLatestBlockNumber(id, proposalDetails.timestamp);
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
@@ -63,6 +61,7 @@ export const ProposalDetails = () => {
     isErrorDialogOpen,
     errorDialogMessage,
     proposalStatus,
+    showProposalDetailButton,
   } = proposalDetails;
 
   const formattedProposal = proposal.data ? formatProposal(proposal.data) : undefined;
@@ -194,9 +193,11 @@ export const ProposalDetails = () => {
             <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
               View Discussion
             </Button>
-            <Button variant="primary" onClick={getLatestProposalDetails}>
-              Get Latest Proposal Status
-            </Button>
+            {showProposalDetailButton ? (
+              <Button variant="primary" onClick={getLatestProposalDetails}>
+                Get Latest Proposal Status
+              </Button>
+            ) : undefined}
             <Card
               bg={Color.White_01}
               border={`0.25px solid ${Color.Grey_01}`}

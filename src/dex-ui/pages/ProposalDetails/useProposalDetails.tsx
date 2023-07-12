@@ -5,22 +5,35 @@ import {
   useProposal,
   useCancelProposal,
   useFetchLockedGovToken,
+  useGetLatestBlockNumber,
 } from "@hooks";
 import { ProposalState, ProposalStatus, ProposalStates, ProposalStateIcon } from "../../store/governanceSlice";
 import { createHashScanAccountIdLink, createHashScanTransactionLink, getStatusColor } from "@utils";
 import { Contracts } from "@services";
+import { isNotNil } from "ramda";
 
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const proposal = useProposal(proposalId);
   const castVote = useCastVote(proposalId);
   const cancelProposal = useCancelProposal(proposalId);
-  const hasVoted = proposal.data?.voted ?? false;
-  const timestamp = proposal.data?.timestamp ?? "";
   const executeProposal = useExecuteGovernanceProposal(proposalId);
+
+  const timestamp = proposal.data?.timestamp;
+  const isValidStatusToCallQuery =
+    proposal.data?.state !== ProposalState.Canceled &&
+    proposal.data?.state !== ProposalState.Defeated &&
+    proposal.data?.state !== ProposalState.Expired &&
+    proposal.data?.state !== ProposalState.Executed;
+
+  const enableLatestBlockNumberQuery = isNotNil(proposalId) && isNotNil(timestamp) && isValidStatusToCallQuery;
+  const { data: latestBlock } = useGetLatestBlockNumber(proposalId, timestamp, enableLatestBlockNumberQuery);
+  const showProposalDetailButton = (latestBlock ?? -1) > Number(proposal.data?.endBlock);
+
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const { data: lockedGODToken = 0 } = useFetchLockedGovToken(walletId, Contracts.GODHolder.ProxyId);
 
+  const hasVoted = proposal.data?.voted ?? false;
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
   const isHasVotedMessageVisible = hasVoted && proposal.data?.status === ProposalStatus.Active;
   const areVoteButtonsVisible = !hasVoted && proposal.data?.status === ProposalStatus.Active;
@@ -154,5 +167,6 @@ export function useProposalDetails(proposalId: string | undefined) {
     proposalStatus,
     votingPower,
     timestamp,
+    showProposalDetailButton,
   };
 }
