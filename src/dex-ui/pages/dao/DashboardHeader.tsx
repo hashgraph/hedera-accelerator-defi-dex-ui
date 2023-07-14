@@ -10,6 +10,8 @@ import {
   CheckRightIcon,
 } from "@dex-ui-components";
 import { DAOType } from "@services";
+import { MintNFTModal } from "./MintNFTModal";
+import { useToken } from "@hooks";
 
 interface DashboardHeaderProps {
   isMember?: boolean;
@@ -20,11 +22,14 @@ interface DashboardHeaderProps {
   name: string;
   type: DAOType;
   logoUrl?: string;
+  handleMintNFT?: (tokenLinks: string[]) => void;
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { daoAccountId, name, type, logoUrl, govTokenId, safeId, isMember, isAdmin } = props;
+  const { daoAccountId, name, type, logoUrl, govTokenId, safeId, isMember, isAdmin, handleMintNFT } = props;
   const navigate = useNavigate();
+  const { data: token } = useToken(govTokenId ?? "");
+  const showMintNFTButton = type === DAOType.NFT && Number(token?.data.max_supply) > Number(token?.data.total_supply);
 
   return (
     <Flex bg={Color.White_02} direction="column" padding="24px 80px 16px">
@@ -74,6 +79,11 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           <Flex height="40px" alignItems="center">
             <Breadcrumb to="/daos" label="Back to DAOs" />
           </Flex>
+          {showMintNFTButton && token && (
+            <Flex height="40px" alignItems="center">
+              <MintNFTModal token={token} handleMintNFT={handleMintNFT} />
+            </Flex>
+          )}
           <Flex direction="column" gap="0.6rem">
             <Button
               variant="primary"

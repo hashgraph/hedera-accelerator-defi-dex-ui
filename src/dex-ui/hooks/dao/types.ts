@@ -19,6 +19,7 @@ export enum DAOMutations {
   ApproveProposal = "ApproveProposal",
   ExecuteProposal = "ExecuteProposal",
   UpdateDAODetails = "UpdateDAODetails",
+  MintNFTTokens = "MintNFTTokens",
 }
 
 export enum ProposalStatus {

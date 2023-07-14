@@ -1,16 +1,19 @@
 import { Outlet, useParams } from "react-router-dom";
 import { Member, NFTDAODetails } from "@services";
-import { TokenBalance, useAccountTokenBalances, useDAOs } from "@hooks";
+import { TokenBalance, useAccountTokenBalances, useDAOs, useHandleTransactionSuccess, useMintNFT } from "@hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
+import { TransactionResponse } from "@hashgraph/sdk";
 
 export function NFTDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
+  const handleTransactionSuccess = useHandleTransactionSuccess();
   const daosQueryResults = useDAOs<NFTDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
 
   const accountTokenBalancesQueryResults = useAccountTokenBalances("");
+  const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
 
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
@@ -19,6 +22,15 @@ export function NFTDAODashboard() {
   const isLoading = daosQueryResults.isLoading || accountTokenBalancesQueryResults.isLoading;
   const errorMessage = daosQueryResults.error?.message || accountTokenBalancesQueryResults.error?.message;
   const isSuccess = daosQueryResults.isSuccess;
+
+  const handleMintNFT = (tokenLinks: string[]) => {
+    mintNFT.mutate({ tokenId: dao?.tokenId ?? "", tokenLinks });
+  };
+
+  function handleMintNFTTokensSuccess(transactionResponse: TransactionResponse) {
+    const message = "Successfully minted NFT tokens";
+    handleTransactionSuccess(transactionResponse, message);
+  }
 
   if (dao) {
     const { adminId } = dao;
@@ -40,6 +52,7 @@ export function NFTDAODashboard() {
         isLoading={isLoading}
         errorMessage={errorMessage}
         isSuccess={isSuccess}
+        handleMintNFT={handleMintNFT}
       >
         <Outlet context={{ dao, tokenBalances, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
       </DAODashboard>

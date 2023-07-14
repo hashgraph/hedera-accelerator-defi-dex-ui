@@ -5,3 +5,7 @@ export interface DAOSettingsForm {
   isPublic?: boolean;
   daoLinks: Record<"value", string>[];
 }
+
+export interface MintNFTTokensFormData {
+  tokenLinks: Record<"value", string>[];
+}

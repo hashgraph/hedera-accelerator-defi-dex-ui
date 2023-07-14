@@ -19,6 +19,7 @@ interface DAODashboardProps extends PropsWithChildren {
   isLoading: boolean;
   errorMessage?: string;
   isSuccess: boolean;
+  handleMintNFT?: (tokenLinks: string[]) => void;
 }
 
 export function DAODashboard(props: DAODashboardProps) {
@@ -51,7 +52,8 @@ export function DAODashboard(props: DAODashboardProps) {
     },
   ];
   const { accountId: daoAccountId = "" } = useParams();
-  const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin } = props;
+  const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin, handleMintNFT } =
+    props;
   const { type = "" } = dao ?? {};
   const currentTabNameByRoute = location.pathname.split("/").at(-1) ?? "";
   const daoNavigationTabs = GetDAONavigationTabs();
@@ -124,6 +126,7 @@ export function DAODashboard(props: DAODashboardProps) {
             logoUrl={logoUrl}
             govTokenId={tokenId}
             safeId={safeId}
+            handleMintNFT={handleMintNFT}
           />
         }
         body={

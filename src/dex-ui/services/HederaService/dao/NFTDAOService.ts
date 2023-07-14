@@ -1,8 +1,15 @@
 import { BigNumber } from "bignumber.js";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { ethers } from "ethers";
-import { AccountId, TokenId, ContractId, ContractExecuteTransaction, TransactionResponse } from "@hashgraph/sdk";
-import { BaseDAOContractFunctions } from "./type";
+import {
+  AccountId,
+  TokenId,
+  ContractId,
+  ContractExecuteTransaction,
+  TransactionResponse,
+  TokenMintTransaction,
+} from "@hashgraph/sdk";
+import { BaseDAOContractFunctions, NFTDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
 import { Contracts } from "../../constants";
 import NFTDAOFactoryJSON from "../../abi/NFTDAOFactory.json";
@@ -20,6 +27,11 @@ interface SendCreateNFTDAOTransactionParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
+  signer: HashConnectSigner;
+}
+interface MintNFTTokensTransactionParams {
+  tokenLinks: string[];
+  tokenId: string;
   signer: HashConnectSigner;
 }
 
@@ -68,4 +80,16 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   return createGovernanceDAOResponse;
 }
 
-export { sendCreateNFTDAOTransaction };
+async function sendMintNFTTokensTransaction(params: MintNFTTokensTransactionParams): Promise<TransactionResponse> {
+  const { tokenId, tokenLinks, signer } = params;
+  const data = tokenLinks.map((link) => Buffer.from(link));
+  const mintNFTTokensTransaction = await new TokenMintTransaction()
+    .setTokenId(tokenId)
+    .setMetadata(data)
+    .freezeWithSigner(signer);
+  const mintNFTTokensResponse = await mintNFTTokensTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(mintNFTTokensResponse, NFTDAOContractFunctions.MintTokens);
+  return mintNFTTokensResponse;
+}
+
+export { sendCreateNFTDAOTransaction, sendMintNFTTokensTransaction };

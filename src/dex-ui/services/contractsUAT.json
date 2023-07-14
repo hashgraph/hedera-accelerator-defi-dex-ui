@@ -170,11 +170,11 @@
   },
   {
     "name": "nftdaofactory",
-    "id": "0.0.15021409",
-    "address": "0x0000000000000000000000000000000000e53561",
-    "timestamp": "2023-06-30T10:53:46.503Z",
-    "hash": "91b53d6e773b56141cef7ebd77d8853d",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e53565",
-    "transparentProxyId": "0.0.15021413"
+    "id": "0.0.15051802",
+    "address": "0x0000000000000000000000000000000000e5ac1a",
+    "timestamp": "2023-07-05T12:01:38.207Z",
+    "hash": "dfe74c0b15aa61042d372b8819cb121d",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ac1c",
+    "transparentProxyId": "0.0.15051804"
   }
 ]

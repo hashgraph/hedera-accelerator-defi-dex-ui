@@ -13,4 +13,5 @@ export * from "./useCreateDAOTokenTransferProposal";
 export * from "./useCreateDAOUpgradeProposal";
 export * from "./useCreateDAOTextProposal";
 export * from "./useUpdateDAODetails";
+export * from "./useMintNFT";
 export * from "./types";
