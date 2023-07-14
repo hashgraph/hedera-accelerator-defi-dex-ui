@@ -72,9 +72,11 @@ export function FormInputList<FormType extends FieldValues, FormPath extends Arr
           </Flex>
         );
       })}
-      <Button paddingLeft="0.5rem" variant="link" onClick={handleAddInputClicked}>
-        {fieldButtonText}
-      </Button>
+      {fieldButtonText.length > 0 ? (
+        <Button paddingLeft="0.5rem" variant="link" onClick={handleAddInputClicked}>
+          {fieldButtonText}
+        </Button>
+      ) : undefined}
     </>
   );
 }
