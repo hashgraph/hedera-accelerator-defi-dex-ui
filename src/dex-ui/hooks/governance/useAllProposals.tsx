@@ -4,12 +4,13 @@ import { Proposal, ProposalStatus } from "../../store/governanceSlice";
 import { isNil } from "ramda";
 import { GovernanceQueries } from "./types";
 import { useQuery } from "react-query";
-import { DexService } from "../../services";
+import { DexService } from "@services";
 
 const defaultStatusFilter = [...Object.values(ProposalStatus)];
 const proposalStatusSortOrder = [ProposalStatus.Active, ProposalStatus.Passed, ProposalStatus.Failed];
 interface UseAllProposalsProps {
   titleFilter?: string;
+  accountId: string | undefined;
   statusFilters?: ProposalStatus[];
   startDate?: Date | null;
   endDate?: Date | null;
@@ -18,7 +19,7 @@ interface UseAllProposalsProps {
 type UseAllProposalsQueryKey = [GovernanceQueries.Proposals, "list"];
 
 export function useAllProposals(props: UseAllProposalsProps) {
-  const { titleFilter = "", startDate, endDate, statusFilters = defaultStatusFilter } = props;
+  const { accountId, startDate, endDate, statusFilters = defaultStatusFilter, titleFilter = "" } = props;
 
   function sortProposalCompareFn(proposalA: FormattedProposal, proposalB: FormattedProposal) {
     if (!isNil(proposalA.status) && !isNil(proposalB.status)) {
@@ -54,10 +55,11 @@ export function useAllProposals(props: UseAllProposalsProps) {
 
   return useQuery<Proposal[], Error, FormattedProposal[], UseAllProposalsQueryKey>(
     [GovernanceQueries.Proposals, "list"],
-    async () => DexService.fetchAllProposals(),
+    async () => DexService.fetchAllProposals(accountId ?? ""),
     {
       keepPreviousData: true,
       select: filterFormatSortProposals,
+      enabled: !!accountId,
     }
   );
 }

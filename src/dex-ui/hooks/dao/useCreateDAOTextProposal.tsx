@@ -12,6 +12,7 @@ interface UseCreateDAOTextProposalParams {
   description: string;
   linkToDiscussion: string;
   daoContractId: string;
+  nftTokenSerialId: number;
 }
 
 export function useCreateDAOTextProposal(handleOnSuccess: HandleOnSuccess) {

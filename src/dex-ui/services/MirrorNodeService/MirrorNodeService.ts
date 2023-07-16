@@ -9,10 +9,11 @@ import {
   MirrorNodeTokenPairResponse,
   MirrorNodeEventLog,
   MirrorNodeAccountById,
+  MirrorNodeBlocks,
 } from "./types";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
-import { AccountId } from "@hashgraph/sdk";
+import { AccountId, ContractId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
 
@@ -133,19 +134,19 @@ function createMirrorNodeService() {
    * @param payload -
    * @returns Results from a cost-free EVM call to the contract.
    */
-  async function callContract<Response>(payload: CallContractParams): Promise<Response> {
+  const callContract = async (payload: CallContractParams): Promise<any> => {
     const { block, data, estimate, from, gas, gasPrice, to, value } = payload;
-    return testnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
+    return await testnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
       block,
       data,
       estimate,
       from: AccountId.fromString(from).toSolidityAddress(),
       gas,
       gasPrice,
-      to: AccountId.fromString(to).toSolidityAddress(),
+      to: ContractId.fromString(to).toSolidityAddress(),
       value,
     });
-  }
+  };
 
   /**
    * Fetches the list of token balances given a token ID. This represents
@@ -236,7 +237,7 @@ function createMirrorNodeService() {
        * @see {@link file://./../../../../architecture/05_Event_Based_Historical_Queries.md} for more details
        * regarding a long term solution.
        */
-      limit: 5,
+      limit: 10,
     };
     if (!limitResults) {
       delete params.limit;
@@ -250,11 +251,12 @@ function createMirrorNodeService() {
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };
     });
+
     const uniqueProposals = uniqBy((proposal: MirrorNodeDecodedProposalEvent) => proposal.proposalId, proposals);
     return uniqueProposals;
   };
 
-  const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<BigNumber | undefined> => {
+  const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<number | undefined> => {
     const accountAddress = AccountId.fromString(userID).toSolidityAddress();
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
@@ -285,6 +287,18 @@ function createMirrorNodeService() {
     return transactions.transactions;
   };
 
+  const fetchLatestBlockNumber = async (timestamp: string): Promise<MirrorNodeBlocks[]> => {
+    const response = await testnetMirrorNodeAPI.get("/api/v1/blocks", {
+      params: {
+        order: "desc",
+        timestamp: `gte:${timestamp}`,
+        limit: 1,
+      },
+    });
+    const { blocks } = response.data;
+    return blocks;
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenBalances,
@@ -296,6 +310,7 @@ function createMirrorNodeService() {
     fetchParsedEventLogs,
     fetchAccountInfo,
     fetchTransactionRecord,
+    fetchLatestBlockNumber,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
     fetchUpgradeContractEvents,

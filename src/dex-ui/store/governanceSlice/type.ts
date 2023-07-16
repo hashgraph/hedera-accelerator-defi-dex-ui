@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import BigNumber from "bignumber.js";
 import { AccountId } from "@hashgraph/sdk";
 
 enum ProposalType {
@@ -68,6 +68,10 @@ interface Proposal {
   transferToAccount?: string | undefined;
   tokenToTransfer?: string | undefined;
   transferTokenAmount?: number | undefined;
+  votedUser: string | undefined;
+  isQuorumReached: boolean | undefined;
+  voted: boolean | undefined;
+  endBlock: string | undefined;
   votes: {
     yes: BigNumber | undefined;
     no: BigNumber | undefined;

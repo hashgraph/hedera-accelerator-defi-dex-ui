@@ -10,6 +10,7 @@ import { Paths } from "@routes";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateProposalLocationProps, TokenTransferProposalFormData } from "./types";
 import { WarningIcon } from "@chakra-ui/icons";
+import { DEFAULT_NFT_TOKEN_SERIAL_ID } from "@services";
 
 export function TokenTransferProposalForm(): ReactElement {
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ export function TokenTransferProposalForm(): ReactElement {
       accountToTransferTo: data.accountToTransferTo,
       tokenToTransfer: data.tokenToTransfer,
       amountToTransfer: data.amountToTransfer,
+      nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
     });
   }
 

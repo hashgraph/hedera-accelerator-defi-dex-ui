@@ -1,6 +1,5 @@
 import {
   useDexContext,
-  useHasVoted,
   useCastVote,
   useExecuteGovernanceProposal,
   useProposal,
@@ -13,17 +12,17 @@ import { Contracts } from "@services";
 
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const proposal = useProposal(proposalId);
+  const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
+  const proposal = useProposal(proposalId, walletId);
   const castVote = useCastVote(proposalId);
   const cancelProposal = useCancelProposal(proposalId);
-  const hasVoted = useHasVoted(proposal.data?.contractId, proposal.data?.id, wallet.getSigner());
+  const hasVoted = proposal.data?.voted ?? false;
   const executeProposal = useExecuteGovernanceProposal(proposalId);
-  const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
-  const fetchLockGODTokens = useFetchLockedGovToken(walletId, Contracts.GODHolder.ProxyId);
+  const { data: lockedGODToken = 0 } = useFetchLockedGovToken(walletId, Contracts.GODHolder.ProxyId);
 
   const areButtonsHidden = proposal.isLoading || castVote.isLoading || proposal.data?.status === ProposalStatus.Failed;
-  const isHasVotedMessageVisible = hasVoted.data && proposal.data?.status === ProposalStatus.Active;
-  const areVoteButtonsVisible = !hasVoted.data && proposal.data?.status === ProposalStatus.Active;
+  const isHasVotedMessageVisible = hasVoted && proposal.data?.status === ProposalStatus.Active;
+  const areVoteButtonsVisible = !hasVoted && proposal.data?.status === ProposalStatus.Active;
   const isExecuteButtonVisible =
     proposal.data?.status === ProposalStatus.Passed && proposal.data?.state !== ProposalState.Executed;
   const isClaimTokenButtonVisible = proposal.data?.state === ProposalState.Executed;
@@ -33,7 +32,7 @@ export function useProposalDetails(proposalId: string | undefined) {
 
   const isWalletConnected = wallet.isPaired();
   const doesUserHaveGodTokens = wallet.doesUserHaveGODTokensToVote();
-  const votingPower = `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`;
+  const votingPower = `${lockedGODToken.toFixed(4)}`;
 
   function getLoadingDialogMessage(): string {
     if (castVote.isLoading) return "Please confirm the vote in your wallet to proceed.";

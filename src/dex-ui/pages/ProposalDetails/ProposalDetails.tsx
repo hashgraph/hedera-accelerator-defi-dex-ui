@@ -42,7 +42,6 @@ import { Paths } from "@routes";
 export const ProposalDetails = () => {
   const { id } = useParams();
   const proposalDetails = useProposalDetails(id);
-
   const {
     proposal,
     castVote,
@@ -224,7 +223,7 @@ export const ProposalDetails = () => {
                           {
                             label: "No",
                             value: formattedProposal?.votes.no ?? 0,
-                            icon: <CancelledStepIcon color={Color.Red_03} boxSize="8" />,
+                            icon: <CancelledStepIcon color={Color.Red_03} boxSize="7" />,
                           },
                           {
                             label: "Abstain",

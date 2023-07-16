@@ -12,6 +12,7 @@ interface CreateTokenTransferProposalData {
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: number;
+  nftTokenSerialId: number;
 }
 
 export function useCreateTokenTransferProposal(

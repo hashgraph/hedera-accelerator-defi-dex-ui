@@ -9,6 +9,7 @@ export * from "./HederaService";
 export * from "./MirrorNodeService";
 export * from "./JsonRpcService";
 export * from "./constants";
+export * from "./utils";
 
 const MirrorNodeService = createMirrorNodeService();
 const WalletService = createWalletService();

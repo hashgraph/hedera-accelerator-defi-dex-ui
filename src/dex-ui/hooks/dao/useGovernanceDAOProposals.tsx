@@ -1,16 +1,9 @@
 import { useQuery } from "react-query";
-import {
-  convertEthersBigNumberToBigNumberJS,
-  DAOProposalGovernors,
-  DexService,
-  DEX_TOKEN_PRECISION_VALUE,
-  MirrorNodeTokenById,
-} from "@services";
+import { DAOProposalGovernors, DexService, DEX_TOKEN_PRECISION_VALUE, MirrorNodeTokenById } from "@services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
 import { AccountId } from "@hashgraph/sdk";
 import { isNil } from "ramda";
-import { BigNumber } from "ethers";
-import { default as BigNumberJS } from "bignumber.js";
+import BigNumber from "bignumber.js";
 import { ProposalData } from "@services/DexService/governance/type";
 import { ContractProposalState, ProposalState } from "@store/governanceSlice";
 import { getTimeRemaining, getVotingEndTime } from "@utils";
@@ -42,13 +35,10 @@ export function useGovernanceDAOProposals(
     }
     return ProposalStatus.Pending;
   };
-  const convertVoteNumbers = (voteNumber: BigNumberJS | undefined, precisionValue: number): number => {
-    if (isNil(voteNumber)) {
-      return 0;
-    }
-    return Number(
-      convertEthersBigNumberToBigNumberJS(BigNumber.from(voteNumber)).shiftedBy(-precisionValue).toFixed(3) ?? 0
-    );
+
+  const convertVoteNumbers = (voteNumber: number | undefined, precisionValue: number): number => {
+    if (isNil(voteNumber)) return 0;
+    return Number(BigNumber(voteNumber).shiftedBy(-precisionValue).toFixed(3));
   };
 
   const getVotes = (proposalData: ProposalData, godTokenData: MirrorNodeTokenById | null | undefined): Votes => {
@@ -58,14 +48,12 @@ export function useGovernanceDAOProposals(
     const no = convertVoteNumbers(proposalData.votingInformation?.againstVotes, precisionValue);
     const abstain = convertVoteNumbers(proposalData.votingInformation?.abstainVotes, precisionValue);
     const max = !isNil(totalGodTokenSupply)
-      ? convertEthersBigNumberToBigNumberJS(BigNumber.from(totalGodTokenSupply.toString()))
-          .shiftedBy(-precisionValue)
-          .toNumber()
+      ? BigNumber(totalGodTokenSupply.toString()).shiftedBy(-precisionValue).toNumber()
       : 0;
     const totalVotes = yes + no + abstain;
     const remaining = max - totalVotes;
     const quorum = max
-      ? convertEthersBigNumberToBigNumberJS(BigNumber.from(proposalData.votingInformation?.quorumValue ?? 0))
+      ? BigNumber(proposalData.votingInformation?.quorumValue ?? 0)
           .shiftedBy(-precisionValue)
           .toNumber()
       : 0;
@@ -87,7 +75,7 @@ export function useGovernanceDAOProposals(
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
   ): Proposal => {
-    const proposalState = proposalData.votingInformation?.proposalState
+    const proposalState = proposalData.state
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);
     let timeRemaining;

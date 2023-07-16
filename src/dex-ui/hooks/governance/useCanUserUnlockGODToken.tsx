@@ -10,11 +10,11 @@ type UseFetchCanUnlockGODTokenQueryKey = [
 ];
 
 export function useCanUserUnlockGODToken(accountId: string | undefined, tokenHolderAddress: string) {
-  return useQuery<boolean, Error, boolean, UseFetchCanUnlockGODTokenQueryKey>(
+  return useQuery<boolean | undefined, Error, boolean | undefined, UseFetchCanUnlockGODTokenQueryKey>(
     [GovernanceQueries.FetchCanUnlockGODToken, accountId, tokenHolderAddress],
     async () => {
       if (isNil(accountId)) return false;
-      return DexService.fetchCanUserUnlockGODToken(tokenHolderAddress);
+      return DexService.fetchCanUserClaimGODTokens(tokenHolderAddress, accountId);
     },
     {
       enabled: !!(accountId && tokenHolderAddress),

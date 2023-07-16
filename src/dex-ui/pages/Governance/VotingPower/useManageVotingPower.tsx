@@ -32,7 +32,7 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
 
   const isFormLoading = govTokenBalance.isLoading || lockedGOVToken.isLoading || canClaimGODTokens.isLoading;
   const isLoading = lockGODTokenSubmit.isLoading || unLockGODTokenSubmit.isLoading;
-  const canUserClaimGODTokens = canClaimGODTokens.data;
+  const canUserClaimGODTokens = canClaimGODTokens.data ?? false;
 
   // For Now the SWAP button to show we are keeping to the -4 precision value to match with UI
   const doesUserHaveGOVTokensToLockAndUnlock = isWalletConnected && totalGodToken > 0.0001;

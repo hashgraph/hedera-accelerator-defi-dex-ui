@@ -9,6 +9,7 @@ interface CreateTextProposalData {
   title: string;
   description: string;
   linkToDiscussion: string;
+  nftTokenSerialId: number;
 }
 
 export function useCreateTextProposal(handleSendProposesSuccess: (transactionResponse: TransactionResponse) => void) {

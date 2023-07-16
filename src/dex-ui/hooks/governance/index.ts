@@ -1,7 +1,6 @@
 export * from "./useAllProposals";
 export * from "./useCastVote";
 export * from "./useExecuteGovernanceProposal";
-export * from "./useHasVoted";
 export * from "./useProposal";
 export * from "./useClaimGODTokens";
 export * from "./useCancelProposal";
@@ -12,4 +11,5 @@ export * from "./useUnlockGODToken";
 export * from "./useCreateTextProposal";
 export * from "./useCreateContractUpgradeProposal";
 export * from "./useCreateTokenTransferProposal";
+export * from "./useGetLatestBlockNumber";
 export * from "./types";

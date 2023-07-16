@@ -11,7 +11,7 @@ import {
   sendExecuteMultiSigTransaction,
   fetchNFTDAOLogs,
 } from "./dao";
-import { fetchProposal, fetchAllProposals, fetchAllProposalEvents } from "./governance";
+import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
 
 type DexServiceType = ReturnType<typeof createDexService>;
@@ -46,6 +46,7 @@ function createDexService() {
     proposeChangeThreshold,
     sendApproveMultiSigTransaction,
     sendExecuteMultiSigTransaction,
+    fetchCanUserClaimGODTokens,
   };
 }
 

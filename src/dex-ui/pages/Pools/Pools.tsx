@@ -201,9 +201,8 @@ const Pools = (): JSX.Element => {
                   color={"#3078FF"}
                   onClick={() => {
                     navigate(
-                      `/pools/add-liquidity/${(row as FormattedPoolDetails).pairAccountId}/${
-                        (row as FormattedPoolDetails).name
-                      }`
+                      `/pools/add-liquidity/
+                    ${(row as FormattedPoolDetails).pairAccountId}/${(row as FormattedPoolDetails).name}`
                     );
                   }}
                 >
@@ -223,6 +222,7 @@ const Pools = (): JSX.Element => {
           <Tabs
             display={"flex"}
             flexDirection={"column"}
+            width="100%"
             index={poolsParamsState.selectedTab}
             onChange={(index) => setPoolsParamsState({ ...poolsParamsState, selectedTab: index })}
           >

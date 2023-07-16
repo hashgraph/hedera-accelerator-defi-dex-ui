@@ -14,7 +14,13 @@ import { useForm } from "react-hook-form";
 import { Wizard } from "@components";
 import { Color, LoadingDialog } from "@dex-ui-components";
 import { WarningIcon } from "@chakra-ui/icons";
-import { DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails } from "@services";
+import {
+  DAOType,
+  DEFAULT_NFT_TOKEN_SERIAL_ID,
+  GovernanceDAODetails,
+  MultiSigDAODetails,
+  NFTDAODetails,
+} from "@services";
 import {
   useCreateAddMemberProposal,
   useCreateChangeThresholdProposal,
@@ -254,6 +260,7 @@ export function CreateDAOProposal() {
               receiverId: recipientAccountId,
               amount: Number(amount),
               decimals,
+              nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
             });
         }
       }
@@ -316,6 +323,7 @@ export function CreateDAOProposal() {
           governanceAddress: governors.contractUpgradeLogic,
           governanceTokenId,
           daoContractId: daoAccountId,
+          nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
         });
       }
       case DAOProposalType.Text: {
@@ -327,6 +335,7 @@ export function CreateDAOProposal() {
           governanceAddress: governors.textLogic,
           governanceTokenId,
           daoContractId: daoAccountId,
+          nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
         });
       }
     }
