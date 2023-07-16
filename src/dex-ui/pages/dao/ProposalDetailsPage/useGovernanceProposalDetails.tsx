@@ -7,7 +7,7 @@ import {
   ProposalStatus,
   useHandleTransactionSuccess,
   useGovernanceDAOProposals,
-  useFetchDAOLockedGovToken,
+  useFetchLockedGovToken,
 } from "@hooks";
 import { GovernanceDAODetails } from "@services";
 import { isNotNil } from "ramda";
@@ -31,7 +31,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
 
   const hasVoted = proposal?.hasVoted ?? false;
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
-  const fetchLockGODTokens = useFetchDAOLockedGovToken(dao?.tokenHolderAddress ?? "", walletId);
+  const fetchLockGODTokens = useFetchLockedGovToken(dao?.tokenHolderAddress ?? "", walletId);
 
   const votingPower = `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;

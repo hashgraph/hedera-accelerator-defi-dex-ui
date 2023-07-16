@@ -11,7 +11,7 @@ import {
 } from "@dex-ui-components";
 import { createHashScanTransactionLink } from "@utils";
 import { CardListLayout, Page, PageHeader, TabFilter, TabFilters } from "@layouts";
-import { useAllProposals, useTabFilters } from "@hooks";
+import { useAllProposals, useTabFilters, useDexContext } from "@hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
 import { useInput } from "../../hooks/useInput";
@@ -45,6 +45,8 @@ export const Governance = (): ReactElement => {
   const { tabIndex, handleTabChange } = useTabFilters();
   const { value: proposalTitleFilter, handleChange: handleProposalTitleFilterChange } = useInput<string>("");
   const { startDate, endDate, handleChange: handleProposalDatesFilterChange } = useDateRange(null, null);
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const accountId = wallet.savedPairingData?.accountIds[0];
   const {
     data: proposals,
     error,
@@ -56,6 +58,7 @@ export const Governance = (): ReactElement => {
     statusFilters: proposalTabFilters.at(tabIndex)?.filters,
     startDate,
     endDate,
+    accountId,
   });
   const {
     paginatedData: paginatedProposals,

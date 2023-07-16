@@ -11,6 +11,7 @@ interface CreateContractUpgradeProposalData {
   linkToDiscussion: string;
   contractToUpgrade: string;
   newContractProxyId: string;
+  nftTokenSerialId: number;
 }
 
 export function useCreateContractUpgradeProposal(

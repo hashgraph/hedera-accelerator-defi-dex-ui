@@ -2,9 +2,7 @@ import { ethers } from "ethers";
 import Pair from "./Pair";
 import { AccountId } from "@hashgraph/sdk";
 import Factory from "./Factory";
-import Governor from "./Governor";
 import Configuration from "./Configuration";
-import GODHolder from "./GodHolder";
 import { TOKEN_USER_ID } from "../constants";
 
 const JsonRpcHashioUrl = {
@@ -24,9 +22,7 @@ export function createJsonRpcService(walletAccountId: string = TOKEN_USER_ID) {
     return {
       ...Factory,
       ...Pair,
-      ...Governor,
       ...Configuration,
-      ...GODHolder,
       getJsonRpcProviderAndSigner,
       setJsonRpcProviderAndSigner,
     };

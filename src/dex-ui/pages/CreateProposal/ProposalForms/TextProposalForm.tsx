@@ -9,6 +9,7 @@ import { Paths } from "@routes";
 import { useCreateTextProposal } from "@hooks";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { WarningIcon } from "@chakra-ui/icons";
+import { DEFAULT_NFT_TOKEN_SERIAL_ID } from "@services";
 
 export function TextProposalForm() {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ export function TextProposalForm() {
       title: data.title,
       description: data.description,
       linkToDiscussion: data.linkToDiscussion,
+      nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
     });
   }
 

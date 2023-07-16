@@ -39,7 +39,7 @@ const castVote = async (params: CastVoteParams) => {
   const preciseProposalId = BigNumber(proposalId);
   const contractFunctionParameters = new ContractFunctionParameters()
     .addUint256(preciseProposalId)
-    .addUint256(0) // Added extra key as castVotePublic needs three keys as opposed to two keys required by castVote
+    .addUint256(0)
     .addUint8(voteType);
   const castVoteTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
@@ -83,6 +83,7 @@ interface CreateTransferTokenProposalParams {
   accountToTransferTo: string;
   tokenToTransfer: string;
   amountToTransfer: BigNumber;
+  nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
 
@@ -94,8 +95,16 @@ interface CreateTransferTokenProposalParams {
 const sendCreateTransferTokenProposalTransaction = async (
   params: CreateTransferTokenProposalParams
 ): Promise<TransactionResponse> => {
-  const { title, description, linkToDiscussion, accountToTransferTo, tokenToTransfer, amountToTransfer, signer } =
-    params;
+  const {
+    title,
+    description,
+    linkToDiscussion,
+    accountToTransferTo,
+    tokenToTransfer,
+    amountToTransfer,
+    nftTokenSerialId,
+    signer,
+  } = params;
   const transferFromAddress = signer.getAccountId().toSolidityAddress();
   const transferToAddress = AccountId.fromString(accountToTransferTo).toSolidityAddress();
   const tokenToTransferAddress = TokenId.fromString(tokenToTransfer).toSolidityAddress();
@@ -115,8 +124,9 @@ const sendCreateTransferTokenProposalTransaction = async (
     .addAddress(transferFromAddress)
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
-    .addInt256(amountToTransfer)
-    .addAddress(transferFromAddress);
+    .addUint256(amountToTransfer)
+    .addAddress(AccountId.fromString(walletId).toSolidityAddress())
+    .addUint256(nftTokenSerialId);
 
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(transferTokenContractId)
@@ -133,6 +143,7 @@ interface CreateContractUpgradeProposalParams {
   linkToDiscussion: string;
   contractToUpgrade: string;
   newContractProxyId: string;
+  nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
 
@@ -144,7 +155,8 @@ interface CreateContractUpgradeProposalParams {
 const sendCreateContractUpgradeProposalTransaction = async (
   params: CreateContractUpgradeProposalParams
 ): Promise<TransactionResponse> => {
-  const { title, linkToDiscussion, description, contractToUpgrade, newContractProxyId, signer } = params;
+  const { title, linkToDiscussion, description, contractToUpgrade, newContractProxyId, nftTokenSerialId, signer } =
+    params;
   const contractIdToUpgrade = ContractId.fromString(contractToUpgrade).toSolidityAddress();
   const upgradeProposalProxyId = ContractId.fromString(newContractProxyId).toSolidityAddress();
   const contractUpgradeContractId = ContractId.fromString(Contracts.Governor.ContractUpgrade.ProxyId);
@@ -161,7 +173,9 @@ const sendCreateContractUpgradeProposalTransaction = async (
     .addString(description)
     .addString(linkToDiscussion)
     .addAddress(upgradeProposalProxyId)
-    .addAddress(contractIdToUpgrade);
+    .addAddress(contractIdToUpgrade)
+    .addAddress(AccountId.fromString(walletId).toSolidityAddress())
+    .addUint256(nftTokenSerialId);
   const createUpgradeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(contractUpgradeContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
@@ -176,6 +190,7 @@ interface CreateTextProposalParams {
   title: string;
   description: string;
   linkToDiscussion: string;
+  nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
 /**
@@ -185,7 +200,7 @@ interface CreateTextProposalParams {
  * @returns
  */
 const sendCreateTextProposalTransaction = async (params: CreateTextProposalParams): Promise<TransactionResponse> => {
-  const { title, linkToDiscussion, description, signer } = params;
+  const { title, linkToDiscussion, description, nftTokenSerialId, signer } = params;
   const textProposalContractId = ContractId.fromString(Contracts.Governor.TextProposal.ProxyId);
   const walletId = signer.getAccountId().toString();
   await DexService.setTokenAllowance({
@@ -198,7 +213,9 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
-    .addString(linkToDiscussion);
+    .addString(linkToDiscussion)
+    .addAddress(AccountId.fromString(walletId).toSolidityAddress())
+    .addUint256(nftTokenSerialId);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(textProposalContractId)
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
@@ -314,6 +331,16 @@ const sendUnLockGODTokenTransaction = async (params: SendUnLockGODTokenTransacti
   return sendUnLockGODTokenResponse;
 };
 
+interface GetLatestProposalDetailsParams {
+  proposalId: string;
+  contractId: string;
+  signer: HashConnectSigner;
+}
+
+const getLatestProposalDetails = async (params: GetLatestProposalDetailsParams) => {
+  console.log("");
+};
+
 const GovernorService = {
   sendClaimGODTokenTransaction,
   castVote,
@@ -324,6 +351,7 @@ const GovernorService = {
   sendCreateContractUpgradeProposalTransaction,
   sendLockGODTokenTransaction,
   sendUnLockGODTokenTransaction,
+  getLatestProposalDetails,
 };
 
 export default GovernorService;

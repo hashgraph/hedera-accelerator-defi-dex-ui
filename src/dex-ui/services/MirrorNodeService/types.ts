@@ -111,20 +111,34 @@ interface MirrorNodeProposalEventLog {
   timestamp: string;
 }
 
+interface VotingInformation {
+  abstainVotes: number;
+  againstVotes: number;
+  forVotes: number;
+  isQuorumReached: boolean;
+  proposalState: number;
+  quorumValue: number;
+  voted: boolean;
+  votedUser: string;
+}
 interface MirrorNodeDecodedProposalEvent {
   proposalId: string;
   contractId: string;
   type: string;
-  proposer?: string;
-  startBlock?: string;
-  endBlock?: string;
-  description?: string;
-  title?: string;
-  link?: string;
-  timestamp?: string;
-  data?: string;
+  proposer: string;
+  description: string;
+  title: string;
+  link: string;
+  timestamp: string;
+  nftTokenSerialId: string;
+  duration: {
+    endBlock: string;
+    startBlock: string;
+  };
+  data: string | undefined;
+  votingInformation?: VotingInformation;
+  state?: number;
 }
-
 interface MirrorNodeEventLog {
   address: string;
   bloom: string;
@@ -139,7 +153,9 @@ interface MirrorNodeEventLog {
   transaction_hash: string;
   transaction_index: number;
 }
-
+interface MirrorNodeBlocks {
+  number: number;
+}
 /**
  * TODO: Refactor this to return a single MirrorNode type with other types as properties
  * i.e. MirrorNode.EventLog, MirrorNode.TokenByIdResponse, etc.
@@ -156,4 +172,5 @@ export type {
   MirrorNodeDecodedProposalEvent,
   MirrorNodeTokenPairResponse,
   MirrorNodeAccountById,
+  MirrorNodeBlocks,
 };

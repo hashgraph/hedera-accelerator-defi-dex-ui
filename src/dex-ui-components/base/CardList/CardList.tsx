@@ -10,7 +10,7 @@ interface CardListProps extends PropsWithChildren {
 }
 
 export function CardList(props: CardListProps): ReactElement {
-  const { children, error, isLoading, isSuccess, isError } = props;
+  const { children, error, isLoading, isError } = props;
   const isListEmpty = isNil(children) || isEmpty(children);
 
   if (isLoading) {
@@ -33,7 +33,7 @@ export function CardList(props: CardListProps): ReactElement {
     );
   }
 
-  if (isSuccess && isListEmpty) {
+  if (isListEmpty) {
     return (
       <Text textStyle="h2_empty_or_error" margin="auto">
         No Proposals Found
