@@ -10,6 +10,7 @@ import {
   MirrorNodeEventLog,
   MirrorNodeAccountById,
   MirrorNodeBlocks,
+  MirrorNodeProposalEventLog,
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
@@ -206,14 +207,7 @@ function createMirrorNodeService() {
     contractId: string,
     limitResults = true
   ): Promise<MirrorNodeDecodedProposalEvent[]> => {
-    /*
-     Currently, each proposal requires multiple additional calls to the smart contract
-     to get all of the desired data for the UI. This is an expensive action that costs a large
-     amount of hbar. We are only fetching the latest proposal for the time being to reduce
-     the query overhead. A solution is being built on the smart contract to enable a single
-     query to get all proposal data.
-
-     const response = await fetchNextBatch<{ logs: [] }>(
+    const response: MirrorNodeProposalEventLog[] = await fetchNextBatch(
       `/api/v1/contracts/${contractId.toString()}/results/logs`,
       "logs",
       {
@@ -222,31 +216,7 @@ function createMirrorNodeService() {
         },
       }
     );
-    */
-    const params: any = {
-      order: "desc",
-      /**
-       * Every proposal fetched from the mirror node logs requires an additional hashio
-       * JSON RPC call to fetch the remaining details for the UI. Some of these calls are failing
-       * with a "HBAR rate limit exceeded" error resulting in the UI displaying an error. This is due to
-       * our queries exceeding the global rate limit for the JSON RPC service.
-       *
-       * To reduce the frequency at which this error occurs a temporary limit has been put in place. A
-       * max of 5 proposal details for each type of proposal will be fetched from the proposal logs.
-       *
-       * @see {@link file://./../../../../architecture/05_Event_Based_Historical_Queries.md} for more details
-       * regarding a long term solution.
-       */
-      limit: 10,
-    };
-    if (!limitResults) {
-      delete params.limit;
-    }
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
-      params,
-    });
-
-    const allEvents = decodeLog(abiSignatures, response.data.logs, ["ProposalDetails"]);
+    const allEvents = decodeLog(abiSignatures, response, ["ProposalDetails"]);
     const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       return { ...item, contractId, type: proposalType };

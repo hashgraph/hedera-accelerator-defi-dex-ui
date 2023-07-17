@@ -7,6 +7,7 @@ interface PaginationProps {
   isPaginationVisible: boolean;
   isPreviousButtonVisible: boolean;
   isNextButtonVisible: boolean;
+  customPaginationStyles?: React.CSSProperties;
   handlePageClick: ({ selected }: { selected: number }) => void;
 }
 
@@ -16,7 +17,7 @@ function PaginationBase(props: PaginationProps) {
   }
 
   return (
-    <Box sx={PaginationStyles}>
+    <Box sx={{ ...PaginationStyles, ...props.customPaginationStyles }}>
       <ReactPaginate
         containerClassName="pagination"
         pageLinkClassName="pagination__page-link"

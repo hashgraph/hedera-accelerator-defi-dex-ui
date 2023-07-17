@@ -1,13 +1,15 @@
-import { CardListLayout, ErrorLayout, LoadingSpinnerLayout, NotFound, TabFilters } from "@layouts";
-import { ProposalStatus, useDAOProposals, useGovernanceDAOProposals, useTabFilters } from "@hooks";
+import { CardListLayout, ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout, TabFilters } from "@layouts";
+import { Proposal, ProposalStatus, useDAOProposals, useGovernanceDAOProposals, useTabFilters } from "@hooks";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
-import { DAODetailsContext, DAOType, GovernanceDAODetails, MultiSigDAODetails } from "@services";
-import { TransactionIcon, Color } from "@dex-ui-components";
+import { DAODetailsContext, GovernanceDAODetails, MultiSigDAODetails } from "@services";
+import { TransactionIcon, Color, usePagination, Pagination } from "@dex-ui-components";
 import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@utils";
 import { Paths } from "@routes";
+
+const PageLimit = 10;
 
 const transactionTabFilters = [
   [ProposalStatus.Pending, ProposalStatus.Queued],
@@ -35,7 +37,14 @@ export function ProposalList() {
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  let daoTransactionsQueryResults = useDAOProposals(daoAccountId, safeAccountId, transactionFilters);
+  const multiSigDAOTransactionsQueryResults = useDAOProposals(daoAccountId, safeAccountId, transactionFilters);
+  const {
+    isSuccess: multiSigTransactionSuccess,
+    isLoading: multiSigTransactionLoading,
+    isError: multiSigTransactionFailed,
+    error: multiSigTransactionError,
+    data: multiSigTransactions,
+  } = multiSigDAOTransactionsQueryResults;
 
   const governanceDaoTransactionsQueryResults = useGovernanceDAOProposals(
     daoAccountId,
@@ -43,12 +52,30 @@ export function ProposalList() {
     governors,
     transactionFilters
   );
+  const {
+    isSuccess: govTransactionSuccess,
+    isLoading: govTransactionLoading,
+    isError: govTransactionFailed,
+    error: govTransactionError,
+    data: govTransactions,
+  } = governanceDaoTransactionsQueryResults;
 
-  if (dao.type === DAOType.GovernanceToken) {
-    daoTransactionsQueryResults = governanceDaoTransactionsQueryResults;
-  }
-  const { isSuccess, isLoading, isError, error, data: transactions } = daoTransactionsQueryResults;
+  const transactions = multiSigTransactions || govTransactions;
+  const isError = multiSigTransactionFailed || govTransactionFailed;
+  const isSuccess = multiSigTransactionSuccess || govTransactionSuccess;
+  const isLoading = multiSigTransactionLoading || govTransactionLoading;
+  const error = multiSigTransactionError || govTransactionError;
+
   const hasTransactions = isNotNil(transactions) && !isEmpty(transactions);
+
+  const {
+    paginatedData: paginatedProposals,
+    pageCount,
+    isPaginationVisible,
+    isPreviousButtonVisible,
+    isNextButtonVisible,
+    handlePageClick,
+  } = usePagination<Proposal>({ data: transactions ?? [], pageLimit: PageLimit });
 
   function handleClickCreateProposal() {
     navigate(replaceLastRoute(location.pathname, Paths.DAOs.CreateDAOProposal));
@@ -64,35 +91,49 @@ export function ProposalList() {
 
   if (isSuccess) {
     return (
-      <>
-        <CardListLayout
-          onTabChange={handleTabChange}
-          tabFilters={
-            <Flex layerStyle="dao-dashboard__content-header--with-tabs">
-              <TabFilters filters={transactionTabs} />
-            </Flex>
-          }
-          cardListLayerStyles="dao-dashboard__content-body"
-          cardLists={
-            hasTransactions
-              ? [<></>, <></>].map(() =>
-                  transactions?.map((transaction, index) => (
-                    <ProposalCard proposal={transaction} dao={dao} key={index} />
+      <Page
+        gap={0}
+        type={PageLayout.Dashboard}
+        body={
+          <CardListLayout
+            onTabChange={handleTabChange}
+            tabFilters={
+              <Flex layerStyle="dao-dashboard__content-header--with-tabs">
+                <TabFilters filters={transactionTabs} />
+              </Flex>
+            }
+            cardListLayerStyles="dao-dashboard__content-body"
+            cardLists={
+              hasTransactions
+                ? [<></>, <></>].map(() =>
+                    paginatedProposals?.map((transaction, index) => (
+                      <ProposalCard proposal={transaction} dao={dao} key={index} />
+                    ))
+                  )
+                : [<></>, <></>].map(() => (
+                    <Flex direction="column" gap="2" minHeight="300px">
+                      <NotFound
+                        icon={<TransactionIcon boxSize="4rem" stroke={Color.Neutral._900} />}
+                        message={`We didn't find any ${tabIndex === 0 ? "active" : "past"} proposals.`}
+                        linkText="Create a proposal."
+                        onLinkClick={handleClickCreateProposal}
+                      />
+                    </Flex>
                   ))
-                )
-              : [<></>, <></>].map(() => (
-                  <Flex direction="column" gap="2" minHeight="300px">
-                    <NotFound
-                      icon={<TransactionIcon boxSize="4rem" stroke={Color.Neutral._900} />}
-                      message={`We didn't find any ${tabIndex === 0 ? "active" : "past"} proposals.`}
-                      linkText="Create a proposal."
-                      onLinkClick={handleClickCreateProposal}
-                    />
-                  </Flex>
-                ))
-          }
-        />
-      </>
+            }
+            paginationComponent={
+              <Pagination
+                pageCount={pageCount}
+                customPaginationStyles={{ paddingRight: "5rem" }}
+                isPaginationVisible={isPaginationVisible}
+                isPreviousButtonVisible={isPreviousButtonVisible}
+                isNextButtonVisible={isNextButtonVisible}
+                handlePageClick={handlePageClick}
+              />
+            }
+          />
+        }
+      />
     );
   }
 
