@@ -38,6 +38,7 @@ export const Paths = {
     Proposals: "proposals",
     Assets: "assets",
     Members: "members",
+    Templates: "templates",
     Settings: "settings",
     Staking: "staking",
     AddMember: "add-member",

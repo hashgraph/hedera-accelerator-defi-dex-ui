@@ -34,7 +34,7 @@ export function DAOCard(props: DAOCardProps) {
           <Image
             src={logoUrl}
             objectFit="contain"
-            alt="DAO Logo URl"
+            alt="DAO Logo URL"
             boxSize="3.5rem"
             fallback={<DefaultLogoIcon boxSize="3.5rem" color={Color.Grey_Blue._100} />}
           />

@@ -35,6 +35,10 @@ export function DAODashboard(props: DAODashboardProps) {
       title: "Proposals",
     },
     {
+      icon: <TransactionIcon boxSize="4" />,
+      title: "Templates",
+    },
+    {
       icon: <BoxIcon boxSize="4" />,
       title: "Assets",
     },

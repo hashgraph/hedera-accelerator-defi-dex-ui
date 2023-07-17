@@ -58,6 +58,8 @@ import {
   UpdateDAODetails,
   UpdateDAODetailsForm,
   UpdateDAODetailsReviewForm,
+  TemplatesList,
+  ProposalTemplateEditor,
 } from "@pages";
 import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 import { Paths } from "@routes";
@@ -112,6 +114,7 @@ export const router = createBrowserRouter(
           <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
           <Route path={Paths.DAOs.Overview} element={<GovernanceDAODashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<ProposalList />} />
+          <Route path={Paths.DAOs.Templates} element={<TemplatesList />} />
           <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
@@ -126,6 +129,10 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
         </Route>
+        <Route
+          path={`${Paths.DAOs.GovernanceToken}/:accountId/proposal-template-editor`}
+          element={<ProposalTemplateEditor />}
+        />
         <Route path={`${Paths.DAOs.GovernanceToken}/:accountId/new-proposal`} element={<CreateDAOProposal />}>
           <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
           <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
