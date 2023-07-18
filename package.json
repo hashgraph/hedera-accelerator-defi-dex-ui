@@ -25,6 +25,8 @@
     "framer-motion": "^6.5.0",
     "hashconnect": "^0.2.4",
     "immer": "^9.0.15",
+    "mdast-util-to-markdown": "^2.1.0",
+    "mdast-util-to-string": "^4.0.0",
     "numeral": "^2.0.6",
     "ramda": "^0.29.0",
     "react": "^18.2.0",

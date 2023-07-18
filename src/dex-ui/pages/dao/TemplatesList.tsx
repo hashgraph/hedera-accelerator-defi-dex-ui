@@ -1,7 +1,8 @@
-import { Image, Card, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Image, Card, Flex, SimpleGrid, Text, Button } from "@chakra-ui/react";
 import { Color, DefaultLogoIcon } from "@dex-ui-components";
 import { MultiSigDAODetailsContext } from "./MultiSigDAODashboard/types";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { Paths } from "@dex-ui/routes";
 
 interface ProposalTemplate {
   name: string;
@@ -13,9 +14,23 @@ interface ProposalTemplate {
 export function TemplatesList() {
   const { dao } = useOutletContext<MultiSigDAODetailsContext>();
   const navigate = useNavigate();
+
+  const daoAccountId = dao.accountId;
   const templates: ProposalTemplate[] = [
     {
       name: "HIP",
+      logoURL: "",
+      metadata: "",
+      ipfsURL: "",
+    },
+    {
+      name: "EIP",
+      logoURL: "",
+      metadata: "",
+      ipfsURL: "",
+    },
+    {
+      name: "TC39",
       logoURL: "",
       metadata: "",
       ipfsURL: "",
@@ -24,13 +39,14 @@ export function TemplatesList() {
   const templatesCount = templates.length;
 
   function handleTemplateCardClicked() {
-    navigate(`proposal-template-editor`);
+    navigate(`${Paths.DAOs.absolute}/${Paths.DAOs.GovernanceToken}/${daoAccountId}/proposal-template-editor`);
   }
 
   return (
     <>
-      <Flex layerStyle="dao-dashboard__content-header">
+      <Flex layerStyle="dao-dashboard__content-header" justifyContent="space-between">
         <Text textStyle="p medium medium">{templatesCount} Proposal Templates</Text>
+        <Button onClick={handleTemplateCardClicked}>New Template</Button>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={3} spacingX="2rem" spacingY="2rem">

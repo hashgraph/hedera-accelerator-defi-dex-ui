@@ -2,7 +2,6 @@
 /* eslint-disable max-len */
 import { isNotNil } from "ramda";
 import { HIPMetaData, ProposalType } from "./types";
-import "./HIPProposal.styles.css";
 
 interface HIPProposalProps {
   metadata: string;

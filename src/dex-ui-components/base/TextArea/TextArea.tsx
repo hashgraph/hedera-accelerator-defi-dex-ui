@@ -6,7 +6,7 @@ import { Color } from "../..";
 
 export interface TextAreaProps<T extends string> {
   flex?: number | string;
-  label: string | React.ReactElement;
+  label?: string | React.ReactElement;
   placeholder?: string;
   tooltipLabel?: string;
   isTooltipVisible?: boolean;
