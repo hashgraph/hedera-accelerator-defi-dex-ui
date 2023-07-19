@@ -1,14 +1,14 @@
-import { Text, Flex, Divider, Center, Button } from "@chakra-ui/react";
+import { Text, Flex, Divider, Center, Button, Link } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { FormInput, LoadingDialog, Color } from "@dex-ui-components";
+import { FormInput, LoadingDialog, Color, CopyTextButton, SuccessCheckIcon } from "@dex-ui-components";
 import { useCreateToken, useFetchAccountInfo, useFetchTransactionDetails, useHandleTransactionSuccess } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { isNil, isNotNil } from "ramda";
-import { checkForValidAccountId } from "@utils";
+import { checkForValidAccountId, createHashScanTransactionLink } from "@utils";
 import { DefaultCreateATokenDAOFormData } from "./constants";
 
 export function CreateTokenDAOGovernanceForm() {
@@ -48,6 +48,7 @@ export function CreateTokenDAOGovernanceForm() {
     error: transactionDetailsError,
   } = useFetchTransactionDetails(createTokenData?.transactionId.toString() ?? "");
 
+  const hashscanTransactionLink = createHashScanTransactionLink(createTokenData?.transactionId?.toString() ?? "");
   const isFormInReadOnlyMode = governance?.newToken?.id?.length > 0;
 
   const isLoadingDialogOpen = isCreateTokenLoading || isGetAccountDetailsLoading || isTransactionDetailsLoading;
@@ -65,6 +66,10 @@ export function CreateTokenDAOGovernanceForm() {
     if (isCreateTokenFailed) return createTokenError?.message;
     if (isTransactionDetailsFailed) return transactionDetailsError?.message;
     return "";
+  }
+
+  function handleCopyTextButtonTapped() {
+    console.log("Copy the text to clipboard");
   }
 
   const loadingDialogMessage = getLoadingDialogMessage();
@@ -257,6 +262,30 @@ export function CreateTokenDAOGovernanceForm() {
               Create Token
             </Button>
           </Flex>
+          {isFormInReadOnlyMode ? (
+            <Flex justifyContent="space-between">
+              <Flex direction="column" gap="2">
+                <Text textStyle="p small medium">Token ID</Text>
+                <Flex gap="2" alignItems="center">
+                  <Text textStyle="p medium regular">{governance.newToken.id}</Text>
+                  <CopyTextButton onClick={handleCopyTextButtonTapped} />
+                </Flex>
+              </Flex>
+              <Flex direction="column" gap="2" alignItems="flex-end">
+                <Flex alignItems="center" gap="1">
+                  <SuccessCheckIcon boxSize="4" />
+                  <Text textStyle="p small medium"> {governance.newToken.symbol} token was successfully created.</Text>
+                </Flex>
+                {hashscanTransactionLink && (
+                  <Link href={hashscanTransactionLink} isExternal flexDirection="row">
+                    <Text variant="p small semibold" color={Color.Primary._500}>
+                      View in HashScan
+                    </Text>
+                  </Link>
+                )}
+              </Flex>
+            </Flex>
+          ) : undefined}
         </DAOFormContainer>
         <Text textStyle="p large regular">Initial token distribution</Text>
         <DAOFormContainer>

@@ -8,6 +8,8 @@ import {
   CreateANFTDAOForm,
   TokenDAOGovernanceData,
   DAOGovernanceTokenType,
+  DAONFTTokenType,
+  NFTDAOGovernanceData,
 } from "./types";
 import { useCreateDAO, useHandleTransactionSuccess } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
@@ -58,9 +60,9 @@ export function CreateADAOPage() {
   const createDAO = useCreateDAO(handleCreateDAOSuccess);
 
   function GovernanceForm(): string {
-    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token`;
+    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.GovernanceToken}`;
     if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}`;
-    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.NFT}`;
     return `${Paths.DAOs.absolute}`;
   }
 
@@ -89,8 +91,12 @@ export function CreateADAOPage() {
       (governance as TokenDAOGovernanceData).tokenType === DAOGovernanceTokenType.ExistingToken
     )
       return trigger(["governance.existingToken.id", "governance.existingToken.treasuryWalletAccountId"]);
+    if (type === DAOType.NFT && (governance as NFTDAOGovernanceData).tokenType === DAONFTTokenType.NewNFT)
+      return trigger(["governance.newNFT.id", "governance.newNFT.treasuryWalletAccountId"]);
+    if (type === DAOType.NFT && (governance as NFTDAOGovernanceData).tokenType === DAONFTTokenType.ExistingNFT)
+      return trigger(["governance.existingToken.id", "governance.existingToken.treasuryWalletAccountId"]);
+
     if (type === DAOType.MultiSig) return trigger(["governance.admin"]);
-    if (type === DAOType.NFT) return trigger(["governance.nft.id", "governance.nft.treasuryWalletAccountId"]);
     return Promise.resolve(true);
   }
 
@@ -180,8 +186,14 @@ export function CreateADAOPage() {
         daoLinks: daoLinks.map((link) => link.value),
         logoUrl,
         isPrivate: !isPublic,
-        tokenId: governance.nft.id,
-        treasuryWalletAccountId: governance.nft.treasuryWalletAccountId,
+        tokenId:
+          governance.tokenType === DAONFTTokenType.NewNFT
+            ? governance?.newNFT?.id ?? ""
+            : governance?.existingNFT?.id ?? "",
+        treasuryWalletAccountId:
+          governance.tokenType === DAONFTTokenType.NewNFT
+            ? governance?.newNFT?.treasuryWalletAccountId ?? ""
+            : governance?.existingNFT?.treasuryWalletAccountId ?? "",
         quorum: voting.quorum,
         votingDuration: convertFromDaysToBlocks(voting.duration),
         lockingDuration: convertFromDaysToBlocks(voting.lockingPeriod),

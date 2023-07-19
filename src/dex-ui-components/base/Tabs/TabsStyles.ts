@@ -39,6 +39,17 @@ export const TabsStyles = defineMultiStyleConfig({
         },
       },
     },
+    "dao-create-new": {
+      tab: {
+        color: Color.Neutral._500,
+        stroke: Color.Neutral._400,
+        _selected: {
+          color: Color.White_02,
+          bg: Color.Grey_Blue._500,
+          borderRadius: "0.25rem",
+        },
+      },
+    },
     defaultProps: {},
   },
   defaultProps: {},

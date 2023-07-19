@@ -5,6 +5,11 @@ export enum DAOGovernanceTokenType {
   ExistingToken = "Existing Token",
 }
 
+export enum DAONFTTokenType {
+  NewNFT = "New NFT",
+  ExistingNFT = "Existing NFT",
+}
+
 export interface TokenDAOGovernanceData {
   tokenType: DAOGovernanceTokenType;
   newToken: {
@@ -44,7 +49,17 @@ export interface MultiSigDAOGovernanceData {
 }
 
 export interface NFTDAOGovernanceData {
-  nft: {
+  tokenType: DAONFTTokenType;
+  newNFT: {
+    name: string;
+    symbol: string;
+    logo: string;
+    maxSupply: number;
+    id: string;
+    tokenWalletAddress: string;
+    treasuryWalletAccountId: string;
+  };
+  existingNFT: {
     name: string;
     symbol: string;
     logo: string;
