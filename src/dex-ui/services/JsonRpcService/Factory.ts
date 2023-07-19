@@ -52,7 +52,8 @@ async function fetchAllTokenPairs(): Promise<string[]> {
  */
 async function getPair(tokenAAddress: string, secondTokenAddress: string, transactionFee: number): Promise<string> {
   const factoryContract = createFactoryContract();
-  return await factoryContract.getPair(tokenAAddress, secondTokenAddress, transactionFee);
+  const address = await factoryContract.getPair(tokenAAddress, secondTokenAddress, transactionFee);
+  return address;
 }
 
 /**

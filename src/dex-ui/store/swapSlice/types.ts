@@ -42,6 +42,7 @@ interface Token {
   maxSupply: Long | null;
   tokenMeta: {
     pairAccountId: string | undefined;
+    lpTokenId: string | undefined;
     tokenId: string | undefined;
     fee: BigNumber | undefined;
   };
@@ -69,7 +70,12 @@ interface SwapState {
 interface SwapActions {
   fetchPairInfo: (selectedAccountId: string) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
-  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => Promise<void>;
+  sendSwapTransaction: (
+    tokenToTrade: Token,
+    slippageTolerance: number,
+    transactionDeadline: number,
+    tokenToReceiveId: string
+  ) => Promise<void>;
   fetchTokenPairs: () => Promise<void>;
 }
 

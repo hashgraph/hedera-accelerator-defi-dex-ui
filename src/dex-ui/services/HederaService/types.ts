@@ -36,6 +36,7 @@ interface Token {
   maxSupply: Long | null;
   tokenMeta: {
     pairAccountId: string | undefined;
+    lpTokenId: string | undefined;
     tokenId: string | undefined;
   };
 }

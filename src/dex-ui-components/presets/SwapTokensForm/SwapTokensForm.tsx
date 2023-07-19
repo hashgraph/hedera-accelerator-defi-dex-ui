@@ -49,7 +49,12 @@ interface SwapTokensFormProps {
   connectionStatus: HashConnectConnectionState;
   swapPairData: PairDataResponse | undefined;
   fetchPairForSwap: (tokenAAddress: string, tokenBAddress: string, tokenAQty: number) => Promise<void>;
-  sendSwapTransaction: (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => Promise<void>;
+  sendSwapTransaction: (
+    tokenToTrade: Token,
+    slippageTolerance: number,
+    transactionDeadline: number,
+    tokenToReceiveId: string
+  ) => Promise<void>;
   getPoolLiquidity: (tokenToTrade: Token, tokenToReceive: Token) => Promise<void>;
   fetchPairInfo: (selectedAccountId: string) => Promise<void>;
   connectToWallet: () => void;
@@ -221,7 +226,12 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
       return;
     }
     const transactionDeadlineInSeconds = convertNumberOfMinsToSeconds(data.transactionDeadline);
-    props.sendSwapTransaction(data.tokenToTrade, data.slippage, transactionDeadlineInSeconds);
+    props.sendSwapTransaction(
+      data.tokenToTrade,
+      data.slippage,
+      transactionDeadlineInSeconds,
+      data.tokenToReceive.tokenMeta.tokenId ?? ""
+    );
   }
 
   /* TODO: Remove after swap queries are replaced with React Query */
