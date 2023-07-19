@@ -1,3 +1,5 @@
+import { TokenBalance } from "@dex-ui/hooks";
+
 export enum DAOProposalType {
   Text = "Text",
   TokenTransfer = "Token Transfer",
@@ -58,4 +60,5 @@ export type CreateDAOProposalContext = {
   threshold: number;
   membersCount: number;
   proposalType: DAOProposalType;
+  assets: TokenBalance[];
 };

@@ -6,7 +6,7 @@ import { DAOFormContainer } from "./DAOFormContainer";
 import { FormInput, LoadingDialog, Color } from "@dex-ui-components";
 import { useCreateToken, useFetchAccountInfo, useFetchTransactionDetails, useHandleTransactionSuccess } from "@hooks";
 import { WarningIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { isNil, isNotNil } from "ramda";
 import { checkForValidAccountId } from "@utils";
 import { DefaultCreateATokenDAOFormData } from "./constants";
@@ -21,6 +21,7 @@ export function CreateTokenDAOGovernanceForm() {
   } = useFormContext<CreateATokenDAOForm>();
   const formValues = getValues();
   const { governance } = isNotNil(formValues.governance) ? formValues : DefaultCreateATokenDAOFormData;
+  const [tokenSymbol, setTokenSymbol] = useState("");
 
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
@@ -157,6 +158,10 @@ export function CreateTokenDAOGovernanceForm() {
                 register: {
                   ...register("governance.newToken.symbol", {
                     required: { value: true, message: "A token symbol is required." },
+                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                      const inputElement = event?.target as HTMLInputElement;
+                      setTokenSymbol(inputElement.value);
+                    },
                   }),
                 },
               }}
@@ -208,7 +213,7 @@ export function CreateTokenDAOGovernanceForm() {
               label: "Initial token supply",
               type: "number",
               placeholder: "Enter amount",
-              unit: "$TOKEN",
+              unit: tokenSymbol,
               isDisabled: isFormInReadOnlyMode,
               register: {
                 ...register("governance.newToken.initialSupply", {

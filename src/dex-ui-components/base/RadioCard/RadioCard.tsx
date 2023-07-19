@@ -20,13 +20,11 @@ export function RadioCard(props: any) {
         _checked={{
           bg: Color.Grey_Blue._600,
           color: Color.White,
-          boxShadow: "outline",
         }}
         _hover={{
           bg: Color.Grey_Blue._200,
         }}
         _focus={{
-          boxShadow: "outline",
           bg: Color.Grey_Blue._600,
           color: Color.White,
         }}

@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@utils";
+import { useEffect } from "react";
 
 export interface TokenTransferLocationState {
   state: {
@@ -12,6 +13,12 @@ export interface TokenTransferLocationState {
 }
 
 export function DAOTokenTransferDetailsForm() {
+  /*
+   * TODO: Replace Assets Input with Dropdown
+   * const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+   * const accountTokenBalancesQueryResults = useAccountTokenBalances(wallet.savedPairingData?.accountIds[0] ?? "");
+   * const { data: tokenBalances } = accountTokenBalancesQueryResults;
+   */
   const { state } = useLocation() as TokenTransferLocationState;
   const { safeAccountId, daoType, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
@@ -23,6 +30,26 @@ export function DAOTokenTransferDetailsForm() {
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
   }
+
+  /*
+   * TODO: Replace Assets Input with Dropdown
+   * const assetDropdownOptions =
+   *   tokenBalances
+   *     ?.filter((asset: TokenBalance) => asset.symbol !== "ℏ")
+   *     ?.map((asset: TokenBalance) => {
+   *       const { symbol, tokenId } = asset;
+   *       return {
+   *         label: symbol,
+   *         value: tokenId,
+   *       };
+   *      }) ?? [];
+   */
+
+  useEffect(() => {
+    if (state?.tokenId) {
+      setValue("tokenId", state?.tokenId);
+    }
+  }, [setValue, state?.tokenId]);
 
   return (
     <Flex direction="column" gap="4" width="100%">
@@ -108,6 +135,20 @@ export function DAOTokenTransferDetailsForm() {
         isInvalid={Boolean(errors?.tokenId)}
         errorMessage={errors?.tokenId && errors?.tokenId?.message}
       />
+      {/*
+       *  TODO: Replace Assets Input with Dropdown
+       *  <FormDropdown
+       *   label="Assets"
+       *   placeholder="Select an asset"
+       *   data={assetDropdownOptions}
+       *   isInvalid={Boolean(errors?.tokenId)}
+       *   errorMessage={errors?.tokenId && errors?.tokenId?.message}
+       *   register={register("tokenId", {
+       *     required: { value: true, message: "A token is required." },
+       *     onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("tokenId", e.target.value),
+       *   })}
+       * />
+       */}
       <FormInput<"amount">
         inputProps={{
           id: "amount",

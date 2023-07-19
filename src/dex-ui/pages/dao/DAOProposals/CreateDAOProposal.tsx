@@ -22,6 +22,7 @@ import {
   NFTDAODetails,
 } from "@services";
 import {
+  useAccountTokenBalances,
   useCreateAddMemberProposal,
   useCreateChangeThresholdProposal,
   useCreateDAOTextProposal,
@@ -74,6 +75,11 @@ export function CreateDAOProposal() {
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const transferFrom = currentDaoType === "multisig" ? safeAccountId : walletId;
   const wizardTitle = currentWizardStep === "type" ? "New Proposal" : type;
+
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(
+    currentDaoType === "multisig" ? safeAccountId : daoAccountId
+  );
+  const { data: tokenBalances } = accountTokenBalancesQueryResults;
 
   const sendMultisigTokenMutationResults = useCreateMultiSigProposal(handleCreateDAOProposalSuccess);
   const {
@@ -447,6 +453,7 @@ export function CreateDAOProposal() {
                   membersCount: ownerIds?.length ?? 0,
                   threshold,
                   proposalType: type,
+                  assets: tokenBalances,
                 },
                 ...createDaoProposalForm,
               },

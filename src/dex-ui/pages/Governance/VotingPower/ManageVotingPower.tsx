@@ -14,11 +14,12 @@ import { useTabFilters } from "../../../hooks";
 import { FieldErrorsImpl, useForm, UseFormReturn } from "react-hook-form";
 import { isEmpty } from "ramda";
 import { LockIcon, UnlockIcon } from "@chakra-ui/icons";
-import { InputLabelProps, InputTokenAmountData, ManageVotingPowerProps, ManageVotingPowerTabType } from "./types";
+import { InputTokenAmountData, ManageVotingPowerTabType } from "./types";
 import { formulaTypes } from "../../../../dex-ui-components/presets/types";
 import { halfOf } from "../../../../dex-ui-components/presets/utils";
 
 interface ManageVotingPowerModalBodyProps {
+  tokenSymbol: string;
   lockedGODToken: string;
   lockedGODTokenValue?: string;
   totalGODTokenBalance: string;
@@ -34,6 +35,11 @@ interface ManageVotingPowerModalBodyProps {
   onUnlockButtonClick: (data: InputTokenAmountData) => void;
 }
 
+export interface InputLabelProps {
+  tokenSymbol: string;
+  balance: string;
+}
+
 const InputLabel = (props: InputLabelProps): React.ReactElement => {
   return (
     <Flex alignItems="center" justifyContent="space-between" flex="1">
@@ -46,29 +52,33 @@ const InputLabel = (props: InputLabelProps): React.ReactElement => {
           {props.balance}
         </Text>
         <Text textStyle="p xsmall medium" color={Color.Neutral._400}>
-          GOV
+          {props.tokenSymbol}
         </Text>
       </Flex>
     </Flex>
   );
 };
 
-const RightUnitItem = (props: {
+interface RightUnitItemProps {
+  tokenSymbol: string;
   handleHalfButtonClicked: () => void;
   handleMaxButtonClicked: () => void;
-}): React.ReactElement => {
+}
+
+const RightUnitItem = (props: RightUnitItemProps): React.ReactElement => {
+  const { tokenSymbol, handleHalfButtonClicked, handleMaxButtonClicked } = props;
   return (
     <Flex alignItems="center" gap="5px">
       <Flex gap="5px">
-        <Button variant="link" textStyle="link" onClick={props.handleHalfButtonClicked}>
+        <Button variant="link" textStyle="link" onClick={handleHalfButtonClicked}>
           HALF
         </Button>
-        <Button variant="link" textStyle="link" onClick={props.handleMaxButtonClicked}>
+        <Button variant="link" textStyle="link" onClick={handleMaxButtonClicked}>
           MAX
         </Button>
       </Flex>
       <Divider height="35px" orientation="vertical"></Divider>
-      {<Text textStyle="p medium regular">GOV</Text>}
+      {<Text textStyle="p medium regular">{tokenSymbol}</Text>}
     </Flex>
   );
 };
@@ -120,6 +130,7 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
       <Divider marginBottom="20px" />
       <HStack height="120px" justify="center" borderRadius="8px" background={Color.Neutral._50}>
         <GOVTokenDetails
+          tokenSymbol={props.tokenSymbol}
           lockedGODToken={props.lockedGODToken}
           totalGODTokenBalance={props.totalGODTokenBalance}
           availableGODTokenBalance={props.availableGODTokenBalance}
@@ -139,10 +150,11 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
                 isReadOnly: isLockTabDisabled,
                 id: "lockAmount",
                 pointerEvents: "all",
-                label: <InputLabel balance={props.availableGODTokenBalance} />,
+                label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.availableGODTokenBalance} />,
                 type: "number",
                 unit: (
                   <RightUnitItem
+                    tokenSymbol={props.tokenSymbol}
                     handleHalfButtonClicked={handleHalfButtonClicked}
                     handleMaxButtonClicked={handleMaxButtonClicked}
                   />
@@ -166,10 +178,11 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
                 id: "unLockAmount",
                 isReadOnly: !isUnlockButtonEnabled,
                 pointerEvents: "all",
-                label: <InputLabel balance={props.lockedGODToken} />,
+                label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.lockedGODToken} />,
                 type: "number",
                 unit: (
                   <RightUnitItem
+                    tokenSymbol={props.tokenSymbol}
                     handleHalfButtonClicked={handleHalfButtonClicked}
                     handleMaxButtonClicked={handleMaxButtonClicked}
                   />
@@ -193,7 +206,7 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
           <Notification
             type={NotficationTypes.WARNING}
             message={`You have voted on proposals where the voting period is still in progress, so 
-            any unlocked GOV tokens will be pending unlocks until the in-progress
+            any unlocked ${props.tokenSymbol} tokens will be pending unlocks until the in-progress
             proposals are either complete or canceled.`}
             textStyle="p small regular"
           />
@@ -213,14 +226,35 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
       >
         {tabIndex === ManageVotingPowerTabType.Lock
           ? formValues.lockAmount.length !== 0
-            ? `Lock ${formValues.lockAmount} GOV`
+            ? `Lock ${formValues.lockAmount} ${props.tokenSymbol}`
             : "Lock"
           : formValues.unLockAmount.length !== 0
-          ? `Unlock ${formValues.unLockAmount} GOV`
+          ? `Unlock ${formValues.unLockAmount} ${props.tokenSymbol}`
           : "Unlock"}
       </Button>
     </Flex>
   );
+}
+
+export interface ManageVotingPowerProps {
+  tokenSymbol: string;
+  errorMessage?: string;
+  isLoading?: boolean;
+  isSuccess?: boolean;
+  isError?: boolean;
+  lockedGODToken: string;
+  lockedGODTokenValue?: string;
+  totalGODTokenBalance: string;
+  totalGODTokenBalanceValue?: string;
+  availableGODTokenBalance: string;
+  availableGODTokenBalanceValue?: string;
+  hidePendingStatus?: boolean;
+  isSubmitButtonDisabled?: boolean;
+  canUserClaimGODTokens?: boolean;
+  onErrorMessageDismiss?: () => void | undefined;
+  onClose?: () => void | undefined;
+  onLockClick: (data: InputTokenAmountData) => void;
+  onUnlockClick: (data: InputTokenAmountData) => void;
 }
 
 export const ManageVotingPower = (props: ManageVotingPowerProps) => {
@@ -247,7 +281,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
   return (
     <form>
       <AlertDialog
-        title="Manage GOV token"
+        title={`Manage ${props.tokenSymbol} token`}
         size={["xl", "xxl"]}
         dialogWidth="623px"
         openModalComponent={
@@ -264,6 +298,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
         openDialogButtonText="Manage"
         body={
           <ManageVotingPowerModalBody
+            tokenSymbol={props.tokenSymbol}
             isLoading={props.isLoading}
             lockedGODToken={props.lockedGODToken}
             totalGODTokenBalance={props.totalGODTokenBalance}

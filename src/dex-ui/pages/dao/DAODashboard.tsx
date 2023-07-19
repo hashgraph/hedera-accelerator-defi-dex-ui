@@ -67,7 +67,7 @@ export function DAODashboard(props: DAODashboardProps) {
         return daoTabs.filter((tab) => tab.title !== "Staking");
       case DAOType.GovernanceToken:
       case DAOType.NFT:
-        return daoTabs;
+        return daoTabs.filter((tab) => tab.title !== "Assets");
       default:
         return [];
     }

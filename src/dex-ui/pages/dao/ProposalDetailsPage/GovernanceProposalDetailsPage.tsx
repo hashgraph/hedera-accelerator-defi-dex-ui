@@ -103,6 +103,7 @@ export function GovernanceProposalDetailsPage() {
         <GridItem colSpan={1}>
           {isGovernanceProposal ? (
             <GovernanceProposalConfirmationDetails
+              tokenSymbol={token?.data.symbol ?? ""}
               proposal={proposalDetails}
               hasConnectedWalletVoted={hasVoted}
               status={proposalStatus}

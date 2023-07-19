@@ -8,6 +8,7 @@ import {
 } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
+import { BigNumber } from "bignumber.js";
 
 export enum TokenServiceFunctions {
   CreateToken = "createToken",
@@ -38,13 +39,15 @@ interface CreateTokenParams {
  * @returns
  */
 async function createToken(params: CreateTokenParams) {
-  const treasury = AccountId.fromString(params.tokenWalletAddress);
-  const key = PublicKey.fromString(params.supplyKey);
+  const { name, symbol, initialSupply, decimals = 0, tokenWalletAddress, supplyKey } = params;
+  const treasury = AccountId.fromString(tokenWalletAddress);
+  const key = PublicKey.fromString(supplyKey);
+  const preciseInitialSupply = BigNumber(initialSupply).shiftedBy(Number(decimals)).toNumber();
   const createTokenTransaction = await new TokenCreateTransaction()
-    .setTokenName(params.name)
-    .setTokenSymbol(params.symbol)
-    .setInitialSupply(params.initialSupply)
-    .setDecimals(params.decimals)
+    .setTokenName(name)
+    .setTokenSymbol(symbol)
+    .setInitialSupply(preciseInitialSupply)
+    .setDecimals(decimals)
     .setTreasuryAccountId(treasury)
     .setAutoRenewAccountId(treasury)
     .setAutoRenewPeriod(7000000)
