@@ -1,4 +1,4 @@
-import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
+import { AccountId, TokenId, ContractId, TokenAssociateTransaction } from "@hashgraph/sdk";
 import { getErrorMessage } from "../../utils";
 import { BigNumber } from "bignumber.js";
 import {
@@ -44,7 +44,12 @@ const initialPoolsStore: PoolsState = {
   },
 };
 
-function getTokenInfoObj(token: MirrorNodeTokenById, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
+function getTokenInfoObj(
+  token: MirrorNodeTokenById,
+  pair: MirrorNodeTokenPairResponse,
+  fee: BigNumber,
+  lpTokenId: string
+) {
   return {
     amount: 0.0,
     displayAmount: "",
@@ -58,6 +63,7 @@ function getTokenInfoObj(token: MirrorNodeTokenById, pair: MirrorNodeTokenPairRe
       pairAccountId: pair.data.contract_id,
       tokenId: token.data.token_id,
       fee,
+      lpTokenId,
     },
   };
 }
@@ -74,8 +80,8 @@ const fetchEachToken = async (evmAddress: string) => {
     DexService.fetchTokenData(lpTokenId),
   ]);
 
-  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData, fee);
-  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData, fee);
+  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData, fee, lpTokenId);
+  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData, fee, lpTokenId);
 
   const lpTokenMeta = {
     symbol: tokenCInfo.data.symbol,
@@ -123,6 +129,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       inputToken,
       outputToken,
       contractId,
+      lpTokenId,
       transactionDeadline,
     }: SendAddLiquidityTransactionParams) => {
       const { wallet, app } = get();
@@ -160,6 +167,32 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_ADD_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
+
+        const tokenAAmont = wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
+        const tokenBAmont = wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
+        await DexService.setTokenAllowanceForAddLiquidity(
+          {
+            tokenId: inputToken.address,
+            walletId: signingAccount,
+            spenderContractId: contractId,
+            tokenAmount: tokenAAmont.toNumber(),
+            signer,
+          },
+          {
+            tokenId: outputToken.address,
+            walletId: signingAccount,
+            spenderContractId: contractId,
+            tokenAmount: tokenBAmont.toNumber(),
+            signer,
+          }
+        );
+        if (lpTokenId.length > 0) {
+          const tokenAssociateTx = new TokenAssociateTransaction()
+            .setAccountId(signingAccount)
+            .setTokenIds([lpTokenId]);
+          const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
+          await tokenAssociateSignedTx.executeWithSigner(signer);
+        }
         const result = await DexService.addLiquidity({
           firstTokenAddress,
           firstTokenQuantity,
@@ -324,8 +357,8 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       app.setFeaturesAsLoading(["withdrawTransactionState"]);
       const provider = DexService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
       const signer = DexService.getSigner(provider);
+      const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
       const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpAccountId, lpTokenAmount);
-
       try {
         set(
           ({ pools }) => {
@@ -339,7 +372,14 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           false,
           PoolsActionType.SEND_REMOVE_LIQUIDITY_TRANSACTION_TO_WALLET_STARTED
         );
-
+        const lpTokenContractId = await DexService.getLpTokenContractId(pairAcountId);
+        await DexService.setTokenAllowance({
+          tokenId: lpAccountId,
+          walletId,
+          spenderContractId: lpTokenContractId,
+          tokenAmount: lpTokenAmountBigNumber.toNumber(),
+          signer,
+        });
         const result = await DexService.removeLiquidity({
           signer,
           lpTokenAmount: lpTokenAmountBigNumber,
@@ -429,7 +469,35 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
 
         const newPairAddress = await DexService.getPair(firstTokenAddress, secondTokenAddress, params.transactionFee);
         const pairContractId = ContractId.fromSolidityAddress(newPairAddress);
+        const { lpTokenId } = await DexService.fetchPairTokenIds(pairContractId.toString());
+        const tokenAssociateTx = new TokenAssociateTransaction().setAccountId(signingAccount).setTokenIds([lpTokenId]);
+        const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
+        await tokenAssociateSignedTx.executeWithSigner(signer);
 
+        const firstTokenAmount = wallet.getTokenAmountWithPrecision(
+          params.firstToken.address,
+          params.firstToken.amount
+        );
+        const secondTokenAmount = wallet.getTokenAmountWithPrecision(
+          params.secondToken.address,
+          params.secondToken.amount
+        );
+        await DexService.setTokenAllowanceForAddLiquidity(
+          {
+            tokenId: params.firstToken.address,
+            walletId: signingAccount,
+            spenderContractId: pairContractId.toString(),
+            tokenAmount: firstTokenAmount.toNumber(),
+            signer,
+          },
+          {
+            tokenId: params.secondToken.address,
+            walletId: signingAccount,
+            spenderContractId: pairContractId.toString(),
+            tokenAmount: secondTokenAmount.toNumber(),
+            signer,
+          }
+        );
         const result = await DexService.addLiquidity({
           firstTokenAddress,
           firstTokenQuantity,

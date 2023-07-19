@@ -200,10 +200,8 @@ const Pools = (): JSX.Element => {
                   textDecoration={"underline"}
                   color={"#3078FF"}
                   onClick={() => {
-                    navigate(
-                      `/pools/add-liquidity/
-                    ${(row as FormattedPoolDetails).pairAccountId}/${(row as FormattedPoolDetails).name}`
-                    );
+                    const poolDetails = row as FormattedPoolDetails;
+                    navigate(`/pools/add-liquidity/${poolDetails.pairAccountId}/${poolDetails.name}`);
                   }}
                 >
                   Add Liquidity

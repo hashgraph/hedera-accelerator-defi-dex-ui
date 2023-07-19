@@ -8,21 +8,21 @@
   },
   {
     "name": "configuration",
-    "id": "0.0.15003474",
-    "address": "0x0000000000000000000000000000000000e4ef52",
-    "timestamp": "2023-06-28T05:57:08.099Z",
-    "hash": "3ed604f0c6f6c59c7348334d80b9efe8",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e4ef54",
-    "transparentProxyId": "0.0.15003476"
+    "id": "0.0.15059522",
+    "hash": "a0a2f29c431e70d2333bf61ad0a8dac1",
+    "address": "0x0000000000000000000000000000000000e5ca42",
+    "timestamp": "2023-07-06T14:54:17.777Z",
+    "transparentProxyId": "0.0.15059544",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca58"
   },
   {
     "name": "lptoken",
-    "id": "0.0.14831448",
-    "address": "0x0000000000000000000000000000000000e24f58",
-    "timestamp": "2023-06-19T11:17:05.770Z",
-    "hash": "2189895195b318e265919af12eb61366",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e24f75",
-    "transparentProxyId": "0.0.14831477"
+    "id": "0.0.15059527",
+    "hash": "604ae3bf08f89e4d6afc56bf6ef5dec2",
+    "address": "0x0000000000000000000000000000000000e5ca47",
+    "timestamp": "2023-07-06T14:54:20.046Z",
+    "transparentProxyId": "0.0.15059551",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca5f"
   },
   {
     "name": "splitter",
@@ -53,21 +53,21 @@
   },
   {
     "name": "pair",
-    "id": "0.0.14831460",
-    "address": "0x0000000000000000000000000000000000e24f64",
-    "timestamp": "2023-06-19T11:17:10.124Z",
-    "hash": "a412af0723507a29d9a8dcc64ed6409c",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e24f87",
-    "transparentProxyId": "0.0.14831495"
+    "id": "0.0.15059536",
+    "hash": "a8daa5fbdd41aba00dc8bf2084f0c4f9",
+    "address": "0x0000000000000000000000000000000000e5ca50",
+    "timestamp": "2023-07-06T14:54:22.515Z",
+    "transparentProxyId": "0.0.15059561",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca69"
   },
   {
     "name": "factory",
-    "id": "0.0.14831472",
-    "address": "0x0000000000000000000000000000000000e24f70",
-    "timestamp": "2023-06-19T11:17:10.514Z",
-    "hash": "d4cd360603dff0bd6bb14d04e9301d53",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e24f89",
-    "transparentProxyId": "0.0.14831497"
+    "id": "0.0.15059542",
+    "hash": "349fcaf96c18047334f294ec932be4ab",
+    "address": "0x0000000000000000000000000000000000e5ca56",
+    "timestamp": "2023-07-06T14:54:25.814Z",
+    "transparentProxyId": "0.0.15435061",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca6e"
   },
   {
     "name": "godtokenholderfactory",

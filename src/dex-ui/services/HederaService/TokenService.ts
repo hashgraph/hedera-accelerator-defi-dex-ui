@@ -84,6 +84,20 @@ async function setTokenAllowance(params: SetTokenAllowanceParams) {
   checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
 }
 
+/**
+ * TODO: Change the approach to make multiple params as array[]
+ * @param params -
+ * @returns
+ */
+async function setTokenAllowanceForAddLiquidity(tokenA: SetTokenAllowanceParams, tokenB: SetTokenAllowanceParams) {
+  const tokenAllowanceTxn = new AccountAllowanceApproveTransaction()
+    .approveTokenAllowance(tokenA.tokenId, tokenA.walletId, tokenA.spenderContractId, tokenA.tokenAmount)
+    .approveTokenAllowance(tokenB.tokenId, tokenB.walletId, tokenB.spenderContractId, tokenB.tokenAmount);
+  const tokenAllowanceSignedTx = await tokenAllowanceTxn.freezeWithSigner(tokenA.signer);
+  const response = await tokenAllowanceSignedTx.executeWithSigner(tokenA.signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
+}
+
 interface CreateNFTParams {
   name: string;
   symbol: string;
@@ -128,6 +142,7 @@ const TokenService = {
   createToken,
   setTokenAllowance,
   createNFT,
+  setTokenAllowanceForAddLiquidity,
 };
 
 export default TokenService;

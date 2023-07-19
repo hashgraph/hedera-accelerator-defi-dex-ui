@@ -17,6 +17,7 @@ export interface TokenState {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
     fee: BigNumber | undefined;
+    lpTokenId: string | undefined;
   };
 }
 

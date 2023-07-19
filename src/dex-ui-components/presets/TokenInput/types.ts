@@ -11,6 +11,7 @@ interface Token {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
     fee: BigNumber | undefined;
+    lpTokenId: string | undefined;
   };
 }
 

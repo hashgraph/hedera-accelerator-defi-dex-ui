@@ -27,6 +27,7 @@ export interface Token {
   tokenMeta: {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
+    lpTokenId: string | undefined;
     fee: BigNumber | undefined;
   };
 }

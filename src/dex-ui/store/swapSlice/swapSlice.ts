@@ -1,8 +1,9 @@
 import { BigNumber } from "bignumber.js";
-import { AccountId, TokenId, ContractId } from "@hashgraph/sdk";
+import { AccountId, TokenId, ContractId, TokenBalanceJson, TokenAssociateTransaction } from "@hashgraph/sdk";
 import { DexService, MirrorNodeTokenById, MirrorNodeTokenPairResponse } from "../../services";
 import { getErrorMessage, isHbarToken, withPrecision } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
+import { isNil } from "ramda";
 
 const initialSwapState: SwapState = {
   pairInfo: {
@@ -20,7 +21,12 @@ const initialSwapState: SwapState = {
   tokenPairs: null,
 };
 
-function getTokenInfoObj(token: MirrorNodeTokenById, pair: MirrorNodeTokenPairResponse, fee: BigNumber) {
+function getTokenInfoObj(
+  token: MirrorNodeTokenById,
+  pair: MirrorNodeTokenPairResponse,
+  fee: BigNumber,
+  lpTokenId: string
+) {
   return {
     amount: 0.0,
     displayAmount: "",
@@ -34,6 +40,7 @@ function getTokenInfoObj(token: MirrorNodeTokenById, pair: MirrorNodeTokenPairRe
       pairAccountId: pair.data.contract_id,
       tokenId: token.data.token_id,
       fee,
+      lpTokenId,
     },
   };
 }
@@ -50,8 +57,8 @@ const fetchEachToken = async (evmAddress: string) => {
     DexService.fetchTokenData(lpTokenId),
   ]);
 
-  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData, fee);
-  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData, fee);
+  const tokenAInfoDetails: Token = getTokenInfoObj(tokenAInfo, pairData, fee, lpTokenId);
+  const tokenBInfoDetails: Token = getTokenInfoObj(tokenBInfo, pairData, fee, lpTokenId);
 
   const lpTokenMeta = {
     symbol: tokenCInfo.data.symbol,
@@ -208,7 +215,12 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       }
       app.setFeaturesAsLoaded(["poolLiquidity"]);
     },
-    sendSwapTransaction: async (tokenToTrade: Token, slippageTolerance: number, transactionDeadline: number) => {
+    sendSwapTransaction: async (
+      tokenToTrade: Token,
+      slippageTolerance: number,
+      transactionDeadline: number,
+      tokenToReceiveId: string
+    ) => {
       const { context, wallet, app, swap } = get();
       app.setFeaturesAsLoading(["transactionState"]);
       set(
@@ -248,6 +260,27 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           false,
           SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
         );
+        const amount = wallet
+          .getTokenAmountWithPrecision(tokenToTrade.tokenMeta.tokenId ?? "", tokenToTrade.amount ?? "")
+          .toNumber();
+        const tokenData = wallet.pairedAccountBalance?.tokens;
+        const tokenToReceiveBalance = tokenData?.find(
+          (token: TokenBalanceJson) => token.tokenId === "0.0.123456"
+        )?.balance;
+        if (isNil(tokenToReceiveBalance)) {
+          const tokenAssociateTx = new TokenAssociateTransaction()
+            .setAccountId(signingAccount)
+            .setTokenIds([tokenToReceiveId]);
+          const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
+          await tokenAssociateSignedTx.executeWithSigner(signer);
+        }
+        await DexService.setTokenAllowance({
+          tokenId: tokenToTradeAccountId,
+          walletId: signingAccount,
+          spenderContractId: tokenToTrade.tokenMeta.pairAccountId ?? "",
+          tokenAmount: amount,
+          signer,
+        });
         const result = await DexService.swapToken({
           contractId,
           walletAddress,

@@ -184,10 +184,11 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
         address: data.firstToken.tokenMeta.tokenId ?? "",
       },
       outputToken: {
-        symbol: data.firstToken.symbol,
+        symbol: data.secondToken.symbol,
         amount: data.secondToken.amount,
         address: data.secondToken.tokenMeta.tokenId ?? "",
       },
+      lpTokenId: data.firstToken.tokenMeta.lpTokenId ?? "",
       contractId: data.secondToken.tokenMeta.pairAccountId ?? "",
       transactionDeadline: transactionDeadlineInSeconds,
     });

@@ -36,6 +36,7 @@ interface SendAddLiquidityTransactionParams {
     address: string;
   };
   contractId: string;
+  lpTokenId: string;
   transactionDeadline: number;
 }
 
@@ -184,6 +185,7 @@ interface Token {
   tokenMeta: {
     pairAccountId: string | undefined;
     tokenId: string | undefined;
+    lpTokenId: string | undefined;
     fee: BigNumber | undefined;
   };
 }
