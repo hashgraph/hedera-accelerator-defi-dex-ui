@@ -92,35 +92,58 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     eventTypes
   );
 
-  return Promise.all([
-    ...logs.map(async (log): Promise<MultiSigDAODetails> => {
-      const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
-      const { daoAddress, safeAddress, inputs } = argsWithName;
-      const { admin, isPrivate, threshold: _threshold, title } = inputs;
-      const safeLogs = await fetchHederaGnosisSafeLogs(safeAddress);
-      const owners = getOwners(safeLogs);
-      const threshold = getThreshold(safeLogs, _threshold);
+  const multiSigEventResults = logs.map(async (log): Promise<MultiSigDAODetails> => {
+    const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
+    const { daoAddress, safeAddress, inputs } = argsWithName;
+    const { admin, isPrivate, threshold: _threshold, title } = inputs;
+    const safeLogs = await fetchHederaGnosisSafeLogs(safeAddress);
+    const owners = getOwners(safeLogs);
+    const threshold = getThreshold(safeLogs, _threshold);
 
-      const { name, description, logoUrl, webLinks } = await fetchMultiSigDAOSettingsPageDetails(
-        AccountId.fromSolidityAddress(daoAddress).toString(),
-        [DAOEvents.DAOInfoUpdated]
-      );
+    /** START - TODO: Need to apply a proper fix */
+    let accountId;
+    try {
+      accountId = AccountId.fromSolidityAddress(daoAddress).toString();
+    } catch (e) {
+      console.error(e, daoAddress);
       return {
         type: DAOType.MultiSig,
-        accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
-        adminId: AccountId.fromSolidityAddress(admin).toString(),
-        name,
-        logoUrl,
-        title,
-        description,
-        isPrivate,
-        webLinks,
-        safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
-        ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
+        accountId: "Error",
+        adminId: "Error",
+        name: "Error",
+        logoUrl: "Error",
+        title: "Error",
+        description: "Error",
+        isPrivate: false,
+        webLinks: ["Error"],
+        safeId: "Error",
+        ownerIds: ["Error"],
         threshold,
       };
-    }),
-  ]);
+    }
+    /** END - TODO: Need to apply a proper fix */
+
+    const { name, description, logoUrl, webLinks } = await fetchMultiSigDAOSettingsPageDetails(accountId, [
+      DAOEvents.DAOInfoUpdated,
+    ]);
+
+    return {
+      type: DAOType.MultiSig,
+      accountId,
+      adminId: AccountId.fromSolidityAddress(admin).toString(),
+      name,
+      logoUrl,
+      title,
+      description,
+      isPrivate,
+      webLinks,
+      safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
+      ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
+      threshold,
+    };
+  });
+
+  return Promise.all(multiSigEventResults);
 }
 
 async function fetchMultiSigDAOSettingsPageDetails(
@@ -166,9 +189,37 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       description,
       webLinks,
     } = inputs;
+
+    /** START - TODO: Need to apply a proper fix */
+    let accountId;
+    try {
+      accountId = AccountId.fromSolidityAddress(daoAddress).toString();
+    } catch (e) {
+      console.error(e, daoAddress);
+      return {
+        type: DAOType.GovernanceToken,
+        accountId: "Error",
+        adminId: "Error",
+        name: "Error",
+        logoUrl: "Error",
+        isPrivate: false,
+        title: "Error",
+        webLinks: ["Error"],
+        description: "Error",
+        linkToDiscussion: "Error",
+        governors,
+        tokenHolderAddress: "Error",
+        tokenId: "Error",
+        quorumThreshold: 1,
+        votingDelay: 1,
+        votingPeriod: 1,
+      };
+    }
+    /** END - TODO: Need to apply a proper fix */
+
     return {
       type: DAOType.GovernanceToken,
-      accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
+      accountId,
       adminId: AccountId.fromSolidityAddress(admin).toString(),
       name,
       logoUrl,
@@ -211,9 +262,40 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       votingDelay,
       votingPeriod,
     } = inputs;
+    /** START - TODO: Need to apply a proper fix */
+    let accountId;
+    try {
+      accountId = AccountId.fromSolidityAddress(daoAddress).toString();
+    } catch (e) {
+      console.error(e, daoAddress);
+      return {
+        type: DAOType.NFT,
+        accountId: "Error",
+        adminId: "Error",
+        name: "Error",
+        title: "Error",
+        description: "Error",
+        webLinks: ["Error"],
+        linkToDiscussion: "Error",
+        governors: {
+          contractUpgradeLogic: "Error",
+          createTokenLogic: "Error",
+          textLogic: "Error",
+          tokenTransferLogic: "Error",
+        },
+        tokenHolderAddress: "Error",
+        logoUrl: "Error",
+        isPrivate: false,
+        tokenId: "Error",
+        quorumThreshold: 1,
+        votingDelay: 1,
+        votingPeriod: 1,
+      };
+    }
+    /** END - TODO: Need to apply a proper fix */
     return {
       type: DAOType.NFT,
-      accountId: AccountId.fromSolidityAddress(daoAddress).toString(),
+      accountId,
       adminId: AccountId.fromSolidityAddress(admin).toString(),
       name,
       title,

@@ -22,3 +22,4 @@ export * from "./ProgressBar";
 export * from "./Tag";
 export * from "./TextArea";
 export * from "./Toast";
+export * from "./Form";

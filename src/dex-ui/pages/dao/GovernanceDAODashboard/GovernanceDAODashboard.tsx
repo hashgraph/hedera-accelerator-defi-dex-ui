@@ -10,7 +10,7 @@ export function GovernanceDAODashboard() {
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { walletId, isWalletPaired } = usePairedWalletDetails();
-  const accountTokenBalancesQueryResults = useAccountTokenBalances("");
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoAccountId);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
@@ -47,7 +47,7 @@ export function GovernanceDAODashboard() {
         errorMessage={errorMessage}
         isSuccess={isSuccess}
       >
-        <Outlet context={{ dao, tokenBalances, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
+        <Outlet context={{ dao, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
       </DAODashboard>
     );
   }

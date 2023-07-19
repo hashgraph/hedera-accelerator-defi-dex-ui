@@ -28,6 +28,7 @@ interface GovernanceProposalConfirmationDetailsProps {
   hexStringData: string;
   operation: number;
   nonce: number;
+  tokenSymbol: string;
   votingPower: string;
   hasConnectedWalletVoted: boolean;
   castVote: UseMutationResult<TransactionResponse | undefined, Error, UseCastVoteParams, GovernanceMutations.CastVote>;
@@ -51,7 +52,16 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     isCancelProposalOpen: false,
   });
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const { proposal, votingPower, castVote, executeProposal, cancelProposal, status, hasConnectedWalletVoted } = props;
+  const {
+    proposal,
+    tokenSymbol,
+    votingPower,
+    castVote,
+    executeProposal,
+    cancelProposal,
+    status,
+    hasConnectedWalletVoted,
+  } = props;
 
   const contractId = proposal?.contractId ?? "";
 
@@ -116,7 +126,13 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
             openDialogButtonText="Vote"
             isOpenDialogButtonDisabled={proposal === undefined}
             title="Confirm Vote"
-            body={<ProposalVoteModal votingPower={votingPower} handleVoteButtonClicked={handleVoteButtonClicked} />}
+            body={
+              <ProposalVoteModal
+                tokenSymbol={tokenSymbol}
+                votingPower={votingPower}
+                handleVoteButtonClicked={handleVoteButtonClicked}
+              />
+            }
             alertDialogOpen={dialogState.isVoteOpen}
             onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteOpen: true })}
             onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteOpen: false })}
@@ -137,12 +153,12 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
             <Flex flexDirection="column" gap="1.25rem">
               <Text textStyle="b1" fontSize="1rem">
                 {`You’re about to cancel ${proposal?.title}.
-                 If you do this, Governance tokens will be refunded to you and to
+                 If you do this, ${tokenSymbol} tokens will be refunded to you and to
             anyone that voted.`}
               </Text>
               <Flex direction="row">
                 <Text flex="1" textStyle="b3" color={Color.Grey_02}>
-                  Governance tokens Refunded to You
+                  {`${tokenSymbol} Tokens Refunded to You`}
                 </Text>
                 <Text flex="1" textStyle="b3" textAlign="right">
                   {votingPower}
@@ -303,7 +319,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               {votingPower}
             </Text>
             <Text textStyle="p small medium" color={Color.Primary._600}>
-              GOV
+              {tokenSymbol}
             </Text>
           </Flex>
         </Flex>

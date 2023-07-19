@@ -4,12 +4,17 @@ import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
 import { DAOToolTips } from "./constants";
+import { ChangeEvent, useState } from "react";
 
 export function TokenDAOVotingForm() {
   const {
+    getValues,
     register,
     formState: { errors },
   } = useFormContext<CreateATokenDAOForm>();
+  const { voting } = getValues();
+  const [isQuorumWarningVisible, setIsQuorumWarningVisible] = useState(voting.quorum > 90);
+
   return (
     <DAOFormContainer>
       <SimpleGrid columns={2} spacingX="1rem" spacingY="0.75rem">
@@ -44,11 +49,24 @@ export function TokenDAOVotingForm() {
             register: {
               ...register("voting.quorum", {
                 required: { value: true, message: "A quorum required." },
+                min: { value: 0, message: "Quorum must be between 0% and 100%." },
+                max: { value: 100, message: "Quorum must be between 0% and 100%." },
+                onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                  const inputElement = event.target as HTMLInputElement;
+                  setIsQuorumWarningVisible(Number(inputElement.value) > 90);
+                },
               }),
             },
           }}
           isInvalid={Boolean(errors.voting?.quorum)}
           errorMessage={errors.voting?.quorum && errors.voting?.quorum.message}
+          warningHeader={isQuorumWarningVisible ? "High Quorum" : ""}
+          warningMessage={
+            isQuorumWarningVisible
+              ? `A high quorum can make it difficult to get enough members 
+              to vote on a proposal. This can lead to delays and inaction.`
+              : ""
+          }
         />
         <FormInput<"voting.duration">
           inputProps={{

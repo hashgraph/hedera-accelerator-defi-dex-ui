@@ -9,7 +9,7 @@ import { RecentProposals } from "../RecentProposals";
 export function DashboardOverview() {
   const { dao, totalAssetValue, memberCount, ownerCount, tokenCount } = useOutletContext<MultiSigDAODetailsContext>();
   const { accountId, safeId, threshold } = dao;
-  const totalAssetDisplay = totalAssetValue;
+  const totalAssetDisplay = `${totalAssetValue ?? 0} USD`;
   const tokenCountDisplay = tokenCount;
   const memberCountDisplay = String(memberCount);
   const thresholdDisplay = `${String(threshold)} / ${String(ownerCount)}`;

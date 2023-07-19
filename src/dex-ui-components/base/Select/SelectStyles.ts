@@ -4,6 +4,17 @@ import { TextStyles, Color } from "../../themes";
 
 const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(selectAnatomy.keys);
 
+const formTokenSelector = definePartsStyle({
+  field: {
+    ...TextStyles["p small regular"],
+    height: "40px",
+    padding: "0.125rem 1rem",
+    background: Color.Grey_Blue._50,
+    border: `1px solid ${Color.Neutral._300}`,
+    borderRadius: "0.25rem",
+  },
+});
+
 const tokenSymbolSelector = definePartsStyle({
   field: {
     ...TextStyles.b1,
@@ -42,6 +53,6 @@ const dropDownSelector = definePartsStyle({
 export const SelectStyles = defineMultiStyleConfig({
   baseStyle: {},
   sizes: {},
-  variants: { tokenSymbolSelector, dropDownSelector },
+  variants: { formTokenSelector, tokenSymbolSelector, dropDownSelector },
   defaultProps: {},
 });

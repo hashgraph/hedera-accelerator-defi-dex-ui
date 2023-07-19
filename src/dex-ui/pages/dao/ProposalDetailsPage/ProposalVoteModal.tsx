@@ -2,12 +2,13 @@ import { Button, Flex, Text } from "@chakra-ui/react";
 import { VoteType } from "@pages";
 
 interface ConfirmVoteModalBodyProps {
+  tokenSymbol: string;
   votingPower: string;
   handleVoteButtonClicked: (VoteType: VoteType) => void;
 }
 
 const ProposalVoteModal = (props: ConfirmVoteModalBodyProps) => {
-  const { handleVoteButtonClicked } = props;
+  const { tokenSymbol, votingPower, handleVoteButtonClicked } = props;
   function handleVoteYesClicked() {
     handleVoteButtonClicked(VoteType.For);
   }
@@ -26,7 +27,7 @@ const ProposalVoteModal = (props: ConfirmVoteModalBodyProps) => {
           Your Voting Power
         </Text>
         <Text flex="1" textAlign="right" textStyle="b1">
-          {props.votingPower}
+          {votingPower} {tokenSymbol}
         </Text>
       </Flex>
       <Flex gap="4">

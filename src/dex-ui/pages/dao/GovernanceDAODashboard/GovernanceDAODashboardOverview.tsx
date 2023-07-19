@@ -31,7 +31,7 @@ export function GovernanceDAODashboardOverview() {
                     labelTextColor={Color.Neutral._500}
                     labelTextStyle="p xsmall medium"
                     labelOpacity="1.0"
-                    value={totalAssetValue ?? 0}
+                    value={`${totalAssetValue ?? 0} USD`}
                     valueStyle="p large semibold"
                     valueTextColor={Color.Grey_Blue._800}
                     valueUnitSymbol="USD"

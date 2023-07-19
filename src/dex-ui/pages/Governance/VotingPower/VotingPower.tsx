@@ -14,7 +14,7 @@ export interface VotingPowerComponentProps {
 export const VotingPower = (props: VotingPowerComponentProps) => {
   const { governanceTokenId, tokenHolderAddress } = props;
   const {
-    godToken,
+    tokenData,
     isFormLoading,
     isLoading,
     canUserClaimGODTokens,
@@ -73,28 +73,30 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
         labelTextColor={Color.Neutral._500}
         labelTextStyle="p xsmall medium"
         labelOpacity="1.0"
-        value={godToken.locked}
+        value={tokenData.locked}
         valueTextColor={Color.Primary._600}
         valueStyle="h3 medium"
-        valueUnitSymbol="GOV"
+        valueUnitSymbol={tokenData.symbol}
         amount="$--.--"
       />
       <Spacer />
       <HStack padding="8px 24px" gap="40px" justify="right" borderRadius="8px" background={Color.Neutral._50}>
         <GOVTokenDetails
-          lockedGODToken={godToken.locked}
-          totalGODTokenBalance={godToken.total}
-          availableGODTokenBalance={godToken.available}
+          tokenSymbol={tokenData.symbol ?? ""}
+          lockedGODToken={tokenData.locked}
+          totalGODTokenBalance={tokenData.total}
+          availableGODTokenBalance={tokenData.available}
           isLoading={isFormLoading}
           hidePendingStatus
         />
         {doesUserHaveGOVTokensToLockAndUnlock ? (
           <ManageVotingPower
+            tokenSymbol={tokenData.symbol ?? ""}
             isLoading={isFormLoading}
             canUserClaimGODTokens={canUserClaimGODTokens}
-            lockedGODToken={godToken.locked}
-            totalGODTokenBalance={godToken.total}
-            availableGODTokenBalance={godToken.available}
+            lockedGODToken={tokenData.locked}
+            totalGODTokenBalance={tokenData.total}
+            availableGODTokenBalance={tokenData.available}
             onLockClick={handleClickLockGodTokenButton}
             onUnlockClick={handleClickUnLockGodTokenButton}
           />

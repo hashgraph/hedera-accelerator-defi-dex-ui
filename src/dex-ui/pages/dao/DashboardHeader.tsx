@@ -58,7 +58,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
                 {govTokenId ? (
                   <HStack>
                     <Text textStyle="h4" opacity="0.8">
-                      GOV TOKEN ID:
+                      {`${token?.data.symbol} TOKEN ID:`}
                     </Text>
                     <HashScanLink id={govTokenId} type={HashscanData.Token} />
                   </HStack>

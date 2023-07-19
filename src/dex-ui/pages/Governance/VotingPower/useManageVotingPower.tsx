@@ -6,6 +6,7 @@ import {
   useTokenBalance,
   useUnlockGODToken,
   useHandleTransactionSuccess,
+  useToken,
 } from "@hooks";
 import { TransactionResponse } from "@hashgraph/sdk";
 
@@ -13,7 +14,7 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const isWalletConnected = wallet.isPaired();
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
-
+  const { data: token } = useToken(governanceTokenId);
   const govTokenBalance = useTokenBalance({ tokenId: governanceTokenId });
 
   const lockedGOVToken = useFetchLockedGovToken(walletId, tokenHolderAddress);
@@ -22,7 +23,8 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const unLockGODTokenSubmit = useUnlockGODToken(walletId, tokenHolderAddress, handleUnLockedGODTokenSuccess);
 
   const totalGodToken = (lockedGOVToken.data ?? 0) + (govTokenBalance.data ?? 0);
-  const godToken = {
+  const tokenData = {
+    symbol: token?.data.symbol,
     locked: isWalletConnected ? `${lockedGOVToken.data?.toFixed(4) ?? 0}` : "-",
     available: isWalletConnected ? `${govTokenBalance.data?.toFixed(4) ?? 0}` : "-",
     total: isWalletConnected ? `${totalGodToken.toFixed(4)}` : "-",
@@ -38,8 +40,10 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const doesUserHaveGOVTokensToLockAndUnlock = isWalletConnected && totalGodToken > 0.0001;
 
   function getLoadingDialogMessage(): string {
-    if (lockGODTokenSubmit.isLoading) return "Please confirm the locking of GOD Tokens in your wallet to proceed.";
-    if (unLockGODTokenSubmit.isLoading) return "Please confirm the unlocking of GOD Tokens in your wallet to proceed.";
+    if (lockGODTokenSubmit.isLoading)
+      return `Please confirm the locking of ${tokenData.symbol} tokens in your wallet to proceed.`;
+    if (unLockGODTokenSubmit.isLoading)
+      return `Please confirm the unlocking of ${tokenData.symbol} tokens in your wallet to proceed.`;
     return "";
   }
   const loadingDialogMessage = getLoadingDialogMessage();
@@ -53,12 +57,12 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const errorDialogMessage = getErrorDialogMessage();
 
   function handleLockedGODTokenSuccess(transactionResponse: TransactionResponse) {
-    const message = `Successfully Locked GOD Tokens`;
+    const message = `Successfully locked ${tokenData.symbol} tokens.`;
     handleTransactionSuccess(transactionResponse, message);
   }
 
   function handleUnLockedGODTokenSuccess(transactionResponse: TransactionResponse) {
-    const message = `Successfully UnLocked GOD Tokens`;
+    const message = `Successfully unlocked ${tokenData.symbol} tokens.`;
     handleTransactionSuccess(transactionResponse, message);
   }
 
@@ -69,7 +73,7 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
     isErrorDialogOpen,
     errorDialogMessage,
     isWalletConnected,
-    godToken,
+    tokenData,
     doesUserHaveGOVTokensToLockAndUnlock,
     canUserClaimGODTokens,
     lockGODTokenSubmit,

@@ -112,7 +112,7 @@ export const router = createBrowserRouter(
           <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
           <Route path={Paths.DAOs.Overview} element={<GovernanceDAODashboardOverview />} />
           <Route path={Paths.DAOs.Proposals} element={<ProposalList />} />
-          <Route path={Paths.DAOs.Assets} element={<NotFound message={`The assets page is under construction`} />} />
+          <Route path={Paths.DAOs.Assets} element={<AssetsList />} />
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
