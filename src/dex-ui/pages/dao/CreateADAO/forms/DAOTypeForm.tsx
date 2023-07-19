@@ -4,6 +4,7 @@ import { RadioCard } from "@dex-ui-components";
 import {
   CreateADAOForm,
   DAOGovernanceTokenType,
+  DAONFTTokenType,
   MultiSigDAOGovernanceData,
   MultiSigDAOVotingData,
   NFTDAOGovernanceData,
@@ -85,7 +86,7 @@ function getDefaultFormValues(type: DAOType): {
   }
   return {
     governance: {
-      nft: {
+      newNFT: {
         name: "",
         symbol: "",
         logo: "",
@@ -94,6 +95,16 @@ function getDefaultFormValues(type: DAOType): {
         id: "",
         treasuryWalletAccountId: "",
       },
+      existingNFT: {
+        name: "",
+        symbol: "",
+        logo: "",
+        tokenWalletAddress: "",
+        maxSupply: 0,
+        id: "",
+        treasuryWalletAccountId: "",
+      },
+      tokenType: DAONFTTokenType.NewNFT,
     },
     voting: {
       minProposalDeposit: 0,

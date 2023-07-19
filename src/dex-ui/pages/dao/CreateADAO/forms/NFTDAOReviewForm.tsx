@@ -1,6 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { FormInput } from "@dex-ui-components";
-import { CreateANFTDAOForm } from "../types";
+import { CreateANFTDAOForm, DAONFTTokenType } from "../types";
 import { DAOReviewForm } from "./DAOReviewForm";
 
 export function NFTDAOReviewForm() {
@@ -21,7 +21,10 @@ export function NFTDAOReviewForm() {
             id: "governance.nft.name",
             label: "NFT name",
             type: "text",
-            value: governance.nft.name,
+            value:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? governance?.newNFT?.name ?? ""
+                : governance?.existingNFT?.name ?? "",
             isReadOnly: true,
           }}
         />,
@@ -30,7 +33,10 @@ export function NFTDAOReviewForm() {
             id: "governance.nft.symbol",
             label: "NFT symbol",
             type: "text",
-            value: governance.nft.symbol,
+            value:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? governance?.newNFT?.symbol ?? ""
+                : governance?.existingNFT?.symbol ?? "",
             isReadOnly: true,
           }}
         />,
@@ -39,7 +45,10 @@ export function NFTDAOReviewForm() {
             id: "governance.nft.id",
             label: "NFT id",
             type: "text",
-            value: governance.nft.id,
+            value:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? governance?.newNFT?.id ?? ""
+                : governance?.existingNFT?.id ?? "",
             isReadOnly: true,
           }}
         />,
@@ -48,8 +57,14 @@ export function NFTDAOReviewForm() {
             id: "governance.nft.maxSupply",
             label: "Max supply",
             type: "number",
-            unit: governance.nft.symbol,
-            value: String(governance.nft.maxSupply),
+            unit:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? governance?.newNFT?.symbol ?? ""
+                : governance?.existingNFT?.symbol ?? "",
+            value:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? String(governance?.newNFT?.maxSupply ?? "")
+                : String(governance?.existingNFT?.maxSupply ?? ""),
             isReadOnly: true,
           }}
         />,
@@ -58,7 +73,10 @@ export function NFTDAOReviewForm() {
             id: "governance.token.treasuryWalletAccountId",
             label: "Treasury wallet account id",
             type: "text",
-            value: governance.nft.treasuryWalletAccountId,
+            value:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? governance?.newNFT?.treasuryWalletAccountId ?? ""
+                : governance?.existingNFT?.treasuryWalletAccountId ?? "",
             isReadOnly: true,
           }}
         />,
