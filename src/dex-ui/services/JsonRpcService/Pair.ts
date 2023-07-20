@@ -7,7 +7,7 @@ import {
   convertEthersBigNumberToBigNumberJS,
   solidityAddressToTokenIdString,
 } from "./utils";
-import { ContractId } from "@hashgraph/sdk";
+import { DexService } from "@services";
 
 /**
  * Creates an ethers.Contract representation of the Pair contract.
@@ -119,9 +119,10 @@ async function getPairInfo(pairAccountId: string): Promise<PairInfoResponse> {
 
 async function getLpTokenContractId(pairAccountId: string): Promise<string> {
   const pairContract = createPairContract(pairAccountId);
-  const lpTokenContractAddress: string = await pairContract.getLpTokenContractAddress();
-  checkIfTokenAddressesAreValid([lpTokenContractAddress]);
-  return ContractId.fromSolidityAddress(lpTokenContractAddress).toString();
+  const evmAddress: string = await pairContract.getLpTokenContractAddress();
+  const lpTokenContract = await DexService.fetchLatestContractId(evmAddress);
+  checkIfTokenAddressesAreValid([lpTokenContract.toSolidityAddress()]);
+  return lpTokenContract.toString();
 }
 
 const PairContract = {

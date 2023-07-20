@@ -62,12 +62,12 @@
   },
   {
     "name": "factory",
-    "id": "0.0.15059542",
-    "hash": "349fcaf96c18047334f294ec932be4ab",
-    "address": "0x0000000000000000000000000000000000e5ca56",
-    "timestamp": "2023-07-06T14:54:25.814Z",
-    "transparentProxyId": "0.0.15426433",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca6e"
+    "id": "0.0.15503561",
+    "hash": "0cf331288f6f84bfd740a1886e3245c0",
+    "address": "0x0000000000000000000000000000000000ec90c9",
+    "timestamp": "2023-07-20T08:53:53.150Z",
+    "transparentProxyId": "0.0.15503580",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000ec90dc"
   },
   {
     "name": "godtokenholderfactory",
