@@ -25,7 +25,6 @@ export const TabsStyles = defineMultiStyleConfig({
     "dao-dashboard-tab": {
       tab: {
         height: "fit-content",
-        padding: "0",
         textStyle: "p medium medium",
         color: Color.Neutral._400,
         stroke: Color.Neutral._400,

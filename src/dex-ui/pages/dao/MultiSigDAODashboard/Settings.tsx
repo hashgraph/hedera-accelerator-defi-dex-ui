@@ -76,7 +76,7 @@ export function Settings() {
 
   return (
     <form id="dao-settings-submit">
-      <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" paddingTop="1rem">
+      <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" padding="1rem 0">
         <DAOFormContainer>
           <Flex direction="column" gap={2} marginBottom="0.4rem">
             <Text textStyle="p medium medium">Members</Text>

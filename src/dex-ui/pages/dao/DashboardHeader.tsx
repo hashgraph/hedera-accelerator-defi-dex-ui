@@ -32,9 +32,9 @@ export function DashboardHeader(props: DashboardHeaderProps) {
   const showMintNFTButton = type === DAOType.NFT && Number(token?.data.max_supply) > Number(token?.data.total_supply);
 
   return (
-    <Flex bg={Color.White_02} direction="column" padding="24px 80px 16px">
-      <Flex bg={Color.White_02} direction="row" gap="4">
-        <Flex bg={Color.White_02} direction="column" gap="2">
+    <Flex bg={Color.White} direction="column" padding="1rem 5rem 0.5rem">
+      <Flex bg={Color.White} direction="row" gap="4">
+        <Flex bg={Color.White} direction="column" gap="2">
           <HStack gap="0.7rem">
             <Image
               boxSize="3.5rem"

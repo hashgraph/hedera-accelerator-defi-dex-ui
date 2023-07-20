@@ -1,5 +1,5 @@
 import { Flex, Text, Grid, GridItem, Link, ListItem, UnorderedList } from "@chakra-ui/react";
-import { Color, MetricLabel } from "@dex-ui-components";
+import { Color, MetricLabel, PeopleIcon, TokenIcon } from "@dex-ui-components";
 import { Link as ReachLink, useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
@@ -9,7 +9,7 @@ import { RecentProposals } from "../RecentProposals";
 export function DashboardOverview() {
   const { dao, totalAssetValue, memberCount, ownerCount, tokenCount } = useOutletContext<MultiSigDAODetailsContext>();
   const { accountId, safeId, threshold } = dao;
-  const totalAssetDisplay = `${totalAssetValue ?? 0} USD`;
+  const totalAssetDisplay = totalAssetValue;
   const tokenCountDisplay = tokenCount;
   const memberCountDisplay = String(memberCount);
   const thresholdDisplay = `${String(threshold)} / ${String(ownerCount)}`;
@@ -20,15 +20,34 @@ export function DashboardOverview() {
 
   return (
     <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
-      <Flex gap="4" direction="column">
+      <Flex gap="2" direction="column">
         <Text textStyle="h4 medium">Overview</Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+        <Grid templateColumns="repeat(2, 1fr)" gap="2">
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
               <Text textStyle="p medium semibold">Assets</Text>
               <Flex direction="row" justifyContent="space-between">
-                <MetricLabel label="TOTAL ASSETS" value={totalAssetDisplay} />
-                <MetricLabel label="TOKENS" value={tokenCountDisplay} />
+                <MetricLabel
+                  label="TOTAL VALUE"
+                  labelTextColor={Color.Neutral._500}
+                  labelTextStyle="p xsmall medium"
+                  labelOpacity="1.0"
+                  value={`$${totalAssetDisplay}`}
+                  valueStyle="p large medium"
+                  valueTextColor={Color.Grey_Blue._800}
+                  valueUnitSymbol="USD"
+                  valueUnitSymbolColor={Color.Grey_Blue._800}
+                />
+                <MetricLabel
+                  label="TOKENS"
+                  labelTextColor={Color.Neutral._500}
+                  labelTextStyle="p xsmall medium"
+                  labelOpacity="1.0"
+                  value={tokenCountDisplay}
+                  valueStyle="p large medium"
+                  valueUnitSymbol={<TokenIcon fill={Color.Grey_Blue._800} />}
+                  valueTextColor={Color.Grey_Blue._800}
+                />
               </Flex>
             </Flex>
           </GridItem>
@@ -36,8 +55,28 @@ export function DashboardOverview() {
             <Flex layerStyle="dao-dashboard__card">
               <Text textStyle="p medium semibold">Governance</Text>
               <Flex direction="row" justifyContent="space-between">
-                <MetricLabel label="MEMBERS" value={memberCountDisplay} />
-                <MetricLabel label="THRESHOLD" value={thresholdDisplay} />
+                <MetricLabel
+                  label="MEMBERS"
+                  labelTextColor={Color.Neutral._500}
+                  labelTextStyle="p xsmall medium"
+                  labelOpacity="1.0"
+                  value={memberCountDisplay}
+                  valueStyle="p large medium"
+                  valueTextColor={Color.Grey_Blue._800}
+                  valueUnitSymbol={<PeopleIcon />}
+                  valueUnitSymbolColor={Color.Grey_Blue._800}
+                />
+                <MetricLabel
+                  label="THRESHOLD"
+                  labelTextColor={Color.Neutral._500}
+                  labelTextStyle="p xsmall medium"
+                  labelOpacity="1.0"
+                  value={thresholdDisplay}
+                  valueStyle="p large medium"
+                  valueTextColor={Color.Grey_Blue._800}
+                  valueUnitSymbol={<PeopleIcon />}
+                  valueUnitSymbolColor={Color.Grey_Blue._800}
+                />
               </Flex>
             </Flex>
           </GridItem>
@@ -75,7 +114,7 @@ export function DashboardOverview() {
           </GridItem>
         </Grid>
       </Flex>
-      <Flex gap="4" direction="column">
+      <Flex gap="2" direction="column">
         <Text textStyle="h4 medium">Recent Proposals</Text>
         <Flex direction="column" gap="2" minHeight="300px">
           <RecentProposals

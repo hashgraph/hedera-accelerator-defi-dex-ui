@@ -130,36 +130,36 @@ export function DAODashboard(props: DAODashboardProps) {
           />
         }
         body={
-          <Flex direction="column" gap="1rem">
+          <Flex direction="column" gap="0.75rem">
             {isVotingPowerVisible ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
-            ) : undefined}
+            ) : (
+              <Box></Box>
+            )}
             <Tabs
               defaultIndex={initialTabIndex}
               onChange={handleTabChange}
               isLazy
-              bg={Color.White_02}
+              bg={Color.White}
               variant="dao-dashboard-tab"
             >
-              <Flex flex="row" padding="0px 80px" borderBottom={`1px solid ${Color.Neutral._200}`}>
+              <Flex flex="row" padding="0px 5rem" borderBottom={`1px solid ${Color.Neutral._200}`}>
                 <TabList borderBottom="0">
                   {daoNavigationTabs.map((tab, index: number) => {
                     return (
-                      <Tab key={index} tabIndex={index}>
-                        <NavLink style={{ padding: "0.75rem 1.25rem" }} to={tab.title.toLowerCase()}>
+                      <NavLink to={tab.title.toLowerCase()}>
+                        <Tab key={index} tabIndex={index}>
                           <Flex gap={2.5} alignItems="center" justifyContent="center">
                             {tab.icon}
                             <Box>{tab.title}</Box>
                           </Flex>
-                        </NavLink>
-                      </Tab>
+                        </Tab>
+                      </NavLink>
                     );
                   })}
                 </TabList>
               </Flex>
-              <Box bg={Color.Primary_Bg} minHeight="80vh">
-                {props.children}
-              </Box>
+              <Box bg={Color.Primary_Bg}>{props.children}</Box>
             </Tabs>
           </Flex>
         }

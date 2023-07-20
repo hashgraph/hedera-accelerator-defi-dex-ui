@@ -9,3 +9,4 @@ export * from "./NotFoundLayout";
 export * from "./LoadingSpinnerLayout";
 export * from "./AppLayout";
 export * from "./ErrorLayout";
+export * from "./PageFooter";

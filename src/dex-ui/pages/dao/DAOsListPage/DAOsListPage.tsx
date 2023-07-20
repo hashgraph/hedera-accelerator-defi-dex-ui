@@ -30,8 +30,6 @@ export function DAOsListPage() {
       body={
         <CardGridLayout<DAO[]>
           columns={{ md: 2, lg: 3 }}
-          spacingX="3rem"
-          spacingY="2rem"
           queryResult={daos}
           message={"It looks like no DAOs have been created yet."}
           preLinkText={"Click on this link to&nbsp;"}

@@ -19,7 +19,7 @@ export function MembersList() {
         <Text textStyle="p medium medium">{memberCount} Members</Text>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
-        <SimpleGrid minWidth="100%" columns={3} spacingX="2rem" spacingY="2rem">
+        <SimpleGrid minWidth="100%" columns={3} spacing="1rem">
           {membersWithAdminFirst?.map((member, index) => {
             const { accountId } = member;
             const isAdmin = accountId === adminId;

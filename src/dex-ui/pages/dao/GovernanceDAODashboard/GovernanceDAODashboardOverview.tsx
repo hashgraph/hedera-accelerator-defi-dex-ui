@@ -18,9 +18,9 @@ export function GovernanceDAODashboardOverview() {
 
   return (
     <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
-      <Flex gap="4" direction="column">
+      <Flex gap="2" direction="column">
         <Text textStyle="h4 medium">Overview</Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+        <Grid templateColumns="repeat(2, 1fr)" gap="2">
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
               <Text textStyle="p medium semibold">Assets</Text>
@@ -31,8 +31,8 @@ export function GovernanceDAODashboardOverview() {
                     labelTextColor={Color.Neutral._500}
                     labelTextStyle="p xsmall medium"
                     labelOpacity="1.0"
-                    value={`${totalAssetValue ?? 0} USD`}
-                    valueStyle="p large semibold"
+                    value={`${totalAssetValue ?? 0}`}
+                    valueStyle="p large medium"
                     valueTextColor={Color.Grey_Blue._800}
                     valueUnitSymbol="USD"
                     valueUnitSymbolColor={Color.Grey_Blue._800}
@@ -45,7 +45,7 @@ export function GovernanceDAODashboardOverview() {
                     labelTextStyle="p xsmall medium"
                     labelOpacity="1.0"
                     value={tokenCount ?? 0}
-                    valueStyle="p large semibold"
+                    valueStyle="p large medium"
                     valueTextColor={Color.Grey_Blue._800}
                   />
                 </Flex>
@@ -62,7 +62,7 @@ export function GovernanceDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={dao.quorumThreshold ?? 0}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="%"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -73,7 +73,7 @@ export function GovernanceDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={convertFromBlocksToDays(dao.votingPeriod)}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="days"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -85,7 +85,7 @@ export function GovernanceDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={convertFromBlocksToDays(dao.votingDelay)}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="days"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -97,7 +97,7 @@ export function GovernanceDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={dao.minimumProposalDeposit ?? 0}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="HEY"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -135,7 +135,7 @@ export function GovernanceDAODashboardOverview() {
           </GridItem>
         </Grid>
       </Flex>
-      <Flex gap="4" direction="column">
+      <Flex gap="2" direction="column">
         <Text textStyle="h4 medium">Recent Proposals</Text>
         <Flex direction="column" gap="2" minHeight="300px">
           <RecentProposals

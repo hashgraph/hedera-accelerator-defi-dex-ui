@@ -41,7 +41,7 @@ export function DAOSettings() {
 
   return (
     <form id="dao-settings-submit">
-      <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" paddingTop="1rem">
+      <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" padding="1rem 0">
         <DAOFormContainer>
           <Flex direction="column" gap={2} marginBottom="0.4rem">
             <Text textStyle="p medium medium">Governance</Text>
@@ -50,7 +50,7 @@ export function DAOSettings() {
             </Text>
             <Divider />
           </Flex>
-          <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="1.2rem">
+          <SimpleGrid minWidth="100%" columns={2} spacing="1rem">
             <Flex layerStyle="content-box">
               <MetricLabel
                 label="MINIMUM PROPOSAL DEPOSIT"

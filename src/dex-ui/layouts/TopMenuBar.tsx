@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Menu, MenuItem, Box, Text, Center, Flex } from "@chakra-ui/react";
+import { Menu, MenuItem, Box, Text, Flex } from "@chakra-ui/react";
 import { useDexContext } from "@hooks";
 import { Color, HederaIcon, WalletConnection, Tag } from "@dex-ui-components";
 
@@ -7,31 +7,21 @@ export interface TopMenuBarProps {
   menuOptions: Array<string>;
 }
 
-const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
+export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
   const { app, wallet } = useDexContext(({ app, context, wallet }) => ({ app, context, wallet }));
 
   return (
-    <Menu>
-      <Flex
-        padding="2rem 1rem"
-        w="100%"
-        height="4rem"
-        alignItems="center"
-        bg={Color.White}
-        borderBottom={`1px solid ${Color.Neutral._200}`}
-      >
-        <Box flex="1.5">
+    <Flex as="header" layerStyle="navbar">
+      <Menu>
+        <Flex direction="row" gap="4">
           <Flex direction="row" gap="2" alignItems="center">
-            <HederaIcon />
-            <Text textStyle="h4 bold">Hedera Open DEX</Text>
+            <HederaIcon boxSize="8" />
             <Tag label="Pre-Alpha" />
           </Flex>
-        </Box>
-        <Box flex="1">
-          <Center gap="12">
+          <Flex direction="row" gap="1">
             {props.menuOptions.map((menuOption, index) => {
               return (
-                <Box flex="1" key={index}>
+                <Box width="fit-content" key={index}>
                   <NavLink key={menuOption} to={`${menuOption.toLowerCase()}`}>
                     <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Neutral._100 }}>
                       <Text textStyle="p medium medium">{menuOption}</Text>
@@ -40,23 +30,19 @@ const TopMenuBar = (props: TopMenuBarProps): JSX.Element => {
                 </Box>
               );
             })}
-          </Center>
+          </Flex>
+        </Flex>
+        <Box textAlign="right" float="right" borderRadius="8px" width="fit-content">
+          <WalletConnection
+            accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
+            connectionState={wallet.hashConnectConnectionState}
+            accountBalances={wallet.pairedAccountBalance}
+            isLoading={app.isFeatureLoading("pairedAccountBalance")}
+            connectToWallet={wallet.connectToWallet}
+            disconnectFromWallet={wallet.disconnectWallet}
+          />
         </Box>
-        <Box flex="1.5">
-          <Box textAlign="right" float="right" borderRadius="8px" width="fit-content">
-            <WalletConnection
-              accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
-              connectionState={wallet.hashConnectConnectionState}
-              accountBalances={wallet.pairedAccountBalance}
-              isLoading={app.isFeatureLoading("pairedAccountBalance")}
-              connectToWallet={wallet.connectToWallet}
-              disconnectFromWallet={wallet.disconnectWallet}
-            />
-          </Box>
-        </Box>
-      </Flex>
-    </Menu>
+      </Menu>
+    </Flex>
   );
-};
-
-export { TopMenuBar };
+}

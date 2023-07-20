@@ -45,3 +45,4 @@ export * from "./MemberIcon";
 export * from "./SendTokenIcon";
 export * from "./SettingsToolIcon";
 export * from "./CheckRightIcon";
+export * from "./GithubIcon";

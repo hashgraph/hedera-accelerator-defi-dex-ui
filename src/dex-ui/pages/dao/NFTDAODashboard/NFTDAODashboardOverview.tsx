@@ -33,8 +33,8 @@ export function NFTDAODashboardOverview() {
                     labelTextColor={Color.Neutral._500}
                     labelTextStyle="p xsmall medium"
                     labelOpacity="1.0"
-                    value={totalAssetValue ?? 0}
-                    valueStyle="p large semibold"
+                    value={`${totalAssetValue ?? 0}`}
+                    valueStyle="p large medium"
                     valueTextColor={Color.Grey_Blue._800}
                     valueUnitSymbol="USD"
                     valueUnitSymbolColor={Color.Grey_Blue._800}
@@ -47,7 +47,7 @@ export function NFTDAODashboardOverview() {
                     labelTextStyle="p xsmall medium"
                     labelOpacity="1.0"
                     value={tokenCount ?? 0}
-                    valueStyle="p large semibold"
+                    valueStyle="p large medium"
                     valueTextColor={Color.Grey_Blue._800}
                   />
                 </Flex>
@@ -73,7 +73,7 @@ export function NFTDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={dao.quorumThreshold}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="%"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -84,7 +84,7 @@ export function NFTDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={convertFromBlocksToDays(dao.votingPeriod)}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="days"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -96,7 +96,7 @@ export function NFTDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={convertFromBlocksToDays(dao.votingDelay)}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbol="days"
                   valueUnitSymbolColor={Color.Neutral._900}
@@ -108,9 +108,9 @@ export function NFTDAODashboardOverview() {
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
                   value={dao.minimumProposalDeposit ?? 0}
-                  valueStyle="p large semibold"
+                  valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="HEY"
+                  valueUnitSymbol={"FIX"}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
               </Flex>

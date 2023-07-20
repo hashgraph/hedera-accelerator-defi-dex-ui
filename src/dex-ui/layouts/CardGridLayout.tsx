@@ -7,8 +7,8 @@ import { LoadingSpinnerLayout } from "./LoadingSpinnerLayout";
 
 interface CardGridLayoutProps<QueryResultDataType> extends PropsWithChildren {
   columns: number | Record<string, number>;
-  spacingX: string;
-  spacingY: string;
+  spacingX?: string;
+  spacingY?: string;
   queryResult: UseQueryResult<QueryResultDataType, Error>;
   message: string;
   preLinkText: string;
@@ -17,7 +17,17 @@ interface CardGridLayoutProps<QueryResultDataType> extends PropsWithChildren {
 }
 
 export function CardGridLayout<QueryResultDataType>(props: CardGridLayoutProps<QueryResultDataType>) {
-  const { columns, spacingX, spacingY, message, preLinkText, linkText, onLinkClick, queryResult, children } = props;
+  const {
+    columns,
+    spacingX = "1rem",
+    spacingY = "1rem",
+    message,
+    preLinkText,
+    linkText,
+    onLinkClick,
+    queryResult,
+    children,
+  } = props;
 
   if (queryResult.isError) {
     return (

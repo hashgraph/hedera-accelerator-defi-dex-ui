@@ -18,7 +18,7 @@ export function AssetsList() {
         <Text textStyle="p medium medium">Total Assets: {assets.length}</Text>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
-        <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="2rem">
+        <SimpleGrid minWidth="100%" columns={2} spacing="1rem">
           {assetsWithHBARFirst.map((asset, index) => {
             const { name, tokenId, balance, symbol } = asset;
             return (

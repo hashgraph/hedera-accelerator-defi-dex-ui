@@ -1,5 +1,9 @@
 import { Color } from "./color";
 
+const HeaderHeight = 65;
+const FooterHeight = 33;
+const BodyHeight = HeaderHeight + FooterHeight;
+
 const base = {
   padding: "1rem",
   bg: Color.White,
@@ -106,5 +110,38 @@ export const LayerStyles = {
     padding: "0 80px 2px",
     bg: Color.White,
     borderBottom: `1px solid ${Color.Neutral._200}`,
+  },
+  navbar: {
+    zIndex: 200,
+    direction: "row",
+    position: "fixed",
+    top: 0,
+    padding: "2rem 1rem",
+    width: "100%",
+    height: `${HeaderHeight}px`,
+    alignItems: "center",
+    justifyContent: "space-between",
+    bg: Color.White,
+    borderBottom: `1px solid ${Color.Neutral._200}`,
+  },
+  footer: {
+    direction: "row",
+    padding: "1rem",
+    width: "100%",
+    height: `${FooterHeight}px`,
+    alignItems: "center",
+    justifyContent: "space-between",
+    bg: Color.White,
+    borderTop: `1px solid ${Color.Neutral._100}`,
+  },
+  body: {
+    color: Color.Black,
+    width: "100%",
+    maxWidth: "100%",
+    minHeight: `calc(100vh - ${BodyHeight}px)`,
+    height: "100%",
+    bg: Color.White,
+    padding: "0",
+    marginTop: "4rem",
   },
 };
