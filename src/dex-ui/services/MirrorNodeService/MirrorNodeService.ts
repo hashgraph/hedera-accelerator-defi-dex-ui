@@ -269,6 +269,11 @@ function createMirrorNodeService() {
     return blocks;
   };
 
+  const fetchLatestContractId = async (pairAddress: string): Promise<ContractId> => {
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    return ContractId.fromString(response.data.contract_id);
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenBalances,
@@ -281,6 +286,7 @@ function createMirrorNodeService() {
     fetchAccountInfo,
     fetchTransactionRecord,
     fetchLatestBlockNumber,
+    fetchLatestContractId,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
     fetchUpgradeContractEvents,

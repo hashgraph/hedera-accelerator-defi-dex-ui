@@ -230,15 +230,17 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         false,
         SwapActionType.SEND_SWAP_TRANSACTION_TO_WALLET_STARTED
       );
-      const tokenToTradeAccountId = tokenToTrade.tokenMeta.tokenId ?? "";
+      const tokenToTradeId = tokenToTrade.tokenMeta.tokenId ?? "";
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const contractId = ContractId.fromString(tokenToTrade.tokenMeta.pairAccountId ?? "");
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-      const tokenToTradeAddress = TokenId.fromString(tokenToTradeAccountId).toSolidityAddress();
-      const tokenToTradeAmount = isHbarToken(tokenToTradeAccountId)
-        ? BigNumber(0)
-        : wallet.getTokenAmountWithPrecision(tokenToTrade.tokenMeta.tokenId ?? "", tokenToTrade.amount ?? "");
-      const HbarAmount = isHbarToken(tokenToTradeAccountId) ? tokenToTrade.amount : 0.0;
+      const tokenToTradeAddress = TokenId.fromString(tokenToTradeId).toSolidityAddress();
+      const tokenAmount = wallet.getTokenAmountWithPrecision(
+        tokenToTrade.tokenMeta.tokenId ?? "",
+        tokenToTrade.amount ?? ""
+      );
+      const tokenToTradeAmount = isHbarToken(tokenToTradeId) ? BigNumber(0) : tokenAmount;
+      const HbarAmount = isHbarToken(tokenToTradeId) ? tokenToTrade.amount : 0.0;
       const provider = DexService.getProvider(
         context.network,
         wallet.topicID,
@@ -260,27 +262,37 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           false,
           SwapActionType.SIGN_SWAP_TRANSACTION_STARTED
         );
-        const amount = wallet
-          .getTokenAmountWithPrecision(tokenToTrade.tokenMeta.tokenId ?? "", tokenToTrade.amount ?? "")
-          .toNumber();
+
+        if (isHbarToken(tokenToTradeId)) {
+          await DexService.setHbarTokenAllowance({
+            walletId: signingAccount,
+            spenderContractId: tokenToTrade.tokenMeta.pairAccountId ?? "",
+            tokenAmount: tokenAmount.toNumber(),
+            signer,
+          });
+        } else {
+          await DexService.setTokenAllowance({
+            tokenId: tokenToTradeId,
+            walletId: signingAccount,
+            spenderContractId: tokenToTrade.tokenMeta.pairAccountId ?? "",
+            tokenAmount: tokenAmount.toNumber(),
+            signer,
+          });
+        }
+
         const tokenData = wallet.pairedAccountBalance?.tokens;
         const tokenToReceiveBalance = tokenData?.find(
-          (token: TokenBalanceJson) => token.tokenId === "0.0.123456"
+          (token: TokenBalanceJson) => token.tokenId === tokenToReceiveId
         )?.balance;
-        if (isNil(tokenToReceiveBalance)) {
+        const isTokenNotAssociated = isNil(tokenToReceiveBalance);
+        if (isTokenNotAssociated) {
           const tokenAssociateTx = new TokenAssociateTransaction()
             .setAccountId(signingAccount)
             .setTokenIds([tokenToReceiveId]);
           const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
           await tokenAssociateSignedTx.executeWithSigner(signer);
         }
-        await DexService.setTokenAllowance({
-          tokenId: tokenToTradeAccountId,
-          walletId: signingAccount,
-          spenderContractId: tokenToTrade.tokenMeta.pairAccountId ?? "",
-          tokenAmount: amount,
-          signer,
-        });
+
         const result = await DexService.swapToken({
           contractId,
           walletAddress,

@@ -67,6 +67,13 @@ interface SetTokenAllowanceParams {
   signer: HashConnectSigner;
 }
 
+interface SetHbarAllowanceParams {
+  spenderContractId: string;
+  tokenAmount: number;
+  walletId: string;
+  signer: HashConnectSigner;
+}
+
 /**
  * TODO
  * @param params -
@@ -95,6 +102,39 @@ async function setTokenAllowanceForAddLiquidity(tokenA: SetTokenAllowanceParams,
     .approveTokenAllowance(tokenB.tokenId, tokenB.walletId, tokenB.spenderContractId, tokenB.tokenAmount);
   const tokenAllowanceSignedTx = await tokenAllowanceTxn.freezeWithSigner(tokenA.signer);
   const response = await tokenAllowanceSignedTx.executeWithSigner(tokenA.signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
+}
+
+/**
+ * TODO
+ * @param params -
+ * @returns
+ */
+async function setHbarTokenAllowance(params: SetHbarAllowanceParams) {
+  const tokenAllowanceTxn = new AccountAllowanceApproveTransaction().approveHbarAllowance(
+    params.walletId,
+    params.spenderContractId,
+    params.tokenAmount
+  );
+  const tokenAllowanceSignedTx = await tokenAllowanceTxn.freezeWithSigner(params.signer);
+  const response = await tokenAllowanceSignedTx.executeWithSigner(params.signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
+}
+
+/**
+ * TODO: Change the approach to make multiple params as array[]
+ * @param params -
+ * @returns
+ */
+async function setHbarTokenAllowanceForAddLiquidity(
+  hbarTokenData: SetHbarAllowanceParams,
+  tokenB: SetTokenAllowanceParams
+) {
+  const tokenAllowanceTxn = new AccountAllowanceApproveTransaction()
+    .approveHbarAllowance(hbarTokenData.walletId, hbarTokenData.spenderContractId, hbarTokenData.tokenAmount)
+    .approveTokenAllowance(tokenB.tokenId, tokenB.walletId, tokenB.spenderContractId, tokenB.tokenAmount);
+  const tokenAllowanceSignedTx = await tokenAllowanceTxn.freezeWithSigner(hbarTokenData.signer);
+  const response = await tokenAllowanceSignedTx.executeWithSigner(hbarTokenData.signer);
   checkTransactionResponseForError(response, TokenServiceFunctions.SetTokenAllowance);
 }
 
@@ -143,6 +183,8 @@ const TokenService = {
   setTokenAllowance,
   createNFT,
   setTokenAllowanceForAddLiquidity,
+  setHbarTokenAllowance,
+  setHbarTokenAllowanceForAddLiquidity,
 };
 
 export default TokenService;

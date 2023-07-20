@@ -1,4 +1,4 @@
-import { AccountId, TokenId, ContractId, TokenAssociateTransaction } from "@hashgraph/sdk";
+import { AccountId, TokenId, ContractId, TokenAssociateTransaction, TokenBalanceJson } from "@hashgraph/sdk";
 import { getErrorMessage } from "../../utils";
 import { BigNumber } from "bignumber.js";
 import {
@@ -170,23 +170,63 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
 
         const tokenAAmont = wallet.getTokenAmountWithPrecision(inputToken.address, inputToken.amount);
         const tokenBAmont = wallet.getTokenAmountWithPrecision(outputToken.address, outputToken.amount);
-        await DexService.setTokenAllowanceForAddLiquidity(
-          {
-            tokenId: inputToken.address,
-            walletId: signingAccount,
-            spenderContractId: contractId,
-            tokenAmount: tokenAAmont.toNumber(),
-            signer,
-          },
-          {
-            tokenId: outputToken.address,
-            walletId: signingAccount,
-            spenderContractId: contractId,
-            tokenAmount: tokenBAmont.toNumber(),
-            signer,
-          }
-        );
-        if (lpTokenId.length > 0) {
+
+        const isFirstTokenHBar = isHbarToken(inputToken.address);
+        const isSecondTokenHbar = isHbarToken(outputToken.address);
+        if (isFirstTokenHBar || isSecondTokenHbar) {
+          const hbarData = isFirstTokenHBar
+            ? {
+                walletId: signingAccount,
+                spenderContractId: contractId,
+                tokenAmount: tokenAAmont.toNumber(),
+                signer,
+              }
+            : {
+                walletId: signingAccount,
+                spenderContractId: contractId,
+                tokenAmount: tokenBAmont.toNumber(),
+                signer,
+              };
+          const secondTokenData = isFirstTokenHBar
+            ? {
+                tokenId: outputToken.address,
+                walletId: signingAccount,
+                spenderContractId: contractId,
+                tokenAmount: tokenBAmont.toNumber(),
+                signer,
+              }
+            : {
+                tokenId: inputToken.address,
+                walletId: signingAccount,
+                spenderContractId: contractId,
+                tokenAmount: tokenAAmont.toNumber(),
+                signer,
+              };
+          await DexService.setHbarTokenAllowanceForAddLiquidity(hbarData, secondTokenData);
+        } else {
+          await DexService.setTokenAllowanceForAddLiquidity(
+            {
+              tokenId: inputToken.address,
+              walletId: signingAccount,
+              spenderContractId: contractId,
+              tokenAmount: tokenAAmont.toNumber(),
+              signer,
+            },
+            {
+              tokenId: outputToken.address,
+              walletId: signingAccount,
+              spenderContractId: contractId,
+              tokenAmount: tokenBAmont.toNumber(),
+              signer,
+            }
+          );
+        }
+
+        const walletTokens = wallet.pairedAccountBalance?.tokens;
+        const lpTokenBalance = walletTokens?.find((token: TokenBalanceJson) => token.tokenId === lpTokenId)?.balance;
+
+        const isTokenNotAssociated = isNil(lpTokenBalance);
+        if (isTokenNotAssociated) {
           const tokenAssociateTx = new TokenAssociateTransaction()
             .setAccountId(signingAccount)
             .setTokenIds([lpTokenId]);
@@ -468,7 +508,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
         });
 
         const newPairAddress = await DexService.getPair(firstTokenAddress, secondTokenAddress, params.transactionFee);
-        const pairContractId = ContractId.fromSolidityAddress(newPairAddress);
+        const pairContractId = await DexService.fetchLatestContractId(newPairAddress);
         const { lpTokenId } = await DexService.fetchPairTokenIds(pairContractId.toString());
         const tokenAssociateTx = new TokenAssociateTransaction().setAccountId(signingAccount).setTokenIds([lpTokenId]);
         const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
@@ -482,22 +522,59 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
           params.secondToken.address,
           params.secondToken.amount
         );
-        await DexService.setTokenAllowanceForAddLiquidity(
-          {
-            tokenId: params.firstToken.address,
-            walletId: signingAccount,
-            spenderContractId: pairContractId.toString(),
-            tokenAmount: firstTokenAmount.toNumber(),
-            signer,
-          },
-          {
-            tokenId: params.secondToken.address,
-            walletId: signingAccount,
-            spenderContractId: pairContractId.toString(),
-            tokenAmount: secondTokenAmount.toNumber(),
-            signer,
-          }
-        );
+
+        const isFirstTokenHbar = isHbarToken(params.firstToken.address);
+        const isSecondTokenHbar = isHbarToken(params.secondToken.address);
+
+        if (isFirstTokenHbar || isSecondTokenHbar) {
+          const hbarData = isFirstTokenHbar
+            ? {
+                walletId: signingAccount,
+                spenderContractId: pairContractId.toString(),
+                tokenAmount: firstTokenAmount.toNumber(),
+                signer,
+              }
+            : {
+                walletId: signingAccount,
+                spenderContractId: pairContractId.toString(),
+                tokenAmount: secondTokenAmount.toNumber(),
+                signer,
+              };
+          const secondTokenData = isFirstTokenHbar
+            ? {
+                tokenId: params.secondToken.address,
+                walletId: signingAccount,
+                spenderContractId: pairContractId.toString(),
+                tokenAmount: secondTokenAmount.toNumber(),
+                signer,
+              }
+            : {
+                tokenId: params.firstToken.address,
+                walletId: signingAccount,
+                spenderContractId: pairContractId.toString(),
+                tokenAmount: firstTokenAmount.toNumber(),
+                signer,
+              };
+          await DexService.setHbarTokenAllowanceForAddLiquidity(hbarData, secondTokenData);
+        } else {
+          await DexService.setTokenAllowanceForAddLiquidity(
+            {
+              tokenId: params.firstToken.address,
+              walletId: signingAccount,
+              spenderContractId: pairContractId.toString(),
+              tokenAmount: firstTokenAmount.toNumber(),
+              signer,
+            },
+            {
+              tokenId: params.secondToken.address,
+              walletId: signingAccount,
+              spenderContractId: pairContractId.toString(),
+              tokenAmount: secondTokenAmount.toNumber(),
+              signer,
+            }
+          );
+        }
+
         const result = await DexService.addLiquidity({
           firstTokenAddress,
           firstTokenQuantity,
