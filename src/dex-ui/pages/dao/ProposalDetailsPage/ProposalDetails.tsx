@@ -62,7 +62,7 @@ export function ProposalDetails(props: ProposalDetailsProps) {
         )}
         <Divider />
         <ProposalDetailsDescription description={description} />
-        {approvers && approvalCount && (
+        {approvers && approvalCount !== undefined && approvalCount > 0 && (
           <>
             <Divider />
             <ProposalMemberVotes approvers={approvers} approvalCount={approvalCount} />
