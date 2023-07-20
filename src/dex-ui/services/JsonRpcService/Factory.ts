@@ -4,6 +4,7 @@ import Factory from "../abi/Factory.json";
 import { convertEthersBigNumberToBigNumberJS, createContract, solidityAddressToTokenIdString } from "./utils";
 import { TokenId } from "@hashgraph/sdk";
 import BigNumber from "bignumber.js";
+import { DexService } from "@services";
 
 type RawPairDataResponse = [
   pair: string,
@@ -72,8 +73,9 @@ async function getBestSwapPairAvailable(params: GetBestSwapPairAvailableProps): 
   );
 
   const [pair, token, swappedQty, fee, slippage] = pairData;
+  const pairContractId = await DexService.fetchLatestContractId(pair);
   return {
-    pair: solidityAddressToTokenIdString(pair),
+    pair: pairContractId.toString(),
     token: solidityAddressToTokenIdString(token),
     swappedQty: convertEthersBigNumberToBigNumberJS(swappedQty).shiftedBy(-DEX_TOKEN_PRECISION_VALUE),
     fee: convertEthersBigNumberToBigNumberJS(fee),
