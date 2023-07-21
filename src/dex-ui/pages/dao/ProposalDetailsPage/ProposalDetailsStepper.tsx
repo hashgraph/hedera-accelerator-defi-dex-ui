@@ -19,13 +19,13 @@ export const ProposalStatusAsStep: Readonly<{ [key in ProposalStatus]: number }>
 
 interface ProposalDetailsStepperProps {
   status: ProposalStatus;
-  isThresholdReached: boolean;
+  isThresholdReached?: boolean;
   isExecutionProcessing: boolean;
   hasExecutionFailed: boolean;
 }
 
 export function ProposalDetailsStepper(props: ProposalDetailsStepperProps) {
-  const { status, isThresholdReached, isExecutionProcessing, hasExecutionFailed } = props;
+  const { status, isThresholdReached = false, isExecutionProcessing, hasExecutionFailed } = props;
 
   const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
   const hasProposalFailed = proposalStatus === ProposalStatus.Failed;

@@ -77,7 +77,7 @@ export function TokenDAOVotingForm() {
             toolTipLabelPlacement: "top",
             type: "number",
             placeholder: "Enter amount",
-            unit: "Days",
+            unit: "Blocks",
             register: {
               ...register("voting.duration", {
                 required: { value: true, message: "A voting duration is required." },
@@ -96,7 +96,7 @@ export function TokenDAOVotingForm() {
             tooltipLabel: DAOToolTips.lockingPeriod,
             toolTipLabelPlacement: "top",
             placeholder: "Enter amount",
-            unit: "Days",
+            unit: "Blocks",
             register: {
               ...register("voting.lockingPeriod", {
                 required: { value: true, message: "A locking period is required." },
@@ -113,7 +113,7 @@ export function TokenDAOVotingForm() {
             label: "Voting strategy",
             type: "text",
             placeholder: "Enter strategy",
-            unit: "Days",
+            unit: "Blocks",
             register: {
               ...register("voting.strategy", {
                 required: { value: true, message: "A voting strategy is required." },

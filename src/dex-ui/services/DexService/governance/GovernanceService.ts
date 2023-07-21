@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { AccountId } from "@hashgraph/sdk";
+import { AccountId, ContractId } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 import { DexService } from "../..";
 import {
@@ -143,14 +143,18 @@ const fetchAllProposalData = async (
   const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
   const proposalEventsWithDetailsResults = await Promise.allSettled(
     proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
+      let contractId = proposalEvent.contractId;
+      if (contractId.includes("0.0")) {
+        contractId = ContractId.fromString(contractId).toSolidityAddress();
+      }
       const response = await DexService.callContract({
         block: "latest",
         data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
         estimate: false,
-        from: accountId,
+        from: AccountId.fromString(accountId).toSolidityAddress(),
         gas: 9000000,
         gasPrice: 100000000,
-        to: proposalEvent.contractId,
+        to: contractId,
         value: 0,
       });
       const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
@@ -175,14 +179,18 @@ export const fetchAllProposals = async (accountId: string): Promise<Proposal[]> 
 
 async function fetchProposalDetails(proposalEvent: MirrorNodeDecodedProposalEvent, accountId: string) {
   const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
+  let contractId = proposalEvent.contractId;
+  if (contractId.includes("0.0")) {
+    contractId = ContractId.fromString(contractId).toSolidityAddress();
+  }
   const response = await DexService.callContract({
     block: "latest",
     data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
     estimate: false,
-    from: accountId,
+    from: AccountId.fromString(accountId).toSolidityAddress(),
     gas: 9000000,
     gasPrice: 100000000,
-    to: proposalEvent.contractId,
+    to: contractId,
     value: 0,
   });
   const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));

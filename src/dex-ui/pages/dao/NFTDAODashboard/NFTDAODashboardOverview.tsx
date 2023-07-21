@@ -86,7 +86,7 @@ export function NFTDAODashboardOverview() {
                   value={convertFromBlocksToDays(dao.votingPeriod)}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="days"
+                  valueUnitSymbol="blocks"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 
@@ -98,7 +98,7 @@ export function NFTDAODashboardOverview() {
                   value={convertFromBlocksToDays(dao.votingDelay)}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="days"
+                  valueUnitSymbol="blocks"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 

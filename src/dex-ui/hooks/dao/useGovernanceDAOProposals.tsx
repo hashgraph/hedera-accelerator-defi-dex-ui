@@ -24,10 +24,10 @@ export function useGovernanceDAOProposals(
     if (state === ProposalState.Active || state === ProposalState.Pending) {
       return ProposalStatus.Pending;
     }
-    if (state === ProposalState.Queued) {
+    if (state === ProposalState.Succeeded || state === ProposalState.Queued) {
       return ProposalStatus.Queued;
     }
-    if (state === ProposalState.Succeeded || state === ProposalState.Executed) {
+    if (state === ProposalState.Executed) {
       return ProposalStatus.Success;
     }
     if (state === ProposalState.Canceled || state === ProposalState.Defeated || state === ProposalState.Expired) {
@@ -113,6 +113,7 @@ export function useGovernanceDAOProposals(
       hasVoted: proposalData.votingInformation?.voted,
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
       votingEndTime,
+      proposalState: ProposalState[proposalState],
     };
   };
 

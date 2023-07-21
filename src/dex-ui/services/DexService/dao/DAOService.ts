@@ -38,6 +38,7 @@ import { ProposalType } from "@hooks";
 import { ProposalData } from "../governance/type";
 import { isNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
+import GovernorCountingSimpleInternalJSON from "../../abi/GovernorCountingSimpleInternal.json";
 
 export function getOwners(proposalLogs: LogDescription[]): string[] {
   const owners = new Set<string>();
@@ -94,6 +95,8 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
 
   const multiSigEventResults = logs.map(async (log): Promise<MultiSigDAODetails> => {
     const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
+    argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
+    argsWithName.safeAddress = (await DexService.fetchContractId(argsWithName.safeAddress)).toSolidityAddress();
     const { daoAddress, safeAddress, inputs } = argsWithName;
     const { admin, isPrivate, threshold: _threshold, title } = inputs;
     const safeLogs = await fetchHederaGnosisSafeLogs(safeAddress);
@@ -172,8 +175,24 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     new ethers.utils.Interface(FTDAOFactoryJSON.abi),
     eventTypes
   );
-  return logs.map((log): GovernanceDAODetails => {
+
+  const allPromises = logs.map(async (log): Promise<GovernanceDAODetails> => {
     const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
+
+    argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
+    argsWithName.governors.contractUpgradeLogic = (
+      await DexService.fetchContractId(argsWithName.governors.contractUpgradeLogic)
+    ).toSolidityAddress();
+    argsWithName.governors.textLogic = (
+      await DexService.fetchContractId(argsWithName.governors.textLogic)
+    ).toSolidityAddress();
+    argsWithName.governors.tokenTransferLogic = (
+      await DexService.fetchContractId(argsWithName.governors.tokenTransferLogic)
+    ).toSolidityAddress();
+    argsWithName.governors.createTokenLogic = (
+      await DexService.fetchContractId(argsWithName.governors.createTokenLogic)
+    ).toSolidityAddress();
+
     const { daoAddress, governors, tokenHolderAddress, inputs } = argsWithName;
     const {
       admin,
@@ -192,6 +211,8 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
 
     /** START - TODO: Need to apply a proper fix */
     let accountId;
+    let tokenHolderId;
+    let tokenId;
     try {
       accountId = AccountId.fromSolidityAddress(daoAddress).toString();
     } catch (e) {
@@ -217,6 +238,18 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     }
     /** END - TODO: Need to apply a proper fix */
 
+    try {
+      tokenHolderId = AccountId.fromSolidityAddress(tokenHolderAddress).toString();
+    } catch (error) {
+      tokenHolderId = (await DexService.fetchContractId(tokenHolderAddress)).toString();
+    }
+
+    try {
+      tokenId = AccountId.fromSolidityAddress(tokenAddress).toString();
+    } catch (error) {
+      tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
+    }
+
     return {
       type: DAOType.GovernanceToken,
       accountId,
@@ -229,13 +262,15 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       description,
       linkToDiscussion,
       governors,
-      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderAddress).toString(),
-      tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
+      tokenHolderAddress: tokenHolderId,
+      tokenId: tokenId,
       quorumThreshold: quorumThreshold.toNumber(),
       votingDelay: votingDelay.toNumber(),
       votingPeriod: votingPeriod.toNumber(),
     };
   });
+
+  return await Promise.all(allPromises);
 }
 
 async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
@@ -245,8 +280,23 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
     new ethers.utils.Interface(FTDAOFactoryJSON.abi),
     eventTypes
   );
-  return logs.map((log): NFTDAODetails => {
+  const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
     const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
+
+    argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
+    argsWithName.governors.contractUpgradeLogic = (
+      await DexService.fetchContractId(argsWithName.governors.contractUpgradeLogic)
+    ).toSolidityAddress();
+    argsWithName.governors.textLogic = (
+      await DexService.fetchContractId(argsWithName.governors.textLogic)
+    ).toSolidityAddress();
+    argsWithName.governors.tokenTransferLogic = (
+      await DexService.fetchContractId(argsWithName.governors.tokenTransferLogic)
+    ).toSolidityAddress();
+    argsWithName.governors.createTokenLogic = (
+      await DexService.fetchContractId(argsWithName.governors.createTokenLogic)
+    ).toSolidityAddress();
+
     const { daoAddress, governors, tokenHolderAddress, inputs } = argsWithName;
     const {
       admin,
@@ -312,6 +362,8 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       votingPeriod: votingPeriod.toNumber(),
     };
   });
+
+  return Promise.all(allPromises);
 }
 
 export async function fetchAllDAOs(): Promise<DAO[]> {
@@ -367,6 +419,7 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
 }
 
 export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): Promise<ProposalData[]> {
+  const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
   const DefaultTokenTransferDetails = {
     transferFromAccount: undefined,
     transferToAccount: undefined,
@@ -406,11 +459,26 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
         const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
+        let contractId = proposalEvent.contractId;
+        if (contractId.includes("0.0")) {
+          contractId = ContractId.fromString(contractId).toSolidityAddress();
+        }
+        const response = await DexService.callContract({
+          block: "latest",
+          data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
+          estimate: false,
+          from: AccountId.fromString("0.0.4602608").toSolidityAddress(), //TODO: change account id.
+          gas: 9000000,
+          gasPrice: 100000000,
+          to: contractId.toString(),
+          value: 0,
+        });
+        const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
         /**
          * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
          * proposalDetails should override the same field found in the proposalEvent.
          */
-        return { ...proposalEvent, ...tokenTransferDetails };
+        return { ...proposalEvent, state: dataParsed.at(0), ...tokenTransferDetails };
       })
     );
     const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {
@@ -589,7 +657,7 @@ export async function sendApproveMultiSigTransaction(
   transactionHash: string,
   signer: HashConnectSigner
 ) {
-  const safeContractId = ContractId.fromString(safeId);
+  const safeContractId = await DexService.fetchContractId(safeId);
   const utf8BytesTransactionHash = convertToByte32(transactionHash);
   const contractFunctionParameters = new ContractFunctionParameters().addBytes32(utf8BytesTransactionHash);
   const approveMultiSigTransaction = await new ContractExecuteTransaction()
@@ -617,13 +685,12 @@ interface ExecuteMultiSigTransactionParams {
 
 export async function sendExecuteMultiSigTransaction(params: ExecuteMultiSigTransactionParams) {
   const { safeId, msgValue, hexStringData, operation, nonce, signer } = params;
-  const safeContractId = ContractId.fromString(safeId);
-  const toAddress = AccountId.fromString(safeId).toSolidityAddress();
+  const safeContractId = await DexService.fetchContractId(safeId);
   const preciseValue = BigNumber(msgValue);
   const byteData = ethers.utils.arrayify(hexStringData);
 
   const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(toAddress)
+    .addAddress(safeId)
     .addUint256(preciseValue)
     .addBytes(byteData)
     .addUint8(operation)
