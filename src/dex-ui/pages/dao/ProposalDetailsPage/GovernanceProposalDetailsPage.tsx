@@ -1,9 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { ProposalDetails } from "./ProposalDetails";
 import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
-import { ProposalDetailsStepper } from "./ProposalDetailsStepper";
 import { ProposalVoteDetails } from "./ProposalVoteDetails";
-import { ProposalStatus } from "@hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
 import { Grid, GridItem, Flex } from "@chakra-ui/react";
 import { DAOType } from "@services";
@@ -11,6 +9,7 @@ import { isNil, isNotNil } from "ramda";
 import { Paths } from "@routes";
 import { useGovernanceProposalDetails } from "./useGovernanceProposalDetails";
 import { GovernanceProposalConfirmationDetails } from "./GovernanceProposalConfirmationDetails";
+import { GovernanceProposalDetailsStepper } from "./GovernanceProposalDetailsStepper";
 
 export function GovernanceProposalDetailsPage() {
   const navigate = useNavigate();
@@ -26,6 +25,7 @@ export function GovernanceProposalDetailsPage() {
     executeProposal,
     votingPower,
     hasVoted,
+    isAuthor,
   } = useGovernanceProposalDetails(daoAccountId, proposalId);
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposal;
 
@@ -64,13 +64,13 @@ export function GovernanceProposalDetailsPage() {
       operation,
       nonce,
       daoType,
-      isQuorumReached,
+      proposalState,
     } = proposalDetails;
 
     const isGovernanceProposal = daoType === DAOType.GovernanceToken;
 
     /** TODO: Update contracts to support a "queued" status. */
-    const proposalStatus = status === ProposalStatus.Pending && isQuorumReached ? ProposalStatus.Queued : status;
+    const proposalStatus = status;
 
     return (
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
@@ -82,9 +82,8 @@ export function GovernanceProposalDetailsPage() {
               daoType={daoType}
               author={author}
             />
-            <ProposalDetailsStepper
-              status={proposalStatus}
-              isThresholdReached={isQuorumReached ?? false}
+            <GovernanceProposalDetailsStepper
+              state={proposalState}
               isExecutionProcessing={isProposalBeingExecuted}
               hasExecutionFailed={hasProposalExecutionFailed}
             />
@@ -103,7 +102,7 @@ export function GovernanceProposalDetailsPage() {
         <GridItem colSpan={1}>
           {isGovernanceProposal ? (
             <GovernanceProposalConfirmationDetails
-              tokenSymbol={token?.data.symbol ?? ""}
+              tokenSymbol={""}
               proposal={proposalDetails}
               hasConnectedWalletVoted={hasVoted}
               status={proposalStatus}
@@ -115,6 +114,7 @@ export function GovernanceProposalDetailsPage() {
               castVote={castVote}
               executeProposal={executeProposal}
               cancelProposal={cancelProposal}
+              isAuthor={isAuthor}
             />
           ) : (
             <ProposalVoteDetails />

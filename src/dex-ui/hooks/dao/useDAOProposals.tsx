@@ -132,7 +132,7 @@ export function useDAOProposals(
             tokenId: tokenId,
             token: tokenData,
             receiver: receiver ? AccountId.fromSolidityAddress(receiver).toString() : "",
-            safeId: to ? AccountId.fromSolidityAddress(to).toString() : "",
+            safeId: to,
             operation,
             hexStringData,
             msgValue: value ? BigNumber.from(value).toNumber() : 0,

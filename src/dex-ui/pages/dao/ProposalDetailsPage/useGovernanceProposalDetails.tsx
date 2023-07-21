@@ -31,10 +31,11 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
 
   const hasVoted = proposal?.hasVoted ?? false;
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
-  const fetchLockGODTokens = useFetchLockedGovToken(dao?.tokenHolderAddress ?? "", walletId);
+  const fetchLockGODTokens = useFetchLockedGovToken(walletId, dao?.tokenHolderAddress ?? "");
 
   const votingPower = `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
+  const isAuthor = walletId === proposal?.author;
 
   function handleVoteForProposalSuccess(transactionResponse: TransactionResponse) {
     castVote.reset();
@@ -62,6 +63,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     executeProposal,
     votingPower,
     areVoteButtonsVisible,
+    isAuthor,
     isSuccess: daosQueryResults.isSuccess && daoProposalsQueryResults.isSuccess,
     isLoading: daosQueryResults.isLoading || daoProposalsQueryResults.isLoading,
     isError: daosQueryResults.isError || daoProposalsQueryResults.isError,

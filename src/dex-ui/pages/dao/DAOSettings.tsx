@@ -1,7 +1,7 @@
 import { Button, Divider, Flex, SimpleGrid, Text, Image } from "@chakra-ui/react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FormInput, Color, MetricLabel, FormTextArea, FormInputList, DefaultLogoIcon } from "@dex-ui-components";
-import { convertFromBlocksToDays, isValidUrl } from "@utils";
+import { isValidUrl } from "@utils";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
@@ -83,10 +83,10 @@ export function DAOSettings() {
                 labelTextColor={Color.Neutral._500}
                 labelTextStyle="p xsmall medium"
                 labelOpacity="1.0"
-                value={convertFromBlocksToDays(dao.votingPeriod)}
+                value={dao.votingPeriod}
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="days"
+                valueUnitSymbol="blocks"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
@@ -96,10 +96,10 @@ export function DAOSettings() {
                 labelTextColor={Color.Neutral._500}
                 labelTextStyle="p xsmall medium"
                 labelOpacity="1.0"
-                value={convertFromBlocksToDays(dao.votingDelay)}
+                value={dao.votingDelay}
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="days"
+                valueUnitSymbol="blocks"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
@@ -112,7 +112,7 @@ export function DAOSettings() {
                 value="1, 7, 30"
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="days"
+                valueUnitSymbol="blocks"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
