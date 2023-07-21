@@ -47,7 +47,6 @@ function createDexService() {
     sendApproveMultiSigTransaction,
     sendExecuteMultiSigTransaction,
     fetchCanUserClaimGODTokens,
-    associateTokenToSafe,
   };
 }
 
