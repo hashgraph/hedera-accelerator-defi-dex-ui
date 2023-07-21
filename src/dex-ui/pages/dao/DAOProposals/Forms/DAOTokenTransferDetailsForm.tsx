@@ -1,12 +1,10 @@
-import { Text, Flex, Button } from "@chakra-ui/react";
+import { Text, Flex } from "@chakra-ui/react";
 import { HashScanLink, HashscanData, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@utils";
 import { useEffect } from "react";
-import { DexService } from "@dex-ui/services";
-import { useDexContext } from "@hooks";
 
 export interface TokenTransferLocationState {
   state: {
@@ -22,17 +20,10 @@ export function DAOTokenTransferDetailsForm() {
    * const { data: tokenBalances } = accountTokenBalancesQueryResults;
    */
   const { state } = useLocation() as TokenTransferLocationState;
-  const { safeAccountId, daoType, proposalType, daoAccountId } = useOutletContext<CreateDAOProposalContext>();
-
-  const { wallet } = useDexContext(({ wallet }) => ({
-    wallet,
-  }));
-  const signer = wallet.getSigner();
-
+  const { safeAccountId, daoType, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
     setValue,
     register,
-    getValues,
     formState: { errors },
   } = useFormContext<CreateDAOTokenTransferForm>();
 
@@ -128,36 +119,22 @@ export function DAOTokenTransferDetailsForm() {
         isInvalid={Boolean(errors?.recipientAccountId)}
         errorMessage={errors?.recipientAccountId && errors?.recipientAccountId?.message}
       />
-
-      <Flex alignItems="center" gap="1" justifyContent={"end"}>
-        <FormInput<"tokenId">
-          inputProps={{
-            id: "tokenId",
-            label: "Asset",
-            type: "text",
-            placeholder: "Enter a token ID",
-            register: {
-              ...register("tokenId", {
-                required: { value: true, message: "A token ID is required." },
-              }),
-            },
-            value: state?.tokenId,
-          }}
-          isInvalid={Boolean(errors?.tokenId)}
-          errorMessage={errors?.tokenId && errors?.tokenId?.message}
-        />
-        {daoType === "multisig" ? (
-          <Button
-            variant={"primary"}
-            marginTop={"4"}
-            onClick={async () => {
-              await DexService.associateTokenToSafe(getValues().tokenId, daoAccountId, signer);
-            }}
-          >
-            Associate token
-          </Button>
-        ) : undefined}
-      </Flex>
+      <FormInput<"tokenId">
+        inputProps={{
+          id: "tokenId",
+          label: "Asset",
+          type: "text",
+          placeholder: "Enter a token ID",
+          register: {
+            ...register("tokenId", {
+              required: { value: true, message: "A token ID is required." },
+            }),
+          },
+          value: state?.tokenId,
+        }}
+        isInvalid={Boolean(errors?.tokenId)}
+        errorMessage={errors?.tokenId && errors?.tokenId?.message}
+      />
       {/*
        *  TODO: Replace Assets Input with Dropdown
        *  <FormDropdown

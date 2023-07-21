@@ -10,7 +10,6 @@ import {
   sendApproveMultiSigTransaction,
   sendExecuteMultiSigTransaction,
   fetchNFTDAOLogs,
-  associateTokenToSafe,
 } from "./dao";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";

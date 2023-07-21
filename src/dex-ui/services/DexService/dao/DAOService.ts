@@ -706,19 +706,3 @@ export async function sendExecuteMultiSigTransaction(params: ExecuteMultiSigTran
   checkTransactionResponseForError(executeMultiSigTransactionResponse, HederaGnosisSafeFunctions.ExecuteTransaction);
   return executeMultiSigTransactionResponse;
 }
-
-export async function associateTokenToSafe(tokenId: string, multisigDaoId: string, signer: HashConnectSigner) {
-  const contractFunctionParameters = new ContractFunctionParameters().addAddress(
-    ContractId.fromString(tokenId).toSolidityAddress()
-  );
-
-  const txn = await new ContractExecuteTransaction()
-    .setContractId(multisigDaoId)
-    .setFunction("associateTokenToSafe", contractFunctionParameters)
-    .setGas(Gas)
-    .freezeWithSigner(signer);
-
-  const response = await txn.executeWithSigner(signer);
-  checkTransactionResponseForError(response, HederaGnosisSafeFunctions.ExecuteTransaction);
-  return response;
-}
