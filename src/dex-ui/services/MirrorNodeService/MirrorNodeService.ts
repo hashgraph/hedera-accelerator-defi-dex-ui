@@ -95,6 +95,11 @@ function createMirrorNodeService() {
     return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
   };
 
+  const fetchContractId = async (pairAddress: string): Promise<ContractId> => {
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    return ContractId.fromString(response.data.contract_id);
+  };
+
   /**
    * Fetches information related to a specific token.
    * @param tokenId  - The ID of the token account to return data for.
@@ -141,10 +146,10 @@ function createMirrorNodeService() {
       block,
       data,
       estimate,
-      from: AccountId.fromString(from).toSolidityAddress(),
+      from,
       gas,
       gasPrice,
-      to: ContractId.fromString(to).toSolidityAddress(),
+      to,
       value,
     });
   };
@@ -280,6 +285,7 @@ function createMirrorNodeService() {
     fetchAccountBalances,
     fetchBlock,
     fetchContract,
+    fetchContractId,
     fetchTokenData,
     callContract,
     fetchParsedEventLogs,

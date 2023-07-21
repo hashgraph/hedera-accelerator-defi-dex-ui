@@ -1,3 +1,4 @@
+import { ProposalState } from "@dex-ui/store/governanceSlice";
 import { MirrorNodeTokenById } from "@services";
 
 export enum DAOQueries {
@@ -91,6 +92,7 @@ export interface Proposal {
   hasVoted?: boolean;
   isQuorumReached?: boolean;
   votingEndTime?: string;
+  proposalState?: ProposalState;
 }
 
 export const AllFilters = [
