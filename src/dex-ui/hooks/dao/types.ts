@@ -11,6 +11,7 @@ export enum DAOMutations {
   CreateDAO = "CreateDAO",
   CreateMultiSigProposal = "CreateMultiSigProposal",
   CreateTokenTransferProposal = "CreateTokenTransferProposal",
+  CreateTokenAssociateProposal = "CreateTokenAssociateProposal",
   CreateDAOUpgradeProposal = "CreateDAOUpgradeProposal",
   CreateDAOTextProposal = "CreateDAOTextProposal",
   CreateAddMemberProposal = "CreateAddMemberProposal",
@@ -43,6 +44,7 @@ export enum ProposalType {
   RemoveMember = "Remove Member",
   ReplaceMember = "Replace Member",
   ChangeThreshold = "Upgrade Threshold",
+  TokenAssociate = "Token Associate",
   UpgradeContract = "Upgrade Contract",
   TextProposal = "Text Proposal",
 }
@@ -93,6 +95,7 @@ export interface Proposal {
   isQuorumReached?: boolean;
   votingEndTime?: string;
   proposalState?: ProposalState;
+  tokenToAssociate?: string | undefined;
 }
 
 export const AllFilters = [

@@ -6,6 +6,7 @@ import {
   CreateDAOTextProposalForm,
   CreateDAOTokenTransferForm,
   CreateDAOUpgradeThresholdForm,
+  CreateDAOTokenAssociateForm,
   DAOProposalType,
 } from "./types";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page } from "@layouts";
@@ -26,6 +27,7 @@ import {
   useCreateAddMemberProposal,
   useCreateChangeThresholdProposal,
   useCreateDAOTextProposal,
+  useCreateDAOTokenAssociateProposal,
   useCreateDAOTokenTransferProposal,
   useCreateDAOUpgradeProposal,
   useCreateDeleteMemberProposal,
@@ -150,6 +152,15 @@ export function CreateDAOProposal() {
     reset: resetCreateDAOTextProposal,
   } = sendDAOTextMutationResults;
 
+  const sendDAOTokenAssociateResults = useCreateDAOTokenAssociateProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateTokenAssociateProposalLoading,
+    isError: isCreateTokenAssociateProposalFailed,
+    error: isCreateTokenAssociateProposalError,
+    mutate: createDAOTokenAssociateProposal,
+    reset: resetCreateDAOTokenAssociateProposal,
+  } = sendDAOTokenAssociateResults;
+
   const isLoading =
     isCreateMultisigTokenTransferLoading ||
     isCreateGOVTokenTransferLoading ||
@@ -158,7 +169,8 @@ export function CreateDAOProposal() {
     isReplaceMemberLoading ||
     isCreateDAOUpgradeLoading ||
     isCreateDAOTextProposalLoading ||
-    isChangeThresholdLoading;
+    isChangeThresholdLoading ||
+    isCreateTokenAssociateProposalLoading;
 
   const isError =
     isCreateMultisigTokenTransferFailed ||
@@ -168,7 +180,8 @@ export function CreateDAOProposal() {
     isReplaceMemberFailed ||
     isCreateDAOUpgradeFailed ||
     isCreateDAOTextProposalFailed ||
-    isChangeThresholdFailed;
+    isChangeThresholdFailed ||
+    isCreateTokenAssociateProposalFailed;
 
   const steps = [
     {
@@ -198,6 +211,7 @@ export function CreateDAOProposal() {
     resetChangeThresholdTransaction();
     resetCreateDAOUpgradeProposal();
     resetCreateDAOTextProposal();
+    resetCreateDAOTokenAssociateProposal();
   }
 
   function reset() {
@@ -214,6 +228,7 @@ export function CreateDAOProposal() {
     if (isChangeThresholdError) return isChangeThresholdError.message;
     if (isCreateDAOUpgradeError) return isCreateDAOUpgradeError.message;
     if (isCreateDAOTextProposalError) return isCreateDAOTextProposalError.message;
+    if (isCreateTokenAssociateProposalError) return isCreateTokenAssociateProposalError.message;
     return "";
   }
 
@@ -344,6 +359,16 @@ export function CreateDAOProposal() {
           nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
         });
       }
+      case DAOProposalType.TokenAssociate: {
+        const { title, description, tokenId } = data as CreateDAOTokenAssociateForm;
+        return createDAOTokenAssociateProposal({
+          title,
+          description,
+          linkToDiscussion: "", //TODO: To be removed from SC
+          daoAccountId,
+          tokenId,
+        });
+      }
     }
   }
 
@@ -363,6 +388,8 @@ export function CreateDAOProposal() {
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/upgrade-threshold/details`;
       case DAOProposalType.ContractUpgrade:
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/contract-upgrade/details`;
+      case DAOProposalType.TokenAssociate:
+        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/token-associate/details`;
       default:
         return "";
     }
@@ -384,6 +411,8 @@ export function CreateDAOProposal() {
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/upgrade-threshold/review`;
       case DAOProposalType.ContractUpgrade:
         return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/contract-upgrade/review`;
+      case DAOProposalType.TokenAssociate:
+        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/token-associate/review`;
       default:
         return "";
     }
@@ -408,6 +437,8 @@ export function CreateDAOProposal() {
           ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])
           : trigger(["title", "description", "linkToDiscussion", "recipientAccountId", "tokenId", "amount"]);
       }
+      case DAOProposalType.TokenAssociate:
+        return trigger(["tokenId", "title", "description"]);
       default:
         return Promise.resolve(true);
     }

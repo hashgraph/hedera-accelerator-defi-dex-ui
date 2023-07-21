@@ -5,9 +5,10 @@ import {
   DexService,
   MirrorNodeTokenById,
   getThreshold,
+  MultiSigProposeTransactionType,
 } from "@services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
-import { AccountId } from "@hashgraph/sdk";
+import { AccountId, TokenId } from "@hashgraph/sdk";
 import { groupBy, isNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
@@ -64,16 +65,18 @@ export function useDAOProposals(
 
   function getProposalType(transactionType: number): ProposalType {
     switch (transactionType) {
-      case 1:
+      case MultiSigProposeTransactionType.TokenTransfer:
         return ProposalType.TokenTransfer;
-      case 2:
+      case MultiSigProposeTransactionType.AddMember:
         return ProposalType.AddNewMember;
-      case 3:
+      case MultiSigProposeTransactionType.DeleteMember:
         return ProposalType.RemoveMember;
-      case 4:
+      case MultiSigProposeTransactionType.ReplaceMember:
         return ProposalType.ReplaceMember;
-      case 5:
+      case MultiSigProposeTransactionType.ChangeThreshold:
         return ProposalType.ChangeThreshold;
+      case MultiSigProposeTransactionType.TokenAssociation:
+        return ProposalType.TokenAssociate;
       default:
         return ProposalType.TokenTransfer;
     }
@@ -105,7 +108,7 @@ export function useDAOProposals(
             linkToDiscussion,
             transactionType,
           } = proposalInfo;
-          const { amount, receiver, token, _threshold } = data;
+          const { amount, receiver, token, _threshold, tokenAddress } = data;
           const threshold = getThreshold(daoAndSafeLogs, BigNumber.from(_threshold ?? 0));
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;
@@ -141,6 +144,7 @@ export function useDAOProposals(
             description: description,
             link: linkToDiscussion,
             threshold,
+            tokenToAssociate: tokenAddress ? TokenId.fromSolidityAddress(tokenAddress).toString() : undefined,
           };
         })
       );

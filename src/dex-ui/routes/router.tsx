@@ -54,6 +54,8 @@ import {
   DAOUpgradeThresholdReviewForm,
   DAOContractUpgradeDetailsForm,
   DAOContractUpgradeReviewForm,
+  DAOTokenAssociateDetailsForm,
+  DAOTokenAssociateReviewForm,
   GovernanceProposalDetailsPage,
   UpdateDAODetails,
   UpdateDAODetailsForm,
@@ -157,6 +159,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.DAOReplaceMemberReview} element={<DAOReplaceMemberReviewForm />} />
           <Route path={Paths.DAOs.DAOUpgradeThresholdDetails} element={<DAOUpgradeThresholdDetailsForm />} />
           <Route path={Paths.DAOs.DAOUpgradeThresholdReview} element={<DAOUpgradeThresholdReviewForm />} />
+          <Route path={Paths.DAOs.DAOTokenAssociateDetails} element={<DAOTokenAssociateDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTokenAssociateReview} element={<DAOTokenAssociateReviewForm />} />
         </Route>
         <Route path={`${Paths.DAOs.Multisig}/:accountId/settings/change-dao-details`} element={<UpdateDAODetails />}>
           <Route index element={<Navigate to={Paths.DAOs.DetailsStep} />} />

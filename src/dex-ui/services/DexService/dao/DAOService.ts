@@ -406,6 +406,11 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
           ["address token", "address receiver", "uint256 amount"],
           ethers.utils.hexDataSlice(event.args.info.data, 4)
         );
+      } else if (transactionType === MultiSigProposeTransactionType.TokenAssociation) {
+        parsedData = abiCoder.decode(
+          ["address", "address tokenAddress"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;

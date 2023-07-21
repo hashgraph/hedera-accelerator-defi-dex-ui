@@ -146,11 +146,14 @@ export enum HederaGnosisSafeFunctions {
 }
 
 export enum MultiSigProposeTransactionType {
-  TokenTransfer = 1,
-  AddMember,
+  BatchOperation = 1,
+  TokenAssociation,
+  AddMember = 1001,
   DeleteMember,
   ReplaceMember,
   ChangeThreshold,
+  TypeSetText,
+  TokenTransfer,
 }
 // TODO: if members are not present in Governance and NFT DAOs, then move it back with Multisig types
 export interface Member {
