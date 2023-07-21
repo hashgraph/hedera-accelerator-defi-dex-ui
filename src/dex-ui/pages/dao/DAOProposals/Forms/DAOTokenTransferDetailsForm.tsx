@@ -146,15 +146,17 @@ export function DAOTokenTransferDetailsForm() {
           isInvalid={Boolean(errors?.tokenId)}
           errorMessage={errors?.tokenId && errors?.tokenId?.message}
         />
-        <Button
-          variant={"primary"}
-          marginTop={"4"}
-          onClick={async () => {
-            await DexService.associateTokenToSafe(getValues().tokenId, daoAccountId, signer);
-          }}
-        >
-          Associate token
-        </Button>
+        {daoType === "multisig" ? (
+          <Button
+            variant={"primary"}
+            marginTop={"4"}
+            onClick={async () => {
+              await DexService.associateTokenToSafe(getValues().tokenId, daoAccountId, signer);
+            }}
+          >
+            Associate token
+          </Button>
+        ) : undefined}
       </Flex>
       {/*
        *  TODO: Replace Assets Input with Dropdown
