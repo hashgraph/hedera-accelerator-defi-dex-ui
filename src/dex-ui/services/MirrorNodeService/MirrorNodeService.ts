@@ -11,6 +11,7 @@ import {
   MirrorNodeAccountById,
   MirrorNodeBlocks,
   MirrorNodeProposalEventLog,
+  MirrorNodeTokenBalance,
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
@@ -115,6 +116,21 @@ function createMirrorNodeService() {
       params: {
         "account.id": accountId,
         order: "asc",
+      },
+    });
+  };
+
+  /**
+   * Fetches a list of token balances on the Hedera
+   * network for the given account ID.
+   * @param accountId - The ID of the account to return balances for.
+   * @returns The list of balances for the given account ID.
+   */
+  const fetchTokensBalance = async (accountId: string): Promise<MirrorNodeTokenBalance[]> => {
+    return await fetchNextBatch(`/api/v1/accounts/${accountId}/tokens`, "tokens", {
+      params: {
+        order: "desc",
+        limit: 100,
       },
     });
   };
@@ -287,6 +303,7 @@ function createMirrorNodeService() {
     fetchTransactionRecord,
     fetchLatestBlockNumber,
     fetchLatestContractId,
+    fetchTokensBalance,
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
     fetchUpgradeContractEvents,

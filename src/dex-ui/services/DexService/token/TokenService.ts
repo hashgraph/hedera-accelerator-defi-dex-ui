@@ -12,9 +12,10 @@ import { DEX_TOKEN_PRECISION_VALUE } from "../../constants";
  */
 export async function fetchAccountTokenBalances(accountId: string): Promise<MirrorNodeAccountBalance> {
   const accountBalances = await DexService.fetchAccountBalances(accountId);
+  const tokens = await DexService.fetchTokensBalance(accountId);
   const account = accountBalances.filter((accountDetails) => accountDetails.account === accountId)[0];
   const tokenBalances = await Promise.all(
-    account.tokens.map(async (token) => {
+    tokens.map(async (token) => {
       const tokenData = await DexService.fetchTokenData(token.token_id);
       const { decimals, symbol, name } = tokenData.data;
       const balance = BigNumber(token.balance).shiftedBy(-Number(decimals));
