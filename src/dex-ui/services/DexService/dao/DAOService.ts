@@ -8,6 +8,7 @@ import {
   getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
   solidityAddressToTokenIdString,
+  DEFAULT_ACCOUNT_FOR_PROPOSAL,
 } from "@services";
 import { Contracts, Gas } from "../../constants";
 import { getEventArgumentsByName } from "../../utils";
@@ -179,21 +180,19 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
   const allPromises = logs.map(async (log): Promise<GovernanceDAODetails> => {
     const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
 
-    argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
-    argsWithName.governors.contractUpgradeLogic = (
-      await DexService.fetchContractId(argsWithName.governors.contractUpgradeLogic)
-    ).toSolidityAddress();
-    argsWithName.governors.textLogic = (
-      await DexService.fetchContractId(argsWithName.governors.textLogic)
-    ).toSolidityAddress();
-    argsWithName.governors.tokenTransferLogic = (
-      await DexService.fetchContractId(argsWithName.governors.tokenTransferLogic)
-    ).toSolidityAddress();
-    argsWithName.governors.createTokenLogic = (
-      await DexService.fetchContractId(argsWithName.governors.createTokenLogic)
-    ).toSolidityAddress();
+    const {
+      daoAddress,
+      governors: { contractUpgradeLogic, textLogic, tokenTransferLogic, createTokenLogic },
+      tokenHolderAddress,
+      inputs,
+    } = argsWithName;
+    const daoSolidityAddress = (await DexService.fetchContractId(daoAddress)).toSolidityAddress();
+    const upgradeLogicSolidityAddress = (await DexService.fetchContractId(contractUpgradeLogic)).toSolidityAddress();
+    const tokenHolderSolidityAddress = (await DexService.fetchContractId(tokenHolderAddress)).toSolidityAddress();
+    const textLogicSolidityAddress = (await DexService.fetchContractId(textLogic)).toSolidityAddress();
+    const transferLogicSolidityAddress = (await DexService.fetchContractId(tokenTransferLogic)).toSolidityAddress();
+    const tokenLoginSolidityAddress = (await DexService.fetchContractId(createTokenLogic)).toSolidityAddress();
 
-    const { daoAddress, governors, tokenHolderAddress, inputs } = argsWithName;
     const {
       admin,
       name,
@@ -211,10 +210,9 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
 
     /** START - TODO: Need to apply a proper fix */
     let accountId;
-    let tokenHolderId;
     let tokenId;
     try {
-      accountId = AccountId.fromSolidityAddress(daoAddress).toString();
+      accountId = AccountId.fromSolidityAddress(daoSolidityAddress).toString();
     } catch (e) {
       console.error(e, daoAddress);
       return {
@@ -228,7 +226,12 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
         webLinks: ["Error"],
         description: "Error",
         linkToDiscussion: "Error",
-        governors,
+        governors: {
+          contractUpgradeLogic: "Error",
+          createTokenLogic: "Error",
+          textLogic: "Error",
+          tokenTransferLogic: "Error",
+        },
         tokenHolderAddress: "Error",
         tokenId: "Error",
         quorumThreshold: 1,
@@ -237,13 +240,6 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       };
     }
     /** END - TODO: Need to apply a proper fix */
-
-    try {
-      tokenHolderId = AccountId.fromSolidityAddress(tokenHolderAddress).toString();
-    } catch (error) {
-      tokenHolderId = (await DexService.fetchContractId(tokenHolderAddress)).toString();
-    }
-
     try {
       tokenId = AccountId.fromSolidityAddress(tokenAddress).toString();
     } catch (error) {
@@ -261,8 +257,13 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       webLinks,
       description,
       linkToDiscussion,
-      governors,
-      tokenHolderAddress: tokenHolderId,
+      governors: {
+        contractUpgradeLogic: upgradeLogicSolidityAddress,
+        createTokenLogic: tokenLoginSolidityAddress,
+        textLogic: textLogicSolidityAddress,
+        tokenTransferLogic: transferLogicSolidityAddress,
+      },
+      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderSolidityAddress).toString(),
       tokenId: tokenId,
       quorumThreshold: quorumThreshold.toNumber(),
       votingDelay: votingDelay.toNumber(),
@@ -282,22 +283,18 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
   );
   const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
     const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
-
-    argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
-    argsWithName.governors.contractUpgradeLogic = (
-      await DexService.fetchContractId(argsWithName.governors.contractUpgradeLogic)
-    ).toSolidityAddress();
-    argsWithName.governors.textLogic = (
-      await DexService.fetchContractId(argsWithName.governors.textLogic)
-    ).toSolidityAddress();
-    argsWithName.governors.tokenTransferLogic = (
-      await DexService.fetchContractId(argsWithName.governors.tokenTransferLogic)
-    ).toSolidityAddress();
-    argsWithName.governors.createTokenLogic = (
-      await DexService.fetchContractId(argsWithName.governors.createTokenLogic)
-    ).toSolidityAddress();
-
-    const { daoAddress, governors, tokenHolderAddress, inputs } = argsWithName;
+    const {
+      daoAddress,
+      governors: { contractUpgradeLogic, textLogic, tokenTransferLogic, createTokenLogic },
+      tokenHolderAddress,
+      inputs,
+    } = argsWithName;
+    const daoSolidityAddress = (await DexService.fetchContractId(daoAddress)).toSolidityAddress();
+    const upgradeLogicSolidityAddress = (await DexService.fetchContractId(contractUpgradeLogic)).toSolidityAddress();
+    const tokenHolderSolidityAddress = (await DexService.fetchContractId(tokenHolderAddress)).toSolidityAddress();
+    const textLogicSolidityAddress = (await DexService.fetchContractId(textLogic)).toSolidityAddress();
+    const transferLogicSolidityAddress = (await DexService.fetchContractId(tokenTransferLogic)).toSolidityAddress();
+    const tokenLoginSolidityAddress = (await DexService.fetchContractId(createTokenLogic)).toSolidityAddress();
     const {
       admin,
       name,
@@ -314,8 +311,9 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
     } = inputs;
     /** START - TODO: Need to apply a proper fix */
     let accountId;
+    let tokenId;
     try {
-      accountId = AccountId.fromSolidityAddress(daoAddress).toString();
+      accountId = AccountId.fromSolidityAddress(daoSolidityAddress).toString();
     } catch (e) {
       console.error(e, daoAddress);
       return {
@@ -342,6 +340,11 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
         votingPeriod: 1,
       };
     }
+    try {
+      tokenId = AccountId.fromSolidityAddress(tokenAddress).toString();
+    } catch (error) {
+      tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
+    }
     /** END - TODO: Need to apply a proper fix */
     return {
       type: DAOType.NFT,
@@ -352,11 +355,16 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       description,
       webLinks,
       linkToDiscussion,
-      governors,
-      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderAddress).toString(),
+      governors: {
+        contractUpgradeLogic: upgradeLogicSolidityAddress,
+        createTokenLogic: tokenLoginSolidityAddress,
+        textLogic: textLogicSolidityAddress,
+        tokenTransferLogic: transferLogicSolidityAddress,
+      },
+      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderSolidityAddress).toString(),
       logoUrl,
       isPrivate,
-      tokenId: AccountId.fromSolidityAddress(tokenAddress).toString(),
+      tokenId: tokenId,
       quorumThreshold: quorumThreshold.toNumber(),
       votingDelay: votingDelay.toNumber(),
       votingPeriod: votingPeriod.toNumber(),
@@ -472,7 +480,7 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
           block: "latest",
           data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
           estimate: false,
-          from: AccountId.fromString("0.0.4602608").toSolidityAddress(), //TODO: change account id.
+          from: AccountId.fromString(DEFAULT_ACCOUNT_FOR_PROPOSAL).toSolidityAddress(), //TODO: change account id.
           gas: 9000000,
           gasPrice: 100000000,
           to: contractId.toString(),
