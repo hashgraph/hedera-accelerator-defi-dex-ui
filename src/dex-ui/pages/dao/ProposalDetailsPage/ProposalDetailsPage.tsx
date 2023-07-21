@@ -77,6 +77,7 @@ export function ProposalDetailsPage() {
       ownerIds,
       author,
       title,
+      tokenToAssociate,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
@@ -85,6 +86,10 @@ export function ProposalDetailsPage() {
     /** TODO: Update contracts to support a "queued" status. */
     const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
 
+    /** TODO: Update the UI after the Design is Ready */
+    const descriptionArray = isNil(tokenToAssociate)
+      ? [description]
+      : [description, `Associate Token: ${tokenToAssociate}`];
     return (
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
         <GridItem colSpan={3}>
@@ -97,7 +102,7 @@ export function ProposalDetailsPage() {
               hasExecutionFailed={hasProposalExecutionFailed}
             />
             <ProposalDetails
-              description={[description]}
+              description={descriptionArray}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}

@@ -183,9 +183,40 @@ async function sendUpdateDAODetailsTransaction(params: UpdateDAODetailsTransacti
   return sendProposeUpdateDAODetailsResponse;
 }
 
+interface TokenAssociateTransactionParams {
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  tokenId: string;
+  daoAccountId: string;
+  signer: HashConnectSigner;
+}
+
+async function sendDAOTokenAssociateTransaction(params: TokenAssociateTransactionParams) {
+  const { title, description, linkToDiscussion, tokenId, daoAccountId, signer } = params;
+  const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddress(tokenSolidityAddress)
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
+  const sendProposeTokenAssociationTransaction = await new ContractExecuteTransaction()
+    .setContractId(daoAccountId)
+    .setFunction(MultiSigDAOContractFunctions.ProposeTokenAssociation, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeTokenAssociationResponse = await sendProposeTokenAssociationTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(
+    sendProposeTokenAssociationResponse,
+    MultiSigDAOContractFunctions.ProposeTokenAssociation
+  );
+  return sendProposeTokenAssociationResponse;
+}
+
 export {
   sendCreateMultiSigDAOTransaction,
   sendProposeTransferTransaction,
   sendProposeTransaction,
   sendUpdateDAODetailsTransaction,
+  sendDAOTokenAssociateTransaction,
 };

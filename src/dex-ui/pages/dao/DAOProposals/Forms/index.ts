@@ -13,3 +13,5 @@ export * from "./DAOUpgradeThresholdDetailsForm";
 export * from "./DAOUpgradeThresholdReviewForm";
 export * from "./DAOContractUpgradeReviewForm";
 export * from "./DAOContractUpgradeDetailsForm";
+export * from "./DAOTokenAssociateDetailsForm";
+export * from "./DAOTokenAssociateReviewForm";

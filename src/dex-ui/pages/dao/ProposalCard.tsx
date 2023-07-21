@@ -128,6 +128,11 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     {`Required proposal threshold confirmations will be updated.`}
                   </Text>
                 )}
+                {proposal.type === ProposalType.TokenAssociate && (
+                  <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
+                    {`Associate Token: ${proposal.tokenToAssociate}`}
+                  </Text>
+                )}
               </>
             )}
             {isGovernance && (

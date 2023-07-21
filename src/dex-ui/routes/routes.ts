@@ -63,5 +63,7 @@ export const Paths = {
     DAOUpgradeThresholdReview: "upgrade-threshold/review",
     DAOContractUpgradeDetails: "contract-upgrade/details",
     DAOContractUpgradeReview: "contract-upgrade/review",
+    DAOTokenAssociateDetails: "token-associate/details",
+    DAOTokenAssociateReview: "token-associate/review",
   },
 };

@@ -2,6 +2,7 @@ import { TokenBalance } from "@dex-ui/hooks";
 
 export enum DAOProposalType {
   Text = "Text",
+  TokenAssociate = "Token Associate",
   TokenTransfer = "Token Transfer",
   UpgradeThreshold = "Upgrade Threshold",
   UpgradeVotingDuration = "Upgrade Voting Duration",
@@ -30,6 +31,10 @@ export interface CreateDAOTokenTransferForm extends CreateDAOProposalFormBase {
   decimals: number;
 }
 
+export interface CreateDAOTokenAssociateForm extends CreateDAOProposalFormBase {
+  tokenId: string;
+}
+
 export interface CreateDAOMemberOperationForm extends CreateDAOProposalFormBase {
   memberAddress: string;
   newThreshold: number;
@@ -51,7 +56,8 @@ export type CreateDAOProposalForm =
   | CreateDAOTokenTransferForm
   | CreateDAOMemberOperationForm
   | CreateDAOUpgradeThresholdForm
-  | CreateDAOContractUpgradeForm;
+  | CreateDAOContractUpgradeForm
+  | CreateDAOTokenAssociateForm;
 
 export type CreateDAOProposalContext = {
   daoType: string;

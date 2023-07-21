@@ -27,6 +27,11 @@ const MultiSigProposals = [
     icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
   {
+    title: DAOProposalType.TokenAssociate,
+    label: "Propose a token associate.",
+    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+  },
+  {
     title: DAOProposalType.UpgradeThreshold,
     label: "Propose to upgrade the member threshold weight.",
     icon: <TwoLayerSettingsIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
