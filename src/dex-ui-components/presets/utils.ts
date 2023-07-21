@@ -176,7 +176,12 @@ export const getExchangeRateDisplay = ({
   tokenToTradeSymbol,
   tokenToReceiveSymbol,
 }: GetExchangeRateDisplayParams) => {
-  if (spotPrice === undefined || tokenToTradeSymbol === undefined || tokenToReceiveSymbol === undefined) {
+  if (
+    spotPrice === undefined ||
+    tokenToTradeSymbol === undefined ||
+    tokenToReceiveSymbol === undefined ||
+    !isFinite(spotPrice)
+  ) {
     return "--";
   }
   return `${spotPrice?.toFixed(8)} ${tokenToReceiveSymbol}`;

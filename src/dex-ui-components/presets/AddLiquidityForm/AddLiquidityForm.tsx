@@ -29,6 +29,7 @@ import { AlertDialog, DropdownSelector, LoadingDialog } from "../../base";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionStatus } from "../../../dex-ui/store/appSlice";
 import { convertNumberOfMinsToSeconds, getAllPoolTransactionFee } from "../../../dex-ui/utils";
+import { isNotNil } from "ramda";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 
@@ -200,14 +201,18 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
       tokenToTrade: updatedToken,
       tokenToReceive: formValues.secondToken,
     });
-    const secondTokenAmount = getTokenExchangeAmount(updatedToken.amount, secondTokenSpotPrice);
-    const updatedSecondToken = {
-      ...formValues.secondToken,
-      amount: secondTokenAmount || 0,
-      displayAmount: secondTokenAmount ? String(secondTokenAmount) : "",
-    };
-    addLiquidityForm.setValue("secondToken.amount", updatedSecondToken.amount);
-    addLiquidityForm.setValue("secondToken.displayAmount", updatedSecondToken.displayAmount);
+
+    //TODO: A Temporary fix when a Pair comes with 0 liquidity
+    if (isNotNil(secondTokenSpotPrice) && isFinite(secondTokenSpotPrice) && secondTokenSpotPrice > 0) {
+      const secondTokenAmount = getTokenExchangeAmount(updatedToken.amount, secondTokenSpotPrice);
+      const updatedSecondToken = {
+        ...formValues.secondToken,
+        amount: secondTokenAmount || 0,
+        displayAmount: secondTokenAmount ? String(secondTokenAmount) : "",
+      };
+      addLiquidityForm.setValue("secondToken.amount", updatedSecondToken.amount);
+      addLiquidityForm.setValue("secondToken.displayAmount", updatedSecondToken.displayAmount);
+    }
   }
 
   function handleFirstTokenSymbolChanged(updatedToken: TokenState) {
@@ -222,14 +227,16 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
       tokenToTrade: updatedToken,
       tokenToReceive: formValues.firstToken,
     });
-    const firstTokenAmount = getTokenExchangeAmount(updatedToken.amount, firstTokenSpotPrice);
-    const updatedFirstToken = {
-      ...formValues.firstToken,
-      amount: firstTokenAmount || 0,
-      displayAmount: firstTokenAmount ? String(firstTokenAmount) : "",
-    };
-    addLiquidityForm.setValue("firstToken.amount", updatedFirstToken.amount);
-    addLiquidityForm.setValue("firstToken.displayAmount", updatedFirstToken.displayAmount);
+    if (isNotNil(firstTokenSpotPrice) && isFinite(firstTokenSpotPrice) && firstTokenSpotPrice > 0) {
+      const firstTokenAmount = getTokenExchangeAmount(updatedToken.amount, firstTokenSpotPrice);
+      const updatedFirstToken = {
+        ...formValues.firstToken,
+        amount: firstTokenAmount || 0,
+        displayAmount: firstTokenAmount ? String(firstTokenAmount) : "",
+      };
+      addLiquidityForm.setValue("firstToken.amount", updatedFirstToken.amount);
+      addLiquidityForm.setValue("firstToken.displayAmount", updatedFirstToken.displayAmount);
+    }
   }
 
   function handleSecondTokenSymbolChanged(updatedToken: TokenState) {
