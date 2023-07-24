@@ -70,7 +70,7 @@ export function CreateDAOProposal() {
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
-  const { ownerIds, safeId: safeAccountId = "", threshold } = (dao as MultiSigDAODetails) ?? {};
+  const { ownerIds, safeId: safeAccountId = "", threshold, safeEVMAddress } = (dao as MultiSigDAODetails) ?? {};
   const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -266,7 +266,7 @@ export function CreateDAOProposal() {
               decimals,
               title,
               description,
-              safeId: safeAccountId,
+              safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
             });
           default:
@@ -290,7 +290,7 @@ export function CreateDAOProposal() {
         return createAddMemberProposal({
           title,
           description,
-          safeAccountId,
+          safeEVMAddress,
           newMemberAddress: memberAddress,
           multiSigDAOContractId: daoAccountId,
           threshold: newThreshold,
@@ -304,7 +304,7 @@ export function CreateDAOProposal() {
           description,
           memberAddress,
           prevMemberAddress,
-          safeAccountId,
+          safeEVMAddress,
           multiSigDAOContractId: daoAccountId,
           threshold: newThreshold,
         });
@@ -318,7 +318,7 @@ export function CreateDAOProposal() {
           prevMemberAddress,
           newMemberAddress: newMemberAddress,
           oldMemberAddress: memberAddress,
-          safeAccountId,
+          safeEVMAddress,
           multiSigDAOContractId: daoAccountId,
         });
       }
@@ -328,7 +328,7 @@ export function CreateDAOProposal() {
           title,
           description,
           threshold: newThreshold,
-          safeAccountId,
+          safeEVMAddress,
           multiSigDAOContractId: daoAccountId,
         });
       }

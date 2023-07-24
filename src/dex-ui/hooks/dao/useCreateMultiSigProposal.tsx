@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from "react-query";
-import { TransactionResponse } from "@hashgraph/sdk";
+import { TransactionResponse, TokenId, AccountId } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
-import { DexService } from "@services";
+import { DexService, MultiSigProposeTransactionType } from "@services";
 import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
+import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
+import HederaGnosisSafeJSON from "../../services/abi/HederaGnosisSafe.json";
 
 interface UseCreateMultiSigProposalParams {
   tokenId: string;
@@ -13,7 +16,7 @@ interface UseCreateMultiSigProposalParams {
   multiSigDAOContractId: string;
   title: string;
   description: string;
-  safeId: string;
+  safeEVMAddress: string;
 }
 
 export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
@@ -28,14 +31,20 @@ export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.CreateMultiSigProposal
   >(
     async (params: UseCreateMultiSigProposalParams) => {
-      const { tokenId, safeId, receiverId, amount, decimals, multiSigDAOContractId, title, description } = params;
-      return DexService.sendProposeTransferTransaction({
-        tokenId,
-        receiverId,
-        amount,
-        decimals,
+      const { tokenId, safeEVMAddress, receiverId, amount, decimals, multiSigDAOContractId, title, description } =
+        params;
+      const preciseAmount = BigNumber(amount).shiftedBy(decimals).toNumber();
+      const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+      const tokenTransferData = contractInterface.encodeFunctionData("transferTokenViaSafe", [
+        TokenId.fromString(tokenId).toSolidityAddress(),
+        AccountId.fromString(receiverId).toSolidityAddress(),
+        preciseAmount,
+      ]);
+      return DexService.sendProposeTransaction({
+        safeEVMAddress,
+        data: tokenTransferData,
         multiSigDAOContractId,
-        safeId,
+        transactionType: MultiSigProposeTransactionType.TokenTransfer,
         title,
         description,
         signer,

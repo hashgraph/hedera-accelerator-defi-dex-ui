@@ -95,6 +95,8 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
 
   const multiSigEventResults = logs.map(async (log): Promise<MultiSigDAODetails> => {
     const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
+    //TODO: To be changed.
+    const safeEVMAddress = argsWithName.safeAddress;
     argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
     argsWithName.safeAddress = (await DexService.fetchContractId(argsWithName.safeAddress)).toSolidityAddress();
     const { daoAddress, safeAddress, inputs } = argsWithName;
@@ -121,6 +123,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
         webLinks: ["Error"],
         safeId: "Error",
         ownerIds: ["Error"],
+        safeEVMAddress: "",
         threshold,
       };
     }
@@ -141,6 +144,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
       isPrivate,
       webLinks,
       safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
+      safeEVMAddress,
       ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
       threshold,
     };
@@ -524,7 +528,7 @@ export async function fetchHederaGnosisSafeLogs(safeAccountId: string) {
 }
 
 export interface ProposeAddOwnerWithThresholdParams {
-  safeAccountId: string;
+  safeEVMAddress: string;
   newMemberAddress: string;
   multiSigDAOContractId: string;
   threshold: number;
@@ -534,7 +538,7 @@ export interface ProposeAddOwnerWithThresholdParams {
 }
 
 export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithThresholdParams) {
-  const { newMemberAddress, threshold, safeAccountId, multiSigDAOContractId, signer, title, description } = params;
+  const { newMemberAddress, threshold, safeEVMAddress, multiSigDAOContractId, signer, title, description } = params;
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const newOwnerData = contractInterface.encodeFunctionData("addOwnerWithThreshold", [
     AccountId.fromString(newMemberAddress).toSolidityAddress(),
@@ -542,7 +546,7 @@ export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithTh
   ]);
 
   return DexService.sendProposeTransaction({
-    safeAccountId,
+    safeEVMAddress,
     data: newOwnerData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.AddMember,
@@ -553,7 +557,7 @@ export async function proposeAddOwnerWithThreshold(params: ProposeAddOwnerWithTh
 }
 
 export interface ProposeRemoveOwnerWithThresholdParams {
-  safeAccountId: string;
+  safeEVMAddress: string;
   memberAddress: string;
   prevMemberAddress: string;
   title: string;
@@ -567,7 +571,7 @@ export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwner
   const {
     memberAddress,
     threshold,
-    safeAccountId,
+    safeEVMAddress,
     multiSigDAOContractId,
     signer,
     title,
@@ -582,7 +586,7 @@ export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwner
   ]);
 
   return DexService.sendProposeTransaction({
-    safeAccountId,
+    safeEVMAddress,
     data: removeOwnerData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.DeleteMember,
@@ -593,7 +597,7 @@ export async function proposeRemoveOwnerWithThreshold(params: ProposeRemoveOwner
 }
 
 export interface ProposeSwapOwnerWithThresholdParams {
-  safeAccountId: string;
+  safeEVMAddress: string;
   oldMemberAddress: string;
   prevMemberAddress: string;
   title: string;
@@ -606,7 +610,7 @@ export interface ProposeSwapOwnerWithThresholdParams {
 export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWithThresholdParams) {
   const {
     newMemberAddress,
-    safeAccountId,
+    safeEVMAddress,
     multiSigDAOContractId,
     oldMemberAddress,
     signer,
@@ -622,7 +626,7 @@ export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWith
   ]);
 
   return DexService.sendProposeTransaction({
-    safeAccountId,
+    safeEVMAddress,
     data: removeOwnerData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.ReplaceMember,
@@ -633,7 +637,7 @@ export async function proposeSwapOwnerWithThreshold(params: ProposeSwapOwnerWith
 }
 
 export interface ProposeChangeThresholdParams {
-  safeAccountId: string;
+  safeEVMAddress: string;
   title: string;
   description: string;
   threshold: number;
@@ -642,12 +646,12 @@ export interface ProposeChangeThresholdParams {
 }
 
 export async function proposeChangeThreshold(params: ProposeChangeThresholdParams) {
-  const { safeAccountId, multiSigDAOContractId, threshold, signer, title, description } = params;
+  const { safeEVMAddress, multiSigDAOContractId, threshold, signer, title, description } = params;
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const changeThresholdData = contractInterface.encodeFunctionData("changeThreshold", [threshold]);
 
   return DexService.sendProposeTransaction({
-    safeAccountId,
+    safeEVMAddress,
     data: changeThresholdData,
     multiSigDAOContractId,
     transactionType: MultiSigProposeTransactionType.ChangeThreshold,

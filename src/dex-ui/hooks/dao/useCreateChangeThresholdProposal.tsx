@@ -9,7 +9,7 @@ interface ChangeThresholdForm {
   threshold: number;
   title: string;
   description: string;
-  safeAccountId: string;
+  safeEVMAddress: string;
   multiSigDAOContractId: string;
 }
 

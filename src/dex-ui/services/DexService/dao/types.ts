@@ -114,6 +114,7 @@ export interface MultiSigDAODetails {
   webLinks: string[];
   isPrivate: boolean;
   safeId: string;
+  safeEVMAddress: string;
   ownerIds: string[];
   threshold: number;
 }
