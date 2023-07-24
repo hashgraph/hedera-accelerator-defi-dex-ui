@@ -9,7 +9,8 @@ import {
 } from "@hooks";
 
 interface ProposalConfirmationDetailsProps {
-  safeId: string;
+  safeAccountId: string;
+  to: string;
   approvalCount: number;
   approvers: string[];
   memberCount: number;
@@ -28,7 +29,8 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const connectedWalletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const {
-    safeId,
+    safeAccountId,
+    to,
     approvalCount,
     approvers,
     threshold,
@@ -58,7 +60,8 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
   }
 
   interface HandleClickExecuteTransactionParams {
-    safeId: string;
+    safeAccountId: string;
+    to: string;
     msgValue: number;
     hexStringData: string;
     operation: number;
@@ -66,8 +69,8 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
   }
 
   async function handleClickExecuteTransaction(params: HandleClickExecuteTransactionParams) {
-    const { safeId, msgValue, hexStringData, operation, nonce } = params;
-    executeProposalMutation.mutate({ safeId, msgValue, hexStringData, operation, nonce });
+    const { safeAccountId, to, msgValue, hexStringData, operation, nonce } = params;
+    executeProposalMutation.mutate({ safeAccountId, to, msgValue, hexStringData, operation, nonce });
   }
 
   const ConfirmationDetailsButtons: Readonly<{ [key in ProposalStatus]: JSX.Element }> = {
@@ -76,7 +79,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
         Confirmed by you
       </Button>
     ) : (
-      <Button variant="primary" onClick={() => handleClickConfirmProposal(safeId, transactionHash)}>
+      <Button variant="primary" onClick={() => handleClickConfirmProposal(safeAccountId, transactionHash)}>
         Confirm
       </Button>
     ),
@@ -85,7 +88,8 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
         variant="primary"
         onClick={() =>
           handleClickExecuteTransaction({
-            safeId,
+            safeAccountId,
+            to,
             msgValue,
             hexStringData,
             operation,

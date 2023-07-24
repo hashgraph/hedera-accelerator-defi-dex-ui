@@ -65,6 +65,7 @@ interface SendProposeTransaction {
   description: string;
   linkToDiscussion?: string;
   transactionType: number;
+  hBarPayableValue?: number;
   signer: HashConnectSigner;
 }
 
@@ -77,8 +78,10 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     transactionType,
     title,
     description,
+    hBarPayableValue,
     linkToDiscussion = "",
   } = params;
+  const hBarAmount = hBarPayableValue ? hBarPayableValue : 0;
   const ownerData = ethers.utils.arrayify(data);
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddress(safeEVMAddress)
@@ -91,6 +94,7 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     .setContractId(multiSigDAOContractId)
     .setFunction(MultiSigDAOContractFunctions.ProposeTransaction, contractFunctionParameters)
     .setGas(Gas)
+    .setPayableAmount(hBarAmount)
     .freezeWithSigner(signer);
   const sendProposeTransactionResponse = await sendProposeTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(sendProposeTransactionResponse, MultiSigDAOContractFunctions.ProposeTransaction);

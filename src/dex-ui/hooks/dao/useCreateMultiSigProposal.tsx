@@ -7,6 +7,7 @@ import { isNil } from "ramda";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import HederaGnosisSafeJSON from "../../services/abi/HederaGnosisSafe.json";
+import { isHbarToken } from "@utils";
 
 interface UseCreateMultiSigProposalParams {
   tokenId: string;
@@ -18,6 +19,13 @@ interface UseCreateMultiSigProposalParams {
   description: string;
   safeEVMAddress: string;
 }
+
+const getHbarTransferCalldata = () => {
+  const ABI = ["function call()"];
+  const iface = new ethers.utils.Interface(ABI);
+  const data = iface.encodeFunctionData("call", []);
+  return data;
+};
 
 export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
@@ -41,11 +49,14 @@ export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
         preciseAmount,
       ]);
       return DexService.sendProposeTransaction({
-        safeEVMAddress,
-        data: tokenTransferData,
-        multiSigDAOContractId,
-        transactionType: MultiSigProposeTransactionType.TokenTransfer,
+        safeEVMAddress: isHbarToken(tokenId) ? AccountId.fromString(receiverId).toSolidityAddress() : safeEVMAddress,
+        hBarPayableValue: isHbarToken(tokenId) ? amount : 0,
+        data: isHbarToken(tokenId) ? getHbarTransferCalldata() : tokenTransferData,
+        transactionType: isHbarToken(tokenId)
+          ? MultiSigProposeTransactionType.HBARTokenTransfer
+          : MultiSigProposeTransactionType.TokenTransfer,
         title,
+        multiSigDAOContractId,
         description,
         signer,
       });

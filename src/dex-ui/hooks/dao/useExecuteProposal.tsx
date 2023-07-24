@@ -11,7 +11,8 @@ export type UseExecuteProposalMutationResult = UseMutationResult<
   DAOMutations.ExecuteProposal
 >;
 interface UseExecuteProposalParams {
-  safeId: string;
+  safeAccountId: string;
+  to: string;
   msgValue: number;
   hexStringData: string;
   operation: number;
@@ -26,8 +27,7 @@ export function useExecuteProposal(handleOnSuccess: HandleOnSuccess) {
   const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseExecuteProposalParams, DAOMutations.ExecuteProposal>(
     async (params: UseExecuteProposalParams) => {
-      const { safeId, msgValue, hexStringData, operation, nonce } = params;
-      return DexService.sendExecuteMultiSigTransaction({ safeId, msgValue, hexStringData, operation, nonce, signer });
+      return DexService.sendExecuteMultiSigTransaction({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
