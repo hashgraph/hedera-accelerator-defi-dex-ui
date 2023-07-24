@@ -7,7 +7,7 @@ import { isNil } from "ramda";
 
 interface AddMemberForm {
   newMemberAddress: string;
-  safeAccountId: string;
+  safeEVMAddress: string;
   threshold: number;
   title: string;
   description: string;

@@ -12,7 +12,6 @@ import { BaseDAOContractFunctions, MultiSigDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
 import { Contracts } from "../../constants";
 import { ethers } from "ethers";
-import { DexService } from "@services";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 
 const Gas = 9000000;
@@ -58,65 +57,8 @@ async function sendCreateMultiSigDAOTransaction(
   checkTransactionResponseForError(createMultiSigDAOResponse, BaseDAOContractFunctions.CreateDAO);
   return createMultiSigDAOResponse;
 }
-
-interface SendProposeTransferTransaction {
-  tokenId: string;
-  title: string;
-  description: string;
-  linkToDiscussion?: string;
-  receiverId: string;
-  amount: number;
-  decimals: number;
-  multiSigDAOContractId: string;
-  safeId: string;
-  signer: HashConnectSigner;
-}
-
-async function sendProposeTransferTransaction(params: SendProposeTransferTransaction) {
-  const {
-    tokenId,
-    receiverId,
-    safeId,
-    amount,
-    decimals,
-    multiSigDAOContractId,
-    signer,
-    title,
-    description,
-    linkToDiscussion = "",
-  } = params;
-  const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
-  const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
-  const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
-  await DexService.setTokenAllowance({
-    tokenId,
-    walletId: signer.getAccountId().toString(),
-    spenderContractId: safeId,
-    tokenAmount: preciseAmount.toNumber(),
-    signer,
-  });
-  const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(tokenSolidityAddress)
-    .addAddress(receiverSolidityAddress)
-    .addUint256(preciseAmount)
-    .addString(title)
-    .addString(description)
-    .addString(linkToDiscussion);
-  const sendProposeTransferTransaction = await new ContractExecuteTransaction()
-    .setContractId(multiSigDAOContractId)
-    .setFunction(MultiSigDAOContractFunctions.ProposeTransferTransaction, contractFunctionParameters)
-    .setGas(Gas)
-    .freezeWithSigner(signer);
-  const sendProposeTransferTransactionResponse = await sendProposeTransferTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(
-    sendProposeTransferTransactionResponse,
-    MultiSigDAOContractFunctions.ProposeTransferTransaction
-  );
-  return sendProposeTransferTransactionResponse;
-}
-
 interface SendProposeTransaction {
-  safeAccountId: string;
+  safeEVMAddress: string;
   data: string;
   multiSigDAOContractId: string;
   title: string;
@@ -128,7 +70,7 @@ interface SendProposeTransaction {
 
 async function sendProposeTransaction(params: SendProposeTransaction) {
   const {
-    safeAccountId,
+    safeEVMAddress,
     data,
     signer,
     multiSigDAOContractId,
@@ -137,12 +79,10 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     description,
     linkToDiscussion = "",
   } = params;
-  const safeSolidityAddress = ContractId.fromString(safeAccountId).toSolidityAddress();
   const ownerData = ethers.utils.arrayify(data);
   const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(safeSolidityAddress)
+    .addAddress(safeEVMAddress)
     .addBytes(ownerData)
-    .addUint8(0)
     .addUint256(transactionType)
     .addString(title)
     .addString(description)
@@ -215,7 +155,6 @@ async function sendDAOTokenAssociateTransaction(params: TokenAssociateTransactio
 
 export {
   sendCreateMultiSigDAOTransaction,
-  sendProposeTransferTransaction,
   sendProposeTransaction,
   sendUpdateDAODetailsTransaction,
   sendDAOTokenAssociateTransaction,

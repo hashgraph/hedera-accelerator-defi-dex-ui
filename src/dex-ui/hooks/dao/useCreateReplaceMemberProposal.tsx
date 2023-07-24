@@ -11,7 +11,7 @@ interface ReplaceMemberForm {
   title: string;
   description: string;
   oldMemberAddress: string;
-  safeAccountId: string;
+  safeEVMAddress: string;
   multiSigDAOContractId: string;
 }
 

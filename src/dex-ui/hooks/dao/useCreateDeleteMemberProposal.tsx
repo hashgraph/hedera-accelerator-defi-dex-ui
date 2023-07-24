@@ -8,7 +8,7 @@ import { isNil } from "ramda";
 interface DeleteMemberForm {
   prevMemberAddress: string;
   memberAddress: string;
-  safeAccountId: string;
+  safeEVMAddress: string;
   title: string;
   description: string;
   threshold: number;
