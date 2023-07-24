@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { BigNumber } from "bignumber.js";
-import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters } from "@hashgraph/sdk";
+import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters, TokenId } from "@hashgraph/sdk";
 import {
   checkTransactionResponseForError,
   convertEthersBigNumberToBigNumberJS,
@@ -10,7 +10,7 @@ import {
   solidityAddressToTokenIdString,
   DEFAULT_ACCOUNT_FOR_PROPOSAL,
 } from "@services";
-import { Contracts, Gas } from "../../constants";
+import { Contracts, Gas, HBARTokenId } from "../../constants";
 import { getEventArgumentsByName } from "../../utils";
 import FTDAOFactoryJSON from "../../abi/FTDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
@@ -423,6 +423,12 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
           ["address", "address tokenAddress"],
           ethers.utils.hexDataSlice(event.args.info.data, 4)
         );
+      } else if (transactionType === MultiSigProposeTransactionType.HBARTokenTransfer) {
+        parsedData = {
+          amount: event.args.info.value,
+          receiver: event.args.info.to,
+          token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
+        };
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;
@@ -688,7 +694,8 @@ export async function sendApproveMultiSigTransaction(
 }
 
 interface ExecuteMultiSigTransactionParams {
-  safeId: string;
+  safeAccountId: string;
+  to: string;
   /**
    * The hbar value sent when creating the transaction. This value is needed to
    * compute the correct hash value when executing the transaction in the HederaGnosisSafe contract.
@@ -701,13 +708,13 @@ interface ExecuteMultiSigTransactionParams {
 }
 
 export async function sendExecuteMultiSigTransaction(params: ExecuteMultiSigTransactionParams) {
-  const { safeId, msgValue, hexStringData, operation, nonce, signer } = params;
-  const safeContractId = await DexService.fetchContractId(safeId);
+  const { safeAccountId, to, msgValue, hexStringData, operation, nonce, signer } = params;
+  const safeContractId = ContractId.fromString(safeAccountId);
   const preciseValue = BigNumber(msgValue);
   const byteData = ethers.utils.arrayify(hexStringData);
 
   const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(safeId)
+    .addAddress(to)
     .addUint256(preciseValue)
     .addBytes(byteData)
     .addUint8(operation)

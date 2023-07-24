@@ -74,7 +74,8 @@ export interface Proposal {
   token: MirrorNodeTokenById | null | undefined;
   receiver: string;
   sender?: string;
-  safeId: string;
+  safeAccountId: string;
+  to: string;
   operation: number;
   hexStringData: string;
   /**

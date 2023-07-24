@@ -66,6 +66,7 @@ export function useDAOProposals(
   function getProposalType(transactionType: number): ProposalType {
     switch (transactionType) {
       case MultiSigProposeTransactionType.TokenTransfer:
+      case MultiSigProposeTransactionType.HBARTokenTransfer:
         return ProposalType.TokenTransfer;
       case MultiSigProposeTransactionType.AddMember:
         return ProposalType.AddNewMember;
@@ -135,7 +136,8 @@ export function useDAOProposals(
             tokenId: tokenId,
             token: tokenData,
             receiver: receiver ? AccountId.fromSolidityAddress(receiver).toString() : "",
-            safeId: to,
+            safeAccountId,
+            to,
             operation,
             hexStringData,
             msgValue: value ? BigNumber.from(value).toNumber() : 0,

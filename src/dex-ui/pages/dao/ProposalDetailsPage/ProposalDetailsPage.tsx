@@ -62,7 +62,8 @@ export function ProposalDetailsPage() {
       approvalCount,
       transactionHash,
       amount,
-      safeId,
+      safeAccountId,
+      to,
       receiver,
       token,
       event,
@@ -119,7 +120,8 @@ export function ProposalDetailsPage() {
         <GridItem colSpan={1}>
           {isMultiSigProposal && transactionHash ? (
             <ProposalConfirmationDetails
-              safeId={safeId}
+              safeAccountId={safeAccountId}
+              to={to}
               approvalCount={approvalCount}
               approvers={approvers}
               memberCount={memberCount}

@@ -155,6 +155,7 @@ export enum MultiSigProposeTransactionType {
   ChangeThreshold,
   TypeSetText,
   TokenTransfer,
+  HBARTokenTransfer,
 }
 // TODO: if members are not present in Governance and NFT DAOs, then move it back with Multisig types
 export interface Member {
