@@ -1,4 +1,4 @@
-import { GovernanceDAODetails, Member } from "@services";
+import { GovernanceDAODetails, Member, MirrorNodeTokenById } from "@services";
 import { TokenBalance } from "@hooks";
 
 export type GovernanceDAODetailsContext = {
@@ -9,4 +9,5 @@ export type GovernanceDAODetailsContext = {
   memberCount: number;
   tokenCount: number;
   totalAssetValue: number;
+  FTToken: MirrorNodeTokenById;
 };

@@ -2,7 +2,7 @@ import { Color } from "./color";
 
 const HeaderHeight = 65;
 const FooterHeight = 33;
-const BodyHeight = HeaderHeight + FooterHeight;
+export const BodyHeight = HeaderHeight + FooterHeight;
 
 const base = {
   padding: "1rem",

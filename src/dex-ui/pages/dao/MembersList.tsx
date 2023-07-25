@@ -6,7 +6,7 @@ import { useOutletContext } from "react-router-dom";
 import { Member } from "@services";
 
 export function MembersList() {
-  const { dao, memberCount, members } = useOutletContext<MultiSigDAODetailsContext>();
+  const { dao, members } = useOutletContext<MultiSigDAODetailsContext>();
   const { adminId } = dao;
 
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
@@ -16,7 +16,7 @@ export function MembersList() {
   return (
     <>
       <Flex layerStyle="dao-dashboard__content-header">
-        <Text textStyle="p medium medium">{memberCount} Members</Text>
+        <Text textStyle="p medium medium">{members.length} Members</Text>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={3} spacing="1rem">

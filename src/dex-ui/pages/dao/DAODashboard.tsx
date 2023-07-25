@@ -9,6 +9,8 @@ import { DashboardHeader } from "./DashboardHeader";
 import { Paths } from "@routes";
 import { VotingPower } from "../Governance/VotingPower";
 
+const TabsHeight = 44;
+
 interface DAODashboardProps extends PropsWithChildren {
   dao?: DAO;
   isMember?: boolean;
@@ -130,7 +132,7 @@ export function DAODashboard(props: DAODashboardProps) {
           />
         }
         body={
-          <Flex direction="column" gap="0.75rem">
+          <Flex direction="column" gap="0.75rem" height="100%">
             {isVotingPowerVisible ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
             ) : (
@@ -142,6 +144,7 @@ export function DAODashboard(props: DAODashboardProps) {
               isLazy
               bg={Color.White}
               variant="dao-dashboard-tab"
+              height="100%"
             >
               <Flex flex="row" padding="0px 5rem" borderBottom={`1px solid ${Color.Neutral._200}`}>
                 <TabList borderBottom="0">
@@ -159,7 +162,9 @@ export function DAODashboard(props: DAODashboardProps) {
                   })}
                 </TabList>
               </Flex>
-              <Box bg={Color.Primary_Bg}>{props.children}</Box>
+              <Box bg={Color.Primary_Bg} height={`calc(100% - ${TabsHeight}px)`}>
+                {props.children}
+              </Box>
             </Tabs>
           </Flex>
         }

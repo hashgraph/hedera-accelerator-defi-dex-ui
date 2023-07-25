@@ -170,7 +170,7 @@ export function CreateADAOPage() {
         admin: governance.admin,
         name,
         logoUrl,
-        owners: governance.owners.map((owner) => owner.value),
+        owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
       });
