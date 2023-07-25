@@ -96,22 +96,20 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
 
   const multiSigEventResults = logs.map(async (log): Promise<MultiSigDAODetails> => {
     const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
-    //TODO: To be changed.
-    const safeEVMAddress = argsWithName.safeAddress;
-    argsWithName.daoAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
-    argsWithName.safeAddress = (await DexService.fetchContractId(argsWithName.safeAddress)).toSolidityAddress();
-    const { daoAddress, safeAddress, inputs } = argsWithName;
+    const daoSolidityAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
+    const safeDAOSolidityAddress = (await DexService.fetchContractId(argsWithName.safeAddress)).toSolidityAddress();
+    const { inputs, safeAddress: safeEVMAddress } = argsWithName;
     const { admin, isPrivate, threshold: _threshold, title } = inputs;
-    const safeLogs = await fetchHederaGnosisSafeLogs(safeAddress);
+    const safeLogs = await fetchHederaGnosisSafeLogs(safeDAOSolidityAddress);
     const owners = getOwners(safeLogs);
     const threshold = getThreshold(safeLogs, _threshold);
 
     /** START - TODO: Need to apply a proper fix */
     let accountId;
     try {
-      accountId = AccountId.fromSolidityAddress(daoAddress).toString();
+      accountId = AccountId.fromSolidityAddress(daoSolidityAddress).toString();
     } catch (e) {
-      console.error(e, daoAddress);
+      console.error(e, daoSolidityAddress);
       return {
         type: DAOType.MultiSig,
         accountId: "Error",
@@ -144,7 +142,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
       description,
       isPrivate,
       webLinks,
-      safeId: AccountId.fromSolidityAddress(safeAddress).toString(),
+      safeId: AccountId.fromSolidityAddress(safeDAOSolidityAddress).toString(),
       safeEVMAddress,
       ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
       threshold,
