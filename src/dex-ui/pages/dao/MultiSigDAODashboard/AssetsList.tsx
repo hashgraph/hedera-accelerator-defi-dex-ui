@@ -1,9 +1,10 @@
-import { Box, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
 import * as R from "ramda";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 import { HBARTokenSymbol } from "@services";
+import { Paths } from "@dex-ui/routes";
 
 export function AssetsList() {
   const { tokenBalances: assets } = useOutletContext<MultiSigDAODetailsContext>();
@@ -11,6 +12,7 @@ export function AssetsList() {
   const hbarIndex = assets?.findIndex((asset) => asset.name === HBARTokenSymbol);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const assetsWithHBARFirst: Asset[] = R.swap(0, hbarIndex, assets);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -34,7 +36,24 @@ export function AssetsList() {
               >
                 <Flex direction="row" justifyContent="space-between" gap="2">
                   <Text textStyle="p medium semibold">{name}</Text>
-                  <HashScanLink id={tokenId} type={HashscanData.Token} />
+                  {tokenId && (
+                    <Flex gap="2">
+                      <HashScanLink id={tokenId} type={HashscanData.Token} />
+                      <Button
+                        variant="primary"
+                        isDisabled={!balance}
+                        onClick={() => {
+                          navigate(`../${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenTransferDetails}`, {
+                            state: {
+                              tokenId: tokenId,
+                            },
+                          });
+                        }}
+                      >
+                        Send
+                      </Button>
+                    </Flex>
+                  )}
                 </Flex>
                 <Divider />
                 <Flex direction="row" justifyContent="space-between">
