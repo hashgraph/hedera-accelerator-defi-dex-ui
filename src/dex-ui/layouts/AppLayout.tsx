@@ -13,7 +13,7 @@ export function AppLayout() {
       <ScrollToTop />
       <TopMenuBar menuOptions={menuOptions} />
       <Container layerStyle="body">
-        <Flex width="100%" minHeight="100%">
+        <Flex width="100%" minHeight="inherit">
           <Outlet />
         </Flex>
       </Container>

@@ -1,6 +1,13 @@
 import { Outlet, useParams } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@services";
-import { TokenBalance, useAccountTokenBalances, useDAOs, useTokenBalance, usePairedWalletDetails } from "@hooks";
+import {
+  TokenBalance,
+  useAccountTokenBalances,
+  useDAOs,
+  useTokenBalance,
+  usePairedWalletDetails,
+  useToken,
+} from "@hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 
@@ -13,6 +20,7 @@ export function GovernanceDAODashboard() {
   const accountTokenBalancesQueryResults = useAccountTokenBalances(daoAccountId);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
+  const { data: FTToken } = useToken(dao?.tokenId ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
   const isMember = daoGovTokenBalance > 0 && !isAdmin && isWalletPaired;
 
@@ -47,7 +55,7 @@ export function GovernanceDAODashboard() {
         errorMessage={errorMessage}
         isSuccess={isSuccess}
       >
-        <Outlet context={{ dao, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
+        <Outlet context={{ dao, members, memberCount, tokenCount, ownerCount, totalAssetValue, FTToken }} />
       </DAODashboard>
     );
   }

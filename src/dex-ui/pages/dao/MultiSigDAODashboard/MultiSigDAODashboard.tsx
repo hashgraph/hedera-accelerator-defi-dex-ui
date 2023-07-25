@@ -25,14 +25,11 @@ export function MultiSigDAODashboard() {
     const { adminId, ownerIds } = dao;
     const isAdmin = walletId === adminId && isWalletPaired;
     const isMember = ownerIds.includes(walletId ?? "") && isWalletPaired;
-    const ownerCount = ownerIds.length;
-    const members: Member[] = [adminId, ...ownerIds].map((ownerId: string) => ({
+    const members: Member[] = ownerIds.map((memberId: string) => ({
       name: "-",
       logo: "",
-      accountId: ownerId,
+      accountId: memberId,
     }));
-    const memberCount = members.length;
-    const tokenCount = tokenBalances?.length;
     const totalAssetValue = tokenBalances?.reduce((total: number, token: TokenBalance) => total + token.value, 0);
 
     return (
@@ -47,7 +44,7 @@ export function MultiSigDAODashboard() {
         errorMessage={errorMessage}
         isSuccess={isSuccess}
       >
-        <Outlet context={{ dao, tokenBalances, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
+        <Outlet context={{ dao, tokenBalances, members, totalAssetValue }} />
       </DAODashboard>
     );
   }

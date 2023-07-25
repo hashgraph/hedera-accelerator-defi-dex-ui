@@ -35,7 +35,7 @@ const {
 
 export function Settings() {
   const navigate = useNavigate();
-  const { dao, ownerCount, members } = useOutletContext<MultiSigDAODetailsContext>();
+  const { dao, members } = useOutletContext<MultiSigDAODetailsContext>();
   const { name, logoUrl, description, webLinks, adminId, threshold, accountId: daoAccountId } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -151,7 +151,7 @@ export function Settings() {
                   <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
                     THRESHOLD
                   </Text>
-                  <Text textStyle="p large medium">{`${threshold ?? 0} / ${ownerCount}`}</Text>
+                  <Text textStyle="p large medium">{`${threshold ?? 0} / ${members.length}`}</Text>
                 </Flex>
                 <Button
                   type="button"

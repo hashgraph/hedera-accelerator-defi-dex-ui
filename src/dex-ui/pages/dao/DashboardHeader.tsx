@@ -96,7 +96,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             {isMember || isAdmin ? (
               <Flex direction="row" justifyContent="right" gap="0.2rem" alignItems="center">
                 <Text textStyle="p small regular" color={Color.Neutral._500}>
-                  {isMember ? "Member" : "Admin"}
+                  {isAdmin ? "Admin" : "Member"}
                 </Text>
                 <CheckRightIcon boxSize="4" color={Color.Neutral._500} />
               </Flex>

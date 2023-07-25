@@ -7,7 +7,7 @@ import { useGovernanceDAOProposals } from "@hooks";
 import { RecentProposals } from "../RecentProposals";
 
 export function GovernanceDAODashboardOverview() {
-  const { dao, totalAssetValue, tokenCount } = useOutletContext<GovernanceDAODetailsContext>();
+  const { dao, totalAssetValue, tokenCount, FTToken } = useOutletContext<GovernanceDAODetailsContext>();
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   const daoProposalsQueryResults = useGovernanceDAOProposals(dao.accountId, dao.tokenId, dao.governors);
   const { isSuccess, isLoading, isError, error, data: proposals } = daoProposalsQueryResults;
@@ -98,7 +98,7 @@ export function GovernanceDAODashboardOverview() {
                   value={dao.minimumProposalDeposit ?? 0}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="HEY"
+                  valueUnitSymbol={FTToken?.data?.symbol}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
               </Flex>

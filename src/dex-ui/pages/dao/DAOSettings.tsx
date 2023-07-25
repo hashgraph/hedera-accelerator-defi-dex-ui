@@ -9,9 +9,8 @@ import { DAOSettingsForm } from "./types";
 import { getDAOLinksRecordArray } from "./utils";
 
 export function DAOSettings() {
-  const { dao } = useOutletContext<GovernanceDAODetailsContext>();
+  const { dao, FTToken } = useOutletContext<GovernanceDAODetailsContext>();
   const daoLinkRecords = getDAOLinksRecordArray(dao.webLinks);
-
   const daoSettingsForm = useForm<DAOSettingsForm>({
     defaultValues: {
       ...dao,
@@ -60,7 +59,7 @@ export function DAOSettings() {
                 value={dao.minimumProposalDeposit ?? 0}
                 valueStyle="p large medium"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="HEY"
+                valueUnitSymbol={FTToken?.data.symbol}
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>

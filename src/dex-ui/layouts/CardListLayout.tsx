@@ -22,7 +22,7 @@ export function CardListLayout(props: CardListLayoutProps) {
         <TabPanels>
           {props.cardLists?.map((cardList: ReactNode, index: number) => (
             <TabPanel key={index} layerStyle={props.cardListLayerStyles}>
-              <Flex direction="column" gap="2" minHeight="500px">
+              <Flex direction="column" gap="2" minHeight="100%">
                 {cardList}
               </Flex>
             </TabPanel>
