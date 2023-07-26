@@ -103,5 +103,6 @@ export const HBARSymbol = "ℏ";
 export const SENTINEL_OWNER = "0.0.1";
 export const DEFAULT_NFT_TOKEN_SERIAL_ID = 19;
 export const DEFAULT_ACCOUNT_FOR_PROPOSAL = "0.0.4602608";
+export const MINIMUM_DEPOSIT_AMOUNT = 1;
 
 export const Gas = 9000000;

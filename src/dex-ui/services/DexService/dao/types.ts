@@ -56,7 +56,7 @@ export interface MultiSigDAOCreatedEventArgs {
   };
 }
 
-export interface MultiSigDAODetailsInfoEventArgs {
+export interface DAODetailsInfoEventArgs {
   name: string;
   logoUrl: string;
   description: string;
@@ -119,7 +119,7 @@ export interface MultiSigDAODetails {
   threshold: number;
 }
 
-export interface MultiSigDaoSettingsDetails {
+export interface DAOSettingsDetails {
   name: string;
   description: string;
   logoUrl: string;

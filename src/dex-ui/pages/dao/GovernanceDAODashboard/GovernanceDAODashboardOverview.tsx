@@ -74,7 +74,7 @@ export function GovernanceDAODashboardOverview() {
                   value={dao.votingPeriod}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="blocks"
+                  valueUnitSymbol="Blocks"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 
@@ -86,7 +86,7 @@ export function GovernanceDAODashboardOverview() {
                   value={dao.votingDelay}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="blocks"
+                  valueUnitSymbol="Blocks"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 

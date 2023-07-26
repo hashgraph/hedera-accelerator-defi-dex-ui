@@ -1,6 +1,6 @@
 import { SimpleGrid } from "@chakra-ui/react";
 import { FormInput } from "@dex-ui-components";
-import { CreateATokenDAOForm } from "../types";
+import { CreateATokenDAOForm, DAOGovernanceTokenType } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
 import { DAOToolTips } from "./constants";
@@ -12,30 +12,12 @@ export function TokenDAOVotingForm() {
     register,
     formState: { errors },
   } = useFormContext<CreateATokenDAOForm>();
-  const { voting } = getValues();
-  const [isQuorumWarningVisible, setIsQuorumWarningVisible] = useState(voting.quorum > 90);
+  const { voting, governance } = getValues();
+  const [isQuorumWarningVisible, setIsQuorumWarningVisible] = useState(voting?.quorum > 90);
 
   return (
     <DAOFormContainer>
       <SimpleGrid columns={2} spacingX="1rem" spacingY="0.75rem">
-        {/* TODO: For a future version of the form.
-          <FormInput<"voting.minProposalDeposit">
-            inputProps={{
-              id: "voting.minProposalDeposit",
-              label: "Minimum proposal deposit",
-              type: "text",
-              placeholder: "Enter amount",
-              unit: "$TOKEN",
-              register: {
-                ...register("voting.minProposalDeposit", {
-                  required: { value: true, message: "A minimum proposal deposit is required." },
-                }),
-              },
-            }}
-            isInvalid={Boolean(errors.voting?.minProposalDeposit)}
-            errorMessage={errors.voting?.minProposalDeposit && errors.voting?.minProposalDeposit.message}
-          />
-          */}
         <FormInput<"voting.quorum">
           inputProps={{
             id: "voting.quorum",
@@ -105,6 +87,22 @@ export function TokenDAOVotingForm() {
           }}
           isInvalid={Boolean(errors.voting?.lockingPeriod)}
           errorMessage={errors.voting?.lockingPeriod && errors.voting?.lockingPeriod.message}
+        />
+        <FormInput<"voting.minProposalDeposit">
+          inputProps={{
+            id: "voting.minProposalDeposit",
+            value: "1",
+            isDisabled: true,
+            label: "Minimum proposal deposit",
+            type: "text",
+            placeholder: "Enter amount",
+            unit:
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.symbol ?? ""
+                : governance?.existingToken?.symbol ?? "",
+            isTooltipVisible: true,
+            tooltipLabel: DAOToolTips.minimumDeposit,
+          }}
         />
         {/* TODO: For a future version of the form.
         <FormInput<"voting.strategy">

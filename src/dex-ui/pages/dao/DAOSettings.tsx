@@ -1,41 +1,22 @@
-import { Button, Divider, Flex, SimpleGrid, Text, Image } from "@chakra-ui/react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { FormInput, Color, MetricLabel, FormTextArea, FormInputList, DefaultLogoIcon } from "@dex-ui-components";
-import { isValidUrl } from "@utils";
-import { useOutletContext } from "react-router-dom";
+import { Button, Divider, Flex, SimpleGrid, Text, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
+import { Color, MetricLabel, DefaultLogoIcon } from "@dex-ui-components";
+import { useOutletContext, useNavigate, Link as ReachLink } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
-import { DAOSettingsForm } from "./types";
 import { getDAOLinksRecordArray } from "./utils";
+import { usePairedWalletDetails } from "@hooks";
+import { Paths } from "@routes";
 
 export function DAOSettings() {
   const { dao, FTToken } = useOutletContext<GovernanceDAODetailsContext>();
-  const daoLinkRecords = getDAOLinksRecordArray(dao.webLinks);
-  const daoSettingsForm = useForm<DAOSettingsForm>({
-    defaultValues: {
-      ...dao,
-      daoLinks: daoLinkRecords,
-    },
-  });
+  const { name, logoUrl, description, webLinks, adminId } = dao;
+  const daoLinkRecords = getDAOLinksRecordArray(webLinks);
+  const { isWalletPaired, walletId } = usePairedWalletDetails();
+  const isAdmin = isWalletPaired && walletId === adminId;
+  const navigate = useNavigate();
 
-  const {
-    control,
-    getValues,
-    handleSubmit,
-    register,
-    watch,
-    formState: { errors },
-  } = daoSettingsForm;
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "daoLinks",
-  });
-  watch("logoUrl");
-  const { logoUrl } = getValues();
-
-  function onSubmit(data: DAOSettingsForm) {
-    console.log("Details", data);
+  function handleChangeDAODetailsClick() {
+    navigate(Paths.DAOs.ChangeDAOSettings);
   }
 
   return (
@@ -117,95 +98,78 @@ export function DAOSettings() {
             </Flex>
           </SimpleGrid>
         </DAOFormContainer>
-        <DAOFormContainer>
-          <Flex direction="column" gap={2} marginBottom="0.4rem">
+        <DAOFormContainer rest={{ gap: 6 }}>
+          <Flex direction="column" gap={2}>
             <Text textStyle="p medium medium">General</Text>
             <Text textStyle="p small regular" marginBottom="0.7rem" color={Color.Neutral._500}>
               Manage the general DAO properties.
             </Text>
             <Divider />
           </Flex>
-          <FormInput<"name">
-            inputProps={{
-              id: "name",
-              label: "Name",
-              type: "text",
-              placeholder: "Enter the name of your DAO",
-              register: {
-                ...register("name", {
-                  required: { value: true, message: "A name is required." },
-                }),
-              },
-            }}
-            isInvalid={Boolean(errors.name)}
-            errorMessage={errors.name && errors.name.message}
-          />
-          <Flex direction="row" alignItems="center" gap="2rem">
-            <FormInput<"logoUrl">
-              inputProps={{
-                id: "logoUrl",
-                label: "Logo URL",
-                type: "text",
-                placeholder: "Enter the url of your DAO",
-                register: {
-                  ...register("logoUrl", {
-                    validate: (value) => isValidUrl(value) || "Enter a Valid URL.",
-                  }),
-                },
-              }}
-              isInvalid={Boolean(errors.logoUrl)}
-              errorMessage={errors.logoUrl && errors.logoUrl.message}
-            />
-            <Image
-              src={logoUrl}
-              boxSize="4rem"
-              objectFit="contain"
-              alt="Logo Url"
-              fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
-            />
+          <Flex direction="column" gap="1">
+            <Text textStyle="p small medium">Name</Text>
+            <Text textStyle="p small regular" color={Color.Neutral._700}>
+              {name}
+            </Text>
           </Flex>
-          <FormTextArea<"description">
-            textAreaProps={{
-              id: "description",
-              label: "Description",
-              placeholder: "Add a description for your DAO",
-              register: {
-                ...register("description", {
-                  required: { value: true, message: "A description is required." },
-                  validate: (value) => value.length <= 240 || "Maximum character count for the description is 240.",
-                }),
-              },
-            }}
-            isInvalid={Boolean(errors.description)}
-            errorMessage={errors.description && errors.description.message}
-          />
-          <Flex direction="column" marginBottom="0.25rem">
-            <Text textStyle="p small medium">Social</Text>
-            <SimpleGrid row={1} spacingX="1rem">
-              <FormInputList<DAOSettingsForm, "daoLinks">
-                fields={fields}
-                defaultFieldValue={{ value: "" }}
-                formPath="daoLinks"
-                fieldPlaceholder="Enter URL"
-                fieldLabel=""
-                fieldButtonText="+ Add Link"
-                append={append}
-                remove={remove}
-                register={register}
+          <Flex direction="column" gap="1">
+            <Text textStyle="p small medium">Logo URL</Text>
+            <Flex direction="row" gap="2" alignItems="center">
+              <Image
+                src={logoUrl}
+                boxSize="4rem"
+                objectFit="contain"
+                alt="Logo Url"
+                fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
               />
-            </SimpleGrid>
+              <Link as={ReachLink} textStyle="p small regular link" color={Color.Primary._500} to={logoUrl} isExternal>
+                {logoUrl}
+              </Link>
+            </Flex>
           </Flex>
-          <Divider marginBottom="0.4rem" />
-          <Button
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-            variant="primary"
-            padding="10px 10px"
-            height="40px"
-            width="123px"
-          >
-            Save Changes
-          </Button>
+          <Flex direction="column" gap="1">
+            <Text textStyle="p small medium">Description</Text>
+            <Text textStyle="p small regular" color={Color.Neutral._700}>
+              {description}
+            </Text>
+          </Flex>
+          <Flex direction="column" gap="1">
+            <Text textStyle="p small medium">Social Channels</Text>
+            <Flex direction="column" gap={2} justifyContent="space-between">
+              <UnorderedList>
+                {daoLinkRecords.map((link, index) => {
+                  return (
+                    <ListItem>
+                      <Link
+                        key={index}
+                        as={ReachLink}
+                        textStyle="p small regular link"
+                        color={Color.Primary._500}
+                        to={link.value}
+                        isExternal
+                      >
+                        {link.value}
+                      </Link>
+                    </ListItem>
+                  );
+                })}
+              </UnorderedList>
+            </Flex>
+          </Flex>
+          {isAdmin ? (
+            <Flex alignItems="flex-end" gap="1rem" direction="column">
+              <Divider />
+              <Button
+                type="button"
+                variant="primary"
+                padding="10px 15px"
+                height="40px"
+                onClick={handleChangeDAODetailsClick}
+              >
+                Change
+              </Button>
+            </Flex>
+          ) : undefined}
         </DAOFormContainer>
       </Flex>
     </form>

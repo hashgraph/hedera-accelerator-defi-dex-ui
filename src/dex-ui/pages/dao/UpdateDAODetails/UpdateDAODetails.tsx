@@ -1,5 +1,5 @@
 import { Paths } from "@routes";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useForm } from "react-hook-form";
 import { Page } from "@layouts";
@@ -9,10 +9,13 @@ import { Wizard } from "@components";
 import { SettingsForm } from "./types";
 import { useHandleTransactionSuccess, useDAOs, useUpdateDAODetails } from "@hooks";
 import { getDAOLinksRecordArray } from "../utils";
+import { isEmpty } from "ramda";
 
 export function UpdateDAODetails() {
   const { accountId: daoAccountId = "" } = useParams();
-  const backTo = `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/settings`;
+  const location = useLocation();
+  const currentDaoType = location.pathname.split("/").at(2) ?? "";
+  const backTo = `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
@@ -20,7 +23,6 @@ export function UpdateDAODetails() {
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const sendUpdateDAODetails = useUpdateDAODetails(handleUpdateDAODetailsSuccess);
   const { mutate, isLoading, isError, error, reset: resetUpdateDAODetails } = sendUpdateDAODetails;
-
   const updateSettingsForm = useForm<SettingsForm>({
     defaultValues: {
       ...dao,
@@ -36,12 +38,12 @@ export function UpdateDAODetails() {
   const steps = [
     {
       label: "Details",
-      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/settings/change-dao-details/details`,
+      route: `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/settings/change-dao-details/details`,
       validate: async () => trigger(["name", "description"]),
     },
     {
       label: "Review",
-      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Multisig}/${daoAccountId}/settings/change-dao-details/review`,
+      route: `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/settings/change-dao-details/review`,
       isError,
       isLoading,
     },
@@ -63,7 +65,7 @@ export function UpdateDAODetails() {
       name: data.name,
       description: data.description,
       logoUrl: data.logoUrl,
-      webLinks: data.webLinks.map((link) => link.value),
+      webLinks: isEmpty(data.webLinks) ? [] : data.webLinks.map((link) => link.value),
       daoAccountId,
     });
   }
@@ -81,7 +83,7 @@ export function UpdateDAODetails() {
                 steps,
               },
               form: {
-                id: "multi-sig-change-dao-settings",
+                id: `${currentDaoType}-change-dao-settings`,
                 context: {},
                 ...updateSettingsForm,
               },

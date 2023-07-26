@@ -29,3 +29,7 @@ export function checkForValidAccountId(accountId: string): boolean {
     return false;
   }
 }
+
+export function convertNumberToPercentage(number: number, decimalPoint = 2): number {
+  return Number((number / 100).toFixed(decimalPoint));
+}

@@ -119,6 +119,14 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
         </Route>
+        <Route
+          path={`${Paths.DAOs.GovernanceToken}/:accountId/settings/change-dao-details`}
+          element={<UpdateDAODetails />}
+        >
+          <Route index element={<Navigate to={Paths.DAOs.DetailsStep} />} />
+          <Route path={Paths.DAOs.DetailsStep} element={<UpdateDAODetailsForm />} />
+          <Route path={Paths.DAOs.ReviewStep} element={<UpdateDAODetailsReviewForm />} />
+        </Route>
         <Route path={`${Paths.DAOs.NFT}/:accountId`} element={<NFTDAODashboard />}>
           <Route index element={<Navigate to={Paths.DAOs.Overview} />} />
           <Route path={Paths.DAOs.Overview} element={<NFTDAODashboardOverview />} />
@@ -127,6 +135,11 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.Staking} element={<NotFound message={`The staking page is under construction`} />} />
           <Route path={Paths.DAOs.Members} element={<MembersList />} />
           <Route path={Paths.DAOs.Settings} element={<DAOSettings />} />
+        </Route>
+        <Route path={`${Paths.DAOs.NFT}/:accountId/settings/change-dao-details`} element={<UpdateDAODetails />}>
+          <Route index element={<Navigate to={Paths.DAOs.DetailsStep} />} />
+          <Route path={Paths.DAOs.DetailsStep} element={<UpdateDAODetailsForm />} />
+          <Route path={Paths.DAOs.ReviewStep} element={<UpdateDAODetailsReviewForm />} />
         </Route>
         <Route path={`${Paths.DAOs.GovernanceToken}/:accountId/new-proposal`} element={<CreateDAOProposal />}>
           <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
