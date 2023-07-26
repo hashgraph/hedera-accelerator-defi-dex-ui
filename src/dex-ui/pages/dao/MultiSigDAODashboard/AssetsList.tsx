@@ -1,32 +1,78 @@
 import { Box, Button, Divider, Flex, SimpleGrid, Text, Tooltip } from "@chakra-ui/react";
-import { Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
+import { Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } from "@dex-ui-components";
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@services";
 import { Paths } from "@dex-ui/routes";
+import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal";
+import { useState } from "react";
+import { useDepositTokens, useHandleTransactionSuccess, usePairedWalletDetails } from "@hooks";
+import { TransactionResponse } from "@hashgraph/sdk";
 
 export function AssetsList() {
-  const { tokenBalances: assets } = useOutletContext<MultiSigDAODetailsContext>();
+  const { tokenBalances: assets, dao } = useOutletContext<MultiSigDAODetailsContext>();
+  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+  const { isWalletPaired } = usePairedWalletDetails();
   // change to token id match
   const hbarIndex = assets?.findIndex((asset) => asset.name === HBARTokenSymbol);
   assets[hbarIndex] = { ...assets[hbarIndex], tokenId: HBARTokenId };
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const assetsWithHBARFirst: Asset[] = R.swap(0, hbarIndex, assets);
   const navigate = useNavigate();
+  const handleTransactionSuccess = useHandleTransactionSuccess();
+  const depositTokens = useDepositTokens(handleDepositTokensSuccess);
+
+  async function handleDepositClicked(data: DepositTokensFormData) {
+    const selectedToken = assets.find((token) => token.tokenId === data.tokenId);
+    if (!selectedToken) {
+      return;
+    }
+    depositTokens.mutate({ ...data, safeId: dao.safeId, decimals: Number(selectedToken.decimals) });
+  }
+
+  function handleDepositTokensSuccess(transactionResponse: TransactionResponse) {
+    const message = "Successfully deposited tokens to safe";
+    handleTransactionSuccess(transactionResponse, message);
+    setDepositDialogOpen(false);
+  }
 
   return (
     <>
-      <Flex layerStyle="dao-dashboard__content-header">
+      <Flex layerStyle="dao-dashboard__content-header" justifyContent="space-between">
         <Text textStyle="p medium medium">Total Assets: {assets.length}</Text>
+        <Flex>
+          <AlertDialog
+            openDialogButtonStyles={{ flex: "1" }}
+            openDialogButtonText="Deposit"
+            title="Deposit Assets"
+            dialogWidth="30rem"
+            body={
+              <DepositTokensModal
+                safeId={dao.safeId}
+                handleDepositClicked={handleDepositClicked}
+                handleCancelClicked={() => {
+                  setDepositDialogOpen(false);
+                }}
+                handleAssociateTokenClicked={() => {
+                  navigate(`../${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenAssociateDetails}`);
+                }}
+              />
+            }
+            isOpenDialogButtonDisabled={!isWalletPaired}
+            alertDialogOpen={depositDialogOpen}
+            onAlertDialogOpen={() => setDepositDialogOpen(true)}
+            onAlertDialogClose={() => setDepositDialogOpen(false)}
+          />
+        </Flex>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={2} spacing="1rem">
-          {assetsWithHBARFirst.map((asset, index) => {
+          {assetsWithHBARFirst.map((asset) => {
             const { name, tokenId, balance, symbol } = asset;
             return (
               <Flex
-                key={index}
+                key={tokenId}
                 direction="column"
                 bg={Color.White_02}
                 justifyContent="space-between"
@@ -46,7 +92,7 @@ export function AssetsList() {
                     >
                       <Button
                         variant="primary"
-                        isDisabled={!balance}
+                        isDisabled={!balance || !isWalletPaired}
                         onClick={() => {
                           navigate(`../${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenTransferDetails}`, {
                             state: {

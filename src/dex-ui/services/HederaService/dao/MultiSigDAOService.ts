@@ -7,12 +7,14 @@ import {
   ContractFunctionParameters,
   TransactionResponse,
   TokenId,
+  TransferTransaction,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, MultiSigDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
 import { Contracts } from "../../constants";
 import { ethers } from "ethers";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
+import { isHbarToken } from "@utils";
 
 const Gas = 9000000;
 
@@ -156,10 +158,41 @@ async function sendDAOTokenAssociateTransaction(params: TokenAssociateTransactio
   );
   return sendProposeTokenAssociationResponse;
 }
+interface DepositTokensTransactionParams {
+  safeId: string;
+  tokenId: string;
+  amount: number;
+  decimals: number;
+  signer: HashConnectSigner;
+}
+
+async function sendTokensTransaction(params: DepositTokensTransactionParams): Promise<TransactionResponse> {
+  const { safeId, tokenId, amount, decimals, signer } = params;
+  const walletId = signer.getAccountId().toString();
+  const preciseAmount = BigNumber(amount).shiftedBy(decimals).toNumber();
+  if (isHbarToken(tokenId)) {
+    const depositTokensTransaction = await new TransferTransaction()
+      .addHbarTransfer(walletId, -amount)
+      .addHbarTransfer(safeId, amount)
+      .freezeWithSigner(signer);
+    const depositTokensResponse = await depositTokensTransaction.executeWithSigner(signer);
+    checkTransactionResponseForError(depositTokensResponse, MultiSigDAOContractFunctions.DepositTokens);
+    return depositTokensResponse;
+  } else {
+    const depositTokensTransaction = await new TransferTransaction()
+      .addTokenTransfer(tokenId, walletId, -preciseAmount)
+      .addTokenTransfer(tokenId, safeId, preciseAmount)
+      .freezeWithSigner(signer);
+    const depositTokensResponse = await depositTokensTransaction.executeWithSigner(signer);
+    checkTransactionResponseForError(depositTokensResponse, MultiSigDAOContractFunctions.DepositTokens);
+    return depositTokensResponse;
+  }
+}
 
 export {
   sendCreateMultiSigDAOTransaction,
   sendProposeTransaction,
   sendUpdateDAODetailsTransaction,
   sendDAOTokenAssociateTransaction,
+  sendTokensTransaction,
 };
