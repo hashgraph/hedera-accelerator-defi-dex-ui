@@ -7,6 +7,7 @@ import {
   FormDropdown,
   FormTokenInput,
   useHalfMaxButtons,
+  useFormTokenInputPattern,
 } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
@@ -15,6 +16,8 @@ import { isValidUrl } from "@utils";
 import { ChangeEvent, useEffect } from "react";
 import { TokenBalance, useAccountTokenBalances } from "@hooks";
 import { HBARTokenId, HBARSymbol } from "@services";
+import { isEmpty, isNil } from "ramda";
+import BigNumber from "bignumber.js";
 
 export interface TokenTransferLocationState {
   state: {
@@ -35,34 +38,43 @@ export function DAOTokenTransferDetailsForm() {
   watch("tokenId");
   const accountTokenBalancesQueryResults = useAccountTokenBalances(safeAccountId ?? "");
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
-  const selectedAsset = getValues().tokenId
-    ? tokenBalances?.find(
-        (asset: TokenBalance) =>
-          asset.tokenId === getValues().tokenId || (getValues().tokenId === HBARTokenId && asset.symbol === HBARSymbol)
-      )
-    : undefined;
+  const { tokenId } = getValues();
+  const selectedAsset =
+    isEmpty(tokenId) || isNil(tokenId)
+      ? undefined
+      : tokenBalances?.find(
+          (asset: TokenBalance) => asset.tokenId === tokenId || (tokenId === HBARTokenId && asset.symbol === HBARSymbol)
+        );
 
   const { handleMaxButtonClicked, handleHalfButtonClicked } = useHalfMaxButtons(
-    selectedAsset?.balance ?? 0,
-    (amount: number) => setValue("amount", amount)
+    String(selectedAsset?.balance ?? 0),
+    (amount: string | undefined) => setValue("amount", amount)
   );
+
+  const { handleTokenInputChangeWithPattern } = useFormTokenInputPattern((value: string) => setValue("amount", value));
 
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
   }
 
-  function validateAmount(value: number) {
-    const tokenId = getValues().tokenId;
-    const selectedAsset = tokenBalances?.find(
-      (asset: TokenBalance) => asset.tokenId === tokenId || (tokenId === HBARTokenId && asset.symbol === HBARSymbol)
-    );
+  useEffect(() => {
+    if (state?.tokenId) {
+      setValue("tokenId", state?.tokenId);
+    }
+  }, [setValue, state?.tokenId]);
+
+  function validateAmount(value: string | undefined) {
+    if (!value) {
+      return "An amount is required.";
+    }
+    const valueAsBigNumber = BigNumber(value);
     if (!selectedAsset?.balance || selectedAsset?.balance <= 0) {
       return "Token balance must be greater than 0.";
     }
-    if (value > selectedAsset?.balance) {
+    if (valueAsBigNumber.gt(selectedAsset?.balance)) {
       return "Amount must be less than or equal to token balance.";
     }
-    if (value <= 0) {
+    if (valueAsBigNumber.lte(0)) {
       return "Amount must be greater than 0.";
     }
     if (!tokenId) {
@@ -85,18 +97,6 @@ export function DAOTokenTransferDetailsForm() {
         value: tokenId,
       };
     }) ?? [];
-
-  useEffect(() => {
-    if (state?.tokenId) {
-      setValue("tokenId", state?.tokenId);
-    }
-  }, [setValue, state?.tokenId]);
-
-  useEffect(() => {
-    if (daoType === "multisig") {
-      setValue("amount", selectedAsset?.balance ?? 0);
-    }
-  }, [daoType, setValue, selectedAsset?.balance]);
 
   return (
     <Flex direction="column" gap="4" width="100%">
@@ -200,6 +200,7 @@ export function DAOTokenTransferDetailsForm() {
         inputProps={{
           id: "amount",
           pointerEvents: "all",
+          type: "text",
           placeholder: "Enter amount",
           label: (
             <FormTokenInput.Label
@@ -207,7 +208,6 @@ export function DAOTokenTransferDetailsForm() {
               balance={selectedAsset ? String(selectedAsset.balance ?? 0) : "--"}
             />
           ),
-          type: "number",
           unit: (
             <FormTokenInput.RightUnitContent
               tokenSymbol={selectedAsset?.symbol}
@@ -219,6 +219,7 @@ export function DAOTokenTransferDetailsForm() {
             ...register("amount", {
               required: { value: true, message: "An amount is required." },
               validate: { validateAmount },
+              onChange: handleTokenInputChangeWithPattern,
             }),
           },
         }}

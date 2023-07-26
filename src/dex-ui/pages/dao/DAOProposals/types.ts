@@ -27,7 +27,7 @@ export interface CreateDAOTokenTransferForm extends CreateDAOProposalFormBase {
   recipientAccountId: string;
   linkToDiscussion: string;
   tokenId: string;
-  amount: number;
+  amount: string | undefined;
   decimals: number;
 }
 
