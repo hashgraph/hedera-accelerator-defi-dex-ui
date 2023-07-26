@@ -88,7 +88,7 @@ export function NFTDAOReviewForm() {
             label: "QUORUM",
             type: "number",
             unit: "%",
-            value: String(voting.quorum),
+            value: String(voting?.quorum ?? ""),
             isReadOnly: true,
           }}
         />,
@@ -98,7 +98,7 @@ export function NFTDAOReviewForm() {
             label: "VOTING DURATION",
             type: "number",
             unit: "Blocks",
-            value: String(voting.duration),
+            value: String(voting?.duration ?? ""),
             isReadOnly: true,
           }}
         />,
@@ -108,7 +108,20 @@ export function NFTDAOReviewForm() {
             label: "LOCKING PERIOD",
             type: "number",
             unit: "Blocks",
-            value: String(voting.lockingPeriod),
+            value: String(voting?.lockingPeriod ?? ""),
+            isReadOnly: true,
+          }}
+        />,
+        <FormInput<"voting.minProposalDeposit">
+          inputProps={{
+            id: "voting.minProposalDeposit",
+            label: "MINIMUM PROPOSAL DEPOSIT",
+            type: "number",
+            unit:
+              governance?.tokenType === DAONFTTokenType.NewNFT
+                ? governance?.newNFT?.symbol ?? ""
+                : governance?.existingNFT?.symbol ?? "",
+            value: "1",
             isReadOnly: true,
           }}
         />,

@@ -10,12 +10,13 @@ import {
   solidityAddressToTokenIdString,
   DEFAULT_ACCOUNT_FOR_PROPOSAL,
 } from "@services";
-import { Contracts, Gas, HBARTokenId } from "../../constants";
+import { Contracts, Gas, HBARTokenId, MINIMUM_DEPOSIT_AMOUNT } from "@services";
 import { getEventArgumentsByName } from "../../utils";
 import FTDAOFactoryJSON from "../../abi/FTDAOFactory.json";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../abi/MultiSigDAO.json";
+import BaseDAOJSON from "../../abi/BaseDAO.json";
 import FTDAOJSON from "../../abi/FTDAO.json";
 import {
   MultiSigDAODetails,
@@ -30,11 +31,11 @@ import {
   HederaGnosisSafeFunctions,
   MultiSigProposeTransactionType,
   DAOProposalGovernors,
-  MultiSigDaoSettingsDetails,
-  MultiSigDAODetailsInfoEventArgs,
+  DAOSettingsDetails,
+  DAODetailsInfoEventArgs,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { convertToByte32 } from "@utils";
+import { convertNumberToPercentage, convertToByte32 } from "@utils";
 import { ProposalType } from "@hooks";
 import { ProposalData } from "../governance/type";
 import { isNil } from "ramda";
@@ -128,7 +129,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     }
     /** END - TODO: Need to apply a proper fix */
 
-    const { name, description, logoUrl, webLinks } = await fetchMultiSigDAOSettingsPageDetails(accountId, [
+    const { name, description, logoUrl, webLinks } = await fetchDAOSettingsPageDetails(accountId, [
       DAOEvents.DAOInfoUpdated,
     ]);
 
@@ -152,16 +153,9 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
   return Promise.all(multiSigEventResults);
 }
 
-async function fetchMultiSigDAOSettingsPageDetails(
-  accountId: string,
-  eventTypes?: string[]
-): Promise<MultiSigDaoSettingsDetails> {
-  const log = await DexService.fetchParsedEventLogs(
-    accountId,
-    new ethers.utils.Interface(MultiSigDAOJSON.abi),
-    eventTypes
-  );
-  const argsWithName = getEventArgumentsByName<MultiSigDAODetailsInfoEventArgs>(log[0].args.daoInfo, ["webLinks"]);
+async function fetchDAOSettingsPageDetails(accountId: string, eventTypes?: string[]): Promise<DAOSettingsDetails> {
+  const log = await DexService.fetchParsedEventLogs(accountId, new ethers.utils.Interface(BaseDAOJSON.abi), eventTypes);
+  const argsWithName = getEventArgumentsByName<DAODetailsInfoEventArgs>(log[0].args.daoInfo, ["webLinks"]);
   const { name, logoUrl, description, webLinks } = argsWithName;
 
   return {
@@ -195,20 +189,11 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     const transferLogicSolidityAddress = (await DexService.fetchContractId(tokenTransferLogic)).toSolidityAddress();
     const tokenLoginSolidityAddress = (await DexService.fetchContractId(createTokenLogic)).toSolidityAddress();
 
-    const {
-      admin,
-      name,
-      logoUrl,
-      isPrivate,
-      tokenAddress,
-      quorumThreshold,
-      votingDelay,
-      votingPeriod,
-      title,
-      linkToDiscussion,
-      description,
-      webLinks,
-    } = inputs;
+    const { name, description, logoUrl, webLinks } = await fetchDAOSettingsPageDetails(daoSolidityAddress, [
+      DAOEvents.DAOInfoUpdated,
+    ]);
+    const { admin, isPrivate, tokenAddress, quorumThreshold, votingDelay, votingPeriod, title, linkToDiscussion } =
+      inputs;
 
     /** START - TODO: Need to apply a proper fix */
     let accountId;
@@ -267,9 +252,10 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       },
       tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderSolidityAddress).toString(),
       tokenId: tokenId,
-      quorumThreshold: quorumThreshold.toNumber(),
+      quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
       votingDelay: votingDelay.toNumber(),
       votingPeriod: votingPeriod.toNumber(),
+      minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
     };
   });
 
@@ -297,20 +283,11 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
     const textLogicSolidityAddress = (await DexService.fetchContractId(textLogic)).toSolidityAddress();
     const transferLogicSolidityAddress = (await DexService.fetchContractId(tokenTransferLogic)).toSolidityAddress();
     const tokenLoginSolidityAddress = (await DexService.fetchContractId(createTokenLogic)).toSolidityAddress();
-    const {
-      admin,
-      name,
-      logoUrl,
-      isPrivate,
-      title,
-      description,
-      linkToDiscussion,
-      tokenAddress,
-      webLinks,
-      quorumThreshold,
-      votingDelay,
-      votingPeriod,
-    } = inputs;
+    const { admin, isPrivate, title, linkToDiscussion, tokenAddress, quorumThreshold, votingDelay, votingPeriod } =
+      inputs;
+    const { name, description, logoUrl, webLinks } = await fetchDAOSettingsPageDetails(daoSolidityAddress, [
+      DAOEvents.DAOInfoUpdated,
+    ]);
     /** START - TODO: Need to apply a proper fix */
     let accountId;
     let tokenId;
@@ -367,9 +344,10 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       logoUrl,
       isPrivate,
       tokenId: tokenId,
-      quorumThreshold: quorumThreshold.toNumber(),
+      quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
       votingDelay: votingDelay.toNumber(),
       votingPeriod: votingPeriod.toNumber(),
+      minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
     };
   });
 

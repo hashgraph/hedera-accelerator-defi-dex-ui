@@ -1,11 +1,11 @@
 export enum BaseDAOContractFunctions {
   CreateDAO = "createDAO",
+  UpdateDAOInfo = "updateDaoInfo",
 }
 
 export enum MultiSigDAOContractFunctions {
   ProposeTransferTransaction = "proposeTransferTransaction",
   ProposeTransaction = "proposeTransaction",
-  UpdateDAOInfo = "updateDaoInfo",
   ProposeTokenAssociation = "proposeTokenAssociateTransaction",
   DepositTokens = "depositTokens",
 }

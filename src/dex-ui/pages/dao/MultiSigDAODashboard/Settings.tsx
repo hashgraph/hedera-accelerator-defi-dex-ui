@@ -19,8 +19,7 @@ import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { getDAOLinksRecordArray } from "../utils";
 import { Link as ReachLink } from "react-router-dom";
-import { useDexContext } from "@hooks";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { usePairedWalletDetails } from "@hooks";
 import { Paths } from "@routes";
 import { RemoveMemberLocationState, ReplaceMemberLocationState } from "@pages";
 
@@ -38,10 +37,8 @@ export function Settings() {
   const { dao, members } = useOutletContext<MultiSigDAODetailsContext>();
   const { name, logoUrl, description, webLinks, adminId, threshold, accountId: daoAccountId } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
-  const isAdminWalletPaired =
-    walletId === adminId && wallet.hashConnectConnectionState === HashConnectConnectionState.Paired;
+  const { isWalletPaired, walletId } = usePairedWalletDetails();
+  const isAdmin = isWalletPaired && walletId === dao.adminId;
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const membersWithAdminFirst: Member[] = R.swap(0, adminIndex, members);
   const daoLinkRecords = getDAOLinksRecordArray(webLinks);
@@ -94,7 +91,7 @@ export function Settings() {
           <SimpleGrid minWidth="100%" columns={1} spacingX="2rem" spacingY="1.2rem">
             {membersWithAdminFirst?.map((member) => {
               const { accountId } = member;
-              const isAdmin = accountId === adminId;
+              const isAdminTag = accountId === adminId;
               return (
                 <Flex direction="row" bg={Color.White_02} justifyContent="space-between" alignItems="center">
                   <Flex direction="row" gap="2" alignItems="center">
@@ -102,10 +99,10 @@ export function Settings() {
                       {accountId}
                     </Text>
                     <CopyTextButton onClick={handleCopyMemberId} iconSize="17" />
-                    {isAdmin ? <Tag label="Admin" /> : <></>}
+                    {isAdminTag ? <Tag label="Admin" /> : <></>}
                   </Flex>
                   <Flex direction="row" gap="4" alignItems="center" height="20px">
-                    {!isAdmin ? (
+                    {!isAdminTag ? (
                       <IconButton
                         size="xs"
                         variant="link"
@@ -114,7 +111,7 @@ export function Settings() {
                         icon={<RefreshIcon boxSize="17" color={Color.Teal_01} />}
                       />
                     ) : undefined}
-                    {!isAdmin ? (
+                    {!isAdminTag ? (
                       <IconButton
                         size="xs"
                         onClick={() => handleDeleteMemberClick(member.accountId)}
@@ -224,7 +221,7 @@ export function Settings() {
               </UnorderedList>
             </Flex>
           </Flex>
-          {isAdminWalletPaired ? (
+          {isAdmin ? (
             <Flex alignItems="flex-end" gap="1rem" direction="column">
               <Divider />
               <Button

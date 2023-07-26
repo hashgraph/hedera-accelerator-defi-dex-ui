@@ -2,10 +2,16 @@ import { useFormContext } from "react-hook-form";
 import { FormInput } from "@dex-ui-components";
 import { CreateATokenDAOForm, DAOGovernanceTokenType } from "../types";
 import { DAOReviewForm } from "./DAOReviewForm";
+import BigNumber from "bignumber.js";
 
 export function TokenDAOReviewForm() {
   const { getValues } = useFormContext<CreateATokenDAOForm>();
   const { name, description, logoUrl, isPublic, type, governance, voting } = getValues();
+  const initialSupplyWithPrecision =
+    governance?.tokenType === DAOGovernanceTokenType.ExistingToken
+      ? BigNumber(governance?.existingToken?.initialSupply).shiftedBy(-governance?.existingToken?.decimals)
+      : governance?.newToken?.initialSupply;
+
   return (
     <DAOReviewForm
       details={{
@@ -75,11 +81,7 @@ export function TokenDAOReviewForm() {
               governance?.tokenType === DAOGovernanceTokenType.NewToken
                 ? governance?.newToken?.symbol ?? ""
                 : governance?.existingToken?.symbol ?? "",
-            value: String(
-              governance?.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance?.newToken?.initialSupply ?? ""
-                : governance?.existingToken?.initialSupply ?? ""
-            ),
+            value: String(initialSupplyWithPrecision),
           }}
         />,
         <FormInput<"governance.token.treasuryWalletAccountId">
@@ -123,6 +125,19 @@ export function TokenDAOReviewForm() {
             type: "number",
             unit: "Blocks",
             value: String(voting?.lockingPeriod ?? 0),
+            isReadOnly: true,
+          }}
+        />,
+        <FormInput<"voting.minProposalDeposit">
+          inputProps={{
+            id: "voting.minProposalDeposit",
+            label: "MINIMUM PROPOSAL DEPOSIT",
+            type: "number",
+            unit:
+              governance?.tokenType === DAOGovernanceTokenType.NewToken
+                ? governance?.newToken?.symbol ?? ""
+                : governance?.existingToken?.symbol ?? "",
+            value: "1",
             isReadOnly: true,
           }}
         />,

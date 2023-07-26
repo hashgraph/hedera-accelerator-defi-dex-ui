@@ -66,9 +66,12 @@ export function Input<T extends string>(props: InputProps<T>) {
         {isTooltipVisible && <Tooltip label={tooltipLabel ?? ""} placement={toolTipLabelPlacement} />}
       </Flex>
       {isReadOnly ? (
-        <Text textStyle="p small regular" color={Color.Neutral._900}>
-          {value}
-        </Text>
+        <Flex gap="0.2rem">
+          <Text textStyle="p small regular" color={Color.Neutral._900}>
+            {value}
+          </Text>
+          {React.isValidElement(unit) ? unit : <Text textStyle="p small regular">{unit}</Text>}
+        </Flex>
       ) : (
         <InputGroup>
           <ChakraInput

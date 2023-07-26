@@ -104,6 +104,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
         const spotPriceL49BToL49AWithPrecision = pairData.tokenBSpotPrice
           ? pairData.tokenBSpotPrice.dividedBy(pairData.precision)
           : undefined;
+
         const selectedAToBRoute = `${pairData.tokenATokenId}=>${pairData.tokenBTokenId}`;
         const selectedBToARoute = `${pairData.tokenBTokenId}=>${pairData.tokenATokenId}`;
         set(

@@ -15,6 +15,7 @@ import { Contracts } from "../../constants";
 import { ethers } from "ethers";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import { isHbarToken } from "@utils";
+import BaseDAOJSON from "../../abi/BaseDAO.json";
 
 const Gas = 9000000;
 
@@ -114,18 +115,16 @@ interface UpdateDAODetailsTransactionParams {
 
 async function sendUpdateDAODetailsTransaction(params: UpdateDAODetailsTransactionParams) {
   const { name, description, logoUrl, webLinks, daoAccountId, signer } = params;
-  const contractFunctionParameters = new ContractFunctionParameters()
-    .addString(name)
-    .addString(logoUrl)
-    .addString(description)
-    .addStringArray(webLinks);
+  const contractInterface = new ethers.utils.Interface(BaseDAOJSON.abi);
+  const updateDaoParams: any[] = [name, logoUrl, description, webLinks];
+  const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.UpdateDAOInfo, updateDaoParams);
   const sendProposeUpdateDAODetailsTransaction = await new ContractExecuteTransaction()
     .setContractId(daoAccountId)
-    .setFunction(MultiSigDAOContractFunctions.UpdateDAOInfo, contractFunctionParameters)
+    .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
     .freezeWithSigner(signer);
   const sendProposeUpdateDAODetailsResponse = await sendProposeUpdateDAODetailsTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(sendProposeUpdateDAODetailsResponse, MultiSigDAOContractFunctions.UpdateDAOInfo);
+  checkTransactionResponseForError(sendProposeUpdateDAODetailsResponse, BaseDAOContractFunctions.UpdateDAOInfo);
   return sendProposeUpdateDAODetailsResponse;
 }
 
