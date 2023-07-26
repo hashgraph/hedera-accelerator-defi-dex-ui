@@ -8,15 +8,15 @@ import {
   TwoLayerSettingsIcon,
   Notification,
   NotficationTypes,
-} from "../../../../dex-ui-components";
+} from "@dex-ui-components";
 import { GOVTokenDetails } from "./GOVTokenDetails";
-import { useTabFilters } from "../../../hooks";
+import { useTabFilters } from "@hooks";
 import { FieldErrorsImpl, useForm, UseFormReturn } from "react-hook-form";
 import { isEmpty } from "ramda";
 import { LockIcon, UnlockIcon } from "@chakra-ui/icons";
 import { InputTokenAmountData, ManageVotingPowerTabType } from "./types";
-import { formulaTypes } from "../../../../dex-ui-components/presets/types";
-import { halfOf } from "../../../../dex-ui-components/presets/utils";
+import { formulaTypes } from "@dex-ui-components/presets/types";
+import { halfOf } from "@dex-ui-components/presets/utils";
 
 interface ManageVotingPowerModalBodyProps {
   tokenSymbol: string;

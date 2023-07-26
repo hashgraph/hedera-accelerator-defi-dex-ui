@@ -61,7 +61,6 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
           network,
           debug
         );
-        console.log({ topic, pairingString, savedPairings });
         set(
           ({ wallet }) => {
             wallet.topicID = topic;

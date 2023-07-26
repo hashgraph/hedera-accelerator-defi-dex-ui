@@ -1,11 +1,20 @@
 import { Text, Flex } from "@chakra-ui/react";
-import { HashScanLink, HashscanData, FormInput, FormTextArea, FormDropdown } from "@dex-ui-components";
+import {
+  HashScanLink,
+  HashscanData,
+  FormInput,
+  FormTextArea,
+  FormDropdown,
+  FormTokenInput,
+  useHalfMaxButtons,
+} from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@utils";
 import { ChangeEvent, useEffect } from "react";
 import { TokenBalance, useAccountTokenBalances } from "@hooks";
+import { HBARTokenId, HBARSymbol } from "@services";
 
 export interface TokenTransferLocationState {
   state: {
@@ -27,48 +36,55 @@ export function DAOTokenTransferDetailsForm() {
   const accountTokenBalancesQueryResults = useAccountTokenBalances(safeAccountId ?? "");
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const selectedAsset = getValues().tokenId
-    ? tokenBalances?.find((asset: TokenBalance) => asset.tokenId === getValues().tokenId)
+    ? tokenBalances?.find(
+        (asset: TokenBalance) =>
+          asset.tokenId === getValues().tokenId || (getValues().tokenId === HBARTokenId && asset.symbol === HBARSymbol)
+      )
     : undefined;
+
+  const { handleMaxButtonClicked, handleHalfButtonClicked } = useHalfMaxButtons(
+    selectedAsset?.balance ?? 0,
+    (amount: number) => setValue("amount", amount)
+  );
+
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
   }
 
-  const validateAmount = (value: number) => {
-    if (value <= 0) {
-      return "Amount must be greater than 0.";
-    }
+  function validateAmount(value: number) {
     const tokenId = getValues().tokenId;
-    if (!tokenId) {
-      return "Token must be selected.";
-    }
-    const selectedAsset = tokenBalances?.find((asset: TokenBalance) => asset.tokenId === tokenId);
+    const selectedAsset = tokenBalances?.find(
+      (asset: TokenBalance) => asset.tokenId === tokenId || (tokenId === HBARTokenId && asset.symbol === HBARSymbol)
+    );
     if (!selectedAsset?.balance || selectedAsset?.balance <= 0) {
       return "Token balance must be greater than 0.";
     }
     if (value > selectedAsset?.balance) {
       return "Amount must be less than or equal to token balance.";
     }
-    return true;
-  };
-
-  const validateToken = (value: string) => {
-    const selectedAsset = tokenBalances?.find((asset: TokenBalance) => asset.tokenId === value);
-    if (!selectedAsset?.balance || selectedAsset?.balance <= 0) {
-      return "Asset must have a balance greater than 0.";
+    if (value <= 0) {
+      return "Amount must be greater than 0.";
+    }
+    if (!tokenId) {
+      return "A token must be selected.";
     }
     return true;
-  };
+  }
 
   const assetDropdownOptions =
-    tokenBalances
-      ?.filter((asset: TokenBalance) => asset.symbol !== "ℏ")
-      ?.map((asset: TokenBalance) => {
-        const { symbol, tokenId } = asset;
+    tokenBalances?.map((asset: TokenBalance) => {
+      const { symbol, tokenId } = asset;
+      if (symbol === HBARSymbol) {
         return {
           label: symbol,
-          value: tokenId,
+          value: HBARTokenId,
         };
-      }) ?? [];
+      }
+      return {
+        label: symbol,
+        value: tokenId,
+      };
+    }) ?? [];
 
   useEffect(() => {
     if (state?.tokenId) {
@@ -159,7 +175,6 @@ export function DAOTokenTransferDetailsForm() {
           errorMessage={errors?.tokenId && errors?.tokenId?.message}
           register={register("tokenId", {
             required: { value: true, message: "A token is required." },
-            validate: { validateToken },
             onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("tokenId", e.target.value),
           })}
         />
@@ -181,25 +196,35 @@ export function DAOTokenTransferDetailsForm() {
           errorMessage={errors?.tokenId && errors?.tokenId?.message}
         />
       )}
-      <Flex direction="column" alignItems="left">
-        <FormInput<"amount">
-          inputProps={{
-            id: "amount",
-            label: "Amount",
-            type: "number",
-            placeholder: "Enter amount",
-            register: {
-              ...register("amount", {
-                required: { value: true, message: "An amount is required." },
-                validate: { validateAmount },
-              }),
-            },
-          }}
-          isInvalid={Boolean(errors?.amount)}
-          errorMessage={errors?.amount && errors?.amount?.message}
-        />
-        <Text textStyle="h4">Balance:&nbsp;{selectedAsset ? selectedAsset.balance ?? 0 : "--"}</Text>
-      </Flex>
+      <FormTokenInput<"amount">
+        inputProps={{
+          id: "amount",
+          pointerEvents: "all",
+          placeholder: "Enter amount",
+          label: (
+            <FormTokenInput.Label
+              tokenSymbol={selectedAsset?.symbol ?? ""}
+              balance={selectedAsset ? String(selectedAsset.balance ?? 0) : "--"}
+            />
+          ),
+          type: "number",
+          unit: (
+            <FormTokenInput.RightUnitContent
+              tokenSymbol={selectedAsset?.symbol}
+              handleHalfButtonClicked={handleHalfButtonClicked}
+              handleMaxButtonClicked={handleMaxButtonClicked}
+            />
+          ),
+          register: {
+            ...register("amount", {
+              required: { value: true, message: "An amount is required." },
+              validate: { validateAmount },
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors?.amount)}
+        errorMessage={errors?.amount && errors?.amount?.message}
+      />
     </Flex>
   );
 }

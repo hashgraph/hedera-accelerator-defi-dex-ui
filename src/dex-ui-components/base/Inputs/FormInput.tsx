@@ -3,7 +3,7 @@ import { Input, InputProps } from "./Input";
 import { Color } from "@dex-ui-components";
 import { WarningIcon } from "@chakra-ui/icons";
 
-interface FormInputProps<T extends string> {
+export interface FormInputProps<T extends string> {
   inputProps: InputProps<T>;
   flex?: number | string;
   formHelperText?: string;

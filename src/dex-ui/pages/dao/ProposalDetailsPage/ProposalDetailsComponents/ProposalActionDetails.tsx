@@ -1,6 +1,7 @@
 import { Text, Flex } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData, HederaIcon, SendTokenIcon } from "@dex-ui-components";
-import { formatTokenAmountWithDecimal } from "@dex-ui/utils";
+import { HBARTokenSymbol } from "@services";
+import { formatTokenAmountWithDecimal } from "@utils";
 import { ProposalEvent } from "@hooks";
 
 interface ProposalActionDetailsProps {
@@ -25,7 +26,9 @@ export function ProposalActionDetails(props: ProposalActionDetailsProps) {
           <Text textStyle="p medium regular" color={Color.Neutral._700}>
             {formatTokenAmountWithDecimal(amount, tokenDecimals)} {tokenSymbol}
           </Text>
-          <HashScanLink id={tokenId} type={HashscanData.Token} withParentheses />
+          {tokenSymbol !== HBARTokenSymbol ? (
+            <HashScanLink id={tokenId} type={HashscanData.Token} withParentheses />
+          ) : null}
         </Flex>
       </Flex>
       <Flex direction="column" gap="4">
