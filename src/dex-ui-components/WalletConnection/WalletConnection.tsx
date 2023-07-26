@@ -18,9 +18,9 @@ import {
 import { ChevronDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { Color, AlertDialog, Button } from "../";
+import { Color, AlertDialog, Button, WalletTokenAssociation } from "../";
 import { formatWalletConnectionData } from "./formatter";
-import { DexService, TOKEN_USER_ID } from "../../dex-ui/services";
+import { DexService, TOKEN_USER_ID } from "@services";
 import { isEmpty } from "ramda";
 
 /** TODO: Replace this with the real terms and service agreement. */
@@ -238,6 +238,9 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
               <Button variant="ternary" onClick={handleClickDisconnect}>
                 Disconnect Wallet
               </Button>
+            </Center>
+            <Center>
+              <WalletTokenAssociation />
             </Center>
           </Flex>
         </PopoverContent>
