@@ -22,6 +22,7 @@ export enum DAOMutations {
   ExecuteProposal = "ExecuteProposal",
   UpdateDAODetails = "UpdateDAODetails",
   MintNFTTokens = "MintNFTTokens",
+  DepositTokens = "DepositTokens",
 }
 
 export enum ProposalStatus {

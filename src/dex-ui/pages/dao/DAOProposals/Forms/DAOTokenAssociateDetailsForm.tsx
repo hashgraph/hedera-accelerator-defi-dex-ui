@@ -2,15 +2,23 @@ import { Text, Flex } from "@chakra-ui/react";
 import { HashScanLink, HashscanData, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
-import { CreateDAOProposalContext, CreateDAOTokenAssociateForm } from "../types";
+import { CreateDAOProposalContext, CreateDAOTokenAssociateForm, DAOProposalType } from "../types";
 import { isNil } from "ramda";
+import { useEffect } from "react";
 
 export function DAOTokenAssociateDetailsForm() {
-  const { safeAccountId, assets } = useOutletContext<CreateDAOProposalContext>();
+  const { safeAccountId, assets, proposalType } = useOutletContext<CreateDAOProposalContext>();
   const {
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOTokenAssociateForm>();
+
+  useEffect(() => {
+    if (proposalType !== DAOProposalType.TokenAssociate) {
+      setValue("type", DAOProposalType.TokenAssociate);
+    }
+  }, [setValue, proposalType]);
 
   const isTokenAlreadyAssociated = (tokenId: string) => isNil(assets.find((token) => token.tokenId === tokenId));
 
