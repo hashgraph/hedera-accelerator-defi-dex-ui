@@ -5,6 +5,7 @@ import {
   TokenType,
   TokenSupplyType,
   PublicKey,
+  TokenAssociateTransaction,
 } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
@@ -13,6 +14,7 @@ import { BigNumber } from "bignumber.js";
 export enum TokenServiceFunctions {
   CreateToken = "createToken",
   SetTokenAllowance = "setTokenAllowance",
+  AssociateToken = "associateToken",
 }
 
 /**
@@ -181,6 +183,21 @@ async function createNFT(params: CreateNFTParams) {
   return response;
 }
 
+interface AssociateTokenParams {
+  tokenId: string;
+  accountId: string;
+  signer: HashConnectSigner;
+}
+
+async function associateTokenToWallet(params: AssociateTokenParams) {
+  const { tokenId, accountId, signer } = params;
+  const tokenAssociateTx = new TokenAssociateTransaction().setAccountId(accountId).setTokenIds([tokenId]);
+  const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
+  const response = await tokenAssociateSignedTx.executeWithSigner(signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.AssociateToken);
+  return response;
+}
+
 const TokenService = {
   createToken,
   setTokenAllowance,
@@ -188,6 +205,7 @@ const TokenService = {
   setTokenAllowanceForAddLiquidity,
   setHbarTokenAllowance,
   setHbarTokenAllowanceForAddLiquidity,
+  associateTokenToWallet,
 };
 
 export default TokenService;
