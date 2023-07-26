@@ -43,13 +43,22 @@
     "transparentProxyId": "0.0.14831484"
   },
   {
+    "name": "ftdaofactory",
+    "id": "0.0.15616002",
+    "hash": "7523ff28b5a882aed68849e502249eba",
+    "address": "0x0000000000000000000000000000000000ee4802",
+    "timestamp": "2023-07-26T12:15:37.932Z",
+    "transparentProxyId": "0.0.15616009",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000ee4809"
+  },
+  {
     "name": "multisigdaofactory",
-    "id": "0.0.15542660",
-    "hash": "6c60dd3b2516a87abe29f06fc2ae3835",
-    "address": "0x0000000000000000000000000000000000ed2984",
-    "timestamp": "2023-07-21T07:36:50.081Z",
-    "transparentProxyId": "0.0.15542663",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000ed2987"
+    "id": "0.0.15616001",
+    "hash": "efdb0db4095288e45aafcadffaee8951",
+    "address": "0x0000000000000000000000000000000000ee4801",
+    "timestamp": "2023-07-26T12:15:34.808Z",
+    "transparentProxyId": "0.0.15616008",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000ee4808"
   },
   {
     "name": "pair",
@@ -62,12 +71,12 @@
   },
   {
     "name": "factory",
-    "id": "0.0.15503561",
-    "hash": "0cf331288f6f84bfd740a1886e3245c0",
-    "address": "0x0000000000000000000000000000000000ec90c9",
-    "timestamp": "2023-07-20T08:53:53.150Z",
-    "transparentProxyId": "0.0.15503580",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000ec90dc"
+    "id": "0.0.15616004",
+    "hash": "cd435d947effb93fbf735f9819b5f7e0",
+    "address": "0x0000000000000000000000000000000000ee4804",
+    "timestamp": "2023-07-26T12:15:39.377Z",
+    "transparentProxyId": "0.0.15616010",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000ee480a"
   },
   {
     "name": "godtokenholderfactory",
@@ -160,21 +169,12 @@
     "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca74"
   },
   {
-    "name": "ftdaofactory",
-    "id": "0.0.15059533",
-    "hash": "c25566412cb38fd17c1c3d1d1319886c",
-    "address": "0x0000000000000000000000000000000000e5ca4d",
-    "timestamp": "2023-07-06T14:54:22.812Z",
-    "transparentProxyId": "0.0.15059558",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ca66"
-  },
-  {
     "name": "nftdaofactory",
-    "id": "0.0.15051802",
-    "address": "0x0000000000000000000000000000000000e5ac1a",
-    "timestamp": "2023-07-05T12:01:38.207Z",
-    "hash": "dfe74c0b15aa61042d372b8819cb121d",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000e5ac1c",
-    "transparentProxyId": "0.0.15051804"
+    "id": "0.0.15616758",
+    "hash": "3eafce2cb7d3b8ccd5a067245bf4f7ad",
+    "address": "0x0000000000000000000000000000000000ee4af6",
+    "timestamp": "2023-07-26T12:43:56.306Z",
+    "transparentProxyId": "0.0.15616771",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000ee4b03"
   }
 ]
