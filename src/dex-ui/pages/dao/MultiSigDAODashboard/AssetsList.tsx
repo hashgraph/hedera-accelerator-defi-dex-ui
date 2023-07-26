@@ -1,15 +1,16 @@
-import { Box, Button, Divider, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, SimpleGrid, Text, Tooltip } from "@chakra-ui/react";
 import { Color, HashScanLink, HashscanData, MetricLabel } from "@dex-ui-components";
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
-import { HBARTokenSymbol } from "@services";
+import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@services";
 import { Paths } from "@dex-ui/routes";
 
 export function AssetsList() {
   const { tokenBalances: assets } = useOutletContext<MultiSigDAODetailsContext>();
   // change to token id match
   const hbarIndex = assets?.findIndex((asset) => asset.name === HBARTokenSymbol);
+  assets[hbarIndex] = { ...assets[hbarIndex], tokenId: HBARTokenId };
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const assetsWithHBARFirst: Asset[] = R.swap(0, hbarIndex, assets);
   const navigate = useNavigate();
@@ -36,9 +37,13 @@ export function AssetsList() {
               >
                 <Flex direction="row" justifyContent="space-between" gap="2">
                   <Text textStyle="p medium semibold">{name}</Text>
-                  {tokenId && (
-                    <Flex gap="2">
-                      <HashScanLink id={tokenId} type={HashscanData.Token} />
+                  <Flex gap="2">
+                    {symbol !== HBARSymbol ? <HashScanLink id={tokenId} type={HashscanData.Token} /> : null}
+                    <Tooltip
+                      label={"Token balance must be greater than 0 to create a Token Transfer proposal."}
+                      isDisabled={!!balance}
+                      placement="bottom"
+                    >
                       <Button
                         variant="primary"
                         isDisabled={!balance}
@@ -52,8 +57,8 @@ export function AssetsList() {
                       >
                         Send
                       </Button>
-                    </Flex>
-                  )}
+                    </Tooltip>
+                  </Flex>
                 </Flex>
                 <Divider />
                 <Flex direction="row" justifyContent="space-between">
