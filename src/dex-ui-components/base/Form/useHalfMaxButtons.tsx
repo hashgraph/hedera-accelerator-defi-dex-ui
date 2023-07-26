@@ -1,13 +1,13 @@
 import { formulaTypes } from "@dex-ui-components/presets/types";
-import { halfOf } from "@dex-ui-components/presets/utils";
-import { useState } from "react";
+import BigNumber from "bignumber.js";
 
-export function useHalfMaxButtons(initialAmount: number, amountSetter?: (amount: number) => void) {
-  const [amount, setAmount] = useState(initialAmount);
-
+export function useHalfMaxButtons(maxBalance: string, amountSetter: (amount: string | undefined) => void) {
   function setInputAmountWithFormula(formula: formulaTypes = formulaTypes.MAX) {
-    const newAmount = formula === formulaTypes.MAX ? initialAmount : halfOf(Number(initialAmount));
-    amountSetter ? amountSetter(newAmount) : setAmount(newAmount);
+    if (BigNumber(maxBalance).isNaN()) {
+      return amountSetter(undefined);
+    }
+    const newAmount = formula === formulaTypes.MAX ? maxBalance : BigNumber(maxBalance).div(2).toString();
+    amountSetter(newAmount);
   }
 
   function handleMaxButtonClicked() {
@@ -18,7 +18,6 @@ export function useHalfMaxButtons(initialAmount: number, amountSetter?: (amount:
     setInputAmountWithFormula(formulaTypes.HALF);
   }
   return {
-    amount,
     handleMaxButtonClicked,
     handleHalfButtonClicked,
   };
