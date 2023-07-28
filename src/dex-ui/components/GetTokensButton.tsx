@@ -2,12 +2,12 @@ import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation } from "react-query";
-import { useDexContext } from "../hooks";
-import { DexService } from "../services";
+import { useDexContext } from "@hooks";
+import { DexService, Tokens } from "@services";
 import { Link, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
-import { Notification, LoadingDialog, NotficationTypes } from "../../dex-ui-components";
-import { createHashScanTransactionLink } from "../utils";
+import { Notification, LoadingDialog, NotficationTypes } from "@dex-ui-components";
+import { createHashScanTransactionLink } from "@utils";
 
 /**
  * This is a temporary component used to add L49A, L49B, L49C, and L49D to a
@@ -58,7 +58,8 @@ export function GetTokensButton() {
       <Notification
         type={NotficationTypes.SUCCESS}
         textStyle="b3"
-        message={`1000 LAB49A (0.0.8579), LAB49B (0.0.8581), and LAB49C (0.0.8583) 
+        message={`1000 LAB49A 
+        ${Tokens.TokenAAccountId}, LAB49B ${Tokens.TokenBAccountId}, and LAB49C ${Tokens.TokenCAccountId} 
         Tokens sent to the connected wallet (${receivingAccountId}).`}
         isLinkShown={true}
         linkText="View in HashScan"
@@ -74,7 +75,8 @@ export function GetTokensButton() {
       </Link>
       <LoadingDialog
         isOpen={getL49Tokens.isLoading}
-        message={`Sending 1000 LAB49A (0.0.8579), LAB49B (0.0.8581), and LAB49C (0.0.8583) 
+        message={`Sending 1000 LAB49A 
+        ${Tokens.TokenAAccountId}, LAB49B ${Tokens.TokenBAccountId}, and LAB49C ${Tokens.TokenCAccountId} 
         Tokens to the connected wallet (${receivingAccountId}).`}
       />
       <LoadingDialog

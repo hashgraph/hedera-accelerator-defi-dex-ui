@@ -13,19 +13,13 @@ interface ContractMetaData {
 enum ContractNames {
   Factory = "factory",
   GodHolder = "godholder",
-  Value = "vault",
-  Splitter = "splitter",
-  Pair = "pair",
-  LPToken = "lptoken",
   GovernorContractUpgrade = "governorupgrade",
   GovernorTransferToken = "governortransfertoken",
   GovernorTextProposal = "governortextproposal",
   GovernorCreateToken = "governortokencreate",
   Configuration = "configuration",
-  GodTokenHolderFactory = "godtokenholderfactory",
   FTDAOFactory = "ftdaofactory",
   MultiSigDAOFactory = "multisigdaofactory",
-  MultiSigDAO = "multisigdao",
   NFTDAOFactory = "nftdaofactory",
 }
 
@@ -63,9 +57,6 @@ export const Contracts = {
   MultiSigDAOFactory: {
     ProxyId: getProxyId(ContractNames.MultiSigDAOFactory),
   },
-  MultiSigDAO: {
-    ProxyId: getProxyId(ContractNames.MultiSigDAO),
-  },
   NFTDAOFactory: {
     ProxyId: getProxyId(ContractNames.NFTDAOFactory),
   },
@@ -74,11 +65,13 @@ export const Contracts = {
 /** The "hashconnectData" is the string used by the hashconnect lib to modify localStorage */
 export const WALLET_LOCAL_DATA_KEY = "hashconnectData";
 
-export const TREASURY_ID = "0.0.6880";
-export const TREASURY_KEY = "c372f05c182ae62e04603081f6abc8cbd3a712401e1d1f88401cf310c91f644b";
+export const TREASURY_ID = "0.0.78619";
+export const TREASURY_KEY =
+  "302e020100300506032b657004220420c8cb72a0addffcbd898689e5b5641c0abff4399ddeb90a04071433e3724e14dd";
 
-export const TOKEN_USER_ID = "0.0.8255";
-export const TOKEN_USER_KEY = "0bf5b9ac3f3066f6046a778409891e9f2081c349b4cf8688d29023312cc2d632";
+export const TOKEN_USER_ID = "0.0.65816";
+export const TOKEN_USER_KEY =
+  "302e020100300506032b657004220420899ec4fb7e8153a36bd37dd9500b9057982bf76bc1f0efa5b8cb170ee2329997";
 
 export const DEX_TOKEN_PRECISION_VALUE = 8;
 export const DEX_PRECISION = 100000000;
@@ -86,23 +79,22 @@ export const DEBOUNCE_TIME = 500;
 
 export const Tokens = Object.freeze({
   TokenASymbol: "LAB49A",
-  TokenAAccountId: "0.0.8579",
+  TokenAAccountId: "0.0.80170",
   TokenBSymbol: "LAB49B",
-  TokenBAccountId: "0.0.8581",
+  TokenBAccountId: "0.0.80174",
   TokenCSymbol: "LAB49C",
-  TokenCAccountId: "0.0.8583",
+  TokenCAccountId: "0.0.80180",
 });
 
 export const USDC_TOKEN_ID = "0.0.2276691";
 
-export const GovernanceTokenId = "0.0.8576";
+export const GovernanceTokenId = "0.0.80158";
 
-export const HBARTokenId = "0.0.8578";
+export const HBARTokenId = "0.0.80165";
 export const HBARTokenSymbol = "HBAR";
 export const HBARSymbol = "ℏ";
 export const SENTINEL_OWNER = "0.0.1";
 export const DEFAULT_NFT_TOKEN_SERIAL_ID = 19;
-export const DEFAULT_ACCOUNT_FOR_PROPOSAL = "0.0.4602608";
 export const MINIMUM_DEPOSIT_AMOUNT = 1;
 
 export const Gas = 9000000;
