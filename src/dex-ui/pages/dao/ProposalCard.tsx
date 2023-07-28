@@ -3,10 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatTokenAmountWithDecimal, getShortDescription, replaceLastRoute } from "@utils";
 import { Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@dex-ui-components";
 import { DAO, DAOType } from "@services";
-import { ProposalStatusAsTagVariant } from "./constants";
+import { ProposalStateAsTagVariant, ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
 import { Proposal, ProposalType } from "@hooks";
 import { Paths } from "@routes";
+import { ProposalState } from "@dex-ui/store/governanceSlice";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -25,6 +26,12 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const timeRemaining = "";
   const votingEndTime = "";
   const { amount, token, transactionHash, proposalId } = proposal;
+  const getLabel = (proposal: Proposal) => {
+    if (proposal.proposalState === ProposalState.Canceled) {
+      return ProposalState.Canceled;
+    }
+    return proposal.status;
+  };
 
   const tokenSymbol = token?.data.symbol;
   const RightContent = () => (
@@ -44,7 +51,13 @@ export const ProposalCard = (props: ProposalCardProps) => {
       )}
       {showTypeTag ? <Tag variant={TagVariant.Secondary} label={`${dao.type} DAO`} /> : <></>}
       <Tag variant={TagVariant.Primary} label={proposal.type} />
-      {proposal.status ? <Tag variant={ProposalStatusAsTagVariant[proposal.status]} label={proposal.status} /> : <></>}
+      {isMultiSig && proposal.status ? (
+        <Tag variant={ProposalStatusAsTagVariant[proposal.status]} label={proposal.status} />
+      ) : proposal.proposalState ? (
+        <Tag variant={ProposalStateAsTagVariant[proposal.proposalState]} label={getLabel(proposal)} />
+      ) : (
+        <></>
+      )}
     </Flex>
   );
 

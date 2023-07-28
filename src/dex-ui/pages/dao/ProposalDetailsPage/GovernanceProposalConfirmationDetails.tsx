@@ -20,10 +20,13 @@ import {
 import { useState } from "react";
 import { UseMutationResult } from "react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
+import { ProposalCancelModal } from "./ProposalDetailsComponents";
+import { ProposalState } from "@dex-ui/store/governanceSlice";
 
 interface GovernanceProposalConfirmationDetailsProps {
   proposal: Proposal;
   status: ProposalStatus;
+  state?: ProposalState;
   msgValue: number;
   hexStringData: string;
   operation: number;
@@ -61,11 +64,13 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     executeProposal,
     cancelProposal,
     status,
+    state,
     hasConnectedWalletVoted,
     isAuthor,
   } = props;
 
   const contractId = proposal?.contractId ?? "";
+  const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0;
 
   async function handleVoteButtonClicked(voteType: VoteType) {
     resetServerState();
@@ -129,7 +134,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 <AlertDialog
                   openDialogButtonStyles={{ flex: "1" }}
                   openDialogButtonText="Vote"
-                  isOpenDialogButtonDisabled={proposal === undefined}
+                  isOpenDialogButtonDisabled={isVotingDisabled}
                   title="Confirm Vote"
                   body={
                     <ProposalVoteModal
@@ -146,62 +151,56 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
             </>
           )}
         </>
-        {isAuthor && (
-          <AlertDialog
-            openModalComponent={
-              <Button variant="secondary" textStyle="h3" width="290px">
-                Cancel
-              </Button>
-            }
-            title="Cancel Proposal"
-            body={
-              <Flex flexDirection="column" gap="1.25rem">
-                <Text textStyle="b1" fontSize="1rem">
-                  {`You’re about to cancel ${proposal?.title}.
-                 If you do this, ${tokenSymbol} tokens will be refunded to you and to
-            anyone that voted.`}
-                </Text>
-                <Flex direction="row">
-                  <Text flex="1" textStyle="b3" color={Color.Grey_02}>
-                    {`${tokenSymbol} Tokens Refunded to You`}
-                  </Text>
-                  <Text flex="1" textStyle="b3" textAlign="right">
-                    {votingPower}
-                  </Text>
-                </Flex>
-              </Flex>
-            }
-            footer={
-              <Flex flexDirection="column" width="100%" gap="0.5rem">
-                <Button onClick={handleCancelProposalClicked}>Cancel Proposal</Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => setDialogState({ ...dialogState, isCancelProposalOpen: false })}
-                >
-                  Don't Cancel
-                </Button>
-              </Flex>
-            }
-            alertDialogOpen={dialogState.isCancelProposalOpen}
-            onAlertDialogOpen={() => setDialogState({ ...dialogState, isCancelProposalOpen: true })}
-            onAlertDialogClose={() => setDialogState({ ...dialogState, isCancelProposalOpen: false })}
+        {isAuthor ? (
+          <ProposalCancelModal
+            title={proposal?.title}
+            tokenSymbol={tokenSymbol}
+            votingPower={votingPower}
+            handleCancelProposalClicked={handleCancelProposalClicked}
+            setDialogState={setDialogState}
+            dialogState={dialogState}
           />
+        ) : (
+          <></>
         )}
       </Flex>
     ),
     [ProposalStatus.Queued]: (
       <>
         {isAuthor && (
-          <Flex>
+          <>
             <Button variant="primary" onClick={() => handleClickExecuteTransaction()}>
               Execute
             </Button>
-          </Flex>
+            <ProposalCancelModal
+              title={proposal?.title}
+              tokenSymbol={tokenSymbol}
+              votingPower={votingPower}
+              handleCancelProposalClicked={handleCancelProposalClicked}
+              setDialogState={setDialogState}
+              dialogState={dialogState}
+            />
+          </>
         )}
       </>
     ),
     [ProposalStatus.Success]: <></>,
-    [ProposalStatus.Failed]: <></>,
+    [ProposalStatus.Failed]: (
+      <>
+        {isAuthor && state !== ProposalState.Canceled ? (
+          <ProposalCancelModal
+            title={proposal?.title}
+            tokenSymbol={tokenSymbol}
+            votingPower={votingPower}
+            handleCancelProposalClicked={handleCancelProposalClicked}
+            setDialogState={setDialogState}
+            dialogState={dialogState}
+          />
+        ) : (
+          <></>
+        )}
+      </>
+    ),
   };
   const { yes = 0, no = 0, abstain = 0, max = 0, turnout = 0, remaining = 0, quorum = 0 } = proposal.votes ?? {};
 

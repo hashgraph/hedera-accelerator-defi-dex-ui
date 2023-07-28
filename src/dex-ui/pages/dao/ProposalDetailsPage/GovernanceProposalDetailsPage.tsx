@@ -106,6 +106,7 @@ export function GovernanceProposalDetailsPage() {
               proposal={proposalDetails}
               hasConnectedWalletVoted={hasVoted}
               status={proposalStatus}
+              state={proposalState}
               hexStringData={hexStringData}
               msgValue={msgValue}
               operation={operation}
