@@ -26,8 +26,8 @@ enum StepperProposalStatus {
   Active = "Active",
   Queued = "Queued to Execute",
   Executed = "Executed",
-  Failed = "Failed",
   Defeated = "Defeated",
+  Cancelled = "Cancelled",
 }
 
 export function getProposalSteps(
@@ -67,7 +67,7 @@ export function getProposalSteps(
     } else {
       activeStep = 4;
     }
-  } else if (state === ProposalState.Canceled || state === ProposalState.Expired) {
+  } else if (state === ProposalState.Canceled) {
     steps = [
       {
         label: StepperProposalStatus.Created,
@@ -76,12 +76,12 @@ export function getProposalSteps(
         label: StepperProposalStatus.Active,
       },
       {
-        label: StepperProposalStatus.Failed,
+        label: StepperProposalStatus.Cancelled,
         isError: true,
       },
     ];
     activeStep = 2;
-  } else if (state === ProposalState.Defeated) {
+  } else if (state === ProposalState.Defeated || state === ProposalState.Expired) {
     steps = [
       {
         label: StepperProposalStatus.Created,

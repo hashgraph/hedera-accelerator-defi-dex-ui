@@ -28,7 +28,7 @@ export enum DAOMutations {
 export enum ProposalStatus {
   Pending = "Active",
   Queued = "Queued",
-  Success = "Passed",
+  Success = "Executed",
   Failed = "Failed",
 }
 
