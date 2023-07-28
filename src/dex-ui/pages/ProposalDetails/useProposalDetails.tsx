@@ -25,6 +25,8 @@ export function useProposalDetails(proposalId: string | undefined) {
   const areVoteButtonsVisible = !hasVoted && proposal.data?.status === ProposalStatus.Active;
   const isExecuteButtonVisible =
     proposal.data?.status === ProposalStatus.Passed && proposal.data?.state !== ProposalState.Executed;
+  const isCancelButtonVisible =
+    proposal.data?.state !== ProposalState.Executed && proposal.data?.state !== ProposalState.Canceled;
   const isClaimTokenButtonVisible = proposal.data?.state === ProposalState.Executed;
   const statusColor = getStatusColor(proposal.data?.status, proposal.data?.state);
 
@@ -151,6 +153,7 @@ export function useProposalDetails(proposalId: string | undefined) {
     isWalletConnected,
     doesUserHaveGodTokens,
     proposalStatus,
+    isCancelButtonVisible,
     votingPower,
   };
 }

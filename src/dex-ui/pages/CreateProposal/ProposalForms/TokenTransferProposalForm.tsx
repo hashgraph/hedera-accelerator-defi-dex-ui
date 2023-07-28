@@ -10,7 +10,7 @@ import { Paths } from "@routes";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateProposalLocationProps, TokenTransferProposalFormData } from "./types";
 import { WarningIcon } from "@chakra-ui/icons";
-import { DEFAULT_NFT_TOKEN_SERIAL_ID } from "@services";
+import { DEFAULT_NFT_TOKEN_SERIAL_ID, EDITOR_DEFAULT_CHARACTER_COUNT } from "@services";
 
 export function TokenTransferProposalForm(): ReactElement {
   const navigate = useNavigate();
@@ -103,7 +103,9 @@ export function TokenTransferProposalForm(): ReactElement {
                       control={control}
                       rules={{
                         required: { value: true, message: "Description is required." },
-                        minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
+                        validate: (value) =>
+                          (value.length > 0 && value.length <= 240 + EDITOR_DEFAULT_CHARACTER_COUNT) ||
+                          "Maximum character count for the description is 240.",
                       }}
                       render={({ field }) => (
                         <TextEditor

@@ -173,46 +173,46 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
             />
           </TabPanel>
           <TabPanel padding="1rem 0">
-            <FormInput<"unLockAmount">
-              inputProps={{
-                id: "unLockAmount",
-                isReadOnly: !isUnlockButtonEnabled,
-                pointerEvents: "all",
-                label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.lockedGODToken} />,
-                type: "number",
-                unit: (
-                  <RightUnitItem
-                    tokenSymbol={props.tokenSymbol}
-                    handleHalfButtonClicked={handleHalfButtonClicked}
-                    handleMaxButtonClicked={handleMaxButtonClicked}
-                  />
-                ),
-                placeholder: "",
-                register: {
-                  ...props.form.register("unLockAmount", {
-                    validate: (value) =>
-                      Number(value) <= Number(props.lockedGODToken) || "Cannot unlock more than locked balance",
-                  }),
-                },
-              }}
-              isInvalid={Boolean(props.form.formState.errors.unLockAmount)}
-              errorMessage={props.errors.unLockAmount && props.errors.unLockAmount?.message}
-            />
+            {!isUnlockButtonEnabled && tabIndex === ManageVotingPowerTabType.Unlock ? (
+              <Flex width="fit-content" alignItems="center" margin="0px 15px 20px 15px">
+                <Notification
+                  type={NotficationTypes.WARNING}
+                  message={`You have voted on proposals where the voting period is still in progress, so 
+            any unlocked ${props.tokenSymbol} tokens will be pending unlocks until the in-progress
+            proposals are either complete or canceled.`}
+                  textStyle="p small regular"
+                />
+              </Flex>
+            ) : (
+              <FormInput<"unLockAmount">
+                inputProps={{
+                  id: "unLockAmount",
+                  isReadOnly: !isUnlockButtonEnabled,
+                  pointerEvents: "all",
+                  label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.lockedGODToken} />,
+                  type: "number",
+                  unit: (
+                    <RightUnitItem
+                      tokenSymbol={props.tokenSymbol}
+                      handleHalfButtonClicked={handleHalfButtonClicked}
+                      handleMaxButtonClicked={handleMaxButtonClicked}
+                    />
+                  ),
+                  placeholder: "",
+                  register: {
+                    ...props.form.register("unLockAmount", {
+                      validate: (value) =>
+                        Number(value) <= Number(props.lockedGODToken) || "Cannot unlock more than locked balance",
+                    }),
+                  },
+                }}
+                isInvalid={Boolean(props.form.formState.errors.unLockAmount)}
+                errorMessage={props.errors.unLockAmount && props.errors.unLockAmount?.message}
+              />
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>
-      {!isUnlockButtonEnabled && tabIndex === ManageVotingPowerTabType.Unlock ? (
-        <Flex width="fit-content" alignItems="center" margin="0px 15px 20px 15px">
-          <Notification
-            type={NotficationTypes.WARNING}
-            message={`You have voted on proposals where the voting period is still in progress, so 
-            any unlocked ${props.tokenSymbol} tokens will be pending unlocks until the in-progress
-            proposals are either complete or canceled.`}
-            textStyle="p small regular"
-          />
-        </Flex>
-      ) : null}
-
       <Button
         variant="primary"
         type="submit"

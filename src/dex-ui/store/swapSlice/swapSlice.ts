@@ -286,7 +286,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           (token: TokenBalanceJson) => token.tokenId === tokenToReceiveId
         )?.balance;
         const isTokenNotAssociated = isNil(tokenToReceiveBalance);
-        if (isTokenNotAssociated) {
+        const isReceivingTokenHbar = isHbarToken(tokenToReceiveId);
+        if (isTokenNotAssociated && !isReceivingTokenHbar) {
           const tokenAssociateTx = new TokenAssociateTransaction()
             .setAccountId(signingAccount)
             .setTokenIds([tokenToReceiveId]);

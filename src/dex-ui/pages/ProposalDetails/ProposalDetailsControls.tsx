@@ -5,7 +5,7 @@ import { CancelProposalModalButton } from "./CancelProposalModalButton";
 import { useState } from "react";
 import { useProposalDetails } from "./useProposalDetails";
 import { VoteType } from "./types";
-import { useDexContext } from "@hooks";
+import { useDexContext, usePairedWalletDetails } from "@hooks";
 import { useNavigate } from "react-router-dom";
 import { formatProposal } from "../Governance/formatter";
 
@@ -37,16 +37,13 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     isWalletConnected,
     doesUserHaveGodTokens,
     votingPower,
+    isCancelButtonVisible,
   } = props.proposalDetails;
 
   const formattedProposal = proposal.data ? formatProposal(proposal.data) : undefined;
 
-  let isUserProposalCreator = false;
-  try {
-    isUserProposalCreator = formattedProposal?.author === wallet.savedPairingData?.accountIds[0] ?? "";
-  } catch (error) {
-    console.log(error);
-  }
+  const { walletId } = usePairedWalletDetails();
+  const isUserAuthor = formattedProposal?.author === walletId && isWalletConnected;
 
   const handleGetDexCoinsClicked = () => navigate("/swap");
 
@@ -114,6 +111,23 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
     handleVoteButtonClicked(VoteType.Abstain);
   }
 
+  if (areButtonsHidden && isCancelButtonVisible) {
+    return (
+      <>
+        <Notification
+          type={NotficationTypes.WARNING}
+          message={"This proposal was created by you. You can cancel your proposal to get your DexCoins back."}
+          isLinkShown={true}
+          linkText="Cancel Proposal"
+          isButton={true}
+          handleLinkClick={handleCancelProposalClicked}
+          isVisible={isCancelButtonVisible && isUserAuthor}
+          handleClickClose={handleNotificationCloseButtonClicked}
+        />
+      </>
+    );
+  }
+
   if (areButtonsHidden) {
     return <></>;
   }
@@ -123,6 +137,16 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
       <>
         <Text textStyle="h3">Vote on Proposal</Text>
         <Text textStyle="b2">You have voted on this proposal.</Text>
+        <Notification
+          type={NotficationTypes.WARNING}
+          message={"This proposal was created by you. You can cancel your proposal to get your DexCoins back."}
+          isLinkShown={true}
+          linkText="Cancel Proposal"
+          isButton={true}
+          handleLinkClick={handleCancelProposalClicked}
+          isVisible={isCancelButtonVisible && isUserAuthor}
+          handleClickClose={handleNotificationCloseButtonClicked}
+        />
       </>
     );
   }
@@ -135,7 +159,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
           cancelProposal={cancelProposal}
           votingPower={votingPower}
           isOpenDialogButtonDisabled={proposal === undefined}
-          isOpenDialogButtonVisible={isUserProposalCreator}
+          isOpenDialogButtonVisible={isUserAuthor}
           isAlertDialogOpen={dialogState.isCancelProposalOpen}
           onAlertDialogOpen={() => setDialogState({ ...dialogState, isCancelProposalOpen: true })}
           onAlertDialogClose={() => setDialogState({ ...dialogState, isCancelProposalOpen: false })}
@@ -237,7 +261,7 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
           linkText="Cancel Proposal"
           isButton={true}
           handleLinkClick={handleCancelProposalClicked}
-          isVisible={areVoteButtonsVisible && isUserProposalCreator}
+          isVisible={isCancelButtonVisible && isUserAuthor}
           handleClickClose={handleNotificationCloseButtonClicked}
         />
       </>
