@@ -98,7 +98,9 @@ export function ContractUpgradeProposalForm(): ReactElement {
                       control={control}
                       rules={{
                         required: { value: true, message: "Description is required." },
-                        minLength: { value: 107, message: "Please enter atleast 100 characters in the description." },
+                        validate: (value) =>
+                          (value.length > 0 && value.length <= 240) ||
+                          "Maximum character count for the description is 240.",
                       }}
                       render={({ field }) => (
                         <TextEditor
