@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Text, Flex, Divider, CircularProgress } from "@chakra-ui/react";
 import { AlertDialog, Button, CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@dex-ui-components";
 import { useForm } from "react-hook-form";
-import { useAssociateToken, useHandleTransactionSuccess, useFetchTokenData } from "@hooks";
+import { useAssociateToken, useHandleTransactionSuccess, useFetchTokenData, useTokenBalance } from "@hooks";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { checkForValidTokenId } from "@utils";
 import { MirrorNodeTokenById, DEBOUNCE_TIME } from "@services";
@@ -14,6 +14,7 @@ export interface TokenAssociationFormData {
   mirrorNodeTokenId: string | undefined;
   name: string;
   symbol: string;
+  balanceInUserWallet: number | undefined;
 }
 
 export const WalletTokenAssociation = () => {
@@ -23,16 +24,13 @@ export const WalletTokenAssociation = () => {
     watch,
     register,
     setValue,
-    reset: resetForm,
+    reset,
     trigger,
     getValues,
     formState: { errors },
   } = tokenAssociationForm;
-  watch("tokenId", "mirrorNodeTokenId");
-  register("mirrorNodeTokenId", {
-    required: { value: true, message: "A valid token id is required." },
-    validate: (value) => isNotNil(value) || "Invalid Token id",
-  });
+  watch(["tokenId", "mirrorNodeTokenId", "balanceInUserWallet"]);
+
   const { tokenId, name: tokenName, symbol, mirrorNodeTokenId } = getValues();
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const associateToken = useAssociateToken(handleAssociateTokenSuccess);
@@ -41,12 +39,31 @@ export const WalletTokenAssociation = () => {
     associateToken.mutate({ tokenId });
   }
 
-  const { refetch, isFetching, isSuccess, isError } = useFetchTokenData({
+  const { refetch, isFetching, isSuccess, isError, data } = useFetchTokenData({
     tokenId,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
   });
-  const disableAssociateButton = isError || isFetching || isNil(mirrorNodeTokenId);
+  const {
+    data: tokenBalance,
+    isLoading,
+    refetch: refetchTokenBalance,
+  } = useTokenBalance({
+    tokenId: data?.data.token_id,
+    handleTokenBalanceSuccessResponse,
+    handleTokenBalanceErrorResponse,
+  });
+  const isTokenAlreadyAssociated = isNotNil(tokenBalance);
+  const isInvalidTokenId = isNil(mirrorNodeTokenId);
+  const isAssociateButtonDisabled = isFetching || isInvalidTokenId || isLoading || isTokenAlreadyAssociated;
+
+  register("mirrorNodeTokenId", {
+    validate: (value) => isNotNil(value) || "A valid token id is required.",
+  });
+
+  register("balanceInUserWallet", {
+    validate: (value) => isNil(value) || "Token is already associated.",
+  });
 
   function handleTokenSuccessResponse(tokenData: MirrorNodeTokenById) {
     setValue("tokenId", tokenData.data.token_id, { shouldValidate: true });
@@ -54,13 +71,27 @@ export const WalletTokenAssociation = () => {
     setValue("symbol", tokenData.data.symbol);
     setValue("mirrorNodeTokenId", tokenData?.data.token_id, { shouldValidate: true });
     trigger(["mirrorNodeTokenId"]);
+    refetchTokenBalance();
   }
 
   function handleTokenErrorResponse() {
     setValue("mirrorNodeTokenId", undefined, { shouldValidate: true });
     setValue("name", "");
     setValue("symbol", "");
-    trigger(["mirrorNodeTokenId"]);
+    trigger(["balanceInUserWallet"]);
+  }
+
+  function resetForm() {
+    reset();
+  }
+
+  function handleTokenBalanceSuccessResponse(data: number | undefined) {
+    setValue("balanceInUserWallet", data, { shouldValidate: true });
+    trigger(["balanceInUserWallet"]);
+  }
+
+  function handleTokenBalanceErrorResponse() {
+    trigger(["balanceInUserWallet"]);
   }
 
   async function handleTokenIdChange(value: string) {
@@ -77,12 +108,22 @@ export const WalletTokenAssociation = () => {
   function getIconForTokenIdField() {
     if (isFetching) return <CircularProgress isIndeterminate color={Color.Primary._500} size="1.5rem" />;
     if (isError) return <CancelledStepIcon boxSize="4" color={Color.Destructive._500} />;
+    if (isNotNil(tokenBalance)) return <CancelledStepIcon boxSize="4" color={Color.Destructive._500} />;
     if (isSuccess && tokenId?.length > 0) {
       return <CheckCircleIcon color={Color.Success._500} />;
     }
     return undefined;
   }
 
+  function isInvalidTokenInputField() {
+    return Boolean(errors?.mirrorNodeTokenId) || Boolean(errors?.balanceInUserWallet);
+  }
+
+  function getFieldErrorMessage() {
+    if (errors?.mirrorNodeTokenId) return errors?.mirrorNodeTokenId?.message;
+    if (errors?.balanceInUserWallet) return errors?.balanceInUserWallet?.message;
+    return "";
+  }
   return (
     <form>
       <AlertDialog
@@ -112,8 +153,8 @@ export const WalletTokenAssociation = () => {
                     }),
                   },
                 }}
-                isInvalid={Boolean(errors?.mirrorNodeTokenId)}
-                errorMessage={errors?.mirrorNodeTokenId && errors?.mirrorNodeTokenId.message}
+                isInvalid={isInvalidTokenInputField()}
+                errorMessage={getFieldErrorMessage()}
               />
               {tokenName && symbol ? (
                 <Flex direction="row" flex="1" paddingTop="0.6rem" paddingBottom="0.6rem">
@@ -135,6 +176,7 @@ export const WalletTokenAssociation = () => {
                   width="12rem"
                   variant="primary"
                   onClick={() => {
+                    resetForm();
                     setDialogsOpenState(false);
                   }}
                 >
@@ -145,7 +187,7 @@ export const WalletTokenAssociation = () => {
                   type="submit"
                   variant="primary"
                   onClick={onSubmit}
-                  isDisabled={disableAssociateButton}
+                  isDisabled={isAssociateButtonDisabled}
                 >
                   Associate Token
                 </Button>
@@ -158,8 +200,8 @@ export const WalletTokenAssociation = () => {
           setDialogsOpenState(true);
         }}
         onAlertDialogClose={() => {
-          setDialogsOpenState(false);
           resetForm();
+          setDialogsOpenState(false);
         }}
       />
     </form>
