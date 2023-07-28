@@ -8,7 +8,7 @@ import {
   getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
   solidityAddressToTokenIdString,
-  DEFAULT_ACCOUNT_FOR_PROPOSAL,
+  TOKEN_USER_ID,
 } from "@services";
 import { Contracts, Gas, HBARTokenId, MINIMUM_DEPOSIT_AMOUNT } from "@services";
 import { getEventArgumentsByName } from "../../utils";
@@ -466,7 +466,7 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
           block: "latest",
           data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
           estimate: false,
-          from: AccountId.fromString(DEFAULT_ACCOUNT_FOR_PROPOSAL).toSolidityAddress(), //TODO: change account id.
+          from: AccountId.fromString(TOKEN_USER_ID).toSolidityAddress(),
           gas: 9000000,
           gasPrice: 100000000,
           to: contractId.toString(),
