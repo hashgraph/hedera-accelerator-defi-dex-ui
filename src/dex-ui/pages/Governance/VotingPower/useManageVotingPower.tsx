@@ -22,17 +22,17 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const lockGODTokenSubmit = useLockGODToken(walletId, tokenHolderAddress, handleLockedGODTokenSuccess);
   const unLockGODTokenSubmit = useUnlockGODToken(walletId, tokenHolderAddress, handleUnLockedGODTokenSuccess);
 
-  const totalGodToken = (lockedGOVToken.data ?? 0) + (govTokenBalance.data ?? 0);
+  const totalGodToken = (lockedGOVToken.data ?? 0) + (govTokenBalance?.data ?? 0);
   const tokenData = {
     symbol: token?.data.symbol,
     locked: isWalletConnected ? `${lockedGOVToken.data?.toFixed(4) ?? 0}` : "-",
-    available: isWalletConnected ? `${govTokenBalance.data?.toFixed(4) ?? 0}` : "-",
+    available: isWalletConnected ? `${govTokenBalance?.data?.toFixed(4) ?? 0}` : "-",
     total: isWalletConnected ? `${totalGodToken.toFixed(4)}` : "-",
   };
 
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
-  const isFormLoading = govTokenBalance.isLoading || lockedGOVToken.isLoading || canClaimGODTokens.isLoading;
+  const isFormLoading = govTokenBalance?.isLoading || lockedGOVToken.isLoading || canClaimGODTokens.isLoading;
   const isLoading = lockGODTokenSubmit.isLoading || unLockGODTokenSubmit.isLoading;
   const canUserClaimGODTokens = canClaimGODTokens.data ?? false;
 
