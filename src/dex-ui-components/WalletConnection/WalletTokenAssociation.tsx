@@ -30,8 +30,7 @@ export const WalletTokenAssociation = () => {
     formState: { errors },
   } = tokenAssociationForm;
   watch(["tokenId", "mirrorNodeTokenId", "balanceInUserWallet"]);
-
-  const { tokenId, name: tokenName, symbol, mirrorNodeTokenId } = getValues();
+  const { tokenId, name: tokenName, symbol, mirrorNodeTokenId, balanceInUserWallet } = getValues();
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const associateToken = useAssociateToken(handleAssociateTokenSuccess);
 
@@ -39,7 +38,7 @@ export const WalletTokenAssociation = () => {
     associateToken.mutate({ tokenId });
   }
 
-  const { refetch, isFetching, isSuccess, isError, data } = useFetchTokenData({
+  const { refetch, isFetching, isError } = useFetchTokenData({
     tokenId,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
@@ -49,11 +48,12 @@ export const WalletTokenAssociation = () => {
     isLoading,
     refetch: refetchTokenBalance,
   } = useTokenBalance({
-    tokenId: data?.data.token_id,
+    tokenId: mirrorNodeTokenId,
     handleTokenBalanceSuccessResponse,
     handleTokenBalanceErrorResponse,
   });
-  const isTokenAlreadyAssociated = isNotNil(tokenBalance);
+  const isTokenAlreadyAssociated = isNotNil(balanceInUserWallet);
+  const isTokenNotAssociated = !isTokenAlreadyAssociated && isNotNil(mirrorNodeTokenId);
   const isInvalidTokenId = isNil(mirrorNodeTokenId);
   const isAssociateButtonDisabled = isFetching || isInvalidTokenId || isLoading || isTokenAlreadyAssociated;
 
@@ -109,7 +109,7 @@ export const WalletTokenAssociation = () => {
     if (isFetching) return <CircularProgress isIndeterminate color={Color.Primary._500} size="1.5rem" />;
     if (isError) return <CancelledStepIcon boxSize="4" color={Color.Destructive._500} />;
     if (isNotNil(tokenBalance)) return <CancelledStepIcon boxSize="4" color={Color.Destructive._500} />;
-    if (isSuccess && tokenId?.length > 0) {
+    if (isTokenNotAssociated) {
       return <CheckCircleIcon color={Color.Success._500} />;
     }
     return undefined;
@@ -145,7 +145,7 @@ export const WalletTokenAssociation = () => {
                   id: "tokenId",
                   label: "Token",
                   type: "text",
-                  placeholder: "Enter Token Id.",
+                  placeholder: "Enter Token ID",
                   unit: getIconForTokenIdField(),
                   register: {
                     ...register("tokenId", {
