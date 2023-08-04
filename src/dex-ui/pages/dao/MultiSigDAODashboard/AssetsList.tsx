@@ -28,7 +28,12 @@ export function AssetsList() {
     if (!selectedToken) {
       return;
     }
-    depositTokens.mutate({ ...data, safeId: dao.safeId, decimals: Number(selectedToken.decimals) });
+    depositTokens.mutate({
+      ...data,
+      safeId: dao.safeId,
+      decimals: Number(selectedToken.decimals),
+      amount: Number(data.amount),
+    });
   }
 
   function handleDepositTokensSuccess(transactionResponse: TransactionResponse) {
