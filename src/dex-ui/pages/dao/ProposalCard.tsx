@@ -8,6 +8,7 @@ import { DAOProposalVoting } from "./DAOProposalVoting";
 import { Proposal, ProposalType } from "@hooks";
 import { Paths } from "@routes";
 import { ProposalState } from "@dex-ui/store/governanceSlice";
+import { getProposalData } from "./utils";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -121,31 +122,9 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     </Text>
                   </Flex>
                 )}
-                {proposal.type === ProposalType.AddNewMember && (
-                  <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Max proposal confirmations will increase by 1.`}
-                  </Text>
-                )}
-                {proposal.type === ProposalType.RemoveMember && (
-                  <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Max proposal confirmations will decrease by 1.`}
-                  </Text>
-                )}
-                {proposal.type === ProposalType.ReplaceMember && (
-                  <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Required proposal threshold confirmations will be updated.`}
-                  </Text>
-                )}
-                {proposal.type === ProposalType.ChangeThreshold && (
-                  <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Required proposal threshold confirmations will be updated.`}
-                  </Text>
-                )}
-                {proposal.type === ProposalType.TokenAssociate && (
-                  <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
-                    {`Associate Token: ${proposal.tokenToAssociate}`}
-                  </Text>
-                )}
+                <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
+                  {getProposalData(proposal)}
+                </Text>
               </>
             )}
             {isGovernance && (

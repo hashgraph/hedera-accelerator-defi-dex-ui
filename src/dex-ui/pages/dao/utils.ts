@@ -1,6 +1,17 @@
 import { StepProps } from "@dex-ui-components";
-import { ProposalState } from "@dex-ui/store/governanceSlice";
-import { SENTINEL_OWNER } from "@services";
+import {
+  Proposal,
+  ProposalDataAddMember,
+  ProposalDataChangeThreshold,
+  ProposalDataDeleteMember,
+  ProposalDataReplaceMember,
+  ProposalDataTokenAssociation,
+  ProposalType,
+} from "@hooks";
+import { ProposalState } from "@store/governanceSlice";
+import { HBARTokenSymbol, SENTINEL_OWNER, solidityAddressToTokenIdString } from "@services";
+import { TokenId } from "@hashgraph/sdk";
+import { isHbarToken } from "@utils";
 
 export function getDAOLinksRecordArray(links: string[]): Record<"value", string>[] {
   const arrayOfRecords = links.map((linkString) => {
@@ -97,4 +108,38 @@ export function getProposalSteps(
     activeStep = 2;
   }
   return { steps, activeStep };
+}
+
+export function getProposalData(proposal: Proposal): string {
+  switch (proposal.type) {
+    case ProposalType.AddNewMember: {
+      const { owner, _threshold } = proposal.data as ProposalDataAddMember;
+      const ownerAddress = solidityAddressToTokenIdString(owner);
+      return `Proposed to add new member ${ownerAddress} and change threshold to ${_threshold}`;
+    }
+    case ProposalType.RemoveMember: {
+      const { owner, _threshold } = proposal.data as ProposalDataDeleteMember;
+      const ownerAddress = solidityAddressToTokenIdString(owner);
+      return `Proposed to remove member ${ownerAddress} and change threshold to ${_threshold}`;
+    }
+    case ProposalType.ReplaceMember: {
+      const { oldOwner, newOwner } = proposal.data as ProposalDataReplaceMember;
+      const oldOwnerAddress = solidityAddressToTokenIdString(oldOwner);
+      const newOwnerAddress = solidityAddressToTokenIdString(newOwner);
+      return `Proposed to replace member ${oldOwnerAddress} with ${newOwnerAddress}`;
+    }
+    case ProposalType.ChangeThreshold: {
+      const { _threshold } = proposal.data as ProposalDataChangeThreshold;
+      return `Proposed to change required threshold to ${_threshold}`;
+    }
+    case ProposalType.TokenAssociate: {
+      const { tokenAddress } = proposal.data as ProposalDataTokenAssociation;
+      const tokenToAssociate = TokenId.fromSolidityAddress(tokenAddress).toString();
+      return isHbarToken(tokenToAssociate)
+        ? `Associate Token: ${HBARTokenSymbol}`
+        : `Associate Token: ${tokenToAssociate}`;
+    }
+    default:
+      return "";
+  }
 }

@@ -150,8 +150,8 @@ export function DAODashboard(props: DAODashboardProps) {
                 <TabList borderBottom="0">
                   {daoNavigationTabs.map((tab, index: number) => {
                     return (
-                      <NavLink to={tab.title.toLowerCase()}>
-                        <Tab key={index} tabIndex={index}>
+                      <NavLink to={tab.title.toLowerCase()} key={index}>
+                        <Tab tabIndex={index}>
                           <Flex gap={2.5} alignItems="center" justifyContent="center">
                             {tab.icon}
                             <Box>{tab.title}</Box>

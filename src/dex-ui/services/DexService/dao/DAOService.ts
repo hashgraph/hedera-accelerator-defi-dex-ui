@@ -413,7 +413,6 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
     }
     return event;
   });
-
   return parsedEventsWithData;
 }
 

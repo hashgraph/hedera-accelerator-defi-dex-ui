@@ -60,6 +60,56 @@ export interface Votes {
   turnout: number | undefined;
 }
 
+export interface ProposalDataTokenTransfer {
+  token: string;
+  receiver: string;
+  amount: string;
+}
+
+export interface ProposalDataHbarTransfer {
+  token: string;
+  receiver: string;
+  amount: string;
+}
+export interface ProposalDataTokenAssociation {
+  tokenAddress: string;
+}
+
+export interface ProposalDataAddMember {
+  owner: string;
+  _threshold: string;
+}
+
+export interface ProposalDataDeleteMember {
+  owner: string;
+  _threshold: string;
+}
+
+export interface ProposalDataReplaceMember {
+  oldOwner: string;
+  newOwner: string;
+}
+
+export interface ProposalDataChangeThreshold {
+  _threshold: string;
+}
+
+export interface ProposalDataGovernanceTokenTransfer {
+  transferFromAccount: string;
+  transferToAccount: string;
+  tokenToTransfer: string;
+  transferTokenAmount: number;
+}
+
+export type ProposalData =
+  | ProposalDataTokenTransfer
+  | ProposalDataHbarTransfer
+  | ProposalDataTokenAssociation
+  | ProposalDataAddMember
+  | ProposalDataDeleteMember
+  | ProposalDataReplaceMember
+  | ProposalDataChangeThreshold
+  | ProposalDataGovernanceTokenTransfer;
 export interface Proposal {
   id: number;
   nonce: number;
@@ -79,6 +129,7 @@ export interface Proposal {
   to: string;
   operation: number;
   hexStringData: string;
+  data: ProposalData;
   /**
    * The hbar value sent when creating the proposal. This value is needed to
    * compute the correct hash value when executing the proposal in the HederaGnosisSafe contract.
@@ -97,7 +148,6 @@ export interface Proposal {
   isQuorumReached?: boolean;
   votingEndTime?: string;
   proposalState?: ProposalState;
-  tokenToAssociate?: string | undefined;
 }
 
 export const AllFilters = [

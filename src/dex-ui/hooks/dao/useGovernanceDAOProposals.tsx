@@ -1,6 +1,15 @@
 import { useQuery } from "react-query";
 import { DAOProposalGovernors, DexService, DEX_TOKEN_PRECISION_VALUE, MirrorNodeTokenById } from "@services";
-import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
+import {
+  AllFilters,
+  DAOQueries,
+  Proposal,
+  ProposalDataGovernanceTokenTransfer,
+  ProposalEvent,
+  ProposalStatus,
+  ProposalType,
+  Votes,
+} from "./types";
 import { AccountId } from "@hashgraph/sdk";
 import { isNil } from "ramda";
 import BigNumber from "bignumber.js";
@@ -83,6 +92,12 @@ export function useGovernanceDAOProposals(
       timeRemaining = getTimeRemaining(proposalData.duration?.startBlock, proposalData.duration?.endBlock).toString();
     }
     const votingEndTime = getVotingEndTime(proposalData.timestamp || "", timeRemaining || "");
+    const data: ProposalDataGovernanceTokenTransfer = {
+      transferFromAccount: proposalData.transferFromAccount ?? "",
+      transferToAccount: proposalData.transferToAccount ?? "",
+      tokenToTransfer: proposalData.tokenToTransfer ?? "",
+      transferTokenAmount: proposalData.transferTokenAmount ?? 0,
+    };
     return {
       id: index,
       timeRemaining,
@@ -115,6 +130,7 @@ export function useGovernanceDAOProposals(
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
       votingEndTime,
       proposalState: ProposalState[proposalState],
+      data,
     };
   };
 
