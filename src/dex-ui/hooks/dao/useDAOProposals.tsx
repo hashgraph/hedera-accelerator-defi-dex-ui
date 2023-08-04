@@ -8,7 +8,7 @@ import {
   MultiSigProposeTransactionType,
 } from "@services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
-import { AccountId, TokenId } from "@hashgraph/sdk";
+import { AccountId } from "@hashgraph/sdk";
 import { groupBy, isNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
@@ -109,7 +109,7 @@ export function useDAOProposals(
             linkToDiscussion,
             transactionType,
           } = proposalInfo;
-          const { amount, receiver, token, _threshold, tokenAddress } = data;
+          const { amount, receiver, token, _threshold } = data;
           const threshold = getThreshold(daoAndSafeLogs, BigNumber.from(_threshold ?? 0));
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;
@@ -140,13 +140,13 @@ export function useDAOProposals(
             to,
             operation,
             hexStringData,
+            data: { ...data },
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
             title: title,
             author: creator ? AccountId.fromSolidityAddress(creator).toString() : "",
             description: description,
             link: linkToDiscussion,
             threshold,
-            tokenToAssociate: tokenAddress ? TokenId.fromSolidityAddress(tokenAddress).toString() : undefined,
           };
         })
       );

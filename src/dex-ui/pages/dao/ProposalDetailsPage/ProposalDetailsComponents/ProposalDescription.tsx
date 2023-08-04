@@ -9,8 +9,8 @@ export function ProposalDetailsDescription(props: ProposalDetailsDescriptionProp
   const { description } = props;
   const DescriptionFormatted = (
     <>
-      {description.map((text: string) => (
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
+      {description.map((text: string, index) => (
+        <Text textStyle="p small regular" color={Color.Neutral._700} key={index}>
           {text}
         </Text>
       ))}

@@ -12,6 +12,7 @@ import { DAOType } from "@services";
 import { isNil, isNotNil } from "ramda";
 import { Paths } from "@routes";
 import { useProposalDetails } from "./useProposalDetails";
+import { getProposalData } from "../utils";
 
 export function ProposalDetailsPage() {
   const navigate = useNavigate();
@@ -78,7 +79,6 @@ export function ProposalDetailsPage() {
       ownerIds,
       author,
       title,
-      tokenToAssociate,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
@@ -87,10 +87,7 @@ export function ProposalDetailsPage() {
     /** TODO: Update contracts to support a "queued" status. */
     const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
 
-    /** TODO: Update the UI after the Design is Ready */
-    const descriptionArray = isNil(tokenToAssociate)
-      ? [description]
-      : [description, `Associate Token: ${tokenToAssociate}`];
+    const descriptionArray = [description, getProposalData(proposalDetails)];
     return (
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
         <GridItem colSpan={3}>
