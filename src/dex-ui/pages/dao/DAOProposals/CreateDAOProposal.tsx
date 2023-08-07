@@ -33,6 +33,7 @@ import {
   useCreateDeleteMemberProposal,
   useCreateMultiSigProposal,
   useCreateReplaceMemberProposal,
+  useCreateMultiSigTextProposal,
   useDAOs,
   useDexContext,
   useHandleTransactionSuccess,
@@ -40,13 +41,13 @@ import {
 import { isNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { getLastPathInRoute } from "@utils";
-import { getPreviousMemberAddress } from "../utils";
+import { getDAOType, getPreviousMemberAddress } from "../utils";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
   const createDaoProposalForm = useForm<CreateDAOProposalForm>({
     defaultValues: {
-      type: DAOProposalType.TokenTransfer,
+      type: DAOProposalType.Text,
       title: "",
       description: "",
       linkToDiscussion: "",
@@ -75,11 +76,11 @@ export function CreateDAOProposal() {
   const { type } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
-  const transferFrom = currentDaoType === "multisig" ? safeAccountId : walletId;
+  const transferFrom = currentDaoType === Paths.DAOs.Multisig ? safeAccountId : walletId;
   const wizardTitle = currentWizardStep === "type" ? "New Proposal" : type;
 
   const accountTokenBalancesQueryResults = useAccountTokenBalances(
-    currentDaoType === "multisig" ? safeAccountId : daoAccountId
+    currentDaoType === Paths.DAOs.Multisig ? safeAccountId : daoAccountId
   );
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
 
@@ -161,6 +162,15 @@ export function CreateDAOProposal() {
     reset: resetCreateDAOTokenAssociateProposal,
   } = sendDAOTokenAssociateResults;
 
+  const sendMultiSigDAOTextProposalResults = useCreateMultiSigTextProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateMultiSigTextProposalLoading,
+    isError: isCreateMultiSigTextProposalFailed,
+    error: isCreateMultiSigTextProposalError,
+    mutate: createMultiSigTextProposal,
+    reset: resetCreateMultiSigTextProposal,
+  } = sendMultiSigDAOTextProposalResults;
+
   const isLoading =
     isCreateMultisigTokenTransferLoading ||
     isCreateGOVTokenTransferLoading ||
@@ -170,7 +180,8 @@ export function CreateDAOProposal() {
     isCreateDAOUpgradeLoading ||
     isCreateDAOTextProposalLoading ||
     isChangeThresholdLoading ||
-    isCreateTokenAssociateProposalLoading;
+    isCreateTokenAssociateProposalLoading ||
+    isCreateMultiSigTextProposalLoading;
 
   const isError =
     isCreateMultisigTokenTransferFailed ||
@@ -181,12 +192,15 @@ export function CreateDAOProposal() {
     isCreateDAOUpgradeFailed ||
     isCreateDAOTextProposalFailed ||
     isChangeThresholdFailed ||
-    isCreateTokenAssociateProposalFailed;
+    isCreateTokenAssociateProposalFailed ||
+    isCreateMultiSigTextProposalFailed;
 
   const steps = [
     {
       label: "Type",
-      route: `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/type`,
+      route:
+        `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+        `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOProposalType}`,
       validate: async () => trigger(["type"]),
     },
     {
@@ -212,6 +226,7 @@ export function CreateDAOProposal() {
     resetCreateDAOUpgradeProposal();
     resetCreateDAOTextProposal();
     resetCreateDAOTokenAssociateProposal();
+    resetCreateMultiSigTextProposal();
   }
 
   function reset() {
@@ -229,6 +244,7 @@ export function CreateDAOProposal() {
     if (isCreateDAOUpgradeError) return isCreateDAOUpgradeError.message;
     if (isCreateDAOTextProposalError) return isCreateDAOTextProposalError.message;
     if (isCreateTokenAssociateProposalError) return isCreateTokenAssociateProposalError.message;
+    if (isCreateMultiSigTextProposalError) return isCreateMultiSigTextProposalError.message;
     return "";
   }
 
@@ -257,8 +273,8 @@ export function CreateDAOProposal() {
           description,
           linkToDiscussion = "",
         } = data as CreateDAOTokenTransferForm;
-        switch (currentDaoType) {
-          case DAOType.MultiSig.toLowerCase():
+        switch (getDAOType(currentDaoType)) {
+          case DAOType.MultiSig:
             return createMultisigTokenTransferProposal({
               tokenId,
               receiverId: recipientAccountId,
@@ -269,7 +285,7 @@ export function CreateDAOProposal() {
               safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
             });
-          default:
+          case DAOType.GovernanceToken:
             return createGOVTokenTransferProposal({
               tokenId,
               title,
@@ -283,6 +299,10 @@ export function CreateDAOProposal() {
               decimals,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
             });
+          case DAOType.NFT:
+            return;
+          default:
+            return;
         }
       }
       case DAOProposalType.AddMember: {
@@ -349,15 +369,29 @@ export function CreateDAOProposal() {
       }
       case DAOProposalType.Text: {
         const { title, description, linkToDiscussion } = data as CreateDAOTextProposalForm;
-        return createDAOTextProposal({
-          title,
-          description,
-          linkToDiscussion,
-          governanceAddress: governors.textLogic,
-          governanceTokenId,
-          daoContractId: daoAccountId,
-          nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
-        });
+        switch (getDAOType(currentDaoType)) {
+          case DAOType.MultiSig:
+            return createMultiSigTextProposal({
+              title,
+              description,
+              linkToDiscussion,
+              safeEVMAddress,
+              multiSigDAOContractId: daoAccountId,
+            });
+          case DAOType.GovernanceToken:
+          case DAOType.NFT:
+            return createDAOTextProposal({
+              title,
+              description,
+              linkToDiscussion,
+              governanceAddress: governors.textLogic,
+              governanceTokenId,
+              daoContractId: daoAccountId,
+              nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+            });
+          default:
+            return;
+        }
       }
       case DAOProposalType.TokenAssociate: {
         const { title, description, tokenId } = data as CreateDAOTokenAssociateForm;
@@ -375,21 +409,45 @@ export function CreateDAOProposal() {
   function ProposalsDetailsForm(): string {
     switch (type) {
       case DAOProposalType.Text:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/text/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTextProposalDetails}`
+        );
       case DAOProposalType.TokenTransfer:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/token-transfer/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenTransferDetails}`
+        );
       case DAOProposalType.AddMember:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/add-member/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOAddMemberDetails}`
+        );
       case DAOProposalType.RemoveMember:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/remove-member/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAODeleteMemberDetails}`
+        );
       case DAOProposalType.ReplaceMember:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/replace-member/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOReplaceMemberDetails}`
+        );
       case DAOProposalType.UpgradeThreshold:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/upgrade-threshold/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOUpgradeThresholdDetails}`
+        );
       case DAOProposalType.ContractUpgrade:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/contract-upgrade/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOContractUpgradeDetails}`
+        );
       case DAOProposalType.TokenAssociate:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/token-associate/details`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenAssociateDetails}`
+        );
       default:
         return "";
     }
@@ -398,21 +456,45 @@ export function CreateDAOProposal() {
   function ProposalsReviewForm(): string {
     switch (type) {
       case DAOProposalType.Text:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/text/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTextProposalReview}`
+        );
       case DAOProposalType.TokenTransfer:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/token-transfer/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenTransferReview}`
+        );
       case DAOProposalType.AddMember:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/add-member/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOAddMemberReview}`
+        );
       case DAOProposalType.RemoveMember:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/remove-member/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAODeleteMemberReview}`
+        );
       case DAOProposalType.ReplaceMember:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/replace-member/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOReplaceMemberReview}`
+        );
       case DAOProposalType.UpgradeThreshold:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/upgrade-threshold/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOUpgradeThresholdReview}`
+        );
       case DAOProposalType.ContractUpgrade:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/contract-upgrade/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOContractUpgradeReview}`
+        );
       case DAOProposalType.TokenAssociate:
-        return `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/new-proposal/token-associate/review`;
+        return (
+          `${Paths.DAOs.absolute}/${currentDaoType}/${daoAccountId}/` +
+          `${Paths.DAOs.CreateDAOProposal}/${Paths.DAOs.DAOTokenAssociateReview}`
+        );
       default:
         return "";
     }

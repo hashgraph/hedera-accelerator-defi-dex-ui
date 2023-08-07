@@ -78,6 +78,8 @@ export function useDAOProposals(
         return ProposalType.ChangeThreshold;
       case MultiSigProposeTransactionType.TokenAssociation:
         return ProposalType.TokenAssociate;
+      case MultiSigProposeTransactionType.TypeSetText:
+        return ProposalType.TextProposal;
       default:
         return ProposalType.TokenTransfer;
     }
@@ -109,7 +111,7 @@ export function useDAOProposals(
             linkToDiscussion,
             transactionType,
           } = proposalInfo;
-          const { amount, receiver, token, _threshold } = data;
+          const { amount, receiver, token, _threshold } = data ?? {};
           const threshold = getThreshold(daoAndSafeLogs, BigNumber.from(_threshold ?? 0));
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;

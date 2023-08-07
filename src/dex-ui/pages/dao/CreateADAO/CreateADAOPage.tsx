@@ -59,23 +59,26 @@ export function CreateADAOPage() {
   const createDAO = useCreateDAO(handleCreateDAOSuccess);
 
   function GovernanceForm(): string {
-    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.GovernanceToken}`;
-    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}`;
-    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.NFT}`;
+    if (type === DAOType.GovernanceToken)
+      return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.GovernanceToken}`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.Multisig}`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.NFT}`;
     return `${Paths.DAOs.absolute}`;
   }
 
   function VotingForm(): string {
-    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token/voting`;
-    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}/voting`;
-    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft/voting`;
+    if (type === DAOType.GovernanceToken)
+      return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.GovernanceTokenVoting}`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.MultisigVoting}`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.NFTVoting}`;
     return `${Paths.DAOs.absolute}`;
   }
 
   function ReviewForm(): string {
-    if (type === DAOType.GovernanceToken) return `${Paths.DAOs.absolute}/create/governance-token/review`;
-    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/create/${Paths.DAOs.Multisig}/review`;
-    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/create/nft/review`;
+    if (type === DAOType.GovernanceToken)
+      return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.GovernanceTokenReview}`;
+    if (type === DAOType.MultiSig) return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.MultisigReview}`;
+    if (type === DAOType.NFT) return `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.NFTReview}`;
     return `${Paths.DAOs.absolute}`;
   }
 
@@ -109,12 +112,12 @@ export function CreateADAOPage() {
   const steps = [
     {
       label: "Details",
-      route: `${Paths.DAOs.absolute}/create/details`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.DAODetails}`,
       validate: async () => trigger(["name", "logoUrl", "isPublic", "description"]),
     },
     {
       label: "Type",
-      route: `${Paths.DAOs.absolute}/create/type`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.type}`,
       validate: async () => trigger(["type"]),
     },
     {

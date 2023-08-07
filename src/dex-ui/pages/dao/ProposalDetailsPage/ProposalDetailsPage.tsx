@@ -7,9 +7,9 @@ import { ProposalVoteDetails } from "./ProposalVoteDetails";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useExecuteProposal, ProposalStatus, useApproveProposal, useHandleTransactionSuccess } from "@hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
-import { Grid, GridItem, Flex } from "@chakra-ui/react";
+import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
 import { DAOType } from "@services";
-import { isNil, isNotNil } from "ramda";
+import { isEmpty, isNil, isNotNil } from "ramda";
 import { Paths } from "@routes";
 import { useProposalDetails } from "./useProposalDetails";
 import { getProposalData } from "../utils";
@@ -56,6 +56,12 @@ export function ProposalDetailsPage() {
     />;
   }
 
+  function onViewDiscussionLinkTap() {
+    if (isNotNil(proposalDetails?.link)) {
+      window.open(proposalDetails?.link);
+    }
+  }
+
   if (isSuccess && isNotNil(proposalDetails)) {
     const {
       description,
@@ -79,6 +85,7 @@ export function ProposalDetailsPage() {
       ownerIds,
       author,
       title,
+      link,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
@@ -115,26 +122,33 @@ export function ProposalDetailsPage() {
           </Flex>
         </GridItem>
         <GridItem colSpan={1}>
-          {isMultiSigProposal && transactionHash ? (
-            <ProposalConfirmationDetails
-              safeAccountId={safeAccountId}
-              to={to}
-              approvalCount={approvalCount}
-              approvers={approvers}
-              memberCount={memberCount}
-              threshold={threshold}
-              status={proposalStatus}
-              transactionHash={transactionHash}
-              hexStringData={hexStringData}
-              msgValue={msgValue}
-              operation={operation}
-              nonce={nonce}
-              approveProposalMutation={approveProposalMutation}
-              executeProposalMutation={executeProposalMutation}
-            />
-          ) : (
-            <ProposalVoteDetails />
-          )}
+          <Flex gap="1rem" width="100%" direction="column" height="100%">
+            {isNotNil(link) && !isEmpty(link) ? (
+              <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
+                View Discussion
+              </Button>
+            ) : undefined}
+            {isMultiSigProposal && transactionHash ? (
+              <ProposalConfirmationDetails
+                safeAccountId={safeAccountId}
+                to={to}
+                approvalCount={approvalCount}
+                approvers={approvers}
+                memberCount={memberCount}
+                threshold={threshold}
+                status={proposalStatus}
+                transactionHash={transactionHash}
+                hexStringData={hexStringData}
+                msgValue={msgValue}
+                operation={operation}
+                nonce={nonce}
+                approveProposalMutation={approveProposalMutation}
+                executeProposalMutation={executeProposalMutation}
+              />
+            ) : (
+              <ProposalVoteDetails />
+            )}
+          </Flex>
         </GridItem>
       </Grid>
     );
