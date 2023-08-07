@@ -149,6 +149,7 @@ export enum HederaGnosisSafeFunctions {
 export enum MultiSigProposeTransactionType {
   BatchOperation = 1,
   TokenAssociation,
+  UpgradeProxy,
   AddMember = 1001,
   DeleteMember,
   ReplaceMember,

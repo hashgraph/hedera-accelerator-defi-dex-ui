@@ -12,15 +12,14 @@ import {
   SettingsToolIcon,
 } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
+import { getDAOType } from "../../utils";
 
 const MultiSigProposals = [
-  /* TODO: Enabled Text Proposals for MultiSig DAOs
-    {
-      title: DAOProposalType.Text,
-      label: "Create a text only proposal.",
-      icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-    }, 
-  */
+  {
+    title: DAOProposalType.Text,
+    label: "Create a text only proposal.",
+    icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+  },
   {
     title: DAOProposalType.TokenTransfer,
     label: "Propose a token transfer.",
@@ -105,13 +104,6 @@ export function DAOProposalTypeForm() {
     if (currentDAO === DAOType.GovernanceToken) return GovernanceProposals;
     if (currentDAO === DAOType.NFT) return NFTProposals;
     return [];
-  }
-
-  function getDAOType(type: string) {
-    if (type === "multisig") return DAOType.MultiSig;
-    if (type === "governance-token") return DAOType.GovernanceToken;
-    if (type === "nft") return DAOType.NFT;
-    return "";
   }
 
   return (

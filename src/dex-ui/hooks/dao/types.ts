@@ -14,6 +14,7 @@ export enum DAOMutations {
   CreateTokenAssociateProposal = "CreateTokenAssociateProposal",
   CreateDAOUpgradeProposal = "CreateDAOUpgradeProposal",
   CreateDAOTextProposal = "CreateDAOTextProposal",
+  CreateMultiSigDAOTextProposal = "CreateMultiSigDAOTextProposal",
   CreateAddMemberProposal = "CreateAddMemberProposal",
   CreateDeleteMemberProposal = "CreateDeleteMemberProposal",
   CreateReplaceMemberProposal = "CreateReplaceMemberProposal",

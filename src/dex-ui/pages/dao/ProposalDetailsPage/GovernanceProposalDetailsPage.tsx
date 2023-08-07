@@ -3,9 +3,9 @@ import { ProposalDetails } from "./ProposalDetails";
 import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
 import { ProposalVoteDetails } from "./ProposalVoteDetails";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
-import { Grid, GridItem, Flex } from "@chakra-ui/react";
+import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
 import { DAOType } from "@services";
-import { isNil, isNotNil } from "ramda";
+import { isNil, isNotNil, isEmpty } from "ramda";
 import { Paths } from "@routes";
 import { useGovernanceProposalDetails } from "./useGovernanceProposalDetails";
 import { GovernanceProposalConfirmationDetails } from "./GovernanceProposalConfirmationDetails";
@@ -50,6 +50,12 @@ export function GovernanceProposalDetailsPage() {
     />;
   }
 
+  function onViewDiscussionLinkTap() {
+    if (isNotNil(proposalDetails?.link)) {
+      window.open(proposalDetails?.link);
+    }
+  }
+
   if (isSuccess && isNotNil(proposalDetails)) {
     const {
       amount,
@@ -65,6 +71,7 @@ export function GovernanceProposalDetailsPage() {
       nonce,
       daoType,
       proposalState,
+      link,
     } = proposalDetails;
 
     const isGovernanceProposal = daoType === DAOType.GovernanceToken;
@@ -100,26 +107,33 @@ export function GovernanceProposalDetailsPage() {
           </Flex>
         </GridItem>
         <GridItem colSpan={1}>
-          {isGovernanceProposal ? (
-            <GovernanceProposalConfirmationDetails
-              tokenSymbol={""}
-              proposal={proposalDetails}
-              hasConnectedWalletVoted={hasVoted}
-              status={proposalStatus}
-              state={proposalState}
-              hexStringData={hexStringData}
-              msgValue={msgValue}
-              operation={operation}
-              nonce={nonce}
-              votingPower={votingPower}
-              castVote={castVote}
-              executeProposal={executeProposal}
-              cancelProposal={cancelProposal}
-              isAuthor={isAuthor}
-            />
-          ) : (
-            <ProposalVoteDetails />
-          )}
+          <Flex gap="1rem" width="100%" direction="column" height="100%">
+            {isNotNil(link) && !isEmpty(link) ? (
+              <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
+                View Discussion
+              </Button>
+            ) : undefined}
+            {isGovernanceProposal ? (
+              <GovernanceProposalConfirmationDetails
+                tokenSymbol={""}
+                proposal={proposalDetails}
+                hasConnectedWalletVoted={hasVoted}
+                status={proposalStatus}
+                state={proposalState}
+                hexStringData={hexStringData}
+                msgValue={msgValue}
+                operation={operation}
+                nonce={nonce}
+                votingPower={votingPower}
+                castVote={castVote}
+                executeProposal={executeProposal}
+                cancelProposal={cancelProposal}
+                isAuthor={isAuthor}
+              />
+            ) : (
+              <ProposalVoteDetails />
+            )}
+          </Flex>
         </GridItem>
       </Grid>
     );

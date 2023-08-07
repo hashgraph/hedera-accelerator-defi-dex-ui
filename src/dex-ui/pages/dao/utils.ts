@@ -9,9 +9,10 @@ import {
   ProposalType,
 } from "@hooks";
 import { ProposalState } from "@store/governanceSlice";
-import { HBARTokenSymbol, SENTINEL_OWNER, solidityAddressToTokenIdString } from "@services";
+import { HBARTokenSymbol, SENTINEL_OWNER, solidityAddressToTokenIdString, DAOType } from "@services";
 import { TokenId } from "@hashgraph/sdk";
 import { isHbarToken } from "@utils";
+import { Paths } from "@routes";
 
 export function getDAOLinksRecordArray(links: string[]): Record<"value", string>[] {
   const arrayOfRecords = links.map((linkString) => {
@@ -139,6 +140,19 @@ export function getProposalData(proposal: Proposal): string {
         ? `Associate Token: ${HBARTokenSymbol}`
         : `Associate Token: ${tokenToAssociate}`;
     }
+    default:
+      return "";
+  }
+}
+
+export function getDAOType(path: string) {
+  switch (path) {
+    case Paths.DAOs.Multisig:
+      return DAOType.MultiSig;
+    case Paths.DAOs.GovernanceToken:
+      return DAOType.GovernanceToken;
+    case Paths.DAOs.NFT:
+      return DAOType.NFT;
     default:
       return "";
   }

@@ -405,6 +405,11 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
           receiver: event.args.info.to,
           token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
         };
+      } else if (transactionType === MultiSigProposeTransactionType.TypeSetText) {
+        parsedData = abiCoder.decode(
+          ["address account", "string title"],
+          ethers.utils.hexDataSlice(event.args.info.data, 4)
+        );
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;
@@ -646,6 +651,37 @@ export async function proposeChangeThreshold(params: ProposeChangeThresholdParam
     transactionType: MultiSigProposeTransactionType.ChangeThreshold,
     title,
     description,
+    signer,
+  });
+}
+
+export interface ProposeMultiSigTextProposalParams {
+  safeEVMAddress: string;
+  multiSigDAOContractId: string;
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  signerAccountId: string;
+  signer: HashConnectSigner;
+}
+
+export async function proposeMultiSigTextProposal(params: ProposeMultiSigTextProposalParams) {
+  const { safeEVMAddress, multiSigDAOContractId, signer, title, description, signerAccountId, linkToDiscussion } =
+    params;
+  const contractInterface = new ethers.utils.Interface(MultiSigDAOJSON.abi);
+  const textProposalData = contractInterface.encodeFunctionData("setText", [
+    AccountId.fromString(signerAccountId).toSolidityAddress(),
+    title,
+  ]);
+
+  return DexService.sendProposeTransaction({
+    safeEVMAddress,
+    data: textProposalData,
+    multiSigDAOContractId,
+    transactionType: MultiSigProposeTransactionType.TypeSetText,
+    title,
+    description,
+    linkToDiscussion,
     signer,
   });
 }
