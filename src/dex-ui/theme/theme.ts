@@ -14,6 +14,8 @@ import {
   TextAreaStyles,
   TabsStyles,
   LinkStyles,
+  ModalStyles,
+  ListStyles,
 } from "@dex-ui-components";
 
 export const DEXTheme = extendTheme({
@@ -38,5 +40,7 @@ export const DEXTheme = extendTheme({
     Textarea: TextAreaStyles,
     Tabs: TabsStyles,
     Link: LinkStyles,
+    Modal: ModalStyles,
+    List: ListStyles,
   },
 });

@@ -7,7 +7,7 @@ import {
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
 import { Color } from "../..";
@@ -50,6 +50,23 @@ export function Input<T extends string>(props: InputProps<T>) {
     pointerEvents,
     register,
   } = props;
+
+  const RightElements = React.isValidElement(unit) ? (
+    unit
+  ) : (
+    <Text textStyle="p small regular" padding="0 1rem">
+      {unit}
+    </Text>
+  );
+  const [rightElementWidth, setRightElementWidth] = useState(0);
+  const rightElementRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (rightElementRef.current !== null) {
+      setRightElementWidth((rightElementRef.current as HTMLElement).offsetWidth);
+    }
+  }, [unit]);
+
   return (
     <Box flex={flex} width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
@@ -76,6 +93,7 @@ export function Input<T extends string>(props: InputProps<T>) {
         <InputGroup>
           <ChakraInput
             variant="input-v2"
+            paddingRight={unit ? `${rightElementWidth}px` : "1rem"}
             type={type}
             step={step}
             id={id}
@@ -92,12 +110,17 @@ export function Input<T extends string>(props: InputProps<T>) {
               },
             }}
           />
-          <InputRightElement
-            pointerEvents={pointerEvents ? pointerEvents : "none"}
-            children={React.isValidElement(unit) ? unit : <Text textStyle="p small regular">{unit}</Text>}
-            width="fit-content"
-            padding="0 0.75rem"
-          />
+          {unit ? (
+            <InputRightElement
+              ref={rightElementRef}
+              pointerEvents={pointerEvents ? pointerEvents : "none"}
+              children={RightElements}
+              width="fit-content"
+              padding="0"
+            />
+          ) : (
+            <></>
+          )}
         </InputGroup>
       )}
     </Box>

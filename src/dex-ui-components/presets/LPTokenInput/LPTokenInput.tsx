@@ -1,6 +1,5 @@
-import { Text, Input as ChakraInput, FormControl, Skeleton } from "@chakra-ui/react";
+import { Text, Input as ChakraInput, FormControl, Skeleton, Button } from "@chakra-ui/react";
 import { FieldValues, UseFormReturn } from "react-hook-form";
-import { Button } from "../../base";
 import { TokenInputLayout } from "../layouts";
 import { formulaTypes, LPTokenState } from "../types";
 import { halfOf } from "../utils";

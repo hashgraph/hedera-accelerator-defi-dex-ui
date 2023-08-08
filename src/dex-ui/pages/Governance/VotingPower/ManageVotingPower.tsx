@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Divider, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import { Button, Divider, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import {
   AlertDialog,
-  Button,
   Color,
   FormInput,
   TwoLayerSettingsIcon,

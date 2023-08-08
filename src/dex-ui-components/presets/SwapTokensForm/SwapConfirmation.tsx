@@ -1,8 +1,8 @@
 import { BaseSyntheticEvent, useEffect, useState } from "react";
-import { Text, Flex, Spacer } from "@chakra-ui/react";
+import { Text, Flex, Spacer, Button } from "@chakra-ui/react";
 import { TokenState } from "../types";
 import { WarningIcon } from "@chakra-ui/icons";
-import { AlertDialog, LoadingDialog, Button } from "../../base";
+import { AlertDialog, LoadingDialog } from "../../base";
 import { Color } from "../../themes";
 
 export enum SwapConfirmationStep {

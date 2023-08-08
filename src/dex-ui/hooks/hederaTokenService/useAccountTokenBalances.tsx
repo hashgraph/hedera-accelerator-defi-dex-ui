@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
-import { DexService } from "../../services";
+import { DexService, HBARTokenId } from "../../services";
 import { HTSQueries } from "./types";
+import { isEmpty, isNotNil } from "ramda";
 
 export interface TokenBalance {
   name: string;
@@ -14,7 +15,27 @@ export interface TokenBalance {
 
 type UseTokenBalancesKey = [HTSQueries.AccountTokenBalances, string];
 
-export function useAccountTokenBalances(accountId: string) {
+type UseAccountTokenBalancesFilters = {
+  textSearch?: string;
+  tokenId?: string;
+};
+
+export function useAccountTokenBalances(accountId: string, filterBy?: UseAccountTokenBalancesFilters) {
+  function filterBalances(tokenBalances: TokenBalance[]) {
+    if (!filterBy) {
+      return tokenBalances;
+    }
+    const { textSearch = "", tokenId: tokenIdFilter = "" } = filterBy;
+    return tokenBalances.filter((tokenBalance: TokenBalance) => {
+      const { name, symbol, tokenId } = tokenBalance;
+      const searchString = `${name} ${symbol} ${tokenId}`.toLowerCase();
+      const doesMatchSearchInput =
+        isEmpty(textSearch) || (isNotNil(textSearch) && searchString.includes(textSearch.toLowerCase()));
+      const doesMatchTokenId = isEmpty(tokenIdFilter) || (isNotNil(tokenIdFilter) && tokenId === tokenIdFilter);
+      return doesMatchSearchInput && doesMatchTokenId;
+    });
+  }
+
   return useQuery<TokenBalance[], Error, TokenBalance[], UseTokenBalancesKey>(
     [HTSQueries.AccountTokenBalances, accountId],
     async () => {
@@ -24,7 +45,7 @@ export function useAccountTokenBalances(accountId: string) {
         symbol: "ℏ",
         decimals: "8",
         logo: "",
-        tokenId: "",
+        tokenId: HBARTokenId,
         balance: accountBalances.balance.toNumber(),
         value: 0,
       };
@@ -50,6 +71,7 @@ export function useAccountTokenBalances(accountId: string) {
     {
       enabled: !!accountId,
       staleTime: 5,
+      select: filterBalances,
       keepPreviousData: true,
     }
   );

@@ -1,17 +1,8 @@
 import { Button, Divider, Flex, Text } from "@chakra-ui/react";
-import {
-  Color,
-  FormDropdown,
-  FormTokenInput,
-  NewTokenIcon,
-  useFormTokenInputPattern,
-  useHalfMaxButtons,
-} from "@dex-ui-components";
-import { TokenBalance, useAccountTokenBalances, useDexContext } from "@hooks";
-import { ChangeEvent } from "react";
+import { Color, NewTokenIcon } from "@dex-ui-components";
+import { FormTokenInput } from "@components";
+import { usePairedWalletDetails } from "@hooks";
 import { useForm } from "react-hook-form";
-import { HBARTokenId, HBARSymbol } from "@services";
-import BigNumber from "bignumber.js";
 
 interface DepositTokensModalBodyProps {
   safeId: string;
@@ -26,122 +17,31 @@ export interface DepositTokensFormData {
   decimals: number;
 }
 
-const DepositTokensModal = (props: DepositTokensModalBodyProps) => {
+export function DepositTokensModal(props: DepositTokensModalBodyProps) {
   const { safeId, handleDepositClicked, handleCancelClicked, handleAssociateTokenClicked } = props;
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const { walletId } = usePairedWalletDetails();
+  const form = useForm<DepositTokensFormData>();
   const {
     handleSubmit,
-    register,
-    setValue,
     getValues,
-    watch,
     formState: { errors },
-  } = useForm<DepositTokensFormData>();
-  watch("tokenId");
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(safeId ?? "");
-  const { data: tokenBalances } = accountTokenBalancesQueryResults;
-
-  const walletTokenBalancesQueryResults = useAccountTokenBalances(wallet.savedPairingData?.accountIds[0] ?? "");
-  const { data: walletBalances } = walletTokenBalancesQueryResults;
-  const assetDropdownOptions =
-    tokenBalances?.map((asset: TokenBalance) => {
-      const { symbol, tokenId } = asset;
-      if (symbol === HBARSymbol) {
-        return {
-          label: symbol,
-          value: HBARTokenId,
-        };
-      }
-      return {
-        label: symbol,
-        value: tokenId,
-      };
-    }) ?? [];
+  } = form;
 
   async function onSubmit(data: DepositTokensFormData) {
     handleDepositClicked(data);
   }
 
-  const selectedAsset = getValues().tokenId
-    ? walletBalances?.find(
-        (asset: TokenBalance) =>
-          asset.tokenId === getValues().tokenId || (getValues().tokenId === HBARTokenId && asset.symbol === HBARSymbol)
-      )
-    : undefined;
-
-  function validateAmount(value: string | undefined) {
-    if (!value) {
-      return "An amount is required.";
-    }
-    const valueAsBigNumber = BigNumber(value);
-    const tokenId = getValues().tokenId;
-    const selectedAsset = walletBalances?.find(
-      (asset: TokenBalance) => asset.tokenId === tokenId || (tokenId === HBARTokenId && asset.symbol === HBARSymbol)
-    );
-    if (!selectedAsset?.balance || selectedAsset?.balance <= 0) {
-      return "Token balance must be greater than 0.";
-    }
-    if (valueAsBigNumber.gt(selectedAsset?.balance)) {
-      return "Amount must be less than or equal to token balance.";
-    }
-    if (valueAsBigNumber.lte(0)) {
-      return "Amount must be greater than 0.";
-    }
-    if (!tokenId) {
-      return "A token must be selected.";
-    }
-    return true;
-  }
-
-  const { handleMaxButtonClicked, handleHalfButtonClicked } = useHalfMaxButtons(
-    String(selectedAsset?.balance ?? 0),
-    (amount: string | undefined) => setValue("amount", amount)
-  );
-
-  const { handleTokenInputChangeWithPattern } = useFormTokenInputPattern((value: string) => setValue("amount", value));
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Flex direction="column" gap={4}>
         <Divider marginX={-5} paddingX={5} />
-        <FormDropdown
-          label="Assets"
-          placeholder="Select a token"
-          data={assetDropdownOptions}
-          isInvalid={Boolean(errors?.tokenId)}
-          errorMessage={errors?.tokenId && errors?.tokenId?.message}
-          register={register("tokenId", {
-            required: { value: true, message: "A token is required." },
-            onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("tokenId", e.target.value),
-          })}
-        />
-        <FormTokenInput<"amount">
-          inputProps={{
-            id: "amount",
-            pointerEvents: "all",
-            placeholder: "Enter amount",
-            label: (
-              <FormTokenInput.Label
-                tokenSymbol={selectedAsset?.symbol ?? ""}
-                balance={selectedAsset ? String(selectedAsset.balance ?? 0) : "--"}
-              />
-            ),
-            type: "text",
-            unit: (
-              <FormTokenInput.RightUnitContent
-                tokenSymbol={selectedAsset?.symbol}
-                handleHalfButtonClicked={handleHalfButtonClicked}
-                handleMaxButtonClicked={handleMaxButtonClicked}
-              />
-            ),
-            register: {
-              ...register("amount", {
-                required: { value: true, message: "An amount is required." },
-                validate: { validateAmount },
-                onChange: handleTokenInputChangeWithPattern,
-              }),
-            },
-          }}
+        <FormTokenInput
+          amountFormId="amount"
+          tokenFormId="tokenId"
+          assetListAccountId={safeId}
+          balanceAccountId={walletId ?? ""}
+          currentAmount={getValues().amount ?? ""}
+          form={form}
           isInvalid={Boolean(errors?.amount)}
           errorMessage={errors?.amount && errors?.amount?.message}
         />
@@ -168,6 +68,4 @@ const DepositTokensModal = (props: DepositTokensModalBodyProps) => {
       </Flex>
     </form>
   );
-};
-
-export { DepositTokensModal };
+}

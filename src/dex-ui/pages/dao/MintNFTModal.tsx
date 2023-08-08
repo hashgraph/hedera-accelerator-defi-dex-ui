@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Flex, SimpleGrid, Text } from "@chakra-ui/react";
-import { AlertDialog, Button, Color, FormInputList } from "@dex-ui-components";
+import { Flex, SimpleGrid, Text, Button } from "@chakra-ui/react";
+import { AlertDialog, Color, FormInputList } from "@dex-ui-components";
 import { useFieldArray, useForm } from "react-hook-form";
 import { MintNFTTokensFormData } from "./types";
 import { MirrorNodeTokenById } from "@services";

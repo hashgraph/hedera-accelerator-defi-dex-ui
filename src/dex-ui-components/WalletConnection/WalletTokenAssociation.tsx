@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Text, Flex, Divider, CircularProgress } from "@chakra-ui/react";
-import { AlertDialog, Button, CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@dex-ui-components";
+import { Text, Flex, Divider, CircularProgress, Button } from "@chakra-ui/react";
+import { AlertDialog, CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@dex-ui-components";
 import { useForm } from "react-hook-form";
 import { useAssociateToken, useHandleTransactionSuccess, useFetchTokenData, useTokenBalance } from "@hooks";
 import { TransactionResponse } from "@hashgraph/sdk";

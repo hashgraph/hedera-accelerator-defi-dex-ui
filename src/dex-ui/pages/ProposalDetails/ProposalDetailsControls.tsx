@@ -1,5 +1,5 @@
-import { Flex, Text } from "@chakra-ui/react";
-import { AlertDialog, NotficationTypes, Notification, Button } from "@dex-ui-components";
+import { Flex, Text, Button } from "@chakra-ui/react";
+import { AlertDialog, NotficationTypes, Notification } from "@dex-ui-components";
 import { ConfirmVoteModalBody } from "./ConfirmVoteModalBody";
 import { CancelProposalModalButton } from "./CancelProposalModalButton";
 import { useState } from "react";
