@@ -80,6 +80,8 @@ export function useDAOProposals(
         return ProposalType.TokenAssociate;
       case MultiSigProposeTransactionType.TypeSetText:
         return ProposalType.TextProposal;
+      case MultiSigProposeTransactionType.UpgradeProxy:
+        return ProposalType.UpgradeContract;
       default:
         return ProposalType.TokenTransfer;
     }

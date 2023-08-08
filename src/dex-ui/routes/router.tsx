@@ -176,6 +176,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.DAOUpgradeThresholdReview} element={<DAOUpgradeThresholdReviewForm />} />
           <Route path={Paths.DAOs.DAOTokenAssociateDetails} element={<DAOTokenAssociateDetailsForm />} />
           <Route path={Paths.DAOs.DAOTokenAssociateReview} element={<DAOTokenAssociateReviewForm />} />
+          <Route path={Paths.DAOs.DAOContractUpgradeDetails} element={<DAOContractUpgradeDetailsForm />} />
+          <Route path={Paths.DAOs.DAOContractUpgradeReview} element={<DAOContractUpgradeReviewForm />} />
         </Route>
         <Route path={`${Paths.DAOs.Multisig}/:accountId/settings/change-dao-details`} element={<UpdateDAODetails />}>
           <Route index element={<Navigate to={Paths.DAOs.DetailsStep} />} />

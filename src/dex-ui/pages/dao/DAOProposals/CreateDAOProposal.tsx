@@ -34,6 +34,7 @@ import {
   useCreateMultiSigProposal,
   useCreateReplaceMemberProposal,
   useCreateMultiSigTextProposal,
+  useCreateMultiSigDAOUpgradeProposal,
   useDAOs,
   useDexContext,
   useHandleTransactionSuccess,
@@ -171,6 +172,15 @@ export function CreateDAOProposal() {
     reset: resetCreateMultiSigTextProposal,
   } = sendMultiSigDAOTextProposalResults;
 
+  const sendMultiSigDAOUpgradeProposalResults = useCreateMultiSigDAOUpgradeProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateMultiSigUpgradeProposalLoading,
+    isError: isCreateMultiSigUpgradeProposalFailed,
+    error: isCreateMultiSigUpgradeProposalError,
+    mutate: createMultiSigUpgradeProposal,
+    reset: resetCreateMultiSigUpgradeProposal,
+  } = sendMultiSigDAOUpgradeProposalResults;
+
   const isLoading =
     isCreateMultisigTokenTransferLoading ||
     isCreateGOVTokenTransferLoading ||
@@ -181,7 +191,8 @@ export function CreateDAOProposal() {
     isCreateDAOTextProposalLoading ||
     isChangeThresholdLoading ||
     isCreateTokenAssociateProposalLoading ||
-    isCreateMultiSigTextProposalLoading;
+    isCreateMultiSigTextProposalLoading ||
+    isCreateMultiSigUpgradeProposalLoading;
 
   const isError =
     isCreateMultisigTokenTransferFailed ||
@@ -193,7 +204,8 @@ export function CreateDAOProposal() {
     isCreateDAOTextProposalFailed ||
     isChangeThresholdFailed ||
     isCreateTokenAssociateProposalFailed ||
-    isCreateMultiSigTextProposalFailed;
+    isCreateMultiSigTextProposalFailed ||
+    isCreateMultiSigUpgradeProposalFailed;
 
   const steps = [
     {
@@ -227,6 +239,7 @@ export function CreateDAOProposal() {
     resetCreateDAOTextProposal();
     resetCreateDAOTokenAssociateProposal();
     resetCreateMultiSigTextProposal();
+    resetCreateMultiSigUpgradeProposal();
   }
 
   function reset() {
@@ -245,6 +258,7 @@ export function CreateDAOProposal() {
     if (isCreateDAOTextProposalError) return isCreateDAOTextProposalError.message;
     if (isCreateTokenAssociateProposalError) return isCreateTokenAssociateProposalError.message;
     if (isCreateMultiSigTextProposalError) return isCreateMultiSigTextProposalError.message;
+    if (isCreateMultiSigUpgradeProposalError) return isCreateMultiSigUpgradeProposalError.message;
     return "";
   }
 
@@ -355,17 +369,33 @@ export function CreateDAOProposal() {
       case DAOProposalType.ContractUpgrade: {
         const { title, description, linkToDiscussion, oldProxyAddress, newImplementationAddress } =
           data as CreateDAOContractUpgradeForm;
-        return createDAOUpgradeProposal({
-          title,
-          description,
-          linkToDiscussion,
-          oldProxyAddress,
-          newImplementationAddress,
-          governanceAddress: governors.contractUpgradeLogic,
-          governanceTokenId,
-          daoContractId: daoAccountId,
-          nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
-        });
+        switch (getDAOType(currentDaoType)) {
+          case DAOType.GovernanceToken:
+            return createDAOUpgradeProposal({
+              title,
+              description,
+              linkToDiscussion,
+              oldProxyAddress,
+              newImplementationAddress,
+              governanceAddress: governors.contractUpgradeLogic,
+              governanceTokenId,
+              daoContractId: daoAccountId,
+              nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+            });
+          case DAOType.MultiSig:
+            return createMultiSigUpgradeProposal({
+              title,
+              description,
+              linkToDiscussion,
+              oldProxyAddress,
+              newImplementationAddress,
+              multiSigDAOContractId: daoAccountId,
+            });
+          case DAOType.NFT:
+            return;
+          default:
+            return;
+        }
       }
       case DAOProposalType.Text: {
         const { title, description, linkToDiscussion, nftTokenSerialId } = data as CreateDAOTextProposalForm;
