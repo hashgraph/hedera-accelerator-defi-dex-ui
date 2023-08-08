@@ -12,7 +12,7 @@ import {
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./type";
 import { checkTransactionResponseForError } from "../utils";
 import { Contracts, DEX_PRECISION } from "../../constants";
-import { DexService } from "@services";
+import { DAOType, DexService } from "@services";
 import FTDAOFactoryJSON from "../../abi/FTDAOFactory.json";
 
 const Gas = 9000000;
@@ -212,6 +212,7 @@ interface SendDAOTextProposalTransactionParams {
   daoContractId: string;
   nftTokenSerialId: number;
   signer: HashConnectSigner;
+  daoType: DAOType;
 }
 
 async function sendTextProposalTransaction(params: SendDAOTextProposalTransactionParams) {
@@ -224,15 +225,25 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
     governanceAddress,
     linkToDiscussion,
     nftTokenSerialId,
+    daoType,
   } = params;
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
-  await DexService.setTokenAllowance({
-    tokenId: governanceTokenId,
-    walletId: signer.getAccountId().toString(),
-    spenderContractId,
-    tokenAmount: 1 * DEX_PRECISION,
-    signer,
-  });
+  if (daoType === DAOType.NFT) {
+    await DexService.setNFTAllowance({
+      nftId: governanceTokenId,
+      walletId: signer.getAccountId().toString(),
+      spenderContractId,
+      signer,
+    });
+  } else {
+    await DexService.setTokenAllowance({
+      tokenId: governanceTokenId,
+      walletId: signer.getAccountId().toString(),
+      spenderContractId,
+      tokenAmount: 1 * DEX_PRECISION,
+      signer,
+    });
+  }
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)

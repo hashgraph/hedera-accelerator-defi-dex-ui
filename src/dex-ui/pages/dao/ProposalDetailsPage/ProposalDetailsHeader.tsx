@@ -13,10 +13,13 @@ interface ProposalDetailsHeaderProps {
 
 export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
   const { daoAccountId, title, daoType, author } = props;
-  let to = `/daos/${Paths.DAOs.Multisig}/${daoAccountId}/${Paths.DAOs.Proposals}`;
-  if (daoType === DAOType.GovernanceToken) {
-    to = `/daos/${Paths.DAOs.GovernanceToken}/${daoAccountId}/${Paths.DAOs.Proposals}`;
-  }
+  const to = `/daos/${
+    daoType === DAOType.GovernanceToken
+      ? Paths.DAOs.GovernanceToken
+      : daoType === DAOType.NFT
+      ? Paths.DAOs.NFT
+      : Paths.DAOs.Multisig
+  }/${daoAccountId}/${Paths.DAOs.Proposals}`;
   return (
     <>
       <Flex direction="row" justifyContent="space-between" flexWrap="wrap-reverse" gap="2">

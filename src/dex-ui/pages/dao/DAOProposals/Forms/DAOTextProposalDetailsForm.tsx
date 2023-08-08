@@ -1,14 +1,21 @@
-import { FormInput, FormTextArea } from "@dex-ui-components";
-import { CreateDAOTextProposalForm } from "../types";
+import { FormDropdown, FormInput, FormTextArea } from "@dex-ui-components";
+import { CreateDAOProposalContext, CreateDAOTextProposalForm } from "../types";
 import { useFormContext } from "react-hook-form";
 import { isValidUrl } from "@utils";
 import { Flex } from "@chakra-ui/react";
+import { useTokenNFTs } from "@hooks";
+import { useOutletContext } from "react-router-dom";
+import { ChangeEvent } from "react";
+import { Paths } from "@routes";
 
 export function DAOTextProposalDetailsForm() {
+  const { governanceTokenId, daoType } = useOutletContext<CreateDAOProposalContext>();
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext<CreateDAOTextProposalForm>();
+  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId);
   return (
     <Flex direction="column" gap="1.3rem">
       <FormInput<"title">
@@ -56,6 +63,26 @@ export function DAOTextProposalDetailsForm() {
         isInvalid={Boolean(errors?.linkToDiscussion)}
         errorMessage={errors?.linkToDiscussion && errors?.linkToDiscussion?.message}
       />
+      {daoType === Paths.DAOs.NFT && (
+        <>
+          <FormDropdown
+            label="Token Serial Number"
+            placeholder="Select a token serial number"
+            data={tokenNFTs.map((input: any) => {
+              return {
+                label: input.serial_number,
+                value: input.serial_number,
+              };
+            })}
+            isInvalid={Boolean(errors?.nftTokenSerialId)}
+            errorMessage={errors.nftTokenSerialId && errors.nftTokenSerialId.message}
+            register={register("nftTokenSerialId", {
+              required: { value: true, message: "A token is required to be locked to create proposal" },
+              onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftTokenSerialId", Number(e.target.value)),
+            })}
+          />
+        </>
+      )}
     </Flex>
   );
 }

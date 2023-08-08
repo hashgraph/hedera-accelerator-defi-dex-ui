@@ -368,7 +368,7 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.Text: {
-        const { title, description, linkToDiscussion } = data as CreateDAOTextProposalForm;
+        const { title, description, linkToDiscussion, nftTokenSerialId } = data as CreateDAOTextProposalForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.MultiSig:
             return createMultiSigTextProposal({
@@ -379,7 +379,6 @@ export function CreateDAOProposal() {
               multiSigDAOContractId: daoAccountId,
             });
           case DAOType.GovernanceToken:
-          case DAOType.NFT:
             return createDAOTextProposal({
               title,
               description,
@@ -388,6 +387,18 @@ export function CreateDAOProposal() {
               governanceTokenId,
               daoContractId: daoAccountId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+              daoType: DAOType.GovernanceToken,
+            });
+          case DAOType.NFT:
+            return createDAOTextProposal({
+              title,
+              description,
+              linkToDiscussion,
+              governanceAddress: governors.textLogic,
+              governanceTokenId,
+              daoContractId: daoAccountId,
+              nftTokenSerialId,
+              daoType: DAOType.NFT,
             });
           default:
             return;
@@ -503,7 +514,9 @@ export function CreateDAOProposal() {
   async function ValidateDetailsForm(): Promise<boolean> {
     switch (type) {
       case DAOProposalType.Text:
-        return trigger(["title", "description", "linkToDiscussion"]);
+        return currentDaoType === Paths.DAOs.NFT
+          ? trigger(["title", "description", "linkToDiscussion", "nftTokenSerialId"])
+          : trigger(["title", "description", "linkToDiscussion"]);
       case DAOProposalType.AddMember:
         return trigger(["memberAddress", "newThreshold", "title", "description"]);
       case DAOProposalType.RemoveMember:
@@ -567,6 +580,7 @@ export function CreateDAOProposal() {
                   threshold,
                   proposalType: type,
                   assets: tokenBalances,
+                  governanceTokenId,
                 },
                 ...createDaoProposalForm,
               },

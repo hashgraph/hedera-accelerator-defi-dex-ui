@@ -156,6 +156,23 @@ interface MirrorNodeEventLog {
 interface MirrorNodeBlocks {
   number: number;
 }
+interface MirrorNodeTokenNFT {
+  account_id: string;
+  created_timestamp: string;
+  delegating_spender: string;
+  deleted: boolean;
+  metadata: string;
+  modified_timestamp: string;
+  serial_number: number;
+  spender_id: string;
+  token_id: string;
+}
+
+interface MirrorNodeTokenNFTResponse {
+  nfts: MirrorNodeTokenNFT[];
+  links: MirrorNodeLinks;
+}
+
 /**
  * TODO: Refactor this to return a single MirrorNode type with other types as properties
  * i.e. MirrorNode.EventLog, MirrorNode.TokenByIdResponse, etc.
@@ -173,4 +190,6 @@ export type {
   MirrorNodeTokenPairResponse,
   MirrorNodeAccountById,
   MirrorNodeBlocks,
+  MirrorNodeTokenNFT,
+  MirrorNodeTokenNFTResponse,
 };

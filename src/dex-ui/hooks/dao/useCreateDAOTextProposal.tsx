@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
-import { DexService } from "@services";
+import { DAOType, DexService } from "@services";
 import { useDexContext, HandleOnSuccess } from "@hooks";
 import { isNil } from "ramda";
 
@@ -13,6 +13,7 @@ interface UseCreateDAOTextProposalParams {
   linkToDiscussion: string;
   daoContractId: string;
   nftTokenSerialId: number;
+  daoType: DAOType;
 }
 
 export function useCreateDAOTextProposal(handleOnSuccess: HandleOnSuccess) {

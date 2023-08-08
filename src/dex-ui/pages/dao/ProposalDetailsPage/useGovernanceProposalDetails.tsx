@@ -9,7 +9,7 @@ import {
   useGovernanceDAOProposals,
   useFetchLockedGovToken,
 } from "@hooks";
-import { GovernanceDAODetails } from "@services";
+import { GovernanceDAODetails, NFTDAODetails } from "@services";
 import { isNotNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
 
@@ -20,9 +20,9 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
   const executeProposal = useExecuteGovernanceProposal(proposalId, handleExecuteProposalSuccess);
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
-  const daosQueryResults = useDAOs<GovernanceDAODetails>(daoAccountId);
+  const daosQueryResults = useDAOs<GovernanceDAODetails | NFTDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao: GovernanceDAODetails) => dao.accountId === daoAccountId);
+  const dao = daos?.find((dao: GovernanceDAODetails | NFTDAODetails) => dao.accountId === daoAccountId);
   const daoProposalsQueryResults = useGovernanceDAOProposals(daoAccountId, dao?.tokenId, dao?.governors);
   const { data: proposals } = daoProposalsQueryResults;
   const proposal = proposals?.find((proposal) => proposal.proposalId === proposalId);
