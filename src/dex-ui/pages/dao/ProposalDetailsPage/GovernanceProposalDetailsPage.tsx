@@ -75,6 +75,7 @@ export function GovernanceProposalDetailsPage() {
     } = proposalDetails;
 
     const isGovernanceProposal = daoType === DAOType.GovernanceToken;
+    const isNFTProposal = daoType === DAOType.NFT;
 
     /** TODO: Update contracts to support a "queued" status. */
     const proposalStatus = status;
@@ -113,7 +114,7 @@ export function GovernanceProposalDetailsPage() {
                 View Discussion
               </Button>
             ) : undefined}
-            {isGovernanceProposal ? (
+            {isGovernanceProposal || isNFTProposal ? (
               <GovernanceProposalConfirmationDetails
                 tokenSymbol={""}
                 proposal={proposalDetails}

@@ -15,6 +15,7 @@ export enum TokenServiceFunctions {
   CreateToken = "createToken",
   SetTokenAllowance = "setTokenAllowance",
   AssociateToken = "associateToken",
+  SetNFTAllowance = "setNFTAllowance",
 }
 
 /**
@@ -197,6 +198,23 @@ async function associateTokenToWallet(params: AssociateTokenParams) {
   checkTransactionResponseForError(response, TokenServiceFunctions.AssociateToken);
   return response;
 }
+interface SetNFTAllowanceParams {
+  nftId: string;
+  spenderContractId: string;
+  walletId: string;
+  signer: HashConnectSigner;
+}
+
+async function setNFTAllowance(params: SetNFTAllowanceParams) {
+  const nftAllowanceTxn = new AccountAllowanceApproveTransaction().approveTokenNftAllowanceAllSerials(
+    params.nftId,
+    params.walletId,
+    params.spenderContractId
+  );
+  const tokenAllowanceSignedTx = await nftAllowanceTxn.freezeWithSigner(params.signer);
+  const response = await tokenAllowanceSignedTx.executeWithSigner(params.signer);
+  checkTransactionResponseForError(response, TokenServiceFunctions.SetNFTAllowance);
+}
 
 const TokenService = {
   createToken,
@@ -206,6 +224,7 @@ const TokenService = {
   setHbarTokenAllowance,
   setHbarTokenAllowanceForAddLiquidity,
   associateTokenToWallet,
+  setNFTAllowance,
 };
 
 export default TokenService;

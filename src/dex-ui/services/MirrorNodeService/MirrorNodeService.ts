@@ -12,6 +12,7 @@ import {
   MirrorNodeBlocks,
   MirrorNodeProposalEventLog,
   MirrorNodeTokenBalance,
+  MirrorNodeTokenNFTResponse,
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
@@ -185,6 +186,21 @@ function createMirrorNodeService() {
   };
 
   /**
+   * Fetches the list of nfts associated with a token ID for a given account ID
+   * @param tokenId - The ID of the token to return NFTs for.
+   * @returns The list of NFTs for the given token ID.
+   */
+  const fetchTokenNFTs = async (tokenId: string, accountId: string): Promise<MirrorNodeTokenNFTResponse> => {
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/nfts`, {
+      params: {
+        order: "asc",
+        "account.id": accountId,
+      },
+    });
+    return response.data;
+  };
+
+  /**
    * Fetchs information about a specific blockNumber.
    * @param blockNumber - The block number to query.
    * @returns Information about the block.
@@ -313,6 +329,7 @@ function createMirrorNodeService() {
     // TODO: Decouple from MirrorNodeService and move to GovernanceService
     fetchContractProposalEvents,
     fetchUpgradeContractEvents,
+    fetchTokenNFTs,
   };
 }
 

@@ -1,12 +1,15 @@
 import { Divider, Flex, Text } from "@chakra-ui/react";
 import { Color, CopyTextButton } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
-import { CreateDAOTextProposalForm } from "../types";
+import { CreateDAOProposalContext, CreateDAOTextProposalForm } from "../types";
 import { useDexContext } from "@hooks";
+import { useOutletContext } from "react-router-dom";
+import { Paths } from "@routes";
 
 export function DAOTextProposalReviewForm() {
+  const { daoType } = useOutletContext<CreateDAOProposalContext>();
   const { getValues } = useFormContext<CreateDAOTextProposalForm>();
-  const { title, description, linkToDiscussion } = getValues();
+  const { title, description, linkToDiscussion, nftTokenSerialId } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
 
@@ -37,6 +40,17 @@ export function DAOTextProposalReviewForm() {
         </Text>
       </Flex>
       <Divider />
+      {daoType === Paths.DAOs.NFT && (
+        <>
+          <Flex direction="column" gap="2">
+            <Text textStyle="p small medium">Token serial number</Text>
+            <Text textStyle="p small regular" color={Color.Neutral._700}>
+              {nftTokenSerialId}
+            </Text>
+          </Flex>
+          <Divider />
+        </>
+      )}
       <Flex direction="column" gap="2">
         <Text textStyle="p small medium">Submitted By</Text>
         <Flex gap="2" alignItems="center">

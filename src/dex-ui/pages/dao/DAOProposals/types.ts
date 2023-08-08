@@ -21,6 +21,7 @@ export interface CreateDAOProposalFormBase {
 
 export interface CreateDAOTextProposalForm extends CreateDAOProposalFormBase {
   linkToDiscussion: string;
+  nftTokenSerialId: number;
 }
 
 export interface CreateDAOTokenTransferForm extends CreateDAOProposalFormBase {
@@ -67,4 +68,5 @@ export type CreateDAOProposalContext = {
   membersCount: number;
   proposalType: DAOProposalType;
   assets: TokenBalance[];
+  governanceTokenId: string;
 };

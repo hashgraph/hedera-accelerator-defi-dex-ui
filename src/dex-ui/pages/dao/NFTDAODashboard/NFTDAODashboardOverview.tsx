@@ -4,10 +4,18 @@ import { useOutletContext } from "react-router-dom";
 import { NFTDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
 import { convertFromBlocksToDays } from "@utils";
+import { RecentProposals } from "../RecentProposals";
+import { useGovernanceDAOProposals } from "@hooks";
 
 export function NFTDAODashboardOverview() {
   const { dao, totalAssetValue, tokenCount } = useOutletContext<NFTDAODetailsContext>();
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
+  const daoProposalsQueryResults = useGovernanceDAOProposals(dao.accountId, dao.tokenId, dao.governors);
+  const { isSuccess, isLoading, isError, error, data: proposals } = daoProposalsQueryResults;
+  const recentProposals = proposals
+    ?.sort((proposalA, proposalB) => +proposalB.timestamp - +proposalA.timestamp)
+    .slice(0, 3);
+
   return (
     <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
       <Flex gap="4" direction="column">
@@ -166,8 +174,18 @@ export function NFTDAODashboardOverview() {
           </GridItem>
         </Grid>
       </Flex>
-      <Flex gap="4" direction="column">
-        <Text textStyle="h4 medium">Recent Transactions</Text>
+      <Flex gap="2" direction="column">
+        <Text textStyle="h4 medium">Recent Proposals</Text>
+        <Flex direction="column" gap="2" minHeight="300px">
+          <RecentProposals
+            proposals={recentProposals}
+            dao={dao}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+            isError={isError}
+            error={error}
+          />
+        </Flex>
       </Flex>
     </Flex>
   );

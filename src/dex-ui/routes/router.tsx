@@ -156,6 +156,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.DAOProposalType} element={<DAOProposalTypeForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferDetails} element={<DAOTokenTransferDetailsForm />} />
           <Route path={Paths.DAOs.DAOTokenTransferReview} element={<DAOTokenTransferReviewForm />} />
+          <Route path={Paths.DAOs.DAOTextProposalDetails} element={<DAOTextProposalDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTextProposalReview} element={<DAOTextProposalReviewForm />} />
         </Route>
         <Route path={`${Paths.DAOs.Multisig}/:accountId/new-proposal`} element={<CreateDAOProposal />}>
           <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
@@ -186,6 +188,10 @@ export const router = createBrowserRouter(
         />
         <Route
           path={`${Paths.DAOs.GovernanceToken}/:accountId/proposals/:proposalId`}
+          element={<GovernanceProposalDetailsPage />}
+        />
+        <Route
+          path={`${Paths.DAOs.NFT}/:accountId/proposals/:proposalId`}
           element={<GovernanceProposalDetailsPage />}
         />
       </Route>
