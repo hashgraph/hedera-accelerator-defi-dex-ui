@@ -427,6 +427,12 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
           );
           break;
         }
+        case MultiSigProposeTransactionType.UpgradeProxy: {
+          parsedData = abiCoder.decode(
+            ["address proxy", "address proxyLogic", "address proxyAdmin"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+        }
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;

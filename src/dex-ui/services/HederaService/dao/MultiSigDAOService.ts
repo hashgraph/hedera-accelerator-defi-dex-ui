@@ -188,10 +188,49 @@ async function sendTokensTransaction(params: DepositTokensTransactionParams): Pr
   }
 }
 
+export interface ProposeMultiSigDAOUpgradeProposalParams {
+  multiSigDAOContractId: string;
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  newImplementationAddress: string;
+  oldProxyAddress: string;
+  signer: HashConnectSigner;
+}
+
+async function proposeMultiSigDAOUpgradeProposal(params: ProposeMultiSigDAOUpgradeProposalParams) {
+  const {
+    multiSigDAOContractId,
+    signer,
+    title,
+    description,
+    linkToDiscussion,
+    newImplementationAddress,
+    oldProxyAddress,
+  } = params;
+  const proxyContractAddress = ContractId.fromString(newImplementationAddress).toSolidityAddress();
+  const proxyToUpgrade = ContractId.fromString(oldProxyAddress).toSolidityAddress();
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddress(proxyToUpgrade)
+    .addAddress(proxyContractAddress)
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
+  const sendProposeDAOUpgradeTransaction = await new ContractExecuteTransaction()
+    .setContractId(multiSigDAOContractId)
+    .setFunction(MultiSigDAOContractFunctions.ProposeDAOUpgrade, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeDAOUpgradeResponse = await sendProposeDAOUpgradeTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendProposeDAOUpgradeResponse, MultiSigDAOContractFunctions.ProposeDAOUpgrade);
+  return sendProposeDAOUpgradeResponse;
+}
+
 export {
   sendCreateMultiSigDAOTransaction,
   sendProposeTransaction,
   sendUpdateDAODetailsTransaction,
   sendDAOTokenAssociateTransaction,
   sendTokensTransaction,
+  proposeMultiSigDAOUpgradeProposal,
 };

@@ -1,5 +1,6 @@
 import { StepProps } from "@dex-ui-components";
 import {
+  DAOUpgradeProposal,
   Proposal,
   ProposalDataAddMember,
   ProposalDataChangeThreshold,
@@ -9,8 +10,13 @@ import {
   ProposalType,
 } from "@hooks";
 import { ProposalState } from "@store/governanceSlice";
-import { HBARTokenSymbol, SENTINEL_OWNER, solidityAddressToTokenIdString, DAOType } from "@services";
-import { TokenId } from "@hashgraph/sdk";
+import {
+  HBARTokenSymbol,
+  SENTINEL_OWNER,
+  solidityAddressToTokenIdString,
+  solidityAddressToContractIdString,
+  DAOType,
+} from "@services";
 import { isHbarToken } from "@utils";
 import { Paths } from "@routes";
 
@@ -135,10 +141,16 @@ export function getProposalData(proposal: Proposal): string {
     }
     case ProposalType.TokenAssociate: {
       const { tokenAddress } = proposal.data as ProposalDataTokenAssociation;
-      const tokenToAssociate = TokenId.fromSolidityAddress(tokenAddress).toString();
+      const tokenToAssociate = solidityAddressToTokenIdString(tokenAddress);
       return isHbarToken(tokenToAssociate)
         ? `Associate Token: ${HBARTokenSymbol}`
         : `Associate Token: ${tokenToAssociate}`;
+    }
+    case ProposalType.UpgradeContract: {
+      const { proxy, proxyLogic } = proposal.data as DAOUpgradeProposal;
+      const newProxyId = solidityAddressToContractIdString(proxyLogic);
+      const oldProxyId = solidityAddressToContractIdString(proxy);
+      return `Proposed to upgrade DAO from ${oldProxyId} to ${newProxyId}`;
     }
     default:
       return "";

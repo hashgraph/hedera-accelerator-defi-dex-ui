@@ -19,6 +19,7 @@ export enum DAOMutations {
   CreateDeleteMemberProposal = "CreateDeleteMemberProposal",
   CreateReplaceMemberProposal = "CreateReplaceMemberProposal",
   CreateChangeThresholdProposal = "CreateChangeThresholdProposal",
+  CreateMultiSigDAOUpgradeProposal = "CreateMultiSigDAOUpgradeProposal",
   ApproveProposal = "ApproveProposal",
   ExecuteProposal = "ExecuteProposal",
   UpdateDAODetails = "UpdateDAODetails",
@@ -102,6 +103,12 @@ export interface ProposalDataGovernanceTokenTransfer {
   transferTokenAmount: number;
 }
 
+export interface DAOUpgradeProposal {
+  proxy: string;
+  proxyLogic: string;
+  proxyAdmin: string;
+}
+
 export type ProposalData =
   | ProposalDataTokenTransfer
   | ProposalDataHbarTransfer
@@ -110,7 +117,8 @@ export type ProposalData =
   | ProposalDataDeleteMember
   | ProposalDataReplaceMember
   | ProposalDataChangeThreshold
-  | ProposalDataGovernanceTokenTransfer;
+  | ProposalDataGovernanceTokenTransfer
+  | DAOUpgradeProposal;
 export interface Proposal {
   id: number;
   nonce: number;

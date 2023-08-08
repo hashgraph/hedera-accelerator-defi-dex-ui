@@ -6,6 +6,9 @@ import { DexService } from "..";
 export const solidityAddressToTokenIdString = (address: string): string =>
   TokenId.fromSolidityAddress(address).toString();
 
+export const solidityAddressToContractIdString = (address: string): string =>
+  ContractId.fromSolidityAddress(address).toString();
+
 /**
  * Checks if all addresses in the list are valid ethereum addresses.
  * @param addresses - Addresses to validate.

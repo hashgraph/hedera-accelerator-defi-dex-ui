@@ -8,6 +8,7 @@ export enum MultiSigDAOContractFunctions {
   ProposeTransaction = "proposeTransaction",
   ProposeTokenAssociation = "proposeTokenAssociateTransaction",
   DepositTokens = "depositTokens",
+  ProposeDAOUpgrade = "proposeUpgradeProxyTransaction",
 }
 
 export enum GovernorDAOContractFunctions {
