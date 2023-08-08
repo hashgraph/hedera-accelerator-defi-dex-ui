@@ -91,7 +91,7 @@ export const router = createBrowserRouter(
         <Route path={Paths.DAOs.Create} element={<CreateADAOPage />}>
           <Route index element={<Navigate to={Paths.DAOs.DAODetails} />} />
           <Route path={Paths.DAOs.DAODetails} element={<DAODetailsForm />} />
-          <Route path={Paths.DAOs.type} element={<DAOTypeForm />} />
+          <Route path={Paths.DAOs.Type} element={<DAOTypeForm />} />
           <Route path={Paths.DAOs.GovernanceToken} element={<TokenDAOGovernanceForm />} />
           <Route path={Paths.DAOs.GovernanceTokenVoting} element={<TokenDAOVotingForm />} />
           <Route path={Paths.DAOs.GovernanceTokenReview} element={<TokenDAOReviewForm />} />

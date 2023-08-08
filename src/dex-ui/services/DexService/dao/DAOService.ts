@@ -372,44 +372,61 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
     if (event.name === DAOEvents.TransactionCreated) {
       const transactionType: MultiSigProposeTransactionType = event.args.info.transactionType.toNumber();
       let parsedData;
-      if (transactionType === MultiSigProposeTransactionType.AddMember) {
-        parsedData = abiCoder.decode(
-          ["address owner", "uint256 _threshold"],
-          ethers.utils.hexDataSlice(event.args.info.data, 4)
-        );
-      } else if (transactionType === MultiSigProposeTransactionType.DeleteMember) {
-        parsedData = abiCoder.decode(
-          ["address prevOwner", "address owner", "uint256 _threshold"],
-          ethers.utils.hexDataSlice(event.args.info.data, 4)
-        );
-      } else if (transactionType === MultiSigProposeTransactionType.ReplaceMember) {
-        parsedData = abiCoder.decode(
-          ["address prevOwner", "address oldOwner", "address newOwner"],
-          ethers.utils.hexDataSlice(event.args.info.data, 4)
-        );
-      } else if (transactionType === MultiSigProposeTransactionType.ChangeThreshold) {
-        parsedData = abiCoder.decode(["uint256 _threshold"], ethers.utils.hexDataSlice(event.args.info.data, 4));
-      } else if (transactionType === MultiSigProposeTransactionType.TokenTransfer) {
-        parsedData = abiCoder.decode(
-          ["address token", "address receiver", "uint256 amount"],
-          ethers.utils.hexDataSlice(event.args.info.data, 4)
-        );
-      } else if (transactionType === MultiSigProposeTransactionType.TokenAssociation) {
-        parsedData = abiCoder.decode(
-          ["address", "address tokenAddress"],
-          ethers.utils.hexDataSlice(event.args.info.data, 4)
-        );
-      } else if (transactionType === MultiSigProposeTransactionType.HBARTokenTransfer) {
-        parsedData = {
-          amount: event.args.info.value,
-          receiver: event.args.info.to,
-          token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
-        };
-      } else if (transactionType === MultiSigProposeTransactionType.TypeSetText) {
-        parsedData = abiCoder.decode(
-          ["address account", "string title"],
-          ethers.utils.hexDataSlice(event.args.info.data, 4)
-        );
+      switch (transactionType) {
+        case MultiSigProposeTransactionType.AddMember: {
+          parsedData = abiCoder.decode(
+            ["address owner", "uint256 _threshold"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+          break;
+        }
+        case MultiSigProposeTransactionType.DeleteMember: {
+          parsedData = abiCoder.decode(
+            ["address prevOwner", "address owner", "uint256 _threshold"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+          break;
+        }
+        case MultiSigProposeTransactionType.ReplaceMember: {
+          parsedData = abiCoder.decode(
+            ["address prevOwner", "address oldOwner", "address newOwner"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+          break;
+        }
+        case MultiSigProposeTransactionType.ChangeThreshold: {
+          parsedData = abiCoder.decode(["uint256 _threshold"], ethers.utils.hexDataSlice(event.args.info.data, 4));
+          break;
+        }
+        case MultiSigProposeTransactionType.TokenTransfer: {
+          parsedData = abiCoder.decode(
+            ["address token", "address receiver", "uint256 amount"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+          break;
+        }
+        case MultiSigProposeTransactionType.TokenAssociation: {
+          parsedData = abiCoder.decode(
+            ["address", "address tokenAddress"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+          break;
+        }
+        case MultiSigProposeTransactionType.HBARTokenTransfer: {
+          parsedData = {
+            amount: event.args.info.value,
+            receiver: event.args.info.to,
+            token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
+          };
+          break;
+        }
+        case MultiSigProposeTransactionType.TypeSetText: {
+          parsedData = abiCoder.decode(
+            ["address account", "string title"],
+            ethers.utils.hexDataSlice(event.args.info.data, 4)
+          );
+          break;
+        }
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
       eventClone.args.info.data = parsedData;

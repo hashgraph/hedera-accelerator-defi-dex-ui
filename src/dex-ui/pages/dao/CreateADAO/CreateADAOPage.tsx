@@ -117,7 +117,7 @@ export function CreateADAOPage() {
     },
     {
       label: "Type",
-      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.type}`,
+      route: `${Paths.DAOs.absolute}/${Paths.DAOs.Create}/${Paths.DAOs.Type}`,
       validate: async () => trigger(["type"]),
     },
     {
