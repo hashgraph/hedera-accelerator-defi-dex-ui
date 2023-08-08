@@ -1,7 +1,8 @@
-import { Flex, FormControl, FormErrorMessage, FormHelperText, Text } from "@chakra-ui/react";
+import { Flex, Box, FormControl, FormErrorMessage, FormHelperText, Text } from "@chakra-ui/react";
 import { Input, InputProps } from "./Input";
 import { Color } from "@dex-ui-components";
 import { WarningIcon } from "@chakra-ui/icons";
+import { ReactNode } from "react";
 
 export interface FormInputProps<T extends string> {
   inputProps: InputProps<T>;
@@ -11,14 +12,17 @@ export interface FormInputProps<T extends string> {
   warningMessage?: string;
   isInvalid?: boolean;
   errorMessage?: string | undefined;
+  actionButton?: ReactNode;
 }
 
 export function FormInput<T extends string>(props: FormInputProps<T>) {
-  const { isInvalid, flex, inputProps, errorMessage, formHelperText, warningMessage, warningHeader } = props;
+  const { isInvalid, flex, inputProps, errorMessage, formHelperText, warningMessage, warningHeader, actionButton } =
+    props;
   return (
     <FormControl flex={flex} isInvalid={isInvalid}>
       <Input<T> {...inputProps} isError={isInvalid} />
       <FormErrorMessage>{errorMessage}</FormErrorMessage>
+      <Box padding="0 0.25rem">{actionButton}</Box>
       <FormHelperText textStyle="p small regular">{formHelperText}</FormHelperText>
       {/** TODO: Create Inline Alert Component */}
       {warningMessage && (

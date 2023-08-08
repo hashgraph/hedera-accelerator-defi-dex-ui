@@ -1,7 +1,6 @@
-import { Text } from "@chakra-ui/react";
+import { Text, Button } from "@chakra-ui/react";
 import { Color } from "../..";
 import { CogIcon } from "../Icons";
-import { Button } from "./Button";
 
 interface SettingsButtonProps {
   isError?: boolean;

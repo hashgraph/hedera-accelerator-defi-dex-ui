@@ -12,3 +12,4 @@ export * from "./swap";
 export * from "./pool";
 export * from "./token";
 export * from "./utils";
+export * from "./useInput";

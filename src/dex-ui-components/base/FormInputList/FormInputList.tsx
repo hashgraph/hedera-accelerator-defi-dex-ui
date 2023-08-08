@@ -8,8 +8,8 @@ import {
   UseFieldArrayRemove,
   UseFormRegister,
 } from "react-hook-form";
-import { Button, FormInput, CancelledStepIcon, Color } from "../..";
-import { Flex, IconButton } from "@chakra-ui/react";
+import { FormInput, CancelledStepIcon, Color } from "../..";
+import { Flex, IconButton, Button } from "@chakra-ui/react";
 
 interface FormInputListProps<FormType extends FieldValues, FormPath extends ArrayPath<FormType>> {
   fields: FieldArrayWithId<FormType, FormPath, "id">[];

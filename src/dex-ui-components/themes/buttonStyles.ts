@@ -1,5 +1,5 @@
 import { theme, ComponentStyleConfig } from "@chakra-ui/react";
-import { Color, TextStyles } from "../../../themes";
+import { Color, TextStyles } from "./";
 
 const primary = {
   ...TextStyles["p small semibold"],
@@ -88,6 +88,21 @@ export const ButtonStyles: ComponentStyleConfig = {
       bg: "transparent",
       padding: 0,
       margin: "0 -0.25rem",
+    },
+    "token-selector": {
+      padding: "0 1rem",
+      minWidth: "120px",
+      bg: "transparent",
+      border: "1px solid transparent",
+      color: Color.Black,
+      _hover: {
+        bg: "transparent",
+        border: `1px solid ${Color.Blue._300}`,
+        boxShadow: `0px 0px 0px 4px ${Color.Blue._100}`,
+      },
+      _focus: {
+        bg: "transparent",
+      },
     },
   },
   defaultProps: {

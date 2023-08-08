@@ -1,23 +1,11 @@
 import { Text, Flex } from "@chakra-ui/react";
-import {
-  HashScanLink,
-  HashscanData,
-  FormInput,
-  FormTextArea,
-  FormDropdown,
-  FormTokenInput,
-  useHalfMaxButtons,
-  useFormTokenInputPattern,
-} from "@dex-ui-components";
+import { HashScanLink, HashscanData, FormInput, FormTextArea } from "@dex-ui-components";
 import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@utils";
-import { ChangeEvent, useEffect } from "react";
-import { TokenBalance, useAccountTokenBalances } from "@hooks";
-import { HBARTokenId, HBARSymbol } from "@services";
-import { isEmpty, isNil } from "ramda";
-import BigNumber from "bignumber.js";
+import { useEffect } from "react";
+import { FormTokenInput } from "@components";
 
 export interface TokenTransferLocationState {
   state: {
@@ -28,30 +16,13 @@ export interface TokenTransferLocationState {
 export function DAOTokenTransferDetailsForm() {
   const { state } = useLocation() as TokenTransferLocationState;
   const { safeAccountId, daoType, proposalType } = useOutletContext<CreateDAOProposalContext>();
+  const form = useFormContext<CreateDAOTokenTransferForm>();
   const {
-    getValues,
     setValue,
+    getValues,
     register,
-    watch,
     formState: { errors },
-  } = useFormContext<CreateDAOTokenTransferForm>();
-  watch("tokenId");
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(safeAccountId ?? "");
-  const { data: tokenBalances } = accountTokenBalancesQueryResults;
-  const { tokenId } = getValues();
-  const selectedAsset =
-    isEmpty(tokenId) || isNil(tokenId)
-      ? undefined
-      : tokenBalances?.find(
-          (asset: TokenBalance) => asset.tokenId === tokenId || (tokenId === HBARTokenId && asset.symbol === HBARSymbol)
-        );
-
-  const { handleMaxButtonClicked, handleHalfButtonClicked } = useHalfMaxButtons(
-    String(selectedAsset?.balance ?? 0),
-    (amount: string | undefined) => setValue("amount", amount)
-  );
-
-  const { handleTokenInputChangeWithPattern } = useFormTokenInputPattern((value: string) => setValue("amount", value));
+  } = form;
 
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
@@ -62,41 +33,6 @@ export function DAOTokenTransferDetailsForm() {
       setValue("tokenId", state?.tokenId);
     }
   }, [setValue, state?.tokenId]);
-
-  function validateAmount(value: string | undefined) {
-    if (!value) {
-      return "An amount is required.";
-    }
-    const valueAsBigNumber = BigNumber(value);
-    if (!selectedAsset?.balance || selectedAsset?.balance <= 0) {
-      return "Token balance must be greater than 0.";
-    }
-    if (valueAsBigNumber.gt(selectedAsset?.balance)) {
-      return "Amount must be less than or equal to token balance.";
-    }
-    if (valueAsBigNumber.lte(0)) {
-      return "Amount must be greater than 0.";
-    }
-    if (!tokenId) {
-      return "A token must be selected.";
-    }
-    return true;
-  }
-
-  const assetDropdownOptions =
-    tokenBalances?.map((asset: TokenBalance) => {
-      const { symbol, tokenId } = asset;
-      if (symbol === HBARSymbol) {
-        return {
-          label: symbol,
-          value: HBARTokenId,
-        };
-      }
-      return {
-        label: symbol,
-        value: tokenId,
-      };
-    }) ?? [];
 
   return (
     <Flex direction="column" gap="4" width="100%">
@@ -167,65 +103,52 @@ export function DAOTokenTransferDetailsForm() {
         errorMessage={errors?.recipientAccountId && errors?.recipientAccountId?.message}
       />
       {daoType === "multisig" ? (
-        <FormDropdown
-          label="Assets"
-          placeholder="Select an asset"
-          data={assetDropdownOptions}
-          isInvalid={Boolean(errors?.tokenId)}
-          errorMessage={errors?.tokenId && errors?.tokenId?.message}
-          register={register("tokenId", {
-            required: { value: true, message: "A token is required." },
-            onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("tokenId", e.target.value),
-          })}
+        <FormTokenInput
+          amountFormId="amount"
+          tokenFormId="tokenId"
+          assetListAccountId={safeAccountId}
+          balanceAccountId={safeAccountId}
+          initialSelectedTokenId={state?.tokenId}
+          currentAmount={getValues().amount ?? ""}
+          isInvalid={Boolean(errors?.amount)}
+          errorMessage={errors?.amount && errors?.amount?.message}
+          form={form}
         />
       ) : (
-        <FormInput<"tokenId">
-          inputProps={{
-            id: "tokenId",
-            label: "Asset",
-            type: "text",
-            placeholder: "Enter a token ID",
-            register: {
-              ...register("tokenId", {
-                required: { value: true, message: "A token ID is required." },
-              }),
-            },
-            value: state?.tokenId,
-          }}
-          isInvalid={Boolean(errors?.tokenId)}
-          errorMessage={errors?.tokenId && errors?.tokenId?.message}
-        />
+        <>
+          <FormInput<"tokenId">
+            inputProps={{
+              id: "tokenId",
+              label: "Asset",
+              type: "text",
+              placeholder: "Enter a token ID",
+              register: {
+                ...register("tokenId", {
+                  required: { value: true, message: "A token ID is required." },
+                }),
+              },
+              value: state?.tokenId,
+            }}
+            isInvalid={Boolean(errors?.tokenId)}
+            errorMessage={errors?.tokenId && errors?.tokenId?.message}
+          />
+          <FormInput<"amount">
+            inputProps={{
+              id: "amount",
+              label: "Amount",
+              type: "text",
+              placeholder: "Enter an amount",
+              register: {
+                ...register("amount", {
+                  required: { value: true, message: "An amount is required." },
+                }),
+              },
+            }}
+            isInvalid={Boolean(errors?.amount)}
+            errorMessage={errors?.amount && errors?.amount?.message}
+          />
+        </>
       )}
-      <FormTokenInput<"amount">
-        inputProps={{
-          id: "amount",
-          pointerEvents: "all",
-          type: "text",
-          placeholder: "Enter amount",
-          label: (
-            <FormTokenInput.Label
-              tokenSymbol={selectedAsset?.symbol ?? ""}
-              balance={selectedAsset ? String(selectedAsset.balance ?? 0) : "--"}
-            />
-          ),
-          unit: (
-            <FormTokenInput.RightUnitContent
-              tokenSymbol={selectedAsset?.symbol}
-              handleHalfButtonClicked={handleHalfButtonClicked}
-              handleMaxButtonClicked={handleMaxButtonClicked}
-            />
-          ),
-          register: {
-            ...register("amount", {
-              required: { value: true, message: "An amount is required." },
-              validate: { validateAmount },
-              onChange: handleTokenInputChangeWithPattern,
-            }),
-          },
-        }}
-        isInvalid={Boolean(errors?.amount)}
-        errorMessage={errors?.amount && errors?.amount?.message}
-      />
     </Flex>
   );
 }
