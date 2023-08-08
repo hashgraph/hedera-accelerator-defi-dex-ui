@@ -25,7 +25,7 @@ export const Paths = {
     Create: "create",
     Overview: "overview",
     DAODetails: "details",
-    type: "type",
+    Type: "type",
     GovernanceToken: "governance-token",
     GovernanceTokenVoting: "governance-token/voting",
     GovernanceTokenReview: "governance-token/review",
