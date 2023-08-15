@@ -110,7 +110,6 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
-  const accountSolidityAddress = signer.getAccountId().toSolidityAddress();
   const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
   await DexService.setTokenAllowance({
@@ -124,7 +123,6 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
-    .addAddress(accountSolidityAddress)
     .addAddress(receiverSolidityAddress)
     .addAddress(tokenSolidityAddress)
     .addUint256(preciseAmount)
@@ -143,6 +141,61 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     GovernorDAOContractFunctions.CreateTokenTransferProposal
   );
   return sendProposeTokenTransferTransactionResponse;
+}
+
+interface TokenAssociateTransactionParams {
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  tokenId: string;
+  governanceTokenId: string;
+  daoAccountId: string;
+  governanceAddress: string;
+  nftTokenSerialId: number;
+  signer: HashConnectSigner;
+}
+
+async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactionParams) {
+  const {
+    title,
+    description,
+    linkToDiscussion,
+    tokenId,
+    governanceTokenId,
+    daoAccountId,
+    governanceAddress,
+    nftTokenSerialId,
+    signer,
+  } = params;
+  const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
+  const governanceTokenDetails = await DexService.fetchTokenData(governanceTokenId);
+  const governanceTokenDecimals = governanceTokenDetails.data.decimals;
+  const tokenAmount = BigNumber(1).shiftedBy(Number(governanceTokenDecimals)).toNumber();
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion)
+    .addAddress(tokenSolidityAddress)
+    .addUint256(nftTokenSerialId);
+  await DexService.setTokenAllowance({
+    tokenId: governanceTokenId,
+    walletId: signer.getAccountId().toString(),
+    spenderContractId,
+    tokenAmount,
+    signer,
+  });
+  const sendProposeTokenAssociationTransaction = await new ContractExecuteTransaction()
+    .setContractId(daoAccountId)
+    .setFunction(GovernorDAOContractFunctions.CreateTokenAssociationProposal, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeTokenAssociationResponse = await sendProposeTokenAssociationTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(
+    sendProposeTokenAssociationResponse,
+    GovernorDAOContractFunctions.CreateTokenAssociationProposal
+  );
+  return sendProposeTokenAssociationResponse;
 }
 
 interface SendDAOContractUpgradeProposalTransactionParams {
@@ -268,4 +321,5 @@ export {
   sendProposeTokenTransferTransaction,
   sendContractUpgradeTransaction,
   sendTextProposalTransaction,
+  sendGOVTokenAssociateTransaction,
 };

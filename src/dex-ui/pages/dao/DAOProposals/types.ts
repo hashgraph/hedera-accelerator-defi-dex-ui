@@ -34,6 +34,7 @@ export interface CreateDAOTokenTransferForm extends CreateDAOProposalFormBase {
 
 export interface CreateDAOTokenAssociateForm extends CreateDAOProposalFormBase {
   tokenId: string;
+  linkToDiscussion: string;
 }
 
 export interface CreateDAOMemberOperationForm extends CreateDAOProposalFormBase {

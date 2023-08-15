@@ -69,6 +69,11 @@ const GovernanceProposals = [
     icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
   {
+    title: DAOProposalType.TokenAssociate,
+    label: "Propose a token associate.",
+    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+  },
+  {
     title: DAOProposalType.ContractUpgrade,
     label: "Propose to upgrade to the latest version of the DAO's contract.",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,

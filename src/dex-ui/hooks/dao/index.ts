@@ -18,4 +18,5 @@ export * from "./useCreateDAOTokenAssociateProposal";
 export * from "./useDepositTokens";
 export * from "./useCreateMultiSigTextProposal";
 export * from "./useCreateMultiSigDAOUpgradeProposal";
+export * from "./useCreateGOVTokenAssociateProposal";
 export * from "./types";

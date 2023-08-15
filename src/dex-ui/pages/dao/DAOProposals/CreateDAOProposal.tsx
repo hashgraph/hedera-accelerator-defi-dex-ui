@@ -36,11 +36,11 @@ import {
   useCreateMultiSigTextProposal,
   useCreateMultiSigDAOUpgradeProposal,
   useDAOs,
-  useDexContext,
   useHandleTransactionSuccess,
+  useCreateGOVTokenAssociateProposal,
 } from "@hooks";
 import { isNil } from "ramda";
-import { TransactionResponse } from "@hashgraph/sdk";
+import { AccountId, TransactionResponse } from "@hashgraph/sdk";
 import { getLastPathInRoute } from "@utils";
 import { getDAOType, getPreviousMemberAddress } from "../utils";
 
@@ -75,11 +75,11 @@ export function CreateDAOProposal() {
   const { ownerIds, safeId: safeAccountId = "", threshold, safeEVMAddress } = (dao as MultiSigDAODetails) ?? {};
   const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
-  const transferFrom = currentDaoType === Paths.DAOs.Multisig ? safeAccountId : walletId;
+  const tokenTransferGovernorAccountId = governors?.tokenTransferLogic
+    ? AccountId.fromSolidityAddress(governors.tokenTransferLogic).toString()
+    : "";
+  const transferFrom = currentDaoType === Paths.DAOs.Multisig ? safeAccountId : tokenTransferGovernorAccountId;
   const wizardTitle = currentWizardStep === "type" ? "New Proposal" : type;
-
   const accountTokenBalancesQueryResults = useAccountTokenBalances(
     currentDaoType === Paths.DAOs.Multisig ? safeAccountId : daoAccountId
   );
@@ -163,6 +163,15 @@ export function CreateDAOProposal() {
     reset: resetCreateDAOTokenAssociateProposal,
   } = sendDAOTokenAssociateResults;
 
+  const sendGOVTokenAssociateResults = useCreateGOVTokenAssociateProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateGOVTokenAssociateProposalLoading,
+    isError: isCreateGOVTokenAssociateProposalFailed,
+    error: isCreateGOVTokenAssociateProposalError,
+    mutate: createGOVTokenAssociateProposal,
+    reset: resetCreateGOVTokenAssociateProposal,
+  } = sendGOVTokenAssociateResults;
+
   const sendMultiSigDAOTextProposalResults = useCreateMultiSigTextProposal(handleCreateDAOProposalSuccess);
   const {
     isLoading: isCreateMultiSigTextProposalLoading,
@@ -191,6 +200,7 @@ export function CreateDAOProposal() {
     isCreateDAOTextProposalLoading ||
     isChangeThresholdLoading ||
     isCreateTokenAssociateProposalLoading ||
+    isCreateGOVTokenAssociateProposalLoading ||
     isCreateMultiSigTextProposalLoading ||
     isCreateMultiSigUpgradeProposalLoading;
 
@@ -204,6 +214,7 @@ export function CreateDAOProposal() {
     isCreateDAOTextProposalFailed ||
     isChangeThresholdFailed ||
     isCreateTokenAssociateProposalFailed ||
+    isCreateGOVTokenAssociateProposalFailed ||
     isCreateMultiSigTextProposalFailed ||
     isCreateMultiSigUpgradeProposalFailed;
 
@@ -238,6 +249,7 @@ export function CreateDAOProposal() {
     resetCreateDAOUpgradeProposal();
     resetCreateDAOTextProposal();
     resetCreateDAOTokenAssociateProposal();
+    resetCreateGOVTokenAssociateProposal();
     resetCreateMultiSigTextProposal();
     resetCreateMultiSigUpgradeProposal();
   }
@@ -257,6 +269,7 @@ export function CreateDAOProposal() {
     if (isCreateDAOUpgradeError) return isCreateDAOUpgradeError.message;
     if (isCreateDAOTextProposalError) return isCreateDAOTextProposalError.message;
     if (isCreateTokenAssociateProposalError) return isCreateTokenAssociateProposalError.message;
+    if (isCreateGOVTokenAssociateProposalError) return isCreateGOVTokenAssociateProposalError.message;
     if (isCreateMultiSigTextProposalError) return isCreateMultiSigTextProposalError.message;
     if (isCreateMultiSigUpgradeProposalError) return isCreateMultiSigUpgradeProposalError.message;
     return "";
@@ -435,14 +448,32 @@ export function CreateDAOProposal() {
         }
       }
       case DAOProposalType.TokenAssociate: {
-        const { title, description, tokenId } = data as CreateDAOTokenAssociateForm;
-        return createDAOTokenAssociateProposal({
-          title,
-          description,
-          linkToDiscussion: "", //TODO: To be removed from SC
-          daoAccountId,
-          tokenId,
-        });
+        const { title, description, tokenId, linkToDiscussion } = data as CreateDAOTokenAssociateForm;
+        switch (getDAOType(currentDaoType)) {
+          case DAOType.MultiSig:
+            return createDAOTokenAssociateProposal({
+              title,
+              description,
+              linkToDiscussion,
+              daoAccountId,
+              tokenId,
+            });
+          case DAOType.GovernanceToken:
+            return createGOVTokenAssociateProposal({
+              title,
+              description,
+              linkToDiscussion,
+              tokenId,
+              governanceTokenId,
+              daoAccountId,
+              governanceAddress: governors.tokenTransferLogic,
+              nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+            });
+          case DAOType.NFT:
+            return;
+          default:
+            return;
+        }
       }
     }
   }
@@ -558,12 +589,12 @@ export function CreateDAOProposal() {
       case DAOProposalType.ContractUpgrade:
         return trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
       case DAOProposalType.TokenTransfer: {
-        return currentDaoType === "multisig"
+        return currentDaoType === Paths.DAOs.Multisig
           ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])
           : trigger(["title", "description", "linkToDiscussion", "recipientAccountId", "tokenId", "amount"]);
       }
       case DAOProposalType.TokenAssociate:
-        return trigger(["tokenId", "title", "description"]);
+        return trigger(["tokenId", "title", "description", "linkToDiscussion"]);
       default:
         return Promise.resolve(true);
     }

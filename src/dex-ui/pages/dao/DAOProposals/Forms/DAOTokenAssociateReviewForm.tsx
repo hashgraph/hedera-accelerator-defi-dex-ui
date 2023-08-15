@@ -12,7 +12,7 @@ export function DAOTokenAssociateReviewForm() {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { getValues } = useFormContext<CreateDAOTokenAssociateForm>();
-  const { tokenId, title, description } = getValues() ?? {};
+  const { tokenId, title, description, linkToDiscussion } = getValues() ?? {};
   const { error, isSuccess, isError, isLoading, data: token } = useToken(tokenId);
   const isNotFound = isSuccess && isNil(token);
   const isTokenFound = isSuccess && isNotNil(token);
@@ -50,6 +50,13 @@ export function DAOTokenAssociateReviewForm() {
           <Text textStyle="p small medium">Description</Text>
           <Text textStyle="p small regular" color={Color.Neutral._700}>
             {description}
+          </Text>
+        </Flex>
+        <Divider />
+        <Flex direction="column" gap="2">
+          <Text textStyle="p small medium">Link to Discussion</Text>
+          <Text textStyle="p small regular" color={Color.Neutral._700}>
+            {linkToDiscussion}
           </Text>
         </Flex>
         <Divider />

@@ -5,6 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { CreateDAOProposalContext, CreateDAOTokenAssociateForm, DAOProposalType } from "../types";
 import { isNil } from "ramda";
 import { useEffect } from "react";
+import { isValidUrl } from "@utils";
 
 export function DAOTokenAssociateDetailsForm() {
   const { safeAccountId, assets, proposalType } = useOutletContext<CreateDAOProposalContext>();
@@ -53,6 +54,21 @@ export function DAOTokenAssociateDetailsForm() {
         }}
         isInvalid={Boolean(errors?.description)}
         errorMessage={errors?.description && errors?.description?.message}
+      />
+      <FormInput<"linkToDiscussion">
+        inputProps={{
+          id: "linkToDiscussion",
+          label: "Link to discussion",
+          type: "text",
+          placeholder: "Enter URL",
+          register: {
+            ...register("linkToDiscussion", {
+              validate: (value) => isValidUrl(value) || "Invalid URL, Please try again.",
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors?.linkToDiscussion)}
+        errorMessage={errors?.linkToDiscussion && errors?.linkToDiscussion?.message}
       />
       <Flex direction="column" alignItems="left" gap="1">
         <Text textStyle="p small medium">Associating To</Text>

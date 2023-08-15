@@ -33,6 +33,7 @@ import {
   DAOProposalGovernors,
   DAOSettingsDetails,
   DAODetailsInfoEventArgs,
+  GovernanceProposalOperationType,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@utils";
@@ -456,21 +457,35 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
   const getTokenTransferDetailsFromHexData = (data: string | undefined) => {
     if (isNil(data)) return { ...DefaultTokenTransferDetails };
     const abiCoder = ethers.utils.defaultAbiCoder;
-    const parsedData = abiCoder.decode(
-      [
-        "address transferFromAccount",
-        "address transferToAccount",
-        "address tokenToTransfer",
-        "uint256 transferTokenAmount",
-      ],
-      data
-    );
-    return {
-      transferFromAccount: solidityAddressToTokenIdString(parsedData.transferFromAccount),
-      transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
-      tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
-      transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
-    };
+    const operationTypeData = ethers.utils.defaultAbiCoder.decode(["uint256 operationType"], data);
+    const operationType = convertEthersBigNumberToBigNumberJS(operationTypeData.operationType).toNumber();
+    switch (operationType) {
+      case GovernanceProposalOperationType.TokenTransfer: {
+        const parsedData = abiCoder.decode(
+          [
+            "uint256 operationType",
+            "address transferToAccount",
+            "address tokenToTransfer",
+            "uint256 transferTokenAmount",
+          ],
+          data
+        );
+        return {
+          transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+          tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
+          transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
+        };
+      }
+      case GovernanceProposalOperationType.TokenAssociation: {
+        const parsedData = abiCoder.decode(["uint256 operationType", "address tokenToAssociate"], data);
+        return {
+          type: ProposalType.TokenAssociate,
+          tokenToAssociate: solidityAddressToTokenIdString(parsedData.tokenToAssociate),
+        };
+      }
+      default:
+        return { ...DefaultTokenTransferDetails };
+    }
   };
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
     const proposalEventsResults = await Promise.allSettled([

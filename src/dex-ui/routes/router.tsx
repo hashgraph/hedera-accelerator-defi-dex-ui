@@ -150,6 +150,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.DAOs.DAOContractUpgradeReview} element={<DAOContractUpgradeReviewForm />} />
           <Route path={Paths.DAOs.DAOTextProposalDetails} element={<DAOTextProposalDetailsForm />} />
           <Route path={Paths.DAOs.DAOTextProposalReview} element={<DAOTextProposalReviewForm />} />
+          <Route path={Paths.DAOs.DAOTokenAssociateDetails} element={<DAOTokenAssociateDetailsForm />} />
+          <Route path={Paths.DAOs.DAOTokenAssociateReview} element={<DAOTokenAssociateReviewForm />} />
         </Route>
         <Route path={`${Paths.DAOs.NFT}/:accountId/new-proposal`} element={<CreateDAOProposal />}>
           <Route index element={<Navigate to={Paths.DAOs.DAOProposalType} />} />
