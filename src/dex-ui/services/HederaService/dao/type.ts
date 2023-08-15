@@ -16,6 +16,7 @@ export enum GovernorDAOContractFunctions {
   CreateTokenTransferProposal = "createTokenTransferProposal",
   CreateContractUpgradeProposal = "createContractUpgradeProposal",
   CreateTextProposal = "createTextProposal",
+  CreateTokenAssociationProposal = "createTokenAssociateProposal",
 }
 
 export enum NFTDAOContractFunctions {

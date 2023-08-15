@@ -168,3 +168,8 @@ export interface Member {
 export type DAODetailsContext = {
   dao: DAO;
 };
+
+export enum GovernanceProposalOperationType {
+  TokenTransfer = 1,
+  TokenAssociation,
+}
