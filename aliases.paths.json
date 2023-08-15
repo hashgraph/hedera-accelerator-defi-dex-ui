@@ -1,14 +1,16 @@
 {
-    "@dex-ui": "src/dex-ui",
-    "@components": "src/dex-ui/components",
-    "@context": "src/dex-ui/context",
-    "@hooks": "src/dex-ui/hooks",
-    "@layouts": "src/dex-ui/layouts",
-    "@pages": "src/dex-ui/pages",
-    "@services": "src/dex-ui/services",
-    "@store": "src/dex-ui/store",
-    "@theme": "src/dex-ui/theme",
-    "@routes": "src/dex-ui/routes",
-    "@utils": "src/dex-ui/utils",
-    "@dex-ui-components": "src/dex-ui-components"
+  "@dao": "src/dao",
+  "@dao/routes": "src/dao/routes",
+  "@dex": "src/dex",
+  "@dex/components": "src/dex/components",
+  "@dex/context": "src/dex/context",
+  "@dex/hooks": "src/dex/hooks",
+  "@dex/layouts": "src/dex/layouts",
+  "@dex/pages": "src/dex/pages",
+  "@dex/services": "src/dex/services",
+  "@dex/store": "src/dex/store",
+  "@dex/theme": "src/dex/theme",
+  "@dex/routes": "src/dex/routes",
+  "@dex/utils": "src/dex/utils",
+  "@shared/ui-kit": "src/dex-ui-components"
 }

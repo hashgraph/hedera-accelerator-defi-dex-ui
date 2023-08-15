@@ -1,5 +1,5 @@
 import { isNil, isEmpty } from "ramda";
-import { Pool } from "../../../dex-ui/store/poolsSlice/types";
+import { Pool } from "../../../dex/store/poolsSlice/types";
 import { TokenState } from "../types";
 import { BigNumber } from "bignumber.js";
 

@@ -2,78 +2,34 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@dex-ui": [
-        "dex-ui"
-      ],
-      "@dex-ui/*": [
-        "dex-ui/*"
-      ],
-      "@components": [
-        "dex-ui/components"
-      ],
-      "@components/*": [
-        "dex-ui/components/*"
-      ],
-      "@context": [
-        "dex-ui/context"
-      ],
-      "@context/*": [
-        "dex-ui/context/*"
-      ],
-      "@hooks": [
-        "dex-ui/hooks"
-      ],
-      "@hooks/*": [
-        "dex-ui/hooks/*"
-      ],
-      "@layouts": [
-        "dex-ui/layouts"
-      ],
-      "@layouts/*": [
-        "dex-ui/layouts/*"
-      ],
-      "@pages": [
-        "dex-ui/pages"
-      ],
-      "@pages/*": [
-        "dex-ui/pages/*"
-      ],
-      "@services": [
-        "dex-ui/services"
-      ],
-      "@services/*": [
-        "dex-ui/services/*"
-      ],
-      "@store": [
-        "dex-ui/store"
-      ],
-      "@store/*": [
-        "dex-ui/store/*"
-      ],
-      "@theme": [
-        "dex-ui/theme"
-      ],
-      "@theme/*": [
-        "dex-ui/theme/*"
-      ],
-      "@routes": [
-        "dex-ui/routes"
-      ],
-      "@routes/*": [
-        "dex-ui/routes/*"
-      ],
-      "@utils": [
-        "dex-ui/utils"
-      ],
-      "@utils/*": [
-        "dex-ui/utils/*"
-      ],
-      "@dex-ui-components": [
-        "dex-ui-components"
-      ],
-      "@dex-ui-components/*": [
-        "dex-ui-components/*"
-      ],
-    },
+      "@dao": ["dao"],
+      "@dao/*": ["dao/*"],
+      "@dao/routes": ["dao/routes"],
+      "@dao/routes/*": ["dao/routes/*"],
+      "@dex": ["dex"],
+      "@dex/*": ["dex/*"],
+      "@dex/components": ["dex/components"],
+      "@dex/components/*": ["dex/components/*"],
+      "@dex/context": ["dex/context"],
+      "@dex/context/*": ["dex/context/*"],
+      "@dex/hooks": ["dex/hooks"],
+      "@dex/hooks/*": ["dex/hooks/*"],
+      "@dex/layouts": ["dex/layouts"],
+      "@dex/layouts/*": ["dex/layouts/*"],
+      "@dex/pages": ["dex/pages"],
+      "@dex/pages/*": ["dex/pages/*"],
+      "@dex/services": ["dex/services"],
+      "@dex/services/*": ["dex/services/*"],
+      "@dex/store": ["dex/store"],
+      "@dex/store/*": ["dex/store/*"],
+      "@dex/theme": ["dex/theme"],
+      "@dex/theme/*": ["dex/theme/*"],
+      "@dex/routes": ["dex/routes"],
+      "@dex/routes/*": ["dex/routes/*"],
+      "@dex/utils": ["dex/utils"],
+      "@dex/utils/*": ["dex/utils/*"],
+      "@shared/ui-kit": ["dex-ui-components"],
+      "@shared/ui-kit/*": ["dex-ui-components/*"]
+    }
   }
 }

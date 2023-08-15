@@ -2,7 +2,7 @@ import { Stepper, Step, StepLabel, Orientation } from "@material-ui/core";
 import { Box, Text, Flex } from "@chakra-ui/react";
 import { StepperStyles } from "./StepperStyles";
 import { ProposalStateIcon, ProposalState } from "./types";
-import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon, Color } from "@dex-ui-components";
+import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon, Color } from "@shared/ui-kit";
 
 const GetStatusIcon = (iconType: string) => {
   switch (iconType) {

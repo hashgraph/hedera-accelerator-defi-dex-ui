@@ -10,7 +10,7 @@ import {
 } from "../../base";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { AccountBalanceJson } from "@hashgraph/sdk";
-import { TransactionState } from "../../../dex-ui/store/swapSlice";
+import { TransactionState } from "../../../dex/store/swapSlice";
 import { DefiFormLayout } from "../layouts";
 import { SwapTokensFormData, Token, TokenPair } from "./types";
 import { TokenState } from "../types";
@@ -31,11 +31,11 @@ import {
 import { InitialTokenState } from "../constants";
 import { InitialSwapFormState } from "./constants";
 import { isEmpty, isNil } from "ramda";
-import { useSwapData } from "../../../dex-ui/hooks";
-import { REFRESH_INTERVAL } from "../../../dex-ui/hooks/constants";
+import { useSwapData } from "../../../dex/hooks";
+import { REFRESH_INTERVAL } from "../../../dex/hooks/constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
-import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
-import { PairDataResponse } from "../../../dex-ui/hooks/swap/types";
+import { convertNumberOfMinsToSeconds } from "../../../dex/utils";
+import { PairDataResponse } from "../../../dex/hooks/swap/types";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 interface SwapTokensFormProps {

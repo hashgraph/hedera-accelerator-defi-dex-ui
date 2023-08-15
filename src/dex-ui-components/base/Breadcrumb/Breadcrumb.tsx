@@ -1,5 +1,5 @@
 import { Text, Link } from "@chakra-ui/react";
-import { Color } from "@dex-ui-components";
+import { Color } from "@shared/ui-kit";
 import { Link as ReachLink } from "react-router-dom";
 
 interface BreadcrumbProps {

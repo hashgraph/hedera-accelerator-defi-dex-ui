@@ -1,6 +1,6 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Link, Text, Flex } from "@chakra-ui/react";
-import { createHashScanLink } from "../../../dex-ui/utils";
+import { createHashScanLink } from "../../../dex/utils";
 import { Color } from "../../themes";
 
 export enum HashscanData {

@@ -1,7 +1,7 @@
 import { isNil } from "ramda";
 import { useState } from "react";
-import { useLocalStorage } from "../../../dex-ui/hooks";
-import { DefaultAmount, DefaultPercent } from "../../../dex-ui/utils";
+import { useLocalStorage } from "../../../dex/hooks";
+import { DefaultAmount, DefaultPercent } from "../../../dex/utils";
 import { TransactionDeadline, LocalStorageKeys } from "../constants";
 interface UseFormSettingsProps {
   slippage?: number;

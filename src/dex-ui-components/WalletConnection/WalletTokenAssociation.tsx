@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Text, Flex, Divider, CircularProgress, Button } from "@chakra-ui/react";
-import { AlertDialog, CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@dex-ui-components";
+import { AlertDialog, CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@shared/ui-kit";
 import { useForm } from "react-hook-form";
-import { useAssociateToken, useHandleTransactionSuccess, useFetchTokenData, useTokenBalance } from "@hooks";
+import { useAssociateToken, useHandleTransactionSuccess, useFetchTokenData, useTokenBalance } from "@dex/hooks";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { checkForValidTokenId } from "@utils";
-import { MirrorNodeTokenById, DEBOUNCE_TIME } from "@services";
+import { checkForValidTokenId } from "@dex/utils";
+import { MirrorNodeTokenById, DEBOUNCE_TIME } from "@dex/services";
 import { debounce } from "ts-debounce";
 import { isNil, isNotNil } from "ramda";
 

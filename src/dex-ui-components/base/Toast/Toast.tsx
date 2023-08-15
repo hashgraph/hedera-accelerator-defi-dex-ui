@@ -3,7 +3,7 @@ import { ToastErrorIcon, ToastSuccessIcon, ToastInfoIcon, XIcon } from "../Icons
 import { Color } from "../../themes";
 import { ToastContentProps as ToastifyProps } from "react-toastify";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { createHashScanTransactionLink } from "@utils";
+import { createHashScanTransactionLink } from "@dex/utils";
 
 enum ToastType {
   Success = "success",

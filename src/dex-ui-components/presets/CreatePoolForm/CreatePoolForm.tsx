@@ -11,22 +11,22 @@ import { TokenPair } from "../SwapTokensForm/types";
 import { TokenInput } from "../TokenInput";
 import { isNil } from "ramda";
 import { TokenState } from "../types";
-import { usePoolsData } from "../../../dex-ui/hooks";
-import { REFRESH_INTERVAL } from "../../../dex-ui/hooks/constants";
+import { usePoolsData } from "../../../dex/hooks";
+import { REFRESH_INTERVAL } from "../../../dex/hooks/constants";
 import {
   getTokenBalance,
   getUniqueTokensFromSelectedOne,
   getTokensByUniqueAccountIds,
   getCreatePoolExchangeRate,
 } from "../utils";
-import { CreatePoolState, SendCreatePoolTransactionParams, Pool } from "../../../dex-ui/store/poolsSlice";
+import { CreatePoolState, SendCreatePoolTransactionParams, Pool } from "../../../dex/store/poolsSlice";
 import { AlertDialog, LoadingDialog } from "../../base";
 import { WarningIcon } from "@chakra-ui/icons";
-import { TransactionStatus } from "../../../dex-ui/store/appSlice";
-import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
+import { TransactionStatus } from "../../../dex/store/appSlice";
+import { convertNumberOfMinsToSeconds } from "../../../dex/utils";
 import { useCreatePoolFormData } from "./useCreatePoolForm";
 import { DropdownSelector } from "../../base";
-import { PoolTransactionFee } from "../../../dex-ui/hooks/pool/types";
+import { PoolTransactionFee } from "../../../dex/hooks/pool/types";
 
 interface CreatePoolFormProps {
   isLoading: boolean;
