@@ -2,10 +2,10 @@ import { isEmpty, isNil, uniqBy } from "ramda";
 import { CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW, Token, TokenPair } from "./TokenInput";
 import { TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
 import { TokenState } from "./types";
-import { HBARTokenId } from "../../dex-ui/services";
+import { HBARTokenId } from "../../dex/services";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
-import { formatBigNumberToPercent } from "../../dex-ui/utils";
-import { UserPool } from "../../dex-ui/store/poolsSlice";
+import { formatBigNumberToPercent } from "../../dex/utils";
+import { UserPool } from "../../dex/store/poolsSlice";
 import { BigNumber } from "bignumber.js";
 
 /**

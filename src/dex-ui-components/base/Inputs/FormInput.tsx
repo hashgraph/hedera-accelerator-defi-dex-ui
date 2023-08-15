@@ -1,6 +1,6 @@
 import { Flex, Box, FormControl, FormErrorMessage, FormHelperText, Text } from "@chakra-ui/react";
 import { Input, InputProps } from "./Input";
-import { Color } from "@dex-ui-components";
+import { Color } from "@shared/ui-kit";
 import { WarningIcon } from "@chakra-ui/icons";
 import { ReactNode } from "react";
 

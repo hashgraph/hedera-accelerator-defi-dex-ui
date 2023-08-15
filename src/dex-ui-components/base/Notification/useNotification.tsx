@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { TransactionState } from "@store/swapSlice";
-import { createHashScanTransactionLink } from "@utils";
+import { TransactionState } from "@dex/store";
+import { createHashScanTransactionLink } from "@dex/utils";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface UseNotificationProps {

@@ -8,10 +8,10 @@ import { FormSettings, useFormSettings } from "../FormSettings";
 import { DefiFormLayout } from "../layouts";
 import { isEmpty, isNil } from "ramda";
 import { LPTokenDetails, PoolLiquidityDetails } from "./types";
-import { SendWithdrawTransactionParams, WithdrawState } from "../../../dex-ui/store/poolsSlice";
-import { convertNumberOfMinsToSeconds } from "../../../dex-ui/utils";
+import { SendWithdrawTransactionParams, WithdrawState } from "../../../dex/store/poolsSlice";
+import { convertNumberOfMinsToSeconds } from "../../../dex/utils";
 import { AlertDialog, LoadingDialog } from "../../base";
-import { TransactionStatus } from "../../../dex-ui/store/appSlice";
+import { TransactionStatus } from "../../../dex/store/appSlice";
 import { WarningIcon } from "@chakra-ui/icons";
 import { LPTokenInput } from "../LPTokenInput";
 

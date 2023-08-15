@@ -11,8 +11,8 @@ import { TokenPair } from "../SwapTokensForm/types";
 import { TokenInput } from "../TokenInput";
 import { isEmpty, isNil } from "ramda";
 import { TokenState } from "../types";
-import { usePoolsData, useSwapData } from "../../../dex-ui/hooks";
-import { REFRESH_INTERVAL } from "../../../dex-ui/hooks/constants";
+import { usePoolsData, useSwapData } from "../../../dex/hooks";
+import { REFRESH_INTERVAL } from "../../../dex/hooks/constants";
 import {
   calculatePoolRatio,
   getExchangeRateDisplay,
@@ -24,11 +24,11 @@ import {
   getTokensByUniqueAccountIds,
 } from "../utils";
 import { InitialTokenState } from "../constants";
-import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "../../../dex-ui/store/poolsSlice";
+import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "../../../dex/store/poolsSlice";
 import { AlertDialog, DropdownSelector, LoadingDialog } from "../../base";
 import { WarningIcon } from "@chakra-ui/icons";
-import { TransactionStatus } from "../../../dex-ui/store/appSlice";
-import { convertNumberOfMinsToSeconds, getAllPoolTransactionFee } from "../../../dex-ui/utils";
+import { TransactionStatus } from "../../../dex/store/appSlice";
+import { convertNumberOfMinsToSeconds, getAllPoolTransactionFee } from "../../../dex/utils";
 import { isNotNil } from "ramda";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;

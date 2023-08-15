@@ -21,7 +21,7 @@ import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { Color, AlertDialog, WalletTokenAssociation } from "../";
 import { formatWalletConnectionData } from "./formatter";
-import { DexService, TOKEN_USER_ID } from "@services";
+import { DexService, TOKEN_USER_ID } from "@dex/services";
 import { isEmpty } from "ramda";
 
 /** TODO: Replace this with the real terms and service agreement. */
