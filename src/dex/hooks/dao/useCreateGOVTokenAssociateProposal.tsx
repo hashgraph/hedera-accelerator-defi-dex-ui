@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
-import { DexService } from "@services";
-import { useDexContext, HandleOnSuccess } from "@hooks";
+import { DexService } from "@dex/services";
+import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
 
 interface UseCreateGOVTokenAssociateProposalParams {

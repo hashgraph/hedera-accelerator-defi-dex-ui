@@ -16,7 +16,7 @@ import { ethers } from "ethers";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import { isHbarToken } from "@dex/utils";
 import BaseDAOJSON from "../../abi/BaseDAO.json";
-import { DexService } from "@services";
+import { DexService } from "@dex/services";
 
 const Gas = 9000000;
 

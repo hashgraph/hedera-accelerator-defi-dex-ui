@@ -1,4 +1,4 @@
-import { TokenBalance } from "@hooks";
+import { TokenBalance } from "@dex/hooks";
 import { BigNumber } from "ethers";
 
 export enum DAOType {

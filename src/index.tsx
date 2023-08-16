@@ -28,16 +28,13 @@ initializeServices().then(() => {
   const subdomain = process.env.NODE_ENV === DEV_ENV ? devHostname : window.location.hostname.split(".")?.[0];
 
   function getApp(): React.ReactNode {
-    switch (subdomain) {
-      case DAO_HOSTNAME:
-        return <DAO />;
-      case DEX_HOSTNAME: {
-        MenuOptions = ["Swap", "Pools", "Governance"];
-        return <DEX />;
-      }
-      default:
-        return <>Cannot resolve hostname</>;
+    if (subdomain.includes(DAO_HOSTNAME)) return <DAO />;
+    if (subdomain.includes(DEX_HOSTNAME)) {
+      MenuOptions = ["Swap", "Pools", "Governance"];
+      return <DEX />;
     }
+    /** TODO: Style this error message component. */
+    return <>Cannot resolve hostname</>;
   }
 
   root.render(<DEXStoreProvider {...DEFAULT_DEX_PROVIDER_PROPS}>{getApp()}</DEXStoreProvider>);
