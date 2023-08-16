@@ -19,17 +19,14 @@ export const ProposalStatusAsStep: Readonly<{ [key in ProposalStatus]: number }>
 
 interface ProposalDetailsStepperProps {
   status: ProposalStatus;
-  isThresholdReached?: boolean;
   isExecutionProcessing: boolean;
   hasExecutionFailed: boolean;
 }
 
 export function ProposalDetailsStepper(props: ProposalDetailsStepperProps) {
-  const { status, isThresholdReached = false, isExecutionProcessing, hasExecutionFailed } = props;
+  const { status, isExecutionProcessing, hasExecutionFailed } = props;
 
-  const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
-  const hasProposalFailed = proposalStatus === ProposalStatus.Failed;
-
+  const hasProposalFailed = status === ProposalStatus.Failed;
   const steps: StepProps[] = [
     {
       label: StepperProposalStatus.Created,
@@ -43,12 +40,12 @@ export function ProposalDetailsStepper(props: ProposalDetailsStepperProps) {
       isError: hasExecutionFailed,
     },
     {
-      label: proposalStatus === ProposalStatus.Failed ? StepperProposalStatus.Failed : StepperProposalStatus.Executed,
+      label: status === ProposalStatus.Failed ? StepperProposalStatus.Failed : StepperProposalStatus.Executed,
       isError: hasProposalFailed,
     },
   ];
 
-  const activeStep = ProposalStatusAsStep[proposalStatus];
+  const activeStep = ProposalStatusAsStep[status];
 
   return (
     <Flex layerStyle="content-box">

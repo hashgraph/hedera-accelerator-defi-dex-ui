@@ -11,6 +11,7 @@ import {
   sendExecuteMultiSigTransaction,
   fetchNFTDAOLogs,
   proposeMultiSigTextProposal,
+  sendChangeAdminForProposalTransaction,
 } from "./dao";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
@@ -49,6 +50,7 @@ function createDexService() {
     sendExecuteMultiSigTransaction,
     fetchCanUserClaimGODTokens,
     proposeMultiSigTextProposal,
+    sendChangeAdminForProposalTransaction,
   };
 }
 

@@ -742,6 +742,24 @@ export async function sendApproveMultiSigTransaction(
   return approveMultiSigTransactionResponse;
 }
 
+export async function sendChangeAdminForProposalTransaction(
+  safeId: string,
+  proxyAddress: string,
+  signer: HashConnectSigner
+) {
+  const safeAddress = await DexService.fetchContractEVMAddress(safeId);
+  const proxyContractId = await DexService.fetchContractId(proxyAddress);
+  const contractFunctionParameters = new ContractFunctionParameters().addAddress(safeAddress);
+  const changeAdminTransaction = await new ContractExecuteTransaction()
+    .setContractId(proxyContractId)
+    .setFunction("changeAdmin", contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const changeAdminTransactionResponse = await changeAdminTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(changeAdminTransactionResponse, HederaGnosisSafeFunctions.ApproveHash);
+  return changeAdminTransactionResponse;
+}
+
 interface ExecuteMultiSigTransactionParams {
   safeAccountId: string;
   to: string;
