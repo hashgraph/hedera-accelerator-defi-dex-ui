@@ -5,7 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { CreateDAOProposalContext, CreateDAOTokenAssociateForm, DAOProposalType } from "../types";
 import { isNil } from "ramda";
 import { useEffect } from "react";
-import { isValidUrl } from "@utils";
+import { isValidUrl } from "@dex/utils";
 
 export function DAOTokenAssociateDetailsForm() {
   const { safeAccountId, assets, proposalType } = useOutletContext<CreateDAOProposalContext>();

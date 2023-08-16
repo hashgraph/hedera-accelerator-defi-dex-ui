@@ -1,7 +1,7 @@
 import { UseMutationResult, useMutation, useQueryClient } from "react-query";
-import { DAOMutations, DAOQueries, HandleOnSuccess, useDexContext } from "@hooks";
+import { DAOMutations, DAOQueries, HandleOnSuccess, useDexContext } from "@dex/hooks";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { DexService } from "@services";
+import { DexService } from "@dex/services";
 import { isNil } from "ramda";
 
 export type UseChangeAdminMutationResult = UseMutationResult<
