@@ -2,16 +2,15 @@ import { Box, Button, Divider, Flex, SimpleGrid, Text, Tooltip } from "@chakra-u
 import { Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } from "@dex-ui-components";
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { MultiSigDAODetailsContext } from "./types";
-import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@services";
+import { HBARTokenId, HBARTokenSymbol, HBARSymbol, DAODetailsContext, DAOType } from "@services";
 import { Paths } from "@dex-ui/routes";
 import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal";
 import { useState } from "react";
 import { useDepositTokens, useHandleTransactionSuccess, usePairedWalletDetails } from "@hooks";
-import { TransactionResponse } from "@hashgraph/sdk";
+import { AccountId, TransactionResponse } from "@hashgraph/sdk";
 
 export function AssetsList() {
-  const { tokenBalances: assets, dao } = useOutletContext<MultiSigDAODetailsContext>();
+  const { tokenBalances: assets, dao } = useOutletContext<DAODetailsContext>();
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const { isWalletPaired } = usePairedWalletDetails();
   // change to token id match
@@ -22,6 +21,12 @@ export function AssetsList() {
   const navigate = useNavigate();
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const depositTokens = useDepositTokens(handleDepositTokensSuccess);
+  const tokenTransferAccountId =
+    dao.type === DAOType.MultiSig
+      ? dao.safeId
+      : dao.governors?.tokenTransferLogic
+      ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
+      : "";
 
   async function handleDepositClicked(data: DepositTokensFormData) {
     const selectedToken = assets.find((token) => token.tokenId === data.tokenId);
@@ -30,7 +35,7 @@ export function AssetsList() {
     }
     depositTokens.mutate({
       ...data,
-      safeId: dao.safeId,
+      safeId: tokenTransferAccountId,
       decimals: Number(selectedToken.decimals),
       amount: Number(data.amount),
     });
@@ -54,7 +59,7 @@ export function AssetsList() {
             dialogWidth="30rem"
             body={
               <DepositTokensModal
-                safeId={dao.safeId}
+                safeId={tokenTransferAccountId}
                 handleDepositClicked={handleDepositClicked}
                 handleCancelClicked={() => {
                   setDepositDialogOpen(false);

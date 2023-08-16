@@ -102,53 +102,17 @@ export function DAOTokenTransferDetailsForm() {
         isInvalid={Boolean(errors?.recipientAccountId)}
         errorMessage={errors?.recipientAccountId && errors?.recipientAccountId?.message}
       />
-      {daoType === "multisig" ? (
-        <FormTokenInput
-          amountFormId="amount"
-          tokenFormId="tokenId"
-          assetListAccountId={safeAccountId}
-          balanceAccountId={safeAccountId}
-          initialSelectedTokenId={state?.tokenId}
-          currentAmount={getValues().amount ?? ""}
-          isInvalid={Boolean(errors?.amount)}
-          errorMessage={errors?.amount && errors?.amount?.message}
-          form={form}
-        />
-      ) : (
-        <>
-          <FormInput<"tokenId">
-            inputProps={{
-              id: "tokenId",
-              label: "Asset",
-              type: "text",
-              placeholder: "Enter a token ID",
-              register: {
-                ...register("tokenId", {
-                  required: { value: true, message: "A token ID is required." },
-                }),
-              },
-              value: state?.tokenId,
-            }}
-            isInvalid={Boolean(errors?.tokenId)}
-            errorMessage={errors?.tokenId && errors?.tokenId?.message}
-          />
-          <FormInput<"amount">
-            inputProps={{
-              id: "amount",
-              label: "Amount",
-              type: "text",
-              placeholder: "Enter an amount",
-              register: {
-                ...register("amount", {
-                  required: { value: true, message: "An amount is required." },
-                }),
-              },
-            }}
-            isInvalid={Boolean(errors?.amount)}
-            errorMessage={errors?.amount && errors?.amount?.message}
-          />
-        </>
-      )}
+      <FormTokenInput
+        amountFormId="amount"
+        tokenFormId="tokenId"
+        assetListAccountId={safeAccountId}
+        balanceAccountId={safeAccountId}
+        initialSelectedTokenId={state?.tokenId}
+        currentAmount={getValues().amount ?? ""}
+        isInvalid={Boolean(errors?.amount)}
+        errorMessage={errors?.amount && errors?.amount?.message}
+        form={form}
+      />
     </Flex>
   );
 }
