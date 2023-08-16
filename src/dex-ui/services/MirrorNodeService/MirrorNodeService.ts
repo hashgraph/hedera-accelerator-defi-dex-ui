@@ -102,6 +102,11 @@ function createMirrorNodeService() {
     return ContractId.fromString(response.data.contract_id);
   };
 
+  const fetchContractEVMAddress = async (pairAddress: string): Promise<string> => {
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    return response.data.evm_address;
+  };
+
   /**
    * Fetches information related to a specific token.
    * @param tokenId  - The ID of the token account to return data for.
@@ -279,6 +284,16 @@ function createMirrorNodeService() {
     return lockTokenDetails?.idOrAmount;
   };
 
+  const fetchContractLogs = async (contractId: string): Promise<any> => {
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+      params: {
+        order: "desc",
+      },
+    });
+
+    return response.data.logs;
+  };
+
   const fetchAccountInfo = async (accountAddress: string): Promise<MirrorNodeAccountById> => {
     const { data: accountData } = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${accountAddress}`);
     return accountData;
@@ -330,6 +345,8 @@ function createMirrorNodeService() {
     fetchContractProposalEvents,
     fetchUpgradeContractEvents,
     fetchTokenNFTs,
+    fetchContractEVMAddress,
+    fetchContractLogs,
   };
 }
 

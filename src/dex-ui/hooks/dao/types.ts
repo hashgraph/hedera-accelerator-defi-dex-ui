@@ -26,6 +26,7 @@ export enum DAOMutations {
   UpdateDAODetails = "UpdateDAODetails",
   MintNFTTokens = "MintNFTTokens",
   DepositTokens = "DepositTokens",
+  ChangeAdmin = "ChangeAdmin",
 }
 
 export enum ProposalStatus {
@@ -108,6 +109,7 @@ export interface DAOUpgradeProposal {
   proxy: string;
   proxyLogic: string;
   proxyAdmin: string;
+  currentLogic: string;
 }
 
 export type ProposalData =
@@ -158,6 +160,11 @@ export interface Proposal {
   isQuorumReached?: boolean;
   votingEndTime?: string;
   proposalState?: ProposalState;
+  /**
+   * TODO: To be removed
+   * Extra objects to check for DAO upgrade Proposal
+   **/
+  isContractUpgradeProposal?: boolean;
 }
 
 export const AllFilters = [

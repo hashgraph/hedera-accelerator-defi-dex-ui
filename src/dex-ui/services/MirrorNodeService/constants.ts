@@ -3,6 +3,7 @@ import multiSigDAOFactory from "../abi/MultiSigDAOFactory.json";
 import hederaGnosisSafe from "../abi/HederaGnosisSafe.json";
 import multiSigDAO from "../abi/MultiSigDAO.json";
 import GODHolder from "../abi/GODHolder.json";
+import PatternProxy from "../abi/ProxyPattern.json";
 import Web3 from "web3";
 import { EventAbi } from "../abi/types";
 
@@ -17,6 +18,7 @@ function loadGovernorAbiEventSignatures() {
     ...hederaGnosisSafe.abi,
     ...multiSigDAO.abi,
     ...GODHolder.abi,
+    ...PatternProxy.abi,
   ];
   abis.forEach((abi: any) => {
     if (abi.type === "event") {

@@ -16,6 +16,7 @@ import { ethers } from "ethers";
 import MultiSigDAOFactoryJSON from "../../abi/MultiSigDAOFactory.json";
 import { isHbarToken } from "@utils";
 import BaseDAOJSON from "../../abi/BaseDAO.json";
+import { DexService } from "@services";
 
 const Gas = 9000000;
 
@@ -208,11 +209,11 @@ async function proposeMultiSigDAOUpgradeProposal(params: ProposeMultiSigDAOUpgra
     newImplementationAddress,
     oldProxyAddress,
   } = params;
-  const proxyContractAddress = ContractId.fromString(newImplementationAddress).toSolidityAddress();
-  const proxyToUpgrade = ContractId.fromString(oldProxyAddress).toSolidityAddress();
+  const proxyToUpgradeEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
+  const proxyEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
   const contractFunctionParameters = new ContractFunctionParameters()
-    .addAddress(proxyToUpgrade)
-    .addAddress(proxyContractAddress)
+    .addAddress(proxyToUpgradeEVMAddress)
+    .addAddress(proxyEVMAddress)
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion);

@@ -5,7 +5,13 @@ import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
 import { ProposalDetailsStepper } from "./ProposalDetailsStepper";
 import { ProposalVoteDetails } from "./ProposalVoteDetails";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useExecuteProposal, ProposalStatus, useApproveProposal, useHandleTransactionSuccess } from "@hooks";
+import {
+  useExecuteProposal,
+  useApproveProposal,
+  useHandleTransactionSuccess,
+  useChangeAdmin,
+  DAOUpgradeProposal,
+} from "@hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@layouts";
 import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
 import { DAOType } from "@services";
@@ -20,6 +26,7 @@ export function ProposalDetailsPage() {
   const { proposalDetails, isSuccess, isLoading, isError, error } = useProposalDetails(daoAccountId, transactionHash);
   const approveProposalMutation = useApproveProposal(handleApproveProposalSuccess);
   const executeProposalMutation = useExecuteProposal(handleExecuteProposalSuccess);
+  const changeAdminMutation = useChangeAdmin(handleExecuteProposalSuccess);
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposalMutation;
 
@@ -86,23 +93,23 @@ export function ProposalDetailsPage() {
       author,
       title,
       link,
+      isContractUpgradeProposal,
+      data,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
-    const isThresholdReached = approvalCount >= threshold;
     const memberCount = ownerIds.length;
-    /** TODO: Update contracts to support a "queued" status. */
-    const proposalStatus = status === ProposalStatus.Pending && isThresholdReached ? ProposalStatus.Queued : status;
-
+    const proxyId = (data as DAOUpgradeProposal)?.proxy ?? "";
+    const proxyAdmin = (data as DAOUpgradeProposal)?.proxyAdmin ?? "";
     const descriptionArray = [description, getProposalData(proposalDetails)];
+
     return (
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
         <GridItem colSpan={3}>
           <Flex direction="column" gap="8">
             <ProposalDetailsHeader daoAccountId={daoAccountId} title={title} daoType={daoType} author={author} />
             <ProposalDetailsStepper
-              status={proposalStatus}
-              isThresholdReached={isThresholdReached}
+              status={status}
               isExecutionProcessing={isProposalBeingExecuted}
               hasExecutionFailed={hasProposalExecutionFailed}
             />
@@ -136,7 +143,7 @@ export function ProposalDetailsPage() {
                 approvers={approvers}
                 memberCount={memberCount}
                 threshold={threshold}
-                status={proposalStatus}
+                status={status}
                 transactionHash={transactionHash}
                 hexStringData={hexStringData}
                 msgValue={msgValue}
@@ -144,6 +151,10 @@ export function ProposalDetailsPage() {
                 nonce={nonce}
                 approveProposalMutation={approveProposalMutation}
                 executeProposalMutation={executeProposalMutation}
+                isContractUpgradeProposal={isContractUpgradeProposal}
+                changeAdminMutation={changeAdminMutation}
+                proxyAddress={proxyId}
+                proxyAdmin={proxyAdmin}
               />
             ) : (
               <ProposalVoteDetails />

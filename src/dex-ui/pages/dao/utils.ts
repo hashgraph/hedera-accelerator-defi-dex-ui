@@ -10,13 +10,7 @@ import {
   ProposalType,
 } from "@hooks";
 import { ProposalState } from "@store/governanceSlice";
-import {
-  HBARTokenSymbol,
-  SENTINEL_OWNER,
-  solidityAddressToTokenIdString,
-  solidityAddressToContractIdString,
-  DAOType,
-} from "@services";
+import { HBARTokenSymbol, SENTINEL_OWNER, solidityAddressToTokenIdString, DAOType } from "@services";
 import { isHbarToken } from "@utils";
 import { Paths } from "@routes";
 
@@ -147,10 +141,8 @@ export function getProposalData(proposal: Proposal): string {
         : `Associate Token: ${tokenToAssociate}`;
     }
     case ProposalType.UpgradeContract: {
-      const { proxy, proxyLogic } = proposal.data as DAOUpgradeProposal;
-      const newProxyId = solidityAddressToContractIdString(proxyLogic);
-      const oldProxyId = solidityAddressToContractIdString(proxy);
-      return `Proposed to upgrade DAO from ${oldProxyId} to ${newProxyId}`;
+      const { proxyLogic, currentLogic } = proposal.data as DAOUpgradeProposal;
+      return `Proposed to upgrade DAO from ${currentLogic} to ${proxyLogic}`;
     }
     default:
       return "";

@@ -139,6 +139,8 @@ export enum DAOEvents {
   RemovedOwner = "RemovedOwner",
   ChangedThreshold = "ChangedThreshold",
   DAOInfoUpdated = "DAOInfoUpdated",
+  ChangeAdmin = "AdminChanged",
+  Upgraded = "Upgraded",
 }
 
 export enum HederaGnosisSafeFunctions {

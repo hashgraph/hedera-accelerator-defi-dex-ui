@@ -6,10 +6,12 @@ import {
   MirrorNodeTokenById,
   getThreshold,
   MultiSigProposeTransactionType,
+  decodeLog,
+  abiSignatures,
 } from "@services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
 import { AccountId } from "@hashgraph/sdk";
-import { groupBy, isNil } from "ramda";
+import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
@@ -53,14 +55,32 @@ export function useDAOProposals(
     return Array.from(approverCache);
   }
 
-  function getProposalStatus(proposalLogs: LogDescription[], isThresholdReached: boolean): ProposalStatus {
-    return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
-      ? ProposalStatus.Success
-      : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-      ? ProposalStatus.Failed
-      : isThresholdReached
-      ? ProposalStatus.Queued
-      : ProposalStatus.Pending;
+  function getProposalStatus(
+    proposalLogs: LogDescription[],
+    isThresholdReached: boolean,
+    type: ProposalType,
+    isAdminApproved: boolean
+  ): ProposalStatus {
+    switch (type) {
+      case ProposalType.UpgradeContract: {
+        return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
+          ? ProposalStatus.Success
+          : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
+          ? ProposalStatus.Failed
+          : isThresholdReached && isAdminApproved
+          ? ProposalStatus.Queued
+          : ProposalStatus.Pending;
+      }
+      default: {
+        return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
+          ? ProposalStatus.Success
+          : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
+          ? ProposalStatus.Failed
+          : isThresholdReached
+          ? ProposalStatus.Queued
+          : ProposalStatus.Pending;
+      }
+    }
   }
 
   function getProposalType(transactionType: number): ProposalType {
@@ -118,8 +138,30 @@ export function useDAOProposals(
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;
           const isThresholdReached = approvalCount >= threshold;
-          const status = getProposalStatus(proposalLogs, isThresholdReached);
           const proposalType = getProposalType(BigNumber.from(transactionType).toNumber());
+          /** TODO: For DAO Upgrade extra step is introduced to check for Admin Approval */
+          const isContractUpgradeProposal = proposalType === ProposalType.UpgradeContract;
+          let isAdminApproved = false;
+          let parsedData;
+          if (isContractUpgradeProposal) {
+            const safeEVMAddress = await DexService.fetchContractEVMAddress(safeAccountId);
+            const upgradeProposalData = { ...data };
+            const logs = await DexService.fetchContractLogs(upgradeProposalData.proxy);
+
+            const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
+            const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
+            const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+
+            const currentLogic = isNotNil(upgradedLogs[0])
+              ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
+              : "";
+            const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
+            const proxyAdmin = AccountId.fromSolidityAddress(upgradeProposalData.proxyAdmin).toString();
+            const proxyLogic = (await DexService.fetchContractId(upgradeProposalData.proxyLogic)).toString();
+            parsedData = { ...upgradeProposalData, proxyAdmin, proxyLogic, currentLogic };
+            isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
+          }
+          const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
           const tokenId = token ? AccountId.fromSolidityAddress(token).toString() : "";
           if (!tokenDataCache.has(tokenId)) {
             tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
@@ -144,13 +186,15 @@ export function useDAOProposals(
             to,
             operation,
             hexStringData,
-            data: { ...data },
+            data: isContractUpgradeProposal ? parsedData : { ...data },
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
             title: title,
             author: creator ? AccountId.fromSolidityAddress(creator).toString() : "",
             description: description,
             link: linkToDiscussion,
             threshold,
+            /**TODO Remove the logic from here once extra step for ContractUpgrade is Not required */
+            isContractUpgradeProposal,
           };
         })
       );

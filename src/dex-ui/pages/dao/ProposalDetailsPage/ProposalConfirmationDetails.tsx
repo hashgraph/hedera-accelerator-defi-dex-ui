@@ -5,8 +5,10 @@ import {
   ProposalStatus,
   UseApproveProposalMutationResult,
   UseExecuteProposalMutationResult,
+  UseChangeAdminMutationResult,
   useDexContext,
 } from "@hooks";
+import { WarningIcon } from "@chakra-ui/icons";
 
 interface ProposalConfirmationDetailsProps {
   safeAccountId: string;
@@ -23,6 +25,10 @@ interface ProposalConfirmationDetailsProps {
   nonce: number;
   approveProposalMutation: UseApproveProposalMutationResult;
   executeProposalMutation: UseExecuteProposalMutationResult;
+  changeAdminMutation: UseChangeAdminMutationResult;
+  isContractUpgradeProposal?: boolean;
+  proxyAddress?: string;
+  proxyAdmin?: string;
 }
 
 export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsProps) {
@@ -43,11 +49,17 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     nonce,
     approveProposalMutation,
     executeProposalMutation,
+    changeAdminMutation,
+    isContractUpgradeProposal = false,
+    proxyAddress = "",
+    proxyAdmin = "",
   } = props;
 
   const confirmationProgress = approvalCount > 0 ? (approvalCount / threshold) * 100 : 0;
   const notConfirmedCount = memberCount - (approvalCount ?? 0);
   const hasConnectedWalletVoted = approvers.includes(connectedWalletId);
+  const isApproveAdminButtonVisible = isContractUpgradeProposal && approvalCount >= threshold;
+  const isApproveAdminButtonDisabled = connectedWalletId !== proxyAdmin;
 
   /*
    * TODO: Added loading modals and states for proposal approval and execution.
@@ -73,8 +85,49 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     executeProposalMutation.mutate({ safeAccountId, to, msgValue, hexStringData, operation, nonce });
   }
 
+  async function handleClickChangeAdminTransaction(safeAccountId: string, proxyAddress: string) {
+    changeAdminMutation.mutate({ safeAccountId, proxyAddress });
+  }
+
   const ConfirmationDetailsButtons: Readonly<{ [key in ProposalStatus]: JSX.Element }> = {
-    [ProposalStatus.Pending]: hasConnectedWalletVoted ? (
+    [ProposalStatus.Pending]: isContractUpgradeProposal ? (
+      isApproveAdminButtonVisible ? (
+        <Flex direction="column" gap="1rem">
+          <Button
+            variant="primary"
+            isDisabled={isApproveAdminButtonDisabled}
+            onClick={() => {
+              handleClickChangeAdminTransaction(safeAccountId, proxyAddress);
+            }}
+          >
+            Transfer Ownership
+          </Button>
+          <Flex
+            direction="row"
+            padding="0.5rem"
+            bg={Color.Warning._50}
+            borderRadius="0.375rem"
+            border={`1px solid ${Color.Warning._300}`}
+            gap="2"
+          >
+            <WarningIcon h={4} w={4} color={Color.Warning._600} marginTop="2px" />
+            <Flex direction="column" gap="1">
+              <Text textStyle="p small regular" color={Color.Neutral._700}>
+                {`Connect your wallet with ${proxyAdmin} to approve the transfer of ownership to ${safeAccountId}`}
+              </Text>
+            </Flex>
+          </Flex>
+        </Flex>
+      ) : hasConnectedWalletVoted ? (
+        <Button isDisabled leftIcon={<CheckCircleUnfilledIcon boxSize={4} />}>
+          Confirmed by you
+        </Button>
+      ) : (
+        <Button variant="primary" onClick={() => handleClickConfirmProposal(safeAccountId, transactionHash)}>
+          Confirm
+        </Button>
+      )
+    ) : hasConnectedWalletVoted ? (
       <Button isDisabled leftIcon={<CheckCircleUnfilledIcon boxSize={4} />}>
         Confirmed by you
       </Button>
