@@ -1,3 +1,4 @@
+import { TokenBalance } from "@hooks";
 import { BigNumber } from "ethers";
 
 export enum DAOType {
@@ -167,6 +168,7 @@ export interface Member {
 
 export type DAODetailsContext = {
   dao: DAO;
+  tokenBalances: TokenBalance[];
 };
 
 export enum GovernanceProposalOperationType {

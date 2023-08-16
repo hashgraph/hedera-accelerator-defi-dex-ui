@@ -10,6 +10,7 @@ import {
 } from "@hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
+import { AccountId } from "@hashgraph/sdk";
 
 export function GovernanceDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -17,7 +18,10 @@ export function GovernanceDAODashboard() {
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { walletId, isWalletPaired } = usePairedWalletDetails();
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoAccountId);
+  const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
+    ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
+    : "";
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
   const { data: FTToken } = useToken(dao?.tokenId ?? "");
@@ -55,7 +59,9 @@ export function GovernanceDAODashboard() {
         errorMessage={errorMessage}
         isSuccess={isSuccess}
       >
-        <Outlet context={{ dao, members, memberCount, tokenCount, ownerCount, totalAssetValue, FTToken }} />
+        <Outlet
+          context={{ dao, members, memberCount, tokenCount, ownerCount, totalAssetValue, FTToken, tokenBalances }}
+        />
       </DAODashboard>
     );
   }

@@ -405,7 +405,6 @@ export function CreateDAOProposal() {
               multiSigDAOContractId: daoAccountId,
             });
           case DAOType.NFT:
-            return;
           default:
             return;
         }
