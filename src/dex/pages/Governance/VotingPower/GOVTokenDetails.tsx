@@ -1,8 +1,8 @@
 import { Flex } from "@chakra-ui/react";
-import { Color } from "../../../../dex-ui-components/themes";
-import { LockIcon } from "../../../../dex-ui-components/base/Icons";
+import { Color } from "../../../../shared/ui-kit/themes";
+import { LockIcon } from "../../../../shared/ui-kit/components/Icons";
 import { Divider } from "@material-ui/core";
-import { MetricLabel, Tooltip } from "../../../../dex-ui-components";
+import { MetricLabel, Tooltip } from "../../../../shared/ui-kit";
 
 interface GOVTokenDetailsProps {
   tokenSymbol: string;

@@ -6,6 +6,12 @@
       "@dao/*": ["dao/*"],
       "@dao/routes": ["dao/routes"],
       "@dao/routes/*": ["dao/routes/*"],
+      "@dao/pages": ["dao/pages"],
+      "@dao/pages/*": ["dao/pages/*"],
+      "@dao/hooks": ["dao/hooks"],
+      "@dao/hooks/*": ["dao/hooks/*"],
+      "@dao/services": ["dao/services"],
+      "@dao/services/*": ["dao/services/*"],
       "@dex": ["dex"],
       "@dex/*": ["dex/*"],
       "@dex/components": ["dex/components"],
@@ -22,14 +28,16 @@
       "@dex/services/*": ["dex/services/*"],
       "@dex/store": ["dex/store"],
       "@dex/store/*": ["dex/store/*"],
-      "@dex/theme": ["dex/theme"],
-      "@dex/theme/*": ["dex/theme/*"],
       "@dex/routes": ["dex/routes"],
       "@dex/routes/*": ["dex/routes/*"],
       "@dex/utils": ["dex/utils"],
       "@dex/utils/*": ["dex/utils/*"],
-      "@shared/ui-kit": ["dex-ui-components"],
-      "@shared/ui-kit/*": ["dex-ui-components/*"]
+      "@shared/ui-kit": ["shared/ui-kit"],
+      "@shared/ui-kit/*": ["shared/ui-kit/*"],
+      "@shared/services": ["shared/services"],
+      "@shared/services/*": ["shared/services/*"],
+      "@shared/utils": ["shared/utils"],
+      "@shared/utils/*": ["shared/utils/*"]
     }
   }
 }

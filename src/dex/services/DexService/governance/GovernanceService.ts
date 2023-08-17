@@ -10,8 +10,8 @@ import {
   ProposalStatus,
 } from "../../../store/governanceSlice";
 import { getTimeRemaining } from "@dex/utils";
-import { MirrorNodeDecodedProposalEvent } from "../../MirrorNodeService";
-import { getFulfilledResultsData } from "../../MirrorNodeService/utils";
+import { MirrorNodeDecodedProposalEvent } from "../../../../shared/services/MirrorNodeService";
+import { getFulfilledResultsData } from "../../../../shared/services/MirrorNodeService/utils";
 import { Contracts, GovernanceTokenId } from "../../constants";
 import { GovernanceEvent, ProposalData } from "./type";
 import { ethers } from "ethers";

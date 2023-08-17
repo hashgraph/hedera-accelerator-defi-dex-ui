@@ -1,4 +1,4 @@
-import { DEXTheme } from "../src/dex/theme";
+import { DEXTheme } from "../src/shared/ui-kit/themes";
 import HederaDeFiTheme from "./HederaDeFiTheme";
 
 export const parameters = {

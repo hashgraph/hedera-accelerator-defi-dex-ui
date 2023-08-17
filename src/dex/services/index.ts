@@ -1,12 +1,12 @@
 import { createDexService } from "./DexService";
 import { createHederaService } from "./HederaService";
 import { createJsonRpcService } from "./JsonRpcService";
-import { createMirrorNodeService } from "./MirrorNodeService";
-import { createWalletService } from "./WalletService";
+import { createMirrorNodeService } from "@shared/services/MirrorNodeService";
+import { createWalletService } from "@shared/services/WalletService";
 export * from "./DexService";
-export * from "./WalletService";
+export * from "@shared/services/WalletService";
 export * from "./HederaService";
-export * from "./MirrorNodeService";
+export * from "@shared/services/MirrorNodeService";
 export * from "./JsonRpcService";
 export * from "./constants";
 export * from "./utils";

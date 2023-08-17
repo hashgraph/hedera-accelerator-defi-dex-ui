@@ -12,7 +12,7 @@ import {
   fetchNFTDAOLogs,
   proposeMultiSigTextProposal,
   sendChangeAdminForProposalTransaction,
-} from "./dao";
+} from "@dao/services";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
 

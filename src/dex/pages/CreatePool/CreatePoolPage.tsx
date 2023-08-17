@@ -1,5 +1,5 @@
 import { useDexContext } from "../../hooks";
-import { CreatePoolForm } from "../../../dex-ui-components";
+import { CreatePoolForm } from "../../../shared/ui-kit";
 import { Page, DefiFormContainer } from "../../layouts";
 import { useCreatePoolTransactionFee } from "../../hooks";
 

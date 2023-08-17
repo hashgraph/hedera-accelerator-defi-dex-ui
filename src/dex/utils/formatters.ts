@@ -1,5 +1,5 @@
 import { isNil } from "ramda";
-import { HashscanData } from "../../dex-ui-components";
+import { HashscanData } from "../../shared/ui-kit";
 
 const HashScanUrl = "https://hashscan.io";
 

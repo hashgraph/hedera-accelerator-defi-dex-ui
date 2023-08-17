@@ -1,4 +1,4 @@
-import { SwapTokensForm } from "../../../dex-ui-components";
+import { SwapTokensForm } from "../../../shared/ui-kit";
 import { useDexContext, useFetchSwapPair } from "../../hooks";
 import { formatSwapPageData } from "./formatters";
 import { GetTokensButton } from "../../components";
