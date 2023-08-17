@@ -15,7 +15,7 @@ import { PairContractFunctions } from "./types";
 import { client, getTreasurer } from "./utils";
 import GovernorService from "./GovernorService";
 import TokenService from "./TokenService";
-import DAOService from "./dao";
+import DAOService from "../../../dao/services/contracts";
 
 type HederaServiceType = ReturnType<typeof createHederaService>;
 

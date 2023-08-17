@@ -1,5 +1,5 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { Color } from "../../../dex-ui-components";
+import { Color } from "../../../shared/ui-kit";
 
 interface ConfirmVoteModalBodyProps {
   votingPower: string;

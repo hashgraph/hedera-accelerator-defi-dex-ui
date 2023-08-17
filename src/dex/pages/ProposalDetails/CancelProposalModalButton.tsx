@@ -1,5 +1,5 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
-import { AlertDialog, Color } from "../../../dex-ui-components";
+import { AlertDialog, Color } from "../../../shared/ui-kit";
 import { UseCancelProposalResult, useDexContext } from "../../hooks";
 import { FormattedProposal } from "../Governance/types";
 

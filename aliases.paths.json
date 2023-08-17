@@ -1,6 +1,9 @@
 {
   "@dao": "src/dao",
   "@dao/routes": "src/dao/routes",
+  "@dao/pages": "src/dao/pages",
+  "@dao/hooks": "src/dao/hooks",
+  "@dao/services": "src/dao/services",
   "@dex": "src/dex",
   "@dex/components": "src/dex/components",
   "@dex/context": "src/dex/context",
@@ -9,8 +12,9 @@
   "@dex/pages": "src/dex/pages",
   "@dex/services": "src/dex/services",
   "@dex/store": "src/dex/store",
-  "@dex/theme": "src/dex/theme",
   "@dex/routes": "src/dex/routes",
   "@dex/utils": "src/dex/utils",
-  "@shared/ui-kit": "src/dex-ui-components"
+  "@shared/ui-kit": "src/shared/ui-kit",
+  "@shared/services": "src/shared/services",
+  "@shared/utils": "src/shared/utils"
 }

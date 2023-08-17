@@ -14,8 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
-import { DataTable, DataTableColumnConfig } from "../../../dex-ui-components/base/DataTable";
-import { NotficationTypes, Notification } from "../../../dex-ui-components";
+import { DataTable, DataTableColumnConfig } from "../../../shared/ui-kit/components/DataTable";
+import { NotficationTypes, Notification } from "../../../shared/ui-kit";
 import { formatPoolMetrics, formatUserPoolMetrics } from "./formatters";
 import { isEmpty } from "ramda";
 import { useDexContext, usePoolsData } from "../../hooks";

@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { DexService } from "../..";
-import { MirrorNodeAccountBalance } from "../../MirrorNodeService";
+import { MirrorNodeAccountBalance } from "../../../../shared/services/MirrorNodeService";
 import { DEX_TOKEN_PRECISION_VALUE } from "../../constants";
 
 /**

@@ -1,14 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { isNil } from "ramda";
-import {
-  MirrorNodeTransaction,
-  MirrorNodeTokenTransfer,
-  MirrorNodeAccountBalance,
-} from "../services/MirrorNodeService/types";
-import { TokenPair } from "../store/poolsSlice";
+import { MirrorNodeTransaction, MirrorNodeTokenTransfer, MirrorNodeAccountBalance } from "@shared/services";
+import { TokenPair } from "@dex/store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
-import { HBARTokenId } from "../services";
-import { getTransactionFeeRateDisplay } from "../../dex-ui-components/presets/utils";
+import { HBARTokenId } from "@dex/services";
+import { getTransactionFeeRateDisplay } from "@shared/utils";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;

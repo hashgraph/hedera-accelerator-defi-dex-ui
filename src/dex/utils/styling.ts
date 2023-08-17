@@ -1,4 +1,4 @@
-import { Color } from "../../dex-ui-components";
+import { Color } from "../../shared/ui-kit";
 import { ProposalStatus, ProposalState } from "../store/governanceSlice";
 
 export const getStatusColor = (status: ProposalStatus | undefined, state: ProposalState | undefined): string => {

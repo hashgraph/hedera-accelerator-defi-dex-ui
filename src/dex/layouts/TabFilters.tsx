@@ -1,5 +1,5 @@
 import { Tab, TabList } from "@chakra-ui/react";
-import { Color } from "../../dex-ui-components";
+import { Color } from "../../shared/ui-kit";
 
 export interface TabFilter<T> {
   name: string;

@@ -2,9 +2,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { ChakraProvider } from "@chakra-ui/react";
 import { RouterProvider } from "react-router-dom";
-import { DEXTheme } from "@dex/theme";
 import { router } from "@dex/routes";
-import { ToastContainer } from "@shared/ui-kit";
+import { ToastContainer, DefaultTheme } from "@shared/ui-kit";
 
 const SEVEN_SECONDS = 7 * 1000;
 
@@ -26,9 +25,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const DEX = () => {
+export function DEX() {
   return (
-    <ChakraProvider theme={DEXTheme}>
+    <ChakraProvider theme={DefaultTheme}>
       <QueryClientProvider client={queryClient}>
         <ToastContainer />
         <RouterProvider router={router} />
@@ -36,6 +35,4 @@ const DEX = () => {
       </QueryClientProvider>
     </ChakraProvider>
   );
-};
-
-export { DEX };
+}

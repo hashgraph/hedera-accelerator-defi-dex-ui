@@ -1,6 +1,6 @@
 import { useDexContext } from "../../hooks";
 import { formatSwapPageData } from "../Swap/formatters";
-import { AddLiquidityForm } from "../../../dex-ui-components";
+import { AddLiquidityForm } from "../../../shared/ui-kit";
 import { Page, DefiFormContainer } from "../../layouts";
 import { useParams } from "react-router-dom";
 

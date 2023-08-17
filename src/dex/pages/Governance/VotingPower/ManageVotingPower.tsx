@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { Button, Divider, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
-import { AlertDialog, Color, FormInput, TwoLayerSettingsIcon, Notification, NotficationTypes } from "@shared/ui-kit";
+import {
+  AlertDialog,
+  Color,
+  FormInput,
+  TwoLayerSettingsIcon,
+  Notification,
+  NotficationTypes,
+  formulaTypes,
+} from "@shared/ui-kit";
+import { halfOf } from "@shared/utils";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { useTabFilters } from "@dex/hooks";
 import { FieldErrorsImpl, useForm, UseFormReturn } from "react-hook-form";
 import { isEmpty } from "ramda";
 import { LockIcon, UnlockIcon } from "@chakra-ui/icons";
 import { InputTokenAmountData, ManageVotingPowerTabType } from "./types";
-import { formulaTypes } from "@shared/ui-kit/presets/types";
-import { halfOf } from "@shared/ui-kit/presets/utils";
 
 interface ManageVotingPowerModalBodyProps {
   tokenSymbol: string;

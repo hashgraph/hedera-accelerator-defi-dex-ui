@@ -1,5 +1,5 @@
 import { Flex, Spinner } from "@chakra-ui/react";
-import { Color } from "../../dex-ui-components";
+import { Color } from "../../shared/ui-kit";
 
 export function LoadingSpinnerLayout() {
   return (

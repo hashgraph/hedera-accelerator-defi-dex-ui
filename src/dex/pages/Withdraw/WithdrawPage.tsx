@@ -1,5 +1,5 @@
 import { useDexContext, usePoolsData } from "../../hooks";
-import { WithdrawForm } from "../../../dex-ui-components";
+import { WithdrawForm } from "../../../shared/ui-kit";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { REFRESH_INTERVAL } from "../../hooks/constants";
 import { formatWithdrawDataPoints } from "./formatter";
