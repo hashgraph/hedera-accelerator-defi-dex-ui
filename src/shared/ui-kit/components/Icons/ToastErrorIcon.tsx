@@ -7,10 +7,11 @@ export const ToastErrorIcon = createIcon({
   path: (
     <>
       <rect width="24" height="24" fill={Color.Destructive._50} rx="12" />
-      <path stroke={Color.Destructive._700} strokeLinecap="round" strokeLinejoin="round" d="m16 8-8 8m0-8 8 8" />
+      <path stroke={Color.Destructive._500} strokeLinecap="round" strokeLinejoin="round" d="m16 8-8 8m0-8 8 8" />
     </>
   ),
   defaultProps: {
     fill: "none",
+    color: Color.Destructive._500,
   },
 });

@@ -1,8 +1,7 @@
-import { Flex, Box, FormControl, FormErrorMessage, FormHelperText, Text } from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, FormHelperText } from "@chakra-ui/react";
 import { Input, InputProps } from "./Input";
-import { Color } from "../../themes";
-import { WarningIcon } from "@chakra-ui/icons";
 import { ReactNode } from "react";
+import { InlineAlert, InlineAlertType } from "../InlineAlert";
 
 export interface FormInputProps<T extends string> {
   inputProps: InputProps<T>;
@@ -25,24 +24,7 @@ export function FormInput<T extends string>(props: FormInputProps<T>) {
       <Box padding="0 0.25rem">{actionButton}</Box>
       <FormHelperText textStyle="p small regular">{formHelperText}</FormHelperText>
       {/** TODO: Create Inline Alert Component */}
-      {warningMessage && (
-        <Flex
-          direction="row"
-          padding="0.5rem"
-          bg={Color.Warning._50}
-          borderRadius="0.375rem"
-          border={`1px solid ${Color.Warning._300}`}
-          gap="2"
-        >
-          <WarningIcon h={4} w={4} color={Color.Warning._600} marginTop="2px" />
-          <Flex direction="column" gap="1">
-            <Text textStyle="p small medium">{warningHeader}</Text>
-            <Text textStyle="p small regular" color={Color.Neutral._700}>
-              {warningMessage}
-            </Text>
-          </Flex>
-        </Flex>
-      )}
+      {warningMessage && <InlineAlert title={warningHeader} message={warningMessage} type={InlineAlertType.Warning} />}
     </FormControl>
   );
 }

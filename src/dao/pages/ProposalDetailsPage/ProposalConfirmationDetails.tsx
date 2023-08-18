@@ -1,5 +1,14 @@
 import { Box, Text, Flex, Button } from "@chakra-ui/react";
-import { Tag, Color, ProgressBar, PeopleIcon, MetricLabel, CheckCircleUnfilledIcon } from "@shared/ui-kit";
+import {
+  Tag,
+  Color,
+  ProgressBar,
+  PeopleIcon,
+  MetricLabel,
+  CheckCircleUnfilledIcon,
+  InlineAlert,
+  InlineAlertType,
+} from "@shared/ui-kit";
 import { ProposalStatusAsTagVariant } from "../constants";
 import { useDexContext } from "@dex/hooks";
 import {
@@ -8,7 +17,6 @@ import {
   UseChangeAdminMutationResult,
   ProposalStatus,
 } from "@dao/hooks";
-import { WarningIcon } from "@chakra-ui/icons";
 
 interface ProposalConfirmationDetailsProps {
   safeAccountId: string;
@@ -102,21 +110,10 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
           >
             Transfer Ownership
           </Button>
-          <Flex
-            direction="row"
-            padding="0.5rem"
-            bg={Color.Warning._50}
-            borderRadius="0.375rem"
-            border={`1px solid ${Color.Warning._300}`}
-            gap="2"
-          >
-            <WarningIcon h={4} w={4} color={Color.Warning._600} marginTop="2px" />
-            <Flex direction="column" gap="1">
-              <Text textStyle="p small regular" color={Color.Neutral._700}>
-                {`Connect your wallet with ${proxyAdmin} to approve the transfer of ownership to ${safeAccountId}`}
-              </Text>
-            </Flex>
-          </Flex>
+          <InlineAlert
+            type={InlineAlertType.Warning}
+            message={`Connect your wallet with ${proxyAdmin} to approve the transfer of ownership to ${safeAccountId}`}
+          />
         </Flex>
       ) : hasConnectedWalletVoted ? (
         <Button isDisabled leftIcon={<CheckCircleUnfilledIcon boxSize={4} />}>

@@ -3,14 +3,17 @@ import { Color } from "../../themes";
 
 export const ToastInfoIcon = createIcon({
   displayName: "ToastInfoIcon",
-  viewBox: "0 0 24 24",
+  viewBox: "0 0 20 20",
   path: (
-    <>
-      <rect width="24" height="24" fill={Color.Blue._50} rx="12" />
-      <path fill={Color.Blue._500} d="M13 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM11 12a1 1 0 1 1 2 0v4a1 1 0 1 1-2 0v-4Z" />
-    </>
+    <path
+      d="M10 6.667V10m0 3.333h.008M18.333 10a8.333 8.333 0 1 1-16.666 0 8.333 8.333 0 0 1 16.666 0Z"
+      stroke-width="1.667"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
   ),
   defaultProps: {
     fill: "none",
+    stroke: Color.Primary._500,
   },
 });
