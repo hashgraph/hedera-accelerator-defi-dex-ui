@@ -18,5 +18,6 @@ export const ToastSuccessIcon = createIcon({
   ),
   defaultProps: {
     fill: "none",
+    color: Color.Success._500,
   },
 });

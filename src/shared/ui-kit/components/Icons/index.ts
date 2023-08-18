@@ -37,6 +37,7 @@ export * from "./SettingsIcon";
 export * from "./CopyIcon";
 export * from "./ToastSuccessIcon";
 export * from "./ToastErrorIcon";
+export * from "./ToastWarningIcon";
 export * from "./ToastInfoIcon";
 export * from "./TextProposalIcon";
 export * from "./NewTokenIcon";

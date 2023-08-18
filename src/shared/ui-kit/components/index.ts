@@ -34,3 +34,4 @@ export * from "./types";
 export * from "./FormTokenInput";
 export * from "./List";
 export * from "./Modal";
+export * from "./InlineAlert";
