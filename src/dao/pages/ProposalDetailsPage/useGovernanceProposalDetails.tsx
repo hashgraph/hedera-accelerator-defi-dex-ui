@@ -10,12 +10,13 @@ import {
   useDAOs,
   ProposalStatus,
   useGovernanceDAOProposals,
+  useFetchLockedNFTToken,
   useChangeAdmin,
   ProposalType,
   TokenAssociateProposalDetails,
   GOVUpgradeProposalDetails,
 } from "@dao/hooks";
-import { GovernanceDAODetails, NFTDAODetails } from "@dao/services";
+import { DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
 import { TransactionResponse, ContractId } from "@hashgraph/sdk";
 
@@ -39,8 +40,12 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
   const hasVoted = proposal?.hasVoted ?? false;
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const fetchLockGODTokens = useFetchLockedGovToken(walletId, dao?.tokenHolderAddress ?? "");
+  const lockedNFTToken = useFetchLockedNFTToken(walletId, dao?.tokenHolderAddress ?? "");
 
-  const votingPower = `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`;
+  const votingPower =
+    dao?.type === DAOType.GovernanceToken
+      ? `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`
+      : `${(Number(lockedNFTToken.data) ? 1 : 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
   const isAuthor = walletId === proposal?.author;
   const governorUpgrade = dao?.governors?.contractUpgradeLogic;

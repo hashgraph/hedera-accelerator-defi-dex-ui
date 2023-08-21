@@ -199,3 +199,8 @@ export type ProposalDataDetails =
   | TokenTransferDetails
   | TokenAssociateProposalDetails
   | undefined;
+
+export enum NFTDAOFunctions {
+  GrabTokensFromUser = "grabTokensFromUser",
+  RevertTokensForVoter = "revertTokensForVoter",
+}

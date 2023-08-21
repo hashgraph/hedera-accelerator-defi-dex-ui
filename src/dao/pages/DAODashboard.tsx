@@ -8,6 +8,7 @@ import { DAO, DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails }
 import { DashboardHeader } from "./DashboardHeader";
 import { Routes } from "@dao/routes";
 import { VotingPower } from "@dex/pages/Governance/VotingPower";
+import { NFTVotingPower } from "./NFTVotingPower";
 
 const TabsHeight = 44;
 
@@ -110,7 +111,8 @@ export function DAODashboard(props: DAODashboardProps) {
 
   if (dao && isDAOFound && isSuccess) {
     const { accountId, type, name, logoUrl } = dao;
-    const isVotingPowerVisible = type === DAOType.GovernanceToken || type === DAOType.NFT;
+    const isGovernance = type === DAOType.GovernanceToken;
+    const isNFT = type === DAOType.NFT;
     const { tokenId, tokenHolderAddress } = dao as GovernanceDAODetails | NFTDAODetails;
     const { safeId } = dao as MultiSigDAODetails;
 
@@ -133,8 +135,13 @@ export function DAODashboard(props: DAODashboardProps) {
         }
         body={
           <Flex direction="column" gap="0.75rem" height="100%">
-            {isVotingPowerVisible ? (
+            {isGovernance ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
+            ) : (
+              <Box></Box>
+            )}
+            {isNFT ? (
+              <NFTVotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
             ) : (
               <Box></Box>
             )}
