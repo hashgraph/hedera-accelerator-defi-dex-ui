@@ -112,6 +112,19 @@ export interface DAOUpgradeProposal {
   currentLogic: string;
 }
 
+export interface GOVUpgradeProposalDetails {
+  proxy: string;
+  proxyAdmin: string;
+  proxyLogic: string;
+  currentLogic: string;
+  isAdminApproved: boolean;
+  isAdminApprovalButtonVisible: boolean;
+}
+
+export interface TokenAssociateProposalDetails {
+  tokenToAssociate: string;
+}
+
 export type ProposalData =
   | ProposalDataTokenTransfer
   | ProposalDataHbarTransfer
@@ -121,7 +134,9 @@ export type ProposalData =
   | ProposalDataReplaceMember
   | ProposalDataChangeThreshold
   | ProposalDataGovernanceTokenTransfer
-  | DAOUpgradeProposal;
+  | DAOUpgradeProposal
+  | GOVUpgradeProposalDetails
+  | TokenAssociateProposalDetails;
 
 export interface Proposal {
   id: number;
@@ -142,7 +157,7 @@ export interface Proposal {
   to: string;
   operation: number;
   hexStringData: string;
-  data: ProposalData;
+  data: ProposalData | undefined;
   /**
    * The hbar value sent when creating the proposal. This value is needed to
    * compute the correct hash value when executing the proposal in the HederaGnosisSafe contract.

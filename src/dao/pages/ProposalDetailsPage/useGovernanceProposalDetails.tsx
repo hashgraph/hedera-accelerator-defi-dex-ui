@@ -6,16 +6,25 @@ import {
   useHandleTransactionSuccess,
   useFetchLockedGovToken,
 } from "@dex/hooks";
-import { useDAOs, ProposalStatus, useGovernanceDAOProposals } from "@dao/hooks";
+import {
+  useDAOs,
+  ProposalStatus,
+  useGovernanceDAOProposals,
+  useChangeAdmin,
+  ProposalType,
+  TokenAssociateProposalDetails,
+  GOVUpgradeProposalDetails,
+} from "@dao/hooks";
 import { GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
-import { TransactionResponse } from "@hashgraph/sdk";
+import { TransactionResponse, ContractId } from "@hashgraph/sdk";
 
 export function useGovernanceProposalDetails(daoAccountId: string, proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const castVote = useCastVote(proposalId, handleVoteForProposalSuccess);
   const cancelProposal = useCancelProposal(proposalId);
   const executeProposal = useExecuteGovernanceProposal(proposalId, handleExecuteProposalSuccess);
+  const changeAdminMutation = useChangeAdmin(handleExecuteProposalSuccess);
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const daosQueryResults = useDAOs<GovernanceDAODetails | NFTDAODetails>(daoAccountId);
@@ -34,6 +43,10 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
   const votingPower = `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
   const isAuthor = walletId === proposal?.author;
+  const governorUpgrade = dao?.governors?.contractUpgradeLogic;
+  const governorUpgradeContractId = isNotNil(governorUpgrade)
+    ? ContractId.fromSolidityAddress(governorUpgrade).toString()
+    : "";
 
   function handleVoteForProposalSuccess(transactionResponse: TransactionResponse) {
     castVote.reset();
@@ -47,6 +60,21 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     handleTransactionSuccess(transactionResponse, message);
   }
 
+  function getProposalSubDescription() {
+    switch (proposal?.type) {
+      case ProposalType.TokenAssociate:
+        return `Proposal to Associate token: ${(proposal?.data as TokenAssociateProposalDetails).tokenToAssociate}`;
+      case ProposalType.UpgradeContract: {
+        const upgradeData = proposal?.data as GOVUpgradeProposalDetails;
+        return `Proposed to upgrade DAO from ${upgradeData?.currentLogic} to ${upgradeData?.proxyLogic}`;
+      }
+      default:
+        return "";
+    }
+  }
+
+  const subDescription = getProposalSubDescription();
+
   return {
     proposalDetails: isDataFetched
       ? {
@@ -59,9 +87,13 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     cancelProposal,
     hasVoted,
     executeProposal,
+    changeAdminMutation,
     votingPower,
     areVoteButtonsVisible,
     isAuthor,
+    subDescription,
+    governorUpgradeContractId,
+    contractUpgradeLogic: governorUpgrade,
     isSuccess: daosQueryResults.isSuccess && daoProposalsQueryResults.isSuccess,
     isLoading: daosQueryResults.isLoading || daoProposalsQueryResults.isLoading,
     isError: daosQueryResults.isError || daoProposalsQueryResults.isError,

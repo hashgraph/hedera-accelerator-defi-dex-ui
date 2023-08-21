@@ -68,6 +68,6 @@ export function GovernanceDAODashboard() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       isSuccess={isSuccess}
-    ></DAODashboard>
+    />
   );
 }

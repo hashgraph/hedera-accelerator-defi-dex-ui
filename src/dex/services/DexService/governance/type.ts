@@ -31,6 +31,13 @@ interface ProposalDetailsResponse {
   tokenToTransfer?: string | undefined;
   transferTokenAmount?: number | undefined;
   votingInformation?: VotingInformation;
+  tokenToAssociate?: string;
+  proxy?: string;
+  proxyAdmin?: string;
+  proxyLogic?: string;
+  currentLogic?: string;
+  isAdminApproved?: boolean;
+  isAdminApprovalButtonVisible?: boolean;
   state?: number;
 }
 

@@ -138,8 +138,8 @@ export function getProposalData(proposal: Proposal): string {
       const { tokenAddress } = proposal.data as ProposalDataTokenAssociation;
       const tokenToAssociate = solidityAddressToTokenIdString(tokenAddress);
       return isHbarToken(tokenToAssociate)
-        ? `Associate Token: ${HBARTokenSymbol}`
-        : `Associate Token: ${tokenToAssociate}`;
+        ? `Proposed to Associate Token: ${HBARTokenSymbol}`
+        : `Proposed to Associate Token: ${tokenToAssociate}`;
     }
     case ProposalType.UpgradeContract: {
       const { proxyLogic, currentLogic } = proposal.data as DAOUpgradeProposal;
