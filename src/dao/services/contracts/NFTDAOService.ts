@@ -8,11 +8,13 @@ import {
   ContractExecuteTransaction,
   TransactionResponse,
   TokenMintTransaction,
+  ContractFunctionParameters,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, NFTDAOContractFunctions } from "./types";
 import { checkTransactionResponseForError } from "@dex/services";
 import { Contracts } from "@dex/services/constants";
 import NFTDAOFactoryJSON from "@dex/services/abi/NFTDAOFactory.json";
+import { NFTDAOFunctions } from "../types";
 
 const Gas = 9000000;
 
@@ -92,4 +94,48 @@ async function sendMintNFTTokensTransaction(params: MintNFTTokensTransactionPara
   return mintNFTTokensResponse;
 }
 
-export { sendCreateNFTDAOTransaction, sendMintNFTTokensTransaction };
+interface SendLockNFTTokenTransactionParams {
+  nftTokenSerialId: number;
+  tokenHolderAddress: string;
+  signer: HashConnectSigner;
+}
+
+const sendLockNFTTokenTransaction = async (params: SendLockNFTTokenTransactionParams) => {
+  const { nftTokenSerialId, signer, tokenHolderAddress } = params;
+  const godHolderContractId = ContractId.fromString(tokenHolderAddress);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(nftTokenSerialId);
+  const executeSendLockGODTokenTransaction = await new ContractExecuteTransaction()
+    .setContractId(godHolderContractId)
+    .setFunction(NFTDAOFunctions.GrabTokensFromUser, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const sendLockGODTokenResponse = await executeSendLockGODTokenTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendLockGODTokenResponse, NFTDAOFunctions.GrabTokensFromUser);
+  return sendLockGODTokenResponse;
+};
+
+interface SendUnLockNFTTokenTransactionParams {
+  tokenHolderAddress: string;
+  signer: HashConnectSigner;
+}
+
+const sendUnLockGODTokenTransaction = async (params: SendUnLockNFTTokenTransactionParams) => {
+  const { signer, tokenHolderAddress } = params;
+  const godHolderContractId = ContractId.fromString(tokenHolderAddress);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(0);
+  const executeSendUnLockGODTokenTransaction = await new ContractExecuteTransaction()
+    .setContractId(godHolderContractId)
+    .setFunction(NFTDAOFunctions.RevertTokensForVoter, contractFunctionParameters)
+    .setGas(900000)
+    .freezeWithSigner(signer);
+  const sendUnLockGODTokenResponse = await executeSendUnLockGODTokenTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendUnLockGODTokenResponse, NFTDAOFunctions.RevertTokensForVoter);
+  return sendUnLockGODTokenResponse;
+};
+
+export {
+  sendCreateNFTDAOTransaction,
+  sendMintNFTTokensTransaction,
+  sendLockNFTTokenTransaction,
+  sendUnLockGODTokenTransaction,
+};

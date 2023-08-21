@@ -288,7 +288,6 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
 };
 
 interface SendLockGODTokenTransactionParams {
-  accountId: string;
   tokenAmount: number;
   tokenHolderAddress: string;
   signer: HashConnectSigner;

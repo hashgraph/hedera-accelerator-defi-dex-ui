@@ -35,3 +35,4 @@ export * from "./FormTokenInput";
 export * from "./List";
 export * from "./Modal";
 export * from "./InlineAlert";
+export * from "./VotingPower";

@@ -22,7 +22,7 @@ export function useLockGODToken(
   const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseLockGODTokenParams, GovernanceMutations.ClaimGODToken>(
     async (params: UseLockGODTokenParams) => {
-      const { accountId, amount, tokenHolderAddress, governanceTokenId } = params;
+      const { amount, tokenHolderAddress, governanceTokenId } = params;
       await DexService.setTokenAllowance({
         tokenId: governanceTokenId,
         walletId: wallet.savedPairingData?.accountIds[0] ?? "",
@@ -30,7 +30,7 @@ export function useLockGODToken(
         tokenAmount: DEX_PRECISION * amount,
         signer: signer,
       });
-      return DexService.sendLockGODTokenTransaction({ accountId, signer, tokenHolderAddress, tokenAmount: amount });
+      return DexService.sendLockGODTokenTransaction({ signer, tokenHolderAddress, tokenAmount: amount });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

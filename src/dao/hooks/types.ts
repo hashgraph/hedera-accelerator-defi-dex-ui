@@ -5,6 +5,8 @@ export enum DAOQueries {
   DAOs = "daos",
   Proposals = "proposals",
   GodTokens = "godTokens",
+  FetchLockNFTToken = "fetchLockNFTToken",
+  FetchCanUnlockNFTToken = "fetchCanUnlockNFTToken",
 }
 
 export enum DAOMutations {
@@ -27,6 +29,8 @@ export enum DAOMutations {
   MintNFTTokens = "MintNFTTokens",
   DepositTokens = "DepositTokens",
   ChangeAdmin = "ChangeAdmin",
+  LockNFTToken = "lockNFTToken",
+  UnlockNFTToken = "unlockNFTToken",
 }
 
 export enum ProposalStatus {

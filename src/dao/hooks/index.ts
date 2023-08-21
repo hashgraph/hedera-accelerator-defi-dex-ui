@@ -20,4 +20,8 @@ export * from "./useCreateMultiSigTextProposal";
 export * from "./useCreateMultiSigDAOUpgradeProposal";
 export * from "./useCreateGOVTokenAssociateProposal";
 export * from "./useChangeAdmin";
+export * from "./useManageNFTVotingPower";
+export * from "./useFetchLockedNFTToken";
+export * from "./useLockNFTToken";
+export * from "./useUnlockNFTToken";
 export * from "./types";
