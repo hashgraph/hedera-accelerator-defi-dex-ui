@@ -942,6 +942,11 @@
           "internalType": "uint256",
           "name": "_quorumThresholdInBsp",
           "type": "uint256"
+        },
+        {
+          "internalType": "contract ISystemRoleBasedAccess",
+          "name": "_iSystemRoleBasedAccess",
+          "type": "address"
         }
       ],
       "name": "initialize",

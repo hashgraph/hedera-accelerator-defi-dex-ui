@@ -2,8 +2,10 @@ import { ethers } from "ethers";
 import { BigNumber } from "bignumber.js";
 import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters, TokenId } from "@hashgraph/sdk";
 import {
+  abiSignatures,
   checkTransactionResponseForError,
   convertEthersBigNumberToBigNumberJS,
+  decodeLog,
   DexService,
   getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
@@ -34,14 +36,17 @@ import {
   DAOSettingsDetails,
   DAODetailsInfoEventArgs,
   GovernanceProposalOperationType,
+  UpgradeContractDetails,
+  ProposalDataDetails,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
 import { ProposalType } from "@dao/hooks";
 import { ProposalData } from "../../dex/services/DexService/governance/type";
-import { isNil } from "ramda";
+import { isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import GovernorCountingSimpleInternalJSON from "../../dex/services/abi/GovernorCountingSimpleInternal.json";
+import { ContractProposalState } from "@dex/store";
 
 export function getOwners(proposalLogs: LogDescription[]): string[] {
   const owners = new Set<string>();
@@ -445,17 +450,21 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
   return parsedEventsWithData;
 }
 
-export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): Promise<ProposalData[]> {
-  const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
-  const DefaultTokenTransferDetails = {
-    transferFromAccount: undefined,
-    transferToAccount: undefined,
-    tokenToTransfer: undefined,
-    transferTokenAmount: undefined,
+function getProposalData(type: string, data: string | undefined): ProposalDataDetails {
+  const getUpgradeContractProposalData = (data: string | undefined) => {
+    if (isNil(data)) return;
+    const abiCoder = ethers.utils.defaultAbiCoder;
+    const parsedData = abiCoder.decode(["address proxy", "address proxyLogic", "address proxyAdmin"], data);
+    return {
+      type: ProposalType.UpgradeContract,
+      proxy: parsedData.proxy,
+      proxyAdmin: parsedData.proxyAdmin,
+      proxyLogic: parsedData.proxyLogic,
+    };
   };
 
-  const getTokenTransferDetailsFromHexData = (data: string | undefined) => {
-    if (isNil(data)) return { ...DefaultTokenTransferDetails };
+  const getTokenTransferProposalDataFromHexData = (data: string | undefined) => {
+    if (isNil(data)) return;
     const abiCoder = ethers.utils.defaultAbiCoder;
     const operationTypeData = ethers.utils.defaultAbiCoder.decode(["uint256 operationType"], data);
     const operationType = convertEthersBigNumberToBigNumberJS(operationTypeData.operationType).toNumber();
@@ -471,6 +480,7 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
           data
         );
         return {
+          type: ProposalType.TokenTransfer,
           transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
           tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
           transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
@@ -484,9 +494,23 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
         };
       }
       default:
-        return { ...DefaultTokenTransferDetails };
+        return;
     }
   };
+
+  switch (type) {
+    case ProposalType.TokenTransfer:
+      return getTokenTransferProposalDataFromHexData(data);
+    case ProposalType.UpgradeContract:
+      return getUpgradeContractProposalData(data);
+    default:
+      return;
+  }
+}
+
+export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): Promise<ProposalData[]> {
+  const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
+
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
     const proposalEventsResults = await Promise.allSettled([
       DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.tokenTransferLogic, false),
@@ -499,7 +523,7 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-        const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
+        const proposalDetailsData = getProposalData(proposalEvent.type, proposalEvent.data);
         let contractId = proposalEvent.contractId;
         if (contractId.includes("0.0")) {
           contractId = ContractId.fromString(contractId).toSolidityAddress();
@@ -519,7 +543,42 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
          * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
          * proposalDetails should override the same field found in the proposalEvent.
          */
-        return { ...proposalEvent, state: dataParsed.at(0), ...tokenTransferDetails };
+
+        const isContractUpgradeProposal = proposalEvent.type === ProposalType.UpgradeContract;
+        let isAdminApproved = false;
+        let parsedData;
+        if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
+          const proposalData = proposalDetailsData as UpgradeContractDetails;
+          const logs = await DexService.fetchContractLogs(proposalData?.proxy ?? "");
+          const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
+          const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
+          const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+          const currentLogic = isNotNil(upgradedLogs[0])
+            ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
+            : "";
+          const proxyAdmin = AccountId.fromSolidityAddress(proposalData?.proxyAdmin).toString();
+          const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
+          const upgradeLogicEVMAddress = await DexService.fetchContractEVMAddress(governors.contractUpgradeLogic);
+          const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
+          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === upgradeLogicEVMAddress;
+          parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
+        }
+        const isAdminApprovalButtonVisible =
+          dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved && isContractUpgradeProposal;
+        const currentStateOfProposal = isContractUpgradeProposal
+          ? dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved
+            ? ContractProposalState.Active
+            : dataParsed.at(0)
+          : dataParsed.at(0);
+
+        return {
+          ...proposalEvent,
+          state: currentStateOfProposal,
+          ...proposalDetailsData,
+          ...parsedData,
+          isAdminApproved,
+          isAdminApprovalButtonVisible,
+        };
       })
     );
     const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {

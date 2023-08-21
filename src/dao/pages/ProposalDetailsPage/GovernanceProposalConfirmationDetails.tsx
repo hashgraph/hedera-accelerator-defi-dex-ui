@@ -5,6 +5,8 @@ import {
   LightningBoltIcon,
   AlertDialog,
   HorizontalStackBarChart,
+  InlineAlert,
+  InlineAlertType,
 } from "@shared/ui-kit";
 import { VoteType } from "@dex/pages";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -14,8 +16,9 @@ import {
   UseCastVoteParams,
   useDexContext,
   UseExecuteProposalParams,
+  usePairedWalletDetails,
 } from "@dex/hooks";
-import { Proposal, ProposalStatus } from "@dao/hooks";
+import { GOVUpgradeProposalDetails, Proposal, ProposalStatus, UseChangeAdminMutationResult } from "@dao/hooks";
 import { useState } from "react";
 import { UseMutationResult } from "react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
@@ -32,6 +35,8 @@ interface GovernanceProposalConfirmationDetailsProps {
   nonce: number;
   tokenSymbol: string;
   votingPower: string;
+  contractUpgradeLogic: string;
+  governorUpgradeContractId: string;
   hasConnectedWalletVoted: boolean;
   isAuthor: boolean;
   castVote: UseMutationResult<TransactionResponse | undefined, Error, UseCastVoteParams, GovernanceMutations.CastVote>;
@@ -47,6 +52,7 @@ interface GovernanceProposalConfirmationDetailsProps {
     UseCancelProposalParams,
     GovernanceMutations.CancelProposal
   >;
+  changeAdminMutation: UseChangeAdminMutationResult;
 }
 
 export function GovernanceProposalConfirmationDetails(props: GovernanceProposalConfirmationDetailsProps) {
@@ -55,6 +61,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     isCancelProposalOpen: false,
   });
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const { walletId } = usePairedWalletDetails();
   const {
     proposal,
     tokenSymbol,
@@ -62,6 +69,9 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     castVote,
     executeProposal,
     cancelProposal,
+    changeAdminMutation,
+    contractUpgradeLogic,
+    governorUpgradeContractId,
     status,
     state,
     hasConnectedWalletVoted,
@@ -70,6 +80,10 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
 
   const contractId = proposal?.contractId ?? "";
   const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0;
+  const isAdminApprovalButtonVisible =
+    (proposal?.data as GOVUpgradeProposalDetails)?.isAdminApprovalButtonVisible ?? false;
+  const isApproveAdminButtonDisabled = walletId !== (proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin;
+  const isContractUpgradeProposal = proposal?.isContractUpgradeProposal;
 
   async function handleVoteButtonClicked(voteType: VoteType) {
     resetServerState();
@@ -100,6 +114,10 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     }
   }
 
+  async function handleClickChangeAdminTransaction(governorUpgradeLogic: string, proxyAddress: string) {
+    changeAdminMutation.mutate({ safeAccountId: governorUpgradeLogic, proxyAddress });
+  }
+
   function handleCancelProposalClicked() {
     resetServerState();
     if (proposal) {
@@ -122,8 +140,29 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
   const ConfirmationDetailsButtons: Readonly<{ [key in ProposalStatus]: JSX.Element }> = {
     [ProposalStatus.Pending]: (
       <Flex direction="column" gap={2}>
-        <>
-          {hasConnectedWalletVoted ? (
+        {isContractUpgradeProposal ? (
+          isAdminApprovalButtonVisible ? (
+            <Flex direction="column" gap="1rem">
+              <Button
+                variant="primary"
+                isDisabled={isApproveAdminButtonDisabled}
+                onClick={() => {
+                  handleClickChangeAdminTransaction(
+                    contractUpgradeLogic,
+                    (proposal?.data as GOVUpgradeProposalDetails)?.proxy ?? ""
+                  );
+                }}
+              >
+                Transfer Ownership
+              </Button>
+              <InlineAlert
+                type={InlineAlertType.Warning}
+                message={`Connect your wallet with 
+                ${(proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin} 
+                to approve the transfer of ownership to ${governorUpgradeContractId}`}
+              />
+            </Flex>
+          ) : hasConnectedWalletVoted ? (
             <Button isDisabled leftIcon={<CheckCircleUnfilledIcon boxSize={4} />}>
               You have voted
             </Button>
@@ -148,8 +187,37 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 />
               </Flex>
             </>
-          )}
-        </>
+          )
+        ) : (
+          <>
+            {hasConnectedWalletVoted ? (
+              <Button isDisabled leftIcon={<CheckCircleUnfilledIcon boxSize={4} />}>
+                You have voted
+              </Button>
+            ) : (
+              <>
+                <Flex gap="4">
+                  <AlertDialog
+                    openDialogButtonStyles={{ flex: "1" }}
+                    openDialogButtonText="Vote"
+                    isOpenDialogButtonDisabled={isVotingDisabled}
+                    title="Confirm Vote"
+                    body={
+                      <ProposalVoteModal
+                        tokenSymbol={tokenSymbol}
+                        votingPower={votingPower}
+                        handleVoteButtonClicked={handleVoteButtonClicked}
+                      />
+                    }
+                    alertDialogOpen={dialogState.isVoteOpen}
+                    onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteOpen: true })}
+                    onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteOpen: false })}
+                  />
+                </Flex>
+              </>
+            )}
+          </>
+        )}
         {isAuthor ? (
           <ProposalCancelModal
             title={proposal?.title}
@@ -166,20 +234,18 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     ),
     [ProposalStatus.Queued]: (
       <>
+        <Button variant="primary" onClick={() => handleClickExecuteTransaction()}>
+          Execute
+        </Button>
         {isAuthor && (
-          <>
-            <Button variant="primary" onClick={() => handleClickExecuteTransaction()}>
-              Execute
-            </Button>
-            <ProposalCancelModal
-              title={proposal?.title}
-              tokenSymbol={tokenSymbol}
-              votingPower={votingPower}
-              handleCancelProposalClicked={handleCancelProposalClicked}
-              setDialogState={setDialogState}
-              dialogState={dialogState}
-            />
-          </>
+          <ProposalCancelModal
+            title={proposal?.title}
+            tokenSymbol={tokenSymbol}
+            votingPower={votingPower}
+            handleCancelProposalClicked={handleCancelProposalClicked}
+            setDialogState={setDialogState}
+            dialogState={dialogState}
+          />
         )}
       </>
     ),

@@ -1,18 +1,9 @@
 import { useQuery } from "react-query";
 import { DexService, DEX_TOKEN_PRECISION_VALUE, MirrorNodeTokenById } from "@dex/services";
 import { DAOProposalGovernors } from "@dao/services";
-import {
-  AllFilters,
-  DAOQueries,
-  Proposal,
-  ProposalDataGovernanceTokenTransfer,
-  ProposalEvent,
-  ProposalStatus,
-  ProposalType,
-  Votes,
-} from "./types";
+import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
 import { AccountId } from "@hashgraph/sdk";
-import { isNil } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import BigNumber from "bignumber.js";
 import { ProposalData } from "@dex/services/DexService/governance/type";
 import { ContractProposalState, ProposalState } from "@dex/store";
@@ -79,6 +70,36 @@ export function useGovernanceDAOProposals(
     };
   };
 
+  const getFormattedProposalData = (proposalType: string, proposalData: ProposalData) => {
+    switch (proposalType) {
+      case ProposalType.TokenTransfer: {
+        return {
+          transferFromAccount: proposalData.transferFromAccount ?? "",
+          transferToAccount: proposalData.transferToAccount ?? "",
+          tokenToTransfer: proposalData.tokenToTransfer ?? "",
+          transferTokenAmount: proposalData.transferTokenAmount ?? 0,
+        };
+      }
+      case ProposalType.TokenAssociate: {
+        return {
+          tokenToAssociate: proposalData.tokenToAssociate ?? "",
+        };
+      }
+      case ProposalType.UpgradeContract: {
+        return {
+          proxy: proposalData?.proxy ?? "",
+          proxyAdmin: proposalData?.proxyAdmin ?? "",
+          proxyLogic: proposalData?.proxyLogic ?? "",
+          currentLogic: proposalData?.currentLogic ?? "",
+          isAdminApproved: proposalData?.isAdminApproved ?? false,
+          isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
+        };
+      }
+      default:
+        return undefined;
+    }
+  };
+
   const convertDataToProposal = (
     proposalData: ProposalData,
     index: number,
@@ -93,12 +114,6 @@ export function useGovernanceDAOProposals(
       timeRemaining = getTimeRemaining(proposalData.duration?.startBlock, proposalData.duration?.endBlock).toString();
     }
     const votingEndTime = getVotingEndTime(proposalData.timestamp || "", timeRemaining || "");
-    const data: ProposalDataGovernanceTokenTransfer = {
-      transferFromAccount: proposalData.transferFromAccount ?? "",
-      transferToAccount: proposalData.transferToAccount ?? "",
-      tokenToTransfer: proposalData.tokenToTransfer ?? "",
-      transferTokenAmount: proposalData.transferTokenAmount ?? 0,
-    };
     return {
       id: index,
       timeRemaining,
@@ -131,7 +146,8 @@ export function useGovernanceDAOProposals(
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
       votingEndTime,
       proposalState: ProposalState[proposalState],
-      data,
+      data: getFormattedProposalData(proposalData.type, proposalData),
+      isContractUpgradeProposal: proposalData.type === ProposalType.UpgradeContract,
     };
   };
 
@@ -148,9 +164,9 @@ export function useGovernanceDAOProposals(
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
       const proposals = await Promise.all(
         data[0].map(async (proposal, index) => {
-          const tokenId = proposal.tokenToTransfer;
+          const tokenId = proposal?.tokenToTransfer ?? "";
           let tokenData;
-          if (tokenId) {
+          if (!isEmpty(tokenId)) {
             if (!tokenDataCache.has(tokenId)) {
               tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
             }

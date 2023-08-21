@@ -223,8 +223,8 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     nftTokenSerialId,
   } = params;
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
-  const proxyContractAddress = ContractId.fromString(newImplementationAddress).toSolidityAddress();
-  const proxyToUpgrade = ContractId.fromString(oldProxyAddress).toSolidityAddress();
+  const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
+  const proxyLogicEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
   await DexService.setTokenAllowance({
     tokenId: governanceTokenId,
     walletId: signer.getAccountId().toString(),
@@ -236,8 +236,8 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
-    .addAddress(proxyContractAddress)
-    .addAddress(proxyToUpgrade)
+    .addAddress(proxyEVMAddress)
+    .addAddress(proxyLogicEVMAddress)
     .addUint256(nftTokenSerialId);
 
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()

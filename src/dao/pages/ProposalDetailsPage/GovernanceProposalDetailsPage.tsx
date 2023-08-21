@@ -25,6 +25,10 @@ export function GovernanceProposalDetailsPage() {
     executeProposal,
     votingPower,
     hasVoted,
+    changeAdminMutation,
+    contractUpgradeLogic,
+    governorUpgradeContractId,
+    subDescription,
     isAuthor,
   } = useGovernanceProposalDetails(daoAccountId, proposalId);
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposal;
@@ -96,7 +100,7 @@ export function GovernanceProposalDetailsPage() {
               hasExecutionFailed={hasProposalExecutionFailed}
             />
             <ProposalDetails
-              description={[proposalDetails.description]}
+              description={[proposalDetails.description, subDescription]}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}
@@ -117,6 +121,8 @@ export function GovernanceProposalDetailsPage() {
             {isGovernanceProposal || isNFTProposal ? (
               <GovernanceProposalConfirmationDetails
                 tokenSymbol={""}
+                contractUpgradeLogic={contractUpgradeLogic ?? ""}
+                governorUpgradeContractId={governorUpgradeContractId ?? ""}
                 proposal={proposalDetails}
                 hasConnectedWalletVoted={hasVoted}
                 status={proposalStatus}
@@ -128,6 +134,7 @@ export function GovernanceProposalDetailsPage() {
                 votingPower={votingPower}
                 castVote={castVote}
                 executeProposal={executeProposal}
+                changeAdminMutation={changeAdminMutation}
                 cancelProposal={cancelProposal}
                 isAuthor={isAuthor}
               />

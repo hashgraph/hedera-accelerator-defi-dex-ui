@@ -177,3 +177,25 @@ export enum GovernanceProposalOperationType {
   TokenTransfer = 1,
   TokenAssociation,
 }
+export interface UpgradeContractDetails {
+  type: string;
+  proxy: string;
+  proxyAdmin: string;
+  proxyLogic: string;
+}
+export interface TokenTransferDetails {
+  type: string;
+  transferToAccount: string;
+  tokenToTransfer: string;
+  transferTokenAmount: number;
+}
+export interface TokenAssociateProposalDetails {
+  type: string;
+  tokenToAssociate: string;
+}
+
+export type ProposalDataDetails =
+  | UpgradeContractDetails
+  | TokenTransferDetails
+  | TokenAssociateProposalDetails
+  | undefined;

@@ -141,7 +141,7 @@ export function DAOSettings() {
                   return (
                     <ListItem>
                       <Link
-                        key={index}
+                        key={link.value}
                         as={ReachLink}
                         textStyle="p small regular link"
                         color={Color.Primary._500}

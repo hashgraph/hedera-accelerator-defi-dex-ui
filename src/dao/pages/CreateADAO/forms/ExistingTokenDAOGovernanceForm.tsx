@@ -52,9 +52,10 @@ export function ExistingTokenDAOGovernanceForm() {
   }
 
   function getIconForTokenIdField() {
-    if (isFetching) return <CircularProgress isIndeterminate color={Color.Primary._500} size="25px" />;
+    if (isFetching)
+      return <CircularProgress isIndeterminate color={Color.Primary._500} size="1.5rem" marginRight="0.5rem" />;
     if (isSuccess && governance.existingToken.id.length > 0) {
-      return <CheckCircleIcon color={Color.Success._500} />;
+      return <CheckCircleIcon color={Color.Success._500} boxSize="1rem" marginRight="0.5rem" />;
     }
     return undefined;
   }

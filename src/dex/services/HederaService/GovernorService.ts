@@ -295,11 +295,10 @@ interface SendLockGODTokenTransactionParams {
 }
 
 const sendLockGODTokenTransaction = async (params: SendLockGODTokenTransactionParams) => {
-  const { accountId, tokenAmount, signer, tokenHolderAddress } = params;
+  const { tokenAmount, signer, tokenHolderAddress } = params;
   const godHolderContractId = ContractId.fromString(tokenHolderAddress);
   const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
-  const accountAddress = AccountId.fromString(accountId).toSolidityAddress();
-  const contractFunctionParameters = new ContractFunctionParameters().addAddress(accountAddress).addUint256(amount);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(amount);
   const executeSendLockGODTokenTransaction = await new ContractExecuteTransaction()
     .setContractId(godHolderContractId)
     .setFunction(GovernorContractFunctions.LockGODToken, contractFunctionParameters)
