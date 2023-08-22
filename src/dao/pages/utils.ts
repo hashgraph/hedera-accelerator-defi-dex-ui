@@ -1,6 +1,7 @@
 import { StepProps } from "@shared/ui-kit";
 import {
   DAOUpgradeProposal,
+  GOVUpgradeProposalDetails,
   Proposal,
   ProposalDataAddMember,
   ProposalDataChangeThreshold,
@@ -142,7 +143,7 @@ export function getProposalData(proposal: Proposal): string {
         : `Proposed to Associate Token: ${tokenToAssociate}`;
     }
     case ProposalType.UpgradeContract: {
-      const { proxyLogic, currentLogic } = proposal.data as DAOUpgradeProposal;
+      const { proxyLogic, currentLogic } = proposal.data as DAOUpgradeProposal | GOVUpgradeProposalDetails;
       return `Proposed to upgrade DAO from ${currentLogic} to ${proxyLogic}`;
     }
     default:

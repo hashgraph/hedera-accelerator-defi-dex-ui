@@ -177,7 +177,7 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
                 <Notification
                   type={NotficationTypes.WARNING}
                   message={`You have voted on proposals where the voting period is still in progress, so 
-            any unlocked ${props.tokenSymbol} tokens will be pending unlocks until the in-progress
+            any locked ${props.tokenSymbol} tokens will be pending unlocks until the in-progress
             proposals are either complete or canceled.`}
                   textStyle="p small regular"
                 />

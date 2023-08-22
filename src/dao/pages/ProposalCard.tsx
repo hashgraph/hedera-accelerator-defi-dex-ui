@@ -23,7 +23,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const location = useLocation();
 
   const isMultiSig = dao.type === DAOType.MultiSig;
-  const isGovernance = dao.type === DAOType.GovernanceToken;
+  const isGovernanceOrNFT = dao.type === DAOType.GovernanceToken || dao.type === DAOType.NFT;
   const timeRemaining = "";
   const votingEndTime = "";
   const { amount, token, transactionHash, proposalId } = proposal;
@@ -127,7 +127,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                 </Text>
               </>
             )}
-            {isGovernance && (
+            {isGovernanceOrNFT && (
               <>
                 {proposal.type === ProposalType.TokenTransfer && (
                   <Flex alignItems="center">
@@ -138,6 +138,9 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     </Text>
                   </Flex>
                 )}
+                <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
+                  {getProposalData(proposal)}
+                </Text>
               </>
             )}
           </Flex>

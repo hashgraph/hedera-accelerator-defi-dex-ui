@@ -207,6 +207,7 @@ interface SendDAOContractUpgradeProposalTransactionParams {
   oldProxyAddress: string;
   daoContractId: string;
   nftTokenSerialId: number;
+  daoType: string;
   signer: HashConnectSigner;
 }
 async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProposalTransactionParams) {
@@ -220,18 +221,37 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     linkToDiscussion,
     oldProxyAddress,
     newImplementationAddress,
+    daoType,
     nftTokenSerialId,
   } = params;
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
   const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
   const proxyLogicEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
-  await DexService.setTokenAllowance({
-    tokenId: governanceTokenId,
-    walletId: signer.getAccountId().toString(),
-    spenderContractId,
-    tokenAmount: 1 * DEX_PRECISION,
-    signer,
-  });
+
+  switch (daoType) {
+    case DAOType.NFT: {
+      await DexService.setNFTAllowance({
+        nftId: governanceTokenId,
+        walletId: signer.getAccountId().toString(),
+        spenderContractId,
+        signer,
+      });
+      break;
+    }
+    case DAOType.GovernanceToken: {
+      await DexService.setTokenAllowance({
+        tokenId: governanceTokenId,
+        walletId: signer.getAccountId().toString(),
+        spenderContractId,
+        tokenAmount: 1 * DEX_PRECISION,
+        signer,
+      });
+      break;
+    }
+    default:
+      break;
+  }
+
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)

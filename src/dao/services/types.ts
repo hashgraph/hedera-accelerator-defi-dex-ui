@@ -191,7 +191,7 @@ export interface TokenTransferDetails {
 }
 export interface TokenAssociateProposalDetails {
   type: string;
-  tokenToAssociate: string;
+  tokenAddress: string;
 }
 
 export type ProposalDataDetails =

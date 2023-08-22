@@ -119,7 +119,7 @@ interface SendUnLockNFTTokenTransactionParams {
   signer: HashConnectSigner;
 }
 
-const sendUnLockGODTokenTransaction = async (params: SendUnLockNFTTokenTransactionParams) => {
+const sendUnLockNFTTokenTransaction = async (params: SendUnLockNFTTokenTransactionParams) => {
   const { signer, tokenHolderAddress } = params;
   const godHolderContractId = ContractId.fromString(tokenHolderAddress);
   const contractFunctionParameters = new ContractFunctionParameters().addUint256(0);
@@ -137,5 +137,5 @@ export {
   sendCreateNFTDAOTransaction,
   sendMintNFTTokensTransaction,
   sendLockNFTTokenTransaction,
-  sendUnLockGODTokenTransaction,
+  sendUnLockNFTTokenTransaction,
 };

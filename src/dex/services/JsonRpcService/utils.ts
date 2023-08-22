@@ -3,11 +3,13 @@ import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { DexService } from "..";
 
-export const solidityAddressToTokenIdString = (address: string): string =>
-  TokenId.fromSolidityAddress(address).toString();
-
-export const solidityAddressToContractIdString = (address: string): string =>
-  ContractId.fromSolidityAddress(address).toString();
+export const solidityAddressToTokenIdString = (address: string): string => {
+  try {
+    return TokenId.fromSolidityAddress(address).toString();
+  } catch {
+    return address;
+  }
+};
 
 /**
  * Checks if all addresses in the list are valid ethereum addresses.
