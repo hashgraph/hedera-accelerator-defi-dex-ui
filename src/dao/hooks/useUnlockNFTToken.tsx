@@ -19,7 +19,7 @@ export function useUnlockNFTToken(
   const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseUnLockNFTTokenParams, DAOMutations.UnlockNFTToken>(
     async (params: UseUnLockNFTTokenParams) => {
-      return DAOService.sendUnLockGODTokenTransaction({ ...params, signer });
+      return DAOService.sendUnLockNFTTokenTransaction({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

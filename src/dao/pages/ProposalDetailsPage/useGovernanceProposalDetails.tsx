@@ -6,19 +6,11 @@ import {
   useHandleTransactionSuccess,
   useFetchLockedGovToken,
 } from "@dex/hooks";
-import {
-  useDAOs,
-  ProposalStatus,
-  useGovernanceDAOProposals,
-  useFetchLockedNFTToken,
-  useChangeAdmin,
-  ProposalType,
-  TokenAssociateProposalDetails,
-  GOVUpgradeProposalDetails,
-} from "@dao/hooks";
+import { useDAOs, ProposalStatus, useGovernanceDAOProposals, useFetchLockedNFTToken, useChangeAdmin } from "@dao/hooks";
 import { DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
 import { TransactionResponse, ContractId } from "@hashgraph/sdk";
+import { getProposalData } from "../utils";
 
 export function useGovernanceProposalDetails(daoAccountId: string, proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -64,22 +56,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     const message = "Proposal has been executed.";
     handleTransactionSuccess(transactionResponse, message);
   }
-
-  function getProposalSubDescription() {
-    switch (proposal?.type) {
-      case ProposalType.TokenAssociate:
-        return `Proposal to Associate token: ${(proposal?.data as TokenAssociateProposalDetails).tokenToAssociate}`;
-      case ProposalType.UpgradeContract: {
-        const upgradeData = proposal?.data as GOVUpgradeProposalDetails;
-        return `Proposed to upgrade DAO from ${upgradeData?.currentLogic} to ${upgradeData?.proxyLogic}`;
-      }
-      default:
-        return "";
-    }
-  }
-
-  const subDescription = getProposalSubDescription();
-
+  const subDescription = isNotNil(proposal) ? getProposalData(proposal) : "";
   return {
     proposalDetails: isDataFetched
       ? {

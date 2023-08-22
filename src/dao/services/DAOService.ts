@@ -19,7 +19,7 @@ import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.js
 import HederaGnosisSafeJSON from "../../dex/services/abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../dex/services/abi/MultiSigDAO.json";
 import BaseDAOJSON from "../../dex/services/abi/BaseDAO.json";
-import FTDAOJSON from "../../dex/services/abi/FTDAO.json";
+
 import {
   MultiSigDAODetails,
   MultiSigDAOCreatedEventArgs,
@@ -487,10 +487,10 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
         };
       }
       case GovernanceProposalOperationType.TokenAssociation: {
-        const parsedData = abiCoder.decode(["uint256 operationType", "address tokenToAssociate"], data);
+        const parsedData = abiCoder.decode(["uint256 operationType", "address tokenAddress"], data);
         return {
           type: ProposalType.TokenAssociate,
-          tokenToAssociate: solidityAddressToTokenIdString(parsedData.tokenToAssociate),
+          tokenAddress: solidityAddressToTokenIdString(parsedData.tokenAddress),
         };
       }
       case GovernanceProposalOperationType.HBarTransfer: {
@@ -602,27 +602,6 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
   const proposalEvents = await fetchDAOProposalEvents();
   const proposalDetails = await fetchDAOProposalData(proposalEvents);
   return proposalDetails;
-}
-
-export async function fetchNFTDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
-  const contractInterface = new ethers.utils.Interface(FTDAOJSON.abi);
-  const abiCoder = ethers.utils.defaultAbiCoder;
-  const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
-
-  const parsedEventsWithData = parsedEvents.map((event) => {
-    if (event.name === DAOEvents.TransactionCreated) {
-      const parsedData = abiCoder.decode(
-        ["address token", "address receiver", "uint256 amount"],
-        ethers.utils.hexDataSlice(event.args.info.data, 4)
-      );
-      const eventClone: ethers.utils.LogDescription = structuredClone(event);
-      eventClone.args.info.data = parsedData;
-      eventClone.args.info.hexStringData = event.args.info.data;
-      return eventClone;
-    }
-    return event;
-  });
-  return parsedEventsWithData;
 }
 
 export async function fetchHederaGnosisSafeLogs(safeAccountId: string) {

@@ -82,7 +82,7 @@ export function useGovernanceDAOProposals(
       }
       case ProposalType.TokenAssociate: {
         return {
-          tokenToAssociate: proposalData.tokenToAssociate ?? "",
+          tokenAddress: proposalData.tokenAddress ?? "",
         };
       }
       case ProposalType.UpgradeContract: {

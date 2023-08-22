@@ -80,6 +80,8 @@ export const router = createBrowserRouter(
         <Route path={Routes.DAOTokenTransferReview} element={<Pages.DAOTokenTransferReviewForm />} />
         <Route path={Routes.DAOTextProposalDetails} element={<Pages.DAOTextProposalDetailsForm />} />
         <Route path={Routes.DAOTextProposalReview} element={<Pages.DAOTextProposalReviewForm />} />
+        <Route path={Routes.DAOContractUpgradeDetails} element={<Pages.DAOContractUpgradeDetailsForm />} />
+        <Route path={Routes.DAOContractUpgradeReview} element={<Pages.DAOContractUpgradeReviewForm />} />
       </Route>
       <Route path={`${Routes.Multisig}/:accountId/new-proposal`} element={<Pages.CreateDAOProposal />}>
         <Route index element={<Navigate to={Routes.DAOProposalType} />} />

@@ -371,7 +371,7 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.ContractUpgrade: {
-        const { title, description, linkToDiscussion, oldProxyAddress, newImplementationAddress } =
+        const { title, description, linkToDiscussion, oldProxyAddress, newImplementationAddress, nftTokenSerialId } =
           data as CreateDAOContractUpgradeForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.GovernanceToken:
@@ -385,6 +385,7 @@ export function CreateDAOProposal() {
               governanceTokenId,
               daoContractId: daoAccountId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+              daoType: DAOType.GovernanceToken,
             });
           case DAOType.MultiSig:
             return createMultiSigUpgradeProposal({
@@ -396,6 +397,19 @@ export function CreateDAOProposal() {
               multiSigDAOContractId: daoAccountId,
             });
           case DAOType.NFT:
+            if (isNil(nftTokenSerialId)) return;
+            return createDAOUpgradeProposal({
+              title,
+              description,
+              linkToDiscussion,
+              oldProxyAddress,
+              newImplementationAddress,
+              governanceAddress: governors.contractUpgradeLogic,
+              governanceTokenId,
+              daoContractId: daoAccountId,
+              nftTokenSerialId: nftTokenSerialId,
+              daoType: DAOType.NFT,
+            });
           default:
             return;
         }
@@ -539,7 +553,16 @@ export function CreateDAOProposal() {
       case DAOProposalType.UpgradeThreshold:
         return trigger(["newThreshold", "title", "description"]);
       case DAOProposalType.ContractUpgrade:
-        return trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
+        return currentDaoType === Routes.NFT
+          ? trigger([
+              "title",
+              "description",
+              "linkToDiscussion",
+              "oldProxyAddress",
+              "newImplementationAddress",
+              "nftTokenSerialId",
+            ])
+          : trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
       case DAOProposalType.TokenTransfer: {
         return currentDaoType === Routes.Multisig
           ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])

@@ -1,14 +1,21 @@
-import { FormInput, FormTextArea } from "@shared/ui-kit";
-import { CreateDAOContractUpgradeForm } from "../types";
+import { FormInput, FormTextArea, FormDropdown } from "@shared/ui-kit";
+import { CreateDAOContractUpgradeForm, CreateDAOProposalContext } from "../types";
 import { useFormContext } from "react-hook-form";
 import { isValidUrl } from "@dex/utils";
 import { Flex } from "@chakra-ui/react";
+import { useOutletContext } from "react-router-dom";
+import { useTokenNFTs } from "@dex/hooks";
+import { Routes } from "@dao/routes";
+import { ChangeEvent } from "react";
 
 export function DAOContractUpgradeDetailsForm() {
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext<CreateDAOContractUpgradeForm>();
+  const { governanceTokenId, daoType } = useOutletContext<CreateDAOProposalContext>();
+  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId);
   return (
     <Flex direction="column" gap="1.3rem">
       <FormInput<"title">
@@ -86,6 +93,24 @@ export function DAOContractUpgradeDetailsForm() {
         isInvalid={Boolean(errors?.oldProxyAddress)}
         errorMessage={errors?.oldProxyAddress && errors?.oldProxyAddress?.message}
       />
+      {daoType === Routes.NFT && (
+        <FormDropdown
+          label="Token Serial Number"
+          placeholder="Select a token serial number"
+          data={tokenNFTs.map((input: any) => {
+            return {
+              label: input.serial_number,
+              value: input.serial_number,
+            };
+          })}
+          isInvalid={Boolean(errors?.nftTokenSerialId)}
+          errorMessage={errors.nftTokenSerialId && errors.nftTokenSerialId.message}
+          register={register("nftTokenSerialId", {
+            required: { value: true, message: "A token is required to be locked to create proposal" },
+            onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftTokenSerialId", Number(e.target.value)),
+          })}
+        />
+      )}
     </Flex>
   );
 }

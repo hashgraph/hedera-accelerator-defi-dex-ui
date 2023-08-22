@@ -9,7 +9,6 @@ import {
   proposeChangeThreshold,
   sendApproveMultiSigTransaction,
   sendExecuteMultiSigTransaction,
-  fetchNFTDAOLogs,
   proposeMultiSigTextProposal,
   sendChangeAdminForProposalTransaction,
 } from "@dao/services";
@@ -40,7 +39,6 @@ function createDexService() {
     fetchAllDAOs,
     fetchMultiSigDAOLogs,
     fetchGovernanceDAOLogs,
-    fetchNFTDAOLogs,
     fetchHederaGnosisSafeLogs,
     proposeAddOwnerWithThreshold,
     proposeRemoveOwnerWithThreshold,

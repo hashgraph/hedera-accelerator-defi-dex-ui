@@ -6,7 +6,7 @@ import { DAOMutations, DAOQueries } from "./types";
 import DAOService from "@dao/services/contracts";
 import { DexService } from "@dex/services";
 
-interface UseLockGODTokenParams {
+interface UseLockNFTTokenParams {
   nftTokenSerialId: number;
   tokenHolderAddress: string;
   governanceTokenId: string;
@@ -20,8 +20,8 @@ export function useLockNFTToken(
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
-  return useMutation<TransactionResponse | undefined, Error, UseLockGODTokenParams, DAOMutations.LockNFTToken>(
-    async (params: UseLockGODTokenParams) => {
+  return useMutation<TransactionResponse | undefined, Error, UseLockNFTTokenParams, DAOMutations.LockNFTToken>(
+    async (params: UseLockNFTTokenParams) => {
       const { nftTokenSerialId, tokenHolderAddress, governanceTokenId } = params;
       await DexService.setNFTAllowance({
         nftId: governanceTokenId,

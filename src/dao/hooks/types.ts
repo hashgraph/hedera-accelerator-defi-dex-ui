@@ -125,10 +125,6 @@ export interface GOVUpgradeProposalDetails {
   isAdminApprovalButtonVisible: boolean;
 }
 
-export interface TokenAssociateProposalDetails {
-  tokenToAssociate: string;
-}
-
 export type ProposalData =
   | ProposalDataTokenTransfer
   | ProposalDataHbarTransfer
@@ -139,8 +135,7 @@ export type ProposalData =
   | ProposalDataChangeThreshold
   | ProposalDataGovernanceTokenTransfer
   | DAOUpgradeProposal
-  | GOVUpgradeProposalDetails
-  | TokenAssociateProposalDetails;
+  | GOVUpgradeProposalDetails;
 
 export interface Proposal {
   id: number;
