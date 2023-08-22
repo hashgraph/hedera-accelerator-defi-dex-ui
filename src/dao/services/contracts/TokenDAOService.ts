@@ -8,11 +8,14 @@ import {
   ContractExecuteTransaction,
   ContractFunctionParameters,
   TransactionResponse,
+  Hbar,
+  HbarUnit,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./types";
 import { DexService, checkTransactionResponseForError, Contracts, DEX_PRECISION } from "@dex/services";
 import { DAOType } from "@dao/services";
 import FTDAOFactoryJSON from "@dex/services/abi/FTDAOFactory.json";
+import { isHbarToken } from "@dex/utils";
 
 const Gas = 9000000;
 
@@ -109,8 +112,10 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
-  const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
+  const contractCallParams = new ContractFunctionParameters();
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
+  let preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
+  let functionName = GovernorDAOContractFunctions.CreateTokenTransferProposal;
   await DexService.setTokenAllowance({
     tokenId: governanceTokenId,
     walletId: signer.getAccountId().toString(),
@@ -118,27 +123,35 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     tokenAmount: 1 * DEX_PRECISION,
     signer,
   });
-  const contractCallParams = new ContractFunctionParameters()
-    .addString(title)
-    .addString(description)
-    .addString(linkToDiscussion)
-    .addAddress(receiverSolidityAddress)
-    .addAddress(tokenSolidityAddress)
-    .addUint256(preciseAmount)
-    .addUint256(nftTokenSerialId);
-
+  if (isHbarToken(tokenId)) {
+    preciseAmount = Hbar.from(amount, HbarUnit.Hbar).to(HbarUnit.Tinybar);
+    functionName = GovernorDAOContractFunctions.CreateHBarTransferProposal;
+    contractCallParams
+      .addString(title)
+      .addString(description)
+      .addString(linkToDiscussion)
+      .addAddress(receiverSolidityAddress)
+      .addUint256(preciseAmount)
+      .addUint256(nftTokenSerialId);
+  } else {
+    contractCallParams
+      .addString(title)
+      .addString(description)
+      .addString(linkToDiscussion)
+      .addAddress(receiverSolidityAddress)
+      .addAddress(tokenSolidityAddress)
+      .addUint256(preciseAmount)
+      .addUint256(nftTokenSerialId);
+  }
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
     .setContractId(daoContractId)
-    .setFunction(GovernorDAOContractFunctions.CreateTokenTransferProposal, contractCallParams)
+    .setFunction(functionName, contractCallParams)
     .setGas(Gas)
     .freezeWithSigner(signer);
   const sendProposeTokenTransferTransactionResponse = await sendProposeTokenTransferTransaction.executeWithSigner(
     signer
   );
-  checkTransactionResponseForError(
-    sendProposeTokenTransferTransactionResponse,
-    GovernorDAOContractFunctions.CreateTokenTransferProposal
-  );
+  checkTransactionResponseForError(sendProposeTokenTransferTransactionResponse, functionName);
   return sendProposeTokenTransferTransactionResponse;
 }
 
