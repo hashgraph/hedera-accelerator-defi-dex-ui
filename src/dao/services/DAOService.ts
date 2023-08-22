@@ -493,6 +493,18 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
           tokenToAssociate: solidityAddressToTokenIdString(parsedData.tokenToAssociate),
         };
       }
+      case GovernanceProposalOperationType.HBarTransfer: {
+        const parsedData = abiCoder.decode(
+          ["uint256 operationType", "address transferToAccount", "uint256 transferTokenAmount"],
+          data
+        );
+        return {
+          type: ProposalType.TokenTransfer,
+          transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+          tokenToTransfer: HBARTokenId,
+          transferTokenAmount: parseInt(parsedData.transferTokenAmount),
+        };
+      }
       default:
         return;
     }

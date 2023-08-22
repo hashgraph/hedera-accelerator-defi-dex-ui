@@ -176,6 +176,7 @@ export type DAODetailsContext = {
 export enum GovernanceProposalOperationType {
   TokenTransfer = 1,
   TokenAssociation,
+  HBarTransfer,
 }
 export interface UpgradeContractDetails {
   type: string;
