@@ -1,3 +1,4 @@
+import { Long } from "@hashgraph/sdk/lib/long";
 import { TokenState } from "../types";
 import BigNumber from "bignumber.js";
 

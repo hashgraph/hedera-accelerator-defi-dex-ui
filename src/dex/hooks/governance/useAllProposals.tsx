@@ -3,7 +3,7 @@ import { FormattedProposal } from "../../pages/Governance/types";
 import { Proposal, ProposalStatus } from "../../store/governanceSlice";
 import { isNil } from "ramda";
 import { GovernanceQueries } from "./types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { DexService } from "@dex/services";
 
 const defaultStatusFilter = [...Object.values(ProposalStatus)];

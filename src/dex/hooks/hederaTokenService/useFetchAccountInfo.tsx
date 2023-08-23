@@ -1,5 +1,5 @@
 import { HTSMutations } from "./types";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { DexService, MirrorNodeAccountById } from "../../services";
 import { useDexContext } from "../useDexContext";
 

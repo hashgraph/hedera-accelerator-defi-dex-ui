@@ -20,7 +20,7 @@ import {
 } from "@dex/hooks";
 import { GOVUpgradeProposalDetails, Proposal, ProposalStatus, UseChangeAdminMutationResult } from "@dao/hooks";
 import { useState } from "react";
-import { UseMutationResult } from "react-query";
+import { UseMutationResult } from "@tanstack/react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
 import { ProposalCancelModal } from "./ProposalDetailsComponents";
 import { ProposalState } from "@dex/store";

@@ -1,5 +1,5 @@
 import { DexService } from "@dex/services";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { GovernanceQueries } from "./types";
 import { isNil } from "ramda";
 

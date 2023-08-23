@@ -175,7 +175,6 @@ const SwapConfirmation = (props: SwapConfirmationProps) => {
         onAlertDialogClose={() => setDialogsOpenState({ ...dialogsOpenState, alertDialog: false })}
       />
       {confirmationStep === SwapConfirmationStep.SIGN ? (
-        // Sign transaction dialog
         <LoadingDialog
           isOpen={dialogsOpenState.signingDialog}
           message={"Please confirm the swap in your wallet to proceed"}

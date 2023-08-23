@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   DexService,
   convertEthersBigNumberToBigNumberJS,
@@ -34,7 +34,14 @@ export function useDAOProposals(
     const logsGroupedByTransactionHash = groupByTransactionHash(logs);
     delete logsGroupedByTransactionHash["undefined"];
     const proposalEntries = Object.entries(logsGroupedByTransactionHash);
-    return proposalEntries;
+    const filteredProposalEntries = proposalEntries.reduce(
+      (acc, [transactionHash, proposalLogs]): [string, LogDescription[]][] => {
+        if (proposalLogs === undefined) return acc;
+        return [...acc, [transactionHash, proposalLogs]];
+      },
+      [] as [string, LogDescription[]][]
+    );
+    return filteredProposalEntries;
   }
 
   function getApprovers(proposalLogs: LogDescription[], transactionHash: string): string[] {

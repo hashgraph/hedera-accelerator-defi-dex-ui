@@ -1,7 +1,7 @@
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DexService } from "../../services";
 import { isNil } from "ramda";
 import { HandleOnSuccess } from "..";

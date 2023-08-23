@@ -1,5 +1,5 @@
 import { TokenQueries } from "./types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { DexService } from "@dex/services";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { useDexContext } from "..";

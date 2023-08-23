@@ -1,7 +1,7 @@
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DexService } from "../../services";
 import { isNil } from "ramda";
 import { HandleOnSuccess } from "..";
@@ -25,7 +25,7 @@ export function useCastVote(id: string | undefined, handleOnSuccess?: HandleOnSu
       onSuccess: (transactionResponse) => {
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "list"]);
         queryClient.invalidateQueries([GovernanceQueries.Proposals, "detail", id]);
-        queryClient.invalidateQueries(GovernanceQueries.FetchHasVoted);
+        queryClient.invalidateQueries([GovernanceQueries.FetchHasVoted]);
         if (transactionResponse && handleOnSuccess) {
           handleOnSuccess(transactionResponse);
         }

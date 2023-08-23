@@ -1,6 +1,6 @@
 import { TokenMutationQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { DexService } from "@dex/services";
 import { isNil } from "ramda";
 import { HandleOnSuccess, useDexContext } from "@dex/hooks";

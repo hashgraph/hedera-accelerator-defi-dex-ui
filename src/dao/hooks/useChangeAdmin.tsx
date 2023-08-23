@@ -1,4 +1,4 @@
-import { UseMutationResult, useMutation, useQueryClient } from "react-query";
+import { UseMutationResult, useMutation, useQueryClient } from "@tanstack/react-query";
 import { HandleOnSuccess, useDexContext } from "@dex/hooks";
 import { DAOMutations, DAOQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";

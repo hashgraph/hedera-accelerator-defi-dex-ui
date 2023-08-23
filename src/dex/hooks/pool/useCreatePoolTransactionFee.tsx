@@ -1,5 +1,5 @@
 import { PoolTransactionFee, PoolQueries, TransactionFeeLabelValue } from "./types";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { DexService } from "../../services";
 import { BigNumber } from "bignumber.js";
 

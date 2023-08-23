@@ -1,6 +1,6 @@
 import { HTSMutations } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { DexService } from "@dex/services";
 import { useDexContext } from "../useDexContext";
 import { HandleOnSuccess } from "@dex/hooks";
