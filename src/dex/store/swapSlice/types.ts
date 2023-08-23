@@ -2,6 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
+import { Long } from "@hashgraph/sdk/lib/long";
 
 enum SwapActionType {
   SEND_SWAP_TRANSACTION_TO_WALLET_STARTED = "swap/SEND_SWAP_TRANSACTION_TO_WALLET_STARTED",

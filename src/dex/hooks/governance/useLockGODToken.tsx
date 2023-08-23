@@ -1,6 +1,6 @@
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DexService, DEX_PRECISION } from "@dex/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";

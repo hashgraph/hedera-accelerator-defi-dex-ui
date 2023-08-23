@@ -1,3 +1,4 @@
+import { Long } from "@hashgraph/sdk/lib/long";
 import BigNumber from "bignumber.js";
 
 export const SELECT_TOKEN_TO_VIEW = "Select Token To View";

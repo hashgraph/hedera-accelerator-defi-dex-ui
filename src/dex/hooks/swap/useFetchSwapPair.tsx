@@ -1,5 +1,5 @@
 import { PairDataResponse, SwapMutations } from "./types";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { DexService } from "../../services";
 
 export interface UseSwapParams {

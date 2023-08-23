@@ -1,4 +1,4 @@
-import { DEXTheme } from "../src/shared/ui-kit/themes";
+import { DefaultTheme } from "../src/shared/ui-kit/themes";
 import HederaDeFiTheme from "./HederaDeFiTheme";
 
 export const parameters = {
@@ -7,7 +7,7 @@ export const parameters = {
     theme: HederaDeFiTheme,
   },
   chakra: {
-    theme: DEXTheme,
+    theme: DefaultTheme,
   },
   controls: {
     matchers: {

@@ -14,9 +14,8 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const navigate = useNavigate();
 
   const statusColor = getStatusColor(proposal.status, proposal.state);
-
+  /** TODO: Update UI Library Card component to accept style variants. */
   return (
-    /** TODO: Update UI Library Card component to accept style variants. */
     <Card
       variant="proposal-card"
       height="99px"

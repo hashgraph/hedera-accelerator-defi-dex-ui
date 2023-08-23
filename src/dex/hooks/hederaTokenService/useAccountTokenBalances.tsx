@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { DexService, HBARTokenId } from "../../services";
 import { HTSQueries } from "./types";
 import { isEmpty, isNotNil } from "ramda";

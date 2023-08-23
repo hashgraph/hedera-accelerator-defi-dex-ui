@@ -1,6 +1,6 @@
 import { DAOQueries, DAOMutations } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DexService } from "@dex/services";
 import { DAOType } from "@dao/services";
 import { HandleOnSuccess, useDexContext } from "@dex/hooks";
@@ -72,7 +72,7 @@ export function useCreateDAO(handleOnSuccess: HandleOnSuccess) {
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
         if (isNil(transactionResponse)) return;
-        queryClient.invalidateQueries(DAOQueries.DAOs);
+        queryClient.invalidateQueries([DAOQueries.DAOs]);
         handleOnSuccess(transactionResponse);
       },
     }
