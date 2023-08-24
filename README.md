@@ -76,8 +76,6 @@ SSL_KEY_FILE=./.cert/key.pem
 
 6. Run the application with `yarn start`. You should see `https://` prefixed to the localhost URL.
 
-[Additional Info](https://create-react-app.dev/docs/using-https-in-development/)
-
 ## Usage
 
 ### Run The Application

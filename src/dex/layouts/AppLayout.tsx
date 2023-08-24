@@ -3,14 +3,18 @@ import { PageFooter, TopMenuBar } from "@dex/layouts";
 import { Outlet } from "react-router-dom";
 import { ScrollToTop } from "@dex/utils";
 import { useWalletConnection } from "@dex/hooks";
-import { MenuOptions } from "../../index";
 
-export function AppLayout() {
+interface AppLayoutProps {
+  navOptions: string[];
+}
+
+export function AppLayout(props: AppLayoutProps) {
+  const { navOptions } = props;
   useWalletConnection();
   return (
     <>
       <ScrollToTop />
-      <TopMenuBar menuOptions={MenuOptions} />
+      <TopMenuBar menuOptions={navOptions} />
       <Container layerStyle="body">
         <Flex width="100%" minHeight="inherit">
           <Outlet />

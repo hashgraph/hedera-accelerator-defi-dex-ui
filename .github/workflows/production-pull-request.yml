@@ -22,8 +22,7 @@ jobs:
     - name: Lint
       run: yarn lint
 
-    - name: Build App & Storybook
+    - name: Build App
       run: | 
         yarn build
-        yarn build:storybook
       

@@ -1,3 +1,5 @@
+import Long from "long";
+
 enum GovernorContractFunctions {
   CreateProposal = "createProposal",
   CastVotePublic = "castVotePublic",

@@ -1,4 +1,5 @@
 import { BigNumber } from "bignumber.js";
+import Long from "long";
 
 interface MirrorNodeLinks {
   links: {

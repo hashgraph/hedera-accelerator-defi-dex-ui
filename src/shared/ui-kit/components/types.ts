@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import Long from "long";
 
 export enum formulaTypes {
   MAX = "MAX",

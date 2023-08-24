@@ -15,7 +15,7 @@ export function ProposalMemberVotes(props: ProposalMemberVotesProps) {
     ) : (
       <>
         {approvers.map((approver) => (
-          <HashScanLink id={approver} type={HashscanData.Account} />
+          <HashScanLink id={approver} key={approver} type={HashscanData.Account} />
         ))}
       </>
     );
