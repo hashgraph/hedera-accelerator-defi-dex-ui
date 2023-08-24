@@ -290,6 +290,7 @@ export function CreateDAOProposal() {
           title,
           description,
           linkToDiscussion = "",
+          nftTokenSerialId,
         } = data as CreateDAOTokenTransferForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.MultiSig:
@@ -316,9 +317,24 @@ export function CreateDAOProposal() {
               amount: Number(amount),
               decimals,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+              daoType: DAOType.GovernanceToken,
             });
           case DAOType.NFT:
-            return;
+            if (isNil(nftTokenSerialId)) return;
+            return createGOVTokenTransferProposal({
+              tokenId,
+              title,
+              linkToDiscussion,
+              governanceAddress: governors.tokenTransferLogic,
+              governanceTokenId,
+              daoContractId: daoAccountId,
+              description,
+              receiverId: recipientAccountId,
+              amount: Number(amount),
+              decimals,
+              nftTokenSerialId,
+              daoType: DAOType.NFT,
+            });
           default:
             return;
         }
@@ -452,7 +468,7 @@ export function CreateDAOProposal() {
         }
       }
       case DAOProposalType.TokenAssociate: {
-        const { title, description, tokenId, linkToDiscussion } = data as CreateDAOTokenAssociateForm;
+        const { title, description, tokenId, linkToDiscussion, nftTokenSerialId } = data as CreateDAOTokenAssociateForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.MultiSig:
             return createDAOTokenAssociateProposal({
@@ -472,9 +488,21 @@ export function CreateDAOProposal() {
               daoAccountId,
               governanceAddress: governors.tokenTransferLogic,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+              daoType: DAOType.GovernanceToken,
             });
           case DAOType.NFT:
-            return;
+            if (isNil(nftTokenSerialId)) return;
+            return createGOVTokenAssociateProposal({
+              title,
+              description,
+              linkToDiscussion,
+              tokenId,
+              governanceTokenId,
+              daoAccountId,
+              governanceAddress: governors.tokenTransferLogic,
+              nftTokenSerialId,
+              daoType: DAOType.NFT,
+            });
           default:
             return;
         }

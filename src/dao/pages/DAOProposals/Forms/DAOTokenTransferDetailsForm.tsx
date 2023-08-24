@@ -1,10 +1,12 @@
 import { Text, Flex } from "@chakra-ui/react";
-import { FormTokenInput, HashScanLink, HashscanData, FormInput, FormTextArea } from "@shared/ui-kit";
+import { FormTokenInput, HashScanLink, HashscanData, FormInput, FormTextArea, FormDropdown } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@dex/utils";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
+import { useTokenNFTs } from "@dex/hooks";
+import { Routes } from "@dao/routes";
 
 export interface TokenTransferLocationState {
   state: {
@@ -14,7 +16,7 @@ export interface TokenTransferLocationState {
 
 export function DAOTokenTransferDetailsForm() {
   const { state } = useLocation() as TokenTransferLocationState;
-  const { safeAccountId, daoType, proposalType } = useOutletContext<CreateDAOProposalContext>();
+  const { safeAccountId, daoType, proposalType, governanceTokenId } = useOutletContext<CreateDAOProposalContext>();
   const form = useFormContext<CreateDAOTokenTransferForm>();
   const {
     setValue,
@@ -22,6 +24,7 @@ export function DAOTokenTransferDetailsForm() {
     register,
     formState: { errors },
   } = form;
+  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId);
 
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
@@ -112,6 +115,26 @@ export function DAOTokenTransferDetailsForm() {
         errorMessage={errors?.amount && errors?.amount?.message}
         form={form}
       />
+      {daoType === Routes.NFT && (
+        <>
+          <FormDropdown
+            label="Token Serial Number"
+            placeholder="Select a token serial number"
+            data={tokenNFTs.map((input: any) => {
+              return {
+                label: input.serial_number,
+                value: input.serial_number,
+              };
+            })}
+            isInvalid={Boolean(errors?.nftTokenSerialId)}
+            errorMessage={errors.nftTokenSerialId && errors.nftTokenSerialId.message}
+            register={register("nftTokenSerialId", {
+              required: { value: true, message: "A token is required to be locked to create proposal" },
+              onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftTokenSerialId", Number(e.target.value)),
+            })}
+          />
+        </>
+      )}
     </Flex>
   );
 }

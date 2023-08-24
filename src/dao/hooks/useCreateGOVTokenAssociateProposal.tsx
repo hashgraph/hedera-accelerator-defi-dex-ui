@@ -4,6 +4,7 @@ import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@dex/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
+import { DAOType } from "@dao/services";
 
 interface UseCreateGOVTokenAssociateProposalParams {
   title: string;
@@ -14,6 +15,7 @@ interface UseCreateGOVTokenAssociateProposalParams {
   daoAccountId: string;
   governanceAddress: string;
   nftTokenSerialId: number;
+  daoType: DAOType;
 }
 
 export function useCreateGOVTokenAssociateProposal(handleOnSuccess: HandleOnSuccess) {
