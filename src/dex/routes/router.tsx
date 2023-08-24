@@ -6,7 +6,7 @@ import { Paths } from "@dex/routes";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path={Paths.Home} element={<AppLayout />}>
+    <Route path={Paths.Home} element={<AppLayout navOptions={["Swap", "Pools", "Governance"]} />}>
       <Route index element={<Navigate to="swap" />} />
       <Route path={Paths.Swap.default} element={<Pages.SwapPage />} />
       <Route path={Paths.Pools.default} element={<Pages.Pools />} />

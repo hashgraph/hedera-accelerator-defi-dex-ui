@@ -19,6 +19,7 @@ import { solidityAddressToTokenIdString, convertEthersBigNumberToBigNumberJS } f
 import GODHolderJSON from "../../abi/GODHolder.json";
 import GovernorCountingSimpleInternalJSON from "../../abi/GovernorCountingSimpleInternal.json";
 import { getEventArgumentsByName } from "../..";
+import Long from "long";
 
 const DefaultTokenTransferDetails = {
   transferFromAccount: undefined,

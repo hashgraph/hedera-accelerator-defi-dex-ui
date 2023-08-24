@@ -1,5 +1,6 @@
 import { TokenState } from "../types";
 import BigNumber from "bignumber.js";
+import Long from "long";
 
 export type SwapTokensFormData = {
   tokenToTrade: TokenState;

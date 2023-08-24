@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { DAOsListPage } from "../DAOsListPage";
-import { vi } from "vitest";
+import { test, expect, vi } from "vitest";
 
 vi.mock("react-router-dom", async () => {
   const actual: any = await vi.importActual("react-router-dom");

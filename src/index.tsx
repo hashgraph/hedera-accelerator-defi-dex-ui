@@ -16,8 +16,6 @@ const DEV_ENV = "development";
  * */
 const shouldRenderDEX = false;
 
-export let MenuOptions: string[] = [];
-
 /** Needed to enable immutable immer updates on Map and Set objects. */
 enableMapSet();
 
@@ -30,7 +28,6 @@ initializeServices().then(() => {
   function getApp(): React.ReactNode {
     if (subdomain.includes(DAO_HOSTNAME)) return <DAO />;
     if (subdomain.includes(DEX_HOSTNAME)) {
-      MenuOptions = ["Swap", "Pools", "Governance"];
       return <DEX />;
     }
     /** TODO: Style this error message component. */

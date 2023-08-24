@@ -1,1 +1,5 @@
-dist
+node_modules/
+dist/
+.prettierrc.json
+.eslintrc.json
+env.d.ts

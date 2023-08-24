@@ -6,7 +6,7 @@ import * as Pages from "@dao/pages";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path={Routes.Home} element={<AppLayout />}>
+    <Route path={Routes.Home} element={<AppLayout navOptions={[]} />}>
       <Route index element={<Pages.DAOsListPage />} />
       <Route path={Routes.Create} element={<Pages.CreateADAOPage />}>
         <Route index element={<Navigate to={Routes.DAODetails} />} />
