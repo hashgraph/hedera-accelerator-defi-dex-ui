@@ -5,6 +5,7 @@ import { useDAOs, useMintNFT } from "@dao/hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
+import { AccountId } from "@hashgraph/sdk";
 
 export function NFTDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -12,8 +13,10 @@ export function NFTDAODashboard() {
   const daosQueryResults = useDAOs<NFTDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
-
-  const accountTokenBalancesQueryResults = useAccountTokenBalances("");
+  const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
+    ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
+    : "";
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
 

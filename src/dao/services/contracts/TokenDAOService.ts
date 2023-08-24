@@ -93,6 +93,7 @@ interface SendProposeTokenTransferTransactionParams {
   daoContractId: string;
   nftTokenSerialId: number;
   signer: HashConnectSigner;
+  daoType: DAOType;
 }
 
 async function sendProposeTokenTransferTransaction(params: SendProposeTokenTransferTransactionParams) {
@@ -109,6 +110,7 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     governanceAddress,
     linkToDiscussion,
     nftTokenSerialId,
+    daoType,
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
@@ -116,13 +118,29 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
   let preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
   let functionName = GovernorDAOContractFunctions.CreateTokenTransferProposal;
-  await DexService.setTokenAllowance({
-    tokenId: governanceTokenId,
-    walletId: signer.getAccountId().toString(),
-    spenderContractId,
-    tokenAmount: 1 * DEX_PRECISION,
-    signer,
-  });
+  switch (daoType) {
+    case DAOType.NFT: {
+      await DexService.setNFTAllowance({
+        nftId: governanceTokenId,
+        walletId: signer.getAccountId().toString(),
+        spenderContractId,
+        signer,
+      });
+      break;
+    }
+    case DAOType.GovernanceToken: {
+      await DexService.setTokenAllowance({
+        tokenId: governanceTokenId,
+        walletId: signer.getAccountId().toString(),
+        spenderContractId,
+        tokenAmount: 1 * DEX_PRECISION,
+        signer,
+      });
+      break;
+    }
+    default:
+      break;
+  }
   if (isHbarToken(tokenId)) {
     preciseAmount = Hbar.from(amount, HbarUnit.Hbar).to(HbarUnit.Tinybar);
     functionName = GovernorDAOContractFunctions.CreateHBarTransferProposal;
@@ -164,6 +182,7 @@ interface TokenAssociateTransactionParams {
   daoAccountId: string;
   governanceAddress: string;
   nftTokenSerialId: number;
+  daoType: DAOType;
   signer: HashConnectSigner;
 }
 
@@ -177,6 +196,7 @@ async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactio
     daoAccountId,
     governanceAddress,
     nftTokenSerialId,
+    daoType,
     signer,
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
@@ -190,13 +210,29 @@ async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactio
     .addString(linkToDiscussion)
     .addAddress(tokenSolidityAddress)
     .addUint256(nftTokenSerialId);
-  await DexService.setTokenAllowance({
-    tokenId: governanceTokenId,
-    walletId: signer.getAccountId().toString(),
-    spenderContractId,
-    tokenAmount,
-    signer,
-  });
+  switch (daoType) {
+    case DAOType.NFT: {
+      await DexService.setNFTAllowance({
+        nftId: governanceTokenId,
+        walletId: signer.getAccountId().toString(),
+        spenderContractId,
+        signer,
+      });
+      break;
+    }
+    case DAOType.GovernanceToken: {
+      await DexService.setTokenAllowance({
+        tokenId: governanceTokenId,
+        walletId: signer.getAccountId().toString(),
+        spenderContractId,
+        tokenAmount,
+        signer,
+      });
+      break;
+    }
+    default:
+      break;
+  }
   const sendProposeTokenAssociationTransaction = await new ContractExecuteTransaction()
     .setContractId(daoAccountId)
     .setFunction(GovernorDAOContractFunctions.CreateTokenAssociationProposal, contractFunctionParameters)

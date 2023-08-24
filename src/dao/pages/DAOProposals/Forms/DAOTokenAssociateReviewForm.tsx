@@ -6,13 +6,14 @@ import { useDexContext, useToken } from "@dex/hooks";
 import { isNil, isNotNil } from "ramda";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
 import { useOutletContext } from "react-router-dom";
+import { Routes } from "@dao/routes";
 
 export function DAOTokenAssociateReviewForm() {
-  const { safeAccountId } = useOutletContext<CreateDAOProposalContext>();
+  const { safeAccountId, daoType } = useOutletContext<CreateDAOProposalContext>();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { getValues } = useFormContext<CreateDAOTokenAssociateForm>();
-  const { tokenId, title, description, linkToDiscussion } = getValues() ?? {};
+  const { tokenId, title, description, linkToDiscussion, nftTokenSerialId } = getValues() ?? {};
   const { error, isSuccess, isError, isLoading, data: token } = useToken(tokenId);
   const isNotFound = isSuccess && isNil(token);
   const isTokenFound = isSuccess && isNotNil(token);
@@ -76,6 +77,17 @@ export function DAOTokenAssociateReviewForm() {
           </Flex>
         </Flex>
         <Divider />
+        {daoType === Routes.NFT && (
+          <>
+            <Flex direction="column" gap="2">
+              <Text textStyle="p small medium">Token serial number</Text>
+              <Text textStyle="p small regular" color={Color.Neutral._700}>
+                {nftTokenSerialId}
+              </Text>
+            </Flex>
+            <Divider />
+          </>
+        )}
         <Flex direction="column" alignItems="left" gap="1">
           <Text textStyle="p small medium">Created by</Text>
           <HashScanLink id={walletAccountId} type={HashscanData.Account} />

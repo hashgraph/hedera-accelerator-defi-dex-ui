@@ -1,19 +1,23 @@
 import { Text, Flex } from "@chakra-ui/react";
-import { HashScanLink, HashscanData, FormInput, FormTextArea } from "@shared/ui-kit";
+import { HashScanLink, HashscanData, FormInput, FormTextArea, FormDropdown } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
 import { CreateDAOProposalContext, CreateDAOTokenAssociateForm, DAOProposalType } from "../types";
 import { isNil } from "ramda";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { isValidUrl } from "@dex/utils";
+import { useTokenNFTs } from "@dex/hooks";
+import { Routes } from "@dao/routes";
 
 export function DAOTokenAssociateDetailsForm() {
-  const { safeAccountId, assets, proposalType } = useOutletContext<CreateDAOProposalContext>();
+  const { safeAccountId, assets, proposalType, daoType, governanceTokenId } =
+    useOutletContext<CreateDAOProposalContext>();
   const {
     setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateDAOTokenAssociateForm>();
+  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId);
 
   useEffect(() => {
     if (proposalType !== DAOProposalType.TokenAssociate) {
@@ -90,6 +94,26 @@ export function DAOTokenAssociateDetailsForm() {
         isInvalid={Boolean(errors?.tokenId)}
         errorMessage={errors?.tokenId && errors?.tokenId?.message}
       />
+      {daoType === Routes.NFT && (
+        <>
+          <FormDropdown
+            label="Token Serial Number"
+            placeholder="Select a token serial number"
+            data={tokenNFTs.map((input: any) => {
+              return {
+                label: input.serial_number,
+                value: input.serial_number,
+              };
+            })}
+            isInvalid={Boolean(errors?.nftTokenSerialId)}
+            errorMessage={errors.nftTokenSerialId && errors.nftTokenSerialId.message}
+            register={register("nftTokenSerialId", {
+              required: { value: true, message: "A token is required to be locked to create proposal" },
+              onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftTokenSerialId", Number(e.target.value)),
+            })}
+          />
+        </>
+      )}
     </Flex>
   );
 }

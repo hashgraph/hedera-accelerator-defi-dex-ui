@@ -4,6 +4,7 @@ import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@dex/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
+import { DAOType } from "@dao/services";
 
 interface UseCreateDAOTokenTransferProposalParams {
   tokenId: string;
@@ -17,6 +18,7 @@ interface UseCreateDAOTokenTransferProposalParams {
   title: string;
   description: string;
   nftTokenSerialId: number;
+  daoType: DAOType;
 }
 
 export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSuccess) {
@@ -43,6 +45,7 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         governanceAddress,
         governanceTokenId,
         nftTokenSerialId,
+        daoType,
       } = params;
       return DexService.sendProposeTokenTransferTransaction({
         tokenId,
@@ -57,6 +60,7 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         description,
         nftTokenSerialId,
         signer,
+        daoType,
       });
     },
     {

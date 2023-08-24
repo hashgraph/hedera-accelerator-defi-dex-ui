@@ -51,7 +51,7 @@ export const router = createBrowserRouter(
         <Route index element={<Navigate to={Routes.Overview} />} />
         <Route path={Routes.Overview} element={<Pages.NFTDAODashboardOverview />} />
         <Route path={Routes.Proposals} element={<Pages.ProposalList />} />
-        <Route path={Routes.Assets} element={<NotFound message={`The assets page is under construction`} />} />
+        <Route path={Routes.Assets} element={<Pages.AssetsList />} />
         <Route path={Routes.Staking} element={<NotFound message={`The staking page is under construction`} />} />
         <Route path={Routes.Members} element={<Pages.MembersList />} />
         <Route path={Routes.Settings} element={<Pages.DAOSettings />} />
@@ -82,6 +82,8 @@ export const router = createBrowserRouter(
         <Route path={Routes.DAOTextProposalReview} element={<Pages.DAOTextProposalReviewForm />} />
         <Route path={Routes.DAOContractUpgradeDetails} element={<Pages.DAOContractUpgradeDetailsForm />} />
         <Route path={Routes.DAOContractUpgradeReview} element={<Pages.DAOContractUpgradeReviewForm />} />
+        <Route path={Routes.DAOTokenAssociateDetails} element={<Pages.DAOTokenAssociateDetailsForm />} />
+        <Route path={Routes.DAOTokenAssociateReview} element={<Pages.DAOTokenAssociateReviewForm />} />
       </Route>
       <Route path={`${Routes.Multisig}/:accountId/new-proposal`} element={<Pages.CreateDAOProposal />}>
         <Route index element={<Navigate to={Routes.DAOProposalType} />} />
