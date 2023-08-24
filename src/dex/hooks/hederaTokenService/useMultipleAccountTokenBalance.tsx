@@ -51,7 +51,7 @@ export function useMultipleAccountTokenBalances(accountIds: string[], filterBy?:
       const tokenBalances = accountBalances
         .flatMap((account) => account.tokens)
         .reduce((tokens: TokenBalance[], token) => {
-          const tokenObj = tokens.find((obj) => obj?.symbol === token.symbol);
+          const tokenObj = tokens.find((obj) => obj?.tokenId === token.token_id);
           if (!tokenObj) {
             tokens.push({
               name: token?.name ?? "",

@@ -18,24 +18,11 @@ export function GovernanceDAODashboard() {
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { walletId, isWalletPaired } = usePairedWalletDetails();
-  const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
-    ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
-    : "";
-  const createTokenGovernorAccountId = dao?.governors?.createTokenLogic
-    ? AccountId.fromSolidityAddress(dao.governors.createTokenLogic).toString()
-    : "";
-  const textGovernorAccountId = dao?.governors?.textLogic
-    ? AccountId.fromSolidityAddress(dao.governors.textLogic).toString()
-    : "";
-  const contractUpgradeGovernorAccountId = dao?.governors?.contractUpgradeLogic
-    ? AccountId.fromSolidityAddress(dao.governors.contractUpgradeLogic).toString()
-    : "";
-  const accountTokenBalancesQueryResults = useMultipleAccountTokenBalances([
-    tokenTransferGovernorAccountId,
-    createTokenGovernorAccountId,
-    textGovernorAccountId,
-    contractUpgradeGovernorAccountId,
-  ]);
+  const { governors } = dao ?? {};
+  const governorArray = isNotNil(governors)
+    ? Object.values(governors).map((address) => AccountId.fromSolidityAddress(address).toString())
+    : [];
+  const accountTokenBalancesQueryResults = useMultipleAccountTokenBalances(governorArray);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
   const { data: FTToken } = useToken(dao?.tokenId ?? "");
