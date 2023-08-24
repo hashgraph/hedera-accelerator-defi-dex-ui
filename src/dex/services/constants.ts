@@ -99,3 +99,8 @@ export const DEFAULT_NFT_TOKEN_SERIAL_ID = 0;
 export const MINIMUM_DEPOSIT_AMOUNT = 1;
 
 export const Gas = 9000000;
+
+export const TokenType = Object.freeze({
+  FT: "FUNGIBLE_COMMON",
+  NFT: "NON_FUNGIBLE_UNIQUE",
+});

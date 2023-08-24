@@ -5,4 +5,6 @@ export * from "./useCreateNonFungibleToken";
 export * from "./useFetchAccountInfo";
 export * from "./useFetchTransactionDetails";
 export * from "./useFetchTokenData";
+export * from "./useMultipleAccountTokenBalance";
 export * from "./useTokenNFTs";
+export * from "./types";

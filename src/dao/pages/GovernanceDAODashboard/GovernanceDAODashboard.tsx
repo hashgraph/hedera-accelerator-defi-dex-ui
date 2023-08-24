@@ -1,6 +1,12 @@
 import { Outlet, useParams } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@dao/services";
-import { TokenBalance, useAccountTokenBalances, useTokenBalance, usePairedWalletDetails, useToken } from "@dex/hooks";
+import {
+  TokenBalance,
+  useTokenBalance,
+  usePairedWalletDetails,
+  useToken,
+  useMultipleAccountTokenBalances,
+} from "@dex/hooks";
 import { useDAOs } from "@dao/hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
@@ -15,7 +21,21 @@ export function GovernanceDAODashboard() {
   const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
     ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
     : "";
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
+  const createTokenGovernorAccountId = dao?.governors?.createTokenLogic
+    ? AccountId.fromSolidityAddress(dao.governors.createTokenLogic).toString()
+    : "";
+  const textGovernorAccountId = dao?.governors?.textLogic
+    ? AccountId.fromSolidityAddress(dao.governors.textLogic).toString()
+    : "";
+  const contractUpgradeGovernorAccountId = dao?.governors?.contractUpgradeLogic
+    ? AccountId.fromSolidityAddress(dao.governors.contractUpgradeLogic).toString()
+    : "";
+  const accountTokenBalancesQueryResults = useMultipleAccountTokenBalances([
+    tokenTransferGovernorAccountId,
+    createTokenGovernorAccountId,
+    textGovernorAccountId,
+    contractUpgradeGovernorAccountId,
+  ]);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: daoGovTokenBalance = 0 } = useTokenBalance({ tokenId: dao?.tokenId ?? "" });
   const { data: FTToken } = useToken(dao?.tokenId ?? "");

@@ -1,17 +1,7 @@
 import { useQuery } from "react-query";
-import { DexService, HBARTokenId } from "../../services";
-import { HTSQueries } from "./types";
+import { DexService, HBARTokenId, TokenType } from "../../services";
+import { HTSQueries, TokenBalance } from "./types";
 import { isEmpty, isNotNil } from "ramda";
-
-export interface TokenBalance {
-  name: string;
-  symbol: string;
-  decimals: string;
-  logo: string;
-  tokenId: string;
-  balance: number;
-  value: number;
-}
 
 type UseTokenBalancesKey = [HTSQueries.AccountTokenBalances, string];
 
@@ -48,6 +38,7 @@ export function useAccountTokenBalances(accountId: string, filterBy?: UseAccount
         tokenId: HBARTokenId,
         balance: accountBalances.balance.toNumber(),
         value: 0,
+        type: TokenType.FT,
       };
 
       const { tokens = [] } = accountBalances;
@@ -61,6 +52,7 @@ export function useAccountTokenBalances(accountId: string, filterBy?: UseAccount
           logo: "",
           tokenId: token_id ?? "",
           balance: balance.toNumber(),
+          type: token.type ?? "",
           // TODO: Compute Fiat Value
           value: 0,
         };

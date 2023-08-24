@@ -66,6 +66,7 @@ interface MirrorNodeTokenBalance {
   decimals?: string;
   symbol?: string;
   name?: string;
+  type?: string;
 }
 
 interface MirrorNodeBalanceResponse {
