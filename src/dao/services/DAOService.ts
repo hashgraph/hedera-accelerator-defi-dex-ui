@@ -532,10 +532,32 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
     return getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
   };
 
+  const parseDataForContractUpgradeProposal = async (data: UpgradeContractDetails) => {
+    const logs = await DexService.fetchContractLogs(data.proxy);
+    const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
+    const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
+    const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+    const currentLogic = isNotNil(upgradedLogs[0])
+      ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
+      : "";
+    const proxyAdmin = AccountId.fromSolidityAddress(data.proxyAdmin).toString();
+    const proxyLogic = (await DexService.fetchContractId(data.proxyLogic)).toString();
+    const upgradeLogicEVMAddress = await DexService.fetchContractEVMAddress(governors.contractUpgradeLogic);
+    const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
+    const isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === upgradeLogicEVMAddress;
+    const upgradeDataDetails = { ...data, currentLogic, proxyAdmin, proxyLogic };
+    return { isAdminApproved, upgradeDataDetails };
+  };
+
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
+        /**
+         * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
+         * proposalDetails should override the same field found in the proposalEvent.
+         */
         const proposalDetailsData = getProposalData(proposalEvent.type, proposalEvent.data);
+        const isContractUpgradeProposal = proposalEvent.type === ProposalType.UpgradeContract;
         let contractId = proposalEvent.contractId;
         if (contractId.includes("0.0")) {
           contractId = ContractId.fromString(contractId).toSolidityAddress();
@@ -550,45 +572,30 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
           to: contractId.toString(),
           value: 0,
         });
-        const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
-        /**
-         * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
-         * proposalDetails should override the same field found in the proposalEvent.
-         */
 
-        const isContractUpgradeProposal = proposalEvent.type === ProposalType.UpgradeContract;
-        let isAdminApproved = false;
-        let parsedData;
-        if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
-          const proposalData = proposalDetailsData as UpgradeContractDetails;
-          const logs = await DexService.fetchContractLogs(proposalData?.proxy ?? "");
-          const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
-          const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
-          const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
-          const currentLogic = isNotNil(upgradedLogs[0])
-            ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
-            : "";
-          const proxyAdmin = AccountId.fromSolidityAddress(proposalData?.proxyAdmin).toString();
-          const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
-          const upgradeLogicEVMAddress = await DexService.fetchContractEVMAddress(governors.contractUpgradeLogic);
-          const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === upgradeLogicEVMAddress;
-          parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
-        }
+        const { isAdminApproved, upgradeDataDetails } =
+          isContractUpgradeProposal && isNotNil(proposalDetailsData as UpgradeContractDetails)
+            ? await parseDataForContractUpgradeProposal(proposalDetailsData as UpgradeContractDetails)
+            : { isAdminApproved: false, upgradeDataDetails: undefined };
+
+        const proposalState = contractInterface.decodeFunctionResult(
+          "state",
+          ethers.utils.arrayify(response.data.result)
+        );
         const isAdminApprovalButtonVisible =
-          dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved && isContractUpgradeProposal;
+          isContractUpgradeProposal && proposalState.at(0) === ContractProposalState.Succeeded && !isAdminApproved;
+
         const currentStateOfProposal = isContractUpgradeProposal
-          ? dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved
+          ? proposalState.at(0) === ContractProposalState.Succeeded && !isAdminApproved
             ? ContractProposalState.Active
-            : dataParsed.at(0)
-          : dataParsed.at(0);
+            : proposalState.at(0)
+          : proposalState.at(0);
 
         return {
           ...proposalEvent,
           state: currentStateOfProposal,
           ...proposalDetailsData,
-          ...parsedData,
-          isAdminApproved,
+          ...upgradeDataDetails,
           isAdminApprovalButtonVisible,
         };
       })

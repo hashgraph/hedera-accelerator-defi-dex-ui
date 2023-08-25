@@ -36,7 +36,6 @@ interface ProposalDetailsResponse {
   proxyAdmin?: string;
   proxyLogic?: string;
   currentLogic?: string;
-  isAdminApproved?: boolean;
   isAdminApprovalButtonVisible?: boolean;
   state?: number;
 }

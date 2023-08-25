@@ -91,7 +91,6 @@ export function useGovernanceDAOProposals(
           proxyAdmin: proposalData?.proxyAdmin ?? "",
           proxyLogic: proposalData?.proxyLogic ?? "",
           currentLogic: proposalData?.currentLogic ?? "",
-          isAdminApproved: proposalData?.isAdminApproved ?? false,
           isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
         };
       }

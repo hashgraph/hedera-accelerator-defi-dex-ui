@@ -114,15 +114,7 @@ export interface DAOUpgradeProposal {
   proxyLogic: string;
   proxyAdmin: string;
   currentLogic: string;
-}
-
-export interface GOVUpgradeProposalDetails {
-  proxy: string;
-  proxyAdmin: string;
-  proxyLogic: string;
-  currentLogic: string;
-  isAdminApproved: boolean;
-  isAdminApprovalButtonVisible: boolean;
+  isAdminApprovalButtonVisible?: boolean;
 }
 
 export type ProposalData =
@@ -134,8 +126,7 @@ export type ProposalData =
   | ProposalDataReplaceMember
   | ProposalDataChangeThreshold
   | ProposalDataGovernanceTokenTransfer
-  | DAOUpgradeProposal
-  | GOVUpgradeProposalDetails;
+  | DAOUpgradeProposal;
 
 export interface Proposal {
   id: number;

@@ -7,7 +7,15 @@ import {
   abiSignatures,
 } from "@dex/services";
 import { DAOEvents, getThreshold, MultiSigProposeTransactionType } from "@dao/services";
-import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
+import {
+  AllFilters,
+  DAOQueries,
+  Proposal,
+  DAOUpgradeProposal,
+  ProposalEvent,
+  ProposalStatus,
+  ProposalType,
+} from "./types";
 import { AccountId } from "@hashgraph/sdk";
 import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
@@ -81,6 +89,28 @@ export function useDAOProposals(
     }
   }
 
+  async function getUpgradeProposalData(proposalData: DAOUpgradeProposal) {
+    const safeEVMAddress = await DexService.fetchContractEVMAddress(safeAccountId);
+    const logs = await DexService.fetchContractLogs(proposalData.proxy);
+
+    const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
+    const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
+    const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+
+    const currentLogic = isNotNil(upgradedLogs[0])
+      ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
+      : "";
+    const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
+    const proxyAdmin = AccountId.fromSolidityAddress(proposalData.proxyAdmin).toString();
+    const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
+    const parsedProposalDataData = { ...proposalData, proxyAdmin, proxyLogic, currentLogic };
+    const isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
+    return {
+      parsedProposalDataData,
+      isAdminApproved,
+    };
+  }
+
   function getProposalType(transactionType: number): ProposalType {
     switch (transactionType) {
       case MultiSigProposeTransactionType.TokenTransfer:
@@ -139,26 +169,12 @@ export function useDAOProposals(
           const proposalType = getProposalType(BigNumber.from(transactionType).toNumber());
           /** TODO: For DAO Upgrade extra step is introduced to check for Admin Approval */
           const isContractUpgradeProposal = proposalType === ProposalType.UpgradeContract;
-          let isAdminApproved = false;
-          let parsedData;
-          if (isContractUpgradeProposal) {
-            const safeEVMAddress = await DexService.fetchContractEVMAddress(safeAccountId);
-            const upgradeProposalData = { ...data };
-            const logs = await DexService.fetchContractLogs(upgradeProposalData.proxy);
 
-            const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
-            const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
-            const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+          const { isAdminApproved, parsedProposalDataData } =
+            isContractUpgradeProposal && isNotNil({ ...data } as DAOUpgradeProposal)
+              ? await getUpgradeProposalData({ ...data })
+              : { isAdminApproved: false, parsedProposalDataData: { ...data } };
 
-            const currentLogic = isNotNil(upgradedLogs[0])
-              ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
-              : "";
-            const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-            const proxyAdmin = AccountId.fromSolidityAddress(upgradeProposalData.proxyAdmin).toString();
-            const proxyLogic = (await DexService.fetchContractId(upgradeProposalData.proxyLogic)).toString();
-            parsedData = { ...upgradeProposalData, proxyAdmin, proxyLogic, currentLogic };
-            isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
-          }
           const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
           const tokenId = token ? AccountId.fromSolidityAddress(token).toString() : "";
           if (!tokenDataCache.has(tokenId)) {
@@ -184,7 +200,7 @@ export function useDAOProposals(
             to,
             operation,
             hexStringData,
-            data: isContractUpgradeProposal ? parsedData : { ...data },
+            data: parsedProposalDataData,
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
             title: title,
             author: creator ? AccountId.fromSolidityAddress(creator).toString() : "",

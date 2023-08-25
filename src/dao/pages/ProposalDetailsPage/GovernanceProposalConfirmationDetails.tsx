@@ -18,7 +18,7 @@ import {
   UseExecuteProposalParams,
   usePairedWalletDetails,
 } from "@dex/hooks";
-import { GOVUpgradeProposalDetails, Proposal, ProposalStatus, UseChangeAdminMutationResult } from "@dao/hooks";
+import { DAOUpgradeProposal, Proposal, ProposalStatus, UseChangeAdminMutationResult } from "@dao/hooks";
 import { useState } from "react";
 import { UseMutationResult } from "react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
@@ -80,9 +80,8 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
 
   const contractId = proposal?.contractId ?? "";
   const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0;
-  const isAdminApprovalButtonVisible =
-    (proposal?.data as GOVUpgradeProposalDetails)?.isAdminApprovalButtonVisible ?? false;
-  const isApproveAdminButtonDisabled = walletId !== (proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin;
+  const isAdminApprovalButtonVisible = (proposal?.data as DAOUpgradeProposal)?.isAdminApprovalButtonVisible ?? false;
+  const isApproveAdminButtonDisabled = walletId !== (proposal?.data as DAOUpgradeProposal)?.proxyAdmin;
   const isContractUpgradeProposal = proposal?.isContractUpgradeProposal;
 
   async function handleVoteButtonClicked(voteType: VoteType) {
@@ -149,7 +148,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 onClick={() => {
                   handleClickChangeAdminTransaction(
                     contractUpgradeLogic,
-                    (proposal?.data as GOVUpgradeProposalDetails)?.proxy ?? ""
+                    (proposal?.data as DAOUpgradeProposal)?.proxy ?? ""
                   );
                 }}
               >
@@ -158,7 +157,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               <InlineAlert
                 type={InlineAlertType.Warning}
                 message={`Connect your wallet with 
-                ${(proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin} 
+                ${(proposal?.data as DAOUpgradeProposal)?.proxyAdmin} 
                 to approve the transfer of ownership to ${governorUpgradeContractId}`}
               />
             </Flex>
