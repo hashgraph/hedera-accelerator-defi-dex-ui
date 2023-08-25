@@ -1,5 +1,3 @@
-import { Long } from "@hashgraph/sdk/lib/long";
-
 enum GovernorContractFunctions {
   CreateProposal = "createProposal",
   CastVotePublic = "castVotePublic",

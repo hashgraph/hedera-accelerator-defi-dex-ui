@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import { DexService, DEX_TOKEN_PRECISION_VALUE, MirrorNodeTokenById } from "@dex/services";
 import { DAOProposalGovernors } from "@dao/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";

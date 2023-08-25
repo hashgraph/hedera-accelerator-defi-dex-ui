@@ -1,5 +1,5 @@
 import { DexService, DEX_TOKEN_PRECISION_VALUE } from "@dex/services";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import { GovernanceQueries } from "./types";
 import { isNil } from "ramda";
 import BigNumber from "bignumber.js";

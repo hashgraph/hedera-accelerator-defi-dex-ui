@@ -13,7 +13,7 @@ import { useDexContext } from ".";
  */
 export const useSwapData = (selectedPairContractId: string, refreshInterval = 0) => {
   const isInitialFetch = useRef(true);
-  const refreshTimeInterval = useRef<NodeJS.Timeout>();
+  const refreshTimeInterval = useRef<NodeJS.Timer>();
   const { wallet, swap } = useDexContext(({ wallet, swap }) => ({
     wallet,
     swap,

@@ -1,4 +1,3 @@
-import { Long } from "@hashgraph/sdk/lib/long";
 import { BigNumber } from "bignumber.js";
 
 interface MirrorNodeLinks {

@@ -2,7 +2,6 @@ import { BigNumber } from "bignumber.js";
 import { StateCreator } from "zustand";
 import { DEXState } from "..";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { Long } from "@hashgraph/sdk/lib/long";
 
 enum PoolsActionType {
   FETCH_ALL_POOL_METRICS_STARTED = "pools/FETCH_ALL_POOL_METRICS_STARTED",

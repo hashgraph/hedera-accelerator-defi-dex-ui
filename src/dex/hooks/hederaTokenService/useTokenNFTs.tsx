@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import { DexService, MirrorNodeTokenNFT } from "@dex/services";
 import { HTSQueries } from "./types";
 import { useDexContext } from "@dex/hooks";

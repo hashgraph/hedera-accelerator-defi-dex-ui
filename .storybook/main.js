@@ -2,23 +2,18 @@ const path = require(`path`);
 
 module.exports = {
   stories: ["../src/shared/ui-kit/**/*.stories.mdx", "../src/shared/ui-kit/**/*.stories.@(js|jsx|ts|tsx)"],
-
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "@storybook/preset-create-react-app",
     "@chakra-ui/storybook-addon",
-    "@storybook/addon-mdx-gfm"
   ],
-
-  framework: {
-    name: "@storybook/react-webpack5",
-    options: {}
+  framework: "@storybook/react",
+  core: {
+    builder: "@storybook/builder-webpack5",
   },
-
   features: { emotionAlias: false },
-
   webpackFinal: async (config) => {
     config.resolve.alias = {
       "@dao": path.resolve(__dirname, "../src/dao"),
@@ -42,8 +37,4 @@ module.exports = {
     };
     return config;
   },
-
-  docs: {
-    autodocs: true
-  }
 };

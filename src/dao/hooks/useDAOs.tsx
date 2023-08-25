@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import { DexService } from "@dex/services";
 import { DAO } from "@dao/services";
 import { DAOQueries } from "./types";
