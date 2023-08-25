@@ -1,5 +1,5 @@
 import { TransactionResponse } from "@hashgraph/sdk";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
 import { DAOMutations, DAOQueries } from "./types";

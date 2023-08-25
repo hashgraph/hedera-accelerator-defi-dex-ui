@@ -1,5 +1,5 @@
 import { HTSQueries } from "./types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import { DexService, MirrorNodeTokenById } from "@dex/services";
 import { isNil } from "ramda";
 import { checkForValidTokenId } from "@dex/utils";

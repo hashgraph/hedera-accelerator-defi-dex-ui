@@ -1,7 +1,7 @@
 import { Text, SimpleGrid } from "@chakra-ui/react";
 import { isEmpty } from "ramda";
 import { PropsWithChildren } from "react";
-import { UseQueryResult } from "@tanstack/react-query";
+import { UseQueryResult } from "react-query";
 import { NotFound } from "./NotFoundLayout";
 import { LoadingSpinnerLayout } from "./LoadingSpinnerLayout";
 

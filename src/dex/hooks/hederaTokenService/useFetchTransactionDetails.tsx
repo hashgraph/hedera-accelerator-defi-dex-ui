@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import { DexService, MirrorNodeTransaction } from "../../services";
 import { HTSQueries } from "./types";
 import { isNil } from "ramda";
