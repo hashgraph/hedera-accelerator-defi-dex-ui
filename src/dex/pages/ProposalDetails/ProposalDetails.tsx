@@ -31,7 +31,7 @@ import {
   Notification,
   Tag,
   DisplayHTMLContent,
-  StepperUI,
+  Stepper,
 } from "@shared/ui-kit";
 import { ProposalState } from "../../store/governanceSlice";
 import { useProposalDetails } from "./useProposalDetails";
@@ -183,7 +183,7 @@ export const ProposalDetails = () => {
             >
               <CardBody>
                 <Text textStyle="h3">Status</Text>
-                {proposalStatus && <StepperUI states={proposalStatus} />}
+                {proposalStatus && <Stepper states={proposalStatus} />}
               </CardBody>
             </Card>
             <Card

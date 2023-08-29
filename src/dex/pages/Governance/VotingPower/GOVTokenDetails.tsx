@@ -1,7 +1,6 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Divider } from "@chakra-ui/react";
 import { Color } from "../../../../shared/ui-kit/themes";
 import { LockIcon } from "../../../../shared/ui-kit/components/Icons";
-import { Divider } from "@material-ui/core";
 import { MetricLabel, Tooltip } from "../../../../shared/ui-kit";
 
 interface GOVTokenDetailsProps {
