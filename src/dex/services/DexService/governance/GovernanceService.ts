@@ -136,10 +136,7 @@ const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: 
   };
 };
 
-const fetchAllProposalData = async (
-  proposalEvents: MirrorNodeDecodedProposalEvent[],
-  accountId: string
-): Promise<ProposalData[]> => {
+const fetchAllProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
   const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
   const proposalEventsWithDetailsResults = await Promise.allSettled(
     proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
@@ -148,14 +145,9 @@ const fetchAllProposalData = async (
         contractId = ContractId.fromString(contractId).toSolidityAddress();
       }
       const response = await DexService.callContract({
-        block: "latest",
         data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
-        estimate: false,
-        from: AccountId.fromString(accountId).toSolidityAddress(),
-        gas: 9000000,
-        gasPrice: 100000000,
+        from: contractId,
         to: contractId,
-        value: 0,
       });
       const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
       return { ...proposalEvent, state: dataParsed.at(0) };
@@ -167,9 +159,9 @@ const fetchAllProposalData = async (
   return proposalEventsWithDetails;
 };
 
-export const fetchAllProposals = async (accountId: string): Promise<Proposal[]> => {
+export const fetchAllProposals = async (): Promise<Proposal[]> => {
   const proposalEvents = await fetchAllProposalEvents();
-  const proposalDetails = await fetchAllProposalData(proposalEvents, accountId);
+  const proposalDetails = await fetchAllProposalData(proposalEvents);
   const totalGodTokenSupply = await DexService.fetchTokenData(GovernanceTokenId);
   const proposals = proposalDetails.map((proposalData) => {
     return convertDataToProposal(proposalData, totalGodTokenSupply.data.total_supply);
@@ -177,33 +169,28 @@ export const fetchAllProposals = async (accountId: string): Promise<Proposal[]> 
   return proposals;
 };
 
-async function fetchProposalDetails(proposalEvent: MirrorNodeDecodedProposalEvent, accountId: string) {
+async function fetchProposalDetails(proposalEvent: MirrorNodeDecodedProposalEvent) {
   const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
   let contractId = proposalEvent.contractId;
   if (contractId.includes("0.0")) {
     contractId = ContractId.fromString(contractId).toSolidityAddress();
   }
   const response = await DexService.callContract({
-    block: "latest",
     data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
-    estimate: false,
-    from: AccountId.fromString(accountId).toSolidityAddress(),
-    gas: 9000000,
-    gasPrice: 100000000,
+    from: contractId,
     to: contractId,
-    value: 0,
   });
   const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
   const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
   return { ...proposalEvent, ...tokenTransferDetails, state: dataParsed.at(0) };
 }
 
-export async function fetchProposal(id: string, accountId: string): Promise<Proposal> {
+export async function fetchProposal(id: string): Promise<Proposal> {
   const proposalEvents = await fetchAllProposalEvents();
   const proposalEvent = proposalEvents.find(
     (proposalEvent) => proposalEvent.proposalId === id
   ) as MirrorNodeDecodedProposalEvent;
-  const proposalDetails = await fetchProposalDetails(proposalEvent, accountId);
+  const proposalDetails = await fetchProposalDetails(proposalEvent);
   const totalGodTokenSupply = await DexService.fetchTokenData(GovernanceTokenId);
   const proposal = convertDataToProposal(proposalDetails, totalGodTokenSupply.data.total_supply);
   return proposal;

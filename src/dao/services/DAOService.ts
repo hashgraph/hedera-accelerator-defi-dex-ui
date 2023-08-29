@@ -10,7 +10,6 @@ import {
   getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
   solidityAddressToTokenIdString,
-  TOKEN_USER_ID,
 } from "@dex/services";
 import { Contracts, Gas, HBARTokenId, MINIMUM_DEPOSIT_AMOUNT } from "@dex/services";
 import { getEventArgumentsByName } from "../../dex/services/utils";
@@ -44,54 +43,29 @@ import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
 import { ProposalType } from "@dao/hooks";
 import { ProposalData } from "../../dex/services/DexService/governance/type";
 import { isNil, isNotNil } from "ramda";
-import { LogDescription } from "ethers/lib/utils";
 import GovernorCountingSimpleInternalJSON from "../../dex/services/abi/GovernorCountingSimpleInternal.json";
 import { ContractProposalState } from "@dex/store";
 
-export function getOwners(proposalLogs: LogDescription[]): string[] {
-  const owners = new Set<string>();
-  proposalLogs
-    .slice()
-    .reverse()
-    .forEach((log: LogDescription) => {
-      if (log?.name === DAOEvents.SafeSetup) {
-        const {
-          args: { owners: daoOwners },
-        } = log;
-        daoOwners.forEach((owner: string) => owners.add(owner));
-      }
-      if (log?.name === DAOEvents.AddedOwner) {
-        const { args } = log;
-        owners.add(args.owner);
-      }
-      if (log?.name === DAOEvents.RemovedOwner) {
-        const { args } = log;
-        owners.delete(args.owner);
-      }
-    });
-  return Array.from(owners).reverse();
+export async function getOwners(safeAddress: string): Promise<string[]> {
+  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+  const response = await DexService.callContract({
+    data: contractInterface.encodeFunctionData("getOwners"),
+    from: safeAddress,
+    to: safeAddress,
+  });
+  const ownersList = contractInterface.decodeFunctionResult("getOwners", ethers.utils.arrayify(response.data.result));
+  return ownersList[0];
 }
 
-export function getThreshold(proposalLogs: LogDescription[], baseThreshold: ethers.BigNumber): number {
-  let updatedThreshold = baseThreshold;
-  proposalLogs
-    .slice()
-    .reverse()
-    .forEach((log: LogDescription) => {
-      if (log?.name === DAOEvents.SafeSetup) {
-        const {
-          args: { threshold },
-        } = log;
-        updatedThreshold = threshold;
-      }
-      if (log?.name === DAOEvents.ChangedThreshold) {
-        const {
-          args: { threshold },
-        } = log;
-        updatedThreshold = threshold;
-      }
-    });
-  return updatedThreshold.toNumber();
+export async function getThreshold(safeAddress: string): Promise<number> {
+  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
+  const response = await DexService.callContract({
+    data: contractInterface.encodeFunctionData("getThreshold"),
+    from: safeAddress,
+    to: safeAddress,
+  });
+  const threshold = contractInterface.decodeFunctionResult("getThreshold", ethers.utils.arrayify(response.data.result));
+  return threshold[0].toNumber();
 }
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
@@ -106,10 +80,9 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     const daoSolidityAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
     const safeDAOSolidityAddress = (await DexService.fetchContractId(argsWithName.safeAddress)).toSolidityAddress();
     const { inputs, safeAddress: safeEVMAddress } = argsWithName;
-    const { admin, isPrivate, threshold: _threshold, title } = inputs;
-    const safeLogs = await fetchHederaGnosisSafeLogs(safeDAOSolidityAddress);
-    const owners = getOwners(safeLogs);
-    const threshold = getThreshold(safeLogs, _threshold);
+    const { admin, isPrivate, title } = inputs;
+    const owners = await getOwners(safeEVMAddress);
+    const threshold = await getThreshold(safeEVMAddress);
 
     /** START - TODO: Need to apply a proper fix */
     let accountId;
@@ -541,14 +514,9 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
           contractId = ContractId.fromString(contractId).toSolidityAddress();
         }
         const response = await DexService.callContract({
-          block: "latest",
           data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
-          estimate: false,
-          from: AccountId.fromString(TOKEN_USER_ID).toSolidityAddress(),
-          gas: 9000000,
-          gasPrice: 100000000,
+          from: contractId.toString(),
           to: contractId.toString(),
-          value: 0,
         });
         const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
         /**

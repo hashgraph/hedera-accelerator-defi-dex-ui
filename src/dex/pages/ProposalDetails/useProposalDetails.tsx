@@ -13,7 +13,7 @@ import { Contracts } from "@dex/services";
 export function useProposalDetails(proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
-  const proposal = useProposal(proposalId, walletId);
+  const proposal = useProposal(proposalId);
   const castVote = useCastVote(proposalId);
   const cancelProposal = useCancelProposal(proposalId);
   const hasVoted = proposal.data?.voted ?? false;

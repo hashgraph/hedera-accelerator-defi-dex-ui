@@ -131,8 +131,9 @@ export function useDAOProposals(
             linkToDiscussion,
             transactionType,
           } = proposalInfo;
-          const { amount, receiver, token, _threshold } = data ?? {};
-          const threshold = getThreshold(daoAndSafeLogs, BigNumber.from(_threshold ?? 0));
+          const { amount, receiver, token } = data ?? {};
+          const safeEVMAddress = await DexService.fetchContractEVMAddress(safeAccountId);
+          const threshold = await getThreshold(safeEVMAddress);
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;
           const isThresholdReached = approvalCount >= threshold;
@@ -142,7 +143,6 @@ export function useDAOProposals(
           let isAdminApproved = false;
           let parsedData;
           if (isContractUpgradeProposal) {
-            const safeEVMAddress = await DexService.fetchContractEVMAddress(safeAccountId);
             const upgradeProposalData = { ...data };
             const logs = await DexService.fetchContractLogs(upgradeProposalData.proxy);
 

@@ -10,7 +10,6 @@ const defaultStatusFilter = [...Object.values(ProposalStatus)];
 const proposalStatusSortOrder = [ProposalStatus.Active, ProposalStatus.Passed, ProposalStatus.Failed];
 interface UseAllProposalsProps {
   titleFilter?: string;
-  accountId: string | undefined;
   statusFilters?: ProposalStatus[];
   startDate?: Date | null;
   endDate?: Date | null;
@@ -19,7 +18,7 @@ interface UseAllProposalsProps {
 type UseAllProposalsQueryKey = [GovernanceQueries.Proposals, "list"];
 
 export function useAllProposals(props: UseAllProposalsProps) {
-  const { accountId, startDate, endDate, statusFilters = defaultStatusFilter, titleFilter = "" } = props;
+  const { startDate, endDate, statusFilters = defaultStatusFilter, titleFilter = "" } = props;
 
   function sortProposalCompareFn(proposalA: FormattedProposal, proposalB: FormattedProposal) {
     if (!isNil(proposalA.status) && !isNil(proposalB.status)) {
@@ -55,11 +54,10 @@ export function useAllProposals(props: UseAllProposalsProps) {
 
   return useQuery<Proposal[], Error, FormattedProposal[], UseAllProposalsQueryKey>(
     [GovernanceQueries.Proposals, "list"],
-    async () => DexService.fetchAllProposals(accountId ?? ""),
+    async () => DexService.fetchAllProposals(),
     {
       keepPreviousData: true,
       select: filterFormatSortProposals,
-      enabled: !!accountId,
     }
   );
 }

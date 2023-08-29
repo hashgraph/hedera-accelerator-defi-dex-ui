@@ -19,6 +19,7 @@ import { LogDescription } from "ethers/lib/utils";
 import { AccountId, ContractId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
+import { Gas, GasPrice } from "@dex/services";
 
 const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
 /* TODO: Enable for Mainnet usage.
@@ -162,8 +163,9 @@ function createMirrorNodeService() {
    * @param payload -
    * @returns Results from a cost-free EVM call to the contract.
    */
+
   const callContract = async (payload: CallContractParams): Promise<any> => {
-    const { block, data, estimate, from, gas, gasPrice, to, value } = payload;
+    const { block = "latest", data, estimate = false, from, gas = Gas, gasPrice = GasPrice, to, value = 0 } = payload;
     return await testnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
       block,
       data,
