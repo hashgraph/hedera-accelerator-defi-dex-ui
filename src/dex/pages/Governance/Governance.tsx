@@ -4,7 +4,7 @@ import { ReactElement, useState } from "react";
 import { Notification, NotficationTypes, CardList, Pagination, usePagination, RangeDatePicker } from "@shared/ui-kit";
 import { createHashScanTransactionLink } from "@dex/utils";
 import { CardListLayout, Page, PageHeader, TabFilter, TabFilters } from "@dex/layouts";
-import { useAllProposals, useTabFilters, useDexContext } from "@dex/hooks";
+import { useAllProposals, useTabFilters } from "@dex/hooks";
 import { ProposalStatus } from "../../store/governanceSlice";
 import { ProposalCard } from "./ProposalCard";
 import { useInput } from "../../hooks/useInput";
@@ -38,8 +38,6 @@ export const Governance = (): ReactElement => {
   const { tabIndex, handleTabChange } = useTabFilters();
   const { value: proposalTitleFilter, handleChange: handleProposalTitleFilterChange } = useInput<string>("");
   const { startDate, endDate, handleChange: handleProposalDatesFilterChange } = useDateRange(null, null);
-  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const accountId = wallet.savedPairingData?.accountIds[0];
   const {
     data: proposals,
     error,
@@ -51,7 +49,6 @@ export const Governance = (): ReactElement => {
     statusFilters: proposalTabFilters.at(tabIndex)?.filters,
     startDate,
     endDate,
-    accountId,
   });
   const {
     paginatedData: paginatedProposals,
