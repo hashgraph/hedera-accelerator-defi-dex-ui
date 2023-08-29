@@ -18,11 +18,11 @@ const GetStatusIcon = (iconType: string) => {
   }
 };
 
-interface StepperUIProps {
+interface StepperProps {
   states: ProposalState[];
 }
 
-export function Stepper(props: StepperUIProps) {
+export function Stepper(props: StepperProps) {
   const { states } = props;
   const isLastStep = states.length - 1;
   return (
@@ -34,13 +34,13 @@ export function Stepper(props: StepperUIProps) {
               {GetStatusIcon(step.iconType)}
               <Flex flexDirection="row" gap="0.3rem" alignItems="center">
                 <Text
-                  textStyle="b4"
-                  color={step.iconType === ProposalStateIcon.Disabled ? Color.Grey_01 : Color.Text_Primary}
+                  textStyle="p medium regular"
+                  color={step.iconType === ProposalStateIcon.Disabled ? Color.Grey_Blue._200 : Color.Neutral._900}
                 >
                   {step.status}
                 </Text>
                 {step.timeRemaining && (
-                  <Text textStyle="b2" color={Color.Grey_02}>
+                  <Text textStyle="p small regular" color={Color.Grey_Blue._500}>
                     {` - ${step.timeRemaining}`}
                   </Text>
                 )}
