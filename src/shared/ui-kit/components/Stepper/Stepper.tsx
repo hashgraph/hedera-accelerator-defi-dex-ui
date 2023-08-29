@@ -1,6 +1,4 @@
-import { Stepper, Step, StepLabel, Orientation } from "@material-ui/core";
-import { Box, Text, Flex } from "@chakra-ui/react";
-import { StepperStyles } from "./StepperStyles";
+import { Text, Flex, Stepper as ChakraStepper, Step, Divider } from "@chakra-ui/react";
 import { ProposalStateIcon, ProposalState } from "./types";
 import { Color } from "../../themes";
 import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon } from "../Icons";
@@ -22,42 +20,47 @@ const GetStatusIcon = (iconType: string) => {
 
 interface StepperUIProps {
   states: ProposalState[];
-  orientation?: Orientation;
 }
 
-function StepperUI(props: StepperUIProps) {
-  const { orientation = "vertical", states } = props;
+export function Stepper(props: StepperUIProps) {
+  const { states } = props;
+  const isLastStep = states.length - 1;
   return (
-    <Box sx={StepperStyles} marginLeft="-10px">
-      <Stepper orientation={orientation}>
-        {states.length !== 0 &&
-          states.map((state) => {
-            return (
-              <Step key={state.status}>
-                <Flex flexDirection="row" gap="13.5px">
-                  {GetStatusIcon(state.iconType)}
-                  <StepLabel>
-                    <Flex flexDirection="row" gap="4px">
-                      <Text
-                        textStyle="b4"
-                        color={state.iconType === ProposalStateIcon.Disabled ? Color.Grey_01 : Color.Text_Primary}
-                      >
-                        {state.status}
-                      </Text>
-                      {state.timeRemaining && (
-                        <Text textStyle="b2" color={Color.Grey_02}>
-                          {` - ${state.timeRemaining}`}
-                        </Text>
-                      )}
-                    </Flex>
-                  </StepLabel>
-                </Flex>
-              </Step>
-            );
-          })}
-      </Stepper>
-    </Box>
+    <ChakraStepper index={0} orientation="vertical" gap="0" padding="1.5rem 1rem">
+      {states.map((step, index) => (
+        <Step key={step.status}>
+          <Flex direction="column" gap="1">
+            <Flex flexDirection="row" gap="3">
+              {GetStatusIcon(step.iconType)}
+              <Flex flexDirection="row" gap="0.3rem" alignItems="center">
+                <Text
+                  textStyle="b4"
+                  color={step.iconType === ProposalStateIcon.Disabled ? Color.Grey_01 : Color.Text_Primary}
+                >
+                  {step.status}
+                </Text>
+                {step.timeRemaining && (
+                  <Text textStyle="b2" color={Color.Grey_02}>
+                    {` - ${step.timeRemaining}`}
+                  </Text>
+                )}
+              </Flex>
+            </Flex>
+            {index !== isLastStep ? (
+              <Divider
+                orientation="vertical"
+                borderStyle="dashed"
+                height="5"
+                marginLeft="0.7rem"
+                marginBottom="1"
+                borderLeftWidth="0.2rem"
+                borderColor={Color.Grey_01}
+                width="0"
+              />
+            ) : undefined}
+          </Flex>
+        </Step>
+      ))}
+    </ChakraStepper>
   );
 }
-
-export { StepperUI };
