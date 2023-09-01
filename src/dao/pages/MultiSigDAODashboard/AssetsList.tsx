@@ -40,6 +40,7 @@ export function AssetsList() {
       safeId: tokenTransferAccountId,
       decimals: Number(selectedToken.decimals),
       amount: Number(data.amount),
+      isNFT: !!selectedToken.isNFT,
     });
   }
 
