@@ -10,6 +10,8 @@ interface UseDepositTokensParams {
   tokenId: string;
   amount: number;
   decimals: number;
+  isNFT: boolean;
+  nftSerialId: number;
 }
 
 export function useDepositTokens(handleOnSuccess: HandleOnSuccess) {

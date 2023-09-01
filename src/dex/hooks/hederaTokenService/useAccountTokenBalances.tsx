@@ -2,6 +2,7 @@ import { useQuery } from "react-query";
 import { DexService, HBARTokenId } from "../../services";
 import { HTSQueries } from "./types";
 import { isEmpty, isNotNil } from "ramda";
+import { TokenType } from "@hashgraph/sdk";
 
 export interface TokenBalance {
   name: string;
@@ -11,6 +12,7 @@ export interface TokenBalance {
   tokenId: string;
   balance: number;
   value: number;
+  isNFT?: boolean;
 }
 
 type UseTokenBalancesKey = [HTSQueries.AccountTokenBalances, string];
@@ -53,7 +55,7 @@ export function useAccountTokenBalances(accountId: string, filterBy?: UseAccount
       const { tokens = [] } = accountBalances;
 
       const tokenBalances = tokens.map((token): TokenBalance => {
-        const { name = "", symbol = "", decimals = "", token_id = "", balance } = token;
+        const { name = "", symbol = "", decimals = "", token_id = "", balance, type } = token;
         return {
           name,
           symbol,
@@ -63,6 +65,7 @@ export function useAccountTokenBalances(accountId: string, filterBy?: UseAccount
           balance: balance.toNumber(),
           // TODO: Compute Fiat Value
           value: 0,
+          isNFT: type === TokenType.NonFungibleUnique.toString(),
         };
       });
 

@@ -17,3 +17,8 @@ export const DefaultMultiSigDAODetails = {
   ownerIds: [],
   threshold: 0,
 };
+
+export enum DepositTokenModalTabs {
+  Fungible = 0,
+  NFT,
+}

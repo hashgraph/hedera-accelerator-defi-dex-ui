@@ -34,10 +34,11 @@ export function FormTokenInputSelectTokenModal() {
   const { value: searchTokensInput, handleChange: handleSearchTokensInputChanged } = useInput("");
   const tokensQueryResults = useAccountTokenBalances(assetListAccountId, { textSearch: searchTokensInput });
   const { data: tokens = [] } = tokensQueryResults;
+  const fungibleTokens = tokens.filter((token) => !token.isNFT);
 
   useEffect(() => {
     if (!isEmpty(initialSelectedTokenId) || !isNil(initialSelectedTokenId)) {
-      const selectedTokenData = tokens?.find((asset: TokenBalance) => asset.tokenId === initialSelectedTokenId);
+      const selectedTokenData = fungibleTokens?.find((asset: TokenBalance) => asset.tokenId === initialSelectedTokenId);
       setSelectedToken(selectedTokenData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,7 +48,9 @@ export function FormTokenInputSelectTokenModal() {
     const { tokenId } = currentToken;
     setValue(tokenFormId, tokenId);
     const selectedTokenData =
-      isEmpty(tokenId) || isNil(tokenId) ? undefined : tokens?.find((asset: TokenBalance) => asset.tokenId === tokenId);
+      isEmpty(tokenId) || isNil(tokenId)
+        ? undefined
+        : fungibleTokens?.find((asset: TokenBalance) => asset.tokenId === tokenId);
     setSelectedToken(selectedTokenData);
     onClose();
   }
@@ -58,12 +61,12 @@ export function FormTokenInputSelectTokenModal() {
 
   function TokenListItem(props: TokenListItemProps) {
     const { index } = props;
-    const { name, symbol, tokenId } = tokens[index];
+    const { name, symbol, tokenId } = fungibleTokens[index];
 
     return (
       <ListItem
         bg={tokenId === selectedToken?.tokenId ? Color.Blue._100 : Color.White}
-        onClick={() => handleTokenClicked(tokens[index])}
+        onClick={() => handleTokenClicked(fungibleTokens[index])}
       >
         <Flex direction="row" alignItems="center" gap="2">
           <Image
@@ -105,7 +108,9 @@ export function FormTokenInputSelectTokenModal() {
         <Divider />
         <ModalBody>
           <InputGroup>
-            <InputLeftElement children={<SearchIcon />} />
+            <InputLeftElement>
+              <SearchIcon />
+            </InputLeftElement>
             <Input
               variant="input-v2"
               marginBottom="1rem"
@@ -115,13 +120,13 @@ export function FormTokenInputSelectTokenModal() {
               minWidth="100%"
             />
           </InputGroup>
-          {isEmpty(tokens) ? (
+          {isEmpty(fungibleTokens) ? (
             <Flex alignItems="center" justifyContent="center" width="100%" height="100%" maxHeight="296px">
               <Text textStyle="p medium semibold">No results found.</Text>
             </Flex>
           ) : (
             <List variant="select-token-list">
-              <FixedSizeList height={296} itemCount={tokens.length} itemSize={64} width="100%">
+              <FixedSizeList height={296} itemCount={fungibleTokens.length} itemSize={64} width="100%">
                 {({ index }) => <TokenListItem key={index} index={index} />}
               </FixedSizeList>
             </List>

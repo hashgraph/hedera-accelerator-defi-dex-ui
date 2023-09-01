@@ -17,7 +17,7 @@ export async function fetchAccountTokenBalances(accountId: string): Promise<Mirr
   const tokenBalances = await Promise.all(
     tokens.map(async (token) => {
       const tokenData = await DexService.fetchTokenData(token.token_id);
-      const { decimals, symbol, name } = tokenData.data;
+      const { decimals, symbol, name, type } = tokenData.data;
       const balance = BigNumber(token.balance).shiftedBy(-Number(decimals));
       return {
         ...token,
@@ -25,6 +25,7 @@ export async function fetchAccountTokenBalances(accountId: string): Promise<Mirr
         decimals: String(decimals),
         symbol,
         name,
+        type,
       };
     })
   );
