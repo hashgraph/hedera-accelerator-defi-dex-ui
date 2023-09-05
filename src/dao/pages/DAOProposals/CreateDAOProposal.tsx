@@ -290,7 +290,9 @@ export function CreateDAOProposal() {
           title,
           description,
           linkToDiscussion = "",
-          nftTokenSerialId,
+          tokenType,
+          nftSerialId,
+          governanceNftTokenSerialId,
         } = data as CreateDAOTokenTransferForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.MultiSig:
@@ -303,6 +305,8 @@ export function CreateDAOProposal() {
               description,
               safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
+              tokenType,
+              nftSerialId,
             });
           case DAOType.GovernanceToken:
             return createGOVTokenTransferProposal({
@@ -316,11 +320,13 @@ export function CreateDAOProposal() {
               receiverId: recipientAccountId,
               amount: Number(amount),
               decimals,
-              nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
+              tokenType,
+              nftSerialId,
+              governanceNftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
             });
           case DAOType.NFT:
-            if (isNil(nftTokenSerialId)) return;
+            if (isNil(governanceNftTokenSerialId)) return;
             return createGOVTokenTransferProposal({
               tokenId,
               title,
@@ -332,7 +338,9 @@ export function CreateDAOProposal() {
               receiverId: recipientAccountId,
               amount: Number(amount),
               decimals,
-              nftTokenSerialId,
+              tokenType,
+              nftSerialId,
+              governanceNftTokenSerialId,
               daoType: DAOType.NFT,
             });
           default:

@@ -1,16 +1,27 @@
 import { Text, Flex } from "@chakra-ui/react";
-import { FormTokenInput, HashScanLink, HashscanData, FormInput, FormTextArea, FormDropdown } from "@shared/ui-kit";
+import {
+  FormTokenInput,
+  HashScanLink,
+  HashscanData,
+  FormInput,
+  FormTextArea,
+  FormDropdown,
+  InlineAlert,
+  InlineAlertType,
+} from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@dex/utils";
 import { ChangeEvent, useEffect } from "react";
-import { useTokenNFTs } from "@dex/hooks";
+import { useAccountTokenBalances, useTokenNFTs } from "@dex/hooks";
 import { Routes } from "@dao/routes";
+import { TokenType } from "@hashgraph/sdk";
 
 export interface TokenTransferLocationState {
   state: {
     tokenId: string;
+    tokenType: string;
   };
 }
 
@@ -22,9 +33,12 @@ export function DAOTokenTransferDetailsForm() {
     setValue,
     getValues,
     register,
+    watch,
     formState: { errors },
   } = form;
-  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId);
+  const { data: governanceTokenNFTs = [] } = useTokenNFTs(governanceTokenId);
+  const tokensQueryResults = useAccountTokenBalances(safeAccountId);
+  const { data: tokens = [] } = tokensQueryResults;
 
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
@@ -32,9 +46,16 @@ export function DAOTokenTransferDetailsForm() {
 
   useEffect(() => {
     if (state?.tokenId) {
-      setValue("tokenId", state?.tokenId);
+      setValue("tokenId", state.tokenId);
     }
-  }, [setValue, state?.tokenId]);
+    if (state?.tokenType) {
+      setValue("tokenType", state.tokenType);
+    }
+  }, [setValue, state?.tokenId, state?.tokenType]);
+
+  const { amount = "", tokenId = "", tokenType = "" } = getValues();
+  const { data: tokenNFTs = [], isLoading } = useTokenNFTs(tokenId, safeAccountId);
+  watch(["tokenId", "tokenType"]);
 
   return (
     <Flex direction="column" gap="4" width="100%">
@@ -104,33 +125,99 @@ export function DAOTokenTransferDetailsForm() {
         isInvalid={Boolean(errors?.recipientAccountId)}
         errorMessage={errors?.recipientAccountId && errors?.recipientAccountId?.message}
       />
-      <FormTokenInput
-        amountFormId="amount"
-        tokenFormId="tokenId"
-        assetListAccountId={safeAccountId}
-        balanceAccountId={safeAccountId}
-        initialSelectedTokenId={state?.tokenId}
-        currentAmount={getValues().amount ?? ""}
-        isInvalid={Boolean(errors?.amount)}
-        errorMessage={errors?.amount && errors?.amount?.message}
-        form={form}
+      <FormDropdown
+        label="Token Type"
+        placeholder="Select a token type"
+        data={[
+          { label: "Fungible Token", value: TokenType.FungibleCommon.toString() },
+          { label: "NFT", value: TokenType.NonFungibleUnique.toString() },
+        ]}
+        isInvalid={Boolean(errors?.tokenType)}
+        errorMessage={errors.tokenType && errors.tokenType.message}
+        register={register("tokenType", {
+          required: { value: true, message: "A token type is required to be selected to transfer" },
+          onChange: (e: ChangeEvent<HTMLSelectElement>) => {
+            setValue("tokenType", e.target.value), setValue("tokenId", "");
+          },
+        })}
       />
-      {daoType === Routes.NFT && (
-        <>
+      {tokenType === TokenType.FungibleCommon.toString() && (
+        <FormTokenInput
+          amountFormId="amount"
+          tokenFormId="tokenId"
+          assetListAccountId={safeAccountId}
+          balanceAccountId={safeAccountId}
+          initialSelectedTokenId={state?.tokenId}
+          currentAmount={amount}
+          isInvalid={Boolean(errors?.amount)}
+          errorMessage={errors?.amount && errors?.amount?.message}
+          form={form}
+        />
+      )}
+      {tokenType === TokenType.NonFungibleUnique.toString() && (
+        <Flex direction="column" gap={4}>
           <FormDropdown
-            label="Token Serial Number"
-            placeholder="Select a token serial number"
+            label="NFT"
+            placeholder="Select a NFT"
+            data={tokens
+              .filter((token) => token.isNFT)
+              .map((input) => {
+                return {
+                  label: input.name,
+                  value: input.tokenId,
+                };
+              })}
+            isInvalid={Boolean(errors?.tokenId)}
+            errorMessage={errors.tokenId && errors.tokenId.message}
+            register={register("tokenId", {
+              required: { value: true, message: "A token is required" },
+              onChange: (e: ChangeEvent<HTMLSelectElement>) => {
+                setValue("tokenId", e.target.value);
+                setValue("nftSerialId", 0);
+              },
+            })}
+          />
+          <FormDropdown
+            label="NFT Serial Number"
+            placeholder="Select a serial number"
             data={tokenNFTs.map((input: any) => {
               return {
                 label: input.serial_number,
                 value: input.serial_number,
               };
             })}
-            isInvalid={Boolean(errors?.nftTokenSerialId)}
-            errorMessage={errors.nftTokenSerialId && errors.nftTokenSerialId.message}
-            register={register("nftTokenSerialId", {
+            isInvalid={Boolean(errors?.nftSerialId)}
+            errorMessage={errors?.nftSerialId?.message}
+            register={register("nftSerialId", {
               required: { value: true, message: "A token is required to be locked to create proposal" },
-              onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftTokenSerialId", Number(e.target.value)),
+              onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftSerialId", Number(e.target.value)),
+            })}
+          />
+          {tokenId && !isLoading && tokenNFTs.length === 0 && (
+            <InlineAlert type={InlineAlertType.Warning} message={`There are no tokens present in the connect wallet`} />
+          )}
+        </Flex>
+      )}
+      {daoType === Routes.NFT && (
+        <>
+          <FormDropdown
+            label="Governance Token Serial Number"
+            placeholder="Select a governance token serial number"
+            data={governanceTokenNFTs.map((input: any) => {
+              return {
+                label: input.serial_number,
+                value: input.serial_number,
+              };
+            })}
+            isInvalid={Boolean(errors?.governanceNftTokenSerialId)}
+            errorMessage={errors.governanceNftTokenSerialId && errors.governanceNftTokenSerialId.message}
+            register={register("governanceNftTokenSerialId", {
+              required: {
+                value: true,
+                message: "A governance token serial id is required to be locked to create proposal",
+              },
+              onChange: (e: ChangeEvent<HTMLSelectElement>) =>
+                setValue("governanceNftTokenSerialId", Number(e.target.value)),
             })}
           />
         </>

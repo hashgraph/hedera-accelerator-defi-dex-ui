@@ -27,10 +27,12 @@ export interface CreateDAOTextProposalForm extends CreateDAOProposalFormBase {
 export interface CreateDAOTokenTransferForm extends CreateDAOProposalFormBase {
   recipientAccountId: string;
   linkToDiscussion: string;
+  tokenType: string;
   tokenId: string;
   amount: string | undefined;
   decimals: number;
-  nftTokenSerialId: number;
+  nftSerialId: number;
+  governanceNftTokenSerialId: number;
 }
 
 export interface CreateDAOTokenAssociateForm extends CreateDAOProposalFormBase {
