@@ -10,6 +10,7 @@ import {
   TransactionResponse,
   Hbar,
   HbarUnit,
+  TokenType,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./types";
 import { DexService, checkTransactionResponseForError, Contracts, DEX_PRECISION } from "@dex/services";
@@ -91,7 +92,9 @@ interface SendProposeTokenTransferTransactionParams {
   amount: number;
   decimals: number;
   daoContractId: string;
-  nftTokenSerialId: number;
+  tokenType: string;
+  nftSerialId: number;
+  governanceNftTokenSerialId: number;
   signer: HashConnectSigner;
   daoType: DAOType;
 }
@@ -109,7 +112,9 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     description,
     governanceAddress,
     linkToDiscussion,
-    nftTokenSerialId,
+    tokenType,
+    nftSerialId,
+    governanceNftTokenSerialId,
     daoType,
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
@@ -150,7 +155,16 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
       .addString(linkToDiscussion)
       .addAddress(receiverSolidityAddress)
       .addUint256(preciseAmount)
-      .addUint256(nftTokenSerialId);
+      .addUint256(governanceNftTokenSerialId);
+  } else if (tokenType === TokenType.NonFungibleUnique.toString()) {
+    contractCallParams
+      .addString(title)
+      .addString(description)
+      .addString(linkToDiscussion)
+      .addAddress(receiverSolidityAddress)
+      .addAddress(tokenSolidityAddress)
+      .addUint256(nftSerialId)
+      .addUint256(governanceNftTokenSerialId);
   } else {
     contractCallParams
       .addString(title)
@@ -159,7 +173,7 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
       .addAddress(receiverSolidityAddress)
       .addAddress(tokenSolidityAddress)
       .addUint256(preciseAmount)
-      .addUint256(nftTokenSerialId);
+      .addUint256(governanceNftTokenSerialId);
   }
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
     .setContractId(daoContractId)

@@ -4,7 +4,7 @@ import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@dex/services";
 import { DAODetailsContext, DAOType } from "@dao/services";
-import { AccountId, TransactionResponse } from "@hashgraph/sdk";
+import { AccountId, TokenType, TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
 import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal";
 import { useState } from "react";
@@ -82,7 +82,7 @@ export function AssetsList() {
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={2} spacing="1rem">
           {assetsWithHBARFirst.map((asset) => {
-            const { name, tokenId, balance, symbol } = asset;
+            const { name, tokenId, balance, symbol, isNFT } = asset;
             return (
               <Flex
                 key={tokenId}
@@ -110,6 +110,9 @@ export function AssetsList() {
                           navigate(`../${Routes.CreateDAOProposal}/${Routes.DAOTokenTransferDetails}`, {
                             state: {
                               tokenId: tokenId,
+                              tokenType: isNFT
+                                ? TokenType.NonFungibleUnique.toString()
+                                : TokenType.FungibleCommon.toString(),
                             },
                           });
                         }}

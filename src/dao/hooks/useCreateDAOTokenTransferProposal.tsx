@@ -17,7 +17,9 @@ interface UseCreateDAOTokenTransferProposalParams {
   daoContractId: string;
   title: string;
   description: string;
-  nftTokenSerialId: number;
+  tokenType: string;
+  nftSerialId: number;
+  governanceNftTokenSerialId: number;
   daoType: DAOType;
 }
 
@@ -44,7 +46,9 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         linkToDiscussion,
         governanceAddress,
         governanceTokenId,
-        nftTokenSerialId,
+        tokenType,
+        nftSerialId,
+        governanceNftTokenSerialId,
         daoType,
       } = params;
       return DexService.sendProposeTokenTransferTransaction({
@@ -58,7 +62,9 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         governanceTokenId,
         title,
         description,
-        nftTokenSerialId,
+        tokenType,
+        nftSerialId,
+        governanceNftTokenSerialId,
         signer,
         daoType,
       });

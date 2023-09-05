@@ -263,7 +263,8 @@ function createMirrorNodeService() {
     const allEvents = decodeLog(abiSignatures, response, ["ProposalDetails"]);
     const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
-      return { ...item, contractId, type: proposalType };
+      // TODO: added the conversion from BigInt to String. Remove it with making changes in the Interface.
+      return { ...item, contractId, type: proposalType, proposalId: item.proposalId + "" };
     });
 
     const uniqueProposals = uniqBy((proposal: MirrorNodeDecodedProposalEvent) => proposal.proposalId, proposals);

@@ -8,14 +8,23 @@ import { isNil, isNotNil } from "ramda";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
 import { useOutletContext } from "react-router-dom";
 import { Routes } from "@dao/routes";
+import { TokenType } from "@hashgraph/sdk";
 
 export function DAOTokenTransferReviewForm() {
   const { safeAccountId, daoType } = useOutletContext<CreateDAOProposalContext>();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
   const { setValue, getValues } = useFormContext<CreateDAOTokenTransferForm>();
-  const { tokenId, amount, recipientAccountId, title, description, nftTokenSerialId } = getValues() ?? {};
-  // TODO: move useToken hook to modal once asset dropdown is fully implemented.
+  const {
+    tokenId,
+    amount,
+    recipientAccountId,
+    title,
+    description,
+    tokenType,
+    nftSerialId,
+    governanceNftTokenSerialId,
+  } = getValues() ?? {};
   const { error, isSuccess, isError, isLoading, data: token } = useToken(tokenId);
   const isNotFound = isSuccess && isNil(token);
   const isTokenFound = isSuccess && isNotNil(token);
@@ -77,9 +86,13 @@ export function DAOTokenTransferReviewForm() {
               {"-"}
               <HashScanLink id={tokenId} type={HashscanData.Token} />
             </Flex>
-            <Text textStyle="p small regular">
-              {amount} {symbol}
-            </Text>
+            {tokenType === TokenType.NonFungibleUnique.toString() ? (
+              <Text textStyle="p small regular">Serial No: {nftSerialId}</Text>
+            ) : (
+              <Text textStyle="p small regular">
+                {amount} {symbol}
+              </Text>
+            )}
           </Flex>
         </Flex>
         <Divider />
@@ -88,7 +101,7 @@ export function DAOTokenTransferReviewForm() {
             <Flex direction="column" gap="2">
               <Text textStyle="p small medium">Token serial number</Text>
               <Text textStyle="p small regular" color={Color.Neutral._700}>
-                {nftTokenSerialId}
+                {governanceNftTokenSerialId}
               </Text>
             </Flex>
             <Divider />
