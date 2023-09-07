@@ -13,10 +13,6 @@ export enum MultiSigDAOContractFunctions {
 
 export enum GovernorDAOContractFunctions {
   CreateProposal = "createProposal",
-  CreateTokenTransferProposal = "createTokenTransferProposal",
-  CreateHBarTransferProposal = "createHBarTransferProposal",
-  CreateContractUpgradeProposal = "createContractUpgradeProposal",
-  CreateTextProposal = "createTextProposal",
   CreateTokenAssociationProposal = "createTokenAssociateProposal",
 }
 

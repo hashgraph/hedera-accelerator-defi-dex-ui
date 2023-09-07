@@ -12,7 +12,6 @@ interface UseCreateGOVTokenAssociateProposalParams {
   linkToDiscussion: string;
   tokenId: string;
   governanceTokenId: string;
-  daoAccountId: string;
   governanceAddress: string;
   nftTokenSerialId: number;
   daoType: DAOType;

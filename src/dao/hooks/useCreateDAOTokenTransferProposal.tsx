@@ -14,7 +14,6 @@ interface UseCreateDAOTokenTransferProposalParams {
   linkToDiscussion: string;
   amount: number;
   decimals: number;
-  daoContractId: string;
   title: string;
   description: string;
   tokenType: string;
@@ -40,7 +39,6 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         receiverId,
         amount,
         decimals,
-        daoContractId,
         title,
         description,
         linkToDiscussion,
@@ -56,7 +54,6 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         receiverId,
         amount,
         decimals,
-        daoContractId,
         linkToDiscussion,
         governanceAddress,
         governanceTokenId,
