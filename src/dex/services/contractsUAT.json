@@ -19,21 +19,21 @@
   },
   {
     "name": "nftdaofactory",
-    "id": "0.0.897936",
-    "hash": "614ddc4d3287717e487c35ac9ef5d7d5",
-    "address": "0x00000000000000000000000000000000000db390",
-    "timestamp": "2023-08-25T09:34:36.833Z",
-    "transparentProxyId": "0.0.897947",
-    "transparentProxyAddress": "0x00000000000000000000000000000000000db39b"
+    "id": "0.0.1186556",
+    "hash": "e7159a18e9c24c1764943bd05be099de",
+    "address": "0x0000000000000000000000000000000000121afc",
+    "timestamp": "2023-09-07T07:33:57.369Z",
+    "transparentProxyId": "0.0.1186568",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000121b08"
   },
   {
     "name": "ftdaofactory",
-    "id": "0.0.897909",
-    "hash": "dafffa2978472adfecead52b1b0afb49",
-    "address": "0x00000000000000000000000000000000000db375",
-    "timestamp": "2023-08-25T09:33:35.968Z",
-    "transparentProxyId": "0.0.897925",
-    "transparentProxyAddress": "0x00000000000000000000000000000000000db385"
+    "id": "0.0.1186494",
+    "hash": "76532c7486a6d704c63cfabb79560f5c",
+    "address": "0x0000000000000000000000000000000000121abe",
+    "timestamp": "2023-09-07T07:06:51.789Z",
+    "transparentProxyId": "0.0.1186496",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000121ac0"
   },
   {
     "name": "multisigdaofactory",
@@ -55,30 +55,30 @@
   },
   {
     "name": "governortextproposal",
-    "id": "0.0.89713",
-    "hash": "a22803e747f71e855037f7f1044e3c0f",
-    "address": "0x0000000000000000000000000000000000015e71",
-    "timestamp": "2023-07-28T06:23:34.623Z",
-    "transparentProxyId": "0.0.89753",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000015e99"
+    "id": "0.0.1186585",
+    "hash": "1d4dbe0b4f85398ae65ae34bfe4361a5",
+    "address": "0x0000000000000000000000000000000000121b19",
+    "timestamp": "2023-09-07T07:50:50.987Z",
+    "transparentProxyId": "0.0.1186615",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000121b37"
   },
   {
     "name": "governortransfertoken",
-    "id": "0.0.89730",
-    "hash": "73a1d07306079fb37ed3f23922621f1d",
-    "address": "0x0000000000000000000000000000000000015e82",
-    "timestamp": "2023-07-28T06:23:37.485Z",
-    "transparentProxyId": "0.0.89760",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000015ea0"
+    "id": "0.0.1186618",
+    "hash": "3b441bcf31f67944cf37ef7c58ca7fa4",
+    "address": "0x0000000000000000000000000000000000121b3a",
+    "timestamp": "2023-09-07T07:52:04.596Z",
+    "transparentProxyId": "0.0.1186621",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000121b3d"
   },
   {
     "name": "governorupgrade",
-    "id": "0.0.89724",
-    "hash": "06f45e0235a710663b6a8ae18829f07d",
-    "address": "0x0000000000000000000000000000000000015e7c",
-    "timestamp": "2023-07-28T06:23:39.123Z",
-    "transparentProxyId": "0.0.89764",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000015ea4"
+    "id": "0.0.1186623",
+    "hash": "8ced59b416be3dddefc3e4d5c2edd277",
+    "address": "0x0000000000000000000000000000000000121b3f",
+    "timestamp": "2023-09-07T07:53:45.313Z",
+    "transparentProxyId": "0.0.1186625",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000121b41"
   },
   {
     "name": "governortokencreate",

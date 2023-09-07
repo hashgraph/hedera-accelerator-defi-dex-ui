@@ -125,7 +125,6 @@ const sendCreateTransferTokenProposalTransaction = async (
     .addAddress(transferToAddress)
     .addAddress(tokenToTransferAddress)
     .addUint256(amountToTransfer)
-    .addAddress(AccountId.fromString(walletId).toSolidityAddress())
     .addUint256(nftTokenSerialId);
 
   const createProposalTransaction = await new ContractExecuteTransaction()
@@ -174,7 +173,6 @@ const sendCreateContractUpgradeProposalTransaction = async (
     .addString(linkToDiscussion)
     .addAddress(upgradeProposalProxyId)
     .addAddress(contractIdToUpgrade)
-    .addAddress(AccountId.fromString(walletId).toSolidityAddress())
     .addUint256(nftTokenSerialId);
   const createUpgradeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(contractUpgradeContractId)
@@ -214,7 +212,6 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
-    .addAddress(AccountId.fromString(walletId).toSolidityAddress())
     .addUint256(nftTokenSerialId);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(textProposalContractId)

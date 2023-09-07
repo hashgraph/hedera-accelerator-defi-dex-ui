@@ -91,7 +91,6 @@ interface SendProposeTokenTransferTransactionParams {
   receiverId: string;
   amount: number;
   decimals: number;
-  daoContractId: string;
   tokenType: string;
   nftSerialId: number;
   governanceNftTokenSerialId: number;
@@ -106,7 +105,6 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     receiverId,
     amount,
     decimals,
-    daoContractId,
     signer,
     title,
     description,
@@ -122,7 +120,6 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
   const contractCallParams = new ContractFunctionParameters();
   const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
   let preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
-  let functionName = GovernorDAOContractFunctions.CreateTokenTransferProposal;
   switch (daoType) {
     case DAOType.NFT: {
       await DexService.setNFTAllowance({
@@ -148,12 +145,12 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
   }
   if (isHbarToken(tokenId)) {
     preciseAmount = Hbar.from(amount, HbarUnit.Hbar).to(HbarUnit.Tinybar);
-    functionName = GovernorDAOContractFunctions.CreateHBarTransferProposal;
     contractCallParams
       .addString(title)
       .addString(description)
       .addString(linkToDiscussion)
       .addAddress(receiverSolidityAddress)
+      .addAddress(ethers.constants.AddressZero)
       .addUint256(preciseAmount)
       .addUint256(governanceNftTokenSerialId);
   } else if (tokenType === TokenType.NonFungibleUnique.toString()) {
@@ -176,14 +173,17 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
       .addUint256(governanceNftTokenSerialId);
   }
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
-    .setContractId(daoContractId)
-    .setFunction(functionName, contractCallParams)
+    .setContractId(spenderContractId)
+    .setFunction(GovernorDAOContractFunctions.CreateProposal, contractCallParams)
     .setGas(Gas)
     .freezeWithSigner(signer);
   const sendProposeTokenTransferTransactionResponse = await sendProposeTokenTransferTransaction.executeWithSigner(
     signer
   );
-  checkTransactionResponseForError(sendProposeTokenTransferTransactionResponse, functionName);
+  checkTransactionResponseForError(
+    sendProposeTokenTransferTransactionResponse,
+    GovernorDAOContractFunctions.CreateProposal
+  );
   return sendProposeTokenTransferTransactionResponse;
 }
 
@@ -193,7 +193,6 @@ interface TokenAssociateTransactionParams {
   linkToDiscussion: string;
   tokenId: string;
   governanceTokenId: string;
-  daoAccountId: string;
   governanceAddress: string;
   nftTokenSerialId: number;
   daoType: DAOType;
@@ -207,7 +206,6 @@ async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactio
     linkToDiscussion,
     tokenId,
     governanceTokenId,
-    daoAccountId,
     governanceAddress,
     nftTokenSerialId,
     daoType,
@@ -248,7 +246,7 @@ async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactio
       break;
   }
   const sendProposeTokenAssociationTransaction = await new ContractExecuteTransaction()
-    .setContractId(daoAccountId)
+    .setContractId(spenderContractId)
     .setFunction(GovernorDAOContractFunctions.CreateTokenAssociationProposal, contractFunctionParameters)
     .setGas(Gas)
     .freezeWithSigner(signer);
@@ -268,7 +266,6 @@ interface SendDAOContractUpgradeProposalTransactionParams {
   linkToDiscussion: string;
   newImplementationAddress: string;
   oldProxyAddress: string;
-  daoContractId: string;
   nftTokenSerialId: number;
   daoType: string;
   signer: HashConnectSigner;
@@ -276,7 +273,6 @@ interface SendDAOContractUpgradeProposalTransactionParams {
 async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProposalTransactionParams) {
   const {
     governanceTokenId,
-    daoContractId,
     signer,
     title,
     description,
@@ -324,8 +320,8 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     .addUint256(nftTokenSerialId);
 
   const sendProposeTokenTransferTransaction = await new ContractExecuteTransaction()
-    .setContractId(daoContractId)
-    .setFunction(GovernorDAOContractFunctions.CreateContractUpgradeProposal, contractCallParams)
+    .setContractId(spenderContractId)
+    .setFunction(GovernorDAOContractFunctions.CreateProposal, contractCallParams)
     .setGas(Gas)
     .freezeWithSigner(signer);
   const sendProposeTokenTransferTransactionResponse = await sendProposeTokenTransferTransaction.executeWithSigner(
@@ -333,7 +329,7 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
   );
   checkTransactionResponseForError(
     sendProposeTokenTransferTransactionResponse,
-    GovernorDAOContractFunctions.CreateContractUpgradeProposal
+    GovernorDAOContractFunctions.CreateProposal
   );
   return sendProposeTokenTransferTransactionResponse;
 }
@@ -344,7 +340,6 @@ interface SendDAOTextProposalTransactionParams {
   title: string;
   description: string;
   linkToDiscussion: string;
-  daoContractId: string;
   nftTokenSerialId: number;
   signer: HashConnectSigner;
   daoType: DAOType;
@@ -353,7 +348,6 @@ interface SendDAOTextProposalTransactionParams {
 async function sendTextProposalTransaction(params: SendDAOTextProposalTransactionParams) {
   const {
     governanceTokenId,
-    daoContractId,
     signer,
     title,
     description,
@@ -386,14 +380,14 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
     .addUint256(nftTokenSerialId);
 
   const sendProposeTextProposalTransaction = await new ContractExecuteTransaction()
-    .setContractId(daoContractId)
-    .setFunction(GovernorDAOContractFunctions.CreateTextProposal, contractCallParams)
+    .setContractId(spenderContractId)
+    .setFunction(GovernorDAOContractFunctions.CreateProposal, contractCallParams)
     .setGas(Gas)
     .freezeWithSigner(signer);
   const sendProposeTextProposalTransactionResponse = await sendProposeTextProposalTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(
     sendProposeTextProposalTransactionResponse,
-    GovernorDAOContractFunctions.CreateTextProposal
+    GovernorDAOContractFunctions.CreateProposal
   );
   return sendProposeTextProposalTransactionResponse;
 }
