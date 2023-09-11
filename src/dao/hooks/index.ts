@@ -25,4 +25,5 @@ export * from "./useFetchLockedNFTToken";
 export * from "./useLockNFTToken";
 export * from "./useUnlockNFTToken";
 export * from "./useGetBlockedTokenBalance";
+export * from "./useFetchDAOMembers";
 export * from "./types";

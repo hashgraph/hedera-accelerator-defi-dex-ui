@@ -142,6 +142,7 @@ export enum DAOEvents {
   DAOInfoUpdated = "DAOInfoUpdated",
   ChangeAdmin = "AdminChanged",
   Upgraded = "Upgraded",
+  UpdatedAmount = "UpdatedAmount",
 }
 
 export enum HederaGnosisSafeFunctions {
@@ -161,7 +162,6 @@ export enum MultiSigProposeTransactionType {
   TokenTransfer,
   HBARTokenTransfer,
 }
-// TODO: if members are not present in Governance and NFT DAOs, then move it back with Multisig types
 export interface Member {
   name: string;
   logo: string;

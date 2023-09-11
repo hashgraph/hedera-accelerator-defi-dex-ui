@@ -13,7 +13,7 @@ import { getTimeRemaining } from "@dex/utils";
 import { MirrorNodeDecodedProposalEvent } from "../../../../shared/services/MirrorNodeService";
 import { getFulfilledResultsData } from "../../../../shared/services/MirrorNodeService/utils";
 import { Contracts, GovernanceTokenId } from "../../constants";
-import { GovernanceEvent, ProposalData } from "./type";
+import { GovernanceEvent, ProposalData, CanClaimDetails } from "./type";
 import { ethers } from "ethers";
 import { solidityAddressToTokenIdString, convertEthersBigNumberToBigNumberJS } from "../..";
 import GODHolderJSON from "../../abi/GODHolder.json";
@@ -208,13 +208,11 @@ export async function fetchCanUserClaimGODTokens(
   );
 
   const decodedEvents = logs.map((log) => {
-    return getEventArgumentsByName<{ canClaim: boolean; user: string }>(log.args);
+    return getEventArgumentsByName<CanClaimDetails>(log.args);
   });
 
-  /** If events are empty which means user has not participated in any proposal */
-  if (decodedEvents.length === 0) return true;
-  const eventObj = decodedEvents.find(
+  const eventObj = decodedEvents?.find(
     (eventData) => AccountId.fromSolidityAddress(eventData.user).toString() === accountId
   );
-  return eventObj?.canClaim;
+  return eventObj?.canClaim ?? true;
 }

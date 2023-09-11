@@ -8,6 +8,7 @@ export enum DAOQueries {
   FetchLockNFTToken = "fetchLockNFTToken",
   FetchCanUnlockNFTToken = "fetchCanUnlockNFTToken",
   FetchBlockedTokenBalance = "fetchBlockedTokenBalance",
+  FetchDAOMembers = "fetchDAOMembers",
 }
 
 export enum DAOMutations {
@@ -194,8 +195,11 @@ export const AllFilters = [
   ProposalStatus.Pending,
   ProposalStatus.Queued,
 ];
-
 export interface BlockedNFTEvent {
   nftSerialId: number;
   isBlocked: boolean;
+}
+export interface UpdateAmountEventData {
+  user: string;
+  idOrAmount: number;
 }

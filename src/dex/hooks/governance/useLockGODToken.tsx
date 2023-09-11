@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { DexService, DEX_PRECISION } from "@dex/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
+import { DAOQueries } from "@dao/hooks";
 
 interface UseLockGODTokenParams {
   accountId: string;
@@ -37,6 +38,7 @@ export function useLockGODToken(
         if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([GovernanceQueries.FetchLockGODToken, accountId, tokenHolderAddress]);
         queryClient.invalidateQueries([GovernanceQueries.FetchCanUnlockGODToken, accountId, tokenHolderAddress]);
+        queryClient.invalidateQueries([DAOQueries.FetchDAOMembers, tokenHolderAddress]);
         handleOnSuccess(transactionResponse);
       },
     }
