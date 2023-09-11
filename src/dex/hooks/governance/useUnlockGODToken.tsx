@@ -3,6 +3,7 @@ import { TransactionResponse } from "@hashgraph/sdk";
 import { useMutation, useQueryClient } from "react-query";
 import { DexService } from "@dex/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
+import { DAOQueries } from "@dao/hooks";
 import { isNil } from "ramda";
 
 interface UseUnLockGODTokenParams {
@@ -32,6 +33,7 @@ export function useUnlockGODToken(
         if (isNil(transactionResponse)) return;
         queryClient.invalidateQueries([GovernanceQueries.FetchLockGODToken, accountId, tokenHolderAddress]);
         queryClient.invalidateQueries([GovernanceQueries.FetchCanUnlockGODToken, accountId, tokenHolderAddress]);
+        queryClient.invalidateQueries([DAOQueries.FetchDAOMembers, tokenHolderAddress]);
         handleOnSuccess(transactionResponse);
       },
     }

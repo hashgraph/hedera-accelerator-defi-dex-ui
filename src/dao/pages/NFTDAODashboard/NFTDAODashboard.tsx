@@ -1,8 +1,8 @@
 import { Outlet, useParams } from "react-router-dom";
 import { Member, NFTDAODetails } from "@dao/services";
-import { TokenBalance, useAccountTokenBalances, useHandleTransactionSuccess } from "@dex/hooks";
-import { useDAOs, useMintNFT, useGetBlockedTokenBalance } from "@dao/hooks";
-import { isNil, isNotNil } from "ramda";
+import { TokenBalance, useAccountTokenBalances, useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
+import { useDAOs, useMintNFT, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hooks";
+import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { AccountId } from "@hashgraph/sdk";
@@ -13,6 +13,7 @@ export function NFTDAODashboard() {
   const daosQueryResults = useDAOs<NFTDAODetails>(daoAccountId);
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
+  const { walletId, isWalletPaired } = usePairedWalletDetails();
   const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
     ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
     : "";
@@ -24,7 +25,8 @@ export function NFTDAODashboard() {
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
   const { data: blockedBalance } = blockedTokenBalancesQueryResults;
-
+  const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
+  const isAdmin = dao?.adminId === walletId && isWalletPaired;
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
   const isError = daosQueryResults.isError || accountTokenBalancesQueryResults.isError;
@@ -43,17 +45,22 @@ export function NFTDAODashboard() {
 
   if (dao) {
     const { adminId } = dao;
-    const ownerCount = 0;
-    const members: Member[] = [adminId].map((ownerId: string) => ({
+    const adminAsMember: Member[] = [adminId].map((ownerId: string) => ({
       name: "-",
       logo: "",
       accountId: ownerId,
     }));
+    const allMembers = [...adminAsMember, ...daoMembers];
+    const members = uniqBy((member: Member) => member.accountId, allMembers);
     const memberCount = members.length;
+    const activeMember = members.find((member) => member.accountId === walletId);
+    const isMember = isNotNil(activeMember) && !isAdmin && isWalletPaired;
     const tokenCount = tokenBalances?.length;
     const totalAssetValue = tokenBalances?.reduce((total: number, token: TokenBalance) => total + token.value, 0);
     return (
       <DAODashboard
+        isAdmin={isAdmin}
+        isMember={isMember}
         dao={dao}
         isNotFound={isNotFound}
         isDAOFound={isDAOFound}
@@ -70,7 +77,7 @@ export function NFTDAODashboard() {
             members,
             memberCount,
             tokenCount,
-            ownerCount,
+            ownerCount: 0,
             totalAssetValue,
             blockedBalance,
           }}

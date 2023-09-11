@@ -43,6 +43,11 @@ interface ProposalDetailsResponse {
 
 export type ProposalData = MirrorNodeDecodedProposalEvent & ProposalDetailsResponse;
 
+export interface CanClaimDetails {
+  canClaim: boolean;
+  user: string;
+}
+
 export enum GovernanceEvent {
   ProposalCreated = "ProposalCreated",
   ProposalExecuted = "ProposalExecuted",
