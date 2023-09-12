@@ -24,12 +24,56 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "activeProposalsCount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "blockedGodTokenBalance",
+          "type": "uint256"
+        }
+      ],
+      "name": "GovernorBalance",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "internalType": "uint8",
           "name": "version",
           "type": "uint8"
         }
       ],
       "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "oldImplementation",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newImplementation",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "LogicUpdated",
       "type": "event"
     },
     {
@@ -233,7 +277,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "nftTokenSerialId",
+          "name": "amountOrId",
           "type": "uint256"
         }
       ],

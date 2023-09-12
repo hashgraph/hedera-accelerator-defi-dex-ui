@@ -11,4 +11,5 @@ export type GovernanceDAODetailsContext = {
   tokenCount: number;
   totalAssetValue: number;
   FTToken: MirrorNodeTokenById;
+  blockedBalance: number | number[];
 };

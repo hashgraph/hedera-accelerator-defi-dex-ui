@@ -17,6 +17,7 @@ import { ChangeEvent, useEffect } from "react";
 import { useAccountTokenBalances, useTokenNFTs } from "@dex/hooks";
 import { Routes } from "@dao/routes";
 import { TokenType } from "@hashgraph/sdk";
+import { useGetBlockedTokenBalance } from "@dao/hooks";
 
 export interface TokenTransferLocationState {
   state: {
@@ -39,6 +40,7 @@ export function DAOTokenTransferDetailsForm() {
   const { data: governanceTokenNFTs = [] } = useTokenNFTs(governanceTokenId);
   const tokensQueryResults = useAccountTokenBalances(safeAccountId);
   const { data: tokens = [] } = tokensQueryResults;
+  const { data: blockedNFTs } = useGetBlockedTokenBalance(safeAccountId, governanceTokenId);
 
   if (proposalType !== DAOProposalType.TokenTransfer) {
     setValue("type", DAOProposalType.TokenTransfer);
@@ -55,6 +57,11 @@ export function DAOTokenTransferDetailsForm() {
 
   const { amount = "", tokenId = "", tokenType = "" } = getValues();
   const { data: tokenNFTs = [], isLoading } = useTokenNFTs(tokenId, safeAccountId);
+  const nftTokenWithGovernor =
+    getValues().tokenId === governanceTokenId
+      ? tokenNFTs.filter((nft) => !(blockedNFTs as number[]).find((block) => Number(block) === nft.serial_number))
+      : tokenNFTs;
+
   watch(["tokenId", "tokenType"]);
 
   return (
@@ -149,6 +156,7 @@ export function DAOTokenTransferDetailsForm() {
           balanceAccountId={safeAccountId}
           initialSelectedTokenId={state?.tokenId}
           currentAmount={amount}
+          govTokenId={governanceTokenId}
           isInvalid={Boolean(errors?.amount)}
           errorMessage={errors?.amount && errors?.amount?.message}
           form={form}
@@ -180,7 +188,7 @@ export function DAOTokenTransferDetailsForm() {
           <FormDropdown
             label="NFT Serial Number"
             placeholder="Select a serial number"
-            data={tokenNFTs.map((input: any) => {
+            data={nftTokenWithGovernor.map((input: any) => {
               return {
                 label: input.serial_number,
                 value: input.serial_number,
@@ -189,12 +197,12 @@ export function DAOTokenTransferDetailsForm() {
             isInvalid={Boolean(errors?.nftSerialId)}
             errorMessage={errors?.nftSerialId?.message}
             register={register("nftSerialId", {
-              required: { value: true, message: "A token is required to be locked to create proposal" },
+              required: { value: true, message: "Please select a NFT serial id to be transferred." },
               onChange: (e: ChangeEvent<HTMLSelectElement>) => setValue("nftSerialId", Number(e.target.value)),
             })}
           />
           {tokenId && !isLoading && tokenNFTs.length === 0 && (
-            <InlineAlert type={InlineAlertType.Warning} message={`There are no tokens present in the connect wallet`} />
+            <InlineAlert type={InlineAlertType.Warning} message={`No deposits found in assets for selected Token.`} />
           )}
         </Flex>
       )}
@@ -214,7 +222,7 @@ export function DAOTokenTransferDetailsForm() {
             register={register("governanceNftTokenSerialId", {
               required: {
                 value: true,
-                message: "A governance token serial id is required to be locked to create proposal",
+                message: "A governance token serial id is required to be locked to create proposal.",
               },
               onChange: (e: ChangeEvent<HTMLSelectElement>) =>
                 setValue("governanceNftTokenSerialId", Number(e.target.value)),

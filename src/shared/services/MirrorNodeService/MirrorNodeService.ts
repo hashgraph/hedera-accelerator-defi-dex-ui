@@ -271,20 +271,17 @@ function createMirrorNodeService() {
     return uniqueProposals;
   };
 
-  const fetchUpgradeContractEvents = async (contractId: string, userID: string): Promise<number | undefined> => {
-    const accountAddress = AccountId.fromString(userID).toSolidityAddress();
+  const fetchUpgradeContractEvents = async (
+    contractId: string,
+    events: string[]
+  ): Promise<Map<string, any[]> | undefined> => {
     const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
       },
     });
 
-    const allEvents = decodeLog(abiSignatures, response.data.logs, ["UpdatedAmount"]);
-    const amountUpdatedEvents = allEvents.get("UpdatedAmount") ?? [];
-    const lockTokenDetails = amountUpdatedEvents.find(
-      (item) => AccountId.fromSolidityAddress(item.user).toSolidityAddress() === accountAddress
-    );
-    return lockTokenDetails?.idOrAmount;
+    return decodeLog(abiSignatures, response.data.logs, events);
   };
 
   const fetchContractLogs = async (contractId: string): Promise<any> => {

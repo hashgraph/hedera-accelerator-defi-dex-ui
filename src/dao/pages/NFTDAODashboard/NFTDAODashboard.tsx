@@ -1,7 +1,7 @@
 import { Outlet, useParams } from "react-router-dom";
 import { Member, NFTDAODetails } from "@dao/services";
 import { TokenBalance, useAccountTokenBalances, useHandleTransactionSuccess } from "@dex/hooks";
-import { useDAOs, useMintNFT } from "@dao/hooks";
+import { useDAOs, useMintNFT, useGetBlockedTokenBalance } from "@dao/hooks";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -17,8 +17,13 @@ export function NFTDAODashboard() {
     ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
     : "";
   const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
+  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(
+    tokenTransferGovernorAccountId,
+    dao?.tokenId ?? ""
+  );
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances } = accountTokenBalancesQueryResults;
+  const { data: blockedBalance } = blockedTokenBalancesQueryResults;
 
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
@@ -58,7 +63,18 @@ export function NFTDAODashboard() {
         isSuccess={isSuccess}
         handleMintNFT={handleMintNFT}
       >
-        <Outlet context={{ dao, tokenBalances, members, memberCount, tokenCount, ownerCount, totalAssetValue }} />
+        <Outlet
+          context={{
+            dao,
+            tokenBalances,
+            members,
+            memberCount,
+            tokenCount,
+            ownerCount,
+            totalAssetValue,
+            blockedBalance,
+          }}
+        />
       </DAODashboard>
     );
   }

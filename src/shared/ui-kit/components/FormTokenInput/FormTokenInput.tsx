@@ -1,7 +1,8 @@
 import { TokenBalance, useAccountTokenBalances } from "@dex/hooks";
+import { useGetBlockedTokenBalance } from "@dao/hooks";
 import { UseFormReturn } from "react-hook-form";
 import BigNumber from "bignumber.js";
-import { isEmpty, isNil } from "ramda";
+import { isEmpty, isNil, isNotNil } from "ramda";
 import { HBARTokenId } from "@dex/services";
 import { Divider, Flex, useDisclosure, Button } from "@chakra-ui/react";
 import { Color } from "../../themes";
@@ -24,6 +25,7 @@ interface FormTokenInputProps {
   tokenFormId: string;
   assetListAccountId: string;
   balanceAccountId: string;
+  govTokenId?: string;
   form: UseFormReturn<any>;
   initialSelectedTokenId?: string;
   currentAmount: string;
@@ -42,6 +44,7 @@ export function FormTokenInput(props: FormTokenInputProps) {
     currentAmount,
     isInvalid,
     errorMessage,
+    govTokenId,
   } = props;
   const { setValue, register, trigger, watch } = form;
   watch(amountFormId, tokenFormId);
@@ -49,7 +52,10 @@ export function FormTokenInput(props: FormTokenInputProps) {
   const [isRoundValueButtonVisible, setIsRoundValueButtonVisible] = useState(false);
   const [selectedToken, setSelectedToken] = useState<TokenBalance | undefined>();
   const tokenBalanceQueryResults = useAccountTokenBalances(balanceAccountId, { tokenId: selectedToken?.tokenId });
+  const blockedTokenBalanceQueryResults = useGetBlockedTokenBalance(balanceAccountId, govTokenId ?? "");
+
   const { data: assetBalance } = tokenBalanceQueryResults;
+  const { data: blockedBalance = 0 } = blockedTokenBalanceQueryResults;
 
   const tokenId = selectedToken?.tokenId;
   const decimals = selectedToken?.decimals;
@@ -60,7 +66,12 @@ export function FormTokenInput(props: FormTokenInputProps) {
       : selectedToken?.symbol
     : "";
 
-  const balance = isEmpty(tokenId) || isNil(tokenId) ? undefined : assetBalance?.[0]?.balance;
+  const balance =
+    isEmpty(tokenId) || isNil(tokenId)
+      ? undefined
+      : isNotNil(govTokenId) && govTokenId === selectedToken?.tokenId
+      ? (assetBalance?.[0]?.balance ?? 0) - Number(blockedBalance)
+      : assetBalance?.[0]?.balance;
   const balanceDisplay = isNil(balance) ? "--" : String(balance);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
