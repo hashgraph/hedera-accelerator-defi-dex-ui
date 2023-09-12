@@ -7,6 +7,7 @@ export enum DAOQueries {
   GodTokens = "godTokens",
   FetchLockNFTToken = "fetchLockNFTToken",
   FetchCanUnlockNFTToken = "fetchCanUnlockNFTToken",
+  FetchBlockedTokenBalance = "fetchBlockedTokenBalance",
 }
 
 export enum DAOMutations {
@@ -45,6 +46,11 @@ export enum ProposalEvent {
   Receive = "Receive",
   Governance = "Governance",
   SafeCreated = "Safe Created",
+}
+
+export enum GovernanceEvent {
+  NFTSerialIdBlockStatus = "NFTSerialIdBlockStatus",
+  GovernorBalance = "GovernorBalance",
 }
 
 export enum ProposalType {
@@ -188,3 +194,8 @@ export const AllFilters = [
   ProposalStatus.Pending,
   ProposalStatus.Queued,
 ];
+
+export interface BlockedNFTEvent {
+  nftSerialId: number;
+  isBlocked: boolean;
+}

@@ -3,7 +3,7 @@ import { Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } from "@sh
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@dex/services";
-import { DAODetailsContext, DAOType } from "@dao/services";
+import { DAODetailsContext, DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { AccountId, TokenType, TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
 import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal";
@@ -12,7 +12,12 @@ import { useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks"
 import { useDepositTokens } from "@dao/hooks";
 
 export function AssetsList() {
-  const { tokenBalances: assets, dao } = useOutletContext<DAODetailsContext>();
+  const { tokenBalances: assets, dao, blockedBalance } = useOutletContext<DAODetailsContext>();
+  const governanceTokenId = (dao as GovernanceDAODetails | NFTDAODetails)?.tokenId ?? undefined;
+  const govTokenAssetBalance = assets.find((token) => token.tokenId === governanceTokenId)?.balance ?? 0;
+  const totalGovTokenAssetValue =
+    govTokenAssetBalance -
+    (typeof blockedBalance === "number" ? Number(blockedBalance) : (blockedBalance as number[]).length);
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const { isWalletPaired } = usePairedWalletDetails();
   // change to token id match
@@ -125,7 +130,10 @@ export function AssetsList() {
                 <Divider />
                 <Flex direction="row" justifyContent="space-between">
                   <Box>
-                    <MetricLabel label="BALANCE" value={`${balance} ${symbol}`} />
+                    <MetricLabel
+                      label="BALANCE"
+                      value={`${governanceTokenId === tokenId ? totalGovTokenAssetValue : balance} ${symbol}`}
+                    />
                   </Box>
                 </Flex>
               </Flex>

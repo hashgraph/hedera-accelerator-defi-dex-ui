@@ -24,4 +24,5 @@ export * from "./useManageNFTVotingPower";
 export * from "./useFetchLockedNFTToken";
 export * from "./useLockNFTToken";
 export * from "./useUnlockNFTToken";
+export * from "./useGetBlockedTokenBalance";
 export * from "./types";

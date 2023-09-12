@@ -6,6 +6,7 @@ import GODHolder from "../../../dex/services/abi/GODHolder.json";
 import PatternProxy from "../../../dex/services/abi/ProxyPattern.json";
 import FTDAO from "../../../dex/services/abi/FTDAO.json";
 import FTDAOFactory from "../../../dex/services/abi/FTDAOFactory.json";
+import GovernorTransferToken from "../../../dex/services/abi/GovernorTransferToken.json";
 import Web3 from "web3";
 import { EventAbi } from "../../../dex/services/abi/types";
 
@@ -23,6 +24,7 @@ function loadGovernorAbiEventSignatures() {
     ...PatternProxy.abi,
     ...FTDAO.abi,
     ...FTDAOFactory.abi,
+    ...GovernorTransferToken.abi,
   ];
   abis.forEach((abi: any) => {
     if (abi.type === "event") {

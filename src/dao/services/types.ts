@@ -171,6 +171,7 @@ export interface Member {
 export type DAODetailsContext = {
   dao: DAO;
   tokenBalances: TokenBalance[];
+  blockedBalance: number | number[];
 };
 
 export enum GovernanceProposalOperationType {
