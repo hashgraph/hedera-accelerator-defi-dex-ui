@@ -5,6 +5,7 @@ import { useDAOs, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hoo
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { AccountId } from "@hashgraph/sdk";
+import { GovernanceDAODetailsContext } from "./types";
 
 export function GovernanceDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -20,7 +21,7 @@ export function GovernanceDAODashboard() {
     tokenTransferGovernorAccountId,
     dao?.tokenId ?? ""
   );
-  const { data: tokenBalances } = accountTokenBalancesQueryResults;
+  const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
   const { data: blockedBalance = 0 } = blockedTokenBalancesQueryResults;
   const { data: FTToken } = useToken(dao?.tokenId ?? "");
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
@@ -43,10 +44,10 @@ export function GovernanceDAODashboard() {
     const allMembers = [...adminAsMember, ...daoMembers];
     const members = uniqBy((member: Member) => member.accountId, allMembers);
     const memberCount = members.length;
-    const tokenCount = tokenBalances?.length;
+    const tokenCount = tokenBalances?.length ?? 0;
     const activeMember = members.find((member) => member.accountId === walletId);
     const isMember = isNotNil(activeMember) && !isAdmin && isWalletPaired;
-    const totalAssetValue = tokenBalances?.reduce((total: number, token: TokenBalance) => total + token.value, 0);
+    const totalAssetValue = tokenBalances?.reduce((total: number, token: TokenBalance) => total + token.value, 0) ?? 0;
     return (
       <DAODashboard
         isMember={isMember}
@@ -60,17 +61,19 @@ export function GovernanceDAODashboard() {
         isSuccess={isSuccess}
       >
         <Outlet
-          context={{
-            dao,
-            members,
-            memberCount,
-            tokenCount,
-            ownerCount: 0,
-            totalAssetValue,
-            FTToken,
-            tokenBalances,
-            blockedBalance,
-          }}
+          context={
+            {
+              dao,
+              members,
+              memberCount,
+              tokenCount,
+              ownerCount: 0,
+              totalAssetValue,
+              FTToken,
+              tokenBalances,
+              blockedBalance,
+            } satisfies GovernanceDAODetailsContext
+          }
         />
       </DAODashboard>
     );

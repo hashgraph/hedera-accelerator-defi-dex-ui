@@ -6,6 +6,7 @@ import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { AccountId } from "@hashgraph/sdk";
+import { NFTDAODetailsContext } from "./types";
 
 export function NFTDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -23,8 +24,8 @@ export function NFTDAODashboard() {
     dao?.tokenId ?? ""
   );
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
-  const { data: tokenBalances } = accountTokenBalancesQueryResults;
-  const { data: blockedBalance } = blockedTokenBalancesQueryResults;
+  const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
+  const { data: blockedBalance = [] } = blockedTokenBalancesQueryResults;
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
@@ -71,16 +72,18 @@ export function NFTDAODashboard() {
         handleMintNFT={handleMintNFT}
       >
         <Outlet
-          context={{
-            dao,
-            tokenBalances,
-            members,
-            memberCount,
-            tokenCount,
-            ownerCount: 0,
-            totalAssetValue,
-            blockedBalance,
-          }}
+          context={
+            {
+              dao,
+              tokenBalances,
+              members,
+              memberCount,
+              tokenCount,
+              ownerCount: 0,
+              totalAssetValue,
+              blockedBalance,
+            } satisfies NFTDAODetailsContext
+          }
         />
       </DAODashboard>
     );

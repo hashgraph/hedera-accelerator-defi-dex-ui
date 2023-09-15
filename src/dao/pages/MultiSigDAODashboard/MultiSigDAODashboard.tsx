@@ -4,6 +4,7 @@ import { Member, MultiSigDAODetails } from "@dao/services";
 import { Outlet, useParams } from "react-router-dom";
 import { isNil, isNotNil } from "ramda";
 import { DAODashboard } from "../DAODashboard";
+import { MultiSigDAODetailsContext } from "./types";
 
 export function MultiSigDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -13,7 +14,7 @@ export function MultiSigDAODashboard() {
   const { isWalletPaired, walletId } = usePairedWalletDetails();
 
   const accountTokenBalancesQueryResults = useAccountTokenBalances(dao?.safeId ?? "");
-  const { data: tokenBalances } = accountTokenBalancesQueryResults;
+  const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
 
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
@@ -45,7 +46,11 @@ export function MultiSigDAODashboard() {
         errorMessage={errorMessage}
         isSuccess={isSuccess}
       >
-        <Outlet context={{ dao, tokenBalances, members, totalAssetValue }} />
+        <Outlet
+          context={
+            { dao, tokenBalances, members, totalAssetValue, blockedBalance: 0 } satisfies MultiSigDAODetailsContext
+          }
+        />
       </DAODashboard>
     );
   }

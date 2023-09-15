@@ -4,11 +4,9 @@ import { Member, MultiSigDAODetails } from "@dao/services";
 export type MultiSigDAODetailsContext = {
   dao: MultiSigDAODetails;
   tokenBalances: TokenBalance[];
-  ownerCount: number;
   members: Member[];
-  memberCount: number;
-  tokenCount: number;
   totalAssetValue: number;
+  blockedBalance: number | number[];
 };
 
 export const DefaultMultiSigDAODetails = {
