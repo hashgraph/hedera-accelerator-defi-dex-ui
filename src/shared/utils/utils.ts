@@ -6,6 +6,7 @@ import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { formatBigNumberToPercent } from "@dex/utils";
 import { UserPool } from "@dex/store/poolsSlice";
 import { BigNumber } from "bignumber.js";
+import { TokenType } from "@hashgraph/sdk";
 
 /**
  * Returns half of the input amount.
@@ -386,4 +387,12 @@ export const getTransactionFeeRateDisplay = (transactionFee: number | undefined)
   }
 
   return `${transactionFee * 100}%`;
+};
+
+export const isNFT = (tokenType: string = "") => {
+  return tokenType === TokenType.NonFungibleUnique.toString();
+};
+
+export const isFungible = (tokenType: string = "") => {
+  return tokenType === TokenType.FungibleCommon.toString();
 };

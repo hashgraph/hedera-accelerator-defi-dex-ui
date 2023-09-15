@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import { DexService, HBARTokenId } from "../../services";
 import { HTSQueries } from "./types";
 import { isEmpty, isNotNil } from "ramda";
-import { TokenType } from "@hashgraph/sdk";
+import { isNFT } from "shared";
 
 export interface TokenBalance {
   name: string;
@@ -65,7 +65,7 @@ export function useAccountTokenBalances(accountId: string, filterBy?: UseAccount
           balance: balance.toNumber(),
           // TODO: Compute Fiat Value
           value: 0,
-          isNFT: type === TokenType.NonFungibleUnique.toString(),
+          isNFT: isNFT(type),
         };
       });
 

@@ -106,6 +106,7 @@ export function GovernanceProposalDetailsPage() {
               tokenId={token?.data.token_id ?? "-"}
               tokenSymbol={token?.data.symbol ?? "-"}
               tokenDecimals={+(token?.data.decimals ?? 0)}
+              tokenType={token?.data.type ?? ""}
               event={event}
               type={type}
             />

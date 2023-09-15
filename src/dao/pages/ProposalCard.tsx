@@ -9,6 +9,7 @@ import { Proposal, ProposalType } from "@dao/hooks";
 import { Routes } from "@dao/routes";
 import { ProposalState } from "@dex/store";
 import { getProposalData } from "./utils";
+import { isFungible, isNFT } from "shared";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -118,7 +119,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
-                      {formatTokenAmountWithDecimal(amount, Number(token?.data.decimals))} {tokenSymbol}
+                      {formatTokenAmountWithDecimal(amount, Number(token?.data?.decimals ?? 0))} {tokenSymbol}
                     </Text>
                   </Flex>
                 )}
@@ -134,7 +135,15 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
-                      {formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} {tokenSymbol}
+                      {isFungible(token?.data.type) &&
+                        `${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} ${
+                          token?.data.symbol
+                        }`}
+                      {isNFT(token?.data.type) &&
+                        ` ${token?.data.symbol} ${formatTokenAmountWithDecimal(
+                          amount,
+                          Number(token?.data.decimals ?? 0)
+                        )}`}
                     </Text>
                   </Flex>
                 )}

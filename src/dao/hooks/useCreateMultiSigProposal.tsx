@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "react-query";
-import { TransactionResponse, TokenId, AccountId, TokenType } from "@hashgraph/sdk";
+import { TransactionResponse, TokenId, AccountId } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@dex/services";
 import { MultiSigProposeTransactionType } from "@dao/services";
@@ -9,6 +9,7 @@ import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import HederaGnosisSafeJSON from "@dex/services/abi/HederaGnosisSafe.json";
 import { isHbarToken } from "@dex/utils";
+import { isNFT } from "shared";
 
 interface UseCreateMultiSigProposalParams {
   tokenId: string;
@@ -56,7 +57,7 @@ export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
       } = params;
       const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
       let tokenTransferData;
-      if (tokenType === TokenType.NonFungibleUnique.toString()) {
+      if (isNFT(tokenType)) {
         tokenTransferData = contractInterface.encodeFunctionData("transferTokenViaSafe", [
           TokenId.fromString(tokenId).toSolidityAddress(),
           AccountId.fromString(receiverId).toSolidityAddress(),

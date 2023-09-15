@@ -168,7 +168,7 @@ export function useDAOProposals(
           }
           const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
           const tokenId = token ? AccountId.fromSolidityAddress(token).toString() : "";
-          if (!tokenDataCache.has(tokenId)) {
+          if (!!tokenId && !tokenDataCache.has(tokenId)) {
             tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
           }
           const tokenData = await tokenDataCache.get(tokenId);
