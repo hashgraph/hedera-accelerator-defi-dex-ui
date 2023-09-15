@@ -10,13 +10,13 @@ import {
   TransactionResponse,
   Hbar,
   HbarUnit,
-  TokenType,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./types";
 import { DexService, checkTransactionResponseForError, Contracts, DEX_PRECISION } from "@dex/services";
 import { DAOType } from "@dao/services";
 import FTDAOFactoryJSON from "@dex/services/abi/FTDAOFactory.json";
 import { isHbarToken } from "@dex/utils";
+import { isNFT } from "shared";
 
 const Gas = 9000000;
 
@@ -153,7 +153,7 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
       .addAddress(ethers.constants.AddressZero)
       .addUint256(preciseAmount)
       .addUint256(governanceNftTokenSerialId);
-  } else if (tokenType === TokenType.NonFungibleUnique.toString()) {
+  } else if (isNFT(tokenType)) {
     contractCallParams
       .addString(title)
       .addString(description)

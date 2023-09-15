@@ -20,6 +20,7 @@ interface ProposalDetailsProps {
   approvers?: string[];
   approvalCount?: number;
   transactionHash?: string;
+  tokenType: string;
 }
 
 export function ProposalDetails(props: ProposalDetailsProps) {
@@ -35,6 +36,7 @@ export function ProposalDetails(props: ProposalDetailsProps) {
     approvalCount,
     transactionHash,
     tokenDecimals,
+    tokenType,
   } = props;
 
   return (
@@ -56,6 +58,7 @@ export function ProposalDetails(props: ProposalDetailsProps) {
               tokenId={tokenId}
               tokenSymbol={tokenSymbol}
               tokenDecimals={tokenDecimals}
+              tokenType={tokenType}
               event={event}
             />
           </>

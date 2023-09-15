@@ -654,7 +654,7 @@ export function CreateDAOProposal() {
             }}
             header={<Wizard.Header />}
             stepper={<Wizard.Stepper />}
-            form={<Wizard.Form />}
+            form={<Wizard.Form layerStyle={type === DAOProposalType.TokenTransfer ? "dao-wizard__form" : undefined} />}
             footer={<Wizard.Footer />}
           />
         }

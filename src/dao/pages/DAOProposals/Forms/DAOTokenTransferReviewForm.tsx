@@ -8,7 +8,7 @@ import { isNil, isNotNil } from "ramda";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
 import { useOutletContext } from "react-router-dom";
 import { Routes } from "@dao/routes";
-import { TokenType } from "@hashgraph/sdk";
+import { isNFT } from "shared";
 
 export function DAOTokenTransferReviewForm() {
   const { safeAccountId, daoType } = useOutletContext<CreateDAOProposalContext>();
@@ -86,7 +86,7 @@ export function DAOTokenTransferReviewForm() {
               {"-"}
               <HashScanLink id={tokenId} type={HashscanData.Token} />
             </Flex>
-            {tokenType === TokenType.NonFungibleUnique.toString() ? (
+            {isNFT(tokenType) ? (
               <Text textStyle="p small regular">Serial No: {nftSerialId}</Text>
             ) : (
               <Text textStyle="p small regular">
