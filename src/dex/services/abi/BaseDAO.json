@@ -36,6 +36,11 @@
             },
             {
               "internalType": "string",
+              "name": "infoUrl",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
               "name": "description",
               "type": "string"
             },
@@ -187,6 +192,11 @@
         },
         {
           "internalType": "string",
+          "name": "_infoUrl",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
           "name": "_description",
           "type": "string"
         },
@@ -220,6 +230,11 @@
             {
               "internalType": "string",
               "name": "logoUrl",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "infoUrl",
               "type": "string"
             },
             {
@@ -367,6 +382,11 @@
         {
           "internalType": "string",
           "name": "_logoUrl",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_infoUrl",
           "type": "string"
         },
         {

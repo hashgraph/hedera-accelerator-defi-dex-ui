@@ -436,7 +436,7 @@ export function CreateDAOProposal() {
         }
       }
       case DAOProposalType.Text: {
-        const { title, description, linkToDiscussion, nftTokenSerialId } = data as CreateDAOTextProposalForm;
+        const { title, description, linkToDiscussion, nftTokenSerialId, metadata } = data as CreateDAOTextProposalForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.MultiSig:
             return createMultiSigTextProposal({
@@ -445,6 +445,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
+              metadata: metadata,
             });
           case DAOType.GovernanceToken:
             return createDAOTextProposal({
@@ -456,6 +457,7 @@ export function CreateDAOProposal() {
               daoContractId: daoAccountId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
+              metadata: metadata,
             });
           case DAOType.NFT:
             return createDAOTextProposal({
@@ -467,6 +469,7 @@ export function CreateDAOProposal() {
               daoContractId: daoAccountId,
               nftTokenSerialId,
               daoType: DAOType.NFT,
+              metadata: metadata,
             });
           default:
             return;
@@ -573,8 +576,8 @@ export function CreateDAOProposal() {
     switch (type) {
       case DAOProposalType.Text:
         return currentDaoType === Routes.NFT
-          ? trigger(["title", "description", "linkToDiscussion", "nftTokenSerialId"])
-          : trigger(["title", "description", "linkToDiscussion"]);
+          ? trigger(["title", "description", "linkToDiscussion", "metadata", "nftTokenSerialId"])
+          : trigger(["title", "description", "linkToDiscussion", "metadata"]);
       case DAOProposalType.AddMember:
         return trigger(["memberAddress", "newThreshold", "title", "description"]);
       case DAOProposalType.RemoveMember:

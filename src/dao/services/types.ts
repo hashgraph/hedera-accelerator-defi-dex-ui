@@ -10,12 +10,16 @@ export interface DAOCreatedEventArgs {
   admin: string;
   name: string;
   logoUrl: string;
+  infoUrl: string;
   isPrivate: boolean;
-  title: string;
   description: string;
-  linkToDiscussion: string | undefined;
   webLinks: string[];
 }
+
+export type MultiSigDAOCreatedEventInputs = DAOCreatedEventArgs & {
+  owners: string[];
+  threshold: BigNumber;
+};
 
 export interface DAOProposalGovernors {
   contractUpgradeLogic: string;
@@ -51,10 +55,7 @@ export interface NFTDAOCreatedEventArgs {
 export interface MultiSigDAOCreatedEventArgs {
   daoAddress: string;
   safeAddress: string;
-  inputs: DAOCreatedEventArgs & {
-    owners: string[];
-    threshold: BigNumber;
-  };
+  inputs: MultiSigDAOCreatedEventInputs;
 }
 
 export interface DAODetailsInfoEventArgs {
@@ -70,7 +71,7 @@ export interface GovernanceDAODetails {
   adminId: string;
   title: string;
   description: string;
-  linkToDiscussion: string | undefined;
+  infoUrl: string | undefined;
   name: string;
   logoUrl: string;
   isPrivate: boolean;
@@ -90,7 +91,7 @@ export interface NFTDAODetails {
   adminId: string;
   title: string;
   description: string;
-  linkToDiscussion: string | undefined;
+  infoUrl: string | undefined;
   governors: DAOProposalGovernors;
   tokenHolderAddress: string;
   name: string;

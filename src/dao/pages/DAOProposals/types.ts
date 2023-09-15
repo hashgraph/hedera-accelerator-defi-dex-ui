@@ -22,6 +22,7 @@ export interface CreateDAOProposalFormBase {
 export interface CreateDAOTextProposalForm extends CreateDAOProposalFormBase {
   linkToDiscussion: string;
   nftTokenSerialId: number;
+  metadata: string;
 }
 
 export interface CreateDAOTokenTransferForm extends CreateDAOProposalFormBase {

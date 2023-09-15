@@ -129,6 +129,7 @@ interface MirrorNodeDecodedProposalEvent {
   type: string;
   proposer: string;
   description: string;
+  metadata: string;
   title: string;
   link: string;
   timestamp: string;

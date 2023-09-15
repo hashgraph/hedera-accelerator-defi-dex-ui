@@ -56,10 +56,14 @@ async function sendCreateGovernanceDAOTransaction(
   const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
+  /* TODO: Replace this with real info url event data */
+  const infoUrl = "info-url";
+
   const createDaoParams: any[] = [
     daoAdminAddress,
     name,
     logoUrl,
+    infoUrl,
     tokenAddress,
     preciseQuorum.toNumber(),
     preciseLockingDuration.toNumber(),
@@ -115,6 +119,8 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     governanceNftTokenSerialId,
     daoType,
   } = params;
+  /* NOTE: Metadata is not currently in use for this proposal type. Should be removed from the Smart Contracts */
+  const metadata = "";
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
   const contractCallParams = new ContractFunctionParameters();
@@ -143,31 +149,23 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
     default:
       break;
   }
+  contractCallParams
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion)
+    .addString(metadata)
+    .addAddress(receiverSolidityAddress);
+
   if (isHbarToken(tokenId)) {
     preciseAmount = Hbar.from(amount, HbarUnit.Hbar).to(HbarUnit.Tinybar);
     contractCallParams
-      .addString(title)
-      .addString(description)
-      .addString(linkToDiscussion)
-      .addAddress(receiverSolidityAddress)
       .addAddress(ethers.constants.AddressZero)
       .addUint256(preciseAmount)
       .addUint256(governanceNftTokenSerialId);
   } else if (isNFT(tokenType)) {
-    contractCallParams
-      .addString(title)
-      .addString(description)
-      .addString(linkToDiscussion)
-      .addAddress(receiverSolidityAddress)
-      .addAddress(tokenSolidityAddress)
-      .addUint256(nftSerialId)
-      .addUint256(governanceNftTokenSerialId);
+    contractCallParams.addUint256(nftSerialId).addUint256(governanceNftTokenSerialId);
   } else {
     contractCallParams
-      .addString(title)
-      .addString(description)
-      .addString(linkToDiscussion)
-      .addAddress(receiverSolidityAddress)
       .addAddress(tokenSolidityAddress)
       .addUint256(preciseAmount)
       .addUint256(governanceNftTokenSerialId);
@@ -222,6 +220,7 @@ async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactio
     .addString(linkToDiscussion)
     .addAddress(tokenSolidityAddress)
     .addUint256(nftTokenSerialId);
+
   switch (daoType) {
     case DAOType.NFT: {
       await DexService.setNFTAllowance({
@@ -270,6 +269,7 @@ interface SendDAOContractUpgradeProposalTransactionParams {
   daoType: string;
   signer: HashConnectSigner;
 }
+
 async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProposalTransactionParams) {
   const {
     governanceTokenId,
@@ -283,6 +283,8 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     daoType,
     nftTokenSerialId,
   } = params;
+  /* NOTE: Metadata is not currently in use for this proposal type. Should be removed from the Smart Contracts */
+  const metadata = "";
   const spenderContractId = solidityAddressToAccountIdString(governanceAddress);
   const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
   const proxyLogicEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
@@ -315,6 +317,7 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
+    .addString(metadata)
     .addAddress(proxyEVMAddress)
     .addAddress(proxyLogicEVMAddress)
     .addUint256(nftTokenSerialId);
@@ -341,6 +344,7 @@ interface SendDAOTextProposalTransactionParams {
   description: string;
   linkToDiscussion: string;
   nftTokenSerialId: number;
+  metadata: string;
   signer: HashConnectSigner;
   daoType: DAOType;
 }
@@ -354,9 +358,11 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
     governanceAddress,
     linkToDiscussion,
     nftTokenSerialId,
+    metadata,
     daoType,
   } = params;
   const spenderContractId = solidityAddressToAccountIdString(governanceAddress);
+
   if (daoType === DAOType.NFT) {
     await DexService.setNFTAllowance({
       nftId: governanceTokenId,
@@ -373,10 +379,12 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
       signer,
     });
   }
+
   const contractCallParams = new ContractFunctionParameters()
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
+    .addString(metadata)
     .addUint256(nftTokenSerialId);
 
   const sendProposeTextProposalTransaction = await new ContractExecuteTransaction()

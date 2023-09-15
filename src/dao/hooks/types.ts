@@ -172,6 +172,7 @@ export interface Proposal {
   title: string;
   author: string;
   description: string;
+  metadata: string;
   link: string | undefined;
   threshold: number | undefined;
   proposalId?: string;

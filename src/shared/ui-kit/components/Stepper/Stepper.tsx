@@ -22,6 +22,7 @@ interface StepperProps {
   states: ProposalState[];
 }
 
+/** DEPRECATED */
 export function Stepper(props: StepperProps) {
   const { states } = props;
   const isLastStep = states.length - 1;

@@ -12,6 +12,7 @@ interface UseCreateDAOTextProposalParams {
   title: string;
   description: string;
   linkToDiscussion: string;
+  metadata: string;
   daoContractId: string;
   nftTokenSerialId: number;
   daoType: DAOType;

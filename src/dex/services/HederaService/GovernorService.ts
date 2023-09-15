@@ -160,6 +160,8 @@ const sendCreateContractUpgradeProposalTransaction = async (
   const upgradeProposalProxyId = ContractId.fromString(newContractProxyId).toSolidityAddress();
   const contractUpgradeContractId = ContractId.fromString(Contracts.Governor.ContractUpgrade.ProxyId);
   const walletId = signer.getAccountId().toString();
+  /* NOTE: Metadata is not currently in use for this proposal type. Should be removed from the Smart Contracts */
+  const metadata = "";
   await DexService.setTokenAllowance({
     tokenId: GovernanceTokenId,
     walletId,
@@ -171,6 +173,7 @@ const sendCreateContractUpgradeProposalTransaction = async (
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
+    .addString(metadata)
     .addAddress(upgradeProposalProxyId)
     .addAddress(contractIdToUpgrade)
     .addUint256(nftTokenSerialId);
@@ -201,6 +204,8 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
   const { title, linkToDiscussion, description, nftTokenSerialId, signer } = params;
   const textProposalContractId = ContractId.fromString(Contracts.Governor.TextProposal.ProxyId);
   const walletId = signer.getAccountId().toString();
+  /* NOTE: Metadata is not currently in use for this proposal type. Should be removed from the Smart Contracts */
+  const metadata = "";
   await DexService.setTokenAllowance({
     tokenId: GovernanceTokenId,
     walletId,
@@ -212,6 +217,7 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion)
+    .addString(metadata)
     .addUint256(nftTokenSerialId);
   const createProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(textProposalContractId)

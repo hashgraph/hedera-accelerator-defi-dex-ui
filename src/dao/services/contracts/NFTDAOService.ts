@@ -57,11 +57,14 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
+  /* TODO: Replace this with real info url event data */
+  const infoUrl = "info-url";
 
   const createDaoParams: any[] = [
     daoAdminAddress,
     name,
     logoUrl,
+    infoUrl,
     tokenAddress,
     preciseQuorum.toNumber(),
     preciseLockingDuration.toNumber(),

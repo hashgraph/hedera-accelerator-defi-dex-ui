@@ -1,10 +1,11 @@
 import { FormControl, FormErrorMessage, FormHelperText } from "@chakra-ui/react";
 import { TextArea, TextAreaProps } from "./TextArea";
+import { ReactElement } from "react";
 
 interface FormInputProps<T extends string> {
   textAreaProps: TextAreaProps<T>;
   flex?: number | string;
-  formHelperText?: string;
+  formHelperText?: string | ReactElement;
   isInvalid?: boolean;
   errorMessage?: string | undefined;
 }
