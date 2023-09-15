@@ -12,7 +12,7 @@ import { useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks"
 import { useDepositTokens } from "@dao/hooks";
 
 export function AssetsList() {
-  const { tokenBalances: assets, dao, blockedBalance } = useOutletContext<DAODetailsContext>();
+  const { tokenBalances: assets, dao, blockedBalance = 0 } = useOutletContext<DAODetailsContext>();
   const governanceTokenId = (dao as GovernanceDAODetails | NFTDAODetails)?.tokenId ?? undefined;
   const govTokenAssetBalance = assets.find((token) => token.tokenId === governanceTokenId)?.balance ?? 0;
   const totalGovTokenAssetValue =
