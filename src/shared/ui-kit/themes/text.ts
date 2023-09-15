@@ -331,6 +331,11 @@ export const TextStyles = {
     ...baseStyles.link,
     fontWeight: fontWeight.Regular,
   },
+  "p small semibold link": {
+    ...baseStyles.p_small,
+    ...baseStyles.link,
+    fontWeight: fontWeight.Semibold,
+  },
   /**
    * Paragraph
    * Size: XSmall

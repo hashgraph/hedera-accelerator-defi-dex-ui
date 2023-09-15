@@ -61,6 +61,7 @@ async function sendCreateMultiSigDAOTransaction(
   checkTransactionResponseForError(createMultiSigDAOResponse, BaseDAOContractFunctions.CreateDAO);
   return createMultiSigDAOResponse;
 }
+
 interface SendProposeTransaction {
   safeEVMAddress: string;
   data: string;
@@ -68,6 +69,7 @@ interface SendProposeTransaction {
   title: string;
   description: string;
   linkToDiscussion?: string;
+  metadata?: string;
   transactionType: number;
   hBarPayableValue?: number;
   signer: HashConnectSigner;
@@ -82,6 +84,10 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     transactionType,
     title,
     description,
+    /*
+     * TODO: Need to add Metadata support to Multi Sig contracts.
+     * metadata = "",
+     */
     hBarPayableValue,
     linkToDiscussion = "",
   } = params;
@@ -94,6 +100,11 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     .addString(title)
     .addString(description)
     .addString(linkToDiscussion);
+  /*
+   * TODO: Need to add Metadata support to MultiSig contracts.
+   * .addString(metadata);
+   */
+
   const sendProposeTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOContractId)
     .setFunction(MultiSigDAOContractFunctions.ProposeTransaction, contractFunctionParameters)

@@ -87,9 +87,7 @@ export const LayerStyles = {
     gap: "4",
     width: "100%",
     height: "100%",
-    paddingTop: "1.5rem",
-    paddingLeft: "5rem",
-    paddingRight: "5rem",
+    padding: "1.5rem 5rem",
   },
   "dao-dashboard__content-body": {
     minWidth: "100%",

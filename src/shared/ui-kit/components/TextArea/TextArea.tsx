@@ -12,6 +12,8 @@ export interface TextAreaProps<T extends string> {
   isTooltipVisible?: boolean;
   toolTipLabelPlacement?: PlacementWithLogical;
   id: string;
+  height?: string;
+  minHeight?: string;
   isError?: boolean;
   isDisabled?: boolean;
   isReadOnly?: boolean;
@@ -27,6 +29,8 @@ export function TextArea<T extends string>(props: TextAreaProps<T>) {
     isTooltipVisible,
     tooltipLabel,
     id,
+    height,
+    minHeight,
     value,
     placeholder,
     isDisabled,
@@ -47,6 +51,8 @@ export function TextArea<T extends string>(props: TextAreaProps<T>) {
         variant="input-text-area"
         resize={resize}
         value={value}
+        height={height}
+        minHeight={minHeight}
         placeholder={placeholder}
         isDisabled={isDisabled}
         isReadOnly={isReadOnly}

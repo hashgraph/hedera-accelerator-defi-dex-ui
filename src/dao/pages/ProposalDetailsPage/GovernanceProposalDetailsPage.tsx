@@ -76,6 +76,7 @@ export function GovernanceProposalDetailsPage() {
       daoType,
       proposalState,
       link,
+      metadata,
     } = proposalDetails;
 
     const isGovernanceProposal = daoType === DAOType.GovernanceToken;
@@ -101,6 +102,7 @@ export function GovernanceProposalDetailsPage() {
             />
             <ProposalDetails
               description={[proposalDetails.description, subDescription]}
+              metadata={metadata}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}

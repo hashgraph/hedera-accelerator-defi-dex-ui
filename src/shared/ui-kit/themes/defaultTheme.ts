@@ -8,12 +8,13 @@ import { InputStyles, NumberInputStyles } from "../components/Inputs";
 import { CardStyles } from "../components/Card";
 import { SelectStyles } from "../components/Select";
 import { TooltipStyles } from "../components/Tooltip";
-import { StepsV2Theme } from "../components/Stepper";
+import { StepperStyles, StepsV2Theme } from "../components/Stepper";
 import { TagStyles } from "../components/Tag";
 import { TextAreaStyles } from "../components/TextArea";
 import { TabsStyles } from "../components/Tabs";
 import { LinkStyles } from "../components/Links";
 import { ListStyles } from "../components/List";
+import { TableStyles } from "../components/Table";
 
 export const DefaultTheme = extendTheme({
   styles: {
@@ -39,5 +40,7 @@ export const DefaultTheme = extendTheme({
     Link: LinkStyles,
     Modal: ModalStyles,
     List: ListStyles,
+    Table: TableStyles,
+    Stepper: StepperStyles,
   },
 });

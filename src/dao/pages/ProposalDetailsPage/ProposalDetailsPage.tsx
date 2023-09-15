@@ -85,6 +85,7 @@ export function ProposalDetailsPage() {
       daoType,
       threshold,
       ownerIds,
+      metadata,
       author,
       title,
       link,
@@ -110,6 +111,7 @@ export function ProposalDetailsPage() {
             />
             <ProposalDetails
               description={descriptionArray}
+              metadata={metadata}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}

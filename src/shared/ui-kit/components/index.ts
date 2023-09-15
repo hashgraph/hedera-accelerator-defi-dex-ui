@@ -36,3 +36,6 @@ export * from "./List";
 export * from "./Modal";
 export * from "./InlineAlert";
 export * from "./VotingPower";
+export * from "./Text";
+export * from "./Table";
+export * from "./MarkdownRenderer";

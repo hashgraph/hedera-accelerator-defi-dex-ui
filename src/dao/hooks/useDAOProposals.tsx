@@ -172,6 +172,7 @@ export function useDAOProposals(
             tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
           }
           const tokenData = await tokenDataCache.get(tokenId);
+
           return {
             id: index,
             nonce: nonce ? BigNumber.from(nonce).toNumber() : 0,
@@ -182,8 +183,10 @@ export function useDAOProposals(
             approvers,
             event: ProposalEvent.Send,
             status,
-            // TODO: Add real value for timestamp
+            /* TODO: Add real value for timestamp */
             timestamp: "",
+            /* TODO: Replace with real metadata event data */
+            metadata: "",
             tokenId: tokenId,
             token: tokenData,
             receiver: receiver ? solidityAddressToAccountIdString(receiver) : "",
@@ -193,9 +196,9 @@ export function useDAOProposals(
             hexStringData,
             data: isContractUpgradeProposal ? parsedData : { ...data },
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
-            title: title,
+            title,
             author: creator ? solidityAddressToAccountIdString(creator) : "",
-            description: description,
+            description,
             link: linkToDiscussion,
             threshold,
             /**TODO Remove the logic from here once extra step for ContractUpgrade is Not required */
@@ -203,6 +206,7 @@ export function useDAOProposals(
           };
         })
       );
+
       return proposals;
     },
     {

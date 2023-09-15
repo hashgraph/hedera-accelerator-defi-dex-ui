@@ -114,6 +114,8 @@ export function useGovernanceDAOProposals(
       timeRemaining = getTimeRemaining(proposalData.duration?.startBlock, proposalData.duration?.endBlock).toString();
     }
     const votingEndTime = getVotingEndTime(proposalData.timestamp || "", timeRemaining || "");
+    const { metadata } = proposalData;
+
     return {
       id: index,
       timeRemaining,
@@ -138,6 +140,7 @@ export function useGovernanceDAOProposals(
       title: proposalData.title,
       author: proposalData.proposer ? solidityAddressToAccountIdString(proposalData?.proposer) : "",
       description: proposalData.description,
+      metadata,
       link: proposalData.link,
       threshold: 0,
       contractId: proposalData.contractId ? solidityAddressToAccountIdString(proposalData?.contractId) : "",

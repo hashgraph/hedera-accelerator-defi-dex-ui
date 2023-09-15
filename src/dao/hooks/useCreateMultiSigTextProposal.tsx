@@ -9,6 +9,7 @@ interface UseCreateMultiSigTextProposalParams {
   title: string;
   description: string;
   linkToDiscussion: string;
+  metadata: string;
   safeEVMAddress: string;
   multiSigDAOContractId: string;
 }

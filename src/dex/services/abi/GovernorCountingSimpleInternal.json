@@ -204,6 +204,12 @@
         },
         {
           "indexed": false,
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
+        },
+        {
+          "indexed": false,
           "internalType": "bytes",
           "name": "data",
           "type": "bytes"
