@@ -16,7 +16,7 @@ import { DexService, checkTransactionResponseForError, Contracts, DEX_PRECISION 
 import { DAOType } from "@dao/services";
 import FTDAOFactoryJSON from "@dex/services/abi/FTDAOFactory.json";
 import { isHbarToken } from "@dex/utils";
-import { isNFT } from "shared";
+import { isNFT, solidityAddressToAccountIdString } from "@shared/utils";
 
 const Gas = 9000000;
 
@@ -118,7 +118,7 @@ async function sendProposeTokenTransferTransaction(params: SendProposeTokenTrans
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
   const contractCallParams = new ContractFunctionParameters();
-  const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
+  const spenderContractId = solidityAddressToAccountIdString(governanceAddress);
   let preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue();
   switch (daoType) {
     case DAOType.NFT: {
@@ -212,7 +212,7 @@ async function sendGOVTokenAssociateTransaction(params: TokenAssociateTransactio
     signer,
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
-  const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
+  const spenderContractId = solidityAddressToAccountIdString(governanceAddress);
   const governanceTokenDetails = await DexService.fetchTokenData(governanceTokenId);
   const governanceTokenDecimals = governanceTokenDetails.data.decimals;
   const tokenAmount = BigNumber(1).shiftedBy(Number(governanceTokenDecimals)).toNumber();
@@ -283,7 +283,7 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
     daoType,
     nftTokenSerialId,
   } = params;
-  const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
+  const spenderContractId = solidityAddressToAccountIdString(governanceAddress);
   const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
   const proxyLogicEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
 
@@ -356,7 +356,7 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
     nftTokenSerialId,
     daoType,
   } = params;
-  const spenderContractId = AccountId.fromSolidityAddress(governanceAddress).toString();
+  const spenderContractId = solidityAddressToAccountIdString(governanceAddress);
   if (daoType === DAOType.NFT) {
     await DexService.setNFTAllowance({
       nftId: governanceTokenId,

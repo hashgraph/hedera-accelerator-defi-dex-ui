@@ -4,8 +4,8 @@ import { TokenBalance, useAccountTokenBalances, usePairedWalletDetails, useToken
 import { useDAOs, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
-import { AccountId } from "@hashgraph/sdk";
 import { GovernanceDAODetailsContext } from "./types";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function GovernanceDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -14,7 +14,7 @@ export function GovernanceDAODashboard() {
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { walletId, isWalletPaired } = usePairedWalletDetails();
   const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
-    ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
+    ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
     : "";
   const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
   const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(

@@ -15,11 +15,12 @@ import { getFulfilledResultsData } from "../../../../shared/services/MirrorNodeS
 import { Contracts, GovernanceTokenId } from "../../constants";
 import { GovernanceEvent, ProposalData, CanClaimDetails } from "./type";
 import { ethers } from "ethers";
-import { solidityAddressToTokenIdString, convertEthersBigNumberToBigNumberJS } from "../..";
+import { convertEthersBigNumberToBigNumberJS } from "../..";
 import GODHolderJSON from "../../abi/GODHolder.json";
 import GovernorCountingSimpleInternalJSON from "../../abi/GovernorCountingSimpleInternal.json";
 import { getEventArgumentsByName } from "../..";
 import Long from "long";
+import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 
 const DefaultTokenTransferDetails = {
   transferFromAccount: undefined,
@@ -41,8 +42,8 @@ const getTokenTransferDetailsFromHexData = (data: string | undefined) => {
     data
   );
   return {
-    transferFromAccount: solidityAddressToTokenIdString(parsedData.transferFromAccount),
-    transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+    transferFromAccount: solidityAddressToAccountIdString(parsedData.transferFromAccount),
+    transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
     tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
     transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
   };
@@ -113,7 +114,7 @@ const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: 
     description: proposalData.description ?? "",
     link: proposalData.link ?? "",
     author: proposalData.proposer
-      ? AccountId.fromSolidityAddress(proposalData.proposer)
+      ? AccountId.fromString(solidityAddressToAccountIdString(proposalData.proposer))
       : AccountId.fromString("0.0.34728121"),
     status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
     timeRemaining: !isNil(startBlock) && !isNil(endBlock) ? getTimeRemaining(startBlock, endBlock) : undefined,
@@ -124,7 +125,7 @@ const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: 
     tokenToTransfer: proposalData.tokenToTransfer,
     transferTokenAmount: proposalData.transferTokenAmount,
     voted: proposalData.votingInformation?.voted,
-    votedUser: AccountId.fromSolidityAddress(proposalData.votingInformation?.votedUser ?? "").toString(),
+    votedUser: solidityAddressToAccountIdString(proposalData.votingInformation?.votedUser ?? ""),
     isQuorumReached: proposalData.votingInformation?.isQuorumReached,
     endBlock,
     votes: {
@@ -211,8 +212,6 @@ export async function fetchCanUserClaimGODTokens(
     return getEventArgumentsByName<CanClaimDetails>(log.args);
   });
 
-  const eventObj = decodedEvents?.find(
-    (eventData) => AccountId.fromSolidityAddress(eventData.user).toString() === accountId
-  );
+  const eventObj = decodedEvents?.find((eventData) => solidityAddressToAccountIdString(eventData.user) === accountId);
   return eventObj?.canClaim ?? true;
 }

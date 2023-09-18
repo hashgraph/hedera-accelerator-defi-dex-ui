@@ -4,6 +4,7 @@ import { GovernanceQueries } from "./types";
 import { isNil, isNotNil } from "ramda";
 import BigNumber from "bignumber.js";
 import { AccountId } from "@hashgraph/sdk";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 type UseFetchGODTokenQueryKey = [GovernanceQueries.FetchLockGODToken, string | undefined, string | undefined];
 
@@ -13,7 +14,7 @@ export function useFetchLockedGovToken(accountId: string | undefined, tokenHolde
     const amountEventArray = events.get("UpdatedAmount") ?? [];
     const accountAddress = AccountId.fromString(accountId ?? "").toSolidityAddress();
     const lockTokenDetails = amountEventArray.find(
-      (item) => AccountId.fromSolidityAddress(item.user).toSolidityAddress() === accountAddress
+      (item) => solidityAddressToAccountIdString(item.user) === solidityAddressToAccountIdString(accountAddress)
     );
     return isNotNil(lockTokenDetails?.idOrAmount)
       ? BigNumber(lockTokenDetails.idOrAmount).shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toNumber()

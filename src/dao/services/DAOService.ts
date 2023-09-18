@@ -9,7 +9,6 @@ import {
   DexService,
   getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
-  solidityAddressToTokenIdString,
 } from "@dex/services";
 import { Contracts, Gas, HBARTokenId, MINIMUM_DEPOSIT_AMOUNT } from "@dex/services";
 import { getEventArgumentsByName } from "../../dex/services/utils";
@@ -45,6 +44,7 @@ import { ProposalData } from "../../dex/services/DexService/governance/type";
 import { isNil, isNotNil } from "ramda";
 import GovernorCountingSimpleInternalJSON from "../../dex/services/abi/GovernorCountingSimpleInternal.json";
 import { ContractProposalState } from "@dex/store";
+import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 
 export async function getOwners(safeAddress: string): Promise<string[]> {
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
@@ -87,7 +87,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     /** START - TODO: Need to apply a proper fix */
     let accountId;
     try {
-      accountId = AccountId.fromSolidityAddress(daoSolidityAddress).toString();
+      accountId = solidityAddressToAccountIdString(daoSolidityAddress);
     } catch (e) {
       console.error(e, daoSolidityAddress);
       return {
@@ -115,16 +115,16 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     return {
       type: DAOType.MultiSig,
       accountId,
-      adminId: AccountId.fromSolidityAddress(admin).toString(),
+      adminId: solidityAddressToAccountIdString(admin),
       name,
       logoUrl,
       title,
       description,
       isPrivate,
       webLinks,
-      safeId: AccountId.fromSolidityAddress(safeDAOSolidityAddress).toString(),
+      safeId: solidityAddressToAccountIdString(safeDAOSolidityAddress),
       safeEVMAddress,
-      ownerIds: owners.map((owner) => AccountId.fromSolidityAddress(owner).toString()),
+      ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
       threshold,
     };
   });
@@ -178,7 +178,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     let accountId;
     let tokenId;
     try {
-      accountId = AccountId.fromSolidityAddress(daoSolidityAddress).toString();
+      accountId = solidityAddressToAccountIdString(daoSolidityAddress);
     } catch (e) {
       console.error(e, daoAddress);
       return {
@@ -207,7 +207,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     }
     /** END - TODO: Need to apply a proper fix */
     try {
-      tokenId = AccountId.fromSolidityAddress(tokenAddress).toString();
+      tokenId = solidityAddressToTokenIdString(tokenAddress);
     } catch (error) {
       tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
     }
@@ -215,7 +215,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     return {
       type: DAOType.GovernanceToken,
       accountId,
-      adminId: AccountId.fromSolidityAddress(admin).toString(),
+      adminId: solidityAddressToAccountIdString(admin),
       name,
       logoUrl,
       isPrivate,
@@ -229,7 +229,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
         textLogic: textLogicSolidityAddress,
         tokenTransferLogic: transferLogicSolidityAddress,
       },
-      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderSolidityAddress).toString(),
+      tokenHolderAddress: solidityAddressToAccountIdString(tokenHolderSolidityAddress),
       tokenId: tokenId,
       quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
       votingDelay: votingDelay.toNumber(),
@@ -271,7 +271,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
     let accountId;
     let tokenId;
     try {
-      accountId = AccountId.fromSolidityAddress(daoSolidityAddress).toString();
+      accountId = solidityAddressToAccountIdString(daoSolidityAddress);
     } catch (e) {
       console.error(e, daoAddress);
       return {
@@ -299,7 +299,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       };
     }
     try {
-      tokenId = AccountId.fromSolidityAddress(tokenAddress).toString();
+      tokenId = solidityAddressToTokenIdString(tokenAddress).toString();
     } catch (error) {
       tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
     }
@@ -307,7 +307,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
     return {
       type: DAOType.NFT,
       accountId,
-      adminId: AccountId.fromSolidityAddress(admin).toString(),
+      adminId: solidityAddressToAccountIdString(admin),
       name,
       title,
       description,
@@ -319,7 +319,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
         textLogic: textLogicSolidityAddress,
         tokenTransferLogic: transferLogicSolidityAddress,
       },
-      tokenHolderAddress: AccountId.fromSolidityAddress(tokenHolderSolidityAddress).toString(),
+      tokenHolderAddress: solidityAddressToAccountIdString(tokenHolderSolidityAddress),
       logoUrl,
       isPrivate,
       tokenId: tokenId,
@@ -454,7 +454,7 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
         );
         return {
           type: ProposalType.TokenTransfer,
-          transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+          transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
           tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
           transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
         };
@@ -473,7 +473,7 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
         );
         return {
           type: ProposalType.TokenTransfer,
-          transferToAccount: solidityAddressToTokenIdString(parsedData.transferToAccount),
+          transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
           tokenToTransfer: HBARTokenId,
           transferTokenAmount: parseInt(parsedData.transferTokenAmount),
         };
@@ -536,7 +536,7 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
           const currentLogic = isNotNil(upgradedLogs[0])
             ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
             : "";
-          const proxyAdmin = AccountId.fromSolidityAddress(proposalData?.proxyAdmin).toString();
+          const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
           const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
           const upgradeLogicEVMAddress = await DexService.fetchContractEVMAddress(governors.contractUpgradeLogic);
           const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";

@@ -1,15 +1,7 @@
-import { ContractId, TokenId } from "@hashgraph/sdk";
+import { ContractId } from "@hashgraph/sdk";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import { DexService } from "..";
-
-export const solidityAddressToTokenIdString = (address: string): string => {
-  try {
-    return TokenId.fromSolidityAddress(address).toString();
-  } catch {
-    return address;
-  }
-};
 
 /**
  * Checks if all addresses in the list are valid ethereum addresses.

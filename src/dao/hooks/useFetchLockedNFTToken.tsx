@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 import { isNil, isNotNil } from "ramda";
 import { DAOQueries } from "./types";
 import { AccountId } from "@hashgraph/sdk";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 type UseFetchGODTokenQueryKey = [DAOQueries.FetchLockNFTToken, string | undefined, string | undefined];
 
@@ -12,7 +13,7 @@ export function useFetchLockedNFTToken(accountId: string | undefined, tokenHolde
     const amountEventArray = events.get("UpdatedAmount") ?? [];
     const accountAddress = AccountId.fromString(accountId ?? "").toSolidityAddress();
     const lockTokenDetails = amountEventArray.find(
-      (item) => AccountId.fromSolidityAddress(item.user).toSolidityAddress() === accountAddress
+      (item) => solidityAddressToAccountIdString(item.user) === solidityAddressToAccountIdString(accountAddress)
     );
     return isNotNil(lockTokenDetails?.idOrAmount) ? lockTokenDetails.idOrAmount : 0;
   }

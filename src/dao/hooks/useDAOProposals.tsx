@@ -8,10 +8,10 @@ import {
 } from "@dex/services";
 import { DAOEvents, getThreshold, MultiSigProposeTransactionType } from "@dao/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
-import { AccountId } from "@hashgraph/sdk";
 import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
+import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
@@ -53,7 +53,7 @@ export function useDAOProposals(
         transactionHash === log?.args?.approvedHash
       ) {
         const { args } = log;
-        const ownerId = AccountId.fromSolidityAddress(args.owner).toString();
+        const ownerId = solidityAddressToAccountIdString(args.owner);
         approverCache.add(ownerId);
       }
     });
@@ -161,13 +161,13 @@ export function useDAOProposals(
               ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
               : "";
             const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-            const proxyAdmin = AccountId.fromSolidityAddress(upgradeProposalData.proxyAdmin).toString();
+            const proxyAdmin = solidityAddressToAccountIdString(upgradeProposalData.proxyAdmin);
             const proxyLogic = (await DexService.fetchContractId(upgradeProposalData.proxyLogic)).toString();
             parsedData = { ...upgradeProposalData, proxyAdmin, proxyLogic, currentLogic };
             isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
           }
           const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
-          const tokenId = token ? AccountId.fromSolidityAddress(token).toString() : "";
+          const tokenId = token ? solidityAddressToTokenIdString(token) : "";
           if (!!tokenId && !tokenDataCache.has(tokenId)) {
             tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
           }
@@ -186,7 +186,7 @@ export function useDAOProposals(
             timestamp: "",
             tokenId: tokenId,
             token: tokenData,
-            receiver: receiver ? AccountId.fromSolidityAddress(receiver).toString() : "",
+            receiver: receiver ? solidityAddressToAccountIdString(receiver) : "",
             safeAccountId,
             to,
             operation,
@@ -194,7 +194,7 @@ export function useDAOProposals(
             data: isContractUpgradeProposal ? parsedData : { ...data },
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
             title: title,
-            author: creator ? AccountId.fromSolidityAddress(creator).toString() : "",
+            author: creator ? solidityAddressToAccountIdString(creator) : "",
             description: description,
             link: linkToDiscussion,
             threshold,
