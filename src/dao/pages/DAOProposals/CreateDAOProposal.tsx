@@ -33,9 +33,10 @@ import {
 } from "@dao/hooks";
 import { useHandleTransactionSuccess, useAccountTokenBalances } from "@dex/hooks";
 import { isNil } from "ramda";
-import { AccountId, TransactionResponse } from "@hashgraph/sdk";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { getLastPathInRoute } from "@dex/utils";
 import { getDAOType, getPreviousMemberAddress } from "../utils";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -69,7 +70,7 @@ export function CreateDAOProposal() {
   const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
   const tokenTransferGovernorAccountId = governors?.tokenTransferLogic
-    ? AccountId.fromSolidityAddress(governors.tokenTransferLogic).toString()
+    ? solidityAddressToAccountIdString(governors.tokenTransferLogic)
     : "";
   const transferFrom = currentDaoType === Routes.Multisig ? safeAccountId : tokenTransferGovernorAccountId;
   const wizardTitle = currentWizardStep === "type" ? "New Proposal" : type;

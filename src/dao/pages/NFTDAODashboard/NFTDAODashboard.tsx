@@ -5,8 +5,8 @@ import { useDAOs, useMintNFT, useFetchDAOMembers, useGetBlockedTokenBalance } fr
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { AccountId } from "@hashgraph/sdk";
 import { NFTDAODetailsContext } from "./types";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function NFTDAODashboard() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -16,7 +16,7 @@ export function NFTDAODashboard() {
   const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const { walletId, isWalletPaired } = usePairedWalletDetails();
   const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
-    ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
+    ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
     : "";
   const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
   const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(

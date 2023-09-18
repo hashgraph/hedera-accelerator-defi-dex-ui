@@ -6,7 +6,7 @@ import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { formatBigNumberToPercent } from "@dex/utils";
 import { UserPool } from "@dex/store/poolsSlice";
 import { BigNumber } from "bignumber.js";
-import { TokenType } from "@hashgraph/sdk";
+import { TokenType, ContractId, TokenId, AccountId } from "@hashgraph/sdk";
 
 /**
  * Returns half of the input amount.
@@ -395,4 +395,28 @@ export const isNFT = (tokenType: string = "") => {
 
 export const isFungible = (tokenType: string = "") => {
   return tokenType === TokenType.FungibleCommon.toString();
+};
+
+export const solidityAddressToTokenIdString = (address: string): string => {
+  try {
+    return TokenId.fromSolidityAddress(address).toString();
+  } catch {
+    return address;
+  }
+};
+
+export const solidityAddressToAccountIdString = (address: string): string => {
+  try {
+    return AccountId.fromEvmAddress(0, 0, address).toString();
+  } catch {
+    return address;
+  }
+};
+
+export const solidityAddressToContractIdString = (address: string): string => {
+  try {
+    return ContractId.fromEvmAddress(0, 0, address).toString();
+  } catch {
+    return address;
+  }
 };

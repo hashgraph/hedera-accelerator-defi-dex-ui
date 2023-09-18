@@ -1,9 +1,9 @@
 import { DexService } from "@dex/services";
-import { AccountId } from "@hashgraph/sdk";
 import { useQuery } from "react-query";
 import { isNil } from "ramda";
 import { DAOQueries, UpdateAmountEventData } from "./types";
 import { DAOEvents, Member } from "@dao/services";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 type UseFetchDAOMembersQueryKey = [DAOQueries.FetchDAOMembers, string | undefined];
 
@@ -30,7 +30,7 @@ export function useFetchDAOMembers(tokenHolderAddress: string) {
       const activeMemberWithLockedBalance = daoMembers
         .filter((member) => member.idOrAmount > 0)
         .map((member) => {
-          return { name: "-", logo: "", accountId: AccountId.fromSolidityAddress(member.user).toString() };
+          return { name: "-", logo: "", accountId: solidityAddressToAccountIdString(member.user) };
         });
       return activeMemberWithLockedBalance;
     },

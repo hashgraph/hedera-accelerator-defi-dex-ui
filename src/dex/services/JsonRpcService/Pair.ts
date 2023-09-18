@@ -1,13 +1,9 @@
 import { BigNumber } from "bignumber.js";
 import { ethers } from "ethers";
 import Pair from "../abi/Pair.json";
-import {
-  createContract,
-  checkIfTokenAddressesAreValid,
-  convertEthersBigNumberToBigNumberJS,
-  solidityAddressToTokenIdString,
-} from "./utils";
+import { createContract, checkIfTokenAddressesAreValid, convertEthersBigNumberToBigNumberJS } from "./utils";
 import { DexService } from "@dex/services";
+import { solidityAddressToTokenIdString } from "@shared/utils";
 
 /**
  * Creates an ethers.Contract representation of the Pair contract.

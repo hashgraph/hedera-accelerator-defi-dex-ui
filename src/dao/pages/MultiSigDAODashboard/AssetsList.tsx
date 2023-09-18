@@ -4,12 +4,13 @@ import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@dex/services";
 import { DAODetailsContext, DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
-import { AccountId, TokenType, TransactionResponse } from "@hashgraph/sdk";
+import { TokenType, TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
 import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal";
 import { useState } from "react";
 import { useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
 import { useDepositTokens } from "@dao/hooks";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function AssetsList() {
   const { tokenBalances: assets, dao, blockedBalance = 0 } = useOutletContext<DAODetailsContext>();
@@ -32,7 +33,7 @@ export function AssetsList() {
     dao.type === DAOType.MultiSig
       ? dao.safeId
       : dao.governors?.tokenTransferLogic
-      ? AccountId.fromSolidityAddress(dao.governors.tokenTransferLogic).toString()
+      ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
       : "";
 
   async function handleDepositClicked(data: DepositTokensFormData) {

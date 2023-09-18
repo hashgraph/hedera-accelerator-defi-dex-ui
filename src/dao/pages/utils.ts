@@ -11,10 +11,11 @@ import {
   ProposalType,
 } from "@dao/hooks";
 import { ProposalState } from "@dex/store";
-import { HBARTokenSymbol, SENTINEL_OWNER, solidityAddressToTokenIdString } from "@dex/services";
+import { HBARTokenSymbol, SENTINEL_OWNER } from "@dex/services";
 import { DAOType } from "@dao/services";
 import { isHbarToken } from "@dex/utils";
 import { Routes } from "../routes";
+import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 
 export function getDAOLinksRecordArray(links: string[]): Record<"value", string>[] {
   const arrayOfRecords = links.map((linkString) => {
@@ -117,18 +118,18 @@ export function getProposalData(proposal: Proposal): string {
   switch (proposal.type) {
     case ProposalType.AddNewMember: {
       const { owner, _threshold } = proposal.data as ProposalDataAddMember;
-      const ownerAddress = solidityAddressToTokenIdString(owner);
+      const ownerAddress = solidityAddressToAccountIdString(owner);
       return `Proposed to add new member ${ownerAddress} and change threshold to ${_threshold}`;
     }
     case ProposalType.RemoveMember: {
       const { owner, _threshold } = proposal.data as ProposalDataDeleteMember;
-      const ownerAddress = solidityAddressToTokenIdString(owner);
+      const ownerAddress = solidityAddressToAccountIdString(owner);
       return `Proposed to remove member ${ownerAddress} and change threshold to ${_threshold}`;
     }
     case ProposalType.ReplaceMember: {
       const { oldOwner, newOwner } = proposal.data as ProposalDataReplaceMember;
-      const oldOwnerAddress = solidityAddressToTokenIdString(oldOwner);
-      const newOwnerAddress = solidityAddressToTokenIdString(newOwner);
+      const oldOwnerAddress = solidityAddressToAccountIdString(oldOwner);
+      const newOwnerAddress = solidityAddressToAccountIdString(newOwner);
       return `Proposed to replace member ${oldOwnerAddress} with ${newOwnerAddress}`;
     }
     case ProposalType.ChangeThreshold: {

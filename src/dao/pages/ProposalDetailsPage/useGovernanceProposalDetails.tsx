@@ -9,8 +9,9 @@ import {
 import { useDAOs, ProposalStatus, useGovernanceDAOProposals, useFetchLockedNFTToken, useChangeAdmin } from "@dao/hooks";
 import { DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
-import { TransactionResponse, ContractId } from "@hashgraph/sdk";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { getProposalData } from "../utils";
+import { solidityAddressToContractIdString } from "@shared/utils";
 
 export function useGovernanceProposalDetails(daoAccountId: string, proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -41,9 +42,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
   const isAuthor = walletId === proposal?.author;
   const governorUpgrade = dao?.governors?.contractUpgradeLogic;
-  const governorUpgradeContractId = isNotNil(governorUpgrade)
-    ? ContractId.fromSolidityAddress(governorUpgrade).toString()
-    : "";
+  const governorUpgradeContractId = isNotNil(governorUpgrade) ? solidityAddressToContractIdString(governorUpgrade) : "";
 
   function handleVoteForProposalSuccess(transactionResponse: TransactionResponse) {
     castVote.reset();

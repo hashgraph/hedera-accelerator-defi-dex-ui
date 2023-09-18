@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
 import { Contracts, DEX_PRECISION, DEX_TOKEN_PRECISION_VALUE } from "../constants";
 import Factory from "../abi/Factory.json";
-import { convertEthersBigNumberToBigNumberJS, createContract, solidityAddressToTokenIdString } from "./utils";
+import { convertEthersBigNumberToBigNumberJS, createContract } from "./utils";
 import { TokenId } from "@hashgraph/sdk";
 import BigNumber from "bignumber.js";
 import { DexService } from "@dex/services";
+import { solidityAddressToTokenIdString } from "@shared/utils";
 
 type RawPairDataResponse = [
   pair: string,

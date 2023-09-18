@@ -2,12 +2,12 @@ import { useQuery } from "react-query";
 import { DexService, DEX_TOKEN_PRECISION_VALUE, MirrorNodeTokenById } from "@dex/services";
 import { DAOProposalGovernors } from "@dao/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
-import { AccountId } from "@hashgraph/sdk";
 import { isEmpty, isNil } from "ramda";
 import BigNumber from "bignumber.js";
 import { ProposalData } from "@dex/services/DexService/governance/type";
 import { ContractProposalState, ProposalState } from "@dex/store";
 import { getTimeRemaining, getVotingEndTime } from "@dex/utils";
+import { solidityAddressToAccountIdString } from "@shared/utils";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string];
 
@@ -136,11 +136,11 @@ export function useGovernanceDAOProposals(
       hexStringData: proposalData.data ?? "",
       msgValue: 0,
       title: proposalData.title,
-      author: proposalData.proposer ? AccountId.fromSolidityAddress(proposalData.proposer).toString() : "",
+      author: proposalData.proposer ? solidityAddressToAccountIdString(proposalData?.proposer) : "",
       description: proposalData.description,
       link: proposalData.link,
       threshold: 0,
-      contractId: proposalData.contractId ? AccountId.fromSolidityAddress(proposalData?.contractId).toString() : "",
+      contractId: proposalData.contractId ? solidityAddressToAccountIdString(proposalData?.contractId) : "",
       votes: getVotes(proposalData, godTokenData),
       hasVoted: proposalData.votingInformation?.voted,
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
