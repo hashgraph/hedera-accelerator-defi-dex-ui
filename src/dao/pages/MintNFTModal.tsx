@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Flex, SimpleGrid, Text, Button } from "@chakra-ui/react";
-import { AlertDialog, Color, FormInputList } from "@shared/ui-kit";
+import { Flex, SimpleGrid, Button } from "@chakra-ui/react";
+import { Text, AlertDialog, Color, FormInputList } from "@shared/ui-kit";
 import { useFieldArray, useForm } from "react-hook-form";
 import { MintNFTTokensFormData } from "./types";
 import { MirrorNodeTokenById } from "@dex/services";
@@ -51,25 +51,23 @@ export const MintNFTModal = (props: MintNFTModalProps) => {
         dialogWidth="623px"
         openModalComponent={
           <Button key="open-mint-nft" variant="primary">
-            <Text textStyle="p small semibold" color={Color.White_02}>
-              Mint NFT
-            </Text>
+            <Text.P_Small_Semibold color={Color.White_02}>Mint NFT</Text.P_Small_Semibold>
           </Button>
         }
         openDialogButtonText="Mint NFT"
         body={
           <Flex flexDirection="column" height="fit-content" gap="1rem">
             <Flex direction="row" alignItems="start" justifyContent="start" flex="2" gap="1">
-              <Text textStyle="h4">Token:</Text>
-              <Text textStyle="b3">{token.data.symbol}</Text>
+              <Text.H4_Medium>Token:</Text.H4_Medium>
+              <Text.P_XSmall_Regular>{token.data.symbol}</Text.P_XSmall_Regular>
             </Flex>
             <Flex direction="row" alignItems="start" justifyContent="start" flex="2" gap="1">
-              <Text textStyle="h4">Max Supply:</Text>
-              <Text textStyle="b3">{maxSupply}</Text>
+              <Text.H4_Medium>Max Supply:</Text.H4_Medium>
+              <Text.P_XSmall_Regular>{maxSupply}</Text.P_XSmall_Regular>
             </Flex>
             <Flex direction="row" alignItems="start" justifyContent="start" flex="2" gap="1">
-              <Text textStyle="h4">Tokens Minted</Text>
-              <Text textStyle="b3">{totalSupply}</Text>
+              <Text.H4_Medium>Tokens Minted</Text.H4_Medium>
+              <Text.P_XSmall_Regular>{totalSupply}</Text.P_XSmall_Regular>
             </Flex>
             <SimpleGrid row={1} spacingX="1rem" spacingY="0.75rem">
               <FormInputList<MintNFTTokensFormData, "tokenLinks">
@@ -85,9 +83,7 @@ export const MintNFTModal = (props: MintNFTModalProps) => {
               />
             </SimpleGrid>
             <Button key="open-mint-nft" variant="primary" onClick={handleMintNFTClick}>
-              <Text textStyle="p small semibold" color={Color.White_02}>
-                Mint NFT Tokens
-              </Text>
+              <Text.P_Small_Semibold color={Color.White_02}>Mint NFT Tokens</Text.P_Small_Semibold>
             </Button>
           </Flex>
         }

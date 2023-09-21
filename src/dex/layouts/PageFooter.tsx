@@ -1,10 +1,10 @@
-import { Link, Text, Flex } from "@chakra-ui/react";
-import { Color, GithubIcon } from "@shared/ui-kit";
+import { Link, Flex } from "@chakra-ui/react";
+import { Text, Color, GithubIcon } from "@shared/ui-kit";
 
 export function PageFooter() {
   return (
     <Flex layerStyle="footer">
-      <Text textStyle="p xsmall regular">Hedera © 2023</Text>
+      <Text.P_XSmall_Regular>Hedera © 2023</Text.P_XSmall_Regular>
       <Flex direction="row" alignItems="center" gap="8">
         <Link
           textStyle="p small regular link"

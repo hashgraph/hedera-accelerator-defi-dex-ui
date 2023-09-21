@@ -1,8 +1,8 @@
-import { CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@shared/ui-kit";
+import { Text, CancelledStepIcon, CheckCircleIcon, Color, FormInput } from "@shared/ui-kit";
 import { CreateANFTDAOForm } from "../types";
 import { useFormContext } from "react-hook-form";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { CircularProgress, Divider, Flex, Text } from "@chakra-ui/react";
+import { CircularProgress, Divider, Flex } from "@chakra-ui/react";
 import { checkForValidAccountId, checkForValidTokenId } from "@dex/utils";
 import { useFetchTokenData } from "@dex/hooks";
 import { ChangeEvent } from "react";
@@ -87,14 +87,14 @@ export function ExistingTokenNFTDAOForm() {
         {governance?.existingNFT?.name && governance?.existingNFT?.symbol ? (
           <Flex direction="row" flex="1" paddingTop="0.6rem" paddingBottom="0.6rem">
             <Flex direction="column" flex="3">
-              <Text textStyle="p small medium">Name</Text>
-              <Text textStyle="p medium regular">{governance.existingNFT.name}</Text>
+              <Text.P_Small_Medium>Name</Text.P_Small_Medium>
+              <Text.P_Medium_Regular>{governance.existingNFT.name}</Text.P_Medium_Regular>
             </Flex>
             <Flex direction="row" flex="1" alignItems="flex-start" gap="4rem">
               <Divider orientation="vertical" />
               <Flex direction="column">
-                <Text textStyle="p small medium">Symbol</Text>
-                <Text textStyle="p medium regular">{governance.existingNFT.symbol}</Text>
+                <Text.P_Small_Medium>Symbol</Text.P_Small_Medium>
+                <Text.P_Medium_Regular>{governance.existingNFT.symbol}</Text.P_Medium_Regular>
               </Flex>
             </Flex>
           </Flex>

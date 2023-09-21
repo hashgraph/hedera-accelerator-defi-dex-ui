@@ -1,7 +1,7 @@
-import { Text, Flex, Image, Divider } from "@chakra-ui/react";
+import { Flex, Image, Divider } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatTokenAmountWithDecimal, getShortDescription, replaceLastRoute } from "@dex/utils";
-import { Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@shared/ui-kit";
+import { Text, Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@shared/ui-kit";
 import { DAO, DAOType } from "@dao/services";
 import { ProposalStateAsTagVariant, ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
@@ -41,11 +41,13 @@ export const ProposalCard = (props: ProposalCardProps) => {
       {!isMultiSig && (
         <>
           {timeRemaining ? (
-            <Text textStyle="p small regular" color={Color.Neutral._400}>{`${timeRemaining} left`}</Text>
+            <Text.P_Small_Regular color={Color.Neutral._400}>{`${timeRemaining} left`}</Text.P_Small_Regular>
           ) : (
             <>
               {votingEndTime && (
-                <Text textStyle="p small regular" color={Color.Neutral._400}>{`voting ended on ${votingEndTime}`}</Text>
+                <Text.P_Small_Regular
+                  color={Color.Neutral._400}
+                >{`voting ended on ${votingEndTime}`}</Text.P_Small_Regular>
               )}
             </>
           )}
@@ -85,9 +87,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                   alt="Logo Url"
                   fallback={<DefaultLogoIcon boxSize="2rem" color={Color.Grey_Blue._100} />}
                 />
-                <Text textStyle="p medium semibold" color={Color.Neutral._900}>
-                  {dao.name}
-                </Text>
+                <Text.P_Medium_Semibold color={Color.Neutral._900}>{dao.name}</Text.P_Medium_Semibold>
               </Flex>
               <RightContent />
             </Flex>
@@ -96,21 +96,16 @@ export const ProposalCard = (props: ProposalCardProps) => {
         )}
         <Flex justifyContent="space-between">
           <Flex direction="column" alignItems="flex-start" gap={2}>
-            <Text
-              textStyle="p medium semibold"
-              color={Color.Grey_Blue._800}
-              textOverflow="ellipsis"
-              whiteSpace="nowrap"
-            >
+            <Text.P_Medium_Semibold color={Color.Grey_Blue._800} textOverflow="ellipsis" whiteSpace="nowrap">
               {proposal.title}
-            </Text>
-            <Text textStyle="p small regular" color={Color.Neutral._700} textAlign="start">
+            </Text.P_Medium_Semibold>
+            <Text.P_Small_Regular color={Color.Neutral._700} textAlign="start">
               {getShortDescription(proposal.description)}
-            </Text>
+            </Text.P_Small_Regular>
             {proposal.link && proposal.type !== ProposalType.TokenTransfer && (
-              <Text textStyle="p small regular" color={Color.Grey_Blue._400} textAlign="start">
+              <Text.P_Small_Regular color={Color.Grey_Blue._400} textAlign="start">
                 {proposal.link}
-              </Text>
+              </Text.P_Small_Regular>
             )}
             {isMultiSig && (
               <>
@@ -118,14 +113,14 @@ export const ProposalCard = (props: ProposalCardProps) => {
                   <Flex alignItems="center">
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
-                    <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
+                    <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
                       {formatTokenAmountWithDecimal(amount, Number(token?.data?.decimals ?? 0))} {tokenSymbol}
-                    </Text>
+                    </Text.P_Medium_Regular>
                   </Flex>
                 )}
-                <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
+                <Text.P_Small_Regular color={Color.Neutral._900} textAlign="start">
                   {getProposalData(proposal)}
-                </Text>
+                </Text.P_Small_Regular>
               </>
             )}
             {isGovernanceOrNFT && (
@@ -134,7 +129,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
                   <Flex alignItems="center">
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
-                    <Text textStyle="p medium regular" color={Color.Neutral._900} textAlign="start">
+                    <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
                       {isFungible(token?.data.type) &&
                         `${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} ${
                           token?.data.symbol
@@ -144,12 +139,12 @@ export const ProposalCard = (props: ProposalCardProps) => {
                           amount,
                           Number(token?.data.decimals ?? 0)
                         )}`}
-                    </Text>
+                    </Text.P_Medium_Regular>
                   </Flex>
                 )}
-                <Text textStyle="p small regular" color={Color.Neutral._900} textAlign="start">
+                <Text.P_Small_Regular color={Color.Neutral._900} textAlign="start">
                   {getProposalData(proposal)}
-                </Text>
+                </Text.P_Small_Regular>
               </>
             )}
           </Flex>
@@ -157,12 +152,11 @@ export const ProposalCard = (props: ProposalCardProps) => {
             {!showTitle && <RightContent />}
             <Flex gap={4}>
               {proposal.author && (
-                <Text
-                  textStyle="p small regular"
+                <Text.P_Small_Regular
                   color={Color.Neutral._400}
                   textOverflow="ellipsis"
                   whiteSpace="nowrap"
-                >{`Author ${proposal.author.toString()}`}</Text>
+                >{`Author ${proposal.author.toString()}`}</Text.P_Small_Regular>
               )}
               <DAOProposalVoting proposal={proposal} dao={dao} />
             </Flex>

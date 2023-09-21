@@ -5,7 +5,6 @@ import {
   ModalContent,
   ModalHeader,
   Flex,
-  Text,
   Divider,
   ModalBody,
   InputGroup,
@@ -15,6 +14,7 @@ import {
   ListItem,
   Image,
 } from "@chakra-ui/react";
+import { Text } from "@shared/ui-kit";
 import { Color } from "../../themes";
 import { HederaIcon, DefaultLogoIcon } from "../Icons";
 import { useInput, TokenBalance, useAccountTokenBalances } from "@dex/hooks";
@@ -85,10 +85,8 @@ export function FormTokenInputSelectTokenModal() {
             }
           />
           <Flex direction="column">
-            <Text textStyle="p medium semibold">{name}</Text>
-            <Text textStyle="p xsmall regular" color={Color.Neutral._500}>
-              {symbol}
-            </Text>
+            <Text.P_Medium_Semibold>{name}</Text.P_Medium_Semibold>
+            <Text.P_XSmall_Regular color={Color.Neutral._500}>{symbol}</Text.P_XSmall_Regular>
           </Flex>
         </Flex>
       </ListItem>
@@ -101,7 +99,7 @@ export function FormTokenInputSelectTokenModal() {
       <ModalContent>
         <ModalHeader>
           <Flex direction="row" alignItems="center" justifyContent="space-between">
-            <Text textStyle="p large semibold">Select Token</Text>
+            <Text.P_Large_Semibold>Select Token</Text.P_Large_Semibold>
             <CloseIcon w="3" h="3" onClick={onClose} cursor="pointer" />
           </Flex>
         </ModalHeader>
@@ -122,7 +120,7 @@ export function FormTokenInputSelectTokenModal() {
           </InputGroup>
           {isEmpty(fungibleTokens) ? (
             <Flex alignItems="center" justifyContent="center" width="100%" height="100%" maxHeight="296px">
-              <Text textStyle="p medium semibold">No results found.</Text>
+              <Text.P_Medium_Semibold>No results found.</Text.P_Medium_Semibold>
             </Flex>
           ) : (
             <List variant="select-token-list">

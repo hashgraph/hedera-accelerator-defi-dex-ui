@@ -1,10 +1,10 @@
 import { useFormContext } from "react-hook-form";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { Color, FormInput } from "@shared/ui-kit";
+import { Text, Color, FormInput } from "@shared/ui-kit";
 import { useFetchTokenData } from "@dex/hooks";
 import { debounce } from "ts-debounce";
-import { Flex, Text, Divider, CircularProgress } from "@chakra-ui/react";
+import { Flex, Divider, CircularProgress } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DEBOUNCE_TIME, MirrorNodeTokenById } from "@dex/services";
 import { checkForValidTokenId } from "@dex/utils";
@@ -92,14 +92,14 @@ export function ExistingTokenDAOGovernanceForm() {
         {governance.existingToken.name && governance.existingToken.symbol ? (
           <Flex direction="row" flex="1" paddingTop="0.6rem" paddingBottom="0.6rem">
             <Flex direction="column" flex="3">
-              <Text textStyle="p small medium">Name</Text>
-              <Text textStyle="p medium regular">{governance.existingToken.name}</Text>
+              <Text.P_Small_Medium>Name</Text.P_Small_Medium>
+              <Text.P_Medium_Regular>{governance.existingToken.name}</Text.P_Medium_Regular>
             </Flex>
             <Flex direction="row" flex="1" alignItems="flex-start" gap="4rem">
               <Divider orientation="vertical" />
               <Flex direction="column">
-                <Text textStyle="p small medium">Symbol</Text>
-                <Text textStyle="p medium regular">{governance.existingToken.symbol}</Text>
+                <Text.P_Small_Medium>Symbol</Text.P_Small_Medium>
+                <Text.P_Medium_Regular>{governance.existingToken.symbol}</Text.P_Medium_Regular>
               </Flex>
             </Flex>
           </Flex>

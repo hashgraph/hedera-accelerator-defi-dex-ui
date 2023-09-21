@@ -1,8 +1,9 @@
 import { useOutletContext } from "react-router-dom";
 import { DAOType } from "@dao/services";
-import { Flex, useRadioGroup, Text, Box } from "@chakra-ui/react";
+import { Flex, useRadioGroup, Box } from "@chakra-ui/react";
 import { CreateDAOProposalContext, CreateDAOProposalForm, DAOProposalType } from "../types";
 import {
+  Text,
   Color,
   NewTokenIcon,
   MemberIcon,
@@ -128,7 +129,7 @@ export function DAOProposalTypeForm() {
 
   return (
     <Flex direction="column" gap="4">
-      <Text textStyle="p large regular">What type of proposal would you like to create?</Text>
+      <Text.P_Large_Regular>What type of proposal would you like to create?</Text.P_Large_Regular>
       <Flex flexDirection="column" gap="4" {...group}>
         {dataArray.map((option, index) => {
           const radio = getRadioProps({ value: option.title });
@@ -138,12 +139,8 @@ export function DAOProposalTypeForm() {
                 <Flex gap="3">
                   {option.icon}
                   <Flex flexDirection="column" gap="1">
-                    <Text textStyle="p small medium" color="inherit">
-                      {option.title}
-                    </Text>
-                    <Text textStyle="p xsmall regular" color="inherit">
-                      {option.label}
-                    </Text>
+                    <Text.P_Small_Medium color="inherit">{option.title}</Text.P_Small_Medium>
+                    <Text.P_XSmall_Regular color="inherit">{option.label}</Text.P_XSmall_Regular>
                   </Flex>
                 </Flex>
               </RadioCard>
