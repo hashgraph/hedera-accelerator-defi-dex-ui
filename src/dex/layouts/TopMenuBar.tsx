@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { Menu, MenuItem, Box, Text, Flex } from "@chakra-ui/react";
+import { Menu, MenuItem, Box, Flex } from "@chakra-ui/react";
 import { useDexContext } from "@dex/hooks";
-import { Color, HederaIcon, WalletConnection, Tag } from "@shared/ui-kit";
+import { Text, Color, HederaIcon, WalletConnection, Tag } from "@shared/ui-kit";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -24,7 +24,7 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
                 <Box width="fit-content" key={index}>
                   <NavLink key={menuOption} to={`${menuOption.toLowerCase()}`}>
                     <MenuItem justifyContent="center" borderRadius="4px" _hover={{ bg: Color.Neutral._100 }}>
-                      <Text textStyle="p medium medium">{menuOption}</Text>
+                      <Text.P_Medium_Medium>{menuOption}</Text.P_Medium_Medium>
                     </MenuItem>
                   </NavLink>
                 </Box>

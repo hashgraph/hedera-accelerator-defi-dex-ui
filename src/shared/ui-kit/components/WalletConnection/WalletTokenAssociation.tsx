@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text, Flex, Divider, CircularProgress, Button } from "@chakra-ui/react";
+import { Flex, Divider, CircularProgress, Button } from "@chakra-ui/react";
 import { Color } from "../../themes";
 import { CancelledStepIcon, CheckCircleIcon, FormInput, AlertDialog } from "../";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import { checkForValidTokenId } from "@dex/utils";
 import { MirrorNodeTokenById, DEBOUNCE_TIME } from "@dex/services";
 import { debounce } from "ts-debounce";
 import { isNil, isNotNil } from "ramda";
+import { Text } from "../Text";
 
 export interface TokenAssociationFormData {
   tokenId: string;
@@ -160,14 +161,14 @@ export const WalletTokenAssociation = () => {
               {tokenName && symbol ? (
                 <Flex direction="row" flex="1" paddingTop="0.6rem" paddingBottom="0.6rem">
                   <Flex direction="column" flex="3">
-                    <Text textStyle="p small medium">Name</Text>
-                    <Text textStyle="p medium regular">{tokenName}</Text>
+                    <Text.P_Small_Medium>Name</Text.P_Small_Medium>
+                    <Text.P_Medium_Regular>{tokenName}</Text.P_Medium_Regular>
                   </Flex>
                   <Flex direction="row" flex="1" alignItems="flex-start" gap="4rem">
                     <Divider orientation="vertical" />
                     <Flex direction="column">
-                      <Text textStyle="p small medium">Symbol</Text>
-                      <Text textStyle="p medium regular">{symbol}</Text>
+                      <Text.P_Small_Medium>Symbol</Text.P_Small_Medium>
+                      <Text.P_Medium_Regular>{symbol}</Text.P_Medium_Regular>
                     </Flex>
                   </Flex>
                 </Flex>

@@ -1,6 +1,15 @@
-import { Text, Flex, HStack, Button, Image, VStack } from "@chakra-ui/react";
+import { Flex, HStack, Button, Image, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { Breadcrumb, Color, HashScanLink, HashscanData, Tag, DefaultLogoIcon, CheckRightIcon } from "@shared/ui-kit";
+import {
+  Text,
+  Breadcrumb,
+  Color,
+  HashScanLink,
+  HashscanData,
+  Tag,
+  DefaultLogoIcon,
+  CheckRightIcon,
+} from "@shared/ui-kit";
 import { DAOType } from "@dao/services";
 import { MintNFTModal } from "./MintNFTModal";
 import { useToken } from "@dex/hooks";
@@ -38,29 +47,23 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             />
             <VStack alignItems="flex-start" gap="0.2rem">
               <HStack gap="0.7rem">
-                <Text textStyle="h3 medium">{name}</Text>
+                <Text.H3_Medium>{name}</Text.H3_Medium>
                 <Tag label={type} />
               </HStack>
               <HStack>
                 <HStack>
-                  <Text textStyle="h4" opacity="0.8">
-                    DAO ID:
-                  </Text>
+                  <Text.H4_Medium opacity="0.8">DAO ID:</Text.H4_Medium>
                   <HashScanLink id={daoAccountId} type={HashscanData.Account} />
                 </HStack>
                 {govTokenId ? (
                   <HStack>
-                    <Text textStyle="h4" opacity="0.8">
-                      {`${token?.data.symbol} TOKEN ID:`}
-                    </Text>
+                    <Text.H4_Medium opacity="0.8">{`${token?.data.symbol} TOKEN ID:`}</Text.H4_Medium>
                     <HashScanLink id={govTokenId} type={HashscanData.Token} />
                   </HStack>
                 ) : undefined}
                 {safeId ? (
                   <HStack>
-                    <Text textStyle="h4" opacity="0.8">
-                      SAFE ID:
-                    </Text>
+                    <Text.H4_Medium opacity="0.8">SAFE ID:</Text.H4_Medium>
                     <HashScanLink id={safeId} type={HashscanData.Account} />
                   </HStack>
                 ) : undefined}
@@ -88,9 +91,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             </Button>
             {isMember || isAdmin ? (
               <Flex direction="row" justifyContent="right" gap="0.2rem" alignItems="center">
-                <Text textStyle="p small regular" color={Color.Neutral._500}>
-                  {isAdmin ? "Admin" : "Member"}
-                </Text>
+                <Text.P_Small_Regular color={Color.Neutral._500}>{isAdmin ? "Admin" : "Member"}</Text.P_Small_Regular>
                 <CheckRightIcon boxSize="4" color={Color.Neutral._500} />
               </Flex>
             ) : undefined}

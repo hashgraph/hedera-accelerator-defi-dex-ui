@@ -1,5 +1,5 @@
-import { Flex, SimpleGrid, Text } from "@chakra-ui/react";
-import { Color, HashScanLink, HashscanData, Tag } from "@shared/ui-kit";
+import { Flex, SimpleGrid } from "@chakra-ui/react";
+import { Text, Color, HashScanLink, HashscanData, Tag } from "@shared/ui-kit";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./MultiSigDAODashboard/types";
 import { useOutletContext } from "react-router-dom";
@@ -16,7 +16,7 @@ export function MembersList() {
   return (
     <>
       <Flex layerStyle="dao-dashboard__content-header">
-        <Text textStyle="p medium medium">{members.length} Members</Text>
+        <Text.P_Medium_Medium>{members.length} Members</Text.P_Medium_Medium>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={3} spacing="1rem">

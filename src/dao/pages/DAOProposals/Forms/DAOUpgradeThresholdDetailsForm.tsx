@@ -1,5 +1,5 @@
-import { Flex, Text } from "@chakra-ui/react";
-import { Color, FormInput, FormTextArea } from "@shared/ui-kit";
+import { Flex } from "@chakra-ui/react";
+import { Text, Color, FormInput, FormTextArea } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { CreateDAOUpgradeThresholdForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { checkForValidPositiveNumber } from "@dex/utils";
@@ -50,10 +50,10 @@ export function DAOUpgradeThresholdDetailsForm() {
         errorMessage={errors?.description && errors?.description?.message}
       />
       <Flex direction="row" gap="1" alignItems="center">
-        <Text textStyle="p medium regular" color={Color.Neutral._500}>
+        <Text.P_Medium_Regular color={Color.Neutral._500}>
           Current proposal threshold confirmation requirement is
-        </Text>
-        <Text textStyle="p medium semibold">{`${threshold} / ${membersCount} members`}</Text>
+        </Text.P_Medium_Regular>
+        <Text.P_Medium_Semibold>{`${threshold} / ${membersCount} members`}</Text.P_Medium_Semibold>
       </Flex>
       <Flex direction="row" gap="2" alignItems="center">
         <FormInput<"newThreshold">
@@ -78,9 +78,9 @@ export function DAOUpgradeThresholdDetailsForm() {
           isInvalid={Boolean(errors?.newThreshold)}
           errorMessage={errors?.newThreshold && errors?.newThreshold?.message}
         />
-        <Text flex="1" textStyle="p medium semibold" paddingTop="0.8rem">
+        <Text.P_Medium_Semibold flex="1" paddingTop="0.8rem">
           {`/ ${membersCount} members`}
-        </Text>
+        </Text.P_Medium_Semibold>
       </Flex>
     </Flex>
   );

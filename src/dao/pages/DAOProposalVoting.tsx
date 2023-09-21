@@ -1,5 +1,5 @@
-import { Text, Flex } from "@chakra-ui/react";
-import { Color, ProgressBar, PeopleIcon } from "@shared/ui-kit";
+import { Flex } from "@chakra-ui/react";
+import { Text, Color, ProgressBar, PeopleIcon } from "@shared/ui-kit";
 import { Proposal } from "@dao/hooks";
 import { DAO, DAOType } from "@dao/services";
 
@@ -35,32 +35,31 @@ export function DAOProposalVoting(props: DAOProposalVotingProps) {
             progressBarColor={Color.Grey_Blue._300}
           />
           <PeopleIcon boxSize={5} />
-          <Text textStyle="p medium regular">
+          <Text.P_Medium_Regular>
             {proposal.approvalCount} / {dao.threshold}
-          </Text>
+          </Text.P_Medium_Regular>
         </Flex>
       ) : (
         <Flex direction="column" gap={2} padding={3} backgroundColor={Color.Grey_Blue._50} width="256px">
           <Flex justifyContent="space-between" alignItems="flex-start">
             <Flex gap={2} alignItems="flex-start">
               <Flex direction="column" alignItems="flex-start">
-                <Text textStyle="p xsmall regular" color={Color.Grey_Blue._600} textAlign="start">
+                <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
                   Voting end time
-                </Text>
-                <Text textStyle="p xsmall semibold" color={Color.Grey_Blue._600} textAlign="start">
+                </Text.P_XSmall_Regular>
+                <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
                   {proposal.votingEndTime}
-                </Text>
+                </Text.P_XSmall_Semibold>
               </Flex>
               <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">
-                <Text
-                  textStyle="p small medium"
+                <Text.P_Small_Medium
                   color={Color.Success._600}
                   overflow="hidden"
                   textOverflow="ellipsis"
                   whiteSpace="nowrap"
                 >
                   Turnout: {`${turnout}%`}
-                </Text>
+                </Text.P_Small_Medium>
               </Flex>
             </Flex>
           </Flex>
