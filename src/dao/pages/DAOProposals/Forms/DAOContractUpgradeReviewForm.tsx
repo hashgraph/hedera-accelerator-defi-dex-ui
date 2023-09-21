@@ -1,5 +1,5 @@
-import { Divider, Flex, Text } from "@chakra-ui/react";
-import { Color, CopyTextButton } from "@shared/ui-kit";
+import { Divider, Flex } from "@chakra-ui/react";
+import { Text, Color, CopyTextButton } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { CreateDAOContractUpgradeForm, CreateDAOProposalContext } from "../types";
 import { useDexContext } from "@dex/hooks";
@@ -21,57 +21,43 @@ export function DAOContractUpgradeReviewForm() {
   return (
     <Flex gap="1.3rem" direction="column">
       <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">Title</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {title}
-        </Text>
+        <Text.P_Small_Medium>Title</Text.P_Small_Medium>
+        <Text.P_Small_Regular color={Color.Neutral._700}>{title}</Text.P_Small_Regular>
       </Flex>
       <Divider />
       <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">Description</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {description}
-        </Text>
+        <Text.P_Small_Medium>Description</Text.P_Small_Medium>
+        <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
       </Flex>
       <Divider />
       <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">Link to Discussion</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {linkToDiscussion}
-        </Text>
+        <Text.P_Small_Medium>Link to Discussion</Text.P_Small_Medium>
+        <Text.P_Small_Regular color={Color.Neutral._700}>{linkToDiscussion}</Text.P_Small_Regular>
       </Flex>
       <Divider />
       <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">New Implementation Address</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {newImplementationAddress}
-        </Text>
+        <Text.P_Small_Medium>New Implementation Address</Text.P_Small_Medium>
+        <Text.P_Small_Regular color={Color.Neutral._700}>{newImplementationAddress}</Text.P_Small_Regular>
       </Flex>
       <Divider />
       <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">Proxy Address</Text>
-        <Text textStyle="p small regular" color={Color.Neutral._700}>
-          {oldProxyAddress}
-        </Text>
+        <Text.P_Small_Medium>Proxy Address</Text.P_Small_Medium>
+        <Text.P_Small_Regular color={Color.Neutral._700}>{oldProxyAddress}</Text.P_Small_Regular>
       </Flex>
       <Divider />
       {daoType === Routes.NFT && (
         <>
           <Flex direction="column" gap="2">
-            <Text textStyle="p small medium">Token serial number</Text>
-            <Text textStyle="p small regular" color={Color.Neutral._700}>
-              {nftTokenSerialId}
-            </Text>
+            <Text.P_Small_Medium>Token serial number</Text.P_Small_Medium>
+            <Text.P_Small_Regular color={Color.Neutral._700}>{nftTokenSerialId}</Text.P_Small_Regular>
           </Flex>
           <Divider />
         </>
       )}
       <Flex direction="column" gap="2">
-        <Text textStyle="p small medium">Submitted By</Text>
+        <Text.P_Small_Medium>Submitted By</Text.P_Small_Medium>
         <Flex gap="2" alignItems="center">
-          <Text textStyle="p small regular" color={Color.Neutral._700}>
-            {walletId}
-          </Text>
+          <Text.P_Small_Regular color={Color.Neutral._700}>{walletId}</Text.P_Small_Regular>
           <CopyTextButton onClick={() => handleCopyMemberId(walletId)} iconSize="17" />
         </Flex>
       </Flex>

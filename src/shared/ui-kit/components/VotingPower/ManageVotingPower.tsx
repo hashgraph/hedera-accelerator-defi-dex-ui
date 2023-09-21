@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from "react";
-import { Button, Divider, Flex, HStack, Text } from "@chakra-ui/react";
+import { Button, Divider, Flex, HStack } from "@chakra-ui/react";
 import {
+  Text,
   AlertDialog,
   Color,
   TwoLayerSettingsIcon,
@@ -173,7 +174,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
             width="6.5rem"
             leftIcon={<TwoLayerSettingsIcon />}
           >
-            <Text textStyle="p small semibold">Manage</Text>
+            <Text.P_Small_Semibold>Manage</Text.P_Small_Semibold>
           </Button>
         }
         openDialogButtonText="Manage"

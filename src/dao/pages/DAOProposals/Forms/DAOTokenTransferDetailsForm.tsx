@@ -1,5 +1,6 @@
-import { Text, Flex, Tabs, TabList, Tab } from "@chakra-ui/react";
+import { Flex, Tabs, TabList, Tab } from "@chakra-ui/react";
 import {
+  Text,
   FormTokenInput,
   HashScanLink,
   HashscanData,
@@ -147,7 +148,7 @@ export function DAOTokenTransferDetailsForm() {
           />
         ) : undefined}
         <Flex direction="column" alignItems="left" gap="1">
-          <Text textStyle="p small medium">Sending from</Text>
+          <Text.P_Small_Medium>Sending from</Text.P_Small_Medium>
           <HashScanLink id={safeAccountId} type={HashscanData.Account} />
         </Flex>
         <FormInput<"recipientAccountId">

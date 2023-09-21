@@ -1,7 +1,8 @@
-import { Flex, Text, Skeleton } from "@chakra-ui/react";
+import { Text as ChakraText, Flex, Skeleton } from "@chakra-ui/react";
 import { Color } from "../../themes";
 import { ReactElement, isValidElement } from "react";
 import { isNotNil } from "ramda";
+import { Text } from "../Text";
 
 interface MetricLabelProps {
   label: string;
@@ -42,30 +43,24 @@ export const MetricLabel = (props: MetricLabelProps) => {
     <Flex flexDirection="column" gap="1">
       <Flex flexDirection="row" alignItems="center" gap="1" height="1.2rem">
         {labelLeftIcon}
-        <Text textStyle={labelTextStyle} color={labelTextColor} opacity={labelOpacity}>
+        <ChakraText textStyle={labelTextStyle} color={labelTextColor} opacity={labelOpacity}>
           {label}
-        </Text>
+        </ChakraText>
         {labelRightIcon}
       </Flex>
       <Skeleton speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
         <Flex flexDirection="column" align="flex-start" gap="0px">
           <Flex direction="row" gap="3px" alignItems="center">
-            <Text textStyle={valueStyle} color={valueTextColor}>
+            <ChakraText textStyle={valueStyle} color={valueTextColor}>
               {isValidElement(value) ? value : String(value)}
-            </Text>
+            </ChakraText>
             {isValidElement(valueUnitSymbol) ? (
               valueUnitSymbol
             ) : isNotNil(valueUnitSymbol) ? (
-              <Text textStyle="p medium medium" color={valueUnitSymbolColor}>
-                {valueUnitSymbol}
-              </Text>
+              <Text.P_Medium_Medium color={valueUnitSymbolColor}>{valueUnitSymbol}</Text.P_Medium_Medium>
             ) : null}
           </Flex>
-          {amount ? (
-            <Text textStyle="p small medium" color={amountLabelColor}>
-              {amount}
-            </Text>
-          ) : null}
+          {amount ? <Text.P_Small_Medium color={amountLabelColor}>{amount}</Text.P_Small_Medium> : null}
         </Flex>
       </Skeleton>
     </Flex>

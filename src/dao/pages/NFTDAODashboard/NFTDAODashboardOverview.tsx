@@ -1,5 +1,5 @@
-import { Flex, Grid, GridItem, Text, Link } from "@chakra-ui/react";
-import { Color, MetricLabel } from "@shared/ui-kit";
+import { Flex, Grid, GridItem, Link } from "@chakra-ui/react";
+import { Text, Color, MetricLabel } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import { NFTDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
@@ -19,7 +19,7 @@ export function NFTDAODashboardOverview() {
   return (
     <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
       <Flex gap="4" direction="column">
-        <Text textStyle="h4 medium">Overview</Text>
+        <Text.H4_Medium>Overview</Text.H4_Medium>
         <Grid templateColumns="repeat(2, 1fr)" gap={2}>
           <GridItem>
             <Flex
@@ -33,7 +33,7 @@ export function NFTDAODashboardOverview() {
               padding="1.5rem"
               gap="8"
             >
-              <Text textStyle="p medium semibold">Assets</Text>
+              <Text.P_Medium_Semibold>Assets</Text.P_Medium_Semibold>
               <Flex direction="row">
                 <Flex flex={1}>
                   <MetricLabel
@@ -73,7 +73,7 @@ export function NFTDAODashboardOverview() {
               padding="1.5rem"
               gap="8"
             >
-              <Text textStyle="p medium semibold">Governance</Text>
+              <Text.P_Medium_Semibold>Governance</Text.P_Medium_Semibold>
               <Flex direction="row" justifyContent="space-between">
                 <MetricLabel
                   label="QUORUM"
@@ -136,10 +136,8 @@ export function NFTDAODashboardOverview() {
               padding="1.5rem"
               gap="8"
             >
-              <Text textStyle="p medium semibold">About</Text>
-              <Text textStyle="p small regular" color={Color.Neutral._700}>
-                {dao.description}
-              </Text>
+              <Text.P_Medium_Semibold>About</Text.P_Medium_Semibold>
+              <Text.P_Small_Regular color={Color.Neutral._700}>{dao.description}</Text.P_Small_Regular>
             </Flex>
           </GridItem>
           <GridItem>
@@ -154,7 +152,7 @@ export function NFTDAODashboardOverview() {
               borderRadius="4px"
               padding="1.5rem"
             >
-              <Text textStyle="p medium semibold">Social Channels</Text>
+              <Text.P_Medium_Semibold>Social Channels</Text.P_Medium_Semibold>
               <Flex direction="column" gap={2} justifyContent="space-between">
                 {daoLinks.map((link, index) => {
                   return (
@@ -175,7 +173,7 @@ export function NFTDAODashboardOverview() {
         </Grid>
       </Flex>
       <Flex gap="2" direction="column">
-        <Text textStyle="h4 medium">Recent Proposals</Text>
+        <Text.H4_Medium>Recent Proposals</Text.H4_Medium>
         <Flex direction="column" gap="2" minHeight="300px">
           <RecentProposals
             proposals={recentProposals}

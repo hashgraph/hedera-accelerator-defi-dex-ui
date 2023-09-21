@@ -1,5 +1,5 @@
-import { Button, Divider, Flex, Tab, TabList, Tabs, Text } from "@chakra-ui/react";
-import { FormTokenInput, Color, NewTokenIcon, FormDropdown, InlineAlert, InlineAlertType } from "@shared/ui-kit";
+import { Button, Divider, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { Text, FormTokenInput, Color, NewTokenIcon, FormDropdown, InlineAlert, InlineAlertType } from "@shared/ui-kit";
 import { useAccountTokenBalances, usePairedWalletDetails, useTabFilters, useTokenNFTs } from "@dex/hooks";
 import { useForm } from "react-hook-form";
 import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
@@ -70,9 +70,9 @@ export function DepositTokensModal(props: DepositTokensModalBodyProps) {
               errorMessage={errors?.amount && errors?.amount?.message}
             />
             <Flex justify="space-around" gap={4}>
-              <Text textStyle="p xsmall regular">
+              <Text.P_XSmall_Regular>
                 If you can&apos;t find the token you want to deposit, create a proposal
-              </Text>
+              </Text.P_XSmall_Regular>
               <Button
                 variant="secondary"
                 onClick={handleAssociateTokenClicked}

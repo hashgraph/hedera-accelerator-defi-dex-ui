@@ -1,7 +1,7 @@
 import { ArrowRightIcon } from "@chakra-ui/icons";
-import { Color, HashScanLink, HashscanData } from "@shared/ui-kit";
+import { Text, Color, HashScanLink, HashscanData } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
-import { Text, Flex, Divider } from "@chakra-ui/react";
+import { Flex, Divider } from "@chakra-ui/react";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext } from "../types";
 import { useDexContext, useToken } from "@dex/hooks";
 import { isNil, isNotNil } from "ramda";
@@ -55,43 +55,39 @@ export function DAOTokenTransferReviewForm() {
     return (
       <Flex direction="column" width="100%" gap="4">
         <Flex direction="column" gap="2">
-          <Text textStyle="p small medium">Title</Text>
-          <Text textStyle="p small regular" color={Color.Neutral._700}>
-            {title}
-          </Text>
+          <Text.P_Small_Medium>Title</Text.P_Small_Medium>
+          <Text.P_Small_Regular color={Color.Neutral._700}>{title}</Text.P_Small_Regular>
         </Flex>
         <Flex direction="column" gap="2">
-          <Text textStyle="p small medium">Description</Text>
-          <Text textStyle="p small regular" color={Color.Neutral._700}>
-            {description}
-          </Text>
+          <Text.P_Small_Medium>Description</Text.P_Small_Medium>
+          <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
         </Flex>
         <Flex direction="row" width="100%" justifyContent="space-between" alignItems="center">
           <Flex direction="column" alignItems="left" gap="1">
-            <Text textStyle="p small medium">Sending from</Text>
+            <Text.P_Small_Medium>Sending from</Text.P_Small_Medium>
             <HashScanLink id={safeAccountId} type={HashscanData.Account} />
           </Flex>
           <ArrowRightIcon />
           <Flex direction="column" alignItems="left" gap="1">
-            <Text textStyle="p small medium">Recipient</Text>
+            <Text.P_Small_Medium>Recipient</Text.P_Small_Medium>
             <HashScanLink id={recipientAccountId} type={HashscanData.Account} />
           </Flex>
         </Flex>
         <Divider />
         <Flex direction="column" alignItems="left" gap="1">
-          <Text textStyle="p small medium">Token</Text>
+          <Text.P_Small_Medium>Token</Text.P_Small_Medium>
           <Flex direction="row" justifyContent="space-between" gap="1">
             <Flex direction="row" gap="1" alignItems="center">
-              <Text textStyle="p small regular">{name}</Text>
+              <Text.P_Small_Regular>{name}</Text.P_Small_Regular>
               {"-"}
               <HashScanLink id={tokenId} type={HashscanData.Token} />
             </Flex>
             {isNFT(tokenType) ? (
-              <Text textStyle="p small regular">Serial No: {nftSerialId}</Text>
+              <Text.P_Small_Regular>Serial No: {nftSerialId}</Text.P_Small_Regular>
             ) : (
-              <Text textStyle="p small regular">
+              <Text.P_Small_Regular>
                 {amount} {symbol}
-              </Text>
+              </Text.P_Small_Regular>
             )}
           </Flex>
         </Flex>
@@ -99,16 +95,14 @@ export function DAOTokenTransferReviewForm() {
         {daoType === Routes.NFT && (
           <>
             <Flex direction="column" gap="2">
-              <Text textStyle="p small medium">Token serial number</Text>
-              <Text textStyle="p small regular" color={Color.Neutral._700}>
-                {governanceNftTokenSerialId}
-              </Text>
+              <Text.P_Small_Medium>Token serial number</Text.P_Small_Medium>
+              <Text.P_Small_Regular color={Color.Neutral._700}>{governanceNftTokenSerialId}</Text.P_Small_Regular>
             </Flex>
             <Divider />
           </>
         )}
         <Flex direction="column" alignItems="left" gap="1">
-          <Text textStyle="p small medium">Created by</Text>
+          <Text.P_Small_Medium>Created by</Text.P_Small_Medium>
           <HashScanLink id={walletAccountId} type={HashscanData.Account} />
         </Flex>
       </Flex>

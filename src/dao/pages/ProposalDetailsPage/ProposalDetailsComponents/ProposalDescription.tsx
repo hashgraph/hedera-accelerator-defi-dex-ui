@@ -1,5 +1,5 @@
-import { Text, Flex } from "@chakra-ui/react";
-import { Color } from "@shared/ui-kit";
+import { Flex } from "@chakra-ui/react";
+import { Text, Color } from "@shared/ui-kit";
 
 interface ProposalDetailsDescriptionProps {
   description: string[];
@@ -10,16 +10,16 @@ export function ProposalDetailsDescription(props: ProposalDetailsDescriptionProp
   const DescriptionFormatted = (
     <>
       {description.map((text: string, index) => (
-        <Text textStyle="p small regular" color={Color.Neutral._700} key={index}>
+        <Text.P_Small_Regular color={Color.Neutral._700} key={index}>
           {text}
-        </Text>
+        </Text.P_Small_Regular>
       ))}
     </>
   );
 
   return (
     <Flex direction="column" gap="2" width="100%">
-      <Text textStyle="p small medium">Description</Text>
+      <Text.P_Small_Medium>Description</Text.P_Small_Medium>
       {DescriptionFormatted}
     </Flex>
   );

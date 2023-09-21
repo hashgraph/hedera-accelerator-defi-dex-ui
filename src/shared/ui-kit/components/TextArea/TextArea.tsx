@@ -1,8 +1,9 @@
-import { Flex, Text, Box, Textarea as ChakraTextArea, PlacementWithLogical } from "@chakra-ui/react";
+import { Flex, Box, Textarea as ChakraTextArea, PlacementWithLogical } from "@chakra-ui/react";
 import React from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
 import { Color } from "../..";
+import { Text } from "../Text";
 
 export interface TextAreaProps<T extends string> {
   flex?: number | string;
@@ -43,7 +44,7 @@ export function TextArea<T extends string>(props: TextAreaProps<T>) {
   return (
     <Box flex={flex} width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
-        {React.isValidElement(label) ? label : <Text textStyle="p small medium">{label}</Text>}
+        {React.isValidElement(label) ? label : <Text.P_Small_Medium>{label}</Text.P_Small_Medium>}
         {isTooltipVisible && <Tooltip label={tooltipLabel ?? ""} placement={toolTipLabelPlacement} />}
       </Flex>
       <ChakraTextArea

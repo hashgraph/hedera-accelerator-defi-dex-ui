@@ -1,6 +1,7 @@
-import { Text, Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { Color } from "../../themes";
 import { useFormTokenInputContext } from "./FormTokenInputContext";
+import { Text } from "../Text";
 
 export function FormTokenInputLabel() {
   const {
@@ -9,17 +10,11 @@ export function FormTokenInputLabel() {
 
   return (
     <Flex alignItems="center" justifyContent="space-between" flex="1">
-      <Text textStyle="p small medium">Amount</Text>
+      <Text.P_Small_Medium>Amount</Text.P_Small_Medium>
       <Flex alignItems="center" gap="3px">
-        <Text textStyle="p xsmall regular" color={Color.Neutral._400}>
-          Available:&nbsp;
-        </Text>
-        <Text textStyle="p xsmall semibold" color={Color.Neutral._900}>
-          {balanceDisplay}
-        </Text>
-        <Text textStyle="p xsmall medium" color={Color.Neutral._400}>
-          {tokenSymbolDisplay}
-        </Text>
+        <Text.P_XSmall_Regular color={Color.Neutral._400}>Available:&nbsp;</Text.P_XSmall_Regular>
+        <Text.P_XSmall_Semibold color={Color.Neutral._900}>{balanceDisplay}</Text.P_XSmall_Semibold>
+        <Text.P_XSmall_Medium color={Color.Neutral._400}>{tokenSymbolDisplay}</Text.P_XSmall_Medium>
       </Flex>
     </Flex>
   );
