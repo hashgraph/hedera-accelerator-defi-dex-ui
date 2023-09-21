@@ -2,7 +2,6 @@ import {
   FormControl,
   Flex,
   Image,
-  Text,
   Accordion,
   AccordionButton,
   AccordionIcon,
@@ -13,7 +12,7 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { Controller, useFormContext, useFieldArray } from "react-hook-form";
-import { FormInput, FormTextArea, FormInputList, DefaultLogoIcon, Color } from "@shared/ui-kit";
+import { Text, FormInput, FormTextArea, FormInputList, DefaultLogoIcon, Color } from "@shared/ui-kit";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useState } from "react";
@@ -114,14 +113,14 @@ export function DAODetailsForm() {
       </FormControl>
       <Accordion defaultIndex={[0]} allowMultiple>
         <AccordionItem>
-          <Text textStyle="p medium medium">
+          <Text.P_Medium_Medium>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
                 DAO Links
               </Box>
               <AccordionIcon />
             </AccordionButton>
-          </Text>
+          </Text.P_Medium_Medium>
           <AccordionPanel pb={4}>
             <SimpleGrid row={1} spacingX="1rem" spacingY="0.75rem">
               <FormInputList<CreateADAOForm, "daoLinks">

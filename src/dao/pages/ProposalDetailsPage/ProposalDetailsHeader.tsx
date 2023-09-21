@@ -1,5 +1,5 @@
-import { Text, Flex, Box } from "@chakra-ui/react";
-import { Breadcrumb, BreadcrumbText, Color, HashscanData, HashScanLink } from "@shared/ui-kit";
+import { Flex, Box } from "@chakra-ui/react";
+import { Text, Breadcrumb, BreadcrumbText, Color, HashscanData, HashScanLink } from "@shared/ui-kit";
 import { DAOType } from "@dao/services";
 import { Routes } from "@dao/routes";
 
@@ -31,11 +31,9 @@ export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
         </Flex>
       </Flex>
       <Flex direction="column" gap="2">
-        <Text textStyle="h3 medium">{title}</Text>
+        <Text.H3_Medium>{title}</Text.H3_Medium>
         <Flex direction="row" alignItems="center" gap="2">
-          <Text textStyle="p small medium" color={Color.Neutral._500}>
-            Author By:
-          </Text>
+          <Text.P_Small_Medium color={Color.Neutral._500}>Author By:</Text.P_Small_Medium>
           <HashScanLink id={author} type={HashscanData.Account} />
         </Flex>
       </Flex>

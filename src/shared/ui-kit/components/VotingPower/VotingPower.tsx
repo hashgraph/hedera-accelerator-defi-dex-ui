@@ -1,7 +1,7 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import { Text, HStack, Button, Spacer, Flex } from "@chakra-ui/react";
+import { HStack, Button, Spacer, Flex } from "@chakra-ui/react";
 import { MirrorNodeTokenNFT } from "@dex/services";
-import { Color, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon } from "@shared/ui-kit";
+import { Text, Color, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon } from "@shared/ui-kit";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { ManageVotingPower } from "./ManageVotingPower";
 import { InputTokenData } from "./types";
@@ -83,11 +83,11 @@ export const VotingPower = (props: VotingPowerProps) => {
           />
         ) : isWalletConnected ? (
           <Button key="swap" variant="secondary" width="6.5rem" leftIcon={<SwapIcon />} onClick={handleClickSwapButton}>
-            <Text textStyle="p small semibold">Swap</Text>
+            <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
           </Button>
         ) : (
           <Button key="swap" variant="secondary" width="9.5rem" onClick={handleConnectToWalletClick}>
-            <Text textStyle="p small semibold">Connect To Wallet</Text>
+            <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
           </Button>
         )}
       </HStack>

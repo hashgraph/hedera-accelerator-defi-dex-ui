@@ -1,9 +1,9 @@
-import { Text, Flex, Divider, Center, Button, Link } from "@chakra-ui/react";
+import { Flex, Divider, Center, Button, Link } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { FormInput, LoadingDialog, Color, CopyTextButton, SuccessCheckIcon } from "@shared/ui-kit";
+import { Text, FormInput, LoadingDialog, Color, CopyTextButton, SuccessCheckIcon } from "@shared/ui-kit";
 import {
   useCreateToken,
   useFetchAccountInfo,
@@ -131,10 +131,10 @@ export function CreateTokenDAOGovernanceForm() {
     <>
       <Flex gap="1.5rem" direction="column">
         <DAOFormContainer>
-          <Text textStyle="p small medium" paddingBottom="0.4rem">
+          <Text.P_Small_Medium paddingBottom="0.4rem">
             To generate the token ID, define the following inputs. Once the token is created, the token's ID will be
             automatically displayed.
-          </Text>
+          </Text.P_Small_Medium>
           <Flex direction="row" gap="4">
             <FormInput<"governance.newToken.name">
               flex="3"
@@ -263,9 +263,9 @@ export function CreateTokenDAOGovernanceForm() {
             {errors.governance?.newToken?.id ? (
               <Flex gap="1" alignItems="top" direction="row">
                 <WarningIcon color={Color.Destructive._500} marginTop="0.3rem" boxSize="3" />
-                <Text textStyle="p small regular" color={Color.Destructive._500}>
+                <Text.P_Small_Regular color={Color.Destructive._500}>
                   {errors.governance?.newToken?.id?.message}
-                </Text>
+                </Text.P_Small_Regular>
               </Flex>
             ) : undefined}
             <Button key="create-token" onClick={createNewToken} isDisabled={isFormInReadOnlyMode}>
@@ -275,29 +275,29 @@ export function CreateTokenDAOGovernanceForm() {
           {isFormInReadOnlyMode ? (
             <Flex justifyContent="space-between">
               <Flex direction="column" gap="2">
-                <Text textStyle="p small medium">Token ID</Text>
+                <Text.P_Small_Medium>Token ID</Text.P_Small_Medium>
                 <Flex gap="2" alignItems="center">
-                  <Text textStyle="p medium regular">{governance.newToken.id}</Text>
+                  <Text.P_Medium_Regular>{governance.newToken.id}</Text.P_Medium_Regular>
                   <CopyTextButton onClick={handleCopyTextButtonTapped} />
                 </Flex>
               </Flex>
               <Flex direction="column" gap="2" alignItems="flex-end">
                 <Flex alignItems="center" gap="1">
                   <SuccessCheckIcon boxSize="4" />
-                  <Text textStyle="p small medium"> {governance.newToken.symbol} token was successfully created.</Text>
+                  <Text.P_Small_Medium>
+                    {governance.newToken.symbol} token was successfully created.
+                  </Text.P_Small_Medium>
                 </Flex>
                 {hashscanTransactionLink && (
                   <Link href={hashscanTransactionLink} isExternal flexDirection="row">
-                    <Text variant="p small semibold" color={Color.Primary._500}>
-                      View in HashScan
-                    </Text>
+                    <Text.P_Small_Semibold color={Color.Primary._500}>View in HashScan</Text.P_Small_Semibold>
                   </Link>
                 )}
               </Flex>
             </Flex>
           ) : undefined}
         </DAOFormContainer>
-        <Text textStyle="p large regular">Initial token distribution</Text>
+        <Text.P_Large_Regular>Initial token distribution</Text.P_Large_Regular>
         <DAOFormContainer>
           <FormInput<"governance.newToken.treasuryWalletAccountId">
             inputProps={{
