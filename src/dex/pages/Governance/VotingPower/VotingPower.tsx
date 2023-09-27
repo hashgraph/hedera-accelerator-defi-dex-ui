@@ -1,10 +1,10 @@
-import { HStack, Button, Spacer, Flex } from "@chakra-ui/react";
+import { Text, HStack, Button, Spacer, Flex } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { ManageVotingPower } from "./ManageVotingPower";
 import { useManageVotingPower } from "./useManageVotingPower";
 import { InputTokenAmountData } from "./types";
-import { Text, LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, Color } from "@shared/ui-kit";
+import { LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, Color } from "@shared/ui-kit";
 export interface VotingPowerComponentProps {
   governanceTokenId: string;
   tokenHolderAddress: string;
@@ -104,11 +104,11 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
+            <Text textStyle="p small semibold">Swap</Text>
           </Button>
         ) : (
           <Button key="swap" variant="secondary" width="155px" onClick={handleConnectToWalletClick}>
-            <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
+            <Text textStyle="p small semibold">Connect To Wallet</Text>
           </Button>
         )}
       </HStack>

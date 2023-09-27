@@ -1,5 +1,5 @@
-import { Button, Divider, Flex, SimpleGrid, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
-import { Text, Color, MetricLabel, DefaultLogoIcon } from "@shared/ui-kit";
+import { Button, Divider, Flex, SimpleGrid, Text, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
+import { Color, MetricLabel, DefaultLogoIcon } from "@shared/ui-kit";
 import { useOutletContext, useNavigate, Link as ReachLink } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
@@ -24,10 +24,10 @@ export function DAOSettings() {
       <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" padding="1rem 0">
         <DAOFormContainer>
           <Flex direction="column" gap={2} marginBottom="0.4rem">
-            <Text.P_Medium_Medium>Governance</Text.P_Medium_Medium>
-            <Text.P_Small_Regular marginBottom="0.7rem" color={Color.Neutral._500}>
+            <Text textStyle="p medium medium">Governance</Text>
+            <Text textStyle="p small regular" marginBottom="0.7rem" color={Color.Neutral._500}>
               Manage the governance related DAO properties.
-            </Text.P_Small_Regular>
+            </Text>
             <Divider />
           </Flex>
           <SimpleGrid minWidth="100%" columns={2} spacing="1rem">
@@ -100,18 +100,20 @@ export function DAOSettings() {
         </DAOFormContainer>
         <DAOFormContainer rest={{ gap: 6 }}>
           <Flex direction="column" gap={2}>
-            <Text.P_Medium_Medium>General</Text.P_Medium_Medium>
-            <Text.P_Small_Regular marginBottom="0.7rem" color={Color.Neutral._500}>
+            <Text textStyle="p medium medium">General</Text>
+            <Text textStyle="p small regular" marginBottom="0.7rem" color={Color.Neutral._500}>
               Manage the general DAO properties.
-            </Text.P_Small_Regular>
+            </Text>
             <Divider />
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Name</Text.P_Small_Medium>
-            <Text.P_Small_Regular color={Color.Neutral._700}>{name}</Text.P_Small_Regular>
+            <Text textStyle="p small medium">Name</Text>
+            <Text textStyle="p small regular" color={Color.Neutral._700}>
+              {name}
+            </Text>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Logo URL</Text.P_Small_Medium>
+            <Text textStyle="p small medium">Logo URL</Text>
             <Flex direction="row" gap="2" alignItems="center">
               <Image
                 src={logoUrl}
@@ -126,16 +128,18 @@ export function DAOSettings() {
             </Flex>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Description</Text.P_Small_Medium>
-            <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
+            <Text textStyle="p small medium">Description</Text>
+            <Text textStyle="p small regular" color={Color.Neutral._700}>
+              {description}
+            </Text>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Social Channels</Text.P_Small_Medium>
+            <Text textStyle="p small medium">Social Channels</Text>
             <Flex direction="column" gap={2} justifyContent="space-between">
               <UnorderedList>
                 {daoLinkRecords.map((link, index) => {
                   return (
-                    <ListItem key={index}>
+                    <ListItem>
                       <Link
                         key={link.value}
                         as={ReachLink}

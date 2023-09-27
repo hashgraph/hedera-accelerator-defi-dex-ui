@@ -1,5 +1,5 @@
-import { Flex } from "@chakra-ui/react";
-import { Text, Color, HashScanLink, HashscanData, HederaIcon, SendTokenIcon } from "@shared/ui-kit";
+import { Text, Flex } from "@chakra-ui/react";
+import { Color, HashScanLink, HashscanData, HederaIcon, SendTokenIcon } from "@shared/ui-kit";
 import { HBARTokenSymbol } from "@dex/services";
 import { formatTokenAmountWithDecimal } from "@dex/utils";
 import { ProposalEvent } from "@dao/hooks";
@@ -21,21 +21,21 @@ export function ProposalActionDetails(props: ProposalActionDetailsProps) {
   return (
     <Flex direction="row" gap="16">
       <Flex direction="column" gap="2">
-        <Text.P_Small_Medium>{event}</Text.P_Small_Medium>
+        <Text textStyle="p small medium">{event}</Text>
         <Flex direction="row" gap="1" alignItems="center">
           <HederaIcon />
           <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
-          <Text.P_Medium_Regular color={Color.Neutral._700}>
+          <Text textStyle="p medium regular" color={Color.Neutral._700}>
             {isFungible(tokenType) && `${formatTokenAmountWithDecimal(amount, tokenDecimals)} ${tokenSymbol}`}
             {isNFT(tokenType) && ` ${tokenSymbol} ${formatTokenAmountWithDecimal(amount, tokenDecimals)}`}
-          </Text.P_Medium_Regular>
+          </Text>
           {tokenSymbol !== HBARTokenSymbol ? (
             <HashScanLink id={tokenId} type={HashscanData.Token} withParentheses />
           ) : null}
         </Flex>
       </Flex>
       <Flex direction="column" gap="4">
-        <Text.P_Small_Medium>To</Text.P_Small_Medium>
+        <Text textStyle="p small medium">To</Text>
         <HashScanLink id={targetAccountId} type={HashscanData.Account} />
       </Flex>
     </Flex>

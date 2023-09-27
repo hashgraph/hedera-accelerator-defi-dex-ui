@@ -1,5 +1,5 @@
-import { Flex, Link, ListItem, UnorderedList, Image } from "@chakra-ui/react";
-import { Text, Color, CopyTextButton, DefaultLogoIcon, FormInput } from "@shared/ui-kit";
+import { Flex, Link, ListItem, Text, UnorderedList, Image } from "@chakra-ui/react";
+import { Color, CopyTextButton, DefaultLogoIcon, FormInput } from "@shared/ui-kit";
 import { useDexContext } from "@dex/hooks";
 import { useFormContext } from "react-hook-form";
 import { SettingsForm } from "./types";
@@ -48,12 +48,14 @@ export function UpdateDAODetailsReviewForm() {
             }}
           />
           <Flex direction="column">
-            <Text.P_XSmall_Medium color={Color.Neutral._500}>Social Channels</Text.P_XSmall_Medium>
+            <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
+              Social Channels
+            </Text>
             <Flex direction="column" justifyContent="space-between">
               <UnorderedList>
                 {webLinks.map((link, index) => {
                   return (
-                    <ListItem key={index}>
+                    <ListItem>
                       <Link
                         key={index}
                         as={ReachLink}
@@ -71,9 +73,13 @@ export function UpdateDAODetailsReviewForm() {
             </Flex>
           </Flex>
           <Flex direction="column" gap="0.5rem">
-            <Text.P_XSmall_Medium color={Color.Neutral._500}>Submitted By</Text.P_XSmall_Medium>
+            <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
+              Submitted By
+            </Text>
             <Flex gap="0.5rem" alignItems="center">
-              <Text.P_Small_Regular color={Color.Neutral._900}>{walletId}</Text.P_Small_Regular>
+              <Text textStyle="p small regular" color={Color.Neutral._900}>
+                {walletId}
+              </Text>
               <CopyTextButton onClick={() => handleCopyMemberId(walletId)} iconSize="17" />
             </Flex>
           </Flex>

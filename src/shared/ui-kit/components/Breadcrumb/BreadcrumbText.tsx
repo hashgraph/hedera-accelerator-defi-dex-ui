@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
+import { Text } from "@chakra-ui/react";
 import { Color } from "../../themes";
-import { Text } from "../Text";
 
 export function BreadcrumbText() {
   const location = useLocation();
@@ -9,5 +9,9 @@ export function BreadcrumbText() {
     .filter((crumb) => crumb !== "")
     .join(" / ");
 
-  return <Text.P_Small_Medium color={Color.Neutral._500}>{crumb}</Text.P_Small_Medium>;
+  return (
+    <Text textStyle="p small medium" color={Color.Neutral._500}>
+      {crumb}
+    </Text>
+  );
 }

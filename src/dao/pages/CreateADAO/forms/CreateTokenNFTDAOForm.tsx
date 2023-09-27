@@ -1,4 +1,4 @@
-import { Text, FormInput, LoadingDialog, Color, SuccessCheckIcon, CopyTextButton } from "@shared/ui-kit";
+import { FormInput, LoadingDialog, Color, SuccessCheckIcon, CopyTextButton } from "@shared/ui-kit";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateANFTDAOForm } from "../types";
 import { useFormContext } from "react-hook-form";
@@ -9,7 +9,7 @@ import {
   useFetchTransactionDetails,
   useHandleTransactionSuccess,
 } from "@dex/hooks";
-import { Button, Center, Divider, Flex, Link } from "@chakra-ui/react";
+import { Button, Center, Divider, Flex, Link, Text } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { isNil } from "ramda";
@@ -213,27 +213,29 @@ export function CreateTokenNFTDAOForm() {
           {isFormInReadOnlyMode ? (
             <Flex justifyContent="space-between">
               <Flex direction="column" gap="2">
-                <Text.P_Small_Medium>Token ID</Text.P_Small_Medium>
+                <Text textStyle="p small medium">Token ID</Text>
                 <Flex gap="2" alignItems="center">
-                  <Text.P_Medium_Regular>{governance.newNFT.id}</Text.P_Medium_Regular>
+                  <Text textStyle="p medium regular">{governance.newNFT.id}</Text>
                   <CopyTextButton onClick={handleCopyTextButtonTapped} />
                 </Flex>
               </Flex>
               <Flex direction="column" gap="2" alignItems="flex-end">
                 <Flex alignItems="center" gap="1">
                   <SuccessCheckIcon boxSize="4" />
-                  <Text.P_Small_Medium> {governance.newNFT.symbol} token was successfully created.</Text.P_Small_Medium>
+                  <Text textStyle="p small medium"> {governance.newNFT.symbol} token was successfully created.</Text>
                 </Flex>
                 {hashscanTransactionLink && (
                   <Link href={hashscanTransactionLink} isExternal flexDirection="row">
-                    <Text.P_Small_Semibold color={Color.Primary._500}>View in HashScan</Text.P_Small_Semibold>
+                    <Text variant="p small semibold" color={Color.Primary._500}>
+                      View in HashScan
+                    </Text>
                   </Link>
                 )}
               </Flex>
             </Flex>
           ) : undefined}
         </DAOFormContainer>
-        <Text.P_Large_Regular>Initial token distribution</Text.P_Large_Regular>
+        <Text textStyle="p large regular">Initial token distribution</Text>
         <DAOFormContainer>
           <FormInput<"governance.newNFT.treasuryWalletAccountId">
             inputProps={{

@@ -1,6 +1,5 @@
-import { FormControl, Select, FormErrorMessage } from "@chakra-ui/react";
+import { Text, FormControl, Select, FormErrorMessage } from "@chakra-ui/react";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { Text } from "../Text";
 
 interface DropdownOption {
   label: string;
@@ -21,7 +20,9 @@ export function FormDropdown(props: FormDropdownProps) {
 
   return (
     <FormControl isInvalid={isInvalid}>
-      <Text.P_Small_Medium marginBottom="0.25rem">{label}</Text.P_Small_Medium>
+      <Text textStyle="p small medium" marginBottom="0.25rem">
+        {label}
+      </Text>
       <Select variant="formTokenSelector" placeholder={placeholder} {...register}>
         {data.map((option: DropdownOption) => {
           return (

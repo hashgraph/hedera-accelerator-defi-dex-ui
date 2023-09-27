@@ -1,6 +1,6 @@
-import { Box, Flex, useRadioGroup } from "@chakra-ui/react";
+import { Box, Flex, Text, useRadioGroup } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
-import { Text, RadioCard } from "@shared/ui-kit";
+import { RadioCard } from "@shared/ui-kit";
 import {
   CreateADAOForm,
   DAOGovernanceTokenType,
@@ -146,7 +146,7 @@ export function DAOTypeForm() {
 
   return (
     <Flex direction="column" alignItems="left" gap="4">
-      <Text.P_Large_Regular>What type of DAO would you like to create?</Text.P_Large_Regular>
+      <Text textStyle="p large regular">What type of DAO would you like to create?</Text>
       <DAOFormContainer rest={group}>
         {newDAOOptions.map((option, index) => {
           const radio = getRadioProps({ value: option.name });
@@ -154,8 +154,12 @@ export function DAOTypeForm() {
             <Box flex="1" key={index}>
               <RadioCard key={option.type} {...radio} padding="0.75rem">
                 <Flex flexDirection="column" gap="1">
-                  <Text.P_Small_Medium color="inherit">{option.type}</Text.P_Small_Medium>
-                  <Text.P_XSmall_Regular color="inherit">{option.description}</Text.P_XSmall_Regular>
+                  <Text textStyle="p small medium" color="inherit">
+                    {option.type}
+                  </Text>
+                  <Text textStyle="p xsmall regular" color="inherit">
+                    {option.description}
+                  </Text>
                 </Flex>
               </RadioCard>
             </Box>

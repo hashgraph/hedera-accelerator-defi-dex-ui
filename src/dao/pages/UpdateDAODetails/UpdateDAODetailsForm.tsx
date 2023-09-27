@@ -1,4 +1,4 @@
-import { Text, Color, DefaultLogoIcon, FormInput, FormInputList, FormTextArea } from "@shared/ui-kit";
+import { Color, DefaultLogoIcon, FormInput, FormInputList, FormTextArea } from "@shared/ui-kit";
 import {
   Accordion,
   AccordionButton,
@@ -9,6 +9,7 @@ import {
   Flex,
   Image,
   SimpleGrid,
+  Text,
 } from "@chakra-ui/react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { SettingsForm } from "./types";
@@ -85,14 +86,14 @@ export function UpdateDAODetailsForm() {
       </Flex>
       <Accordion defaultIndex={[0]} allowMultiple>
         <AccordionItem>
-          <Text.P_Medium_Medium>
+          <Text textStyle="p medium medium">
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
                 DAO Links
               </Box>
               <AccordionIcon />
             </AccordionButton>
-          </Text.P_Medium_Medium>
+          </Text>
           <AccordionPanel pb={4}>
             <SimpleGrid row={1} spacingX="1rem" spacingY="0.75rem">
               <FormInputList<SettingsForm, "webLinks">
