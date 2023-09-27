@@ -1,6 +1,7 @@
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import {
   Grid,
+  Text,
   Center,
   Popover,
   PopoverTrigger,
@@ -24,7 +25,6 @@ import { Color } from "../../themes";
 import { formatWalletConnectionData } from "./formatter";
 import { DexService, TOKEN_USER_ID } from "@dex/services";
 import { isEmpty } from "ramda";
-import { Text } from "../Text";
 
 /** TODO: Replace this with the real terms and service agreement. */
 const TermsAndServices = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
@@ -140,12 +140,8 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
       <AlertDialog
         openDialogButtonStyles={{ flex: "1" }}
         title="Terms and Services"
-        openModalComponent={
-          <Button>
-            <Text.P_XSmall_Regular>Connect to a Wallet</Text.P_XSmall_Regular>
-          </Button>
-        }
-        body={<Text.P_XSmall_Regular>{TermsAndServices}</Text.P_XSmall_Regular>}
+        openModalComponent={<Button textStyle="h3">Connect to a Wallet</Button>}
+        body={<Text textStyle="b3">{TermsAndServices}</Text>}
         footer={
           <Button flex="1" onClick={handleClickConnect}>
             Agree & Connect
@@ -162,7 +158,7 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
     <Grid templateColumns="repeat(2, 1fr)">
       <Flex justifyContent="center" alignItems="center">
         <Skeleton width="100%" padding="0.5em 1em" speed={0.4} fadeDuration={0} isLoaded={!isLoading}>
-          <Text.P_Medium_Medium>{formattedHbarAmount}</Text.P_Medium_Medium>
+          <Text textStyle="p medium medium">{formattedHbarAmount}</Text>
         </Skeleton>
       </Flex>
       <Popover>
@@ -170,7 +166,9 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
           <Button bg={Color.Black_01} color={Color.White} padding="0.5em 1em" borderRadius="0.5rem">
             <Flex direction="row" alignItems="center" gap="2">
               <Circle size="1em" bg={connectionStatusColor} />
-              <Text.P_Medium_Semibold color={Color.White}>{accountId}</Text.P_Medium_Semibold>
+              <Text textStyle="p medium semibold" color={Color.White}>
+                {accountId}
+              </Text>
               <ChevronDownIcon textStyle="p medium semibold" />
             </Flex>
           </Button>
@@ -185,10 +183,10 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
             {connectionNotification}
             <Grid templateColumns="repeat(3, 1fr)">
               <GridItem justifySelf="left" colSpan={1}>
-                <Text.H4_Medium color={Color.White_01} marginBottom="1rem">
+                <Text textStyle="h4" color={Color.White_01} marginBottom="1rem">
                   Coins
-                </Text.H4_Medium>
-                <Text.P_XSmall_Regular color={Color.White_01}>
+                </Text>
+                <Text textStyle="b3" color={Color.White_01}>
                   <Icon
                     width="1rem"
                     height="1rem"
@@ -212,27 +210,31 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
                     </defs>
                   </Icon>
                   &nbsp;HBAR
-                </Text.P_XSmall_Regular>
+                </Text>
               </GridItem>
               <GridItem justifySelf="right" colSpan={1}>
-                <Text.H4_Medium color={Color.White_01} marginBottom="1rem">
+                <Text textStyle="h4" color={Color.White_01} marginBottom="1rem">
                   In Wallet
-                </Text.H4_Medium>
-                <Text.P_XSmall_Regular color={Color.White_01}>{formattedHbarAmount}</Text.P_XSmall_Regular>
+                </Text>
+                <Text textStyle="b3" color={Color.White_01}>
+                  {formattedHbarAmount}
+                </Text>
               </GridItem>
               <GridItem justifySelf="right" colSpan={1}>
-                <Text.H4_Medium color={Color.White_01} marginBottom="1rem">
+                <Text textStyle="h4" color={Color.White_01} marginBottom="1rem">
                   Price
-                </Text.H4_Medium>
-                <Text.P_XSmall_Regular color={Color.White_01}>-</Text.P_XSmall_Regular>
+                </Text>
+                <Text textStyle="b3" color={Color.White_01}>
+                  -
+                </Text>
               </GridItem>
             </Grid>
             <Center gap="2">
               <Link href={hashScanAccountLink} isExternal>
-                <Text.P_XSmall_Regular_Link>
+                <Text textStyle="link">
                   <ExternalLinkIcon color={Color.Teal_01} w={5} h={5} marginRight="0.5rem" marginBottom="0.125rem" />
                   View on Hashscan
-                </Text.P_XSmall_Regular_Link>
+                </Text>
               </Link>
             </Center>
             <Center>

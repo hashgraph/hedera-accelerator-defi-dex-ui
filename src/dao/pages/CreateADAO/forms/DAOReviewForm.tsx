@@ -1,4 +1,5 @@
 import {
+  Text,
   Accordion,
   AccordionButton,
   AccordionIcon,
@@ -11,7 +12,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { ReactElement, cloneElement } from "react";
-import { Text, FormInput, Tag } from "@shared/ui-kit";
+import { FormInput, Tag } from "@shared/ui-kit";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { DAOType } from "@dao/services";
 import { DefaultLogoIcon, Color } from "@shared/ui-kit";
@@ -34,14 +35,14 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
     <DAOFormContainer>
       <Accordion defaultIndex={[0]} allowMultiple padding={"0.2rem"}>
         <AccordionItem border="none">
-          <Text.P_Medium_Medium>
+          <Text textStyle="p medium medium">
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
                 Details & Type
               </Box>
               <AccordionIcon />
             </AccordionButton>
-          </Text.P_Medium_Medium>
+          </Text>
           <AccordionPanel pb={4}>
             <Flex direction="row" flex="7" alignItems="top" gap="1">
               <Flex flex="1" alignItems="top">
@@ -77,7 +78,9 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
                   List DAO publicly
                 </Checkbox>
                 <Flex direction="column" gap="0.2rem">
-                  <Text.P_XSmall_Medium color={Color.Neutral._500}>TYPE</Text.P_XSmall_Medium>
+                  <Text textStyle="p xsmall medium" color={Color.Neutral._500}>
+                    TYPE
+                  </Text>
                   <Tag label={details.type} />
                 </Flex>
               </Flex>
@@ -85,14 +88,14 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem>
-          <Text.P_Medium_Medium>
+          <Text textStyle="p medium medium">
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
                 Governance
               </Box>
               <AccordionIcon />
             </AccordionButton>
-          </Text.P_Medium_Medium>
+          </Text>
           <AccordionPanel pb={4}>
             <SimpleGrid columns={2} spacingX="1rem" spacingY="0.75rem">
               {governance.map((formInput, index) => {
@@ -102,14 +105,14 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem>
-          <Text.P_Medium_Medium>
+          <Text textStyle="p medium medium">
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left">
                 Voting
               </Box>
               <AccordionIcon />
             </AccordionButton>
-          </Text.P_Medium_Medium>
+          </Text>
           <AccordionPanel pb={4}>
             <SimpleGrid columns={2} spacingX="1rem" spacingY="0.75rem">
               {voting.map((formInput, index) => {

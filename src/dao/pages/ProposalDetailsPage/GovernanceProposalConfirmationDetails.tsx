@@ -1,6 +1,5 @@
-import { Box, Flex, Button, SimpleGrid } from "@chakra-ui/react";
+import { Box, Text, Flex, Button, SimpleGrid } from "@chakra-ui/react";
 import {
-  Text,
   Color,
   CheckCircleUnfilledIcon,
   LightningBoltIcon,
@@ -290,25 +289,26 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
   return (
     <Flex layerStyle="content-box" direction="column" height="100%">
       <Flex direction="column" gap={4} minWidth="250px" height="100%">
-        <Text.H4_Medium>Vote details</Text.H4_Medium>
+        <Text textStyle="h4 medium">Vote details</Text>
         <Flex gap={2} justify="space-between" align="center">
           <Flex direction="column" alignItems="flex-start">
-            <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
+            <Text textStyle="p xsmall regular" color={Color.Grey_Blue._600} textAlign="start">
               Voting end time
-            </Text.P_XSmall_Regular>
-            <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
+            </Text>
+            <Text textStyle="p xsmall semibold" color={Color.Grey_Blue._600} textAlign="start">
               {proposal.votingEndTime}
-            </Text.P_XSmall_Semibold>
+            </Text>
           </Flex>
           <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">
-            <Text.P_Small_Medium
+            <Text
+              textStyle="p small medium"
               color={Color.Success._600}
               overflow="hidden"
               textOverflow="ellipsis"
               whiteSpace="nowrap"
             >
               Turnout: {`${turnout}%`}
-            </Text.P_Small_Medium>
+            </Text>
           </Flex>
         </Flex>
         <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
@@ -328,49 +328,61 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
                 <Box bg={Color.Grey_Blue._300} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>Yes</Text.P_Small_Semibold>
+                <Text textStyle="p small semibold" color={Color.Neutral._600}>
+                  Yes
+                </Text>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>{`${getVotesPercentage(yes).toFixed(
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>{`${getVotesPercentage(yes).toFixed(
                   2
-                )}%`}</Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(yes)}`}</Text.P_Small_Regular>
+                )}%`}</Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>{`${getVotesCount(yes)}`}</Text>
               </Flex>
             </Flex>
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
                 <Box bg={Color.Grey_Blue._900} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>No</Text.P_Small_Semibold>
+                <Text textStyle="p small semibold" color={Color.Neutral._600}>
+                  No
+                </Text>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>{`${getVotesPercentage(no).toFixed(
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>{`${getVotesPercentage(no).toFixed(
                   2
-                )}%`}</Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(no)}`}</Text.P_Small_Regular>
+                )}%`}</Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>{`${getVotesCount(no)}`}</Text>
               </Flex>
             </Flex>
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
                 <Box bg={Color.Grey_Blue._600} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>Abstain</Text.P_Small_Semibold>
+                <Text textStyle="p small semibold" color={Color.Neutral._600}>
+                  Abstain
+                </Text>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>
                   {`${getVotesPercentage(abstain).toFixed(2)}%`}
-                </Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(abstain)}`}</Text.P_Small_Regular>
+                </Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>
+                  {`${getVotesCount(abstain)}`}
+                </Text>
               </Flex>
             </Flex>
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
                 <Box bg={Color.Grey_01} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>Remaining</Text.P_Small_Semibold>
+                <Text textStyle="p small semibold" color={Color.Neutral._600}>
+                  Remaining
+                </Text>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>
+                <Text textStyle="p small semibold" color={Color.Neutral._900}>
                   {`${getVotesPercentage(remaining).toFixed(2)}%`}
-                </Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(remaining)}`}</Text.P_Small_Regular>
+                </Text>
+                <Text textStyle="p small regular" color={Color.Neutral._400}>
+                  {`${getVotesCount(remaining)}`}
+                </Text>
               </Flex>
             </Flex>
           </SimpleGrid>
@@ -378,11 +390,15 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
         <Flex direction="column" gap={1}>
           <Flex justify="center" align="center" color={Color.Neutral._500} gap={1}>
             <LightningBoltIcon />
-            <Text.Overline_Small>Voting Power</Text.Overline_Small>
+            <Text textStyle="p overline small">Voting Power</Text>
           </Flex>
           <Flex align="center" justify="center" gap={1}>
-            <Text.H4_Medium color={Color.Primary._600}>{votingPower}</Text.H4_Medium>
-            <Text.P_Small_Medium color={Color.Primary._600}>{tokenSymbol}</Text.P_Small_Medium>
+            <Text textStyle="h4 medium" color={Color.Primary._600}>
+              {votingPower}
+            </Text>
+            <Text textStyle="p small medium" color={Color.Primary._600}>
+              {tokenSymbol}
+            </Text>
           </Flex>
         </Flex>
         {ConfirmationDetailsButtons[status]}

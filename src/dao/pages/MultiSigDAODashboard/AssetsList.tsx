@@ -1,5 +1,5 @@
-import { Box, Button, Divider, Flex, SimpleGrid, Tooltip } from "@chakra-ui/react";
-import { Text, Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } from "@shared/ui-kit";
+import { Box, Button, Divider, Flex, SimpleGrid, Text, Tooltip } from "@chakra-ui/react";
+import { Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } from "@shared/ui-kit";
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@dex/services";
@@ -59,7 +59,7 @@ export function AssetsList() {
   return (
     <>
       <Flex layerStyle="dao-dashboard__content-header" justifyContent="space-between">
-        <Text.P_Medium_Medium>Total Assets: {assets.length}</Text.P_Medium_Medium>
+        <Text textStyle="p medium medium">Total Assets: {assets.length}</Text>
         <Flex>
           <AlertDialog
             openDialogButtonStyles={{ flex: "1" }}
@@ -101,7 +101,7 @@ export function AssetsList() {
                 padding="1.5rem"
               >
                 <Flex direction="row" justifyContent="space-between" gap="2">
-                  <Text.P_Medium_Semibold>{name}</Text.P_Medium_Semibold>
+                  <Text textStyle="p medium semibold">{name}</Text>
                   <Flex gap="2">
                     {symbol !== HBARSymbol ? <HashScanLink id={tokenId} type={HashscanData.Token} /> : null}
                     <Tooltip

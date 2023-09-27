@@ -1,5 +1,5 @@
-import { Flex } from "@chakra-ui/react";
-import { Text, Color, FormInput, FormTextArea } from "@shared/ui-kit";
+import { Flex, Text } from "@chakra-ui/react";
+import { Color, FormInput, FormTextArea } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { CreateDAOMemberOperationForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { checkForValidAccountId, checkForValidPositiveNumber } from "@dex/utils";
@@ -75,14 +75,14 @@ export function DAODeleteMemberDetailsForm() {
       />
       <Flex direction="column" gap="1" width="100%">
         <Flex direction="row" gap="1" alignItems="center">
-          <Text.P_Medium_Regular color={Color.Neutral._500}>
+          <Text textStyle="p medium regular" color={Color.Neutral._500}>
             Proposal threshold confirmation requirement is
-          </Text.P_Medium_Regular>
-          <Text.P_Medium_Semibold>{`${threshold} / ${membersCount} members`}</Text.P_Medium_Semibold>
+          </Text>
+          <Text textStyle="p medium semibold">{`${threshold} / ${membersCount} members`}</Text>
         </Flex>
-        <Text.P_Medium_Regular color={Color.Neutral._500}>
+        <Text textStyle="p medium regular" color={Color.Neutral._500}>
           By removing a member the threshold changes to:
-        </Text.P_Medium_Regular>
+        </Text>
       </Flex>
       <Flex direction="row" gap="2" alignItems="center">
         <FormInput<"newThreshold">
@@ -109,9 +109,9 @@ export function DAODeleteMemberDetailsForm() {
           isInvalid={Boolean(errors?.newThreshold)}
           errorMessage={errors?.newThreshold && errors?.newThreshold?.message}
         />
-        <Text.P_Medium_Semibold flex="1" paddingTop="0.8rem">
+        <Text flex="1" textStyle="p medium semibold" paddingTop="0.8rem">
           {`/ ${membersCount - 1} members`}
-        </Text.P_Medium_Semibold>
+        </Text>
       </Flex>
     </Flex>
   );

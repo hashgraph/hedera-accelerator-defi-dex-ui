@@ -1,5 +1,5 @@
-import { Flex } from "@chakra-ui/react";
-import { Text, Color } from "@shared/ui-kit";
+import { Text, Flex } from "@chakra-ui/react";
+import { Color } from "@shared/ui-kit";
 
 interface ProposalTransactionDetailsProps {
   transactionHash: string;
@@ -10,10 +10,12 @@ export function ProposalTransactionDetails(props: ProposalTransactionDetailsProp
   return (
     <Flex direction="row" gap="12">
       <Flex flexDirection="column" alignItems="start" gap="2">
-        <Text.P_Small_Medium>Transaction hash</Text.P_Small_Medium>
+        <Text textStyle="p small medium">Transaction hash</Text>
       </Flex>
       <Flex flexDirection="column" alignItems="start" gap="2">
-        <Text.P_Small_Regular color={Color.Neutral._700}>{transactionHash}</Text.P_Small_Regular>
+        <Text textStyle="p small regular" color={Color.Neutral._700}>
+          {transactionHash}
+        </Text>
       </Flex>
     </Flex>
   );

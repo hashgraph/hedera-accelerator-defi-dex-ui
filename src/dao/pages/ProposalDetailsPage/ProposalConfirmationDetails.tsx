@@ -1,6 +1,5 @@
-import { Box, Flex, Button } from "@chakra-ui/react";
+import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import {
-  Text,
   Tag,
   Color,
   ProgressBar,
@@ -159,7 +158,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     <Flex layerStyle="content-box" direction="column" height="100%">
       <Flex direction="column" gap="8" minWidth="250px" height="100%">
         <Flex justifyContent="space-between" gap="1">
-          <Text.H4_Medium>Confirmation details</Text.H4_Medium>
+          <Text textStyle="h5 medium">Confirmation details</Text>
           <Tag variant={ProposalStatusAsTagVariant[status]} />
         </Flex>
         <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
@@ -172,7 +171,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
               progressBarColor={Color.Grey_Blue._300}
             />
             <Flex direction="row" alignItems="center" gap="2">
-              <Text.P_Small_Semibold>{`${approvalCount}/${threshold}`}</Text.P_Small_Semibold>
+              <Text textStyle="p small semibold">{`${approvalCount}/${threshold}`}</Text>
               <PeopleIcon boxSize={3.5} />
             </Flex>
           </Flex>

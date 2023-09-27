@@ -1,5 +1,5 @@
-import { Flex, Divider } from "@chakra-ui/react";
-import { Text, Card, Color, PeopleIcon, ProgressBar, Tag } from "@shared/ui-kit";
+import { Text, Flex, Divider } from "@chakra-ui/react";
+import { Card, Color, PeopleIcon, ProgressBar, Tag } from "@shared/ui-kit";
 import BigNumber from "bignumber.js";
 import { Proposal, ProposalStatus } from "@dao/hooks";
 import { useNavigate } from "react-router-dom";
@@ -31,16 +31,18 @@ export function TransactionCard(props: TransactionCardProps) {
       <Flex direction="column" gap="4">
         <Flex direction="row" justifyContent="space-between">
           <Flex direction="row" gap="2" alignItems="center">
-            <Text.P_Small_Semibold marginRight="0.25rem">{nonce}</Text.P_Small_Semibold>
+            <Text textStyle="p small semibold" marginRight="0.25rem">
+              {nonce}
+            </Text>
             <Tag label={type} />
           </Flex>
           <Tag variant={ProposalStatusAsTagVariant[transactionStatus]} />
         </Flex>
         <Divider />
         <Flex direction="row" justifyContent="space-between">
-          <Text.P_Medium_Regular>
+          <Text textStyle="p medium regular">
             {amountDisplay} {tokenSymbol}
-          </Text.P_Medium_Regular>
+          </Text>
           <Flex direction="row" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" alignItems="center" gap="4">
             <ProgressBar
               width="6rem"
@@ -50,7 +52,7 @@ export function TransactionCard(props: TransactionCardProps) {
               progressBarColor={Color.Grey_Blue._300}
             />
             <Flex direction="row" alignItems="center" gap="2">
-              <Text.P_Small_Semibold>{`${approvalCount}/${threshold}`}</Text.P_Small_Semibold>
+              <Text textStyle="p small semibold">{`${approvalCount}/${threshold}`}</Text>
               <PeopleIcon boxSize={3.5} />
             </Flex>
           </Flex>

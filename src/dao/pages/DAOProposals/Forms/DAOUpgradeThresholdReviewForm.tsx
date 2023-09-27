@@ -1,5 +1,5 @@
-import { Divider, Flex } from "@chakra-ui/react";
-import { Text, Color, CopyTextButton } from "@shared/ui-kit";
+import { Divider, Flex, Text } from "@chakra-ui/react";
+import { Color, CopyTextButton } from "@shared/ui-kit";
 import { useDexContext } from "@dex/hooks";
 import { useFormContext } from "react-hook-form";
 import { CreateDAOUpgradeThresholdForm, CreateDAOProposalContext } from "../types";
@@ -19,25 +19,31 @@ export function DAOUpgradeThresholdReviewForm() {
   return (
     <Flex direction="column" gap="1.4rem">
       <Flex direction="column" gap="2">
-        <Text.P_Small_Medium>Title</Text.P_Small_Medium>
-        <Text.P_Small_Regular color={Color.Neutral._700}>{title}</Text.P_Small_Regular>
+        <Text textStyle="p small medium">Title</Text>
+        <Text textStyle="p small regular" color={Color.Neutral._700}>
+          {title}
+        </Text>
       </Flex>
       <Divider />
       <Flex direction="column" gap="2">
-        <Text.P_Small_Medium>Description</Text.P_Small_Medium>
-        <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
+        <Text textStyle="p small medium">Description</Text>
+        <Text textStyle="p small regular" color={Color.Neutral._700}>
+          {description}
+        </Text>
       </Flex>
       <Divider />
       <Flex direction="row" gap="2" alignItems="center">
-        <Text.P_Small_Medium>Threshold confirmation requirement changes to</Text.P_Small_Medium>
-        <Text.P_Medium_Semibold>{`${newThreshold} / ${membersCount} members`}</Text.P_Medium_Semibold>
-        <Text.P_Small_Medium>members</Text.P_Small_Medium>
+        <Text textStyle="p small medium">Threshold confirmation requirement changes to</Text>
+        <Text textStyle="p medium semibold">{`${newThreshold} / ${membersCount} members`}</Text>
+        <Text textStyle="p small medium">members</Text>
       </Flex>
       <Divider />
       <Flex direction="column" gap="2">
-        <Text.P_Small_Medium>Submitted By</Text.P_Small_Medium>
+        <Text textStyle="p small medium">Submitted By</Text>
         <Flex gap="2" alignItems="center">
-          <Text.P_Small_Regular color={Color.Neutral._700}>{walletId}</Text.P_Small_Regular>
+          <Text textStyle="p small regular" color={Color.Neutral._700}>
+            {walletId}
+          </Text>
           <CopyTextButton onClick={handleCopyMemberId} iconSize="17" />
         </Flex>
       </Flex>

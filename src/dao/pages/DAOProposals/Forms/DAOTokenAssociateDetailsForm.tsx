@@ -1,5 +1,5 @@
-import { Flex } from "@chakra-ui/react";
-import { Text, HashScanLink, HashscanData, FormInput, FormTextArea, FormDropdown } from "@shared/ui-kit";
+import { Text, Flex } from "@chakra-ui/react";
+import { HashScanLink, HashscanData, FormInput, FormTextArea, FormDropdown } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
 import { CreateDAOProposalContext, CreateDAOTokenAssociateForm, DAOProposalType } from "../types";
@@ -75,7 +75,7 @@ export function DAOTokenAssociateDetailsForm() {
         errorMessage={errors?.linkToDiscussion && errors?.linkToDiscussion?.message}
       />
       <Flex direction="column" alignItems="left" gap="1">
-        <Text.P_Small_Medium>Associating To</Text.P_Small_Medium>
+        <Text textStyle="p small medium">Associating To</Text>
         <HashScanLink id={safeAccountId} type={HashscanData.Account} />
       </Flex>
       <FormInput<"tokenId">

@@ -1,5 +1,5 @@
-import { Flex } from "@chakra-ui/react";
-import { Text, HashScanLink, HashscanData } from "@shared/ui-kit";
+import { Text, Flex } from "@chakra-ui/react";
+import { HashScanLink, HashscanData } from "@shared/ui-kit";
 
 interface ProposalMemberVotesProps {
   approvers: string[];
@@ -11,9 +11,7 @@ export function ProposalMemberVotes(props: ProposalMemberVotesProps) {
 
   const ApproversList =
     approvalCount === 0 ? (
-      <Text.P_Small_Regular_Italic>
-        This transaction has not yet been confirmed by an owner.
-      </Text.P_Small_Regular_Italic>
+      <Text textStyle="p small italic">This transaction has not yet been confirmed by an owner.</Text>
     ) : (
       <>
         {approvers.map((approver) => (
@@ -24,7 +22,7 @@ export function ProposalMemberVotes(props: ProposalMemberVotesProps) {
 
   return (
     <Flex direction="column" gap="2" width="100%">
-      <Text.P_Small_Medium>Votes from</Text.P_Small_Medium>
+      <Text textStyle="p small medium">Votes from</Text>
       {ApproversList}
     </Flex>
   );

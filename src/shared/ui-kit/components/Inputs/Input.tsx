@@ -1,6 +1,6 @@
 import {
-  Text as ChakraText,
   Flex,
+  Text,
   Box,
   PlacementWithLogical,
   Input as ChakraInput,
@@ -11,7 +11,6 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
 import { Color } from "../../themes";
-import { Text } from "../Text";
 
 export interface InputProps<T extends string> {
   flex?: number | string;
@@ -55,7 +54,9 @@ export function Input<T extends string>(props: InputProps<T>) {
   const RightElements = React.isValidElement(unit) ? (
     unit
   ) : (
-    <Text.P_Small_Regular padding="0 1rem">{unit}</Text.P_Small_Regular>
+    <Text textStyle="p small regular" padding="0 1rem">
+      {unit}
+    </Text>
   );
   const [rightElementWidth, setRightElementWidth] = useState(0);
   const rightElementRef = useRef(null);
@@ -72,19 +73,21 @@ export function Input<T extends string>(props: InputProps<T>) {
         {React.isValidElement(label) ? (
           label
         ) : (
-          <ChakraText
+          <Text
             textStyle={isReadOnly ? "p xsmall medium" : "p small medium"}
             color={isReadOnly ? Color.Neutral._500 : Color.Neutral._900}
           >
             {label}
-          </ChakraText>
+          </Text>
         )}
         {isTooltipVisible && <Tooltip label={tooltipLabel ?? ""} placement={toolTipLabelPlacement} />}
       </Flex>
       {isReadOnly ? (
         <Flex gap="0.2rem">
-          <Text.P_Small_Regular color={Color.Neutral._900}>{value}</Text.P_Small_Regular>
-          {React.isValidElement(unit) ? unit : <Text.P_Small_Regular>{unit}</Text.P_Small_Regular>}
+          <Text textStyle="p small regular" color={Color.Neutral._900}>
+            {value}
+          </Text>
+          {React.isValidElement(unit) ? unit : <Text textStyle="p small regular">{unit}</Text>}
         </Flex>
       ) : (
         <InputGroup>

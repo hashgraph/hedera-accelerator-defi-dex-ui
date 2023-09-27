@@ -1,8 +1,7 @@
-import { Flex, Stepper as ChakraStepper, Step, Divider } from "@chakra-ui/react";
+import { Text, Flex, Stepper as ChakraStepper, Step, Divider } from "@chakra-ui/react";
 import { ProposalStateIcon, ProposalState } from "./types";
 import { Color } from "../../themes";
 import { ActiveStepIcon, CancelledStepIcon, DisabledStepIcon, CompletedStepIcon } from "../Icons";
-import { Text } from "../Text";
 
 const GetStatusIcon = (iconType: string) => {
   switch (iconType) {
@@ -35,13 +34,16 @@ export function Stepper(props: StepperProps) {
             <Flex flexDirection="row" gap="3">
               {GetStatusIcon(step.iconType)}
               <Flex flexDirection="row" gap="0.3rem" alignItems="center">
-                <Text.P_Medium_Regular
+                <Text
+                  textStyle="p medium regular"
                   color={step.iconType === ProposalStateIcon.Disabled ? Color.Grey_Blue._200 : Color.Neutral._900}
                 >
                   {step.status}
-                </Text.P_Medium_Regular>
+                </Text>
                 {step.timeRemaining && (
-                  <Text.P_Small_Regular color={Color.Grey_Blue._500}>{` - ${step.timeRemaining}`}</Text.P_Small_Regular>
+                  <Text textStyle="p small regular" color={Color.Grey_Blue._500}>
+                    {` - ${step.timeRemaining}`}
+                  </Text>
                 )}
               </Flex>
             </Flex>

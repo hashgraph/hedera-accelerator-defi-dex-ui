@@ -1,5 +1,5 @@
-import { Flex, Grid, GridItem, Link } from "@chakra-ui/react";
-import { Text, Color, MetricLabel } from "@shared/ui-kit";
+import { Flex, Grid, GridItem, Text, Link } from "@chakra-ui/react";
+import { Color, MetricLabel } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
@@ -18,11 +18,11 @@ export function GovernanceDAODashboardOverview() {
   return (
     <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
       <Flex gap="2" direction="column">
-        <Text.H4_Medium>Overview</Text.H4_Medium>
+        <Text textStyle="h4 medium">Overview</Text>
         <Grid templateColumns="repeat(2, 1fr)" gap="2">
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
-              <Text.P_Medium_Semibold>Assets</Text.P_Medium_Semibold>
+              <Text textStyle="p medium semibold">Assets</Text>
               <Flex direction="row">
                 <Flex flex={1}>
                   <MetricLabel
@@ -53,7 +53,7 @@ export function GovernanceDAODashboardOverview() {
           </GridItem>
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
-              <Text.P_Medium_Semibold>Governance</Text.P_Medium_Semibold>
+              <Text textStyle="p medium semibold">Governance</Text>
               <Flex direction="row" justifyContent="space-between">
                 <MetricLabel
                   label="QUORUM"
@@ -106,13 +106,15 @@ export function GovernanceDAODashboardOverview() {
           </GridItem>
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
-              <Text.P_Medium_Semibold>About</Text.P_Medium_Semibold>
-              <Text.P_Small_Regular color={Color.Neutral._700}>{dao.description}</Text.P_Small_Regular>
+              <Text textStyle="p medium semibold">About</Text>
+              <Text textStyle="p small regular" color={Color.Neutral._700}>
+                {dao.description}
+              </Text>
             </Flex>
           </GridItem>
           <GridItem>
             <Flex layerStyle="dao-dashboard__card" gap={6}>
-              <Text.P_Medium_Semibold>Social Channels</Text.P_Medium_Semibold>
+              <Text textStyle="p medium semibold">Social Channels</Text>
               <Flex direction="column" gap={2} justifyContent="space-between">
                 {daoLinks.map((link, index) => {
                   return (
@@ -133,7 +135,7 @@ export function GovernanceDAODashboardOverview() {
         </Grid>
       </Flex>
       <Flex gap="2" direction="column">
-        <Text.H4_Medium>Recent Proposals</Text.H4_Medium>
+        <Text textStyle="h4 medium">Recent Proposals</Text>
         <Flex direction="column" gap="2" minHeight="300px">
           <RecentProposals
             proposals={recentProposals}

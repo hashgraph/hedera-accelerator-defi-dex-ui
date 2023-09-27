@@ -1,6 +1,6 @@
-import { Text, Color, HashScanLink, HashscanData } from "@shared/ui-kit";
+import { Color, HashScanLink, HashscanData } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
-import { Flex, Divider } from "@chakra-ui/react";
+import { Text, Flex, Divider } from "@chakra-ui/react";
 import { CreateDAOTokenAssociateForm, CreateDAOProposalContext } from "../types";
 import { useDexContext, useToken } from "@dex/hooks";
 import { isNil, isNotNil } from "ramda";
@@ -41,30 +41,36 @@ export function DAOTokenAssociateReviewForm() {
     return (
       <Flex direction="column" width="100%" gap="4">
         <Flex direction="column" gap="2">
-          <Text.P_Small_Medium>Title</Text.P_Small_Medium>
-          <Text.P_Small_Regular color={Color.Neutral._700}>{title}</Text.P_Small_Regular>
+          <Text textStyle="p small medium">Title</Text>
+          <Text textStyle="p small regular" color={Color.Neutral._700}>
+            {title}
+          </Text>
         </Flex>
         <Divider />
         <Flex direction="column" gap="2">
-          <Text.P_Small_Medium>Description</Text.P_Small_Medium>
-          <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
+          <Text textStyle="p small medium">Description</Text>
+          <Text textStyle="p small regular" color={Color.Neutral._700}>
+            {description}
+          </Text>
         </Flex>
         <Divider />
         <Flex direction="column" gap="2">
-          <Text.P_Small_Medium>Link to Discussion</Text.P_Small_Medium>
-          <Text.P_Small_Regular color={Color.Neutral._700}>{linkToDiscussion}</Text.P_Small_Regular>
+          <Text textStyle="p small medium">Link to Discussion</Text>
+          <Text textStyle="p small regular" color={Color.Neutral._700}>
+            {linkToDiscussion}
+          </Text>
         </Flex>
         <Divider />
         <Flex direction="column" alignItems="left" gap="1">
-          <Text.P_Small_Medium>Associating To</Text.P_Small_Medium>
+          <Text textStyle="p small medium">Associating To</Text>
           <HashScanLink id={safeAccountId} type={HashscanData.Account} />
         </Flex>
         <Divider />
         <Flex direction="column" alignItems="left" gap="1">
-          <Text.P_Small_Medium>Token</Text.P_Small_Medium>
+          <Text textStyle="p small medium">Token</Text>
           <Flex direction="row" justifyContent="space-between" gap="1">
             <Flex direction="row" gap="1" alignItems="center">
-              <Text.P_Small_Regular>{name}</Text.P_Small_Regular>
+              <Text textStyle="p small regular">{name}</Text>
               {"-"}
               <HashScanLink id={tokenId} type={HashscanData.Token} />
             </Flex>
@@ -74,14 +80,16 @@ export function DAOTokenAssociateReviewForm() {
         {daoType === Routes.NFT && (
           <>
             <Flex direction="column" gap="2">
-              <Text.P_Small_Medium>Token serial number</Text.P_Small_Medium>
-              <Text.P_Small_Regular color={Color.Neutral._700}>{nftTokenSerialId}</Text.P_Small_Regular>
+              <Text textStyle="p small medium">Token serial number</Text>
+              <Text textStyle="p small regular" color={Color.Neutral._700}>
+                {nftTokenSerialId}
+              </Text>
             </Flex>
             <Divider />
           </>
         )}
         <Flex direction="column" alignItems="left" gap="1">
-          <Text.P_Small_Medium>Created by</Text.P_Small_Medium>
+          <Text textStyle="p small medium">Created by</Text>
           <HashScanLink id={walletAccountId} type={HashscanData.Account} />
         </Flex>
       </Flex>

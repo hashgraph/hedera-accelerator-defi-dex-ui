@@ -1,8 +1,7 @@
-import { Flex } from "@chakra-ui/react";
+import { Text, Flex } from "@chakra-ui/react";
 import { Color } from "../../themes";
 import { ReactNode } from "react";
 import { ToastWarningIcon, ToastErrorIcon, ToastInfoIcon, ToastSuccessIcon } from "../Icons";
-import { Text } from "../Text";
 
 export enum InlineAlertType {
   Info = "Info",
@@ -73,8 +72,10 @@ export function InlineAlert(props: InlineAlertProps) {
     <Flex direction="row" gap="2" padding="0.5rem" borderRadius="0.375rem" bg={bg} border={`1px solid ${borderColor}`}>
       {icon}
       <Flex direction="column" gap="1">
-        {title && <Text.P_Small_Medium>{title}</Text.P_Small_Medium>}
-        <Text.P_Small_Regular color={Color.Neutral._700}>{message}</Text.P_Small_Regular>
+        {title && <Text textStyle="p small medium">{title}</Text>}
+        <Text textStyle="p small regular" color={Color.Neutral._700}>
+          {message}
+        </Text>
       </Flex>
     </Flex>
   );
