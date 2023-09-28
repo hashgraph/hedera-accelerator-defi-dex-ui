@@ -115,7 +115,6 @@ export interface MultiSigDAODetails {
   logoUrl: string;
   webLinks: string[];
   isPrivate: boolean;
-  safeId: string;
   safeEVMAddress: string;
   ownerIds: string[];
   threshold: number;
@@ -155,12 +154,12 @@ export enum MultiSigProposeTransactionType {
   BatchOperation = 1,
   TokenAssociation,
   UpgradeProxy,
+  TokenTransfer,
   AddMember = 1001,
   DeleteMember,
   ReplaceMember,
   ChangeThreshold,
   TypeSetText,
-  TokenTransfer,
   HBARTokenTransfer,
 }
 export interface Member {

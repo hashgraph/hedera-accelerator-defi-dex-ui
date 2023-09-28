@@ -114,7 +114,10 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <HederaIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
-                      {formatTokenAmountWithDecimal(amount, Number(token?.data?.decimals ?? 0))} {tokenSymbol}
+                      {isFungible(token?.data.type) &&
+                        `${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} ${tokenSymbol}`}
+                      {isNFT(token?.data.type) &&
+                        ` ${tokenSymbol} ${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))}`}
                     </Text.P_Medium_Regular>
                   </Flex>
                 )}
@@ -131,14 +134,9 @@ export const ProposalCard = (props: ProposalCardProps) => {
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
                       {isFungible(token?.data.type) &&
-                        `${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} ${
-                          token?.data.symbol
-                        }`}
+                        `${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} ${tokenSymbol}`}
                       {isNFT(token?.data.type) &&
-                        ` ${token?.data.symbol} ${formatTokenAmountWithDecimal(
-                          amount,
-                          Number(token?.data.decimals ?? 0)
-                        )}`}
+                        ` ${tokenSymbol} ${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))}`}
                     </Text.P_Medium_Regular>
                   </Flex>
                 )}

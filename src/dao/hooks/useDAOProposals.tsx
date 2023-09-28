@@ -17,7 +17,7 @@ type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
 export function useDAOProposals(
   daoAccountId: string,
-  safeAccountId: string,
+  safeEVMAddress: string,
   proposalFilter: ProposalStatus[] = AllFilters
 ) {
   function filterProposalsByStatus(proposals: Proposal[]): Proposal[] {
@@ -113,11 +113,11 @@ export function useDAOProposals(
   }
 
   return useQuery<Proposal[], Error, Proposal[], UseDAOQueryKey>(
-    [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId, safeAccountId],
+    [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId, safeEVMAddress],
     async () => {
       const logs = await Promise.all([
         DexService.fetchMultiSigDAOLogs(daoAccountId),
-        DexService.fetchHederaGnosisSafeLogs(safeAccountId),
+        DexService.fetchHederaGnosisSafeLogs(safeEVMAddress),
       ]);
       const daoAndSafeLogs = logs ? logs.flat() : [];
       const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
@@ -139,7 +139,6 @@ export function useDAOProposals(
             transactionType,
           } = proposalInfo;
           const { amount, receiver, token } = data ?? {};
-          const safeEVMAddress = await DexService.fetchContractEVMAddress(safeAccountId);
           const threshold = await getThreshold(safeEVMAddress);
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;
@@ -190,7 +189,7 @@ export function useDAOProposals(
             tokenId: tokenId,
             token: tokenData,
             receiver: receiver ? solidityAddressToAccountIdString(receiver) : "",
-            safeAccountId,
+            safeEVMAddress,
             to,
             operation,
             hexStringData,
@@ -210,7 +209,7 @@ export function useDAOProposals(
       return proposals;
     },
     {
-      enabled: !!daoAccountId && !!safeAccountId,
+      enabled: !!daoAccountId && !!safeEVMAddress,
       select: filterProposalsByStatus,
       staleTime: 5,
       keepPreviousData: true,

@@ -6,18 +6,20 @@ import { Wizard, Color, LoadingDialog } from "@shared/ui-kit";
 import { WarningIcon } from "@chakra-ui/icons";
 import { SettingsForm } from "./types";
 import { useHandleTransactionSuccess } from "@dex/hooks";
-import { useDAOs, useUpdateDAODetails } from "@dao/hooks";
+import { useFetchContract, useDAOs, useUpdateDAODetails } from "@dao/hooks";
 import { getDAOLinksRecordArray } from "../utils";
 import { isEmpty } from "ramda";
 
 export function UpdateDAODetails() {
   const { accountId: daoAccountId = "" } = useParams();
+  const daoAccountIdQueryResults = useFetchContract(daoAccountId);
+  const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
   const location = useLocation();
   const currentDaoType = location.pathname.split("/").at(2) ?? "";
   const backTo = `/${currentDaoType}/${daoAccountId}/settings`;
-  const daosQueryResults = useDAOs(daoAccountId);
+  const daosQueryResults = useDAOs();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId === daoAccountId);
+  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const { webLinks } = dao ?? { webLinks: [] };
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const sendUpdateDAODetails = useUpdateDAODetails(handleUpdateDAODetailsSuccess);

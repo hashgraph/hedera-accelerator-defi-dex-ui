@@ -114,7 +114,7 @@ export function DAODashboard(props: DAODashboardProps) {
     const isGovernance = type === DAOType.GovernanceToken;
     const isNFT = type === DAOType.NFT;
     const { tokenId, tokenHolderAddress } = dao as GovernanceDAODetails | NFTDAODetails;
-    const { safeId } = dao as MultiSigDAODetails;
+    const { safeEVMAddress } = dao as MultiSigDAODetails;
 
     return (
       <Page
@@ -124,12 +124,12 @@ export function DAODashboard(props: DAODashboardProps) {
           <DashboardHeader
             isAdmin={isAdmin}
             isMember={isMember}
-            daoAccountId={accountId}
+            accountId={accountId}
             name={name}
             type={type}
             logoUrl={logoUrl}
             govTokenId={tokenId}
-            safeId={safeId}
+            safeEVMAddress={safeEVMAddress}
             handleMintNFT={handleMintNFT}
           />
         }

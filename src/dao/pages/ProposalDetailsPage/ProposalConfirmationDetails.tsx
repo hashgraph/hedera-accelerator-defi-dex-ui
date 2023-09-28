@@ -17,10 +17,11 @@ import {
   UseExecuteProposalMutationResult,
   UseChangeAdminMutationResult,
   ProposalStatus,
+  useFetchContract,
 } from "@dao/hooks";
 
 interface ProposalConfirmationDetailsProps {
-  safeAccountId: string;
+  safeEVMAddress: string;
   to: string;
   approvalCount: number;
   approvers: string[];
@@ -44,7 +45,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const connectedWalletId = wallet.savedPairingData?.accountIds[0] ?? "";
   const {
-    safeAccountId,
+    safeEVMAddress,
     to,
     approvalCount,
     approvers,
@@ -64,6 +65,8 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     proxyAdmin = "",
   } = props;
 
+  const daoSafeIdQueryResults = useFetchContract(safeEVMAddress);
+  const safeAccountId = daoSafeIdQueryResults.data?.data.contract_id ?? "";
   const confirmationProgress = approvalCount > 0 ? (approvalCount / threshold) * 100 : 0;
   const notConfirmedCount = memberCount - (approvalCount ?? 0);
   const hasConnectedWalletVoted = approvers.includes(connectedWalletId);
