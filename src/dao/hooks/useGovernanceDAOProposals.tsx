@@ -132,7 +132,7 @@ export function useGovernanceDAOProposals(
       token: tokenData,
       receiver: proposalData.transferToAccount ?? "",
       sender: proposalData.transferFromAccount ?? "",
-      safeAccountId: "",
+      safeEVMAddress: "",
       to: "",
       operation: 0,
       hexStringData: proposalData.data ?? "",

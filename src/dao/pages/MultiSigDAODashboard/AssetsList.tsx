@@ -3,17 +3,18 @@ import { Text, Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } fro
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@dex/services";
-import { DAODetailsContext, DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
+import { DAODetailsContext, DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails } from "@dao/services";
 import { TokenType, TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
 import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal";
 import { useState } from "react";
 import { useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
-import { useDepositTokens } from "@dao/hooks";
+import { useFetchContract, useDepositTokens } from "@dao/hooks";
 import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function AssetsList() {
   const { tokenBalances: assets, dao, blockedBalance = 0 } = useOutletContext<DAODetailsContext>();
+  const { safeEVMAddress = "" } = dao as MultiSigDAODetails;
   const governanceTokenId = (dao as GovernanceDAODetails | NFTDAODetails)?.tokenId ?? undefined;
   const govTokenAssetBalance = assets.find((token) => token.tokenId === governanceTokenId)?.balance ?? 0;
   const totalGovTokenAssetValue =
@@ -29,9 +30,11 @@ export function AssetsList() {
   const navigate = useNavigate();
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const depositTokens = useDepositTokens(handleDepositTokensSuccess);
+  const daoSafeIdQueryResults = useFetchContract(safeEVMAddress);
+  const daoSafeId = daoSafeIdQueryResults.data?.data.contract_id ?? "";
   const tokenTransferAccountId =
     dao.type === DAOType.MultiSig
-      ? dao.safeId
+      ? daoSafeId
       : dao.governors?.tokenTransferLogic
       ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
       : "";

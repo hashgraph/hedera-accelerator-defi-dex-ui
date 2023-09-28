@@ -9,7 +9,7 @@ import {
 } from "@dex/layouts";
 import { useTabFilters } from "@dex/hooks";
 import { Proposal, ProposalStatus, useDAOProposals, useGovernanceDAOProposals } from "@dao/hooks";
-import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
 import { DAODetailsContext, GovernanceDAODetails, MultiSigDAODetails } from "@dao/services";
@@ -37,16 +37,16 @@ const transactionTabs = [
 ];
 
 export function ProposalList() {
+  const { accountId: daoAccountId = "" } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { dao } = useOutletContext<DAODetailsContext>();
-  const { accountId: daoAccountId } = dao;
-  const { safeId: safeAccountId = "" } = dao as MultiSigDAODetails;
+  const { safeEVMAddress } = dao as MultiSigDAODetails;
   const { tokenId = "", governors } = dao as GovernanceDAODetails;
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
-  const multiSigDAOTransactionsQueryResults = useDAOProposals(daoAccountId, safeAccountId, transactionFilters);
+  const multiSigDAOTransactionsQueryResults = useDAOProposals(daoAccountId, safeEVMAddress, transactionFilters);
   const {
     isSuccess: multiSigTransactionSuccess,
     isLoading: multiSigTransactionLoading,
@@ -120,7 +120,7 @@ export function ProposalList() {
                     ))
                   )
                 : [<></>, <></>].map(() => (
-                    <Flex direction="column" gap="2" minHeight="300px">
+                    <Flex direction="column" gap="2" minHeight="300px" key="not-found">
                       <NotFound
                         icon={<TransactionIcon boxSize="4rem" stroke={Color.Neutral._900} />}
                         message={`We didn't find any ${tabIndex === 0 ? "active" : "past"} proposals.`}

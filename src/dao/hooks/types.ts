@@ -9,6 +9,7 @@ export enum DAOQueries {
   FetchCanUnlockNFTToken = "fetchCanUnlockNFTToken",
   FetchBlockedTokenBalance = "fetchBlockedTokenBalance",
   FetchDAOMembers = "fetchDAOMembers",
+  Contract = "contract",
 }
 
 export enum DAOMutations {
@@ -159,7 +160,7 @@ export interface Proposal {
   token: MirrorNodeTokenById | null | undefined;
   receiver: string;
   sender?: string;
-  safeAccountId: string;
+  safeEVMAddress: string;
   to: string;
   operation: number;
   hexStringData: string;
