@@ -14,13 +14,14 @@ import { DAOType } from "@dao/services";
 import { MintNFTModal } from "./MintNFTModal";
 import { useToken } from "@dex/hooks";
 import { Routes } from "@dao/routes";
+import { useFetchContract } from "@dao/hooks";
 
 interface DashboardHeaderProps {
   isMember?: boolean;
   isAdmin?: boolean;
-  daoAccountId: string;
+  accountId: string;
   govTokenId?: string;
-  safeId?: string;
+  safeEVMAddress?: string;
   name: string;
   type: DAOType;
   logoUrl?: string;
@@ -28,8 +29,12 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { daoAccountId, name, type, logoUrl, govTokenId, safeId, isMember, isAdmin, handleMintNFT } = props;
+  const { accountId, name, type, logoUrl, govTokenId, safeEVMAddress, isMember, isAdmin, handleMintNFT } = props;
   const navigate = useNavigate();
+  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
+  const daoSafeIdQueryResults = useFetchContract(safeEVMAddress ?? "");
+  const safeId = daoSafeIdQueryResults.data?.data.contract_id;
   const { data: token } = useToken(govTokenId ?? "");
   const showMintNFTButton = type === DAOType.NFT && Number(token?.data.max_supply) > Number(token?.data.total_supply);
 
@@ -53,7 +58,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
               <HStack>
                 <HStack>
                   <Text.H4_Medium opacity="0.8">DAO ID:</Text.H4_Medium>
-                  <HashScanLink id={daoAccountId} type={HashscanData.Account} />
+                  {daoAccountId && <HashScanLink id={daoAccountId} type={HashscanData.Account} />}
                 </HStack>
                 {govTokenId ? (
                   <HStack>

@@ -77,41 +77,14 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
 
   const multiSigEventResults = logs.map(async (log): Promise<MultiSigDAODetails> => {
     const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
-    const daoSolidityAddress = (await DexService.fetchContractId(argsWithName.daoAddress)).toSolidityAddress();
-    const safeDAOSolidityAddress = (await DexService.fetchContractId(argsWithName.safeAddress)).toSolidityAddress();
-    const { inputs: initialDAODetails, safeAddress: safeEVMAddress } = argsWithName;
+    const { inputs: initialDAODetails, safeAddress: safeEVMAddress, daoAddress } = argsWithName;
     const owners = await getOwners(safeEVMAddress);
     const threshold = await getThreshold(safeEVMAddress);
-
-    /** START - TODO: Need to apply a proper fix */
-    let accountId;
-    try {
-      accountId = solidityAddressToAccountIdString(daoSolidityAddress);
-    } catch (e) {
-      console.error(e, daoSolidityAddress);
-      return {
-        type: DAOType.MultiSig,
-        accountId: "Error",
-        adminId: "Error",
-        name: "Error",
-        logoUrl: "Error",
-        title: "Error",
-        description: "Error",
-        isPrivate: false,
-        webLinks: ["Error"],
-        safeId: "Error",
-        ownerIds: ["Error"],
-        safeEVMAddress: "",
-        threshold,
-      };
-    }
-    /** END - TODO: Need to apply a proper fix */
-
     const { admin, isPrivate, name, description, logoUrl, webLinks } = initialDAODetails;
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
+    const updatedDAODetails = await fetchDAOSettingsPageDetails(daoAddress, [DAOEvents.DAOInfoUpdated]);
     return {
       type: DAOType.MultiSig,
-      accountId,
+      accountId: daoAddress,
       adminId: solidityAddressToAccountIdString(admin),
       name: updatedDAODetails?.name ?? name,
       logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
@@ -119,7 +92,6 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
       description: updatedDAODetails?.description ?? description,
       isPrivate,
       webLinks: updatedDAODetails?.webLinks ?? webLinks,
-      safeId: solidityAddressToAccountIdString(safeDAOSolidityAddress),
       safeEVMAddress,
       ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
       threshold,
@@ -402,9 +374,15 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
         }
         case MultiSigProposeTransactionType.TokenTransfer: {
           parsedData = abiCoder.decode(
-            ["address token", "address receiver", "uint256 amount"],
+            ["address", "address token", "address receiver", "uint256 amount"],
             ethers.utils.hexDataSlice(event.args.info.data, 4)
           );
+          if (parsedData.token === ethers.constants.AddressZero) {
+            parsedData = {
+              ...parsedData,
+              token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
+            };
+          }
           break;
         }
         case MultiSigProposeTransactionType.TokenAssociation: {

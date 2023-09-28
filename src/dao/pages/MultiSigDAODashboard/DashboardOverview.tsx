@@ -8,12 +8,12 @@ import { RecentProposals } from "../RecentProposals";
 
 export function DashboardOverview() {
   const { dao, totalAssetValue, tokenBalances, members } = useOutletContext<MultiSigDAODetailsContext>();
-  const { accountId, safeId, threshold } = dao;
+  const { accountId, safeEVMAddress, threshold } = dao;
   const totalAssetDisplay = totalAssetValue;
   const tokenCountDisplay = tokenBalances?.length;
   const memberCountDisplay = String(members.length);
   const thresholdDisplay = `${String(threshold)} / ${String(members.length)}`;
-  const daoTransactionsQueryResults = useDAOProposals(accountId, safeId);
+  const daoTransactionsQueryResults = useDAOProposals(accountId, safeEVMAddress);
   const { isSuccess, isLoading, isError, error, data: proposals } = daoTransactionsQueryResults;
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   const recentProposals = proposals?.sort((proposalA, proposalB) => proposalA.id - proposalB.id).slice(0, 3);

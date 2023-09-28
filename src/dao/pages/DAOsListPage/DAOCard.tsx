@@ -2,6 +2,7 @@ import { Text, Grid, GridItem, Flex, Card, Image } from "@chakra-ui/react";
 import { Color, DefaultLogoIcon } from "@shared/ui-kit";
 import { useNavigate } from "react-router-dom";
 import { DAOType } from "@dao/services";
+import { useFetchContract } from "@dao/hooks";
 
 export interface DAOCardProps {
   accountId: string;
@@ -13,10 +14,12 @@ export interface DAOCardProps {
 export function DAOCard(props: DAOCardProps) {
   const { name, type, accountId, logoUrl } = props;
   const navigate = useNavigate();
+  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
 
   function handleDAOCardClicked() {
     const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
-    navigate(`${daoTypePath}/${accountId}`);
+    navigate(`${daoTypePath}/${daoAccountId}`);
   }
 
   return (

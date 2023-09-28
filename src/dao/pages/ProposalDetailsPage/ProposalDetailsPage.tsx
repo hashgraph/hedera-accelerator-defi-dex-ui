@@ -71,7 +71,7 @@ export function ProposalDetailsPage() {
       approvalCount,
       transactionHash,
       amount,
-      safeAccountId,
+      safeEVMAddress,
       to,
       receiver,
       token,
@@ -135,7 +135,7 @@ export function ProposalDetailsPage() {
             ) : undefined}
             {isMultiSigProposal && transactionHash ? (
               <ProposalConfirmationDetails
-                safeAccountId={safeAccountId}
+                safeEVMAddress={safeEVMAddress}
                 to={to}
                 approvalCount={approvalCount}
                 approvers={approvers}

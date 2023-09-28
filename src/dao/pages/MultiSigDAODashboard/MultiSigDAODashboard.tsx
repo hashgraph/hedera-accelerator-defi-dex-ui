@@ -1,5 +1,5 @@
 import { TokenBalance, useAccountTokenBalances, usePairedWalletDetails } from "@dex/hooks";
-import { useDAOs } from "@dao/hooks";
+import { useFetchContract, useDAOs } from "@dao/hooks";
 import { Member, MultiSigDAODetails } from "@dao/services";
 import { Outlet, useParams } from "react-router-dom";
 import { isNil, isNotNil } from "ramda";
@@ -7,21 +7,31 @@ import { DAODashboard } from "../DAODashboard";
 import { MultiSigDAODetailsContext } from "./types";
 
 export function MultiSigDAODashboard() {
-  const { accountId: daoAccountId = "" } = useParams();
-  const daosQueryResults = useDAOs<MultiSigDAODetails>(daoAccountId);
+  const { accountId = "" } = useParams();
+  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
+  const daosQueryResults = useDAOs<MultiSigDAODetails>();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId === daoAccountId);
+  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const { isWalletPaired, walletId } = usePairedWalletDetails();
 
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(dao?.safeId ?? "");
+  const daoSafeIdQueryResults = useFetchContract(dao?.safeEVMAddress ?? "");
+  const daoSafeId = daoSafeIdQueryResults.data?.data.contract_id;
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoSafeId ?? "");
   const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
 
-  const isNotFound = daosQueryResults.isSuccess && isNil(dao);
-  const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
-  const isError = daosQueryResults.isError || accountTokenBalancesQueryResults.isError;
-  const isLoading = daosQueryResults.isLoading || accountTokenBalancesQueryResults.isLoading;
-  const errorMessage = daosQueryResults.error?.message || accountTokenBalancesQueryResults.error?.message;
-  const isSuccess = daosQueryResults.isSuccess && accountTokenBalancesQueryResults.isSuccess;
+  const isNotFound = daosQueryResults.isSuccess && daoAccountIdQueryResults.isSuccess && isNil(dao);
+  const isDAOFound = daosQueryResults.isSuccess && daoAccountIdQueryResults.isSuccess && isNotNil(dao);
+  const isError =
+    daosQueryResults.isError || accountTokenBalancesQueryResults.isError || daoAccountIdQueryResults.isError;
+  const isLoading =
+    daosQueryResults.isLoading || accountTokenBalancesQueryResults.isLoading || daoAccountIdQueryResults.isLoading;
+  const errorMessage =
+    daosQueryResults.error?.message ||
+    accountTokenBalancesQueryResults.error?.message ||
+    daoAccountIdQueryResults.error?.message;
+  const isSuccess =
+    daosQueryResults.isSuccess && accountTokenBalancesQueryResults.isSuccess && daoAccountIdQueryResults.isSuccess;
 
   if (isDAOFound && isSuccess) {
     const { adminId, ownerIds } = dao;

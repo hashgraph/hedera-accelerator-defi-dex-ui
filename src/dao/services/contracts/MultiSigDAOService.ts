@@ -116,6 +116,45 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
   return sendProposeTransactionResponse;
 }
 
+interface SendProposeTransferTransaction {
+  to: string;
+  tokenAddress: string;
+  amountOrId: number;
+  multiSigDAOContractId: string;
+  title: string;
+  description: string;
+  linkToDiscussion?: string;
+  signer: HashConnectSigner;
+}
+
+async function sendProposeTransferTransaction(params: SendProposeTransferTransaction) {
+  const {
+    to,
+    tokenAddress,
+    amountOrId,
+    multiSigDAOContractId,
+    title,
+    description,
+    linkToDiscussion = "",
+    signer,
+  } = params;
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddress(to)
+    .addAddress(tokenAddress)
+    .addUint256(amountOrId)
+    .addString(title)
+    .addString(description)
+    .addString(linkToDiscussion);
+  const sendProposeTransaction = await new ContractExecuteTransaction()
+    .setContractId(multiSigDAOContractId)
+    .setFunction(MultiSigDAOContractFunctions.ProposeTransferTransaction, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeTransactionResponse = await sendProposeTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(sendProposeTransactionResponse, MultiSigDAOContractFunctions.ProposeTransaction);
+  return sendProposeTransactionResponse;
+}
+
 interface UpdateDAODetailsTransactionParams {
   name: string;
   description: string;
@@ -249,6 +288,7 @@ async function proposeMultiSigDAOUpgradeProposal(params: ProposeMultiSigDAOUpgra
 
 export {
   sendCreateMultiSigDAOTransaction,
+  sendProposeTransferTransaction,
   sendProposeTransaction,
   sendUpdateDAODetailsTransaction,
   sendDAOTokenAssociateTransaction,

@@ -30,6 +30,7 @@ import {
   useCreateMultiSigDAOUpgradeProposal,
   useDAOs,
   useCreateGOVTokenAssociateProposal,
+  useFetchContract,
 } from "@dao/hooks";
 import { useHandleTransactionSuccess, useAccountTokenBalances } from "@dex/hooks";
 import { isNil } from "ramda";
@@ -40,6 +41,11 @@ import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
+  const daoAccountIdQueryResults = useFetchContract(daoAccountId);
+  const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
+  const daosQueryResults = useDAOs();
+  const { data: daos } = daosQueryResults;
+  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const createDaoProposalForm = useForm<CreateDAOProposalForm>({
     defaultValues: {
       type: DAOProposalType.Text,
@@ -61,19 +67,18 @@ export function CreateDAOProposal() {
   const currentDaoType = location.pathname.split("/").at(1) ?? "";
   const currentWizardStep = getLastPathInRoute(location.pathname);
   const backTo = `/${currentDaoType}/${daoAccountId}/${Routes.Overview}`;
-  const daosQueryResults = useDAOs(daoAccountId);
   const handleTransactionSuccess = useHandleTransactionSuccess();
-  const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId === daoAccountId);
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
-  const { ownerIds, safeId: safeAccountId = "", threshold, safeEVMAddress } = (dao as MultiSigDAODetails) ?? {};
+  const { ownerIds, threshold, safeEVMAddress } = (dao as MultiSigDAODetails) ?? {};
+  const daoSafeIdQueryResults = useFetchContract(safeEVMAddress ?? "");
+  const safeAccountId = daoSafeIdQueryResults.data?.data.contract_id ?? "";
   const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
   const tokenTransferGovernorAccountId = governors?.tokenTransferLogic
     ? solidityAddressToAccountIdString(governors.tokenTransferLogic)
     : "";
   const transferFrom = currentDaoType === Routes.Multisig ? safeAccountId : tokenTransferGovernorAccountId;
-  const wizardTitle = currentWizardStep === "type" ? "New Proposal" : type;
+  const wizardTitle = currentWizardStep === Routes.Type ? "New Proposal" : type;
   const accountTokenBalancesQueryResults = useAccountTokenBalances(
     currentDaoType === Routes.Multisig ? safeAccountId : daoAccountId
   );
@@ -300,11 +305,10 @@ export function CreateDAOProposal() {
             return createMultisigTokenTransferProposal({
               tokenId,
               receiverId: recipientAccountId,
-              amount: Number(amount),
+              amount: Number(amount ?? 0),
               decimals,
               title,
               description,
-              safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
               tokenType,
               nftSerialId,
@@ -658,7 +662,15 @@ export function CreateDAOProposal() {
             }}
             header={<Wizard.Header />}
             stepper={<Wizard.Stepper />}
-            form={<Wizard.Form layerStyle={type === DAOProposalType.TokenTransfer ? "dao-wizard__form" : undefined} />}
+            form={
+              <Wizard.Form
+                layerStyle={
+                  type === DAOProposalType.TokenTransfer && currentWizardStep === Routes.DAODetails
+                    ? "dao-wizard__form"
+                    : undefined
+                }
+              />
+            }
             footer={<Wizard.Footer />}
           />
         }
