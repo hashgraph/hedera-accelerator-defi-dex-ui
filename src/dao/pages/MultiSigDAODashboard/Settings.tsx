@@ -5,7 +5,7 @@ import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./types";
 import { Member } from "@dao/services";
 import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { getDAOLinksRecordArray } from "../utils";
 import { Link as ReachLink } from "react-router-dom";
 import { usePairedWalletDetails } from "@dex/hooks";
@@ -16,9 +16,10 @@ const { Multisig, DAOAddMemberDetails, DAODeleteMemberDetails, DAOReplaceMemberD
   Routes;
 
 export function Settings() {
+  const { accountId: daoAccountId = "" } = useParams();
   const navigate = useNavigate();
   const { dao, members } = useOutletContext<MultiSigDAODetailsContext>();
-  const { name, logoUrl, description, webLinks, adminId, threshold, accountId: daoAccountId } = dao;
+  const { name, logoUrl, description, webLinks, adminId, threshold } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   const { isWalletPaired, walletId } = usePairedWalletDetails();
   const isAdmin = isWalletPaired && walletId === dao.adminId;

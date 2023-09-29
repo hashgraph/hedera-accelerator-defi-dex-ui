@@ -67,7 +67,7 @@ export interface DAODetailsInfoEventArgs {
 
 export interface GovernanceDAODetails {
   type: DAOType.GovernanceToken;
-  accountId: string;
+  accountEVMAddress: string;
   adminId: string;
   title: string;
   description: string;
@@ -87,7 +87,7 @@ export interface GovernanceDAODetails {
 
 export interface NFTDAODetails {
   type: DAOType.NFT;
-  accountId: string;
+  accountEVMAddress: string;
   adminId: string;
   title: string;
   description: string;
@@ -109,7 +109,7 @@ export interface MultiSigDAODetails {
   type: DAOType.MultiSig;
   title: string;
   description: string;
-  accountId: string;
+  accountEVMAddress: string;
   adminId: string;
   name: string;
   logoUrl: string;

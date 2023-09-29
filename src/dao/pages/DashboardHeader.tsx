@@ -19,7 +19,7 @@ import { useFetchContract } from "@dao/hooks";
 interface DashboardHeaderProps {
   isMember?: boolean;
   isAdmin?: boolean;
-  accountId: string;
+  accountEVMAddress: string;
   govTokenId?: string;
   safeEVMAddress?: string;
   name: string;
@@ -29,9 +29,10 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { accountId, name, type, logoUrl, govTokenId, safeEVMAddress, isMember, isAdmin, handleMintNFT } = props;
+  const { accountEVMAddress, name, type, logoUrl, govTokenId, safeEVMAddress, isMember, isAdmin, handleMintNFT } =
+    props;
   const navigate = useNavigate();
-  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress ?? "");
   const safeId = daoSafeIdQueryResults.data?.data.contract_id;

@@ -19,7 +19,7 @@ export function UpdateDAODetails() {
   const backTo = `/${currentDaoType}/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
+  const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const { webLinks } = dao ?? { webLinks: [] };
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const sendUpdateDAODetails = useUpdateDAODetails(handleUpdateDAODetailsSuccess);

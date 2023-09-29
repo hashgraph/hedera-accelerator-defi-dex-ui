@@ -10,12 +10,11 @@ import { DepositTokensFormData, DepositTokensModal } from "./DepositTokensModal"
 import { useState } from "react";
 import { useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
 import { useFetchContract, useDepositTokens } from "@dao/hooks";
-import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function AssetsList() {
   const { tokenBalances: assets, dao, blockedBalance = 0 } = useOutletContext<DAODetailsContext>();
   const { safeEVMAddress = "" } = dao as MultiSigDAODetails;
-  const governanceTokenId = (dao as GovernanceDAODetails | NFTDAODetails)?.tokenId ?? undefined;
+  const { tokenId: governanceTokenId, governors } = dao as GovernanceDAODetails | NFTDAODetails;
   const govTokenAssetBalance = assets.find((token) => token.tokenId === governanceTokenId)?.balance ?? 0;
   const totalGovTokenAssetValue =
     govTokenAssetBalance -
@@ -32,12 +31,10 @@ export function AssetsList() {
   const depositTokens = useDepositTokens(handleDepositTokensSuccess);
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress);
   const daoSafeId = daoSafeIdQueryResults.data?.data.contract_id ?? "";
-  const tokenTransferAccountId =
-    dao.type === DAOType.MultiSig
-      ? daoSafeId
-      : dao.governors?.tokenTransferLogic
-      ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
-      : "";
+  const daoTokenTransferLogicQueryResults = useFetchContract(governors?.tokenTransferLogic ?? "");
+  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
+
+  const tokenTransferAccountId = dao.type === DAOType.MultiSig ? daoSafeId : daoTokenTransferLogic;
 
   async function handleDepositClicked(data: DepositTokensFormData) {
     const selectedToken = assets.find((token) => token.tokenId === data.tokenId);

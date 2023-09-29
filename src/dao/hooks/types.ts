@@ -177,7 +177,7 @@ export interface Proposal {
   link: string | undefined;
   threshold: number | undefined;
   proposalId?: string;
-  contractId?: string;
+  contractEvmAddress?: string;
   timeRemaining?: string;
   votes?: Votes;
   hasVoted?: boolean;

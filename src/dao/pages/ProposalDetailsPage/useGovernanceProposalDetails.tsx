@@ -6,7 +6,14 @@ import {
   useHandleTransactionSuccess,
   useFetchLockedGovToken,
 } from "@dex/hooks";
-import { useDAOs, ProposalStatus, useGovernanceDAOProposals, useFetchLockedNFTToken, useChangeAdmin } from "@dao/hooks";
+import {
+  useDAOs,
+  ProposalStatus,
+  useGovernanceDAOProposals,
+  useFetchLockedNFTToken,
+  useChangeAdmin,
+  useFetchContract,
+} from "@dao/hooks";
 import { DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -21,9 +28,14 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
   const changeAdminMutation = useChangeAdmin(handleExecuteProposalSuccess);
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
-  const daosQueryResults = useDAOs<GovernanceDAODetails | NFTDAODetails>(daoAccountId);
+  const daoAccountIdQueryResults = useFetchContract(daoAccountId);
+  const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
+  const daosQueryResults = useDAOs<GovernanceDAODetails | NFTDAODetails>();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao: GovernanceDAODetails | NFTDAODetails) => dao.accountId === daoAccountId);
+  const dao = daos?.find(
+    (dao: GovernanceDAODetails | NFTDAODetails) =>
+      dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase()
+  );
   const daoProposalsQueryResults = useGovernanceDAOProposals(daoAccountId, dao?.tokenId, dao?.governors);
   const { data: proposals } = daoProposalsQueryResults;
   const proposal = proposals?.find((proposal) => proposal.proposalId === proposalId);

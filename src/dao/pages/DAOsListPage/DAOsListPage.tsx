@@ -37,9 +37,11 @@ export function DAOsListPage() {
           onLinkClick={handleLinkClick}
         >
           {daos.data?.map((dao: DAO, index: number) => {
-            const { accountId, name, type, isPrivate, logoUrl } = dao;
+            const { accountEVMAddress, name, type, isPrivate, logoUrl } = dao;
             if (isPrivate) return null;
-            return <DAOCard key={index} accountId={accountId} name={name} type={type} logoUrl={logoUrl} />;
+            return (
+              <DAOCard key={index} accountEVMAddress={accountEVMAddress} name={name} type={type} logoUrl={logoUrl} />
+            );
           })}
         </CardGridLayout>
       }

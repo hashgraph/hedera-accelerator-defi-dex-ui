@@ -7,7 +7,7 @@ export function useProposalDetails(daoAccountId: string, transactionHash: string
   const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
   const daosQueryResults = useDAOs<MultiSigDAODetails>();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
+  const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const daoProposalsQueryResults = useDAOProposals(daoAccountId, dao?.safeEVMAddress ?? "");
   const { data: proposals } = daoProposalsQueryResults;
   const proposal = proposals?.find((proposal) => proposal.transactionHash === transactionHash);

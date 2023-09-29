@@ -8,7 +8,7 @@ import { isNil } from "ramda";
 
 interface UseCreateDAOTextProposalParams {
   governanceTokenId: string;
-  governanceAddress: string;
+  spenderContractId: string;
   title: string;
   description: string;
   linkToDiscussion: string;

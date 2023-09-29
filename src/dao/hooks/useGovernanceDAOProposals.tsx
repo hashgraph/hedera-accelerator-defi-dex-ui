@@ -143,7 +143,7 @@ export function useGovernanceDAOProposals(
       metadata,
       link: proposalData.link,
       threshold: 0,
-      contractId: proposalData.contractId ? solidityAddressToAccountIdString(proposalData?.contractId) : "",
+      contractEvmAddress: proposalData.contractId,
       votes: getVotes(proposalData, godTokenData),
       hasVoted: proposalData.votingInformation?.voted,
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,

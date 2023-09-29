@@ -1,14 +1,15 @@
 import { Flex, Grid, GridItem, Link, ListItem, UnorderedList } from "@chakra-ui/react";
 import { Text, Color, MetricLabel, PeopleIcon, TokenIcon } from "@shared/ui-kit";
-import { Link as ReachLink, useOutletContext } from "react-router-dom";
+import { Link as ReachLink, useOutletContext, useParams } from "react-router-dom";
 import { MultiSigDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
 import { useDAOProposals } from "@dao/hooks";
 import { RecentProposals } from "../RecentProposals";
 
 export function DashboardOverview() {
+  const { accountId = "" } = useParams();
   const { dao, totalAssetValue, tokenBalances, members } = useOutletContext<MultiSigDAODetailsContext>();
-  const { accountId, safeEVMAddress, threshold } = dao;
+  const { safeEVMAddress, threshold } = dao;
   const totalAssetDisplay = totalAssetValue;
   const tokenCountDisplay = tokenBalances?.length;
   const memberCountDisplay = String(members.length);

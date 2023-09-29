@@ -3,20 +3,15 @@ import { DexService } from "@dex/services";
 import { DAO } from "@dao/services";
 import { DAOQueries } from "./types";
 
-type UseDAOsQueryKey = [DAOQueries.DAOs, string];
+type UseDAOsQueryKey = [DAOQueries.DAOs];
 
-export function useDAOs<DAOType extends DAO>(daoAccountId = "all") {
+export function useDAOs<DAOType extends DAO>() {
   return useQuery<DAOType[], Error, DAOType[], UseDAOsQueryKey>(
-    [DAOQueries.DAOs, daoAccountId],
+    [DAOQueries.DAOs],
     async () => {
       return (await DexService.fetchAllDAOs()) as DAOType[];
     },
     {
-      enabled: !!daoAccountId,
-      select: (data: DAOType[]) => {
-        if (daoAccountId === "all") return data;
-        return data.filter((dao) => dao.accountId === daoAccountId);
-      },
       staleTime: 5,
       keepPreviousData: true,
     }
