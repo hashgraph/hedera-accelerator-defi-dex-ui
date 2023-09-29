@@ -5,16 +5,16 @@ import { DAOType } from "@dao/services";
 import { useFetchContract } from "@dao/hooks";
 
 export interface DAOCardProps {
-  accountId: string;
+  accountEVMAddress: string;
   name: string;
   type: DAOType;
   logoUrl: string;
 }
 
 export function DAOCard(props: DAOCardProps) {
-  const { name, type, accountId, logoUrl } = props;
+  const { name, type, accountEVMAddress, logoUrl } = props;
   const navigate = useNavigate();
-  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
 
   function handleDAOCardClicked() {

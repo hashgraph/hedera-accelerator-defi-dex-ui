@@ -37,7 +37,6 @@ import { isNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { getLastPathInRoute } from "@dex/utils";
 import { getDAOType, getPreviousMemberAddress } from "../utils";
-import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -45,7 +44,7 @@ export function CreateDAOProposal() {
   const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
   const daosQueryResults = useDAOs();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
+  const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const createDaoProposalForm = useForm<CreateDAOProposalForm>({
     defaultValues: {
       type: DAOProposalType.Text,
@@ -74,10 +73,14 @@ export function CreateDAOProposal() {
   const safeAccountId = daoSafeIdQueryResults.data?.data.contract_id ?? "";
   const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
-  const tokenTransferGovernorAccountId = governors?.tokenTransferLogic
-    ? solidityAddressToAccountIdString(governors.tokenTransferLogic)
-    : "";
-  const transferFrom = currentDaoType === Routes.Multisig ? safeAccountId : tokenTransferGovernorAccountId;
+
+  const daoContractUpgradeLogicQueryResults = useFetchContract(governors?.contractUpgradeLogic ?? "");
+  const daoContractUpgradeLogic = daoContractUpgradeLogicQueryResults.data?.data.contract_id ?? "";
+  const daoTextLogicQueryResults = useFetchContract(governors?.textLogic ?? "");
+  const daoTextLogic = daoTextLogicQueryResults.data?.data.contract_id ?? "";
+  const daoTokenTransferLogicQueryResults = useFetchContract(governors?.tokenTransferLogic ?? "");
+  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
+  const transferFrom = currentDaoType === Routes.Multisig ? safeAccountId : daoTokenTransferLogic;
   const wizardTitle = currentWizardStep === Routes.Type ? "New Proposal" : type;
   const accountTokenBalancesQueryResults = useAccountTokenBalances(
     currentDaoType === Routes.Multisig ? safeAccountId : daoAccountId
@@ -318,7 +321,7 @@ export function CreateDAOProposal() {
               tokenId,
               title,
               linkToDiscussion,
-              governanceAddress: governors.tokenTransferLogic,
+              spenderContractId: daoTokenTransferLogic,
               governanceTokenId,
               description,
               receiverId: recipientAccountId,
@@ -335,7 +338,7 @@ export function CreateDAOProposal() {
               tokenId,
               title,
               linkToDiscussion,
-              governanceAddress: governors.tokenTransferLogic,
+              spenderContractId: daoTokenTransferLogic,
               governanceTokenId,
               description,
               receiverId: recipientAccountId,
@@ -408,7 +411,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               oldProxyAddress,
               newImplementationAddress,
-              governanceAddress: governors.contractUpgradeLogic,
+              spenderContractId: daoContractUpgradeLogic,
               governanceTokenId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
@@ -430,7 +433,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               oldProxyAddress,
               newImplementationAddress,
-              governanceAddress: governors.contractUpgradeLogic,
+              spenderContractId: daoContractUpgradeLogic,
               governanceTokenId,
               nftTokenSerialId: nftTokenSerialId,
               daoType: DAOType.NFT,
@@ -456,7 +459,7 @@ export function CreateDAOProposal() {
               title,
               description,
               linkToDiscussion,
-              governanceAddress: governors.textLogic,
+              spenderContractId: daoTextLogic,
               governanceTokenId,
               daoContractId: daoAccountId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
@@ -468,7 +471,7 @@ export function CreateDAOProposal() {
               title,
               description,
               linkToDiscussion,
-              governanceAddress: governors.textLogic,
+              spenderContractId: daoTextLogic,
               governanceTokenId,
               daoContractId: daoAccountId,
               nftTokenSerialId,
@@ -497,7 +500,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               tokenId,
               governanceTokenId,
-              governanceAddress: governors.tokenTransferLogic,
+              spenderContractId: daoTokenTransferLogic,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
             });
@@ -509,7 +512,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               tokenId,
               governanceTokenId,
-              governanceAddress: governors.tokenTransferLogic,
+              spenderContractId: daoTokenTransferLogic,
               nftTokenSerialId,
               daoType: DAOType.NFT,
             });

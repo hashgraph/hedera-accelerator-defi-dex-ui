@@ -84,7 +84,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     const updatedDAODetails = await fetchDAOSettingsPageDetails(daoAddress, [DAOEvents.DAOInfoUpdated]);
     return {
       type: DAOType.MultiSig,
-      accountId: daoAddress,
+      accountEVMAddress: daoAddress,
       adminId: solidityAddressToAccountIdString(admin),
       name: updatedDAODetails?.name ?? name,
       logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
@@ -130,19 +130,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
   const allPromises = logs.map(async (log): Promise<GovernanceDAODetails> => {
     const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
 
-    const {
-      daoAddress,
-      governors: { contractUpgradeLogic, textLogic, tokenTransferLogic, createTokenLogic },
-      tokenHolderAddress,
-      inputs: initialDAODetails,
-    } = argsWithName;
-    const daoSolidityAddress = (await DexService.fetchContractId(daoAddress)).toSolidityAddress();
-    const upgradeLogicSolidityAddress = (await DexService.fetchContractId(contractUpgradeLogic)).toSolidityAddress();
-    const tokenHolderSolidityAddress = (await DexService.fetchContractId(tokenHolderAddress)).toSolidityAddress();
-    const textLogicSolidityAddress = (await DexService.fetchContractId(textLogic)).toSolidityAddress();
-    const transferLogicSolidityAddress = (await DexService.fetchContractId(tokenTransferLogic)).toSolidityAddress();
-    const tokenLoginSolidityAddress = (await DexService.fetchContractId(createTokenLogic)).toSolidityAddress();
-
+    const { daoAddress: accountId, governors, tokenHolderAddress, inputs: initialDAODetails } = argsWithName;
     const {
       admin,
       isPrivate,
@@ -157,40 +145,9 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       description,
     } = initialDAODetails;
 
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(daoSolidityAddress, [DAOEvents.DAOInfoUpdated]);
+    const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
 
-    /** START - TODO: Need to apply a proper fix */
-    let accountId;
     let tokenId;
-    try {
-      accountId = solidityAddressToAccountIdString(daoSolidityAddress);
-    } catch (e) {
-      console.error(e, daoAddress);
-      return {
-        type: DAOType.GovernanceToken,
-        accountId: "Error",
-        adminId: "Error",
-        name: "Error",
-        logoUrl: "Error",
-        isPrivate: false,
-        title: "Error",
-        webLinks: ["Error"],
-        description: "Error",
-        infoUrl: "Error",
-        governors: {
-          contractUpgradeLogic: "Error",
-          createTokenLogic: "Error",
-          textLogic: "Error",
-          tokenTransferLogic: "Error",
-        },
-        tokenHolderAddress: "Error",
-        tokenId: "Error",
-        quorumThreshold: 1,
-        votingDelay: 1,
-        votingPeriod: 1,
-      };
-    }
-    /** END - TODO: Need to apply a proper fix */
     try {
       tokenId = solidityAddressToTokenIdString(tokenAddress);
     } catch (error) {
@@ -199,7 +156,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
 
     return {
       type: DAOType.GovernanceToken,
-      accountId,
+      accountEVMAddress: accountId,
       adminId: solidityAddressToAccountIdString(admin),
       name: updatedDAODetails?.name ?? name,
       logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
@@ -208,13 +165,8 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       title: updatedDAODetails?.name ?? name,
       webLinks: updatedDAODetails?.webLinks ?? webLinks,
       description: updatedDAODetails?.description ?? description,
-      governors: {
-        contractUpgradeLogic: upgradeLogicSolidityAddress,
-        createTokenLogic: tokenLoginSolidityAddress,
-        textLogic: textLogicSolidityAddress,
-        tokenTransferLogic: transferLogicSolidityAddress,
-      },
-      tokenHolderAddress: solidityAddressToAccountIdString(tokenHolderSolidityAddress),
+      governors,
+      tokenHolderAddress,
       tokenId: tokenId,
       quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
       votingDelay: votingDelay.toNumber(),
@@ -235,18 +187,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
   );
   const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
     const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
-    const {
-      daoAddress,
-      governors: { contractUpgradeLogic, textLogic, tokenTransferLogic, createTokenLogic },
-      tokenHolderAddress,
-      inputs: initialDAODetails,
-    } = argsWithName;
-    const daoSolidityAddress = (await DexService.fetchContractId(daoAddress)).toSolidityAddress();
-    const upgradeLogicSolidityAddress = (await DexService.fetchContractId(contractUpgradeLogic)).toSolidityAddress();
-    const tokenHolderSolidityAddress = (await DexService.fetchContractId(tokenHolderAddress)).toSolidityAddress();
-    const textLogicSolidityAddress = (await DexService.fetchContractId(textLogic)).toSolidityAddress();
-    const transferLogicSolidityAddress = (await DexService.fetchContractId(tokenTransferLogic)).toSolidityAddress();
-    const tokenLoginSolidityAddress = (await DexService.fetchContractId(createTokenLogic)).toSolidityAddress();
+    const { daoAddress: accountId, governors, tokenHolderAddress, inputs: initialDAODetails } = argsWithName;
     const {
       admin,
       isPrivate,
@@ -260,39 +201,10 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       votingDelay,
       votingPeriod,
     } = initialDAODetails;
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(daoSolidityAddress, [DAOEvents.DAOInfoUpdated]);
+    const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
 
     /** START - TODO: Need to apply a proper fix */
-    let accountId;
     let tokenId;
-    try {
-      accountId = solidityAddressToAccountIdString(daoSolidityAddress);
-    } catch (e) {
-      console.error(e, daoAddress);
-      return {
-        type: DAOType.NFT,
-        accountId: "Error",
-        adminId: "Error",
-        name: "Error",
-        title: "Error",
-        description: "Error",
-        webLinks: ["Error"],
-        infoUrl: "Error",
-        governors: {
-          contractUpgradeLogic: "Error",
-          createTokenLogic: "Error",
-          textLogic: "Error",
-          tokenTransferLogic: "Error",
-        },
-        tokenHolderAddress: "Error",
-        logoUrl: "Error",
-        isPrivate: false,
-        tokenId: "Error",
-        quorumThreshold: 1,
-        votingDelay: 1,
-        votingPeriod: 1,
-      };
-    }
     try {
       tokenId = solidityAddressToTokenIdString(tokenAddress).toString();
     } catch (error) {
@@ -301,20 +213,15 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
     /** END - TODO: Need to apply a proper fix */
     return {
       type: DAOType.NFT,
-      accountId,
+      accountEVMAddress: accountId,
       adminId: solidityAddressToAccountIdString(admin),
       name: updatedDAODetails?.name ?? name,
       title: updatedDAODetails?.name ?? name,
       description: updatedDAODetails?.description ?? description,
       webLinks: updatedDAODetails?.webLinks ?? webLinks,
       infoUrl,
-      governors: {
-        contractUpgradeLogic: upgradeLogicSolidityAddress,
-        createTokenLogic: tokenLoginSolidityAddress,
-        textLogic: textLogicSolidityAddress,
-        tokenTransferLogic: transferLogicSolidityAddress,
-      },
-      tokenHolderAddress: solidityAddressToAccountIdString(tokenHolderSolidityAddress),
+      governors,
+      tokenHolderAddress,
       logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
       isPrivate,
       tokenId,

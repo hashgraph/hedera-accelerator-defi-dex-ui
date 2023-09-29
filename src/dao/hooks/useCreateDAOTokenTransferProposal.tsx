@@ -8,7 +8,7 @@ import { DAOType } from "@dao/services";
 
 interface UseCreateDAOTokenTransferProposalParams {
   tokenId: string;
-  governanceAddress: string;
+  spenderContractId: string;
   governanceTokenId: string;
   receiverId: string;
   linkToDiscussion: string;
@@ -42,7 +42,7 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         title,
         description,
         linkToDiscussion,
-        governanceAddress,
+        spenderContractId,
         governanceTokenId,
         tokenType,
         nftSerialId,
@@ -55,7 +55,7 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
         amount,
         decimals,
         linkToDiscussion,
-        governanceAddress,
+        spenderContractId,
         governanceTokenId,
         title,
         description,

@@ -1,39 +1,42 @@
 import { Outlet, useParams } from "react-router-dom";
 import { Member, NFTDAODetails } from "@dao/services";
 import { TokenBalance, useAccountTokenBalances, useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
-import { useDAOs, useMintNFT, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hooks";
+import { useDAOs, useMintNFT, useFetchDAOMembers, useGetBlockedTokenBalance, useFetchContract } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { NFTDAODetailsContext } from "./types";
-import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function NFTDAODashboard() {
-  const { accountId: daoAccountId = "" } = useParams();
+  const { accountId = "" } = useParams();
   const handleTransactionSuccess = useHandleTransactionSuccess();
-  const daosQueryResults = useDAOs<NFTDAODetails>(daoAccountId);
+  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
+  const daosQueryResults = useDAOs<NFTDAODetails>();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId === daoAccountId);
+  const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase());
   const { walletId, isWalletPaired } = usePairedWalletDetails();
-  const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
-    ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
-    : "";
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
-  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(
-    tokenTransferGovernorAccountId,
-    dao?.tokenId ?? ""
-  );
+
+  const daoTokenTransferLogicQueryResults = useFetchContract(dao?.governors?.tokenTransferLogic ?? "");
+  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoTokenTransferLogic);
+  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(daoTokenTransferLogic, dao?.tokenId ?? "");
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
   const { data: blockedBalance = [] } = blockedTokenBalancesQueryResults;
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
-  const isNotFound = daosQueryResults.isSuccess && isNil(dao);
-  const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
-  const isError = daosQueryResults.isError || accountTokenBalancesQueryResults.isError;
-  const isLoading = daosQueryResults.isLoading || accountTokenBalancesQueryResults.isLoading;
-  const errorMessage = daosQueryResults.error?.message || accountTokenBalancesQueryResults.error?.message;
-  const isSuccess = daosQueryResults.isSuccess;
+
+  const isSuccess = daosQueryResults.isSuccess && daoAccountIdQueryResults.isSuccess;
+  const isNotFound = isSuccess && isNil(dao);
+  const isDAOFound = isSuccess && isNotNil(dao);
+  const isError =
+    daosQueryResults.isError || accountTokenBalancesQueryResults.isError || daoAccountIdQueryResults.isError;
+  const isLoading = daosQueryResults.isLoading || daoAccountIdQueryResults.isLoading;
+  const errorMessage =
+    daosQueryResults.error?.message ||
+    accountTokenBalancesQueryResults.error?.message ||
+    daoAccountIdQueryResults.error?.message;
 
   const handleMintNFT = (tokenLinks: string[]) => {
     mintNFT.mutate({ tokenId: dao?.tokenId ?? "", tokenLinks });

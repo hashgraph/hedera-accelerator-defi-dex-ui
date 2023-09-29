@@ -12,7 +12,7 @@ export function MultiSigDAODashboard() {
   const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
   const daosQueryResults = useDAOs<MultiSigDAODetails>();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
+  const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const { isWalletPaired, walletId } = usePairedWalletDetails();
 
   const daoSafeIdQueryResults = useFetchContract(dao?.safeEVMAddress ?? "");

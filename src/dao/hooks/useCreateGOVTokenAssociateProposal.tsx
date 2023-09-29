@@ -12,7 +12,7 @@ interface UseCreateGOVTokenAssociateProposalParams {
   linkToDiscussion: string;
   tokenId: string;
   governanceTokenId: string;
-  governanceAddress: string;
+  spenderContractId: string;
   nftTokenSerialId: number;
   daoType: DAOType;
 }

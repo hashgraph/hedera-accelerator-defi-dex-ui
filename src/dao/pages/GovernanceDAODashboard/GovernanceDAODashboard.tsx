@@ -1,38 +1,40 @@
 import { Outlet, useParams } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@dao/services";
 import { TokenBalance, useAccountTokenBalances, usePairedWalletDetails, useToken } from "@dex/hooks";
-import { useDAOs, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hooks";
+import { useFetchContract, useDAOs, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { GovernanceDAODetailsContext } from "./types";
-import { solidityAddressToAccountIdString } from "@shared/utils";
 
 export function GovernanceDAODashboard() {
-  const { accountId: daoAccountId = "" } = useParams();
-  const daosQueryResults = useDAOs<GovernanceDAODetails>(daoAccountId);
+  const { accountId = "" } = useParams();
+  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
+  const daosQueryResults = useDAOs<GovernanceDAODetails>();
   const { data: daos } = daosQueryResults;
-  const dao = daos?.find((dao) => dao.accountId === daoAccountId);
+  const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase());
   const { walletId, isWalletPaired } = usePairedWalletDetails();
-  const tokenTransferGovernorAccountId = dao?.governors?.tokenTransferLogic
-    ? solidityAddressToAccountIdString(dao.governors.tokenTransferLogic)
-    : "";
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(tokenTransferGovernorAccountId);
-  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(
-    tokenTransferGovernorAccountId,
-    dao?.tokenId ?? ""
-  );
+
+  const daoTokenTransferLogicQueryResults = useFetchContract(dao?.governors?.tokenTransferLogic ?? "");
+  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoTokenTransferLogic);
+  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(daoTokenTransferLogic, dao?.tokenId ?? "");
   const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
   const { data: blockedBalance = 0 } = blockedTokenBalancesQueryResults;
   const { data: FTToken } = useToken(dao?.tokenId ?? "");
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
 
-  const isNotFound = daosQueryResults.isSuccess && isNil(dao);
-  const isDAOFound = daosQueryResults.isSuccess && isNotNil(dao);
-  const isError = daosQueryResults.isError || accountTokenBalancesQueryResults.isError;
-  const isLoading = daosQueryResults.isLoading || accountTokenBalancesQueryResults.isLoading;
-  const errorMessage = daosQueryResults.error?.message || accountTokenBalancesQueryResults.error?.message;
-  const isSuccess = daosQueryResults.isSuccess;
+  const isSuccess = daosQueryResults.isSuccess && daoAccountIdQueryResults.isSuccess;
+  const isNotFound = isSuccess && isNil(dao);
+  const isDAOFound = isSuccess && isNotNil(dao);
+  const isError =
+    daosQueryResults.isError || accountTokenBalancesQueryResults.isError || daoAccountIdQueryResults.isError;
+  const isLoading = daosQueryResults.isLoading || daoAccountIdQueryResults.isLoading;
+  const errorMessage =
+    daosQueryResults.error?.message ||
+    accountTokenBalancesQueryResults.error?.message ||
+    daoAccountIdQueryResults.error?.message;
 
   if (dao) {
     const { adminId } = dao;

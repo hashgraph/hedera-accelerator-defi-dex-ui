@@ -7,7 +7,7 @@ import { isNil } from "ramda";
 
 interface UseCreateDAOUpgradeProposal {
   governanceTokenId: string;
-  governanceAddress: string;
+  spenderContractId: string;
   title: string;
   description: string;
   linkToDiscussion: string;

@@ -19,7 +19,13 @@ import {
   UseExecuteProposalParams,
   usePairedWalletDetails,
 } from "@dex/hooks";
-import { GOVUpgradeProposalDetails, Proposal, ProposalStatus, UseChangeAdminMutationResult } from "@dao/hooks";
+import {
+  GOVUpgradeProposalDetails,
+  Proposal,
+  ProposalStatus,
+  UseChangeAdminMutationResult,
+  useFetchContract,
+} from "@dao/hooks";
 import { useState } from "react";
 import { UseMutationResult } from "react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
@@ -79,7 +85,9 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     isAuthor,
   } = props;
 
-  const contractId = proposal?.contractId ?? "";
+  const contractEvmAddress = proposal?.contractEvmAddress ?? "";
+  const contractIdQueryResults = useFetchContract(contractEvmAddress);
+  const contractId = contractIdQueryResults.data?.data.contract_id ?? "";
   const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0;
   const isAdminApprovalButtonVisible =
     (proposal?.data as GOVUpgradeProposalDetails)?.isAdminApprovalButtonVisible ?? false;

@@ -9,6 +9,7 @@ import { DashboardHeader } from "./DashboardHeader";
 import { Routes } from "@dao/routes";
 import { VotingPower } from "@dex/pages/Governance/VotingPower";
 import { NFTVotingPower } from "./NFTVotingPower";
+import { useFetchContract } from "@dao/hooks";
 
 const TabsHeight = 44;
 
@@ -58,6 +59,9 @@ export function DAODashboard(props: DAODashboardProps) {
   const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin, handleMintNFT } =
     props;
   const { type = "" } = dao ?? {};
+  const { tokenId, tokenHolderAddress } = (dao || {}) as GovernanceDAODetails | NFTDAODetails;
+  const daoTokenHolderQueryResults = useFetchContract(tokenHolderAddress ?? "");
+  const daoTokenHolder = daoTokenHolderQueryResults.data?.data.contract_id ?? "";
   const currentTabNameByRoute = location.pathname.split("/").at(-1) ?? "";
   const daoNavigationTabs = GetDAONavigationTabs();
   const tabIndexByRoute = daoNavigationTabs.map((tab) => tab.title.toLowerCase()).indexOf(currentTabNameByRoute);
@@ -110,10 +114,9 @@ export function DAODashboard(props: DAODashboardProps) {
   }
 
   if (dao && isDAOFound && isSuccess) {
-    const { accountId, type, name, logoUrl } = dao;
+    const { accountEVMAddress, type, name, logoUrl } = dao;
     const isGovernance = type === DAOType.GovernanceToken;
     const isNFT = type === DAOType.NFT;
-    const { tokenId, tokenHolderAddress } = dao as GovernanceDAODetails | NFTDAODetails;
     const { safeEVMAddress } = dao as MultiSigDAODetails;
 
     return (
@@ -124,7 +127,7 @@ export function DAODashboard(props: DAODashboardProps) {
           <DashboardHeader
             isAdmin={isAdmin}
             isMember={isMember}
-            accountId={accountId}
+            accountEVMAddress={accountEVMAddress}
             name={name}
             type={type}
             logoUrl={logoUrl}
@@ -136,15 +139,11 @@ export function DAODashboard(props: DAODashboardProps) {
         body={
           <Flex direction="column" gap="0.75rem" height="100%">
             {isGovernance ? (
-              <VotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
+              <VotingPower governanceTokenId={tokenId} tokenHolderAddress={daoTokenHolder} />
             ) : (
               <Box></Box>
             )}
-            {isNFT ? (
-              <NFTVotingPower governanceTokenId={tokenId} tokenHolderAddress={tokenHolderAddress} />
-            ) : (
-              <Box></Box>
-            )}
+            {isNFT ? <NFTVotingPower governanceTokenId={tokenId} tokenHolderAddress={daoTokenHolder} /> : <Box></Box>}
             <Tabs
               defaultIndex={initialTabIndex}
               onChange={handleTabChange}
