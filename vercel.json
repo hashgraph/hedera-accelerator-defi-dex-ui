@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "/api/ipfs.ts",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/api/pinToIPFS.ts",
+      "methods": ["POST"]
+    }
+  ]
+}

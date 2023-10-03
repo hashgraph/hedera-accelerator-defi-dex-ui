@@ -21,6 +21,7 @@ const queryClient = new QueryClient({
        * regarding a long term solution to reduce our hashio JSON RPC service hbar usage.
        */
       staleTime: SEVEN_SECONDS,
+      retry: 3,
     },
   },
 });

@@ -1,3 +1,10 @@
-export * from "./DAOService";
-export * from "./constants";
+import * as MultiSigDAOService from "./contracts/MultiSigDAOService";
+import * as TokenDAOService from "./contracts/TokenDAOService";
+import * as NFTDAOService from "./contracts/NFTDAOService";
+import * as IPFSService from "./IPFSService";
+export * from "./contracts/types";
+import * as DAOServices from "./DAOService";
+const daoSDK = { ...DAOServices, ...MultiSigDAOService, ...TokenDAOService, ...NFTDAOService, ...IPFSService };
+export default daoSDK;
 export * from "./types";
+export * from "./constants";

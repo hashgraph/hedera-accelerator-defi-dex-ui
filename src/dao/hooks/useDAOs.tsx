@@ -1,6 +1,5 @@
 import { useQuery } from "react-query";
-import { DexService } from "@dex/services";
-import { DAO } from "@dao/services";
+import daoSDK, { DAO } from "@dao/services";
 import { DAOQueries } from "./types";
 
 type UseDAOsQueryKey = [DAOQueries.DAOs];
@@ -9,7 +8,7 @@ export function useDAOs<DAOType extends DAO>() {
   return useQuery<DAOType[], Error, DAOType[], UseDAOsQueryKey>(
     [DAOQueries.DAOs],
     async () => {
-      return (await DexService.fetchAllDAOs()) as DAOType[];
+      return (await daoSDK.fetchAllDAOs()) as DAOType[];
     },
     {
       staleTime: 5,

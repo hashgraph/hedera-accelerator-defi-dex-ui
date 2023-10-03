@@ -10,7 +10,8 @@ export enum DAOQueries {
   FetchBlockedTokenBalance = "fetchBlockedTokenBalance",
   FetchDAOMembers = "fetchDAOMembers",
   Contract = "contract",
-  Config = "config",
+  Config = "Config",
+  IPFSContent = "IPFSContent",
 }
 
 export enum DAOMutations {
@@ -35,6 +36,7 @@ export enum DAOMutations {
   ChangeAdmin = "ChangeAdmin",
   LockNFTToken = "lockNFTToken",
   UnlockNFTToken = "unlockNFTToken",
+  PinToIPFS = "PinToIPFS",
 }
 
 export enum ProposalStatus {
