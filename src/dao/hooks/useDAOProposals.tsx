@@ -6,7 +6,7 @@ import {
   decodeLog,
   abiSignatures,
 } from "@dex/services";
-import { DAOEvents, getThreshold, MultiSigProposeTransactionType } from "@dao/services";
+import daoSDK, { DAOEvents, MultiSigProposeTransactionType } from "@dao/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
 import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
@@ -139,7 +139,7 @@ export function useDAOProposals(
             transactionType,
           } = proposalInfo;
           const { amount, receiver, token } = data ?? {};
-          const threshold = await getThreshold(safeEVMAddress);
+          const threshold = await daoSDK.getThreshold(safeEVMAddress);
           const approvers = getApprovers(proposalLogs, transactionHash);
           const approvalCount = approvers.length;
           const isThresholdReached = approvalCount >= threshold;

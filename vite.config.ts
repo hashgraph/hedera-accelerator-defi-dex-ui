@@ -6,10 +6,13 @@ import aliases from "./aliases.paths.json";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import svgrPlugin from "vite-plugin-svgr";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import dns from "dns";
 
 const resolvedAliases = Object.fromEntries(
   Object.entries(aliases).map(([key, value]) => [key, path.resolve(__dirname, value)])
 );
+
+dns.setDefaultResultOrder("verbatim");
 
 export default defineConfig({
   test: {
@@ -32,6 +35,7 @@ export default defineConfig({
   },
   server: {
     open: true,
+    host: "localhost",
   },
   plugins: [
     react(),

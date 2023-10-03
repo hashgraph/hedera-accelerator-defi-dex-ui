@@ -1,12 +1,16 @@
 import { Flex, Divider } from "@chakra-ui/react";
-import { ProposalEvent, ProposalType } from "@dao/hooks";
+import { ProposalEvent, ProposalType, useIPFSContent } from "@dao/hooks";
 import {
   ProposalActionDetails,
   ProposalDetailsDescription,
   ProposalMemberVotes,
   ProposalTransactionDetails,
 } from "./ProposalDetailsComponents";
-import { Color, Text, MarkdownRenderer, Tag, TagVariant } from "@shared/ui-kit";
+import { Color, Text, MarkdownRenderer, Tag, TagVariant, IPFSLink } from "@shared/ui-kit";
+import { LoadingSpinnerLayout } from "@dex/layouts";
+import { isCIDValid } from "@dao/utils";
+
+const { VITE_PUBLIC_PINATA_GATEWAY_URL } = import.meta.env;
 
 interface ProposalDetailsProps {
   description: string[];
@@ -27,7 +31,7 @@ interface ProposalDetailsProps {
 export function ProposalDetails(props: ProposalDetailsProps) {
   const {
     description,
-    metadata,
+    metadata: CID,
     amount,
     receiver,
     tokenId,
@@ -40,6 +44,8 @@ export function ProposalDetails(props: ProposalDetailsProps) {
     tokenDecimals,
     tokenType,
   } = props;
+  const ipfsContentQueryResults = useIPFSContent(CID);
+  const { data: IPFSData, isLoading } = ipfsContentQueryResults;
 
   return (
     <Flex direction="column" gap="2">
@@ -79,11 +85,24 @@ export function ProposalDetails(props: ProposalDetailsProps) {
             <ProposalTransactionDetails transactionHash={transactionHash} />
           </>
         )}
-        {!!metadata && (
+        {isCIDValid(CID) && (
           <>
             <Divider />
-            <MarkdownRenderer markdown={metadata} />
+            <IPFSLink gatewayURL={VITE_PUBLIC_PINATA_GATEWAY_URL} CID={CID} />
           </>
+        )}
+        {isCIDValid(CID) && isLoading ? (
+          <>
+            <Divider />
+            <LoadingSpinnerLayout />
+          </>
+        ) : (
+          !!IPFSData && (
+            <>
+              <Divider />
+              <MarkdownRenderer markdown={IPFSData} />
+            </>
+          )
         )}
       </Flex>
     </Flex>

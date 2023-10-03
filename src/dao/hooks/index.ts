@@ -29,3 +29,4 @@ export * from "./useFetchDAOMembers";
 export * from "./useFetchContract";
 export * from "./useFetchDAOConfig";
 export * from "./types";
+export * from "./IPFS";

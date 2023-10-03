@@ -73,7 +73,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     eventTypes
   );
 
-  const multiSigEventResults = logs.map(async (log): Promise<MultiSigDAODetails> => {
+  const multiSigEventResults = logs.map(async (log: ethers.utils.LogDescription): Promise<MultiSigDAODetails> => {
     const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
     const { inputs: initialDAODetails, safeAddress: safeEVMAddress, daoAddress } = argsWithName;
     const owners = await getOwners(safeEVMAddress);

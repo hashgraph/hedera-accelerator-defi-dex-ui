@@ -31,12 +31,14 @@ import {
   useDAOs,
   useCreateGOVTokenAssociateProposal,
   useFetchContract,
+  usePinToIPFS,
 } from "@dao/hooks";
 import { useHandleTransactionSuccess, useAccountTokenBalances } from "@dex/hooks";
-import { isNil } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { getLastPathInRoute } from "@dex/utils";
 import { getDAOType, getPreviousMemberAddress } from "../utils";
+import { PinataPinResponse } from "@pinata/sdk";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -45,6 +47,9 @@ export function CreateDAOProposal() {
   const daosQueryResults = useDAOs();
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
+  const pinToIPFSResults = usePinToIPFS();
+  const { mutateAsync: pinMetadataToIPFS } = pinToIPFSResults;
+
   const createDaoProposalForm = useForm<CreateDAOProposalForm>({
     defaultValues: {
       type: DAOProposalType.Text,
@@ -458,9 +463,13 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
-              metadata: metadata,
+              metadata,
             });
-          case DAOType.GovernanceToken:
+          case DAOType.GovernanceToken: {
+            let pinningResponse: PinataPinResponse | undefined;
+            if (!isEmpty(metadata)) {
+              pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+            }
             return createDAOTextProposal({
               title,
               description,
@@ -471,9 +480,14 @@ export function CreateDAOProposal() {
               daoContractId: daoAccountId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
-              metadata: metadata,
+              metadata: pinningResponse?.IpfsHash ?? "",
             });
-          case DAOType.NFT:
+          }
+          case DAOType.NFT: {
+            let pinningResponse: PinataPinResponse | undefined;
+            if (!isEmpty(metadata)) {
+              pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+            }
             return createDAOTextProposal({
               title,
               description,
@@ -484,8 +498,9 @@ export function CreateDAOProposal() {
               daoContractId: daoAccountId,
               nftTokenSerialId,
               daoType: DAOType.NFT,
-              metadata: metadata,
+              metadata: pinningResponse?.IpfsHash ?? "",
             });
+          }
           default:
             return;
         }

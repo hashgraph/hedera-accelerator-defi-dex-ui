@@ -1,17 +1,4 @@
-import {
-  fetchAllDAOs,
-  fetchHederaGnosisSafeLogs,
-  fetchMultiSigDAOLogs,
-  fetchGovernanceDAOLogs,
-  proposeAddOwnerWithThreshold,
-  proposeRemoveOwnerWithThreshold,
-  proposeSwapOwnerWithThreshold,
-  proposeChangeThreshold,
-  sendApproveMultiSigTransaction,
-  sendExecuteMultiSigTransaction,
-  proposeMultiSigTextProposal,
-  sendChangeAdminForProposalTransaction,
-} from "@dao/services";
+import daoSDK from "@dao/services";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
 
@@ -36,19 +23,19 @@ function createDexService() {
     fetchAllProposals,
     fetchAllProposalEvents,
     fetchAccountTokenBalances,
-    fetchAllDAOs,
-    fetchMultiSigDAOLogs,
-    fetchGovernanceDAOLogs,
-    fetchHederaGnosisSafeLogs,
-    proposeAddOwnerWithThreshold,
-    proposeRemoveOwnerWithThreshold,
-    proposeSwapOwnerWithThreshold,
-    proposeChangeThreshold,
-    sendApproveMultiSigTransaction,
-    sendExecuteMultiSigTransaction,
+    fetchAllDAOs: daoSDK.fetchAllDAOs,
+    fetchMultiSigDAOLogs: daoSDK.fetchMultiSigDAOLogs,
+    fetchGovernanceDAOLogs: daoSDK.fetchGovernanceDAOLogs,
+    fetchHederaGnosisSafeLogs: daoSDK.fetchHederaGnosisSafeLogs,
+    proposeAddOwnerWithThreshold: daoSDK.proposeAddOwnerWithThreshold,
+    proposeRemoveOwnerWithThreshold: daoSDK.proposeRemoveOwnerWithThreshold,
+    proposeSwapOwnerWithThreshold: daoSDK.proposeSwapOwnerWithThreshold,
+    proposeChangeThreshold: daoSDK.proposeChangeThreshold,
+    sendApproveMultiSigTransaction: daoSDK.sendApproveMultiSigTransaction,
+    sendExecuteMultiSigTransaction: daoSDK.sendExecuteMultiSigTransaction,
     fetchCanUserClaimGODTokens,
-    proposeMultiSigTextProposal,
-    sendChangeAdminForProposalTransaction,
+    proposeMultiSigTextProposal: daoSDK.proposeMultiSigTextProposal,
+    sendChangeAdminForProposalTransaction: daoSDK.sendChangeAdminForProposalTransaction,
   };
 }
 

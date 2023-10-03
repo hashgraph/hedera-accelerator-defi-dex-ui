@@ -420,7 +420,3 @@ export const solidityAddressToContractIdString = (address: string): string => {
     return address;
   }
 };
-
-export function getByteSize(value: string): number {
-  return value === undefined ? 0 : new Blob([value]).size;
-}
