@@ -9,9 +9,11 @@ import {
   TransactionResponse,
   TokenMintTransaction,
   ContractFunctionParameters,
+  Hbar,
+  HbarUnit,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, NFTDAOContractFunctions } from "./types";
-import { checkTransactionResponseForError } from "@dex/services";
+import { DexService, checkTransactionResponseForError } from "@dex/services";
 import { Contracts } from "@dex/services/constants";
 import NFTDAOFactoryJSON from "@dex/services/abi/NFTDAOFactory.json";
 import { NFTDAOFunctions } from "../types";
@@ -29,6 +31,7 @@ interface SendCreateNFTDAOTransactionParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
+  daoFee: number;
   signer: HashConnectSigner;
 }
 interface MintNFTTokensTransactionParams {
@@ -49,6 +52,7 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
     isPrivate,
     description,
     daoLinks,
+    daoFee,
     signer,
   } = params;
   const nftDAOFactoryContractId = ContractId.fromString(Contracts.NFTDAOFactory.ProxyId);
@@ -75,10 +79,18 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   ];
   const contractInterface = new ethers.utils.Interface(NFTDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
+  const tokenAmount = Hbar.from(daoFee, HbarUnit.Tinybar).to(HbarUnit.Hbar).toNumber();
+  await DexService.setHbarTokenAllowance({
+    walletId: signer.getAccountId().toString(),
+    spenderContractId: Contracts.MultiSigDAOFactory.ProxyId,
+    tokenAmount,
+    signer,
+  });
   const createNFTDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(nftDAOFactoryContractId)
     .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
+    .setPayableAmount(tokenAmount)
     .freezeWithSigner(signer);
   const createGovernanceDAOResponse = await createNFTDAOTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(createGovernanceDAOResponse, BaseDAOContractFunctions.CreateDAO);

@@ -43,8 +43,8 @@ export function NFTDAOVotingForm() {
             isTooltipVisible: true,
             tooltipLabel: DAOToolTips.duration,
             toolTipLabelPlacement: "top",
-            placeholder: "Enter amount",
-            unit: "Blocks",
+            placeholder: "Enter duration",
+            unit: "Secs",
             register: {
               ...register("voting.duration", {
                 required: { value: true, message: "A voting duration is required." },
@@ -62,8 +62,8 @@ export function NFTDAOVotingForm() {
             tooltipLabel: DAOToolTips.lockingPeriod,
             toolTipLabelPlacement: "top",
             type: "number",
-            placeholder: "Enter amount",
-            unit: "Blocks",
+            placeholder: "Enter duration",
+            unit: "Secs",
             register: {
               ...register("voting.lockingPeriod", {
                 required: { value: true, message: "A locking period is required." },

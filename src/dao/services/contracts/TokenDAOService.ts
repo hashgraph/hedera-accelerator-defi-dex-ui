@@ -31,6 +31,7 @@ interface SendCreateGovernanceDAOTransactionParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
+  daoFee: number;
   signer: HashConnectSigner;
 }
 
@@ -49,6 +50,7 @@ async function sendCreateGovernanceDAOTransaction(
     signer,
     description,
     daoLinks,
+    daoFee,
   } = params;
   const ftDAOFactoryContractId = ContractId.fromString(Contracts.FTDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
@@ -74,11 +76,19 @@ async function sendCreateGovernanceDAOTransaction(
   ];
   const contractInterface = new ethers.utils.Interface(FTDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
+  const tokenAmount = Hbar.from(daoFee, HbarUnit.Tinybar).to(HbarUnit.Hbar).toNumber();
+  await DexService.setHbarTokenAllowance({
+    walletId: signer.getAccountId().toString(),
+    spenderContractId: Contracts.FTDAOFactory.ProxyId,
+    tokenAmount,
+    signer,
+  });
 
   const createGovernanceDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(ftDAOFactoryContractId)
     .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
+    .setPayableAmount(tokenAmount)
     .freezeWithSigner(signer);
   const createGovernanceDAOResponse = await createGovernanceDAOTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(createGovernanceDAOResponse, BaseDAOContractFunctions.CreateDAO);

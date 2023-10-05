@@ -113,7 +113,7 @@ export function TokenDAOReviewForm() {
             id: "voting.duration",
             label: "VOTING DURATION",
             type: "number",
-            unit: "Blocks",
+            unit: "Secs",
             value: String(voting?.duration ?? 0),
             isReadOnly: true,
           }}
@@ -123,7 +123,7 @@ export function TokenDAOReviewForm() {
             id: "voting.lockingPeriod",
             label: "LOCKING PERIOD",
             type: "number",
-            unit: "Blocks",
+            unit: "Secs",
             value: String(voting?.lockingPeriod ?? 0),
             isReadOnly: true,
           }}

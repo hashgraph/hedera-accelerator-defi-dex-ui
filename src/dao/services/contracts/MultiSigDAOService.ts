@@ -8,6 +8,8 @@ import {
   TransactionResponse,
   TokenId,
   TransferTransaction,
+  Hbar,
+  HbarUnit,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, MultiSigDAOContractFunctions } from "./types";
 import { checkTransactionResponseForError } from "@dex/services/HederaService/utils";
@@ -29,13 +31,14 @@ interface SendCreateMultiSigDAOTransactionParams {
   daoLinks: string[];
   threshold: number;
   isPrivate: boolean;
+  daoFee: number;
   signer: HashConnectSigner;
 }
 
 async function sendCreateMultiSigDAOTransaction(
   params: SendCreateMultiSigDAOTransactionParams
 ): Promise<TransactionResponse> {
-  const { admin, name, logoUrl, owners, threshold, isPrivate, signer, description, daoLinks } = params;
+  const { admin, name, logoUrl, owners, threshold, isPrivate, signer, description, daoLinks, daoFee } = params;
   const multiSigDAOFactoryContractId = ContractId.fromString(Contracts.MultiSigDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
   const preciseThreshold = BigNumber(threshold);
@@ -52,10 +55,18 @@ async function sendCreateMultiSigDAOTransaction(
   ];
   const contractInterface = new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
+  const tokenAmount = Hbar.from(daoFee, HbarUnit.Tinybar).to(HbarUnit.Hbar).toNumber();
+  await DexService.setHbarTokenAllowance({
+    walletId: signer.getAccountId().toString(),
+    spenderContractId: Contracts.MultiSigDAOFactory.ProxyId,
+    tokenAmount,
+    signer,
+  });
   const createMultiSigDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOFactoryContractId)
     .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
+    .setPayableAmount(tokenAmount)
     .freezeWithSigner(signer);
   const createMultiSigDAOResponse = await createMultiSigDAOTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(createMultiSigDAOResponse, BaseDAOContractFunctions.CreateDAO);
