@@ -97,7 +97,7 @@ export function NFTDAOReviewForm() {
             id: "voting.duration",
             label: "VOTING DURATION",
             type: "number",
-            unit: "Blocks",
+            unit: "Secs",
             value: String(voting?.duration ?? ""),
             isReadOnly: true,
           }}
@@ -107,7 +107,7 @@ export function NFTDAOReviewForm() {
             id: "voting.lockingPeriod",
             label: "LOCKING PERIOD",
             type: "number",
-            unit: "Blocks",
+            unit: "Secs",
             value: String(voting?.lockingPeriod ?? ""),
             isReadOnly: true,
           }}

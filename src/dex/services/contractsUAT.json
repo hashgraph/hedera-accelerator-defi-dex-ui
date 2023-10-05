@@ -60,21 +60,21 @@
   },
   {
     "name": "nftdaofactory",
-    "id": "0.0.1194570",
-    "hash": "3435fadcc407444f00cea3e6633745f5",
-    "address": "0x0000000000000000000000000000000000123a4a",
-    "timestamp": "2023-09-08T08:31:46.867Z",
-    "transparentProxyId": "0.0.1194572",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000123a4c"
+    "id": "0.0.3761792",
+    "hash": "11b3e6045a9c6b9fc8ae50505eebae42",
+    "address": "0x0000000000000000000000000000000000396680",
+    "timestamp": "2023-10-03T10:02:36.893Z",
+    "transparentProxyId": "0.0.3761815",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000396697"
   },
   {
     "name": "ftdaofactory",
-    "id": "0.0.1194739",
-    "hash": "1430dbf355e7036d80f8de68404c93c9",
-    "address": "0x0000000000000000000000000000000000123af3",
-    "timestamp": "2023-09-08T09:27:22.526Z",
-    "transparentProxyId": "0.0.1194741",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000123af5"
+    "id": "0.0.3761795",
+    "hash": "094371d2af246d44b96caf846b0741b0",
+    "address": "0x0000000000000000000000000000000000396683",
+    "timestamp": "2023-10-03T10:02:37.113Z",
+    "transparentProxyId": "0.0.3761816",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000396698"
   },
   {
     "name": "ftdao",
@@ -177,12 +177,12 @@
   },
   {
     "name": "multisigdaofactory",
-    "id": "0.0.1195889",
-    "hash": "04d5dbce199513a6e2ad9f728bf9a63d",
-    "address": "0x0000000000000000000000000000000000123f71",
-    "timestamp": "2023-09-08T13:04:43.396Z",
-    "transparentProxyId": "0.0.1195900",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000123f7c"
+    "id": "0.0.3761796",
+    "hash": "ee52ab783901383e2fc61b6b30f26e69",
+    "address": "0x0000000000000000000000000000000000396684",
+    "timestamp": "2023-10-03T10:02:35.942Z",
+    "transparentProxyId": "0.0.3761812",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000396694"
   },
   {
     "name": "multisigdao",

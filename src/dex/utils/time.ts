@@ -5,7 +5,6 @@ export const MINUTES_IN_AN_HOUR = 60;
 export const SECONDS_IN_A_MINUTE = 60;
 const MILLISECONDS_IN_A_SECOND = 1000;
 const MILLISECONDS_IN_A_DAY = HOURS_IN_A_DAY * MINUTES_IN_AN_HOUR * SECONDS_IN_A_MINUTE * MILLISECONDS_IN_A_SECOND;
-const SECONDS_IN_A_BLOCK = 12;
 
 /**
  * NOTE: Not all time calculation functions have been optimized for nanosecond
@@ -70,14 +69,6 @@ export function getVotingEndTime(startTime: string, duration: string): string {
 
 export function getFormattedEndTime(timeStamp: string): string {
   return convertToLocalString(new Date(parseInt(timeStamp) * MILLISECONDS_IN_A_SECOND));
-}
-
-export function convertFromBlocksToDays(blocks: number): number {
-  return blocks ? Math.round((blocks * SECONDS_IN_A_BLOCK) / (60 * 60 * 24)) : 0;
-}
-
-export function convertFromDaysToBlocks(days: number): number {
-  return days ? Math.round((days / SECONDS_IN_A_BLOCK) * 60 * 60 * 24) : 0;
 }
 
 export { getCurrentUnixTimestamp, getTimestamp24HoursAgo, getTimestamp7DaysAgo, formatDuration };

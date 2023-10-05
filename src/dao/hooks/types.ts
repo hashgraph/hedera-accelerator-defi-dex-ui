@@ -10,6 +10,7 @@ export enum DAOQueries {
   FetchBlockedTokenBalance = "fetchBlockedTokenBalance",
   FetchDAOMembers = "fetchDAOMembers",
   Contract = "contract",
+  Config = "config",
 }
 
 export enum DAOMutations {

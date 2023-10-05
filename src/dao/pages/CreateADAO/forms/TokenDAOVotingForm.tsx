@@ -58,8 +58,8 @@ export function TokenDAOVotingForm() {
             tooltipLabel: DAOToolTips.duration,
             toolTipLabelPlacement: "top",
             type: "number",
-            placeholder: "Enter amount",
-            unit: "Blocks",
+            placeholder: "Enter duration",
+            unit: "Secs",
             register: {
               ...register("voting.duration", {
                 required: { value: true, message: "A voting duration is required." },
@@ -77,8 +77,8 @@ export function TokenDAOVotingForm() {
             isTooltipVisible: true,
             tooltipLabel: DAOToolTips.lockingPeriod,
             toolTipLabelPlacement: "top",
-            placeholder: "Enter amount",
-            unit: "Blocks",
+            placeholder: "Enter duration",
+            unit: "Secs",
             register: {
               ...register("voting.lockingPeriod", {
                 required: { value: true, message: "A locking period is required." },
@@ -104,24 +104,6 @@ export function TokenDAOVotingForm() {
             tooltipLabel: DAOToolTips.minimumDeposit,
           }}
         />
-        {/* TODO: For a future version of the form.
-        <FormInput<"voting.strategy">
-          inputProps={{
-            id: "voting.strategy",
-            label: "Voting strategy",
-            type: "text",
-            placeholder: "Enter strategy",
-            unit: "Blocks",
-            register: {
-              ...register("voting.strategy", {
-                required: { value: true, message: "A voting strategy is required." },
-              }),
-            },
-          }}
-          isInvalid={Boolean(errors.voting?.strategy)}
-          errorMessage={errors.voting?.strategy && errors.voting?.strategy.message}
-        />
-      */}
       </SimpleGrid>
     </DAOFormContainer>
   );

@@ -3,7 +3,6 @@ import { Text, Color, MetricLabel } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import { NFTDAODetailsContext } from "./types";
 import { getDAOLinksRecordArray } from "../utils";
-import { convertFromBlocksToDays } from "@dex/utils";
 import { RecentProposals } from "../RecentProposals";
 import { useGovernanceDAOProposals } from "@dao/hooks";
 
@@ -91,10 +90,10 @@ export function NFTDAODashboardOverview() {
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
-                  value={convertFromBlocksToDays(dao.votingPeriod)}
+                  value={dao.votingPeriod}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="blocks"
+                  valueUnitSymbol="Secs"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 
@@ -103,10 +102,10 @@ export function NFTDAODashboardOverview() {
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
-                  value={convertFromBlocksToDays(dao.votingDelay)}
+                  value={dao.votingDelay}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="blocks"
+                  valueUnitSymbol="Secs"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 
