@@ -12,7 +12,7 @@ import {
   NFTDAOGovernanceData,
 } from "./types";
 import { useHandleTransactionSuccess } from "@dex/hooks";
-import { useCreateDAO } from "@dao/hooks";
+import { useCreateDAO, useFetchDAOConfig } from "@dao/hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
@@ -58,6 +58,7 @@ export function CreateADAOPage() {
   }
 
   const createDAO = useCreateDAO(handleCreateDAOSuccess);
+  const { data: { multiSigDAOConfig, govDAOConfig, nftDAOConfig } = {} } = useFetchDAOConfig();
 
   function GovernanceForm(): string {
     if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceToken}`;
@@ -159,6 +160,7 @@ export function CreateADAOPage() {
         quorum: voting?.quorum ?? 0,
         votingDuration: voting?.duration ?? 0,
         lockingDuration: voting?.lockingPeriod ?? 0,
+        daoFee: govDAOConfig?.daoFee || 0,
       });
     }
     if (data.type === DAOType.MultiSig) {
@@ -174,6 +176,7 @@ export function CreateADAOPage() {
         owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
+        daoFee: multiSigDAOConfig?.daoFee || 0,
       });
     }
     if (data.type === DAOType.NFT) {
@@ -197,6 +200,7 @@ export function CreateADAOPage() {
         quorum: voting.quorum,
         votingDuration: voting?.duration ?? 0,
         lockingDuration: voting?.lockingPeriod ?? 0,
+        daoFee: nftDAOConfig?.daoFee || 0,
       });
     }
   }

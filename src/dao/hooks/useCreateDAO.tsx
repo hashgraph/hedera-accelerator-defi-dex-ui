@@ -17,6 +17,7 @@ interface UseCreateGovernanceDAOParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
+  daoFee: number;
 }
 
 interface UseCreateNFTDAOParams {
@@ -30,6 +31,7 @@ interface UseCreateNFTDAOParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
+  daoFee: number;
 }
 
 interface UseCreateMultiSigDAOParams {
@@ -41,6 +43,7 @@ interface UseCreateMultiSigDAOParams {
   owners: string[];
   threshold: number;
   isPrivate: boolean;
+  daoFee: number;
 }
 
 type UseCreateDAOParams = (UseCreateGovernanceDAOParams | UseCreateMultiSigDAOParams | UseCreateNFTDAOParams) & {

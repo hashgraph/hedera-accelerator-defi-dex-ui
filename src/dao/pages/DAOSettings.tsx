@@ -66,7 +66,7 @@ export function DAOSettings() {
                 value={dao.votingPeriod}
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="blocks"
+                valueUnitSymbol="Secs"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
@@ -79,7 +79,7 @@ export function DAOSettings() {
                 value={dao.votingDelay}
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="blocks"
+                valueUnitSymbol="Secs"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
@@ -92,7 +92,7 @@ export function DAOSettings() {
                 value="1, 7, 30"
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="blocks"
+                valueUnitSymbol="Secs"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
