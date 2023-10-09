@@ -16,6 +16,10 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
     setValue(inputElement.value as T);
   }
 
+  function setStorageValue(newValue: T) {
+    setValue(newValue);
+  }
+
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(value));
   }, [key, value]);
@@ -23,5 +27,6 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
   return {
     value,
     handleChange,
+    setStorageValue,
   };
 }

@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { ChakraProvider } from "@chakra-ui/react";
 import { RouterProvider } from "react-router-dom";
 import { router } from "@dex/routes";
-import { ToastContainer, DefaultTheme } from "@shared/ui-kit";
+import { ToastContainer, DefaultTheme, TermsConditionModal } from "@shared/ui-kit";
 
 const SEVEN_SECONDS = 7 * 1000;
 
@@ -30,6 +30,7 @@ export function DEX() {
     <ChakraProvider theme={DefaultTheme}>
       <QueryClientProvider client={queryClient}>
         <ToastContainer />
+        <TermsConditionModal />
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={true} />
       </QueryClientProvider>

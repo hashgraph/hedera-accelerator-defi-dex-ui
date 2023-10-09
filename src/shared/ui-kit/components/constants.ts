@@ -8,6 +8,7 @@ export const TransactionDeadline = {
 export enum LocalStorageKeys {
   SLIPPAGE = "DEX_SLIPPAGE",
   TRANSACTION_DEADLINE = "DEX_TRANSACTION_DEADLINE",
+  ACCEPTED_TERMS_AND_CONDITIONS = "ACCEPTED_TERMS_AND_CONDITIONS",
 }
 
 export const InitialSlippage = 0.5;
