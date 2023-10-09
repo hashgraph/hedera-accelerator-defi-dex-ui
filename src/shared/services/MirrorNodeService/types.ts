@@ -1,3 +1,4 @@
+import { GovernanceProposalType } from "@dex/store";
 import { BigNumber } from "bignumber.js";
 import Long from "long";
 
@@ -117,30 +118,38 @@ interface VotingInformation {
   abstainVotes: number;
   againstVotes: number;
   forVotes: number;
+  hasVoted: boolean;
   isQuorumReached: boolean;
+  isVoteSucceeded: boolean;
   proposalState: number;
   quorumValue: number;
-  voted: boolean;
-  votedUser: string;
+}
+interface ProposalCoreInputs {
+  amountOrId: number;
+  calldatas: string[];
+  description: string;
+  discussionLink: string;
+  metaData: string;
+  proposalType: GovernanceProposalType;
+  targets: string[];
+  title: string;
+  _values: number[];
+}
+interface ProposalCoreInformation {
+  blockedAmountOrId: number;
+  createdAt: number;
+  creator: string;
+  inputs: ProposalCoreInputs;
+  voteEnd: number;
+  voteStart: number;
 }
 interface MirrorNodeDecodedProposalEvent {
-  proposalId: string;
   contractId: string;
-  type: string;
-  proposer: string;
-  description: string;
-  metadata: string;
-  title: string;
-  link: string;
+  coreInformation: ProposalCoreInformation;
+  proposalId: string;
   timestamp: string;
-  nftTokenSerialId: string;
-  duration: {
-    endBlock: string;
-    startBlock: string;
-  };
-  data: string | undefined;
   votingInformation?: VotingInformation;
-  state?: number;
+  state: number;
 }
 interface MirrorNodeEventLog {
   address: string;
@@ -195,4 +204,5 @@ export type {
   MirrorNodeBlocks,
   MirrorNodeTokenNFT,
   MirrorNodeTokenNFTResponse,
+  ProposalCoreInformation,
 };

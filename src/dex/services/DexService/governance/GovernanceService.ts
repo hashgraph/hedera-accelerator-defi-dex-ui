@@ -8,6 +8,7 @@ import {
   ProposalState,
   ProposalType,
   ProposalStatus,
+  GovernanceProposalType,
 } from "../../../store/governanceSlice";
 import { getTimeRemaining } from "@dex/utils";
 import { MirrorNodeDecodedProposalEvent } from "../../../../shared/services/MirrorNodeService";
@@ -74,60 +75,59 @@ const getStatus = (state: ProposalState): ProposalStatus | undefined => {
  * @returns An array of proposal event data.
  */
 export const fetchAllProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
-  const tokenTransferEventsResults = DexService.fetchContractProposalEvents(
-    ProposalType.TokenTransfer,
-    Contracts.Governor.TransferToken.ProxyId
-  );
-  const createTokenEventsResults = DexService.fetchContractProposalEvents(
-    ProposalType.CreateToken,
-    Contracts.Governor.CreateToken.ProxyId
-  );
-  const textProposalEventsResults = DexService.fetchContractProposalEvents(
-    ProposalType.Text,
-    Contracts.Governor.TextProposal.ProxyId
-  );
-  const contractUpgradeEventsResults = DexService.fetchContractProposalEvents(
-    ProposalType.ContractUpgrade,
-    Contracts.Governor.ContractUpgrade.ProxyId
-  );
-  const proposalEventsResults = await Promise.allSettled([
-    tokenTransferEventsResults,
-    createTokenEventsResults,
-    textProposalEventsResults,
-    contractUpgradeEventsResults,
-  ]);
-  const proposalEvents = getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
-  return proposalEvents;
+  return await DexService.fetchContractProposalEvents(Contracts.Governor.TransferToken.ProxyId);
 };
 
-const convertDataToProposal = (proposalData: ProposalData, totalGodTokenSupply: Long | null): Proposal => {
+const convertProposalType = (proposalType: number): ProposalType => {
+  switch (proposalType) {
+    case GovernanceProposalType.SET_TEXT: {
+      return ProposalType.Text;
+    }
+    case GovernanceProposalType.CREATE_TOKEN: {
+      return ProposalType.CreateToken;
+    }
+    case GovernanceProposalType.UPGRADE_PROXY: {
+      return ProposalType.ContractUpgrade;
+    }
+    default: {
+      return ProposalType.TokenTransfer;
+    }
+  }
+};
+
+const convertDataToProposal = (
+  proposalData: MirrorNodeDecodedProposalEvent,
+  totalGodTokenSupply: Long | null
+): Proposal => {
   const proposalState = proposalData.state
     ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
     : undefined;
-  const isProposalTypeValid = Object.values(ProposalType).includes(proposalData.type as ProposalType);
-  const { startBlock, endBlock } = proposalData?.duration ?? {};
+  const isProposalTypeValid = Object.values(ProposalType).includes(
+    convertProposalType(proposalData.coreInformation.inputs.proposalType) as ProposalType
+  );
+  // const { startBlock, endBlock } =  {};
   return {
     id: proposalData.proposalId,
     contractId: proposalData.contractId,
-    type: isProposalTypeValid ? (proposalData.type as ProposalType) : undefined,
-    title: proposalData.title,
-    description: proposalData.description ?? "",
-    link: proposalData.link ?? "",
-    author: proposalData.proposer
-      ? AccountId.fromString(solidityAddressToAccountIdString(proposalData.proposer))
+    type: isProposalTypeValid ? convertProposalType(proposalData.coreInformation.inputs.proposalType) : undefined,
+    title: proposalData.coreInformation.inputs.title,
+    description: proposalData.coreInformation.inputs.description ?? "",
+    link: proposalData.coreInformation.inputs.discussionLink ?? "",
+    author: proposalData.coreInformation.creator
+      ? AccountId.fromString(solidityAddressToAccountIdString(proposalData.coreInformation.creator))
       : AccountId.fromString("0.0.34728121"),
     status: proposalState ? getStatus(ProposalState[proposalState]) : undefined,
-    timeRemaining: !isNil(startBlock) && !isNil(endBlock) ? getTimeRemaining(startBlock, endBlock) : undefined,
+    timeRemaining: undefined,
     state: proposalState ? ProposalState[proposalState as keyof typeof ProposalState] : undefined,
     timestamp: proposalData.timestamp,
-    transferFromAccount: proposalData.transferFromAccount,
-    transferToAccount: proposalData.transferToAccount,
-    tokenToTransfer: proposalData.tokenToTransfer,
-    transferTokenAmount: proposalData.transferTokenAmount,
-    voted: proposalData.votingInformation?.voted,
-    votedUser: solidityAddressToAccountIdString(proposalData.votingInformation?.votedUser ?? ""),
+    transferFromAccount: "",
+    transferToAccount: "",
+    tokenToTransfer: "",
+    transferTokenAmount: 0,
+    voted: proposalData.votingInformation?.hasVoted,
+    votedUser: solidityAddressToAccountIdString(""),
     isQuorumReached: proposalData.votingInformation?.isQuorumReached,
-    endBlock,
+    endBlock: undefined,
     votes: {
       yes: BigNumber(proposalData?.votingInformation?.forVotes ?? 0),
       no: BigNumber(proposalData?.votingInformation?.againstVotes ?? 0),
@@ -183,7 +183,7 @@ async function fetchProposalDetails(proposalEvent: MirrorNodeDecodedProposalEven
     to: contractId,
   });
   const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
-  const tokenTransferDetails = getTokenTransferDetailsFromHexData(proposalEvent.data);
+  const tokenTransferDetails = getTokenTransferDetailsFromHexData(undefined);
   return { ...proposalEvent, ...tokenTransferDetails, state: dataParsed.at(0) };
 }
 

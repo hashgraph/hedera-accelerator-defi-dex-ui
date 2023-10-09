@@ -4,6 +4,7 @@ import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { useMutation, UseMutationResult, useQueryClient } from "react-query";
 import { DexService } from "../../services";
 import { isNil } from "ramda";
+import { Proposal } from "@dao/hooks";
 
 export type UseCancelProposalResult = UseMutationResult<
   TransactionResponse | undefined,
@@ -13,7 +14,7 @@ export type UseCancelProposalResult = UseMutationResult<
 >;
 export interface UseCancelProposalParams {
   contractId: string;
-  title: string;
+  proposal: Proposal;
   signer: HashConnectSigner;
 }
 
@@ -27,8 +28,7 @@ export function useCancelProposal(id: string | undefined) {
   >(
     async (params: UseCancelProposalParams) => {
       if (isNil(id)) return;
-      const { contractId, title, signer } = params;
-      return DexService.cancelProposal({ contractId, title, signer });
+      return DexService.cancelProposal({ ...params });
     },
     {
       onSuccess: () => {

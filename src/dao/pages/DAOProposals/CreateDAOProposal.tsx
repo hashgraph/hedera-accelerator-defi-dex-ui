@@ -71,16 +71,18 @@ export function CreateDAOProposal() {
   const { ownerIds, threshold, safeEVMAddress } = (dao as MultiSigDAODetails) ?? {};
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress ?? "");
   const safeAccountId = daoSafeIdQueryResults.data?.data.contract_id ?? "";
-  const { governors, tokenId: governanceTokenId = "" } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
+  const {
+    tokenId: governanceTokenId = "",
+    governorAddress,
+    assetsHolderAddress,
+  } = (dao as GovernanceDAODetails | NFTDAODetails) ?? {};
   const { type } = getValues();
 
-  const daoContractUpgradeLogicQueryResults = useFetchContract(governors?.contractUpgradeLogic ?? "");
-  const daoContractUpgradeLogic = daoContractUpgradeLogicQueryResults.data?.data.contract_id ?? "";
-  const daoTextLogicQueryResults = useFetchContract(governors?.textLogic ?? "");
-  const daoTextLogic = daoTextLogicQueryResults.data?.data.contract_id ?? "";
-  const daoTokenTransferLogicQueryResults = useFetchContract(governors?.tokenTransferLogic ?? "");
-  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
-  const transferFrom = currentDaoType === Routes.Multisig ? safeAccountId : daoTokenTransferLogic;
+  const daoGovernanceQueryResults = useFetchContract(governorAddress ?? "");
+  const daoGovernance = daoGovernanceQueryResults.data?.data.contract_id ?? "";
+  const daoAssetHolderQueryResults = useFetchContract(assetsHolderAddress ?? "");
+  const daoAssetHolder = daoAssetHolderQueryResults.data?.data.contract_id ?? "";
+  const transferFrom = currentDaoType === Routes.Multisig ? safeAccountId : daoAssetHolder;
   const wizardTitle = currentWizardStep === Routes.Type ? "New Proposal" : type;
   const accountTokenBalancesQueryResults = useAccountTokenBalances(
     currentDaoType === Routes.Multisig ? safeAccountId : daoAccountId
@@ -321,7 +323,7 @@ export function CreateDAOProposal() {
               tokenId,
               title,
               linkToDiscussion,
-              spenderContractId: daoTokenTransferLogic,
+              spenderContractId: daoGovernance,
               governanceTokenId,
               description,
               receiverId: recipientAccountId,
@@ -338,7 +340,7 @@ export function CreateDAOProposal() {
               tokenId,
               title,
               linkToDiscussion,
-              spenderContractId: daoTokenTransferLogic,
+              spenderContractId: daoGovernance,
               governanceTokenId,
               description,
               receiverId: recipientAccountId,
@@ -411,7 +413,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               oldProxyAddress,
               newImplementationAddress,
-              spenderContractId: daoContractUpgradeLogic,
+              spenderContractId: daoGovernance,
               governanceTokenId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
@@ -433,7 +435,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               oldProxyAddress,
               newImplementationAddress,
-              spenderContractId: daoContractUpgradeLogic,
+              spenderContractId: daoGovernance,
               governanceTokenId,
               nftTokenSerialId: nftTokenSerialId,
               daoType: DAOType.NFT,
@@ -459,7 +461,8 @@ export function CreateDAOProposal() {
               title,
               description,
               linkToDiscussion,
-              spenderContractId: daoTextLogic,
+              governorContractId: daoGovernance,
+              assetHolderEVMAddress: assetsHolderAddress,
               governanceTokenId,
               daoContractId: daoAccountId,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
@@ -471,7 +474,8 @@ export function CreateDAOProposal() {
               title,
               description,
               linkToDiscussion,
-              spenderContractId: daoTextLogic,
+              governorContractId: daoGovernance,
+              assetHolderEVMAddress: assetsHolderAddress,
               governanceTokenId,
               daoContractId: daoAccountId,
               nftTokenSerialId,
@@ -500,7 +504,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               tokenId,
               governanceTokenId,
-              spenderContractId: daoTokenTransferLogic,
+              spenderContractId: daoGovernance,
               nftTokenSerialId: DEFAULT_NFT_TOKEN_SERIAL_ID,
               daoType: DAOType.GovernanceToken,
             });
@@ -512,7 +516,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               tokenId,
               governanceTokenId,
-              spenderContractId: daoTokenTransferLogic,
+              spenderContractId: daoGovernance,
               nftTokenSerialId,
               daoType: DAOType.NFT,
             });

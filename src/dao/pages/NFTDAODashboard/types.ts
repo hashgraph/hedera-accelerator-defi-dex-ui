@@ -9,5 +9,4 @@ export type NFTDAODetailsContext = {
   memberCount: number;
   tokenCount: number;
   totalAssetValue: number;
-  blockedBalance: number | number[];
 };

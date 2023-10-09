@@ -1,7 +1,7 @@
 import { Outlet, useParams } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@dao/services";
 import { TokenBalance, useAccountTokenBalances, usePairedWalletDetails, useToken } from "@dex/hooks";
-import { useFetchContract, useDAOs, useFetchDAOMembers, useGetBlockedTokenBalance } from "@dao/hooks";
+import { useFetchContract, useDAOs, useFetchDAOMembers } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { GovernanceDAODetailsContext } from "./types";
@@ -15,12 +15,10 @@ export function GovernanceDAODashboard() {
   const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase());
   const { walletId, isWalletPaired } = usePairedWalletDetails();
 
-  const daoTokenTransferLogicQueryResults = useFetchContract(dao?.governors?.tokenTransferLogic ?? "");
-  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoTokenTransferLogic);
-  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(daoTokenTransferLogic, dao?.tokenId ?? "");
+  const daoAssetHolderQueryResults = useFetchContract(dao?.assetsHolderAddress ?? "");
+  const daoAssetHolder = daoAssetHolderQueryResults.data?.data.contract_id ?? "";
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoAssetHolder);
   const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
-  const { data: blockedBalance = 0 } = blockedTokenBalancesQueryResults;
   const { data: FTToken } = useToken(dao?.tokenId ?? "");
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
@@ -73,7 +71,6 @@ export function GovernanceDAODashboard() {
               totalAssetValue,
               FTToken,
               tokenBalances,
-              blockedBalance,
             } satisfies GovernanceDAODetailsContext
           }
         />

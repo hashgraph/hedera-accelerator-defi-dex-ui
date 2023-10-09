@@ -13,10 +13,13 @@ import {
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./types";
 import { DexService, checkTransactionResponseForError, Contracts, DEX_PRECISION } from "@dex/services";
-import { DAOType } from "@dao/services";
+import { DAOType, TokenType } from "@dao/services";
 import FTDAOFactoryJSON from "@dex/services/abi/FTDAOFactory.json";
+import HederaGovernorJSON from "@dex/services/abi/HederaGovernor.json";
+import AssetHolderJSON from "@dex/services/abi/AssetHolder.json";
 import { isHbarToken } from "@dex/utils";
 import { isNFT } from "@shared/utils";
+import { GovernanceProposalType } from "@dex/store";
 
 const Gas = 9000000;
 
@@ -344,6 +347,106 @@ async function sendContractUpgradeTransaction(params: SendDAOContractUpgradeProp
   return sendProposeTokenTransferTransactionResponse;
 }
 
+interface CreateProposalParams {
+  governorContractId: string;
+  proposalType: number;
+  title: string;
+  description: string;
+  discussionLink: string;
+  metadata: string;
+  amountOrId: number;
+  targets: string[];
+  values: number[]; // values must be passed here in a form of tinnybar
+  calldatas: Uint8Array[];
+  signer: HashConnectSigner;
+}
+
+const createProposal = async (params: CreateProposalParams) => {
+  const {
+    proposalType,
+    title,
+    description,
+    discussionLink,
+    metadata,
+    amountOrId,
+    targets,
+    values,
+    calldatas,
+    governorContractId,
+    signer,
+  } = params;
+  const createProposalInputs = {
+    proposalType,
+    title,
+    description,
+    discussionLink,
+    metadata,
+    amountOrId,
+    targets,
+    values,
+    calldatas,
+  };
+
+  const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
+  const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.CreateProposal, [
+    Object.values(createProposalInputs),
+  ]);
+
+  const sendProposeTextProposalTransaction = await new ContractExecuteTransaction()
+    .setContractId(governorContractId)
+    .setFunctionParameters(ethers.utils.arrayify(data))
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const sendProposeTextProposalTransactionResponse = await sendProposeTextProposalTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(
+    sendProposeTextProposalTransactionResponse,
+    GovernorDAOContractFunctions.CreateProposal
+  );
+  return sendProposeTextProposalTransactionResponse;
+};
+
+interface CreateTextProposalParams {
+  title: string;
+  description: string;
+  linkToDiscussion: string;
+  metadata: string;
+  nftTokenSerialId: number;
+  assetHolderEVMAddress: string;
+  governorContractId: string;
+  signer: HashConnectSigner;
+}
+
+const createTextProposal = async (params: CreateTextProposalParams) => {
+  const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
+  const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.SetText, []);
+  const {
+    title,
+    description,
+    linkToDiscussion,
+    metadata,
+    nftTokenSerialId,
+    assetHolderEVMAddress,
+    governorContractId,
+    signer,
+  } = params;
+
+  contractInterface.decodeFunctionData(GovernorDAOContractFunctions.SetText, ethers.utils.arrayify(data));
+
+  return await createProposal({
+    proposalType: GovernanceProposalType.SET_TEXT,
+    title,
+    description,
+    discussionLink: linkToDiscussion,
+    metadata,
+    amountOrId: nftTokenSerialId,
+    targets: [assetHolderEVMAddress],
+    values: [0],
+    calldatas: [ethers.utils.arrayify(data)],
+    governorContractId,
+    signer,
+  });
+};
+
 interface SendDAOTextProposalTransactionParams {
   governanceTokenId: string;
   spenderContractId: string;
@@ -406,10 +509,38 @@ async function sendTextProposalTransaction(params: SendDAOTextProposalTransactio
   return sendProposeTextProposalTransactionResponse;
 }
 
+interface SetUpAllowanceParams {
+  tokenType: TokenType;
+  governanceTokenId: string;
+  spenderContractId: string;
+  signer: HashConnectSigner;
+}
+async function setUpAllowance(params: SetUpAllowanceParams) {
+  const { tokenType, governanceTokenId, spenderContractId, signer } = params;
+  if (tokenType === TokenType.NFT) {
+    await DexService.setNFTAllowance({
+      nftId: governanceTokenId,
+      walletId: signer.getAccountId().toString(),
+      spenderContractId,
+      signer,
+    });
+  } else {
+    await DexService.setTokenAllowance({
+      tokenId: governanceTokenId,
+      walletId: signer.getAccountId().toString(),
+      spenderContractId,
+      tokenAmount: 1 * DEX_PRECISION,
+      signer,
+    });
+  }
+}
+
 export {
   sendCreateGovernanceDAOTransaction,
   sendProposeTokenTransferTransaction,
   sendContractUpgradeTransaction,
   sendTextProposalTransaction,
   sendGOVTokenAssociateTransaction,
+  createTextProposal,
+  setUpAllowance,
 };

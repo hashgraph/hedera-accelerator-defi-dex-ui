@@ -30,7 +30,8 @@ export interface DAOProposalGovernors {
 
 export interface GovernanceDAOCreatedEventArgs {
   daoAddress: string;
-  governors: DAOProposalGovernors;
+  governorAddress: string;
+  assetsHolderAddress: string;
   tokenHolderAddress: string;
   inputs: DAOCreatedEventArgs & {
     tokenAddress: string;
@@ -42,7 +43,8 @@ export interface GovernanceDAOCreatedEventArgs {
 
 export interface NFTDAOCreatedEventArgs {
   daoAddress: string;
-  governors: DAOProposalGovernors;
+  governorAddress: string;
+  assetsHolderAddress: string;
   tokenHolderAddress: string;
   inputs: DAOCreatedEventArgs & {
     tokenAddress: string;
@@ -76,7 +78,8 @@ export interface GovernanceDAODetails {
   logoUrl: string;
   isPrivate: boolean;
   tokenId: string;
-  governors: DAOProposalGovernors;
+  governorAddress: string;
+  assetsHolderAddress: string;
   tokenHolderAddress: string;
   webLinks: string[];
   quorumThreshold: number;
@@ -92,7 +95,8 @@ export interface NFTDAODetails {
   title: string;
   description: string;
   infoUrl: string | undefined;
-  governors: DAOProposalGovernors;
+  governorAddress: string;
+  assetsHolderAddress: string;
   tokenHolderAddress: string;
   name: string;
   logoUrl: string;
@@ -172,7 +176,6 @@ export interface Member {
 export type DAODetailsContext = {
   dao: DAO;
   tokenBalances: TokenBalance[];
-  blockedBalance: number | number[];
 };
 
 export enum GovernanceProposalOperationType {

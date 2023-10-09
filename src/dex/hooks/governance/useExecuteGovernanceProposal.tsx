@@ -5,10 +5,11 @@ import { useMutation, useQueryClient } from "react-query";
 import { DexService } from "../../services";
 import { isNil } from "ramda";
 import { HandleOnSuccess } from "..";
+import { Proposal } from "@dao/hooks";
 
 export interface UseExecuteProposalParams {
   contractId: string;
-  title: string;
+  proposal: Proposal;
   signer: HashConnectSigner;
   transfersFromAccount?: string;
   tokenId?: string;

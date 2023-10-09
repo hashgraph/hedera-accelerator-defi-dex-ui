@@ -1,7 +1,7 @@
 import { Outlet, useParams } from "react-router-dom";
 import { Member, NFTDAODetails } from "@dao/services";
 import { TokenBalance, useAccountTokenBalances, useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
-import { useDAOs, useMintNFT, useFetchDAOMembers, useGetBlockedTokenBalance, useFetchContract } from "@dao/hooks";
+import { useDAOs, useMintNFT, useFetchDAOMembers, useFetchContract } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { TransactionResponse } from "@hashgraph/sdk";
@@ -17,13 +17,11 @@ export function NFTDAODashboard() {
   const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase());
   const { walletId, isWalletPaired } = usePairedWalletDetails();
 
-  const daoTokenTransferLogicQueryResults = useFetchContract(dao?.governors?.tokenTransferLogic ?? "");
-  const daoTokenTransferLogic = daoTokenTransferLogicQueryResults.data?.data.contract_id ?? "";
-  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoTokenTransferLogic);
-  const blockedTokenBalancesQueryResults = useGetBlockedTokenBalance(daoTokenTransferLogic, dao?.tokenId ?? "");
+  const daoAssetHolderQueryResults = useFetchContract(dao?.assetsHolderAddress ?? "");
+  const daoAssetHolder = daoAssetHolderQueryResults.data?.data.contract_id ?? "";
+  const accountTokenBalancesQueryResults = useAccountTokenBalances(daoAssetHolder);
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
-  const { data: blockedBalance = [] } = blockedTokenBalancesQueryResults;
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
 
@@ -84,7 +82,6 @@ export function NFTDAODashboard() {
               tokenCount,
               ownerCount: 0,
               totalAssetValue,
-              blockedBalance,
             } satisfies NFTDAODetailsContext
           }
         />

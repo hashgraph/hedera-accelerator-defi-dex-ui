@@ -42,7 +42,7 @@ export function ProposalList() {
   const location = useLocation();
   const { dao } = useOutletContext<DAODetailsContext>();
   const { safeEVMAddress } = dao as MultiSigDAODetails;
-  const { tokenId = "", governors } = dao as GovernanceDAODetails;
+  const { tokenId = "", governorAddress } = dao as GovernanceDAODetails;
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
 
@@ -58,7 +58,7 @@ export function ProposalList() {
   const governanceDaoTransactionsQueryResults = useGovernanceDAOProposals(
     daoAccountId,
     tokenId,
-    governors,
+    governorAddress,
     transactionFilters
   );
   const {

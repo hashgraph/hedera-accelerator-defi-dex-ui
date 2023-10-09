@@ -6,7 +6,6 @@ export type MultiSigDAODetailsContext = {
   tokenBalances: TokenBalance[];
   members: Member[];
   totalAssetValue: number;
-  blockedBalance: number | number[];
 };
 
 export const DefaultMultiSigDAODetails = {

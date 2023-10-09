@@ -56,11 +56,7 @@ export function MultiSigDAODashboard() {
         errorMessage={errorMessage}
         isSuccess={isSuccess}
       >
-        <Outlet
-          context={
-            { dao, tokenBalances, members, totalAssetValue, blockedBalance: 0 } satisfies MultiSigDAODetailsContext
-          }
-        />
+        <Outlet context={{ dao, tokenBalances, members, totalAssetValue } satisfies MultiSigDAODetailsContext} />
       </DAODashboard>
     );
   }

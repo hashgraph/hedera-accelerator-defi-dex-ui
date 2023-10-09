@@ -1,5 +1,5 @@
 import { ProposalState } from "@dex/store";
-import { MirrorNodeTokenById } from "@dex/services";
+import { MirrorNodeTokenById, ProposalCoreInformation } from "@dex/services";
 
 export enum DAOQueries {
   DAOs = "daos",
@@ -179,12 +179,14 @@ export interface Proposal {
   threshold: number | undefined;
   proposalId?: string;
   contractEvmAddress?: string;
-  timeRemaining?: string;
+  timeRemaining?: number;
   votes?: Votes;
   hasVoted?: boolean;
   isQuorumReached?: boolean;
-  votingEndTime?: string;
+  votingEndTime?: number;
   proposalState?: ProposalState;
+  coreInformation?: ProposalCoreInformation;
+
   /**
    * TODO: To be removed
    * Extra objects to check for DAO upgrade Proposal
