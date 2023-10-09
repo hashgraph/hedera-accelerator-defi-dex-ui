@@ -16,7 +16,7 @@ import {
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
-import { AccountId, ContractId } from "@hashgraph/sdk";
+import { ContractId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
 import { Gas, GasPrice } from "@dex/services";
@@ -247,7 +247,6 @@ function createMirrorNodeService() {
 
   // TODO: Move to Governance Service
   const fetchContractProposalEvents = async (
-    proposalType: string,
     contractId: string,
     limitResults = true
   ): Promise<MirrorNodeDecodedProposalEvent[]> => {
@@ -260,11 +259,13 @@ function createMirrorNodeService() {
         },
       }
     );
-    const allEvents = decodeLog(abiSignatures, response, ["ProposalDetails"]);
-    const proposalCreatedEvents = allEvents.get("ProposalDetails") ?? [];
+    const allEvents = decodeLog(abiSignatures, response, ["ProposalCoreInformation", "ProposalVotingInformation"]);
+    const proposalCreatedEvents = allEvents.get("ProposalCoreInformation") ?? [];
+    const proposalVotingEvents = allEvents.get("ProposalVotingInformation") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
+      const votingInformation = proposalVotingEvents.find((e) => e.proposalId === item.proposalId).votingInformation;
       // TODO: added the conversion from BigInt to String. Remove it with making changes in the Interface.
-      return { ...item, contractId, type: proposalType, proposalId: item.proposalId + "" };
+      return { ...item, contractId, proposalId: item.proposalId + "", votingInformation };
     });
 
     const uniqueProposals = uniqBy((proposal: MirrorNodeDecodedProposalEvent) => proposal.proposalId, proposals);

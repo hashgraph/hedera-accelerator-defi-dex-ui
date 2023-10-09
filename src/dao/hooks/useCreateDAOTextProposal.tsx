@@ -2,13 +2,14 @@ import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { DexService } from "@dex/services";
-import { DAOType } from "@dao/services";
+import { DAOType, TokenType } from "@dao/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
 
 interface UseCreateDAOTextProposalParams {
   governanceTokenId: string;
-  spenderContractId: string;
+  governorContractId: string;
+  assetHolderEVMAddress: string;
   title: string;
   description: string;
   linkToDiscussion: string;
@@ -30,7 +31,33 @@ export function useCreateDAOTextProposal(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.CreateDAOTextProposal
   >(
     async (params: UseCreateDAOTextProposalParams) => {
-      return DexService.sendTextProposalTransaction({ ...params, signer });
+      const {
+        title,
+        description,
+        linkToDiscussion,
+        metadata,
+        nftTokenSerialId,
+        assetHolderEVMAddress,
+        governorContractId,
+        governanceTokenId,
+        daoType,
+      } = params;
+      await DexService.setUpAllowance({
+        governanceTokenId,
+        tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
+        spenderContractId: governorContractId,
+        signer,
+      });
+      return DexService.createTextProposal({
+        title,
+        description,
+        linkToDiscussion,
+        metadata,
+        nftTokenSerialId,
+        assetHolderEVMAddress,
+        governorContractId,
+        signer,
+      });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

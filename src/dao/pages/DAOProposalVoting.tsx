@@ -15,6 +15,7 @@ export function DAOProposalVoting(props: DAOProposalVotingProps) {
   if (isMultiSig && dao.threshold) {
     turnout = Math.round((proposal.approvalCount / dao.threshold) * 100);
   }
+  const votingEndTime = new Date(Number(proposal.votingEndTime) * 1000).toLocaleString();
 
   return (
     <>
@@ -47,8 +48,8 @@ export function DAOProposalVoting(props: DAOProposalVotingProps) {
                 <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
                   Voting end time
                 </Text.P_XSmall_Regular>
-                <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
-                  {proposal.votingEndTime}
+                <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start" whiteSpace="nowrap">
+                  {votingEndTime}
                 </Text.P_XSmall_Semibold>
               </Flex>
               <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">

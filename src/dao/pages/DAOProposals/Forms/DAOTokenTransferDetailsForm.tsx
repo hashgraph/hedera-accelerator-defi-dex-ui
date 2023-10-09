@@ -174,7 +174,6 @@ export function DAOTokenTransferDetailsForm() {
             balanceAccountId={safeAccountId}
             initialSelectedTokenId={tokenId}
             currentAmount={amount}
-            govTokenId={governanceTokenId}
             isInvalid={Boolean(errors?.amount)}
             errorMessage={errors?.amount && errors?.amount?.message}
             form={form}

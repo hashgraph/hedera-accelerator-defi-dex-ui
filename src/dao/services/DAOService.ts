@@ -7,7 +7,6 @@ import {
   convertEthersBigNumberToBigNumberJS,
   decodeLog,
   DexService,
-  getFulfilledResultsData,
   MirrorNodeDecodedProposalEvent,
 } from "@dex/services";
 import { Contracts, Gas, HBARTokenId, MINIMUM_DEPOSIT_AMOUNT } from "@dex/services";
@@ -17,6 +16,7 @@ import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.js
 import HederaGnosisSafeJSON from "../../dex/services/abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../dex/services/abi/MultiSigDAO.json";
 import BaseDAOJSON from "../../dex/services/abi/BaseDAO.json";
+import HederaGovernorJSON from "../../dex/services/abi/HederaGovernor.json";
 
 import {
   MultiSigDAODetails,
@@ -30,7 +30,6 @@ import {
   NFTDAOCreatedEventArgs,
   HederaGnosisSafeFunctions,
   MultiSigProposeTransactionType,
-  DAOProposalGovernors,
   DAOSettingsDetails,
   DAODetailsInfoEventArgs,
   GovernanceProposalOperationType,
@@ -39,11 +38,9 @@ import {
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
-import { ProposalType } from "@dao/hooks";
 import { ProposalData } from "../../dex/services/DexService/governance/type";
 import { isNil, isNotNil } from "ramda";
-import GovernorCountingSimpleInternalJSON from "../../dex/services/abi/GovernorCountingSimpleInternal.json";
-import { ContractProposalState } from "@dex/store";
+import { ContractProposalState, GovernanceProposalType, ProposalType } from "@dex/store";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 
 export async function getOwners(safeAddress: string): Promise<string[]> {
@@ -126,11 +123,16 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
     new ethers.utils.Interface(FTDAOFactoryJSON.abi),
     eventTypes
   );
-
   const allPromises = logs.map(async (log): Promise<GovernanceDAODetails> => {
     const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
 
-    const { daoAddress: accountId, governors, tokenHolderAddress, inputs: initialDAODetails } = argsWithName;
+    const {
+      daoAddress: accountId,
+      assetsHolderAddress,
+      governorAddress,
+      tokenHolderAddress,
+      inputs: initialDAODetails,
+    } = argsWithName;
     const {
       admin,
       isPrivate,
@@ -165,7 +167,8 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       title: updatedDAODetails?.name ?? name,
       webLinks: updatedDAODetails?.webLinks ?? webLinks,
       description: updatedDAODetails?.description ?? description,
-      governors,
+      governorAddress,
+      assetsHolderAddress,
       tokenHolderAddress,
       tokenId: tokenId,
       quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
@@ -187,7 +190,13 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
   );
   const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
     const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
-    const { daoAddress: accountId, governors, tokenHolderAddress, inputs: initialDAODetails } = argsWithName;
+    const {
+      daoAddress: accountId,
+      assetsHolderAddress,
+      governorAddress,
+      tokenHolderAddress,
+      inputs: initialDAODetails,
+    } = argsWithName;
     const {
       admin,
       isPrivate,
@@ -220,7 +229,8 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       description: updatedDAODetails?.description ?? description,
       webLinks: updatedDAODetails?.webLinks ?? webLinks,
       infoUrl,
-      governors,
+      governorAddress,
+      assetsHolderAddress,
       tokenHolderAddress,
       logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
       isPrivate,
@@ -331,13 +341,13 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
   return parsedEventsWithData;
 }
 
-function getProposalData(type: string, data: string | undefined): ProposalDataDetails {
+function getProposalData(type: GovernanceProposalType, data: string | undefined): ProposalDataDetails {
   const getUpgradeContractProposalData = (data: string | undefined) => {
     if (isNil(data)) return;
     const abiCoder = ethers.utils.defaultAbiCoder;
     const parsedData = abiCoder.decode(["address proxy", "address proxyLogic", "address proxyAdmin"], data);
     return {
-      type: ProposalType.UpgradeContract,
+      type: GovernanceProposalType.UPGRADE_PROXY,
       proxy: parsedData.proxy,
       proxyAdmin: parsedData.proxyAdmin,
       proxyLogic: parsedData.proxyLogic,
@@ -361,7 +371,7 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
           data
         );
         return {
-          type: ProposalType.TokenTransfer,
+          type: GovernanceProposalType.TRANSFER,
           transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
           tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
           transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
@@ -370,7 +380,7 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
       case GovernanceProposalOperationType.TokenAssociation: {
         const parsedData = abiCoder.decode(["uint256 operationType", "address tokenAddress"], data);
         return {
-          type: ProposalType.TokenAssociate,
+          type: GovernanceProposalType.ASSOCIATE,
           tokenAddress: solidityAddressToTokenIdString(parsedData.tokenAddress),
         };
       }
@@ -380,7 +390,7 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
           data
         );
         return {
-          type: ProposalType.TokenTransfer,
+          type: GovernanceProposalType.TRANSFER,
           transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
           tokenToTransfer: HBARTokenId,
           transferTokenAmount: parseInt(parsedData.transferTokenAmount),
@@ -392,31 +402,28 @@ function getProposalData(type: string, data: string | undefined): ProposalDataDe
   };
 
   switch (type) {
-    case ProposalType.TokenTransfer:
-      return getTokenTransferProposalDataFromHexData(data);
-    case ProposalType.UpgradeContract:
-      return getUpgradeContractProposalData(data);
+    case GovernanceProposalType.TRANSFER:
+      // return getTokenTransferProposalDataFromHexData(data);
+      return undefined;
+    case GovernanceProposalType.UPGRADE_PROXY:
+      // return getUpgradeContractProposalData(data);
+      return undefined;
     default:
       return;
   }
 }
 
-export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): Promise<ProposalData[]> {
-  const contractInterface = new ethers.utils.Interface(GovernorCountingSimpleInternalJSON.abi);
+export async function fetchGovernanceDAOLogs(governorAddress: string): Promise<MirrorNodeDecodedProposalEvent[]> {
+  const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
 
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
-    const proposalEventsResults = await Promise.allSettled([
-      DexService.fetchContractProposalEvents(ProposalType.TokenTransfer, governors.tokenTransferLogic, false),
-      DexService.fetchContractProposalEvents(ProposalType.TextProposal, governors.textLogic, false),
-      DexService.fetchContractProposalEvents(ProposalType.UpgradeContract, governors.contractUpgradeLogic, false),
-    ]);
-    return getFulfilledResultsData<MirrorNodeDecodedProposalEvent>(proposalEventsResults);
+    return await DexService.fetchContractProposalEvents(governorAddress, false);
   };
 
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-        const proposalDetailsData = getProposalData(proposalEvent.type, proposalEvent.data);
+        const proposalDetailsData = getProposalData(proposalEvent.coreInformation.inputs.proposalType, "");
         let contractId = proposalEvent.contractId;
         if (contractId.includes("0.0")) {
           contractId = ContractId.fromString(contractId).toSolidityAddress();
@@ -432,7 +439,8 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
          * proposalDetails should override the same field found in the proposalEvent.
          */
 
-        const isContractUpgradeProposal = proposalEvent.type === ProposalType.UpgradeContract;
+        const isContractUpgradeProposal =
+          proposalEvent.coreInformation.inputs.proposalType === GovernanceProposalType.UPGRADE_PROXY;
         let isAdminApproved = false;
         let parsedData;
         if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
@@ -446,9 +454,8 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
             : "";
           const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
           const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
-          const upgradeLogicEVMAddress = await DexService.fetchContractEVMAddress(governors.contractUpgradeLogic);
           const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === upgradeLogicEVMAddress;
+          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === governorAddress;
           parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
         }
         const isAdminApprovalButtonVisible =
@@ -458,7 +465,6 @@ export async function fetchGovernanceDAOLogs(governors: DAOProposalGovernors): P
             ? ContractProposalState.Active
             : dataParsed.at(0)
           : dataParsed.at(0);
-
         return {
           ...proposalEvent,
           state: currentStateOfProposal,

@@ -114,7 +114,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
       const signer = wallet.getSigner();
       executeProposal.mutate({
         contractId: contractId,
-        title: proposal?.title ?? "",
+        proposal: proposal,
         signer,
         transfersFromAccount: proposal.sender,
         tokenId: proposal.tokenId,
@@ -133,7 +133,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
       const signer = wallet.getSigner();
       cancelProposal.mutate({
         contractId: contractId,
-        title: proposal?.title ?? "",
+        proposal: proposal,
         signer,
       });
     }
@@ -294,7 +294,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     }
     return votesCount;
   };
-
+  const votingEndTime = new Date(Number(proposal.votingEndTime) * 1000).toLocaleString();
   return (
     <Flex layerStyle="content-box" direction="column" height="100%">
       <Flex direction="column" gap={4} minWidth="250px" height="100%">
@@ -305,7 +305,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               Voting end time
             </Text.P_XSmall_Regular>
             <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
-              {proposal.votingEndTime}
+              {votingEndTime}
             </Text.P_XSmall_Semibold>
           </Flex>
           <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">

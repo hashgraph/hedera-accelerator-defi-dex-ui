@@ -36,7 +36,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     (dao: GovernanceDAODetails | NFTDAODetails) =>
       dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase()
   );
-  const daoProposalsQueryResults = useGovernanceDAOProposals(daoAccountId, dao?.tokenId, dao?.governors);
+  const daoProposalsQueryResults = useGovernanceDAOProposals(daoAccountId, dao?.tokenId, dao?.governorAddress);
   const { data: proposals } = daoProposalsQueryResults;
   const proposal = proposals?.find((proposal) => proposal.proposalId === proposalId);
   const isDataFetched =
@@ -53,7 +53,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
       : `${(Number(lockedNFTToken.data) ? 1 : 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
   const isAuthor = walletId === proposal?.author;
-  const governorUpgrade = dao?.governors?.contractUpgradeLogic;
+  const governorUpgrade = dao?.governorAddress;
   const governorUpgradeContractId = isNotNil(governorUpgrade) ? solidityAddressToContractIdString(governorUpgrade) : "";
 
   function handleVoteForProposalSuccess(transactionResponse: TransactionResponse) {

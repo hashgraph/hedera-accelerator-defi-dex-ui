@@ -12,6 +12,9 @@ import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
 import { DexService } from "@dex/services";
+import { ethers } from "ethers";
+import { Proposal } from "@dao/hooks";
+// import { Proposal } from "@dex/store";
 
 /**
  * General format of service calls:
@@ -37,23 +40,20 @@ const castVote = async (params: CastVoteParams) => {
   const { contractId, proposalId, voteType, signer } = params;
   const governorContractId = ContractId.fromString(contractId);
   const preciseProposalId = BigNumber(proposalId);
-  const contractFunctionParameters = new ContractFunctionParameters()
-    .addUint256(preciseProposalId)
-    .addUint256(0)
-    .addUint8(voteType);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(preciseProposalId).addUint8(voteType);
   const castVoteTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
-    .setFunction(GovernorContractFunctions.CastVotePublic, contractFunctionParameters)
+    .setFunction(GovernorContractFunctions.CastVote, contractFunctionParameters)
     .setGas(1000000)
     .freezeWithSigner(signer);
   const response = await castVoteTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(response, GovernorContractFunctions.CastVotePublic);
+  checkTransactionResponseForError(response, GovernorContractFunctions.CastVote);
   return response;
 };
 
 interface CancelProposalParams {
   contractId: string;
-  title: string;
+  proposal: Proposal;
   signer: HashConnectSigner;
 }
 
@@ -63,16 +63,22 @@ interface CancelProposalParams {
  * @returns
  */
 const cancelProposal = async (params: CancelProposalParams) => {
-  const { contractId, title, signer } = params;
+  const { contractId, proposal, signer } = params;
   const governorContractId = ContractId.fromString(contractId);
-  const contractFunctionParameters = new ContractFunctionParameters().addString(title);
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddressArray(proposal.coreInformation?.inputs?.targets ?? [])
+    .addUint256Array(proposal.coreInformation?.inputs?._values.map((value) => Number(value)) ?? [])
+    .addBytesArray(
+      proposal.coreInformation?.inputs?.calldatas?.map((item: string) => ethers.utils.arrayify(item)) ?? []
+    )
+    .addBytes32(stringToByetes32(proposal.title));
   const cancelProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
-    .setFunction(GovernorContractFunctions.CancelProposal, contractFunctionParameters)
+    .setFunction(GovernorContractFunctions.Cancel, contractFunctionParameters)
     .setGas(900000)
     .freezeWithSigner(signer);
   const response = await cancelProposalTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(response, GovernorContractFunctions.CancelProposal);
+  checkTransactionResponseForError(response, GovernorContractFunctions.Cancel);
   return response;
 };
 
@@ -231,7 +237,7 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
 
 interface ExecuteProposalParams {
   contractId: string;
-  title: string;
+  proposal: Proposal;
   signer: HashConnectSigner;
   transfersFromAccount?: string;
   transfersToAccount?: string;
@@ -245,10 +251,16 @@ interface ExecuteProposalParams {
  * @returns
  */
 const executeProposal = async (params: ExecuteProposalParams) => {
-  const { contractId, title, signer, transfersFromAccount, tokenId, tokenAmount } = params;
+  const { contractId, proposal, signer, transfersFromAccount, tokenId, tokenAmount } = params;
   const governorContractId = ContractId.fromString(contractId);
   /** This parameter is named 'description' on the contract function */
-  const contractFunctionParameters = new ContractFunctionParameters().addString(title);
+  const contractFunctionParameters = new ContractFunctionParameters()
+    .addAddressArray(proposal.coreInformation?.inputs?.targets ?? [])
+    .addUint256Array(proposal.coreInformation?.inputs?._values?.map((value) => Number(value)) ?? [])
+    .addBytesArray(
+      proposal.coreInformation?.inputs?.calldatas?.map((item: string) => ethers.utils.arrayify(item)) ?? []
+    )
+    .addBytes32(stringToByetes32(proposal.title));
 
   if (tokenId && transfersFromAccount && tokenAmount) {
     await DexService.setTokenAllowance({
@@ -261,12 +273,18 @@ const executeProposal = async (params: ExecuteProposalParams) => {
   }
   const executeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
-    .setFunction(GovernorContractFunctions.ExecuteProposal, contractFunctionParameters)
+    .setFunction(GovernorContractFunctions.Execute, contractFunctionParameters)
     .setGas(1000000)
     .freezeWithSigner(signer);
   const executeTransactionResponse = await executeProposalTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(executeTransactionResponse, GovernorContractFunctions.ExecuteProposal);
+  checkTransactionResponseForError(executeTransactionResponse, GovernorContractFunctions.Execute);
   return executeTransactionResponse;
+};
+
+const stringToByetes32 = (input: string) => {
+  const toUtf8Bytes = ethers.utils.toUtf8Bytes(input);
+  const keccak256 = ethers.utils.keccak256(toUtf8Bytes);
+  return ethers.utils.arrayify(keccak256);
 };
 
 interface SendClaimGODTokenTransactionParams {

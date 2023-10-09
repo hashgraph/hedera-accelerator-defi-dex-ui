@@ -1,12 +1,14 @@
 import { useQuery } from "react-query";
-import { DexService, DEX_TOKEN_PRECISION_VALUE, MirrorNodeTokenById } from "@dex/services";
-import { DAOProposalGovernors } from "@dao/services";
+import {
+  DexService,
+  DEX_TOKEN_PRECISION_VALUE,
+  MirrorNodeTokenById,
+  MirrorNodeDecodedProposalEvent,
+} from "@dex/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
 import { isEmpty, isNil } from "ramda";
 import BigNumber from "bignumber.js";
-import { ProposalData } from "@dex/services/DexService/governance/type";
-import { ContractProposalState, ProposalState } from "@dex/store";
-import { getTimeRemaining, getVotingEndTime } from "@dex/utils";
+import { ContractProposalState, GovernanceProposalType, ProposalState } from "@dex/store";
 import { solidityAddressToAccountIdString } from "@shared/utils";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string];
@@ -14,7 +16,7 @@ type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string];
 export function useGovernanceDAOProposals(
   daoAccountId: string,
   daoTokenId = "",
-  governors: DAOProposalGovernors | undefined,
+  governorAddress: string | undefined,
   proposalFilter: ProposalStatus[] = AllFilters
 ) {
   function filterProposalsByStatus(proposals: Proposal[]): Proposal[] {
@@ -42,7 +44,10 @@ export function useGovernanceDAOProposals(
     return Number(BigNumber(voteNumber).shiftedBy(-precisionValue).toFixed(3));
   };
 
-  const getVotes = (proposalData: ProposalData, godTokenData: MirrorNodeTokenById | null | undefined): Votes => {
+  const getVotes = (
+    proposalData: MirrorNodeDecodedProposalEvent,
+    godTokenData: MirrorNodeTokenById | null | undefined
+  ): Votes => {
     const totalGodTokenSupply = godTokenData?.data?.total_supply;
     const precisionValue = godTokenData?.data.decimals ? +godTokenData?.data.decimals : DEX_TOKEN_PRECISION_VALUE;
     const yes = convertVoteNumbers(proposalData.votingInformation?.forVotes, precisionValue);
@@ -70,38 +75,58 @@ export function useGovernanceDAOProposals(
     };
   };
 
-  const getFormattedProposalData = (proposalType: string, proposalData: ProposalData) => {
-    switch (proposalType) {
-      case ProposalType.TokenTransfer: {
-        return {
-          transferFromAccount: proposalData.transferFromAccount ?? "",
-          transferToAccount: proposalData.transferToAccount ?? "",
-          tokenToTransfer: proposalData.tokenToTransfer ?? "",
-          transferTokenAmount: proposalData.transferTokenAmount ?? 0,
-        };
+  // const getFormattedProposalData = (proposalType: number, proposalData: ProposalData) => {
+  //   switch (proposalType) {
+  //     case ProposalType.TRANSFER: {
+  //       return {
+  //         transferFromAccount: proposalData.transferFromAccount ?? "",
+  //         transferToAccount: proposalData.transferToAccount ?? "",
+  //         tokenToTransfer: proposalData.tokenToTransfer ?? "",
+  //         transferTokenAmount: proposalData.transferTokenAmount ?? 0,
+  //       };
+  //     }
+  //     case ProposalType.TokenAssociate: {
+  //       return {
+  //         tokenAddress: proposalData.tokenAddress ?? "",
+  //       };
+  //     }
+  //     case ProposalType.UpgradeContract: {
+  //       return {
+  //         proxy: proposalData?.proxy ?? "",
+  //         proxyAdmin: proposalData?.proxyAdmin ?? "",
+  //         proxyLogic: proposalData?.proxyLogic ?? "",
+  //         currentLogic: proposalData?.currentLogic ?? "",
+  //         isAdminApproved: proposalData?.isAdminApproved ?? false,
+  //         isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
+  //       };
+  //     }
+  //     default:
+  //       return undefined;
+  //   }
+  // };
+
+  const getProposalType = (type: GovernanceProposalType) => {
+    switch (Number(type)) {
+      case GovernanceProposalType.ASSOCIATE: {
+        return ProposalType.TokenAssociate;
       }
-      case ProposalType.TokenAssociate: {
-        return {
-          tokenAddress: proposalData.tokenAddress ?? "",
-        };
+      case GovernanceProposalType.SET_TEXT: {
+        return ProposalType.TextProposal;
       }
-      case ProposalType.UpgradeContract: {
-        return {
-          proxy: proposalData?.proxy ?? "",
-          proxyAdmin: proposalData?.proxyAdmin ?? "",
-          proxyLogic: proposalData?.proxyLogic ?? "",
-          currentLogic: proposalData?.currentLogic ?? "",
-          isAdminApproved: proposalData?.isAdminApproved ?? false,
-          isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
-        };
+      case GovernanceProposalType.TRANSFER: {
+        return ProposalType.TokenTransfer;
       }
-      default:
-        return undefined;
+      case GovernanceProposalType.UPGRADE_PROXY: {
+        return ProposalType.UpgradeContract;
+      }
+      default: {
+        return ProposalType.TokenTransfer;
+      }
     }
   };
 
   const convertDataToProposal = (
-    proposalData: ProposalData,
+    proposalData: MirrorNodeDecodedProposalEvent,
     index: number,
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
@@ -109,65 +134,64 @@ export function useGovernanceDAOProposals(
     const proposalState = proposalData.state
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);
-    let timeRemaining;
-    if (proposalData.duration?.startBlock && proposalData.duration?.endBlock) {
-      timeRemaining = getTimeRemaining(proposalData.duration?.startBlock, proposalData.duration?.endBlock).toString();
-    }
-    const votingEndTime = getVotingEndTime(proposalData.timestamp || "", timeRemaining || "");
-    const { metadata } = proposalData;
-
+    const endTime = proposalData?.coreInformation?.voteEnd;
+    const currentTime = new Date().getTime();
+    const timeRemaining = currentTime < endTime ? (endTime - currentTime) / 1000 : 0;
     return {
       id: index,
       timeRemaining,
       nonce: 0,
-      amount: proposalData.transferTokenAmount ?? 0,
+      amount: 0,
       proposalId: proposalData.proposalId,
-      type: proposalData.type as ProposalType,
+      type: getProposalType(proposalData.coreInformation.inputs.proposalType),
       approvalCount: 0,
       approvers: [],
       event: ProposalEvent.Send,
       status: getStatus(ProposalState[proposalState]),
-      timestamp: proposalData.timestamp ?? "",
-      tokenId: proposalData.tokenToTransfer ?? "",
+      timestamp: proposalData.timestamp,
+      tokenId: "",
       token: tokenData,
-      receiver: proposalData.transferToAccount ?? "",
-      sender: proposalData.transferFromAccount ?? "",
+      receiver: "",
+      sender: "",
       safeEVMAddress: "",
       to: "",
       operation: 0,
-      hexStringData: proposalData.data ?? "",
+      hexStringData: "",
       msgValue: 0,
-      title: proposalData.title,
-      author: proposalData.proposer ? solidityAddressToAccountIdString(proposalData?.proposer) : "",
-      description: proposalData.description,
-      metadata,
-      link: proposalData.link,
+      title: proposalData.coreInformation.inputs.title,
+      author: proposalData.coreInformation.creator
+        ? solidityAddressToAccountIdString(proposalData.coreInformation.creator)
+        : "",
+      description: proposalData.coreInformation.inputs.description,
+      metadata: proposalData.coreInformation.inputs.metaData,
+      link: proposalData.coreInformation.inputs.discussionLink,
       threshold: 0,
       contractEvmAddress: proposalData.contractId,
       votes: getVotes(proposalData, godTokenData),
-      hasVoted: proposalData.votingInformation?.voted,
+      hasVoted: proposalData.votingInformation?.hasVoted,
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
-      votingEndTime,
+      votingEndTime: endTime,
       proposalState: ProposalState[proposalState],
-      data: getFormattedProposalData(proposalData.type, proposalData),
-      isContractUpgradeProposal: proposalData.type === ProposalType.UpgradeContract,
+      data: undefined,
+      isContractUpgradeProposal: false,
+      coreInformation: proposalData.coreInformation,
     };
   };
 
   return useQuery<Proposal[], Error, Proposal[], UseDAOQueryKey>(
     [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId],
     async () => {
-      if (!governors) {
+      if (!governorAddress) {
         return [];
       }
       const data = await Promise.all([
-        DexService.fetchGovernanceDAOLogs(governors),
+        DexService.fetchGovernanceDAOLogs(governorAddress),
         DexService.fetchTokenData(daoTokenId),
       ]);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
       const proposals = await Promise.all(
         data[0].map(async (proposal, index) => {
-          const tokenId = proposal?.tokenToTransfer ?? "";
+          const tokenId = "";
           let tokenData;
           if (!isEmpty(tokenId)) {
             if (!tokenDataCache.has(tokenId)) {
@@ -181,7 +205,7 @@ export function useGovernanceDAOProposals(
       return proposals;
     },
     {
-      enabled: !!daoAccountId && !!governors && !!daoTokenId,
+      enabled: !!daoAccountId && !!governorAddress && !!daoTokenId,
       select: filterProposalsByStatus,
       staleTime: 5,
       keepPreviousData: true,

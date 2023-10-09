@@ -2,11 +2,11 @@ import Long from "long";
 
 enum GovernorContractFunctions {
   CreateProposal = "createProposal",
-  CastVotePublic = "castVotePublic",
-  ExecuteProposal = "executeProposal",
+  CastVote = "castVote",
+  Execute = "execute",
   ClaimGODToken = "claimGODToken",
   DeployABIFile = "deployABIFile",
-  CancelProposal = "cancelProposal",
+  Cancel = "cancel",
   LockGODToken = "grabTokensFromUser",
   UnLockGODToken = "revertTokensForVoter",
 }
