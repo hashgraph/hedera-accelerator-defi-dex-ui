@@ -18,25 +18,12 @@ import {
 import { ChevronDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { AlertDialog } from "../Dialogs";
 import { WalletTokenAssociation } from "./WalletTokenAssociation";
 import { Color } from "../../themes";
 import { formatWalletConnectionData } from "./formatter";
 import { DexService, TOKEN_USER_ID } from "@dex/services";
 import { isEmpty } from "ramda";
 import { Text } from "../Text";
-
-/** TODO: Replace this with the real terms and service agreement. */
-const TermsAndServices = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-Nisl nunc mi ipsum faucibus vitae aliquet nec. Consectetur libero id faucibus nisl. 
-Sagittis aliquam malesuada bibendum arcu vitae elementum. 
-In metus vulputate eu scelerisque felis imperdiet. Elit eget gravida cum sociis. 
-Sollicitudin aliquam ultrices sagittis orci a scelerisque purus semper. 
-Urna nec tincidunt praesent semper feugiat nibh sed. Nibh cras pulvinar mattis nunc. 
-Erat nam at lectus urna duis convallis convallis tellus id. Aliquet risus feugiat in 
-ante metus dictum at. Tristique senectus et netus et malesuada fames ac turpis. 
-Mollis nunc sed id semper risus in hendrerit. In`;
 
 export interface WalletConnectionProps {
   /** The account ID the application is paired with. */
@@ -77,7 +64,6 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
   /**
    * Tracks if the alert dialog modal should be displayed or hidden.
    */
-  const [dialogState, setDialogState] = useState(false);
   const isConnectedOrDisconnected = !isConnecting && connectionState !== HashConnectConnectionState.Paired;
   const hasPaired = isConnecting && connectionState === HashConnectConnectionState.Paired;
 
@@ -109,21 +95,12 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
   }, [isConnecting]);
 
   const handleClickConnect = () => {
-    setDialogState(false);
     setIsConnecting(true);
     connectToWallet();
   };
 
   const handleClickDisconnect = () => {
     disconnectFromWallet();
-  };
-
-  const handleOpenDialog = () => {
-    setDialogState(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogState(false);
   };
 
   if (isConnecting) {
@@ -137,24 +114,9 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
 
   if (isConnectedOrDisconnected) {
     return (
-      <AlertDialog
-        openDialogButtonStyles={{ flex: "1" }}
-        title="Terms and Services"
-        openModalComponent={
-          <Button>
-            <Text.P_XSmall_Regular>Connect to a Wallet</Text.P_XSmall_Regular>
-          </Button>
-        }
-        body={<Text.P_XSmall_Regular>{TermsAndServices}</Text.P_XSmall_Regular>}
-        footer={
-          <Button flex="1" onClick={handleClickConnect}>
-            Agree & Connect
-          </Button>
-        }
-        alertDialogOpen={dialogState}
-        onAlertDialogOpen={handleOpenDialog}
-        onAlertDialogClose={handleCloseDialog}
-      />
+      <Button onClick={handleClickConnect}>
+        <Text.P_XSmall_Regular>Connect to a Wallet</Text.P_XSmall_Regular>
+      </Button>
     );
   }
 
