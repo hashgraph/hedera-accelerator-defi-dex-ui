@@ -9,7 +9,12 @@ import { useGovernanceDAOProposals } from "@dao/hooks";
 export function NFTDAODashboardOverview() {
   const { dao, totalAssetValue, tokenCount } = useOutletContext<NFTDAODetailsContext>();
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
-  const daoProposalsQueryResults = useGovernanceDAOProposals(dao.accountEVMAddress, dao.tokenId, dao.governorAddress);
+  const daoProposalsQueryResults = useGovernanceDAOProposals(
+    dao.accountEVMAddress,
+    dao.tokenId,
+    dao.governorAddress,
+    dao.assetsHolderAddress
+  );
   const { isSuccess, isLoading, isError, error, data: proposals } = daoProposalsQueryResults;
   const recentProposals = proposals
     ?.sort((proposalA, proposalB) => +proposalB.timestamp - +proposalA.timestamp)

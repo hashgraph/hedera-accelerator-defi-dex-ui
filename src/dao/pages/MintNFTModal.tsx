@@ -57,17 +57,17 @@ export const MintNFTModal = (props: MintNFTModalProps) => {
         openDialogButtonText="Mint NFT"
         body={
           <Flex flexDirection="column" height="fit-content" gap="1rem">
-            <Flex direction="row" alignItems="start" justifyContent="start" flex="2" gap="1">
+            <Flex direction="row" alignItems="baseline" justifyContent="start" flex="2" gap="1">
               <Text.H4_Medium>Token:</Text.H4_Medium>
-              <Text.P_XSmall_Regular>{token.data.symbol}</Text.P_XSmall_Regular>
+              <Text.P_Medium_Regular>{token.data.symbol}</Text.P_Medium_Regular>
             </Flex>
-            <Flex direction="row" alignItems="start" justifyContent="start" flex="2" gap="1">
+            <Flex direction="row" alignItems="baseline" justifyContent="start" flex="2" gap="1">
               <Text.H4_Medium>Max Supply:</Text.H4_Medium>
-              <Text.P_XSmall_Regular>{maxSupply}</Text.P_XSmall_Regular>
+              <Text.P_Medium_Regular>{maxSupply}</Text.P_Medium_Regular>
             </Flex>
-            <Flex direction="row" alignItems="start" justifyContent="start" flex="2" gap="1">
+            <Flex direction="row" alignItems="baseline" justifyContent="start" flex="2" gap="1">
               <Text.H4_Medium>Tokens Minted</Text.H4_Medium>
-              <Text.P_XSmall_Regular>{totalSupply}</Text.P_XSmall_Regular>
+              <Text.P_Medium_Regular>{totalSupply}</Text.P_Medium_Regular>
             </Flex>
             <SimpleGrid row={1} spacingX="1rem" spacingY="0.75rem">
               <FormInputList<MintNFTTokensFormData, "tokenLinks">

@@ -43,7 +43,7 @@ interface GovernanceProposalConfirmationDetailsProps {
   tokenSymbol: string;
   votingPower: string;
   contractUpgradeLogic: string;
-  governorUpgradeContractId: string;
+  assetHolderContractId: string;
   hasConnectedWalletVoted: boolean;
   isAuthor: boolean;
   castVote: UseMutationResult<TransactionResponse | undefined, Error, UseCastVoteParams, GovernanceMutations.CastVote>;
@@ -78,7 +78,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     cancelProposal,
     changeAdminMutation,
     contractUpgradeLogic,
-    governorUpgradeContractId,
+    assetHolderContractId,
     status,
     state,
     hasConnectedWalletVoted,
@@ -168,7 +168,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 type={InlineAlertType.Warning}
                 message={`Connect your wallet with 
                 ${(proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin} 
-                to approve the transfer of ownership to ${governorUpgradeContractId}`}
+                to approve the transfer of ownership to ${assetHolderContractId}`}
               />
             </Flex>
           ) : hasConnectedWalletVoted ? (

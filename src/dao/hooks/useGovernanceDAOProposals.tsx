@@ -10,6 +10,7 @@ import { isEmpty, isNil } from "ramda";
 import BigNumber from "bignumber.js";
 import { ContractProposalState, GovernanceProposalType, ProposalState } from "@dex/store";
 import { solidityAddressToAccountIdString } from "@shared/utils";
+import { ProposalData } from "@dex/services/DexService/governance/type";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string];
 
@@ -17,6 +18,7 @@ export function useGovernanceDAOProposals(
   daoAccountId: string,
   daoTokenId = "",
   governorAddress: string | undefined,
+  assetHolderEVMAddress: string | undefined,
   proposalFilter: ProposalStatus[] = AllFilters
 ) {
   function filterProposalsByStatus(proposals: Proposal[]): Proposal[] {
@@ -75,35 +77,35 @@ export function useGovernanceDAOProposals(
     };
   };
 
-  // const getFormattedProposalData = (proposalType: number, proposalData: ProposalData) => {
-  //   switch (proposalType) {
-  //     case ProposalType.TRANSFER: {
-  //       return {
-  //         transferFromAccount: proposalData.transferFromAccount ?? "",
-  //         transferToAccount: proposalData.transferToAccount ?? "",
-  //         tokenToTransfer: proposalData.tokenToTransfer ?? "",
-  //         transferTokenAmount: proposalData.transferTokenAmount ?? 0,
-  //       };
-  //     }
-  //     case ProposalType.TokenAssociate: {
-  //       return {
-  //         tokenAddress: proposalData.tokenAddress ?? "",
-  //       };
-  //     }
-  //     case ProposalType.UpgradeContract: {
-  //       return {
-  //         proxy: proposalData?.proxy ?? "",
-  //         proxyAdmin: proposalData?.proxyAdmin ?? "",
-  //         proxyLogic: proposalData?.proxyLogic ?? "",
-  //         currentLogic: proposalData?.currentLogic ?? "",
-  //         isAdminApproved: proposalData?.isAdminApproved ?? false,
-  //         isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
-  //       };
-  //     }
-  //     default:
-  //       return undefined;
-  //   }
-  // };
+  const getFormattedProposalData = (proposalType: number, proposalData: ProposalData) => {
+    switch (proposalType) {
+      case GovernanceProposalType.TRANSFER: {
+        return {
+          transferFromAccount: proposalData.transferFromAccount ?? "",
+          transferToAccount: proposalData.transferToAccount ?? "",
+          tokenToTransfer: proposalData.tokenToTransfer ?? "",
+          transferTokenAmount: proposalData.transferTokenAmount ?? 0,
+        };
+      }
+      case GovernanceProposalType.ASSOCIATE: {
+        return {
+          tokenAddress: proposalData.tokenAddress ?? "",
+        };
+      }
+      case GovernanceProposalType.UPGRADE_PROXY: {
+        return {
+          proxy: proposalData?.proxy ?? "",
+          proxyAdmin: proposalData?.proxyAdmin ?? "",
+          proxyLogic: proposalData?.proxyLogic ?? "",
+          currentLogic: proposalData?.currentLogic ?? "",
+          isAdminApproved: proposalData?.isAdminApproved ?? false,
+          isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
+        };
+      }
+      default:
+        return undefined;
+    }
+  };
 
   const getProposalType = (type: GovernanceProposalType) => {
     switch (Number(type)) {
@@ -126,7 +128,7 @@ export function useGovernanceDAOProposals(
   };
 
   const convertDataToProposal = (
-    proposalData: MirrorNodeDecodedProposalEvent,
+    proposalData: ProposalData,
     index: number,
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
@@ -141,7 +143,7 @@ export function useGovernanceDAOProposals(
       id: index,
       timeRemaining,
       nonce: 0,
-      amount: 0,
+      amount: proposalData.transferTokenAmount ?? 0,
       proposalId: proposalData.proposalId,
       type: getProposalType(proposalData.coreInformation.inputs.proposalType),
       approvalCount: 0,
@@ -149,9 +151,9 @@ export function useGovernanceDAOProposals(
       event: ProposalEvent.Send,
       status: getStatus(ProposalState[proposalState]),
       timestamp: proposalData.timestamp,
-      tokenId: "",
+      tokenId: proposalData.tokenAddress ?? "",
       token: tokenData,
-      receiver: "",
+      receiver: proposalData.transferToAccount ?? "",
       sender: "",
       safeEVMAddress: "",
       to: "",
@@ -172,8 +174,9 @@ export function useGovernanceDAOProposals(
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
       votingEndTime: endTime,
       proposalState: ProposalState[proposalState],
-      data: undefined,
-      isContractUpgradeProposal: false,
+      data: getFormattedProposalData(Number(proposalData.coreInformation.inputs.proposalType), proposalData),
+      isContractUpgradeProposal:
+        Number(proposalData.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY,
       coreInformation: proposalData.coreInformation,
     };
   };
@@ -181,17 +184,17 @@ export function useGovernanceDAOProposals(
   return useQuery<Proposal[], Error, Proposal[], UseDAOQueryKey>(
     [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId],
     async () => {
-      if (!governorAddress) {
+      if (!governorAddress || !assetHolderEVMAddress) {
         return [];
       }
       const data = await Promise.all([
-        DexService.fetchGovernanceDAOLogs(governorAddress),
+        DexService.fetchGovernanceDAOLogs(governorAddress, assetHolderEVMAddress),
         DexService.fetchTokenData(daoTokenId),
       ]);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
       const proposals = await Promise.all(
         data[0].map(async (proposal, index) => {
-          const tokenId = "";
+          const tokenId = proposal.tokenToTransfer ?? "";
           let tokenData;
           if (!isEmpty(tokenId)) {
             if (!tokenDataCache.has(tokenId)) {
@@ -205,7 +208,7 @@ export function useGovernanceDAOProposals(
       return proposals;
     },
     {
-      enabled: !!daoAccountId && !!governorAddress && !!daoTokenId,
+      enabled: !!daoAccountId && !!governorAddress && !!daoTokenId && !!assetHolderEVMAddress,
       select: filterProposalsByStatus,
       staleTime: 5,
       keepPreviousData: true,

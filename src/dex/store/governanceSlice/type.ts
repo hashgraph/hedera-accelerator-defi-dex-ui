@@ -4,7 +4,6 @@ import { AccountId } from "@hashgraph/sdk";
 enum ProposalType {
   Text = "Text",
   TokenTransfer = "Token Transfer",
-  CreateToken = "Create Token",
   ContractUpgrade = "Contract Upgrade",
 }
 
@@ -18,9 +17,6 @@ enum GovernanceProposalType {
   ASSOCIATE = 1001,
   TRANSFER = 1002,
   SET_TEXT = 1003,
-  CREATE_TOKEN = 1004,
-  MINT_TOKEN = 1005,
-  BURN_TOKEN = 1006,
   UPGRADE_PROXY = 1007,
 }
 

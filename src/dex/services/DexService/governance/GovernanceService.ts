@@ -10,9 +10,7 @@ import {
   ProposalStatus,
   GovernanceProposalType,
 } from "../../../store/governanceSlice";
-import { getTimeRemaining } from "@dex/utils";
 import { MirrorNodeDecodedProposalEvent } from "../../../../shared/services/MirrorNodeService";
-import { getFulfilledResultsData } from "../../../../shared/services/MirrorNodeService/utils";
 import { Contracts, GovernanceTokenId } from "../../constants";
 import { GovernanceEvent, ProposalData, CanClaimDetails } from "./type";
 import { ethers } from "ethers";
@@ -83,9 +81,6 @@ const convertProposalType = (proposalType: number): ProposalType => {
     case GovernanceProposalType.SET_TEXT: {
       return ProposalType.Text;
     }
-    case GovernanceProposalType.CREATE_TOKEN: {
-      return ProposalType.CreateToken;
-    }
     case GovernanceProposalType.UPGRADE_PROXY: {
       return ProposalType.ContractUpgrade;
     }
@@ -105,7 +100,6 @@ const convertDataToProposal = (
   const isProposalTypeValid = Object.values(ProposalType).includes(
     convertProposalType(proposalData.coreInformation.inputs.proposalType) as ProposalType
   );
-  // const { startBlock, endBlock } =  {};
   return {
     id: proposalData.proposalId,
     contractId: proposalData.contractId,

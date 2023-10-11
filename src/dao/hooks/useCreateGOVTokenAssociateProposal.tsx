@@ -12,7 +12,8 @@ interface UseCreateGOVTokenAssociateProposalParams {
   linkToDiscussion: string;
   tokenId: string;
   governanceTokenId: string;
-  spenderContractId: string;
+  governorContractId: string;
+  assetHolderEVMAddress: string;
   nftTokenSerialId: number;
   daoType: DAOType;
 }
@@ -29,7 +30,7 @@ export function useCreateGOVTokenAssociateProposal(handleOnSuccess: HandleOnSucc
     DAOMutations.CreateGOVTokenAssociateProposal
   >(
     async (params: UseCreateGOVTokenAssociateProposalParams) => {
-      return DexService.sendGOVTokenAssociateTransaction({ ...params, signer });
+      return DexService.createGOVTokenAssociateProposal({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

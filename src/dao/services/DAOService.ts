@@ -17,6 +17,7 @@ import HederaGnosisSafeJSON from "../../dex/services/abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../dex/services/abi/MultiSigDAO.json";
 import BaseDAOJSON from "../../dex/services/abi/BaseDAO.json";
 import HederaGovernorJSON from "../../dex/services/abi/HederaGovernor.json";
+import AssetHolderJSON from "../../dex/services/abi/AssetHolder.json";
 
 import {
   MultiSigDAODetails,
@@ -32,7 +33,6 @@ import {
   MultiSigProposeTransactionType,
   DAOSettingsDetails,
   DAODetailsInfoEventArgs,
-  GovernanceProposalOperationType,
   UpgradeContractDetails,
   ProposalDataDetails,
 } from "./types";
@@ -42,6 +42,7 @@ import { ProposalData } from "../../dex/services/DexService/governance/type";
 import { isNil, isNotNil } from "ramda";
 import { ContractProposalState, GovernanceProposalType, ProposalType } from "@dex/store";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
+import { GovernorDAOContractFunctions } from "./contracts";
 
 export async function getOwners(safeAddress: string): Promise<string[]> {
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
@@ -342,78 +343,66 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
 }
 
 function getProposalData(type: GovernanceProposalType, data: string | undefined): ProposalDataDetails {
+  const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
   const getUpgradeContractProposalData = (data: string | undefined) => {
     if (isNil(data)) return;
-    const abiCoder = ethers.utils.defaultAbiCoder;
-    const parsedData = abiCoder.decode(["address proxy", "address proxyLogic", "address proxyAdmin"], data);
+    const parsedData = contractInterface.decodeFunctionData(
+      GovernorDAOContractFunctions.UpgradeProxy,
+      ethers.utils.arrayify(data)
+    );
     return {
       type: GovernanceProposalType.UPGRADE_PROXY,
-      proxy: parsedData.proxy,
-      proxyAdmin: parsedData.proxyAdmin,
-      proxyLogic: parsedData.proxyLogic,
+      proxy: parsedData._proxy,
+      proxyAdmin: parsedData._proxyAdmin,
+      proxyLogic: parsedData._proxyLogic,
     };
   };
 
   const getTokenTransferProposalDataFromHexData = (data: string | undefined) => {
     if (isNil(data)) return;
-    const abiCoder = ethers.utils.defaultAbiCoder;
-    const operationTypeData = ethers.utils.defaultAbiCoder.decode(["uint256 operationType"], data);
-    const operationType = convertEthersBigNumberToBigNumberJS(operationTypeData.operationType).toNumber();
-    switch (operationType) {
-      case GovernanceProposalOperationType.TokenTransfer: {
-        const parsedData = abiCoder.decode(
-          [
-            "uint256 operationType",
-            "address transferToAccount",
-            "address tokenToTransfer",
-            "uint256 transferTokenAmount",
-          ],
-          data
-        );
-        return {
-          type: GovernanceProposalType.TRANSFER,
-          transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
-          tokenToTransfer: solidityAddressToTokenIdString(parsedData.tokenToTransfer),
-          transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.transferTokenAmount).toNumber(),
-        };
-      }
-      case GovernanceProposalOperationType.TokenAssociation: {
-        const parsedData = abiCoder.decode(["uint256 operationType", "address tokenAddress"], data);
-        return {
-          type: GovernanceProposalType.ASSOCIATE,
-          tokenAddress: solidityAddressToTokenIdString(parsedData.tokenAddress),
-        };
-      }
-      case GovernanceProposalOperationType.HBarTransfer: {
-        const parsedData = abiCoder.decode(
-          ["uint256 operationType", "address transferToAccount", "uint256 transferTokenAmount"],
-          data
-        );
-        return {
-          type: GovernanceProposalType.TRANSFER,
-          transferToAccount: solidityAddressToAccountIdString(parsedData.transferToAccount),
-          tokenToTransfer: HBARTokenId,
-          transferTokenAmount: parseInt(parsedData.transferTokenAmount),
-        };
-      }
-      default:
-        return;
-    }
+    const parsedData = contractInterface.decodeFunctionData(
+      GovernorDAOContractFunctions.TRANSFER,
+      ethers.utils.arrayify(data)
+    );
+    return {
+      type: GovernanceProposalType.TRANSFER,
+      transferToAccount: solidityAddressToAccountIdString(parsedData.to),
+      tokenToTransfer:
+        parsedData.token === ethers.constants.AddressZero
+          ? HBARTokenId
+          : solidityAddressToTokenIdString(parsedData.token),
+      transferTokenAmount: convertEthersBigNumberToBigNumberJS(parsedData.amount).toNumber(),
+    };
   };
 
-  switch (type) {
+  const getAssociateProposalDataFromHexData = (data: string | undefined) => {
+    if (isNil(data)) return;
+    const parsedData = contractInterface.decodeFunctionData(
+      GovernorDAOContractFunctions.Associate,
+      ethers.utils.arrayify(data)
+    );
+    return {
+      type: GovernanceProposalType.ASSOCIATE,
+      tokenAddress: parsedData._token,
+    };
+  };
+
+  switch (Number(type)) {
     case GovernanceProposalType.TRANSFER:
-      // return getTokenTransferProposalDataFromHexData(data);
-      return undefined;
+      return getTokenTransferProposalDataFromHexData(data);
+    case GovernanceProposalType.ASSOCIATE:
+      return getAssociateProposalDataFromHexData(data);
     case GovernanceProposalType.UPGRADE_PROXY:
-      // return getUpgradeContractProposalData(data);
-      return undefined;
+      return getUpgradeContractProposalData(data);
     default:
       return;
   }
 }
 
-export async function fetchGovernanceDAOLogs(governorAddress: string): Promise<MirrorNodeDecodedProposalEvent[]> {
+export async function fetchGovernanceDAOLogs(
+  governorAddress: string,
+  assetsHolderAddress: string
+): Promise<ProposalData[]> {
   const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
 
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
@@ -423,7 +412,10 @@ export async function fetchGovernanceDAOLogs(governorAddress: string): Promise<M
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-        const proposalDetailsData = getProposalData(proposalEvent.coreInformation.inputs.proposalType, "");
+        const proposalDetailsData = getProposalData(
+          proposalEvent.coreInformation.inputs.proposalType,
+          proposalEvent.coreInformation.inputs.calldatas[0]
+        );
         let contractId = proposalEvent.contractId;
         if (contractId.includes("0.0")) {
           contractId = ContractId.fromString(contractId).toSolidityAddress();
@@ -440,7 +432,7 @@ export async function fetchGovernanceDAOLogs(governorAddress: string): Promise<M
          */
 
         const isContractUpgradeProposal =
-          proposalEvent.coreInformation.inputs.proposalType === GovernanceProposalType.UPGRADE_PROXY;
+          Number(proposalEvent.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY;
         let isAdminApproved = false;
         let parsedData;
         if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
@@ -455,7 +447,7 @@ export async function fetchGovernanceDAOLogs(governorAddress: string): Promise<M
           const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
           const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
           const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === governorAddress;
+          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === assetsHolderAddress.toLocaleLowerCase();
           parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
         }
         const isAdminApprovalButtonVisible =

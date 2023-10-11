@@ -18,7 +18,6 @@ import { DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { getProposalData } from "../utils";
-import { solidityAddressToContractIdString } from "@shared/utils";
 
 export function useGovernanceProposalDetails(daoAccountId: string, proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -36,7 +35,12 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     (dao: GovernanceDAODetails | NFTDAODetails) =>
       dao.accountEVMAddress.toLowerCase() == daoAccountEVMAddress?.toLowerCase()
   );
-  const daoProposalsQueryResults = useGovernanceDAOProposals(daoAccountId, dao?.tokenId, dao?.governorAddress);
+  const daoProposalsQueryResults = useGovernanceDAOProposals(
+    daoAccountId,
+    dao?.tokenId,
+    dao?.governorAddress,
+    dao?.assetsHolderAddress
+  );
   const { data: proposals } = daoProposalsQueryResults;
   const proposal = proposals?.find((proposal) => proposal.proposalId === proposalId);
   const isDataFetched =
@@ -53,8 +57,7 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
       : `${(Number(lockedNFTToken.data) ? 1 : 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
   const isAuthor = walletId === proposal?.author;
-  const governorUpgrade = dao?.governorAddress;
-  const governorUpgradeContractId = isNotNil(governorUpgrade) ? solidityAddressToContractIdString(governorUpgrade) : "";
+  const assetHolderContractId = useFetchContract(dao?.assetsHolderAddress ?? "").data?.data.contract_id;
 
   function handleVoteForProposalSuccess(transactionResponse: TransactionResponse) {
     castVote.reset();
@@ -85,8 +88,8 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
     areVoteButtonsVisible,
     isAuthor,
     subDescription,
-    governorUpgradeContractId,
-    contractUpgradeLogic: governorUpgrade,
+    assetHolderContractId,
+    contractUpgradeLogic: dao?.assetsHolderAddress,
     isSuccess: daosQueryResults.isSuccess && daoProposalsQueryResults.isSuccess,
     isLoading: daosQueryResults.isLoading || daoProposalsQueryResults.isLoading,
     isError: daosQueryResults.isError || daoProposalsQueryResults.isError,

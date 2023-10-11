@@ -7,7 +7,8 @@ import { isNil } from "ramda";
 
 interface UseCreateDAOUpgradeProposal {
   governanceTokenId: string;
-  spenderContractId: string;
+  governorContractId: string;
+  assetHolderEVMAddress: string;
   title: string;
   description: string;
   linkToDiscussion: string;
@@ -29,7 +30,7 @@ export function useCreateDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.CreateDAOUpgradeProposal
   >(
     async (params: UseCreateDAOUpgradeProposal) => {
-      return DexService.sendContractUpgradeTransaction({ ...params, signer });
+      return DexService.createUpgradeProxyProposal({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

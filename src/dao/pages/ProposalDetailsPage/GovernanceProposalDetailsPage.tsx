@@ -27,7 +27,7 @@ export function GovernanceProposalDetailsPage() {
     hasVoted,
     changeAdminMutation,
     contractUpgradeLogic,
-    governorUpgradeContractId,
+    assetHolderContractId,
     subDescription,
     isAuthor,
   } = useGovernanceProposalDetails(daoAccountId, proposalId);
@@ -125,7 +125,7 @@ export function GovernanceProposalDetailsPage() {
               <GovernanceProposalConfirmationDetails
                 tokenSymbol={""}
                 contractUpgradeLogic={contractUpgradeLogic ?? ""}
-                governorUpgradeContractId={governorUpgradeContractId ?? ""}
+                assetHolderContractId={assetHolderContractId ?? ""}
                 proposal={proposalDetails}
                 hasConnectedWalletVoted={hasVoted}
                 status={proposalStatus}

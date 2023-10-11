@@ -101,6 +101,7 @@ async function sendMintNFTTokensTransaction(params: MintNFTTokensTransactionPara
   const { tokenId, tokenLinks, signer } = params;
   const data = tokenLinks.map((link) => Buffer.from(link));
   const mintNFTTokensTransaction = await new TokenMintTransaction()
+    .setMaxTransactionFee(10)
     .setTokenId(tokenId)
     .setMetadata(data)
     .freezeWithSigner(signer);

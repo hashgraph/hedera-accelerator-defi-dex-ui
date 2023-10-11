@@ -30,11 +30,12 @@ export function CancelProposalModalButton(props: CancelProposalModalButtonProps)
     props.resetServerState();
     if (props.proposal) {
       const signer = wallet.getSigner();
-      props.cancelProposal.mutate({
-        contractId: props.proposal?.contractId ?? "",
-        title: props.proposal?.title ?? "",
-        signer,
-      });
+      //TODO: Dex Governance is deprecated and will be removed in the next ticket to no need to fix it.
+      // props.cancelProposal.mutate({
+      //   contractId: props.proposal?.contractId ?? "",
+      //   title: props.proposal?.title ?? "",
+      //   signer,
+      // });
     }
     closeAlertDialog();
   }
