@@ -14,7 +14,9 @@ export enum MultiSigDAOContractFunctions {
 export enum GovernorDAOContractFunctions {
   CreateProposal = "createProposal",
   SetText = "setText",
-  CreateTokenAssociationProposal = "createTokenAssociateProposal",
+  Associate = "associate",
+  TRANSFER = "transfer",
+  UpgradeProxy = "upgradeProxy",
 }
 
 export enum NFTDAOContractFunctions {

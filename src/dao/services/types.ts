@@ -184,19 +184,19 @@ export enum GovernanceProposalOperationType {
   HBarTransfer,
 }
 export interface UpgradeContractDetails {
-  type: string;
+  type: number;
   proxy: string;
   proxyAdmin: string;
   proxyLogic: string;
 }
 export interface TokenTransferDetails {
-  type: string;
+  type: number;
   transferToAccount: string;
   tokenToTransfer: string;
   transferTokenAmount: number;
 }
 export interface TokenAssociateProposalDetails {
-  type: string;
+  type: number;
   tokenAddress: string;
 }
 

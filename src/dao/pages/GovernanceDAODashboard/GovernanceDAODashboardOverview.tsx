@@ -9,7 +9,12 @@ import { RecentProposals } from "../RecentProposals";
 export function GovernanceDAODashboardOverview() {
   const { dao, totalAssetValue, tokenCount, FTToken } = useOutletContext<GovernanceDAODetailsContext>();
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
-  const daoProposalsQueryResults = useGovernanceDAOProposals(dao.accountEVMAddress, dao.tokenId, dao.governorAddress);
+  const daoProposalsQueryResults = useGovernanceDAOProposals(
+    dao.accountEVMAddress,
+    dao.tokenId,
+    dao.governorAddress,
+    dao.assetsHolderAddress
+  );
   const { isSuccess, isLoading, isError, error, data: proposals } = daoProposalsQueryResults;
   const recentProposals = proposals
     ?.sort((proposalA, proposalB) => +proposalB.timestamp - +proposalA.timestamp)

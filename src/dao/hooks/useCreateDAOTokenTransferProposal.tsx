@@ -8,7 +8,8 @@ import { DAOType } from "@dao/services";
 
 interface UseCreateDAOTokenTransferProposalParams {
   tokenId: string;
-  spenderContractId: string;
+  governorContractId: string;
+  assetHolderEVMAddress: string;
   governanceTokenId: string;
   receiverId: string;
   linkToDiscussion: string;
@@ -34,37 +35,7 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
     DAOMutations.CreateTokenTransferProposal
   >(
     async (params: UseCreateDAOTokenTransferProposalParams) => {
-      const {
-        tokenId,
-        receiverId,
-        amount,
-        decimals,
-        title,
-        description,
-        linkToDiscussion,
-        spenderContractId,
-        governanceTokenId,
-        tokenType,
-        nftSerialId,
-        governanceNftTokenSerialId,
-        daoType,
-      } = params;
-      return DexService.sendProposeTokenTransferTransaction({
-        tokenId,
-        receiverId,
-        amount,
-        decimals,
-        linkToDiscussion,
-        spenderContractId,
-        governanceTokenId,
-        title,
-        description,
-        tokenType,
-        nftSerialId,
-        governanceNftTokenSerialId,
-        signer,
-        daoType,
-      });
+      return DexService.createTokenTransferProposal({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

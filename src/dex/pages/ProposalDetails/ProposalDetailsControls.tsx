@@ -50,26 +50,28 @@ export function ProposalDetailsControls(props: ProposalDetailsControlsProps) {
   async function handleExecuteClicked() {
     props.resetServerState();
     const signer = wallet.getSigner();
-    executeProposal.mutate({
-      contractId: proposal.data?.contractId ?? "",
-      title: proposal.data?.title ?? "",
-      signer,
-      transfersFromAccount: proposal.data?.transferFromAccount,
-      tokenId: proposal.data?.tokenToTransfer,
-      tokenAmount: proposal.data?.transferTokenAmount,
-    });
+    //TODO: Dex Governance is deprecated and will be removed in the next ticket to no need to fix it.
+    // executeProposal.mutate({
+    //   contractId: proposal.data?.contractId ?? "",
+    //   title: proposal.data?.title ?? "",
+    //   signer,
+    //   transfersFromAccount: proposal.data?.transferFromAccount,
+    //   tokenId: proposal.data?.tokenToTransfer,
+    //   tokenAmount: proposal.data?.transferTokenAmount,
+    // });
   }
 
   function handleCancelProposalClicked() {
     props.resetServerState();
-    if (proposal) {
-      const signer = wallet.getSigner();
-      cancelProposal.mutate({
-        contractId: proposal.data?.contractId ?? "",
-        title: proposal.data?.title ?? "",
-        signer,
-      });
-    }
+    //TODO: Dex Governance is deprecated and will be removed in the next ticket to no need to fix it.
+    // if (proposal) {
+    //   const signer = wallet.getSigner();
+    //   cancelProposal.mutate({
+    //     contractId: proposal.data?.contractId ?? "",
+    //     title: proposal.data?.title ?? "",
+    //     signer,
+    //   });
+    // }
     setDialogState({ ...dialogState, isCancelProposalOpen: false });
   }
 
