@@ -100,7 +100,7 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
             variant="secondary"
             width="105px"
             leftIcon={<SwapIcon />}
-            href={"https://defi-ui.hedera.com/swap"}
+            href={"https://defi-ui.zilbo.com/swap"}
             target="_blank"
             rel="noopener noreferrer"
           >
