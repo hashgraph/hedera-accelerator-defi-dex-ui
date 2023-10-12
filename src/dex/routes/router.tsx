@@ -6,13 +6,14 @@ import { Paths } from "@dex/routes";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path={Paths.Home} element={<AppLayout navOptions={["Swap", "Pools", "Governance"]} />}>
+    <Route path={Paths.Home} element={<AppLayout navOptions={["Swap", "Pools"]} />}>
       <Route index element={<Navigate to="swap" />} />
       <Route path={Paths.Swap.default} element={<Pages.SwapPage />} />
       <Route path={Paths.Pools.default} element={<Pages.Pools />} />
       <Route path={`${Paths.Pools.AddLiquidity}/:pairId/:poolName`} element={<Pages.AddLiquidityPage />} />
       <Route path={Paths.Pools.Withdraw} element={<Pages.WithdrawPage />} />
       <Route path={Paths.Pools.CreatePool} element={<Pages.CreatePoolPage />} />
+      {/* Governance is Deprecated.
       <Route path={Paths.Governance.default}>
         <Route index element={<Pages.Governance />} />
         <Route path={`${Paths.Governance.ProposalDetails}/:id`} element={<Pages.ProposalDetails />} />
@@ -23,7 +24,8 @@ export const router = createBrowserRouter(
           <Route path={Paths.Governance.CreateTokenTransfer} element={<Pages.TokenTransferProposalForm />} />
           <Route path={Paths.Governance.CreateContractUpgrade} element={<Pages.ContractUpgradeProposalForm />} />
         </Route>
-      </Route>
+      </Route> 
+      */}
       <Route
         path="*"
         element={
