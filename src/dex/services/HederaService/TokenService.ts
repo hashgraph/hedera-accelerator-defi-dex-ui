@@ -6,6 +6,9 @@ import {
   TokenSupplyType,
   PublicKey,
   TokenAssociateTransaction,
+  TokenId,
+  NftId,
+  Hbar,
 } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { checkTransactionResponseForError } from "./utils";
@@ -120,7 +123,7 @@ async function setHbarTokenAllowance(params: SetHbarAllowanceParams) {
   const tokenAllowanceTxn = new AccountAllowanceApproveTransaction().approveHbarAllowance(
     params.walletId,
     params.spenderContractId,
-    params.tokenAmount
+    Hbar.fromTinybars(params.tokenAmount)
   );
   const tokenAllowanceSignedTx = await tokenAllowanceTxn.freezeWithSigner(params.signer);
   const response = await tokenAllowanceSignedTx.executeWithSigner(params.signer);
@@ -199,20 +202,23 @@ async function associateTokenToWallet(params: AssociateTokenParams) {
   return response;
 }
 interface SetNFTAllowanceParams {
-  nftId: string;
+  tokenId: string;
+  nftSerialId: number;
   spenderContractId: string;
   walletId: string;
   signer: HashConnectSigner;
 }
 
 async function setNFTAllowance(params: SetNFTAllowanceParams) {
-  const nftAllowanceTxn = new AccountAllowanceApproveTransaction().approveTokenNftAllowanceAllSerials(
-    params.nftId,
-    params.walletId,
-    params.spenderContractId
+  const { tokenId, nftSerialId, spenderContractId, walletId, signer } = params;
+  const nftId = new NftId(TokenId.fromString(tokenId), nftSerialId);
+  const nftAllowanceTxn = new AccountAllowanceApproveTransaction().approveTokenNftAllowance(
+    nftId,
+    walletId,
+    spenderContractId
   );
-  const tokenAllowanceSignedTx = await nftAllowanceTxn.freezeWithSigner(params.signer);
-  const response = await tokenAllowanceSignedTx.executeWithSigner(params.signer);
+  const tokenAllowanceSignedTx = await nftAllowanceTxn.freezeWithSigner(signer);
+  const response = await tokenAllowanceSignedTx.executeWithSigner(signer);
   checkTransactionResponseForError(response, TokenServiceFunctions.SetNFTAllowance);
 }
 

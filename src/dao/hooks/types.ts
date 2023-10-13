@@ -210,3 +210,17 @@ export interface UpdateAmountEventData {
   user: string;
   idOrAmount: number;
 }
+
+export interface DAOConfigDetails {
+  daoFee: number;
+  daoTreasurer: string;
+  tokenAddress: string;
+  symbol: string;
+  tokenId: string;
+  decimals: number;
+}
+export interface DAOConfig {
+  multisigDAOFeeConfig: DAOConfigDetails;
+  ftDAOFeeConfig: DAOConfigDetails;
+  nftDAOFeeConfig: DAOConfigDetails;
+}

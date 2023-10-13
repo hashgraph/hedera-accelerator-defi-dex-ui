@@ -1,33 +1,18 @@
 import { useQuery } from "react-query";
 import {
   Contracts,
-  DEX_TOKEN_PRECISION_VALUE,
   DexService,
   HBARTokenId,
   convertEthersBigNumberToBigNumberJS,
 } from "@dex/services";
-import { DAOQueries } from "./types";
 import { TokenId } from "@hashgraph/sdk";
+import { DAOConfig, DAOConfigDetails, DAOQueries } from "./types";
 import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.json";
 import FTDAOFactory from "../../dex/services/abi/FTDAOFactory.json";
 import NFTDAOFactory from "../../dex/services/abi/NFTDAOFactory.json";
 import { ethers } from "ethers";
 import { DAOEvents } from "@dao/services";
 import { isHbarToken } from "@dex/utils";
-
-export interface DAOConfigDetails {
-  daoFee: number;
-  daoTreasurer: string;
-  tokenAddress: string;
-  symbol: string;
-  tokenId: string;
-  decimals: number;
-}
-export interface DAOConfig {
-  multisigDAOFeeConfig: DAOConfigDetails;
-  ftDAOFeeConfig: DAOConfigDetails;
-  nftDAOFeeConfig: DAOConfigDetails;
-}
 
 type UseContactQueryKey = [DAOQueries.Config];
 
