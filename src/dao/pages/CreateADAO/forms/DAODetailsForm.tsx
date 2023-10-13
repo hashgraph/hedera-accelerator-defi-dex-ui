@@ -12,19 +12,9 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { Controller, useFormContext, useFieldArray } from "react-hook-form";
-import {
-  Text,
-  FormInput,
-  FormTextArea,
-  FormInputList,
-  DefaultLogoIcon,
-  Color,
-  InlineAlert,
-  InlineAlertType,
-} from "@shared/ui-kit";
-import { CreateADAOForm, CreateDAOContext } from "../types";
+import { Text, FormInput, FormTextArea, FormInputList, DefaultLogoIcon, Color } from "@shared/ui-kit";
+import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { useOutletContext } from "react-router-dom";
 import { useState } from "react";
 
 export function DAODetailsForm() {
@@ -35,7 +25,6 @@ export function DAODetailsForm() {
     formState: { errors },
   } = useFormContext<CreateADAOForm>();
   const daoDetails = getValues();
-  const { daoFeeConfig } = useOutletContext<CreateDAOContext>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "daoLinks",
@@ -149,13 +138,6 @@ export function DAODetailsForm() {
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-      <InlineAlert
-        title="There's a fee involved in creating a DAO"
-        message={`Fee amount: ${daoFeeConfig?.daoFee ?? ""} ${
-          daoFeeConfig?.symbol ?? ""
-        } If you wish to proceed click next.`}
-        type={InlineAlertType.Info}
-      />
     </DAOFormContainer>
   );
 }

@@ -107,7 +107,9 @@ export interface CreateANFTDAOForm extends CreateADAOFormBase {
 }
 
 export type CreateDAOContext = {
-  daoFeeConfig: DAOConfigDetails;
+  multisigDAOFeeConfig: DAOConfigDetails;
+  ftDAOFeeConfig: DAOConfigDetails;
+  nftDAOFeeConfig: DAOConfigDetails;
 };
 
 export type CreateADAOForm = CreateATokenDAOForm | CreateAMultiSigDAOForm | CreateANFTDAOForm;

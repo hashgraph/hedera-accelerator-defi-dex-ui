@@ -1,5 +1,11 @@
 import { useQuery } from "react-query";
-import { Contracts, DEX_TOKEN_PRECISION_VALUE, DexService, convertEthersBigNumberToBigNumberJS } from "@dex/services";
+import {
+  Contracts,
+  DEX_TOKEN_PRECISION_VALUE,
+  DexService,
+  HBARTokenId,
+  convertEthersBigNumberToBigNumberJS,
+} from "@dex/services";
 import { DAOQueries } from "./types";
 import { TokenId } from "@hashgraph/sdk";
 import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.json";
@@ -18,9 +24,9 @@ export interface DAOConfigDetails {
   decimals: number;
 }
 export interface DAOConfig {
-  multiSigDAOConfig: DAOConfigDetails;
-  govDAOConfig: DAOConfigDetails;
-  nftDAOConfig: DAOConfigDetails;
+  multisigDAOFeeConfig: DAOConfigDetails;
+  ftDAOFeeConfig: DAOConfigDetails;
+  nftDAOFeeConfig: DAOConfigDetails;
 }
 
 type UseContactQueryKey = [DAOQueries.Config];
@@ -32,9 +38,7 @@ export function useFetchDAOConfig() {
     const tokenId = TokenId.fromSolidityAddress(tokenAddress).toString();
     const {
       data: { symbol, decimals, token_id },
-    } = isHbar
-      ? { data: { symbol: "Hbar", decimals: DEX_TOKEN_PRECISION_VALUE, token_id: tokenAddress } }
-      : await DexService.fetchTokenData(tokenId);
+    } = await DexService.fetchTokenData(isHbar ? HBARTokenId : tokenId);
     const daoFeeConfig: DAOConfigDetails = {
       daoFee: convertEthersBigNumberToBigNumberJS(daoFee).shiftedBy(-Number(decimals)).toNumber(),
       daoTreasurer: daoTreasurer,
@@ -65,9 +69,9 @@ export function useFetchDAOConfig() {
         [DAOEvents.DAOConfig]
       );
       return {
-        multiSigDAOConfig: await formatConfig(multiSigDAOConfigLogs),
-        govDAOConfig: await formatConfig(govDAOConfigLogs),
-        nftDAOConfig: await formatConfig(nftDAOConfigLogs),
+        multisigDAOFeeConfig: await formatConfig(multiSigDAOConfigLogs),
+        ftDAOFeeConfig: await formatConfig(govDAOConfigLogs),
+        nftDAOFeeConfig: await formatConfig(nftDAOConfigLogs),
       };
     },
     {
