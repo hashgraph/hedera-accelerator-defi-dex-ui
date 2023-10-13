@@ -1,6 +1,7 @@
 import { Box, Flex, useRadioGroup } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { Text, RadioCard } from "@shared/ui-kit";
+import { useOutletContext } from "react-router-dom";
 import {
   CreateADAOForm,
   DAOGovernanceTokenType,
@@ -11,10 +12,12 @@ import {
   NFTDAOVotingData,
   TokenDAOGovernanceData,
   TokenDAOVotingData,
+  CreateDAOContext,
 } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useEffect } from "react";
 import { DAOType } from "@dao/services";
+import { InlineAlert, InlineAlertType } from "@shared/ui-kit";
 
 const newDAOOptions = [
   {
@@ -126,6 +129,18 @@ export function DAOTypeForm() {
     onChange: handleDAOTypeSelectionChange,
   });
 
+  const getDAOFeeAndTokenSymbol = (daoType: DAOType) => {
+    switch (daoType) {
+      case DAOType.MultiSig:
+        return { daoFee: multisigDAOFeeConfig?.daoFee, tokenSymbol: multisigDAOFeeConfig?.symbol };
+      case DAOType.GovernanceToken:
+        return { daoFee: ftDAOFeeConfig?.daoFee, tokenSymbol: ftDAOFeeConfig?.symbol };
+      case DAOType.NFT:
+        return { daoFee: nftDAOFeeConfig?.daoFee, tokenSymbol: nftDAOFeeConfig?.symbol };
+    }
+  };
+  const { multisigDAOFeeConfig, ftDAOFeeConfig, nftDAOFeeConfig } = useOutletContext<CreateDAOContext>();
+  const { daoFee, tokenSymbol } = getDAOFeeAndTokenSymbol(type);
   const defaultFormValues = getDefaultFormValues(type);
   setValue("governance", defaultFormValues.governance);
   setValue("voting", defaultFormValues.voting);
@@ -161,6 +176,11 @@ export function DAOTypeForm() {
             </Box>
           );
         })}
+        <InlineAlert
+          title={`There's a fee involved in creating a ${type} DAO`}
+          message={`Fee amount: ${daoFee ?? ""} ${tokenSymbol ?? ""} If you wish to proceed click next.`}
+          type={InlineAlertType.Info}
+        />
       </DAOFormContainer>
     </Flex>
   );

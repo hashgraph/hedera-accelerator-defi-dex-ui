@@ -58,7 +58,7 @@ export function CreateADAOPage() {
   }
 
   const createDAO = useCreateDAO(handleCreateDAOSuccess);
-  const { data: { multiSigDAOConfig, govDAOConfig, nftDAOConfig } = {} } = useFetchDAOConfig();
+  const { data: { multisigDAOFeeConfig, nftDAOFeeConfig, ftDAOFeeConfig } = {} } = useFetchDAOConfig();
 
   function GovernanceForm(): string {
     if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceToken}`;
@@ -160,7 +160,7 @@ export function CreateADAOPage() {
         quorum: voting?.quorum ?? 0,
         votingDuration: voting?.duration ?? 0,
         lockingDuration: voting?.lockingPeriod ?? 0,
-        daoFee: govDAOConfig?.daoFee || 0,
+        daoFee: ftDAOFeeConfig?.daoFee || 0,
       });
     }
     if (data.type === DAOType.MultiSig) {
@@ -176,7 +176,7 @@ export function CreateADAOPage() {
         owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
-        daoFee: multiSigDAOConfig?.daoFee || 0,
+        daoFee: multisigDAOFeeConfig?.daoFee || 0,
       });
     }
     if (data.type === DAOType.NFT) {
@@ -200,7 +200,7 @@ export function CreateADAOPage() {
         quorum: voting.quorum,
         votingDuration: voting?.duration ?? 0,
         lockingDuration: voting?.lockingPeriod ?? 0,
-        daoFee: nftDAOConfig?.daoFee || 0,
+        daoFee: nftDAOFeeConfig?.daoFee || 0,
       });
     }
   }
@@ -220,7 +220,9 @@ export function CreateADAOPage() {
               form: {
                 id: "create-dao",
                 context: {
-                  daoFeeConfig: multiSigDAOConfig,
+                  ftDAOFeeConfig,
+                  multisigDAOFeeConfig,
+                  nftDAOFeeConfig,
                 },
                 ...createDAOPageForm,
               },
