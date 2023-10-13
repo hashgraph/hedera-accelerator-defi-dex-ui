@@ -9,8 +9,15 @@ import { useOutletContext } from "react-router-dom";
 export function DAOContractUpgradeReviewForm() {
   const { daoType } = useOutletContext<CreateDAOProposalContext>();
   const { getValues } = useFormContext<CreateDAOContractUpgradeForm>();
-  const { title, description, linkToDiscussion, newImplementationAddress, oldProxyAddress, nftTokenSerialId } =
-    getValues();
+  const {
+    title,
+    description,
+    linkToDiscussion,
+    newImplementationAddress,
+    oldProxyAddress,
+    proxyAdmin,
+    nftTokenSerialId,
+  } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
 
@@ -43,6 +50,11 @@ export function DAOContractUpgradeReviewForm() {
       <Flex direction="column" gap="2">
         <Text.P_Small_Medium>Proxy Address</Text.P_Small_Medium>
         <Text.P_Small_Regular color={Color.Neutral._700}>{oldProxyAddress}</Text.P_Small_Regular>
+      </Flex>
+      <Divider />
+      <Flex direction="column" gap="2">
+        <Text.P_Small_Medium>Proxy Admin</Text.P_Small_Medium>
+        <Text.P_Small_Regular color={Color.Neutral._700}>{proxyAdmin}</Text.P_Small_Regular>
       </Flex>
       <Divider />
       {daoType === Routes.NFT && (

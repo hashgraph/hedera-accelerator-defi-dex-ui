@@ -1,6 +1,12 @@
 import { Outlet, useParams } from "react-router-dom";
 import { Member, NFTDAODetails } from "@dao/services";
-import { TokenBalance, useAccountTokenBalances, useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks";
+import {
+  TokenBalance,
+  useAccountTokenBalances,
+  useHandleTransactionSuccess,
+  usePairedWalletDetails,
+  useToken,
+} from "@dex/hooks";
 import { useDAOs, useMintNFT, useFetchDAOMembers, useFetchContract } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
@@ -22,6 +28,7 @@ export function NFTDAODashboard() {
   const accountTokenBalancesQueryResults = useAccountTokenBalances(daoAssetHolder);
   const mintNFT = useMintNFT(handleMintNFTTokensSuccess);
   const { data: tokenBalances = [] } = accountTokenBalancesQueryResults;
+  const { data: NFTToken } = useToken(dao?.tokenId ?? "");
   const { data: daoMembers = [] } = useFetchDAOMembers(dao?.tokenHolderAddress ?? "");
   const isAdmin = dao?.adminId === walletId && isWalletPaired;
 
@@ -82,6 +89,7 @@ export function NFTDAODashboard() {
               tokenCount,
               ownerCount: 0,
               totalAssetValue,
+              NFTToken,
             } satisfies NFTDAODetailsContext
           }
         />

@@ -56,6 +56,7 @@ interface MirrorNodeAccountById {
     _type: string;
     key: string;
   };
+  evm_address?: string;
 }
 
 interface MirrorNodeTokenPairResponse {

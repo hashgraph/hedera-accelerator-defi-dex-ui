@@ -7,7 +7,7 @@ import { RecentProposals } from "../RecentProposals";
 import { useGovernanceDAOProposals } from "@dao/hooks";
 
 export function NFTDAODashboardOverview() {
-  const { dao, totalAssetValue, tokenCount } = useOutletContext<NFTDAODetailsContext>();
+  const { dao, totalAssetValue, tokenCount, NFTToken } = useOutletContext<NFTDAODetailsContext>();
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   const daoProposalsQueryResults = useGovernanceDAOProposals(
     dao.accountEVMAddress,
@@ -122,7 +122,7 @@ export function NFTDAODashboardOverview() {
                   value={dao.minimumProposalDeposit ?? 0}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol={"FIX"}
+                  valueUnitSymbol={NFTToken?.data?.symbol}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
               </Flex>

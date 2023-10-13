@@ -232,6 +232,7 @@ interface CreateUpgradeProxyProposalParams {
   linkToDiscussion: string;
   newImplementationAddress: string;
   oldProxyAddress: string;
+  proxyAdmin: string;
   nftTokenSerialId: number;
   daoType: string;
   signer: HashConnectSigner;
@@ -248,6 +249,7 @@ async function createUpgradeProxyProposal(params: CreateUpgradeProxyProposalPara
     linkToDiscussion,
     oldProxyAddress,
     newImplementationAddress,
+    proxyAdmin,
     daoType,
     nftTokenSerialId,
   } = params;
@@ -260,14 +262,12 @@ async function createUpgradeProxyProposal(params: CreateUpgradeProxyProposalPara
   });
   const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
   const proxyLogicEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
-  //TODO: add proxy admin input in the create proposal form
-  const proxyAdmin = "0x00000000000000000000000000000000000132e7";
-
+  const { evm_address: proxyAdminEVMAddress } = await DexService.fetchAccountInfo(proxyAdmin);
   const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
   const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.UpgradeProxy, [
     proxyEVMAddress,
     proxyLogicEVMAddress,
-    proxyAdmin,
+    proxyAdminEVMAddress,
   ]);
 
   return await createProposal({

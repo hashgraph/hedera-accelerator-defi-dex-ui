@@ -410,8 +410,15 @@ export function CreateDAOProposal() {
         });
       }
       case DAOProposalType.ContractUpgrade: {
-        const { title, description, linkToDiscussion, oldProxyAddress, newImplementationAddress, nftTokenSerialId } =
-          data as CreateDAOContractUpgradeForm;
+        const {
+          title,
+          description,
+          linkToDiscussion,
+          oldProxyAddress,
+          newImplementationAddress,
+          nftTokenSerialId,
+          proxyAdmin,
+        } = data as CreateDAOContractUpgradeForm;
         switch (getDAOType(currentDaoType)) {
           case DAOType.GovernanceToken:
             return createDAOUpgradeProposal({
@@ -420,6 +427,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               oldProxyAddress,
               newImplementationAddress,
+              proxyAdmin,
               governorContractId: daoGovernance,
               assetHolderEVMAddress: assetsHolderAddress,
               governanceTokenId,
@@ -443,6 +451,7 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               oldProxyAddress,
               newImplementationAddress,
+              proxyAdmin,
               governorContractId: daoGovernance,
               assetHolderEVMAddress: assetsHolderAddress,
               governanceTokenId,
