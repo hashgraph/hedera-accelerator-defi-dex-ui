@@ -23,7 +23,6 @@ export function FormInput<T extends string>(props: FormInputProps<T>) {
       <FormErrorMessage>{errorMessage}</FormErrorMessage>
       <Box padding="0 0.25rem">{actionButton}</Box>
       <FormHelperText textStyle="p small regular">{formHelperText}</FormHelperText>
-      {/** TODO: Create Inline Alert Component */}
       {warningMessage && <InlineAlert title={warningHeader} message={warningMessage} type={InlineAlertType.Warning} />}
     </FormControl>
   );

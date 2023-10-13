@@ -1,3 +1,4 @@
+import { DAOConfigDetails } from "@dao/hooks";
 import { DAOType } from "@dao/services";
 
 export enum DAOGovernanceTokenType {
@@ -104,5 +105,9 @@ export interface CreateANFTDAOForm extends CreateADAOFormBase {
   governance: NFTDAOGovernanceData;
   voting: NFTDAOVotingData;
 }
+
+export type CreateDAOContext = {
+  daoFeeConfig: DAOConfigDetails;
+};
 
 export type CreateADAOForm = CreateATokenDAOForm | CreateAMultiSigDAOForm | CreateANFTDAOForm;
