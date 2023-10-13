@@ -93,6 +93,21 @@ export function DAOContractUpgradeDetailsForm() {
         isInvalid={Boolean(errors?.oldProxyAddress)}
         errorMessage={errors?.oldProxyAddress && errors?.oldProxyAddress?.message}
       />
+      <FormInput<"proxyAdmin">
+        inputProps={{
+          id: "proxyAdmin",
+          label: "Proxy admin",
+          type: "text",
+          placeholder: "Enter proxy admin id",
+          register: {
+            ...register("proxyAdmin", {
+              required: { value: true, message: "Proxy admin id is required." },
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors?.proxyAdmin)}
+        errorMessage={errors?.proxyAdmin && errors?.proxyAdmin?.message}
+      />
       {daoType === Routes.NFT && (
         <FormDropdown
           label="Token Serial Number"

@@ -56,6 +56,7 @@ export interface CreateDAOContractUpgradeForm extends CreateDAOProposalFormBase 
   linkToDiscussion: string;
   newImplementationAddress: string;
   oldProxyAddress: string;
+  proxyAdmin: string;
   nftTokenSerialId?: number;
 }
 

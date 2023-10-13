@@ -14,6 +14,7 @@ interface UseCreateDAOUpgradeProposal {
   linkToDiscussion: string;
   newImplementationAddress: string;
   oldProxyAddress: string;
+  proxyAdmin: string;
   nftTokenSerialId: number;
   daoType: string;
 }
