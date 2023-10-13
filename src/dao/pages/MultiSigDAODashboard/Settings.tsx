@@ -171,7 +171,14 @@ export function Settings() {
                 alt="Logo Url"
                 fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
               />
-              <Link as={ReachLink} textStyle="p small regular link" color={Color.Primary._500} to={logoUrl} isExternal>
+              <Link
+                as={ReachLink}
+                textStyle="p small regular link"
+                color={Color.Primary._500}
+                to={logoUrl}
+                isExternal
+                maxWidth="90%"
+              >
                 {logoUrl}
               </Link>
             </Flex>

@@ -7,9 +7,9 @@ import DAOService from "@dao/services/contracts";
 import { DexService } from "@dex/services";
 
 interface UseLockNFTTokenParams {
-  nftTokenSerialId: number;
-  tokenHolderAddress: string;
-  governanceTokenId: string;
+  tokenId: string;
+  nftSerialId: number;
+  spenderContractId: string;
 }
 
 export function useLockNFTToken(
@@ -22,14 +22,15 @@ export function useLockNFTToken(
   const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseLockNFTTokenParams, DAOMutations.LockNFTToken>(
     async (params: UseLockNFTTokenParams) => {
-      const { nftTokenSerialId, tokenHolderAddress, governanceTokenId } = params;
+      const { nftSerialId, spenderContractId, tokenId } = params;
       await DexService.setNFTAllowance({
-        nftId: governanceTokenId,
+        tokenId,
+        nftSerialId,
         walletId: signer.getAccountId().toString(),
-        spenderContractId: tokenHolderAddress,
+        spenderContractId,
         signer,
       });
-      return DAOService.sendLockNFTTokenTransaction({ nftTokenSerialId, tokenHolderAddress, signer });
+      return DAOService.sendLockNFTTokenTransaction({ nftSerialId, spenderContractId, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

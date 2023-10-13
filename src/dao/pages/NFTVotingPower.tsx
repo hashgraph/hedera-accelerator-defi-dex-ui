@@ -38,9 +38,9 @@ export const NFTVotingPower = (props: NFTVotingPowerComponentProps) => {
 
   function handleClickLockGodTokenButton(lockNFTSerialId: number) {
     lockGODTokenSubmit.mutate({
-      nftTokenSerialId: lockNFTSerialId,
-      tokenHolderAddress,
-      governanceTokenId,
+      nftSerialId: lockNFTSerialId,
+      tokenId: governanceTokenId,
+      spenderContractId: tokenHolderAddress,
     });
   }
 

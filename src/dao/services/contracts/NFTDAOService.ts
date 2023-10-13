@@ -17,6 +17,8 @@ import { DexService, checkTransactionResponseForError } from "@dex/services";
 import { Contracts } from "@dex/services/constants";
 import NFTDAOFactoryJSON from "@dex/services/abi/NFTDAOFactory.json";
 import { NFTDAOFunctions } from "../types";
+import { isHbarToken } from "@dex/utils";
+import { DAOConfigDetails } from "@dao/hooks";
 
 const Gas = 9000000;
 
@@ -31,7 +33,7 @@ interface SendCreateNFTDAOTransactionParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
-  daoFee: number;
+  daoFeeConfig: DAOConfigDetails;
   signer: HashConnectSigner;
 }
 interface MintNFTTokensTransactionParams {
@@ -52,12 +54,13 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
     isPrivate,
     description,
     daoLinks,
-    daoFee,
+    daoFeeConfig,
     signer,
   } = params;
+  const { daoFee, tokenAddress: daoFeeTokenAddress } = daoFeeConfig;
   const nftDAOFactoryContractId = ContractId.fromString(Contracts.NFTDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
-  const tokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const governanceTokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
@@ -69,7 +72,7 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
     name,
     logoUrl,
     infoUrl,
-    tokenAddress,
+    governanceTokenAddress,
     preciseQuorum.toNumber(),
     preciseLockingDuration.toNumber(),
     preciseVotingDuration.toNumber(),
@@ -79,18 +82,21 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   ];
   const contractInterface = new ethers.utils.Interface(NFTDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
-  const tokenAmount = Hbar.from(daoFee, HbarUnit.Tinybar).to(HbarUnit.Hbar).toNumber();
-  await DexService.setHbarTokenAllowance({
-    walletId: signer.getAccountId().toString(),
-    spenderContractId: Contracts.MultiSigDAOFactory.ProxyId,
-    tokenAmount,
+
+  const isHbar = isHbarToken(daoFeeTokenAddress);
+  const hBarPayable = Hbar.fromTinybars(isHbar ? daoFee : 0);
+  await DexService.setUpAllowance({
+    tokenId: TokenId.fromSolidityAddress(daoFeeTokenAddress).toString(),
+    tokenAmount: daoFee,
+    spenderContractId: Contracts.NFTDAOFactory.ProxyId,
+    nftSerialId: daoFee,
     signer,
   });
   const createNFTDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(nftDAOFactoryContractId)
     .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
-    .setPayableAmount(tokenAmount)
+    .setPayableAmount(hBarPayable)
     .freezeWithSigner(signer);
   const createGovernanceDAOResponse = await createNFTDAOTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(createGovernanceDAOResponse, BaseDAOContractFunctions.CreateDAO);
@@ -111,15 +117,15 @@ async function sendMintNFTTokensTransaction(params: MintNFTTokensTransactionPara
 }
 
 interface SendLockNFTTokenTransactionParams {
-  nftTokenSerialId: number;
-  tokenHolderAddress: string;
+  nftSerialId: number;
+  spenderContractId: string;
   signer: HashConnectSigner;
 }
 
 const sendLockNFTTokenTransaction = async (params: SendLockNFTTokenTransactionParams) => {
-  const { nftTokenSerialId, signer, tokenHolderAddress } = params;
-  const godHolderContractId = ContractId.fromString(tokenHolderAddress);
-  const contractFunctionParameters = new ContractFunctionParameters().addUint256(nftTokenSerialId);
+  const { nftSerialId, signer, spenderContractId } = params;
+  const godHolderContractId = ContractId.fromString(spenderContractId);
+  const contractFunctionParameters = new ContractFunctionParameters().addUint256(nftSerialId);
   const executeSendLockGODTokenTransaction = await new ContractExecuteTransaction()
     .setContractId(godHolderContractId)
     .setFunction(NFTDAOFunctions.GrabTokensFromUser, contractFunctionParameters)

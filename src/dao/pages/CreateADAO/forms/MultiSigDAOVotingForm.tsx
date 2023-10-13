@@ -11,8 +11,8 @@ export function MultiSigDAOVotingForm() {
     formState: { errors },
   } = useFormContext<CreateAMultiSigDAOForm>();
   const { governance } = getValues();
-  const { admin, owners } = governance;
-  const adminCount = admin.length > 0 ? 1 : 0;
+  const { admin, owners } = governance ?? { admin: "", owners: [] };
+  const adminCount = admin?.length > 0 ? 1 : 0;
   const maxThreshold = (owners?.length ?? 0) + adminCount;
   const minThreshold = 1;
 

@@ -120,7 +120,7 @@ const sendCreateTransferTokenProposalTransaction = async (
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.TransferToken.ProxyId,
-    tokenAmount: 1 * DEX_PRECISION,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()
@@ -172,7 +172,7 @@ const sendCreateContractUpgradeProposalTransaction = async (
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.ContractUpgrade.ProxyId,
-    tokenAmount: 1 * DEX_PRECISION,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()
@@ -216,7 +216,7 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.TextProposal.ProxyId,
-    tokenAmount: 1 * DEX_PRECISION,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()

@@ -19,6 +19,7 @@ import AssetHolderJSON from "@dex/services/abi/AssetHolder.json";
 import { isHbarToken } from "@dex/utils";
 import { isNFT } from "@shared/utils";
 import { GovernanceProposalType } from "@dex/store";
+import { DAOConfigDetails } from "@dao/hooks";
 
 const Gas = 9000000;
 
@@ -33,7 +34,7 @@ interface SendCreateGovernanceDAOTransactionParams {
   quorum: number;
   votingDuration: number;
   lockingDuration: number;
-  daoFee: number;
+  daoFeeConfig: DAOConfigDetails;
   signer: HashConnectSigner;
 }
 
@@ -52,11 +53,12 @@ async function sendCreateGovernanceDAOTransaction(
     signer,
     description,
     daoLinks,
-    daoFee,
+    daoFeeConfig,
   } = params;
   const ftDAOFactoryContractId = ContractId.fromString(Contracts.FTDAOFactory.ProxyId);
+  const { tokenAddress: daoFeeTokenAddress, daoFee } = daoFeeConfig;
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
-  const tokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const governanceTokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
@@ -68,7 +70,7 @@ async function sendCreateGovernanceDAOTransaction(
     name,
     logoUrl,
     infoUrl,
-    tokenAddress,
+    governanceTokenAddress,
     preciseQuorum.toNumber(),
     preciseLockingDuration.toNumber(),
     preciseVotingDuration.toNumber(),
@@ -78,19 +80,21 @@ async function sendCreateGovernanceDAOTransaction(
   ];
   const contractInterface = new ethers.utils.Interface(FTDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
-  const tokenAmount = Hbar.from(daoFee, HbarUnit.Tinybar).to(HbarUnit.Hbar).toNumber();
-  await DexService.setHbarTokenAllowance({
-    walletId: signer.getAccountId().toString(),
+
+  const isHbar = isHbarToken(daoFeeTokenAddress);
+  const hBarPayable = Hbar.fromTinybars(isHbar ? daoFee : 0);
+  await DexService.setUpAllowance({
+    tokenId: TokenId.fromSolidityAddress(daoFeeTokenAddress).toString(),
+    tokenAmount: daoFee,
     spenderContractId: Contracts.FTDAOFactory.ProxyId,
-    tokenAmount,
+    nftSerialId: daoFee,
     signer,
   });
-
   const createGovernanceDAOTransaction = await new ContractExecuteTransaction()
     .setContractId(ftDAOFactoryContractId)
     .setFunctionParameters(ethers.utils.arrayify(data))
     .setGas(Gas)
-    .setPayableAmount(tokenAmount)
+    .setPayableAmount(hBarPayable)
     .freezeWithSigner(signer);
   const createGovernanceDAOResponse = await createGovernanceDAOTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(createGovernanceDAOResponse, BaseDAOContractFunctions.CreateDAO);
@@ -131,16 +135,15 @@ async function createTokenTransferProposal(params: CreateTokenTransferProposalPa
     governorContractId,
     assetHolderEVMAddress,
     governanceNftTokenSerialId,
-    daoType,
   } = params;
 
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
-  // const contractCallParams = new ContractFunctionParameters();
   await DexService.setUpAllowance({
-    governanceTokenId,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
+    tokenId: governanceTokenId,
+    nftSerialId,
     spenderContractId: governorContractId,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
   let transferDetails: string[] = [];
@@ -201,9 +204,10 @@ async function createGOVTokenAssociateProposal(params: CreateTokenAssociationPro
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
 
   await DexService.setUpAllowance({
-    governanceTokenId,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
+    tokenId: governanceTokenId,
+    nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
   const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
@@ -255,9 +259,10 @@ async function createUpgradeProxyProposal(params: CreateUpgradeProxyProposalPara
   } = params;
 
   await DexService.setUpAllowance({
-    governanceTokenId,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
+    tokenId: governanceTokenId,
+    nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
   const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
@@ -371,9 +376,10 @@ const createTextProposal = async (params: CreateTextProposalParams) => {
     signer,
   } = params;
   await DexService.setUpAllowance({
-    governanceTokenId,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
+    tokenId: governanceTokenId,
+    nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
+    tokenAmount: DEX_PRECISION,
     signer,
   });
 
@@ -393,28 +399,46 @@ const createTextProposal = async (params: CreateTextProposalParams) => {
 };
 
 interface SetUpAllowanceParams {
-  tokenType: TokenType;
-  governanceTokenId: string;
+  tokenId: string;
+  nftSerialId: number;
+  tokenAmount: number;
   spenderContractId: string;
   signer: HashConnectSigner;
 }
 async function setUpAllowance(params: SetUpAllowanceParams) {
-  const { tokenType, governanceTokenId, spenderContractId, signer } = params;
-  if (tokenType === TokenType.NFT) {
-    await DexService.setNFTAllowance({
-      nftId: governanceTokenId,
-      walletId: signer.getAccountId().toString(),
-      spenderContractId,
-      signer,
-    });
-  } else {
-    await DexService.setTokenAllowance({
-      tokenId: governanceTokenId,
-      walletId: signer.getAccountId().toString(),
-      spenderContractId,
-      tokenAmount: 1 * DEX_PRECISION,
-      signer,
-    });
+  const { tokenId, spenderContractId, nftSerialId, signer, tokenAmount } = params;
+  const walletId = signer.getAccountId().toString();
+  const {
+    data: { type },
+  } = isHbarToken(tokenId) ? { data: { type: TokenType.HBAR } } : await DexService.fetchTokenData(tokenId);
+
+  switch (type) {
+    case TokenType.HBAR: {
+      return await DexService.setHbarTokenAllowance({
+        walletId,
+        spenderContractId,
+        tokenAmount,
+        signer,
+      });
+    }
+    case TokenType.FungibleToken: {
+      return await DexService.setTokenAllowance({
+        tokenId,
+        walletId,
+        spenderContractId,
+        tokenAmount,
+        signer,
+      });
+    }
+    case TokenType.NFT: {
+      return await DexService.setNFTAllowance({
+        tokenId,
+        nftSerialId,
+        walletId,
+        spenderContractId,
+        signer,
+      });
+    }
   }
 }
 

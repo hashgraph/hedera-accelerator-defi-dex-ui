@@ -160,7 +160,7 @@ export function CreateADAOPage() {
         quorum: voting?.quorum ?? 0,
         votingDuration: voting?.duration ?? 0,
         lockingDuration: voting?.lockingPeriod ?? 0,
-        daoFee: ftDAOFeeConfig?.daoFee || 0,
+        daoFeeConfig: ftDAOFeeConfig,
       });
     }
     if (data.type === DAOType.MultiSig) {
@@ -176,7 +176,7 @@ export function CreateADAOPage() {
         owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
-        daoFee: multisigDAOFeeConfig?.daoFee || 0,
+        daoFeeConfig: multisigDAOFeeConfig,
       });
     }
     if (data.type === DAOType.NFT) {
@@ -200,7 +200,7 @@ export function CreateADAOPage() {
         quorum: voting.quorum,
         votingDuration: voting?.duration ?? 0,
         lockingDuration: voting?.lockingPeriod ?? 0,
-        daoFee: nftDAOFeeConfig?.daoFee || 0,
+        daoFeeConfig: nftDAOFeeConfig,
       });
     }
   }

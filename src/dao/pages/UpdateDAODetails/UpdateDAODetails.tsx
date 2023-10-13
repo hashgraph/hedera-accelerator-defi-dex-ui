@@ -15,7 +15,7 @@ export function UpdateDAODetails() {
   const daoAccountIdQueryResults = useFetchContract(daoAccountId);
   const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
   const location = useLocation();
-  const currentDaoType = location.pathname.split("/").at(2) ?? "";
+  const currentDaoType = location.pathname.split("/").at(1) ?? "";
   const backTo = `/${currentDaoType}/${daoAccountId}/settings`;
   const daosQueryResults = useDAOs();
   const { data: daos } = daosQueryResults;
