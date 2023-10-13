@@ -5,6 +5,7 @@ import { TokenPair } from "@dex/store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
 import { HBARTokenId } from "@dex/services";
 import { getTransactionFeeRateDisplay } from "@shared/utils";
+import { ethers } from "ethers";
 
 // TODO: Need to get token coversion rate from USDC_TOKEN_ID
 const getValueInUSD = (/* tokenAccountId */): number => 1;
@@ -178,8 +179,12 @@ const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFro
   }
 };
 
-const isHbarToken = (TokenID: string): boolean => {
-  return TokenID === HBARTokenId;
+const isHbarToken = (tokenIdOrAddress: string): boolean => {
+  return (
+    tokenIdOrAddress === HBARTokenId ||
+    tokenIdOrAddress === ethers.constants.AddressZero ||
+    tokenIdOrAddress === "0.0.0"
+  );
 };
 
 interface getAllPoolTransactionFeeParams {

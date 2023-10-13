@@ -219,7 +219,9 @@ export function CreateADAOPage() {
               },
               form: {
                 id: "create-dao",
-                context: {},
+                context: {
+                  daoFeeConfig: multiSigDAOConfig,
+                },
                 ...createDAOPageForm,
               },
               onSubmit,

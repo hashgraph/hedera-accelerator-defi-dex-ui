@@ -1,16 +1,21 @@
 import { useQuery } from "react-query";
-import { Contracts, DexService } from "@dex/services";
+import { Contracts, DEX_TOKEN_PRECISION_VALUE, DexService, convertEthersBigNumberToBigNumberJS } from "@dex/services";
 import { DAOQueries } from "./types";
+import { TokenId } from "@hashgraph/sdk";
 import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.json";
 import FTDAOFactory from "../../dex/services/abi/FTDAOFactory.json";
 import NFTDAOFactory from "../../dex/services/abi/NFTDAOFactory.json";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { DAOEvents } from "@dao/services";
+import { isHbarToken } from "@dex/utils";
 
 export interface DAOConfigDetails {
   daoFee: number;
   daoTreasurer: string;
   tokenAddress: string;
+  symbol: string;
+  tokenId: string;
+  decimals: number;
 }
 export interface DAOConfig {
   multiSigDAOConfig: DAOConfigDetails;
@@ -21,14 +26,24 @@ export interface DAOConfig {
 type UseContactQueryKey = [DAOQueries.Config];
 
 export function useFetchDAOConfig() {
-  function formatConfig(events: ethers.utils.LogDescription[]) {
-    const latestConfig = events[0].args.daoConfig;
-    const daoConfig: DAOConfigDetails = {
-      daoFee: BigNumber.from(latestConfig.daoFee || 0).toNumber(),
-      daoTreasurer: latestConfig.daoTreasurer,
-      tokenAddress: latestConfig.tokenAddress,
+  async function formatConfig(events: ethers.utils.LogDescription[]) {
+    const { daoFee, daoTreasurer, tokenAddress } = events[0].args.daoConfig;
+    const isHbar = isHbarToken(tokenAddress);
+    const tokenId = TokenId.fromSolidityAddress(tokenAddress).toString();
+    const {
+      data: { symbol, decimals, token_id },
+    } = isHbar
+      ? { data: { symbol: "Hbar", decimals: DEX_TOKEN_PRECISION_VALUE, token_id: tokenAddress } }
+      : await DexService.fetchTokenData(tokenId);
+    const daoFeeConfig: DAOConfigDetails = {
+      daoFee: convertEthersBigNumberToBigNumberJS(daoFee).shiftedBy(-Number(decimals)).toNumber(),
+      daoTreasurer: daoTreasurer,
+      tokenAddress: tokenAddress,
+      symbol,
+      tokenId: token_id,
+      decimals: Number(decimals),
     };
-    return daoConfig;
+    return daoFeeConfig;
   }
 
   return useQuery<DAOConfig, Error, DAOConfig, UseContactQueryKey>(
@@ -50,9 +65,9 @@ export function useFetchDAOConfig() {
         [DAOEvents.DAOConfig]
       );
       return {
-        multiSigDAOConfig: formatConfig(multiSigDAOConfigLogs),
-        govDAOConfig: formatConfig(govDAOConfigLogs),
-        nftDAOConfig: formatConfig(nftDAOConfigLogs),
+        multiSigDAOConfig: await formatConfig(multiSigDAOConfigLogs),
+        govDAOConfig: await formatConfig(govDAOConfigLogs),
+        nftDAOConfig: await formatConfig(nftDAOConfigLogs),
       };
     },
     {
