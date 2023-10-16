@@ -10,7 +10,7 @@ export async function pinMarkdownToIPFS(metadata: string, fileName: string): Pro
   if (pinataResponse.status === 200) {
     return pinataResponse.data;
   } else {
-    throw new Error("Failed to pin IPFS content.");
+    throw new Error("Failed to pin content to IPFS.");
   }
 }
 
@@ -19,6 +19,6 @@ export async function fetchFileByCID(CID: string): Promise<string> {
   if (pinataResponse.status === 200) {
     return pinataResponse.data;
   } else {
-    throw new Error("Failed to fetch IPFS content.");
+    throw new Error(`Failed to fetch content with CID: ${CID} from IPFS.`);
   }
 }

@@ -23,7 +23,7 @@ export default async function pinToIPFS(request: VercelRequest, response: Vercel
       const pinataResponse = await pinMarkdownToIPFS(metadata, fileName);
       return response.status(200).json(pinataResponse);
     } catch (error) {
-      return response.status(502).json({ error });
+      return response.status(502).json({ error: "Failed to pin data to IPFS." });
     }
   }
 }

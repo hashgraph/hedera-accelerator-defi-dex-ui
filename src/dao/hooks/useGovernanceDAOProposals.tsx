@@ -165,7 +165,7 @@ export function useGovernanceDAOProposals(
         ? solidityAddressToAccountIdString(proposalData.coreInformation.creator)
         : "",
       description: proposalData.coreInformation.inputs.description,
-      metadata: proposalData.coreInformation.inputs.metaData,
+      metadata: proposalData.coreInformation.inputs.metadata,
       link: proposalData.coreInformation.inputs.discussionLink,
       threshold: 0,
       contractEvmAddress: proposalData.contractId,

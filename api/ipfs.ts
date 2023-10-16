@@ -13,7 +13,7 @@ export default async function fetchContentFromPinata(request: VercelRequest & Qu
     const CID = request.query.CID;
 
     if (!isCIDValid(CID)) {
-      return response.status(400).json({ error: "Invalid CID" });
+      return response.status(400).json({ error: "CID is invalid." });
     }
 
     try {
