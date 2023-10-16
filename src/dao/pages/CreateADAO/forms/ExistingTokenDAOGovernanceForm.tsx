@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { Text, Color, FormInput } from "@shared/ui-kit";
+import { Text, Color, FormInput, CancelledStepIcon } from "@shared/ui-kit";
 import { useFetchTokenData } from "@dex/hooks";
 import { debounce } from "ts-debounce";
 import { Flex, Divider, CircularProgress } from "@chakra-ui/react";
@@ -11,6 +11,7 @@ import { checkForValidTokenId } from "@dex/utils";
 import { ChangeEvent } from "react";
 import { DefaultCreateATokenDAOFormData } from "./constants";
 import { isNotNil } from "ramda";
+import { TokenType } from "@dao/services";
 
 export function ExistingTokenDAOGovernanceForm() {
   const {
@@ -22,14 +23,18 @@ export function ExistingTokenDAOGovernanceForm() {
   } = useFormContext<CreateATokenDAOForm>();
   const formValues = getValues();
   const { governance } = isNotNil(formValues.governance) ? formValues : DefaultCreateATokenDAOFormData;
-  const { refetch, isFetching, isSuccess } = useFetchTokenData({
+  const { refetch, isFetching, isSuccess, data, isError } = useFetchTokenData({
     tokenId: governance?.existingToken?.id,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
   });
 
-  function isTokenIdValid() {
-    return checkForValidTokenId(governance.existingToken.mirrorNodeTokenId ?? "") || isSuccess;
+  function isValidTokenId() {
+    return (
+      checkForValidTokenId(governance?.existingToken?.mirrorNodeTokenId ?? "") &&
+      isSuccess &&
+      data?.data.type === TokenType.FungibleToken
+    );
   }
 
   function handleTokenSuccessResponse(tokenData: MirrorNodeTokenById) {
@@ -54,9 +59,8 @@ export function ExistingTokenDAOGovernanceForm() {
   function getIconForTokenIdField() {
     if (isFetching)
       return <CircularProgress isIndeterminate color={Color.Primary._500} size="1.5rem" marginRight="0.5rem" />;
-    if (isSuccess && governance.existingToken.id.length > 0) {
-      return <CheckCircleIcon color={Color.Success._500} boxSize="1rem" marginRight="0.5rem" />;
-    }
+    if (isError) return <CancelledStepIcon boxSize="1rem" color={Color.Destructive._500} marginRight="0.5rem" />;
+    if (isValidTokenId()) return <CheckCircleIcon color={Color.Success._500} boxSize="1rem" marginRight="0.5rem" />;
     return undefined;
   }
 
@@ -80,7 +84,7 @@ export function ExistingTokenDAOGovernanceForm() {
               register: {
                 ...register("governance.existingToken.id", {
                   required: { value: true, message: "A token id is required." },
-                  validate: () => isTokenIdValid() || "Enter a Valid Token Id.",
+                  validate: () => isValidTokenId() || "Enter a Valid Fungible Token Id.",
                   onChange: debounce(handleTokenIdChange, DEBOUNCE_TIME),
                 }),
               },
