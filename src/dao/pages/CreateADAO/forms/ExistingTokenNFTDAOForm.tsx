@@ -8,6 +8,7 @@ import { useFetchTokenData } from "@dex/hooks";
 import { ChangeEvent } from "react";
 import { DEBOUNCE_TIME, MirrorNodeTokenById } from "@dex/services";
 import { debounce } from "ts-debounce";
+import { TokenType } from "@dao/services";
 
 export function ExistingTokenNFTDAOForm() {
   const {
@@ -21,14 +22,14 @@ export function ExistingTokenNFTDAOForm() {
   const formValues = getValues();
   const { governance } = formValues;
 
-  const { refetch, isFetching, isSuccess, isError } = useFetchTokenData({
+  const { refetch, isFetching, isSuccess, isError, data } = useFetchTokenData({
     tokenId: governance?.existingNFT?.id,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
   });
 
-  function isTokenIdValid() {
-    return checkForValidTokenId(governance.existingNFT.id ?? "") || isSuccess;
+  function isValidNFTId() {
+    return checkForValidTokenId(governance?.existingNFT?.id ?? "") && isSuccess && data.data.type === TokenType.NFT;
   }
 
   function handleTokenSuccessResponse(tokenData: MirrorNodeTokenById) {
@@ -50,11 +51,10 @@ export function ExistingTokenNFTDAOForm() {
   }
 
   function getIconForTokenIdField() {
-    if (isFetching) return <CircularProgress isIndeterminate color={Color.Primary._500} size="1.5rem" />;
-    if (isError) return <CancelledStepIcon boxSize="4" color={Color.Destructive._500} />;
-    if (isSuccess && governance?.existingNFT.id.length > 0) {
-      return <CheckCircleIcon color={Color.Success._500} />;
-    }
+    if (isFetching)
+      return <CircularProgress isIndeterminate color={Color.Primary._500} size="1.5rem" marginRight="0.5rem" />;
+    if (isError) return <CancelledStepIcon boxSize="1rem" color={Color.Destructive._500} marginRight="0.5rem" />;
+    if (isValidNFTId()) return <CheckCircleIcon color={Color.Success._500} boxSize="1.2rem" marginRight="0.5rem" />;
     return undefined;
   }
 
@@ -76,7 +76,7 @@ export function ExistingTokenNFTDAOForm() {
             register: {
               ...register("governance.existingNFT.id", {
                 required: { value: true, message: "A NFT id is required." },
-                validate: () => isTokenIdValid() || "Enter a Valid Token Id.",
+                validate: () => isValidNFTId() || "Enter a Valid NFT Id.",
                 onChange: debounce(handleTokenIdChange, DEBOUNCE_TIME),
               }),
             },
