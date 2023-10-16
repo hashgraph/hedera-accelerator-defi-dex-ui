@@ -39,6 +39,7 @@ import { TransactionResponse } from "@hashgraph/sdk";
 import { getLastPathInRoute } from "@dex/utils";
 import { getDAOType, getPreviousMemberAddress } from "../utils";
 import { PinataPinResponse } from "@pinata/sdk";
+import { Button, Flex } from "@chakra-ui/react";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -48,7 +49,13 @@ export function CreateDAOProposal() {
   const { data: daos } = daosQueryResults;
   const dao = daos?.find((dao) => dao.accountEVMAddress.toLowerCase() === daoAccountEVMAddress?.toLowerCase());
   const pinToIPFSResults = usePinToIPFS();
-  const { mutateAsync: pinMetadataToIPFS } = pinToIPFSResults;
+  const {
+    isLoading: isPinningToIPFSLoading,
+    isError: isPinningToIPFSFailed,
+    error: isPinningToIPFSError,
+    mutateAsync: pinMetadataToIPFS,
+    reset: resetPinMetadataToIPFS,
+  } = pinToIPFSResults;
 
   const createDaoProposalForm = useForm<CreateDAOProposalForm>({
     defaultValues: {
@@ -211,7 +218,8 @@ export function CreateDAOProposal() {
     isCreateTokenAssociateProposalLoading ||
     isCreateGOVTokenAssociateProposalLoading ||
     isCreateMultiSigTextProposalLoading ||
-    isCreateMultiSigUpgradeProposalLoading;
+    isCreateMultiSigUpgradeProposalLoading ||
+    isPinningToIPFSLoading;
 
   const isError =
     isCreateMultisigTokenTransferFailed ||
@@ -225,7 +233,8 @@ export function CreateDAOProposal() {
     isCreateTokenAssociateProposalFailed ||
     isCreateGOVTokenAssociateProposalFailed ||
     isCreateMultiSigTextProposalFailed ||
-    isCreateMultiSigUpgradeProposalFailed;
+    isCreateMultiSigUpgradeProposalFailed ||
+    isPinningToIPFSFailed;
 
   const steps = [
     {
@@ -259,6 +268,7 @@ export function CreateDAOProposal() {
     resetCreateGOVTokenAssociateProposal();
     resetCreateMultiSigTextProposal();
     resetCreateMultiSigUpgradeProposal();
+    resetPinMetadataToIPFS();
   }
 
   function reset() {
@@ -279,6 +289,7 @@ export function CreateDAOProposal() {
     if (isCreateGOVTokenAssociateProposalError) return isCreateGOVTokenAssociateProposalError.message;
     if (isCreateMultiSigTextProposalError) return isCreateMultiSigTextProposalError.message;
     if (isCreateMultiSigUpgradeProposalError) return isCreateMultiSigUpgradeProposalError.message;
+    if (isPinningToIPFSError) return isPinningToIPFSError.response?.data.error || isPinningToIPFSError.message;
     return "";
   }
 
@@ -477,7 +488,11 @@ export function CreateDAOProposal() {
           case DAOType.GovernanceToken: {
             let pinningResponse: PinataPinResponse | undefined;
             if (!isEmpty(metadata)) {
-              pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+              try {
+                pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+              } catch (error) {
+                return;
+              }
             }
             return createDAOTextProposal({
               title,
@@ -495,7 +510,11 @@ export function CreateDAOProposal() {
           case DAOType.NFT: {
             let pinningResponse: PinataPinResponse | undefined;
             if (!isEmpty(metadata)) {
-              pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+              try {
+                pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+              } catch (error) {
+                return;
+              }
             }
             return createDAOTextProposal({
               title,
@@ -720,12 +739,29 @@ export function CreateDAOProposal() {
         isOpen={isError}
         message={errorMessage}
         icon={<WarningIcon color={Color.Destructive._500} h={10} w={10} />}
-        buttonConfig={{
-          text: "Dismiss",
-          onClick: () => {
-            resetTransactions();
-          },
-        }}
+        buttons={
+          <Flex direction="row" width="256px" gap="2" paddingBottom="1rem">
+            <Button
+              flex="1"
+              variant="secondary"
+              onClick={() => {
+                resetTransactions();
+              }}
+            >
+              {"Close"}
+            </Button>
+            <Button
+              flex="1"
+              variant="primary"
+              onClick={() => {
+                const formData = getValues();
+                onSubmit(formData);
+              }}
+            >
+              {"Resubmit"}
+            </Button>
+          </Flex>
+        }
       />
     </>
   );

@@ -130,7 +130,7 @@ interface ProposalCoreInputs {
   calldatas: string[];
   description: string;
   discussionLink: string;
-  metaData: string;
+  metadata: string;
   proposalType: GovernanceProposalType;
   targets: string[];
   title: string;

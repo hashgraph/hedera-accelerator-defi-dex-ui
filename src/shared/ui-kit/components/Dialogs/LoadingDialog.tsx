@@ -4,6 +4,7 @@ interface ButtonConfig {
   text: string;
   onClick: () => void;
 }
+
 interface LoadingDialogProps {
   message: string;
   isOpen: boolean;
@@ -11,13 +12,14 @@ interface LoadingDialogProps {
   width?: number;
   icon?: React.ReactNode;
   buttonConfig?: ButtonConfig;
+  buttons?: React.ReactElement;
 }
 
 /**
  * TODO: Add TSDocs
  */
 const LoadingDialog = (props: LoadingDialogProps) => {
-  const { message, isOpen, onClose, width, icon, buttonConfig } = props;
+  const { message, isOpen, onClose, width, icon, buttonConfig, buttons } = props;
 
   return (
     <>
@@ -64,6 +66,7 @@ const LoadingDialog = (props: LoadingDialogProps) => {
             ) : (
               <></>
             )}
+            {buttons ? buttons : <></>}
           </ModalBody>
         </ModalContent>
       </Modal>

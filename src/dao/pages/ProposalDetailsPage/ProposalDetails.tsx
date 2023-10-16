@@ -6,7 +6,7 @@ import {
   ProposalMemberVotes,
   ProposalTransactionDetails,
 } from "./ProposalDetailsComponents";
-import { Color, Text, MarkdownRenderer, Tag, TagVariant, IPFSLink } from "@shared/ui-kit";
+import { Color, Text, MarkdownRenderer, Tag, TagVariant, IPFSLink, InlineAlert, InlineAlertType } from "@shared/ui-kit";
 import { LoadingSpinnerLayout } from "@dex/layouts";
 import { isCIDValid } from "@dao/utils";
 
@@ -45,7 +45,7 @@ export function ProposalDetails(props: ProposalDetailsProps) {
     tokenType,
   } = props;
   const ipfsContentQueryResults = useIPFSContent(CID);
-  const { data: IPFSData, isLoading } = ipfsContentQueryResults;
+  const { data: IPFSData, isSuccess, isLoading, isError, error } = ipfsContentQueryResults;
 
   return (
     <Flex direction="column" gap="2">
@@ -97,12 +97,19 @@ export function ProposalDetails(props: ProposalDetailsProps) {
             <LoadingSpinnerLayout />
           </>
         ) : (
-          !!IPFSData && (
-            <>
-              <Divider />
+          <>
+            <Divider />
+            {!!IPFSData && isSuccess ? (
               <MarkdownRenderer markdown={IPFSData} />
-            </>
-          )
+            ) : isError ? (
+              <InlineAlert
+                message={`Failed to fetch content from IPFS. ${error.response?.data.error ?? error.message}`}
+                type={InlineAlertType.Error}
+              />
+            ) : (
+              <></>
+            )}
+          </>
         )}
       </Flex>
     </Flex>

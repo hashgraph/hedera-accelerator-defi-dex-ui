@@ -31,6 +31,7 @@ export function GovernanceProposalDetailsPage() {
     subDescription,
     isAuthor,
   } = useGovernanceProposalDetails(daoAccountId, proposalId);
+
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposal;
 
   function onBackToDAODashboardLinkClick() {
@@ -76,7 +77,6 @@ export function GovernanceProposalDetailsPage() {
       daoType,
       proposalState,
       link,
-      metadata,
     } = proposalDetails;
 
     const isGovernanceProposal = daoType === DAOType.GovernanceToken;
@@ -102,7 +102,7 @@ export function GovernanceProposalDetailsPage() {
             />
             <ProposalDetails
               description={[proposalDetails.description, subDescription]}
-              metadata={metadata}
+              metadata={proposalDetails.metadata}
               amount={amount}
               receiver={receiver}
               tokenId={token?.data.token_id ?? "-"}
