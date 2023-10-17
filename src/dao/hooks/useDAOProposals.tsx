@@ -137,6 +137,7 @@ export function useDAOProposals(
             creator,
             linkToDiscussion,
             transactionType,
+            metaData,
           } = proposalInfo;
           const { amount, receiver, token } = data ?? {};
           const threshold = await daoSDK.getThreshold(safeEVMAddress);
@@ -144,7 +145,6 @@ export function useDAOProposals(
           const approvalCount = approvers.length;
           const isThresholdReached = approvalCount >= threshold;
           const proposalType = getProposalType(BigNumber.from(transactionType).toNumber());
-          /** TODO: For DAO Upgrade extra step is introduced to check for Admin Approval */
           const isContractUpgradeProposal = proposalType === ProposalType.UpgradeContract;
           let isAdminApproved = false;
           let parsedData;
@@ -184,8 +184,7 @@ export function useDAOProposals(
             status,
             /* TODO: Add real value for timestamp */
             timestamp: "",
-            /* TODO: Replace with real metadata event data */
-            metadata: "",
+            metadata: metaData,
             tokenId: tokenId,
             token: tokenData,
             receiver: receiver ? solidityAddressToAccountIdString(receiver) : "",
@@ -200,7 +199,6 @@ export function useDAOProposals(
             description,
             link: linkToDiscussion,
             threshold,
-            /**TODO Remove the logic from here once extra step for ContractUpgrade is Not required */
             isContractUpgradeProposal,
           };
         })

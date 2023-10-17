@@ -85,23 +85,19 @@ export function DAOTextProposalDetailsForm() {
           />
         </>
       )}
-      {daoType !== Routes.Multisig && (
-        <>
-          <FormTextArea<"metadata">
-            textAreaProps={{
-              id: "metadata",
-              label: "Custom Description",
-              minHeight: "480px",
-              placeholder: HIPTemplate,
-              register: {
-                ...register("metadata"),
-              },
-            }}
-            isInvalid={Boolean(errors?.metadata)}
-            errorMessage={errors?.metadata && errors?.metadata?.message}
-          />
-        </>
-      )}
+      <FormTextArea<"metadata">
+        textAreaProps={{
+          id: "metadata",
+          label: "Custom Description",
+          minHeight: "480px",
+          placeholder: HIPTemplate,
+          register: {
+            ...register("metadata"),
+          },
+        }}
+        isInvalid={Boolean(errors?.metadata)}
+        errorMessage={errors?.metadata && errors?.metadata?.message}
+      />
     </Flex>
   );
 }

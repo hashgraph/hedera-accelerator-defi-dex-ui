@@ -475,6 +475,14 @@ export function CreateDAOProposal() {
       }
       case DAOProposalType.Text: {
         const { title, description, linkToDiscussion, nftTokenSerialId, metadata } = data as CreateDAOTextProposalForm;
+        let pinningResponse: PinataPinResponse | undefined;
+        if (!isEmpty(metadata)) {
+          try {
+            pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
+          } catch (error) {
+            return;
+          }
+        }
         switch (getDAOType(currentDaoType)) {
           case DAOType.MultiSig:
             return createMultiSigTextProposal({
@@ -483,17 +491,9 @@ export function CreateDAOProposal() {
               linkToDiscussion,
               safeEVMAddress,
               multiSigDAOContractId: daoAccountId,
-              metadata,
+              metadata: pinningResponse?.IpfsHash ?? "",
             });
-          case DAOType.GovernanceToken: {
-            let pinningResponse: PinataPinResponse | undefined;
-            if (!isEmpty(metadata)) {
-              try {
-                pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
-              } catch (error) {
-                return;
-              }
-            }
+          case DAOType.GovernanceToken:
             return createDAOTextProposal({
               title,
               description,
@@ -506,16 +506,7 @@ export function CreateDAOProposal() {
               daoType: DAOType.GovernanceToken,
               metadata: pinningResponse?.IpfsHash ?? "",
             });
-          }
-          case DAOType.NFT: {
-            let pinningResponse: PinataPinResponse | undefined;
-            if (!isEmpty(metadata)) {
-              try {
-                pinningResponse = await pinMetadataToIPFS({ fileName: title, metadata });
-              } catch (error) {
-                return;
-              }
-            }
+          case DAOType.NFT:
             return createDAOTextProposal({
               title,
               description,
@@ -528,7 +519,6 @@ export function CreateDAOProposal() {
               daoType: DAOType.NFT,
               metadata: pinningResponse?.IpfsHash ?? "",
             });
-          }
           default:
             return;
         }
@@ -649,13 +639,13 @@ export function CreateDAOProposal() {
       case DAOProposalType.ContractUpgrade:
         return currentDaoType === Routes.NFT
           ? trigger([
-              "title",
-              "description",
-              "linkToDiscussion",
-              "oldProxyAddress",
-              "newImplementationAddress",
-              "nftTokenSerialId",
-            ])
+            "title",
+            "description",
+            "linkToDiscussion",
+            "oldProxyAddress",
+            "newImplementationAddress",
+            "nftTokenSerialId",
+          ])
           : trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
       case DAOProposalType.TokenTransfer: {
         return currentDaoType === Routes.Multisig
