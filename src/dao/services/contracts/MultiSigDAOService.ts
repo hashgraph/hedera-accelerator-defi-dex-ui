@@ -95,10 +95,7 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     transactionType,
     title,
     description,
-    /*
-     * TODO: Need to add Metadata support to Multi Sig contracts.
-     * metadata = "",
-     */
+    metadata = "",
     hBarPayableValue,
     linkToDiscussion = "",
   } = params;
@@ -110,11 +107,8 @@ async function sendProposeTransaction(params: SendProposeTransaction) {
     .addUint256(transactionType)
     .addString(title)
     .addString(description)
-    .addString(linkToDiscussion);
-  /*
-   * TODO: Need to add Metadata support to MultiSig contracts.
-   * .addString(metadata);
-   */
+    .addString(linkToDiscussion)
+    .addString(metadata);
 
   const sendProposeTransaction = await new ContractExecuteTransaction()
     .setContractId(multiSigDAOContractId)
