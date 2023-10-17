@@ -639,13 +639,13 @@ export function CreateDAOProposal() {
       case DAOProposalType.ContractUpgrade:
         return currentDaoType === Routes.NFT
           ? trigger([
-            "title",
-            "description",
-            "linkToDiscussion",
-            "oldProxyAddress",
-            "newImplementationAddress",
-            "nftTokenSerialId",
-          ])
+              "title",
+              "description",
+              "linkToDiscussion",
+              "oldProxyAddress",
+              "newImplementationAddress",
+              "nftTokenSerialId",
+            ])
           : trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
       case DAOProposalType.TokenTransfer: {
         return currentDaoType === Routes.Multisig
