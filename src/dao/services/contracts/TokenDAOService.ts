@@ -20,6 +20,7 @@ import { isHbarToken } from "@dex/utils";
 import { isNFT } from "@shared/utils";
 import { GovernanceProposalType } from "@dex/store";
 import { DAOConfigDetails } from "@dao/hooks";
+import { isNotNil } from "ramda";
 
 const Gas = 9000000;
 
@@ -56,7 +57,7 @@ async function sendCreateGovernanceDAOTransaction(
     daoFeeConfig,
   } = params;
   const ftDAOFactoryContractId = ContractId.fromString(Contracts.FTDAOFactory.ProxyId);
-  const { tokenAddress: daoFeeTokenAddress, daoFee } = daoFeeConfig;
+  const { tokenId: daoFeeTokenId, daoFee, tokenType } = daoFeeConfig;
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
   const governanceTokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
@@ -81,13 +82,14 @@ async function sendCreateGovernanceDAOTransaction(
   const contractInterface = new ethers.utils.Interface(FTDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
 
-  const isHbar = isHbarToken(daoFeeTokenAddress);
+  const isHbar = isHbarToken(daoFeeTokenId);
   const hBarPayable = Hbar.fromTinybars(isHbar ? daoFee : 0);
   await DexService.setUpAllowance({
-    tokenId: TokenId.fromSolidityAddress(daoFeeTokenAddress).toString(),
+    tokenId: daoFeeTokenId,
     tokenAmount: daoFee,
     spenderContractId: Contracts.FTDAOFactory.ProxyId,
     nftSerialId: daoFee,
+    tokenType,
     signer,
   });
   const createGovernanceDAOTransaction = await new ContractExecuteTransaction()
@@ -135,6 +137,7 @@ async function createTokenTransferProposal(params: CreateTokenTransferProposalPa
     governorContractId,
     assetHolderEVMAddress,
     governanceNftTokenSerialId,
+    daoType,
   } = params;
 
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
@@ -144,6 +147,7 @@ async function createTokenTransferProposal(params: CreateTokenTransferProposalPa
     nftSerialId,
     spenderContractId: governorContractId,
     tokenAmount: DEX_PRECISION,
+    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
     signer,
   });
   let transferDetails: string[] = [];
@@ -207,6 +211,7 @@ async function createGOVTokenAssociateProposal(params: CreateTokenAssociationPro
     tokenId: governanceTokenId,
     nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
+    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
     tokenAmount: DEX_PRECISION,
     signer,
   });
@@ -262,6 +267,7 @@ async function createUpgradeProxyProposal(params: CreateUpgradeProxyProposalPara
     tokenId: governanceTokenId,
     nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
+    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
     tokenAmount: DEX_PRECISION,
     signer,
   });
@@ -380,6 +386,7 @@ const createTextProposal = async (params: CreateTextProposalParams) => {
     nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
     tokenAmount: DEX_PRECISION,
+    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
     signer,
   });
 
@@ -402,15 +409,20 @@ interface SetUpAllowanceParams {
   tokenId: string;
   nftSerialId: number;
   tokenAmount: number;
+  tokenType?: string;
   spenderContractId: string;
   signer: HashConnectSigner;
 }
 async function setUpAllowance(params: SetUpAllowanceParams) {
-  const { tokenId, spenderContractId, nftSerialId, signer, tokenAmount } = params;
+  const { tokenId, spenderContractId, nftSerialId, signer, tokenAmount, tokenType } = params;
   const walletId = signer.getAccountId().toString();
   const {
     data: { type },
-  } = isHbarToken(tokenId) ? { data: { type: TokenType.HBAR } } : await DexService.fetchTokenData(tokenId);
+  } = isHbarToken(tokenId)
+    ? { data: { type: TokenType.HBAR } }
+    : isNotNil(tokenType)
+    ? { data: { type: tokenType } }
+    : await DexService.fetchTokenData(tokenId);
 
   switch (type) {
     case TokenType.HBAR: {

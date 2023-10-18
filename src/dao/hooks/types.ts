@@ -217,7 +217,9 @@ export interface DAOConfigDetails {
   tokenAddress: string;
   symbol: string;
   tokenId: string;
+  tokenType: string;
   decimals: number;
+  preciseDAOFee: number;
 }
 export interface DAOConfig {
   multisigDAOFeeConfig: DAOConfigDetails;

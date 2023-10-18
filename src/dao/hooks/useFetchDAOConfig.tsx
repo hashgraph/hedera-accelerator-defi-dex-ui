@@ -1,12 +1,12 @@
 import { useQuery } from "react-query";
 import { Contracts, DexService, HBARTokenId, convertEthersBigNumberToBigNumberJS } from "@dex/services";
 import { TokenId } from "@hashgraph/sdk";
-import { DAOConfig, DAOConfigDetails, DAOQueries } from "./types";
+import { DAOConfig, DAOQueries } from "./types";
 import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.json";
 import FTDAOFactory from "../../dex/services/abi/FTDAOFactory.json";
 import NFTDAOFactory from "../../dex/services/abi/NFTDAOFactory.json";
 import { ethers } from "ethers";
-import { DAOEvents } from "@dao/services";
+import { DAOEvents, TokenType } from "@dao/services";
 import { isHbarToken } from "@dex/utils";
 
 type UseContactQueryKey = [DAOQueries.Config];
@@ -17,17 +17,18 @@ export function useFetchDAOConfig() {
     const isHbar = isHbarToken(tokenAddress);
     const tokenId = TokenId.fromSolidityAddress(tokenAddress).toString();
     const {
-      data: { symbol, decimals, token_id },
+      data: { symbol, decimals, token_id, type },
     } = await DexService.fetchTokenData(isHbar ? HBARTokenId : tokenId);
-    const daoFeeConfig: DAOConfigDetails = {
-      daoFee: convertEthersBigNumberToBigNumberJS(daoFee).shiftedBy(-Number(decimals)).toNumber(),
+    return {
+      daoFee: convertEthersBigNumberToBigNumberJS(daoFee).toNumber(),
+      preciseDAOFee: convertEthersBigNumberToBigNumberJS(daoFee).shiftedBy(-Number(decimals)).toNumber(),
       daoTreasurer: daoTreasurer,
       tokenAddress: tokenAddress,
       symbol,
       tokenId: token_id,
+      tokenType: isHbar ? TokenType.HBAR : type,
       decimals: Number(decimals),
     };
-    return daoFeeConfig;
   }
 
   return useQuery<DAOConfig, Error, DAOConfig, UseContactQueryKey>(
