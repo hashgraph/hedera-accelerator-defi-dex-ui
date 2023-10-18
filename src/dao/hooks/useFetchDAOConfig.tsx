@@ -1,10 +1,5 @@
 import { useQuery } from "react-query";
-import {
-  Contracts,
-  DexService,
-  HBARTokenId,
-  convertEthersBigNumberToBigNumberJS,
-} from "@dex/services";
+import { Contracts, DexService, HBARTokenId, convertEthersBigNumberToBigNumberJS } from "@dex/services";
 import { TokenId } from "@hashgraph/sdk";
 import { DAOConfig, DAOConfigDetails, DAOQueries } from "./types";
 import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.json";
