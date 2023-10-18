@@ -57,7 +57,7 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
     daoFeeConfig,
     signer,
   } = params;
-  const { daoFee, tokenAddress: daoFeeTokenAddress } = daoFeeConfig;
+  const { daoFee, tokenId: daoFeeTokenId, tokenType } = daoFeeConfig;
   const nftDAOFactoryContractId = ContractId.fromString(Contracts.NFTDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(treasuryWalletAccountId).toSolidityAddress();
   const governanceTokenAddress = TokenId.fromString(tokenId).toSolidityAddress();
@@ -83,13 +83,14 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   const contractInterface = new ethers.utils.Interface(NFTDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
 
-  const isHbar = isHbarToken(daoFeeTokenAddress);
+  const isHbar = isHbarToken(daoFeeTokenId);
   const hBarPayable = Hbar.fromTinybars(isHbar ? daoFee : 0);
   await DexService.setUpAllowance({
-    tokenId: TokenId.fromSolidityAddress(daoFeeTokenAddress).toString(),
+    tokenId: daoFeeTokenId,
     tokenAmount: daoFee,
     spenderContractId: Contracts.NFTDAOFactory.ProxyId,
     nftSerialId: daoFee,
+    tokenType,
     signer,
   });
   const createNFTDAOTransaction = await new ContractExecuteTransaction()

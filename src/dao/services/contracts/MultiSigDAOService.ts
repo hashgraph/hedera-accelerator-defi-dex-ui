@@ -39,7 +39,7 @@ async function sendCreateMultiSigDAOTransaction(
   params: SendCreateMultiSigDAOTransactionParams
 ): Promise<TransactionResponse> {
   const { admin, name, logoUrl, owners, threshold, isPrivate, signer, description, daoLinks, daoFeeConfig } = params;
-  const { daoFee, tokenAddress: daoFeeTokenAddress } = daoFeeConfig;
+  const { daoFee, tokenType, tokenId } = daoFeeConfig;
   const multiSigDAOFactoryContractId = ContractId.fromString(Contracts.MultiSigDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
   const preciseThreshold = BigNumber(threshold);
@@ -56,12 +56,13 @@ async function sendCreateMultiSigDAOTransaction(
   ];
   const contractInterface = new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi);
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.CreateDAO, [createDaoParams]);
-  const isHbar = isHbarToken(daoFeeTokenAddress);
+  const isHbar = isHbarToken(tokenId);
   const hBarPayable = Hbar.fromTinybars(isHbar ? daoFee : 0);
   await DexService.setUpAllowance({
-    tokenId: TokenId.fromSolidityAddress(daoFeeTokenAddress).toString(),
+    tokenId: tokenId,
     tokenAmount: daoFee,
     spenderContractId: Contracts.MultiSigDAOFactory.ProxyId,
+    tokenType,
     nftSerialId: daoFee,
     signer,
   });

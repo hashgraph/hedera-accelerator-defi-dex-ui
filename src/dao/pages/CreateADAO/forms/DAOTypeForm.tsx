@@ -132,11 +132,11 @@ export function DAOTypeForm() {
   const getDAOFeeAndTokenSymbol = (daoType: DAOType) => {
     switch (daoType) {
       case DAOType.MultiSig:
-        return { daoFee: multisigDAOFeeConfig?.daoFee, tokenSymbol: multisigDAOFeeConfig?.symbol };
+        return { daoFee: multisigDAOFeeConfig?.preciseDAOFee, tokenSymbol: multisigDAOFeeConfig?.symbol };
       case DAOType.GovernanceToken:
-        return { daoFee: ftDAOFeeConfig?.daoFee, tokenSymbol: ftDAOFeeConfig?.symbol };
+        return { daoFee: ftDAOFeeConfig?.preciseDAOFee, tokenSymbol: ftDAOFeeConfig?.symbol };
       case DAOType.NFT:
-        return { daoFee: nftDAOFeeConfig?.daoFee, tokenSymbol: nftDAOFeeConfig?.symbol };
+        return { daoFee: nftDAOFeeConfig?.preciseDAOFee, tokenSymbol: nftDAOFeeConfig?.symbol };
     }
   };
   const { multisigDAOFeeConfig, ftDAOFeeConfig, nftDAOFeeConfig } = useOutletContext<CreateDAOContext>();
