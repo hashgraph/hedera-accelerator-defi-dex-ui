@@ -32,7 +32,7 @@ export function ExistingTokenDAOGovernanceForm() {
   function isValidTokenId() {
     return (
       checkForValidTokenId(governance?.existingToken?.mirrorNodeTokenId ?? "") &&
-      isSuccess &&
+      isNotNil(data?.data?.type) &&
       data?.data.type === TokenType.FungibleToken
     );
   }
