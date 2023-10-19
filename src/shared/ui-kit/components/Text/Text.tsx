@@ -30,6 +30,20 @@ export const Text = {
   H4_Semibold: (props: TextProps) => <ChakraText textStyle="h4 semibold" {...props} />,
   H4_Bold: (props: TextProps) => <ChakraText textStyle="h4 bold" {...props} />,
   /**
+   * Heading
+   * Size: H5
+   */
+  H5_Medium: (props: TextProps) => <ChakraText textStyle="h5 medium" {...props} />,
+  H5_Semibold: (props: TextProps) => <ChakraText textStyle="h5 semibold" {...props} />,
+  H5_Bold: (props: TextProps) => <ChakraText textStyle="h5 bold" {...props} />,
+  /**
+   * Heading
+   * Size: H6
+   */
+  H6_Medium: (props: TextProps) => <ChakraText textStyle="h6 medium" {...props} />,
+  H6_Semibold: (props: TextProps) => <ChakraText textStyle="h6 semibold" {...props} />,
+  H6_Bold: (props: TextProps) => <ChakraText textStyle="h6 bold" {...props} />,
+  /**
    * Paragraph
    * Size: Large
    */

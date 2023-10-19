@@ -41,6 +41,20 @@ const baseStyles = {
     letterSpacing: "-2%",
     color: Color.Neutral._900,
   },
+  h5: {
+    ...fontType,
+    fontSize: "16px",
+    lineHeight: "24px",
+    letterSpacing: "-2%",
+    color: Color.Neutral._900,
+  },
+  h6: {
+    ...fontType,
+    fontSize: "14px",
+    lineHeight: "24px",
+    letterSpacing: "-2%",
+    color: Color.Neutral._900,
+  },
   p_large: {
     ...fontType,
     fontSize: "18px",
@@ -235,6 +249,38 @@ export const TextStyles = {
   },
   "h4 bold": {
     ...baseStyles.h4,
+    fontWeight: fontWeight.Bold,
+  },
+  /**
+   * Heading
+   * Size: H4
+   */
+  "h5 medium": {
+    ...baseStyles.h5,
+    fontWeight: fontWeight.Medium,
+  },
+  "h5 semibold": {
+    ...baseStyles.h5,
+    fontWeight: fontWeight.Semibold,
+  },
+  "h5 bold": {
+    ...baseStyles.h5,
+    fontWeight: fontWeight.Bold,
+  },
+  /**
+   * Heading
+   * Size: H4
+   */
+  "h6 medium": {
+    ...baseStyles.h6,
+    fontWeight: fontWeight.Medium,
+  },
+  "h6 semibold": {
+    ...baseStyles.h6,
+    fontWeight: fontWeight.Semibold,
+  },
+  "h6 bold": {
+    ...baseStyles.h6,
     fontWeight: fontWeight.Bold,
   },
   /**
