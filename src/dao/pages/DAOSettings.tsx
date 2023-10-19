@@ -3,7 +3,7 @@ import { Text, Color, MetricLabel, DefaultLogoIcon } from "@shared/ui-kit";
 import { useOutletContext, useNavigate, Link as ReachLink } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
-import { getDAOLinksRecordArray } from "./utils";
+import { getDAOLinksRecordArray, shortEnglishHumanizer } from "./utils";
 import { usePairedWalletDetails } from "@dex/hooks";
 import { Routes } from "@dao/routes";
 
@@ -63,10 +63,9 @@ export function DAOSettings() {
                 labelTextColor={Color.Neutral._500}
                 labelTextStyle="p xsmall medium"
                 labelOpacity="1.0"
-                value={dao.votingPeriod}
+                value={shortEnglishHumanizer(dao.votingPeriod * 1000)}
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="Secs"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
@@ -76,10 +75,9 @@ export function DAOSettings() {
                 labelTextColor={Color.Neutral._500}
                 labelTextStyle="p xsmall medium"
                 labelOpacity="1.0"
-                value={dao.votingDelay}
+                value={shortEnglishHumanizer(dao.votingDelay * 1000)}
                 valueStyle="p large semibold"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol="Secs"
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>

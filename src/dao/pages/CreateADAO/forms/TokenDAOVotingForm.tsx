@@ -1,19 +1,27 @@
 import { SimpleGrid } from "@chakra-ui/react";
-import { FormInput } from "@shared/ui-kit";
+import { FormInput, TimeUnitSelector } from "@shared/ui-kit";
 import { CreateATokenDAOForm, DAOGovernanceTokenType } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
 import { DAOToolTips } from "./constants";
 import { ChangeEvent, useState } from "react";
+import { useTimeInputPattern } from "@dao/hooks";
 
 export function TokenDAOVotingForm() {
   const {
     getValues,
+    setValue,
     register,
     formState: { errors },
   } = useFormContext<CreateATokenDAOForm>();
   const { voting, governance } = getValues();
   const [isQuorumWarningVisible, setIsQuorumWarningVisible] = useState(voting?.quorum > 90);
+  const { handleTimeInputChangeWithPattern: handleDurationChangeWithPattern } = useTimeInputPattern((value: number) =>
+    setValue("voting.duration", value)
+  );
+  const { handleTimeInputChangeWithPattern: handleLockingPeriodChangeWithPattern } = useTimeInputPattern(
+    (value: number) => setValue("voting.lockingPeriod", value)
+  );
 
   return (
     <DAOFormContainer>
@@ -59,10 +67,12 @@ export function TokenDAOVotingForm() {
             toolTipLabelPlacement: "top",
             type: "number",
             placeholder: "Enter duration",
-            unit: "Secs",
+            pointerEvents: "all",
+            unit: <TimeUnitSelector selectControls={register("voting.durationUnit", {})} />,
             register: {
               ...register("voting.duration", {
                 required: { value: true, message: "A voting duration is required." },
+                onChange: handleDurationChangeWithPattern,
               }),
             },
           }}
@@ -78,10 +88,12 @@ export function TokenDAOVotingForm() {
             tooltipLabel: DAOToolTips.lockingPeriod,
             toolTipLabelPlacement: "top",
             placeholder: "Enter duration",
-            unit: "Secs",
+            pointerEvents: "all",
+            unit: <TimeUnitSelector selectControls={register("voting.lockingPeriodUnit", {})} />,
             register: {
               ...register("voting.lockingPeriod", {
                 required: { value: true, message: "A locking period is required." },
+                onChange: handleLockingPeriodChangeWithPattern,
               }),
             },
           }}

@@ -3,6 +3,7 @@ import { FormInput } from "@shared/ui-kit";
 import { CreateATokenDAOForm, DAOGovernanceTokenType } from "../types";
 import { DAOReviewForm } from "./DAOReviewForm";
 import BigNumber from "bignumber.js";
+import { shortEnglishHumanizer } from "@dao/pages/utils";
 
 export function TokenDAOReviewForm() {
   const { getValues } = useFormContext<CreateATokenDAOForm>();
@@ -113,8 +114,10 @@ export function TokenDAOReviewForm() {
             id: "voting.duration",
             label: "VOTING DURATION",
             type: "number",
-            unit: "Secs",
-            value: String(voting?.duration ?? 0),
+            value:
+              voting?.duration && voting?.duration
+                ? shortEnglishHumanizer(voting.duration * voting.durationUnit * 1000)
+                : "",
             isReadOnly: true,
           }}
         />,
@@ -123,8 +126,10 @@ export function TokenDAOReviewForm() {
             id: "voting.lockingPeriod",
             label: "LOCKING PERIOD",
             type: "number",
-            unit: "Secs",
-            value: String(voting?.lockingPeriod ?? 0),
+            value:
+              voting?.lockingPeriod && voting?.lockingPeriodUnit
+                ? shortEnglishHumanizer(voting.lockingPeriod * voting.lockingPeriodUnit * 1000)
+                : "",
             isReadOnly: true,
           }}
         />,

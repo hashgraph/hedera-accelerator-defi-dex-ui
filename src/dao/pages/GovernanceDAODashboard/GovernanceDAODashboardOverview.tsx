@@ -2,7 +2,7 @@ import { Flex, Grid, GridItem, Link } from "@chakra-ui/react";
 import { Text, Color, MetricLabel } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./types";
-import { getDAOLinksRecordArray } from "../utils";
+import { getDAOLinksRecordArray, shortEnglishHumanizer } from "../utils";
 import { useGovernanceDAOProposals } from "@dao/hooks";
 import { RecentProposals } from "../RecentProposals";
 
@@ -76,10 +76,9 @@ export function GovernanceDAODashboardOverview() {
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
-                  value={dao.votingPeriod}
+                  value={shortEnglishHumanizer(dao.votingPeriod * 1000)}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="Secs"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 
@@ -88,10 +87,9 @@ export function GovernanceDAODashboardOverview() {
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
-                  value={dao.votingDelay}
+                  value={shortEnglishHumanizer(dao.votingDelay * 1000)}
                   valueStyle="p large medium"
                   valueTextColor={Color.Neutral._900}
-                  valueUnitSymbol="Secs"
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
 
