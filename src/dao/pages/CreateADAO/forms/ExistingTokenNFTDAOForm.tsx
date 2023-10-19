@@ -9,6 +9,7 @@ import { ChangeEvent } from "react";
 import { DEBOUNCE_TIME, MirrorNodeTokenById } from "@dex/services";
 import { debounce } from "ts-debounce";
 import { TokenType } from "@dao/services";
+import { isNotNil } from "ramda";
 
 export function ExistingTokenNFTDAOForm() {
   const {
@@ -29,7 +30,11 @@ export function ExistingTokenNFTDAOForm() {
   });
 
   function isValidNFTId() {
-    return checkForValidTokenId(governance?.existingNFT?.id ?? "") && isSuccess && data.data.type === TokenType.NFT;
+    return (
+      checkForValidTokenId(governance?.existingNFT?.id ?? "") &&
+      isNotNil(data?.data?.type) &&
+      data?.data?.type === TokenType.NFT
+    );
   }
 
   function handleTokenSuccessResponse(tokenData: MirrorNodeTokenById) {
