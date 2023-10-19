@@ -88,7 +88,10 @@ export function ProposalDetails(props: ProposalDetailsProps) {
         {isCIDValid(CID) && (
           <>
             <Divider />
-            <IPFSLink gatewayURL={VITE_PUBLIC_PINATA_GATEWAY_URL} CID={CID} />
+            <Flex direction="column" gap="2">
+              <Text.P_Small_Medium>IPFS CID</Text.P_Small_Medium>
+              <IPFSLink gatewayURL={VITE_PUBLIC_PINATA_GATEWAY_URL} CID={CID} />
+            </Flex>
           </>
         )}
         {isCIDValid(CID) && isLoading ? (
