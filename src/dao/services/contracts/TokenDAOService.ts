@@ -144,7 +144,7 @@ async function createTokenTransferProposal(params: CreateTokenTransferProposalPa
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
   await DexService.setUpAllowance({
     tokenId: governanceTokenId,
-    nftSerialId,
+    nftSerialId: governanceNftTokenSerialId,
     spenderContractId: governorContractId,
     tokenAmount: DEX_PRECISION,
     tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
