@@ -82,7 +82,9 @@ function getDefaultFormValues(type: DAOType): {
         minProposalDeposit: 0,
         quorum: 0,
         duration: 0,
+        durationUnit: 1,
         lockingPeriod: 0,
+        lockingPeriodUnit: 1,
         strategy: "",
       },
     };
@@ -113,7 +115,9 @@ function getDefaultFormValues(type: DAOType): {
       minProposalDeposit: 0,
       quorum: 0,
       duration: 0,
+      durationUnit: 1,
       lockingPeriod: 0,
+      lockingPeriodUnit: 1,
       strategy: "",
     },
   };

@@ -40,7 +40,9 @@ export interface TokenDAOVotingData {
   minProposalDeposit: number;
   quorum: number;
   duration: number;
+  durationUnit: number;
   lockingPeriod: number;
+  lockingPeriodUnit: number;
   strategy: string;
 }
 
@@ -75,7 +77,9 @@ export interface NFTDAOVotingData {
   minProposalDeposit: number;
   quorum: number;
   duration: number;
+  durationUnit: number;
   lockingPeriod: number;
+  lockingPeriodUnit: number;
 }
 
 export interface MultiSigDAOVotingData {

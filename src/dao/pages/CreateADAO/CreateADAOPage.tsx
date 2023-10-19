@@ -158,8 +158,9 @@ export function CreateADAOPage() {
             ? governance?.newToken?.treasuryWalletAccountId ?? ""
             : governance?.existingToken?.treasuryWalletAccountId ?? "",
         quorum: voting?.quorum ?? 0,
-        votingDuration: voting?.duration ?? 0,
-        lockingDuration: voting?.lockingPeriod ?? 0,
+        votingDuration: voting?.duration && voting.durationUnit ? voting.duration * voting.durationUnit : 0,
+        lockingDuration:
+          voting?.lockingPeriod && voting.lockingPeriodUnit ? voting.lockingPeriod * voting.lockingPeriodUnit : 0,
         daoFeeConfig: ftDAOFeeConfig,
       });
     }
@@ -198,8 +199,9 @@ export function CreateADAOPage() {
             ? governance?.newNFT?.treasuryWalletAccountId ?? ""
             : governance?.existingNFT?.treasuryWalletAccountId ?? "",
         quorum: voting.quorum,
-        votingDuration: voting?.duration ?? 0,
-        lockingDuration: voting?.lockingPeriod ?? 0,
+        votingDuration: voting?.duration && voting.durationUnit ? voting.duration * voting.durationUnit : 0,
+        lockingDuration:
+          voting?.lockingPeriod && voting.lockingPeriodUnit ? voting.lockingPeriod * voting.lockingPeriodUnit : 0,
         daoFeeConfig: nftDAOFeeConfig,
       });
     }

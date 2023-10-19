@@ -16,6 +16,7 @@ import { DAOType } from "@dao/services";
 import { isHbarToken } from "@dex/utils";
 import { Routes } from "../routes";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
+import humanizeDuration from "humanize-duration";
 
 export function getDAOLinksRecordArray(links: string[]): Record<"value", string>[] {
   const arrayOfRecords = links.map((linkString) => {
@@ -164,3 +165,19 @@ export function getDAOType(path: string) {
       return "";
   }
 }
+
+export const shortEnglishHumanizer = humanizeDuration.humanizer({
+  language: "shortEn",
+  languages: {
+    shortEn: {
+      y: () => "y",
+      mo: () => "mo",
+      w: () => "w",
+      d: () => "d",
+      h: () => "h",
+      m: () => "m",
+      s: () => "s",
+      ms: () => "ms",
+    },
+  },
+});

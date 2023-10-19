@@ -2,6 +2,7 @@ import { useFormContext } from "react-hook-form";
 import { FormInput } from "@shared/ui-kit";
 import { CreateANFTDAOForm, DAONFTTokenType } from "../types";
 import { DAOReviewForm } from "./DAOReviewForm";
+import { shortEnglishHumanizer } from "@dao/pages/utils";
 
 export function NFTDAOReviewForm() {
   const { getValues } = useFormContext<CreateANFTDAOForm>();
@@ -97,8 +98,10 @@ export function NFTDAOReviewForm() {
             id: "voting.duration",
             label: "VOTING DURATION",
             type: "number",
-            unit: "Secs",
-            value: String(voting?.duration ?? ""),
+            value:
+              voting?.duration && voting?.duration
+                ? shortEnglishHumanizer(voting.duration * voting.durationUnit * 1000)
+                : "",
             isReadOnly: true,
           }}
         />,
@@ -107,8 +110,10 @@ export function NFTDAOReviewForm() {
             id: "voting.lockingPeriod",
             label: "LOCKING PERIOD",
             type: "number",
-            unit: "Secs",
-            value: String(voting?.lockingPeriod ?? ""),
+            value:
+              voting?.lockingPeriod && voting?.lockingPeriodUnit
+                ? shortEnglishHumanizer(voting.lockingPeriod * voting.lockingPeriodUnit * 1000)
+                : "",
             isReadOnly: true,
           }}
         />,

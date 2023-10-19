@@ -1,17 +1,25 @@
-import { FormInput } from "@shared/ui-kit";
+import { FormInput, TimeUnitSelector } from "@shared/ui-kit";
 import { CreateANFTDAOForm, DAONFTTokenType } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
 import { SimpleGrid } from "@chakra-ui/react";
 import { DAOToolTips } from "./constants";
+import { useTimeInputPattern } from "@dao/hooks";
 
 export function NFTDAOVotingForm() {
   const {
     register,
     getValues,
+    setValue,
     formState: { errors },
   } = useFormContext<CreateANFTDAOForm>();
   const { governance } = getValues();
+  const { handleTimeInputChangeWithPattern: handleDurationChangeWithPattern } = useTimeInputPattern((value: number) =>
+    setValue("voting.duration", value)
+  );
+  const { handleTimeInputChangeWithPattern: handleLockingPeriodChangeWithPattern } = useTimeInputPattern(
+    (value: number) => setValue("voting.lockingPeriod", value)
+  );
 
   return (
     <DAOFormContainer>
@@ -44,10 +52,12 @@ export function NFTDAOVotingForm() {
             tooltipLabel: DAOToolTips.duration,
             toolTipLabelPlacement: "top",
             placeholder: "Enter duration",
-            unit: "Secs",
+            pointerEvents: "all",
+            unit: <TimeUnitSelector selectControls={register("voting.durationUnit", {})} />,
             register: {
               ...register("voting.duration", {
                 required: { value: true, message: "A voting duration is required." },
+                onChange: handleDurationChangeWithPattern,
               }),
             },
           }}
@@ -63,10 +73,12 @@ export function NFTDAOVotingForm() {
             toolTipLabelPlacement: "top",
             type: "number",
             placeholder: "Enter duration",
-            unit: "Secs",
+            pointerEvents: "all",
+            unit: <TimeUnitSelector selectControls={register("voting.lockingPeriodUnit", {})} />,
             register: {
               ...register("voting.lockingPeriod", {
                 required: { value: true, message: "A locking period is required." },
+                onChange: handleLockingPeriodChangeWithPattern,
               }),
             },
           }}
