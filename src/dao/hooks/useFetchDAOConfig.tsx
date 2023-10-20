@@ -13,16 +13,16 @@ type UseContactQueryKey = [DAOQueries.Config];
 
 export function useFetchDAOConfig() {
   async function formatConfig(events: ethers.utils.LogDescription[]) {
-    const { daoFee, daoTreasurer, tokenAddress } = events[0].args.daoConfig;
+    const { amountOrId, receiver, tokenAddress } = events[0].args.feeConfig;
     const isHbar = isHbarToken(tokenAddress);
     const tokenId = TokenId.fromSolidityAddress(tokenAddress).toString();
     const {
       data: { symbol, decimals, token_id, type },
     } = await DexService.fetchTokenData(isHbar ? HBARTokenId : tokenId);
     return {
-      daoFee: convertEthersBigNumberToBigNumberJS(daoFee).toNumber(),
-      preciseDAOFee: convertEthersBigNumberToBigNumberJS(daoFee).shiftedBy(-Number(decimals)).toNumber(),
-      daoTreasurer: daoTreasurer,
+      daoFee: convertEthersBigNumberToBigNumberJS(amountOrId).toNumber(),
+      preciseDAOFee: convertEthersBigNumberToBigNumberJS(amountOrId).shiftedBy(-Number(decimals)).toNumber(),
+      daoTreasurer: receiver,
       tokenAddress: tokenAddress,
       symbol,
       tokenId: token_id,
