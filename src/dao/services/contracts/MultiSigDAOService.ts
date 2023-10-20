@@ -46,6 +46,8 @@ async function sendCreateMultiSigDAOTransaction(
   const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
   const preciseThreshold = BigNumber(threshold);
   const ownersSolidityAddresses = owners.map((owner) => AccountId.fromString(owner).toSolidityAddress());
+  // TODO: Remove once standing PR Info URL merged
+  const infoUrl = "https://hedera.com";
   const createDaoParams: any[] = [
     daoAdminAddress,
     name,
