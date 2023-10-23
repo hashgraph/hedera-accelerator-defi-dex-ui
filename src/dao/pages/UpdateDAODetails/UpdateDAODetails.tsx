@@ -66,6 +66,7 @@ export function UpdateDAODetails() {
       name: data.name,
       description: data.description,
       logoUrl: data.logoUrl,
+      infoUrl: data.infoUrl,
       webLinks: isEmpty(data.webLinks) ? [] : data.webLinks.map((link) => link.value),
       daoAccountId,
     });

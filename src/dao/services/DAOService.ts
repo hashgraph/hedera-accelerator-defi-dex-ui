@@ -40,7 +40,7 @@ import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
 import { ProposalData } from "../../dex/services/DexService/governance/type";
 import { isNil, isNotNil } from "ramda";
-import { ContractProposalState, GovernanceProposalType, ProposalType } from "@dex/store";
+import { ContractProposalState, GovernanceProposalType } from "@dex/store";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 import { GovernorDAOContractFunctions } from "./contracts";
 
@@ -78,7 +78,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
     const { inputs: initialDAODetails, safeAddress: safeEVMAddress, daoAddress } = argsWithName;
     const owners = await getOwners(safeEVMAddress);
     const threshold = await getThreshold(safeEVMAddress);
-    const { admin, isPrivate, name, description, logoUrl, webLinks } = initialDAODetails;
+    const { admin, isPrivate, name, description, logoUrl, webLinks, infoUrl } = initialDAODetails;
     const updatedDAODetails = await fetchDAOSettingsPageDetails(daoAddress, [DAOEvents.DAOInfoUpdated]);
     return {
       type: DAOType.MultiSig,
@@ -93,6 +93,7 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
       safeEVMAddress,
       ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
       threshold,
+      infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
     };
   });
 
@@ -108,13 +109,14 @@ async function fetchDAOSettingsPageDetails(
     return undefined;
   }
   const argsWithName = getEventArgumentsByName<DAODetailsInfoEventArgs>(log[0].args.daoInfo, ["webLinks"]);
-  const { name, logoUrl, description, webLinks } = argsWithName;
+  const { name, logoUrl, description, webLinks, infoUrl } = argsWithName;
 
   return {
     name,
     logoUrl,
     description,
     webLinks,
+    infoUrl,
   };
 }
 
@@ -163,7 +165,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       adminId: solidityAddressToAccountIdString(admin),
       name: updatedDAODetails?.name ?? name,
       logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
-      infoUrl,
+      infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
       isPrivate,
       title: updatedDAODetails?.name ?? name,
       webLinks: updatedDAODetails?.webLinks ?? webLinks,

@@ -177,20 +177,20 @@
   },
   {
     "name": "multisigdaofactory",
-    "id": "0.0.3761796",
-    "hash": "ee52ab783901383e2fc61b6b30f26e69",
-    "address": "0x0000000000000000000000000000000000396684",
-    "timestamp": "2023-10-03T10:02:35.942Z",
-    "transparentProxyId": "0.0.3761812",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000396694"
+    "id": "0.0.5712569",
+    "hash": "a47bd73bb42da182d10fa07d4b6ac960",
+    "address": "0x0000000000000000000000000000000000572ab9",
+    "timestamp": "2023-10-18T07:17:15.461Z",
+    "transparentProxyId": "0.0.5712571",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000572abb"
   },
   {
     "name": "multisigdao",
-    "id": "0.0.639207",
-    "hash": "cb287314fae0efdcf55ca3d96b31d563",
-    "address": "0x000000000000000000000000000000000009c0e7",
-    "timestamp": "2023-08-22T12:38:15.652Z",
-    "transparentProxyId": "0.0.639286",
-    "transparentProxyAddress": "0x000000000000000000000000000000000009c136"
+    "id": "0.0.5712583",
+    "hash": "f1e47eeb94100d6f0088f0d53f14cf60",
+    "address": "0x0000000000000000000000000000000000572ac7",
+    "timestamp": "2023-10-18T07:18:53.253Z",
+    "transparentProxyId": "0.0.5712588",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000572acc"
   }
 ]

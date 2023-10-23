@@ -26,6 +26,7 @@ interface SendCreateMultiSigDAOTransactionParams {
   admin: string;
   name: string;
   logoUrl: string;
+  infoUrl: string;
   owners: string[];
   description: string;
   daoLinks: string[];
@@ -38,7 +39,8 @@ interface SendCreateMultiSigDAOTransactionParams {
 async function sendCreateMultiSigDAOTransaction(
   params: SendCreateMultiSigDAOTransactionParams
 ): Promise<TransactionResponse> {
-  const { admin, name, logoUrl, owners, threshold, isPrivate, signer, description, daoLinks, daoFeeConfig } = params;
+  const { admin, name, logoUrl, infoUrl, owners, threshold, isPrivate, signer, description, daoLinks, daoFeeConfig } =
+    params;
   const { daoFee, tokenType, tokenId } = daoFeeConfig;
   const multiSigDAOFactoryContractId = ContractId.fromString(Contracts.MultiSigDAOFactory.ProxyId);
   const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
@@ -48,6 +50,7 @@ async function sendCreateMultiSigDAOTransaction(
     daoAdminAddress,
     name,
     logoUrl,
+    infoUrl,
     ownersSolidityAddresses,
     preciseThreshold.toNumber(),
     isPrivate,
@@ -168,15 +171,16 @@ interface UpdateDAODetailsTransactionParams {
   name: string;
   description: string;
   logoUrl: string;
+  infoUrl: string;
   webLinks: string[];
   daoAccountId: string;
   signer: HashConnectSigner;
 }
 
 async function sendUpdateDAODetailsTransaction(params: UpdateDAODetailsTransactionParams) {
-  const { name, description, logoUrl, webLinks, daoAccountId, signer } = params;
+  const { name, description, logoUrl, infoUrl, webLinks, daoAccountId, signer } = params;
   const contractInterface = new ethers.utils.Interface(BaseDAOJSON.abi);
-  const updateDaoParams: any[] = [name, logoUrl, description, webLinks];
+  const updateDaoParams: any[] = [name, logoUrl, infoUrl, description, webLinks];
   const data = contractInterface.encodeFunctionData(BaseDAOContractFunctions.UpdateDAOInfo, updateDaoParams);
   const sendProposeUpdateDAODetailsTransaction = await new ContractExecuteTransaction()
     .setContractId(daoAccountId)

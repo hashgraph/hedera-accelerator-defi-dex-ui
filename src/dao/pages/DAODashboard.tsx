@@ -58,7 +58,7 @@ export function DAODashboard(props: DAODashboardProps) {
   const { accountId: daoAccountId = "" } = useParams();
   const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin, handleMintNFT } =
     props;
-  const { type = "" } = dao ?? {};
+  const { type = "", infoUrl } = dao ?? {};
   const { tokenId, tokenHolderAddress } = (dao || {}) as GovernanceDAODetails | NFTDAODetails;
   const daoTokenHolderQueryResults = useFetchContract(tokenHolderAddress ?? "");
   const daoTokenHolder = daoTokenHolderQueryResults.data?.data.contract_id ?? "";
@@ -131,6 +131,7 @@ export function DAODashboard(props: DAODashboardProps) {
             name={name}
             type={type}
             logoUrl={logoUrl}
+            infoUrl={infoUrl}
             govTokenId={tokenId}
             safeEVMAddress={safeEVMAddress}
             handleMintNFT={handleMintNFT}

@@ -10,7 +10,6 @@ import {
   TokenMintTransaction,
   ContractFunctionParameters,
   Hbar,
-  HbarUnit,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, NFTDAOContractFunctions } from "./types";
 import { DexService, checkTransactionResponseForError } from "@dex/services";
@@ -27,6 +26,7 @@ interface SendCreateNFTDAOTransactionParams {
   logoUrl: string;
   isPrivate: boolean;
   description: string;
+  infoUrl: string;
   daoLinks: string[];
   tokenId: string;
   treasuryWalletAccountId: string;
@@ -46,6 +46,7 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   const {
     name,
     logoUrl,
+    infoUrl,
     treasuryWalletAccountId,
     tokenId,
     quorum,
@@ -64,8 +65,6 @@ async function sendCreateNFTDAOTransaction(params: SendCreateNFTDAOTransactionPa
   const preciseQuorum = BigNumber(Math.round(quorum * 100)); // Quorum is incremented in 1/100th of percent;
   const preciseLockingDuration = BigNumber(lockingDuration);
   const preciseVotingDuration = BigNumber(votingDuration);
-  /* TODO: Replace this with real info url event data */
-  const infoUrl = "info-url";
 
   const createDaoParams: any[] = [
     daoAdminAddress,

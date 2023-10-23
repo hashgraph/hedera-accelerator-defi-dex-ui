@@ -16,6 +16,7 @@ import { Text, FormInput, FormTextArea, FormInputList, DefaultLogoIcon, Color } 
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useState } from "react";
+import { isValidUrl } from "@dex/utils";
 
 export function DAODetailsForm() {
   const {
@@ -95,6 +96,22 @@ export function DAODetailsForm() {
           fallback={<DefaultLogoIcon boxSize="4rem" alignSelf="end" color={Color.Grey_Blue._100} />}
         />
       </Flex>
+      <FormInput<"infoUrl">
+        inputProps={{
+          id: "infoUrl",
+          label: "Info Url",
+          type: "text",
+          placeholder: "Enter the info url of your DAO",
+          register: {
+            ...register("infoUrl", {
+              required: { value: true, message: "An info url is required." },
+              validate: (value) => isValidUrl(value) || "Invalid URL, Please try again.",
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors.infoUrl)}
+        errorMessage={errors.infoUrl && errors.infoUrl.message}
+      />
       {/* TODO: Create independent component for form checkboxes */}
       <FormControl>
         <Controller

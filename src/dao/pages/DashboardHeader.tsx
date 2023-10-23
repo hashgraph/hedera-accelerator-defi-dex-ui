@@ -9,6 +9,7 @@ import {
   Tag,
   DefaultLogoIcon,
   CheckRightIcon,
+  ExternalLink,
 } from "@shared/ui-kit";
 import { DAOType } from "@dao/services";
 import { MintNFTModal } from "./MintNFTModal";
@@ -25,12 +26,23 @@ interface DashboardHeaderProps {
   name: string;
   type: DAOType;
   logoUrl?: string;
+  infoUrl?: string;
   handleMintNFT?: (tokenLinks: string[]) => void;
 }
 
 export function DashboardHeader(props: DashboardHeaderProps) {
-  const { accountEVMAddress, name, type, logoUrl, govTokenId, safeEVMAddress, isMember, isAdmin, handleMintNFT } =
-    props;
+  const {
+    accountEVMAddress,
+    name,
+    type,
+    logoUrl,
+    govTokenId,
+    safeEVMAddress,
+    isMember,
+    isAdmin,
+    infoUrl,
+    handleMintNFT,
+  } = props;
   const navigate = useNavigate();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
@@ -71,6 +83,14 @@ export function DashboardHeader(props: DashboardHeaderProps) {
                   <HStack>
                     <Text.H4_Medium opacity="0.8">SAFE ID:</Text.H4_Medium>
                     <HashScanLink id={safeId} type={HashscanData.Account} />
+                  </HStack>
+                ) : undefined}
+                {infoUrl ? (
+                  <HStack>
+                    <Text.H4_Medium opacity="0.8">For More Info:</Text.H4_Medium>
+                    <ExternalLink to={infoUrl ?? ""}>
+                      <Text.P_Small_Semibold_Link>Click here</Text.P_Small_Semibold_Link>
+                    </ExternalLink>
                   </HStack>
                 ) : undefined}
               </HStack>

@@ -9,6 +9,7 @@ interface UseUpdateDAODetailsParams {
   name: string;
   description: string;
   logoUrl: string;
+  infoUrl: string;
   webLinks: string[];
   daoAccountId: string;
 }

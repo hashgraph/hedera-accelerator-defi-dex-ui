@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { SettingsForm } from "./types";
+import { isValidUrl } from "@dex/utils";
 
 export function UpdateDAODetailsForm() {
   const {
@@ -83,6 +84,22 @@ export function UpdateDAODetailsForm() {
           fallback={<DefaultLogoIcon boxSize="4rem" alignSelf="end" color={Color.Grey_Blue._100} />}
         />
       </Flex>
+      <FormInput<"infoUrl">
+        inputProps={{
+          id: "infoUrl",
+          label: "Info URL",
+          type: "text",
+          placeholder: "Enter the info url of your DAO",
+          register: {
+            ...register("infoUrl", {
+              required: { value: true, message: "A info url is required." },
+              validate: (value) => isValidUrl(value) || "Invalid URL, Please try again.",
+            }),
+          },
+        }}
+        isInvalid={Boolean(errors.infoUrl)}
+        errorMessage={errors.infoUrl && errors.infoUrl.message}
+      />
       <Accordion defaultIndex={[0]} allowMultiple>
         <AccordionItem>
           <Text.P_Medium_Medium>

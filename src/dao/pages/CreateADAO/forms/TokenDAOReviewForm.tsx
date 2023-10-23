@@ -7,7 +7,7 @@ import { shortEnglishHumanizer } from "@dao/pages/utils";
 
 export function TokenDAOReviewForm() {
   const { getValues } = useFormContext<CreateATokenDAOForm>();
-  const { name, description, logoUrl, isPublic, type, governance, voting } = getValues();
+  const { name, description, logoUrl, isPublic, type, governance, voting, infoUrl } = getValues();
   const initialSupplyWithPrecision =
     governance?.tokenType === DAOGovernanceTokenType.ExistingToken
       ? BigNumber(governance?.existingToken?.initialSupply).shiftedBy(-governance?.existingToken?.decimals)
@@ -19,11 +19,13 @@ export function TokenDAOReviewForm() {
         name,
         description,
         logoUrl,
+        infoUrl,
         isPublic: Boolean(isPublic),
         type,
       }}
       governance={[
         <FormInput<"governance.token.name">
+          key="governance.token.name"
           inputProps={{
             id: "governance.token.name",
             label: "Token name",
@@ -36,6 +38,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"governance.token.symbol">
+          key="governance.token.symbol"
           inputProps={{
             id: "governance.token.symbol",
             label: "Token symbol",
@@ -48,6 +51,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"governance.token.id">
+          key="governance.token.id"
           inputProps={{
             id: "governance.token.id",
             label: "Token id",
@@ -60,6 +64,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"governance.token.decimals">
+          key="governance.token.decimals"
           inputProps={{
             id: "governance.token.decimals",
             label: "Decimals",
@@ -73,6 +78,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"governance.token.initialSupply">
+          key="governance.token.initialSupply"
           inputProps={{
             id: "governance.token.initialSupply",
             label: "Initial token supply",
@@ -86,6 +92,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"governance.token.treasuryWalletAccountId">
+          key="governance.token.treasuryWalletAccountId"
           inputProps={{
             id: "governance.token.treasuryWalletAccountId",
             label: "Treasury wallet account id",
@@ -100,6 +107,7 @@ export function TokenDAOReviewForm() {
       ]}
       voting={[
         <FormInput<"voting.quorum">
+          key="voting.quorum"
           inputProps={{
             id: "voting.quorum",
             label: "QUORUM",
@@ -110,6 +118,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"voting.duration">
+          key="voting.duration"
           inputProps={{
             id: "voting.duration",
             label: "VOTING DURATION",
@@ -122,6 +131,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"voting.lockingPeriod">
+          key="voting.lockingPeriod"
           inputProps={{
             id: "voting.lockingPeriod",
             label: "LOCKING PERIOD",
@@ -134,6 +144,7 @@ export function TokenDAOReviewForm() {
           }}
         />,
         <FormInput<"voting.minProposalDeposit">
+          key="voting.minProposalDeposit"
           inputProps={{
             id: "voting.minProposalDeposit",
             label: "MINIMUM PROPOSAL DEPOSIT",
