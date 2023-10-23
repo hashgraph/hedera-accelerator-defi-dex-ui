@@ -2,6 +2,7 @@ import { Box } from "@chakra-ui/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { RangeDatePickerStyles } from "./styles";
+
 interface RangeDatePickerProps {
   id?: string;
   placeholder?: string;

@@ -169,6 +169,7 @@ export enum MultiSigProposeTransactionType {
   ChangeThreshold,
   TypeSetText,
   HBARTokenTransfer,
+  GenericProposal,
 }
 export interface Member {
   name: string;

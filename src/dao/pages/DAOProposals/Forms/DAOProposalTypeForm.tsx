@@ -56,6 +56,11 @@ const MultiSigProposals = [
     label: "Propose to upgrade to the latest version of the DAO's contract.",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
+  {
+    title: DAOProposalType.Generic,
+    label: "Create a new generic proposal.",
+    icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+  },
 ];
 
 const GovernanceProposals = [
@@ -79,6 +84,11 @@ const GovernanceProposals = [
     label: "Propose to upgrade to the latest version of the DAO's contract.",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
+  {
+    title: DAOProposalType.Generic,
+    label: "Create a new generic proposal.",
+    icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+  },
 ];
 
 const NFTProposals = [
@@ -100,6 +110,11 @@ const NFTProposals = [
   {
     title: DAOProposalType.ContractUpgrade,
     label: "Propose to upgrade to the latest version of the DAO's contract.",
+    icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
+  },
+  {
+    title: DAOProposalType.Generic,
+    label: "Create a new generic proposal.",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
 ];

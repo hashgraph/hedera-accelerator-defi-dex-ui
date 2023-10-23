@@ -19,6 +19,7 @@ export * from "./useDepositTokens";
 export * from "./useCreateMultiSigTextProposal";
 export * from "./useCreateMultiSigDAOUpgradeProposal";
 export * from "./useCreateGOVTokenAssociateProposal";
+export * from "./useCreateMultiSigGenericProposal";
 export * from "./useChangeAdmin";
 export * from "./useManageNFTVotingPower";
 export * from "./useFetchLockedNFTToken";

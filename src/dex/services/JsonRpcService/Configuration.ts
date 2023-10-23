@@ -16,7 +16,6 @@ function createConfigurationContract(): ethers.Contract {
  * Fetches all Transaction Fee available for creating a pool.
  * @returns A list of all DEX pair contract addresses.
  */
-
 async function getTransactionFees(): Promise<BigNumber[]> {
   const configurationContract = createConfigurationContract();
   const transactionFee = await configurationContract.getTransactionsFee();

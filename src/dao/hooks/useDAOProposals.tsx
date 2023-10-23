@@ -107,6 +107,8 @@ export function useDAOProposals(
         return ProposalType.TextProposal;
       case MultiSigProposeTransactionType.UpgradeProxy:
         return ProposalType.UpgradeContract;
+      case MultiSigProposeTransactionType.GenericProposal:
+        return ProposalType.TextProposal;
       default:
         return ProposalType.TokenTransfer;
     }

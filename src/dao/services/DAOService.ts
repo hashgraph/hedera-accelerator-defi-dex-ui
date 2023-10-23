@@ -332,6 +332,10 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
             ["address proxy", "address proxyLogic", "address proxyAdmin"],
             ethers.utils.hexDataSlice(event.args.info.data, 4)
           );
+          break;
+        }
+        case MultiSigProposeTransactionType.GenericProposal: {
+          parsedData = event.args.info.data;
         }
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);

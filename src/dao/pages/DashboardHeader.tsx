@@ -70,24 +70,24 @@ export function DashboardHeader(props: DashboardHeaderProps) {
               </HStack>
               <HStack>
                 <HStack>
-                  <Text.H4_Medium opacity="0.8">DAO ID:</Text.H4_Medium>
+                  <Text.H6_Medium opacity="0.8">DAO ID:</Text.H6_Medium>
                   {daoAccountId && <HashScanLink id={daoAccountId} type={HashscanData.Account} />}
                 </HStack>
                 {govTokenId ? (
                   <HStack>
-                    <Text.H4_Medium opacity="0.8">{`${token?.data.symbol} TOKEN ID:`}</Text.H4_Medium>
+                    <Text.H6_Medium opacity="0.8">{`${token?.data.symbol} TOKEN ID:`}</Text.H6_Medium>
                     <HashScanLink id={govTokenId} type={HashscanData.Token} />
                   </HStack>
                 ) : undefined}
                 {safeId ? (
                   <HStack>
-                    <Text.H4_Medium opacity="0.8">SAFE ID:</Text.H4_Medium>
+                    <Text.H6_Medium opacity="0.8">SAFE ID:</Text.H6_Medium>
                     <HashScanLink id={safeId} type={HashscanData.Account} />
                   </HStack>
                 ) : undefined}
                 {infoUrl ? (
                   <HStack>
-                    <Text.H4_Medium opacity="0.8">For More Info:</Text.H4_Medium>
+                    <Text.H6_Medium opacity="0.8">For More Info:</Text.H6_Medium>
                     <ExternalLink to={infoUrl ?? ""}>
                       <Text.P_Small_Semibold_Link>Click here</Text.P_Small_Semibold_Link>
                     </ExternalLink>
