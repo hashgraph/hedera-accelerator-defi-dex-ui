@@ -404,7 +404,6 @@ const createTextProposal = async (params: CreateTextProposalParams) => {
     signer,
   });
 };
-
 interface SetUpAllowanceParams {
   tokenId: string;
   nftSerialId: number;

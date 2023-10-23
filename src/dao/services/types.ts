@@ -158,11 +158,14 @@ export enum DAOEvents {
   Upgraded = "Upgraded",
   UpdatedAmount = "UpdatedAmount",
   DAOConfig = "FeeConfigUpdated",
+  FeeConfigControllerChanged = "FeeConfigControllerChanged",
+  UpdatedUsers = "UpdatedUsers",
 }
 
 export enum HederaGnosisSafeFunctions {
   ApproveHash = "approveHash",
   ExecuteTransaction = "executeTransaction",
+  ChangeFeeConfigController = "changeFeeConfigController",
 }
 
 export enum MultiSigProposeTransactionType {
@@ -176,6 +179,7 @@ export enum MultiSigProposeTransactionType {
   ChangeThreshold,
   TypeSetText,
   HBARTokenTransfer,
+  GenericProposal,
 }
 export interface Member {
   name: string;

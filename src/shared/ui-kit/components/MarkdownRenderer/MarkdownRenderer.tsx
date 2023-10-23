@@ -32,7 +32,7 @@ const BlockQuoteStyles = {
 
 const BlockQuoteTextStyles = { marginLeft: "0.5rem" };
 
-const CodeStyles = {
+export const CodeStyles = {
   backgroundColor: Color.Neutral._200,
   padding: "0.05rem 0.2rem",
   borderRadius: "0.25rem",

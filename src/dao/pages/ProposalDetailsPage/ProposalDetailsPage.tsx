@@ -6,7 +6,13 @@ import { ProposalDetailsStepper } from "./ProposalDetailsStepper";
 import { ProposalVoteDetails } from "./ProposalVoteDetails";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useHandleTransactionSuccess } from "@dex/hooks";
-import { useExecuteProposal, useApproveProposal, useChangeAdmin, DAOUpgradeProposal } from "@dao/hooks";
+import {
+  useExecuteProposal,
+  useApproveProposal,
+  useChangeAdmin,
+  DAOUpgradeProposal,
+  useTransferOwnership,
+} from "@dao/hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
 import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
 import { DAOType } from "@dao/services";
@@ -23,6 +29,7 @@ export function ProposalDetailsPage() {
   const executeProposalMutation = useExecuteProposal(handleExecuteProposalSuccess);
   const changeAdminMutation = useChangeAdmin(handleExecuteProposalSuccess);
   const handleTransactionSuccess = useHandleTransactionSuccess();
+  const transferOwnershipMutation = useTransferOwnership(handleTransferOwnershipSuccess);
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposalMutation;
 
   function handleApproveProposalSuccess(transactionResponse: TransactionResponse) {
@@ -34,6 +41,12 @@ export function ProposalDetailsPage() {
   function handleExecuteProposalSuccess(transactionResponse: TransactionResponse) {
     executeProposalMutation.reset();
     const message = "Proposal has been executed.";
+    handleTransactionSuccess(transactionResponse, message);
+  }
+
+  function handleTransferOwnershipSuccess(transactionResponse: TransactionResponse) {
+    transferOwnershipMutation.reset();
+    const message = "Ownership has been transferred";
     handleTransactionSuccess(transactionResponse, message);
   }
 
@@ -91,6 +104,10 @@ export function ProposalDetailsPage() {
       link,
       isContractUpgradeProposal,
       data,
+      showTransferOwnerShip,
+      currentOwner,
+      targetId,
+      feeConfigControllerUser,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
@@ -147,12 +164,17 @@ export function ProposalDetailsPage() {
                 msgValue={msgValue}
                 operation={operation}
                 nonce={nonce}
+                targetId={targetId}
                 approveProposalMutation={approveProposalMutation}
                 executeProposalMutation={executeProposalMutation}
                 isContractUpgradeProposal={isContractUpgradeProposal}
                 changeAdminMutation={changeAdminMutation}
                 proxyAddress={proxyId}
                 proxyAdmin={proxyAdmin}
+                showTransferOwnerShip={showTransferOwnerShip}
+                currentOwner={currentOwner}
+                feeConfigControllerUser={feeConfigControllerUser}
+                transferOwnershipMutation={transferOwnershipMutation}
               />
             ) : (
               <ProposalVoteDetails />

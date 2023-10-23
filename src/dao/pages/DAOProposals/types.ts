@@ -1,4 +1,6 @@
 import { TokenBalance } from "@dex/hooks";
+import { UploadedFile } from "@shared/ui-kit";
+import { AbiInternalType, AbiParameter } from "abitype";
 
 export enum DAOProposalType {
   Text = "Text",
@@ -11,6 +13,7 @@ export enum DAOProposalType {
   RemoveMember = "Remove Member",
   Message = "Message",
   ContractUpgrade = "Upgrade DAO",
+  Generic = "Generic",
 }
 
 export interface CreateDAOProposalFormBase {
@@ -60,13 +63,52 @@ export interface CreateDAOContractUpgradeForm extends CreateDAOProposalFormBase 
   nftTokenSerialId?: number;
 }
 
+type ResolvedAbiType = string;
+
+export type Argument = StandardArgument | TupleArgument;
+
+export type StandardArgument = {
+  type: ResolvedAbiType;
+  transformedValue: any | undefined;
+} & BaseArgumentFields;
+
+export type TupleArgument = {
+  type: "tuple" | `tuple[${string}]`;
+  components: readonly Argument[];
+} & BaseArgumentFields;
+
+type BaseArgumentFields = {
+  name?: string | undefined;
+  internalType?: AbiInternalType | undefined;
+  inputValue: string;
+  transformedValue: any | undefined;
+};
+
+export type AbiTupleParameter = {
+  type: "tuple" | `tuple[${string}]`;
+  name?: string | undefined;
+  internalType?: AbiInternalType | undefined;
+  inputValue: string;
+  components: readonly AbiParameter[];
+};
+
+export interface CreateDAOGenericProposalForm extends CreateDAOProposalFormBase {
+  linkToDiscussion: string;
+  targetContractId: string;
+  abiFile: UploadedFile;
+  functionName: string;
+  functionArguments: Argument[];
+  encodedFunctionData: string;
+}
+
 export type CreateDAOProposalForm =
   | CreateDAOTextProposalForm
   | CreateDAOTokenTransferForm
   | CreateDAOMemberOperationForm
   | CreateDAOUpgradeThresholdForm
   | CreateDAOContractUpgradeForm
-  | CreateDAOTokenAssociateForm;
+  | CreateDAOTokenAssociateForm
+  | CreateDAOGenericProposalForm;
 
 export type CreateDAOProposalContext = {
   daoType: string;

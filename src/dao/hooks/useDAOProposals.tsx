@@ -12,6 +12,7 @@ import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
+import { Contracts } from "@dex/services";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
@@ -107,6 +108,8 @@ export function useDAOProposals(
         return ProposalType.TextProposal;
       case MultiSigProposeTransactionType.UpgradeProxy:
         return ProposalType.UpgradeContract;
+      case MultiSigProposeTransactionType.GenericProposal:
+        return ProposalType.GenericProposal;
       default:
         return ProposalType.TokenTransfer;
     }
@@ -122,6 +125,22 @@ export function useDAOProposals(
       const daoAndSafeLogs = logs ? logs.flat() : [];
       const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
+
+      const getCurrentOwnerOfDAO = async () => {
+        const logs = await DexService.fetchContractLogs(Contracts.MultiSigDAOFactory.ProxyId);
+        const currentOwnerEvents =
+          decodeLog(abiSignatures, logs, [DAOEvents.FeeConfigControllerChanged]).get(
+            DAOEvents.FeeConfigControllerChanged
+          ) ?? [];
+        return (await DexService.fetchContractId(currentOwnerEvents[0].newController)).toString();
+      };
+
+      const getFeeConfigControllerUser = async () => {
+        const logs = await DexService.fetchContractLogs(Contracts.SystemRoleBasedAccess.ProxyId);
+        const currentOwnerEvents =
+          decodeLog(abiSignatures, logs, [DAOEvents.UpdatedUsers]).get(DAOEvents.UpdatedUsers) ?? [];
+        return solidityAddressToAccountIdString(currentOwnerEvents[0].users.feeConfigControllerUser);
+      };
       const proposals: Proposal[] = await Promise.all(
         groupedProposalEntries.map(async ([transactionHash, proposalLogs], index) => {
           const proposalInfo: any = proposalLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
@@ -165,6 +184,10 @@ export function useDAOProposals(
             parsedData = { ...upgradeProposalData, proxyAdmin, proxyLogic, currentLogic };
             isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
           }
+          const isGenericProposal = proposalType === ProposalType.GenericProposal;
+          const feeConfigControllerUser = isGenericProposal ? await getFeeConfigControllerUser() : "";
+          const currentOwner = isGenericProposal ? await getCurrentOwnerOfDAO() : "";
+          const targetId = isGenericProposal ? (await DexService.fetchContractId(to)).toString() : "";
           const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
           const tokenId = token ? solidityAddressToTokenIdString(token) : "";
           if (!!tokenId && !tokenDataCache.has(tokenId)) {
@@ -200,6 +223,10 @@ export function useDAOProposals(
             link: linkToDiscussion,
             threshold,
             isContractUpgradeProposal,
+            showTransferOwnerShip: isGenericProposal && isThresholdReached,
+            currentOwner,
+            targetId,
+            feeConfigControllerUser,
           };
         })
       );

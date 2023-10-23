@@ -221,6 +221,7 @@ async function sendDAOTokenAssociateTransaction(params: TokenAssociateTransactio
   );
   return sendProposeTokenAssociationResponse;
 }
+
 interface DepositTokensTransactionParams {
   safeId: string;
   tokenId: string;
