@@ -15,3 +15,4 @@ export * from "./DAOContractUpgradeReviewForm";
 export * from "./DAOContractUpgradeDetailsForm";
 export * from "./DAOTokenAssociateDetailsForm";
 export * from "./DAOTokenAssociateReviewForm";
+export * from "./DAOGenericProposal";

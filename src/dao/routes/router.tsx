@@ -72,6 +72,8 @@ export const router = createBrowserRouter(
         <Route path={Routes.DAOTextProposalReview} element={<Pages.DAOTextProposalReviewForm />} />
         <Route path={Routes.DAOTokenAssociateDetails} element={<Pages.DAOTokenAssociateDetailsForm />} />
         <Route path={Routes.DAOTokenAssociateReview} element={<Pages.DAOTokenAssociateReviewForm />} />
+        <Route path={Routes.DAOGenericProposalDetails} element={<Pages.DAOGenericProposalDetailsForm />} />
+        <Route path={Routes.DAOGenericProposalReview} element={<Pages.DAOGenericProposalReviewForm />} />
       </Route>
       <Route path={`${Routes.NFT}/:accountId/new-proposal`} element={<Pages.CreateDAOProposal />}>
         <Route index element={<Navigate to={Routes.DAOProposalType} />} />
@@ -84,6 +86,8 @@ export const router = createBrowserRouter(
         <Route path={Routes.DAOContractUpgradeReview} element={<Pages.DAOContractUpgradeReviewForm />} />
         <Route path={Routes.DAOTokenAssociateDetails} element={<Pages.DAOTokenAssociateDetailsForm />} />
         <Route path={Routes.DAOTokenAssociateReview} element={<Pages.DAOTokenAssociateReviewForm />} />
+        <Route path={Routes.DAOGenericProposalDetails} element={<Pages.DAOGenericProposalDetailsForm />} />
+        <Route path={Routes.DAOGenericProposalReview} element={<Pages.DAOGenericProposalReviewForm />} />
       </Route>
       <Route path={`${Routes.Multisig}/:accountId/new-proposal`} element={<Pages.CreateDAOProposal />}>
         <Route index element={<Navigate to={Routes.DAOProposalType} />} />
@@ -104,6 +108,8 @@ export const router = createBrowserRouter(
         <Route path={Routes.DAOTokenAssociateReview} element={<Pages.DAOTokenAssociateReviewForm />} />
         <Route path={Routes.DAOContractUpgradeDetails} element={<Pages.DAOContractUpgradeDetailsForm />} />
         <Route path={Routes.DAOContractUpgradeReview} element={<Pages.DAOContractUpgradeReviewForm />} />
+        <Route path={Routes.DAOGenericProposalDetails} element={<Pages.DAOGenericProposalDetailsForm />} />
+        <Route path={Routes.DAOGenericProposalReview} element={<Pages.DAOGenericProposalReviewForm />} />
       </Route>
       <Route path={`${Routes.Multisig}/:accountId/settings/change-dao-details`} element={<Pages.UpdateDAODetails />}>
         <Route index element={<Navigate to={Routes.DetailsStep} />} />

@@ -60,7 +60,7 @@ interface MirrorNodeAccountById {
 }
 
 interface MirrorNodeTokenPairResponse {
-  data: { contract_id: string; evm_address: string };
+  data: { contract_id: string; evm_address: string; account: string };
 }
 
 interface MirrorNodeTokenBalance {

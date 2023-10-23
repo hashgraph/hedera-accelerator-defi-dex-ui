@@ -8,6 +8,9 @@ import {
   CreateDAOUpgradeThresholdForm,
   CreateDAOTokenAssociateForm,
   DAOProposalType,
+  CreateDAOGenericProposalForm,
+  Argument,
+  TupleArgument,
 } from "./types";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page } from "@dex/layouts";
 import { Routes } from "@dao/routes";
@@ -32,6 +35,7 @@ import {
   useCreateGOVTokenAssociateProposal,
   useFetchContract,
   usePinToIPFS,
+  useCreateMultiSigGenericProposal,
 } from "@dao/hooks";
 import { useHandleTransactionSuccess, useAccountTokenBalances } from "@dex/hooks";
 import { isEmpty, isNil } from "ramda";
@@ -40,6 +44,8 @@ import { getLastPathInRoute } from "@dex/utils";
 import { getDAOType, getPreviousMemberAddress } from "../utils";
 import { PinataPinResponse } from "@pinata/sdk";
 import { Button, Flex } from "@chakra-ui/react";
+import { ethers } from "ethers";
+import { SolidityTuple } from "abitype/zod";
 
 export function CreateDAOProposal() {
   const { accountId: daoAccountId = "" } = useParams();
@@ -68,6 +74,9 @@ export function CreateDAOProposal() {
   const {
     trigger,
     getValues,
+    setValue,
+    setError,
+    clearErrors,
     watch,
     reset: resetForm,
     formState: { isSubmitting },
@@ -206,6 +215,15 @@ export function CreateDAOProposal() {
     reset: resetCreateMultiSigUpgradeProposal,
   } = sendMultiSigDAOUpgradeProposalResults;
 
+  const sendGenericProposalResutls = useCreateMultiSigGenericProposal(handleCreateDAOProposalSuccess);
+  const {
+    isLoading: isCreateMultiSigGenericProposalLoading,
+    isError: isCreateMultiSigGenericProposalFailed,
+    error: isCreateMultiSigGenericProposalError,
+    mutate: createMultiSigGenericProposal,
+    reset: resetCreateMultiSigGenericProposal,
+  } = sendGenericProposalResutls;
+
   const isLoading =
     isCreateMultisigTokenTransferLoading ||
     isCreateGOVTokenTransferLoading ||
@@ -219,7 +237,8 @@ export function CreateDAOProposal() {
     isCreateGOVTokenAssociateProposalLoading ||
     isCreateMultiSigTextProposalLoading ||
     isCreateMultiSigUpgradeProposalLoading ||
-    isPinningToIPFSLoading;
+    isPinningToIPFSLoading ||
+    isCreateMultiSigGenericProposalLoading;
 
   const isError =
     isCreateMultisigTokenTransferFailed ||
@@ -234,7 +253,8 @@ export function CreateDAOProposal() {
     isCreateGOVTokenAssociateProposalFailed ||
     isCreateMultiSigTextProposalFailed ||
     isCreateMultiSigUpgradeProposalFailed ||
-    isPinningToIPFSFailed;
+    isPinningToIPFSFailed ||
+    isCreateMultiSigGenericProposalFailed;
 
   const steps = [
     {
@@ -269,6 +289,7 @@ export function CreateDAOProposal() {
     resetCreateMultiSigTextProposal();
     resetCreateMultiSigUpgradeProposal();
     resetPinMetadataToIPFS();
+    resetCreateMultiSigGenericProposal();
   }
 
   function reset() {
@@ -290,6 +311,7 @@ export function CreateDAOProposal() {
     if (isCreateMultiSigTextProposalError) return isCreateMultiSigTextProposalError.message;
     if (isCreateMultiSigUpgradeProposalError) return isCreateMultiSigUpgradeProposalError.message;
     if (isPinningToIPFSError) return isPinningToIPFSError.response?.data.error || isPinningToIPFSError.message;
+    if (isCreateMultiSigGenericProposalError) return isCreateMultiSigGenericProposalError.message;
     return "";
   }
 
@@ -563,6 +585,26 @@ export function CreateDAOProposal() {
             return;
         }
       }
+      case DAOProposalType.Generic: {
+        const { title, description, linkToDiscussion, encodedFunctionData, targetContractId } =
+          data as CreateDAOGenericProposalForm;
+        switch (getDAOType(currentDaoType)) {
+          case DAOType.MultiSig:
+            return createMultiSigGenericProposal({
+              title,
+              description,
+              linkToDiscussion,
+              daoType: DAOType.MultiSig,
+              functionData: encodedFunctionData,
+              targetContractId,
+              multiSigDAOContractId: daoAccountId,
+            });
+          case DAOType.GovernanceToken:
+          case DAOType.NFT:
+          default:
+            return;
+        }
+      }
     }
   }
 
@@ -589,6 +631,10 @@ export function CreateDAOProposal() {
       case DAOProposalType.TokenAssociate:
         return `/${currentDaoType}/${daoAccountId}/`.concat(
           `${Routes.CreateDAOProposal}/${Routes.DAOTokenAssociateDetails}`
+        );
+      case DAOProposalType.Generic:
+        return `/${currentDaoType}/${daoAccountId}/`.concat(
+          `${Routes.CreateDAOProposal}/${Routes.DAOGenericProposalDetails}`
         );
       default:
         return "";
@@ -617,9 +663,21 @@ export function CreateDAOProposal() {
         );
       case DAOProposalType.TokenAssociate:
         return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOTokenAssociateReview}`;
+      case DAOProposalType.Generic:
+        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOGenericProposalReview}`;
       default:
         return "";
     }
+  }
+
+  function transformArgs(args: readonly Argument[]): any[] {
+    return args.map((arg: Argument) => {
+      if (SolidityTuple.safeParse(arg.type).success) {
+        const tupleArg = arg as TupleArgument;
+        return transformArgs(tupleArg.components);
+      }
+      return arg.transformedValue;
+    });
   }
 
   async function ValidateDetailsForm(): Promise<boolean> {
@@ -645,8 +703,16 @@ export function CreateDAOProposal() {
               "oldProxyAddress",
               "newImplementationAddress",
               "nftTokenSerialId",
+              "proxyAdmin",
             ])
-          : trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
+          : trigger([
+              "title",
+              "description",
+              "linkToDiscussion",
+              "oldProxyAddress",
+              "newImplementationAddress",
+              "proxyAdmin",
+            ]);
       case DAOProposalType.TokenTransfer: {
         return currentDaoType === Routes.Multisig
           ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])
@@ -654,6 +720,41 @@ export function CreateDAOProposal() {
       }
       case DAOProposalType.TokenAssociate:
         return trigger(["tokenId", "title", "description", "linkToDiscussion"]);
+      case DAOProposalType.Generic: {
+        await trigger([
+          "title",
+          "description",
+          "linkToDiscussion",
+          "targetContractId",
+          "functionName",
+          "functionArguments",
+        ]);
+        const { abiFile, functionName, functionArguments } = getValues() as CreateDAOGenericProposalForm;
+        let abiFileJSON;
+        try {
+          abiFileJSON = JSON.parse(abiFile.file);
+          const contractInterface = new ethers.utils.Interface(abiFileJSON.abi);
+          const transformedArgs = transformArgs(functionArguments);
+          const proposalData = contractInterface.encodeFunctionData(functionName, transformedArgs);
+          clearErrors();
+          setValue("encodedFunctionData", proposalData);
+        } catch (error: any) {
+          setError("encodedFunctionData", {
+            message: `${error}` ?? "Error encoding function data.",
+          });
+          setValue("encodedFunctionData", "");
+          return Promise.resolve(false);
+        }
+        return trigger([
+          "title",
+          "description",
+          "linkToDiscussion",
+          "targetContractId",
+          "functionName",
+          "functionArguments",
+          "encodedFunctionData",
+        ]);
+      }
       default:
         return Promise.resolve(true);
     }

@@ -43,4 +43,6 @@ export const Routes = {
   DAOContractUpgradeReview: "contract-upgrade/review",
   DAOTokenAssociateDetails: "token-associate/details",
   DAOTokenAssociateReview: "token-associate/review",
+  DAOGenericProposalDetails: "generic-proposal/details",
+  DAOGenericProposalReview: "generic-proposal/review",
 };

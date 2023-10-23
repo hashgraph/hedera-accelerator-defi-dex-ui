@@ -339,6 +339,10 @@ export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers
             ["address proxy", "address proxyLogic", "address proxyAdmin"],
             ethers.utils.hexDataSlice(event.args.info.data, 4)
           );
+          break;
+        }
+        case MultiSigProposeTransactionType.GenericProposal: {
+          parsedData = event.args.info.data;
         }
       }
       const eventClone: ethers.utils.LogDescription = structuredClone(event);
@@ -701,6 +705,28 @@ export async function sendChangeAdminForProposalTransaction(
   const changeAdminTransactionResponse = await changeAdminTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(changeAdminTransactionResponse, HederaGnosisSafeFunctions.ApproveHash);
   return changeAdminTransactionResponse;
+}
+
+export interface SendTransferOwnershipTransactionParams {
+  newOwnerEVMAddress: string;
+  targetAddress: string;
+  signer: HashConnectSigner;
+}
+export async function sendTransferOwnershipTransaction(params: SendTransferOwnershipTransactionParams) {
+  const { newOwnerEVMAddress, targetAddress, signer } = params;
+  const targetContractId = await DexService.fetchContractId(targetAddress);
+  const contractFunctionParameters = new ContractFunctionParameters().addAddress(newOwnerEVMAddress);
+  const transferOwnershipTransaction = await new ContractExecuteTransaction()
+    .setContractId(targetContractId)
+    .setFunction(HederaGnosisSafeFunctions.ChangeFeeConfigController, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const transferOwnershipTransactionResponse = await transferOwnershipTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(
+    transferOwnershipTransactionResponse,
+    HederaGnosisSafeFunctions.ChangeFeeConfigController
+  );
+  return transferOwnershipTransactionResponse;
 }
 
 interface ExecuteMultiSigTransactionParams {

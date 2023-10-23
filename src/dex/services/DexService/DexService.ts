@@ -36,6 +36,7 @@ function createDexService() {
     fetchCanUserClaimGODTokens,
     proposeMultiSigTextProposal: daoSDK.proposeMultiSigTextProposal,
     sendChangeAdminForProposalTransaction: daoSDK.sendChangeAdminForProposalTransaction,
+    sendTransferOwnershipTransaction: daoSDK.sendTransferOwnershipTransaction,
   };
 }
 

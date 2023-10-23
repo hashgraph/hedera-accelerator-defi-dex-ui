@@ -16,6 +16,7 @@ import {
   UseApproveProposalMutationResult,
   UseExecuteProposalMutationResult,
   UseChangeAdminMutationResult,
+  UseTransferOwnershipMutationResult,
   ProposalStatus,
   useFetchContract,
 } from "@dao/hooks";
@@ -37,6 +38,11 @@ interface ProposalConfirmationDetailsProps {
   executeProposalMutation: UseExecuteProposalMutationResult;
   changeAdminMutation: UseChangeAdminMutationResult;
   isContractUpgradeProposal?: boolean;
+  transferOwnershipMutation: UseTransferOwnershipMutationResult;
+  showTransferOwnerShip?: boolean;
+  currentOwner?: string;
+  feeConfigControllerUser?: string;
+  targetId?: string;
   proxyAddress?: string;
   proxyAdmin?: string;
 }
@@ -63,6 +69,11 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     isContractUpgradeProposal = false,
     proxyAddress = "",
     proxyAdmin = "",
+    showTransferOwnerShip,
+    currentOwner = "",
+    targetId = "",
+    feeConfigControllerUser = "",
+    transferOwnershipMutation,
   } = props;
 
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress);
@@ -99,6 +110,10 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
 
   async function handleClickChangeAdminTransaction(safeAccountId: string, proxyAddress: string) {
     changeAdminMutation.mutate({ safeAccountId, proxyAddress });
+  }
+
+  async function handleTransferOwnerShipClickTransaction() {
+    transferOwnershipMutation.mutate({ newOwnerEVMAddress: safeEVMAddress, targetAddress: to });
   }
 
   const ConfirmationDetailsButtons: Readonly<{ [key in ProposalStatus]: JSX.Element }> = {
@@ -138,21 +153,42 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
       </Button>
     ),
     [ProposalStatus.Queued]: (
-      <Button
-        variant="primary"
-        onClick={() =>
-          handleClickExecuteTransaction({
-            safeAccountId,
-            to,
-            msgValue,
-            hexStringData,
-            operation,
-            nonce,
-          })
-        }
-      >
-        Execute
-      </Button>
+      <Flex direction="column" gap="1rem">
+        {showTransferOwnerShip ? (
+          <>
+            <InlineAlert
+              type={InlineAlertType.Warning}
+              message={`Connect your wallet with ${feeConfigControllerUser} 
+              to transfer the ownership of factory (${targetId}) to safe (${safeAccountId})`}
+            />
+            <InlineAlert type={InlineAlertType.Info} message={`Current Owner ${currentOwner}`} />
+            <Button
+              variant="primary"
+              isDisabled={connectedWalletId !== feeConfigControllerUser}
+              onClick={() => {
+                handleTransferOwnerShipClickTransaction();
+              }}
+            >
+              Transfer Ownership To DAO
+            </Button>
+          </>
+        ) : undefined}
+        <Button
+          variant="primary"
+          onClick={() =>
+            handleClickExecuteTransaction({
+              safeAccountId,
+              to,
+              msgValue,
+              hexStringData,
+              operation,
+              nonce,
+            })
+          }
+        >
+          Execute
+        </Button>
+      </Flex>
     ),
     [ProposalStatus.Success]: <></>,
     [ProposalStatus.Failed]: <></>,

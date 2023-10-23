@@ -47,3 +47,4 @@ export * from "./SendTokenIcon";
 export * from "./SettingsToolIcon";
 export * from "./CheckRightIcon";
 export * from "./GithubIcon";
+export * from "./FileIcon";
