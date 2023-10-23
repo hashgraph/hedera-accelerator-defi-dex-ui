@@ -112,7 +112,7 @@ export function CreateADAOPage() {
     {
       label: "Details",
       route: `/${Routes.Create}/${Routes.DAODetails}`,
-      validate: async () => trigger(["name", "logoUrl", "isPublic", "description"]),
+      validate: async () => trigger(["name", "logoUrl", "isPublic", "description", "infoUrl"]),
     },
     {
       label: "Type",
@@ -138,7 +138,7 @@ export function CreateADAOPage() {
   ];
 
   async function onSubmit(data: CreateADAOForm) {
-    const { type, name, isPublic, description, daoLinks = [], logoUrl = "" } = data;
+    const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl } = data;
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
       const { governance, voting } = tokenDAOData;
@@ -147,6 +147,7 @@ export function CreateADAOPage() {
         name,
         logoUrl,
         description,
+        infoUrl,
         daoLinks: daoLinks.map((link) => link.value),
         isPrivate: !isPublic,
         tokenId:
@@ -174,6 +175,7 @@ export function CreateADAOPage() {
         admin: governance.admin,
         name,
         logoUrl,
+        infoUrl,
         owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
@@ -189,6 +191,7 @@ export function CreateADAOPage() {
         description,
         daoLinks: daoLinks.map((link) => link.value),
         logoUrl,
+        infoUrl,
         isPrivate: !isPublic,
         tokenId:
           governance.tokenType === DAONFTTokenType.NewNFT

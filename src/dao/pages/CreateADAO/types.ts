@@ -90,6 +90,7 @@ export interface CreateADAOFormBase {
   name: string;
   description: string;
   logoUrl?: string;
+  infoUrl: string;
   isPublic?: boolean;
   daoLinks: Record<"value", string>[];
   type: DAOType;

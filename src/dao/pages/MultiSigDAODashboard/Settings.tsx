@@ -1,6 +1,6 @@
 import { Button, Divider, Flex, SimpleGrid, IconButton, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { Text, RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon } from "@shared/ui-kit";
+import { Text, RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon, ExternalLink } from "@shared/ui-kit";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./types";
 import { Member } from "@dao/services";
@@ -19,7 +19,7 @@ export function Settings() {
   const { accountId: daoAccountId = "" } = useParams();
   const navigate = useNavigate();
   const { dao, members } = useOutletContext<MultiSigDAODetailsContext>();
-  const { name, logoUrl, description, webLinks, adminId, threshold } = dao;
+  const { name, logoUrl, description, webLinks, adminId, threshold, infoUrl } = dao;
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   const { isWalletPaired, walletId } = usePairedWalletDetails();
   const isAdmin = isWalletPaired && walletId === dao.adminId;
@@ -186,6 +186,12 @@ export function Settings() {
           <Flex direction="column" gap="1">
             <Text.P_Small_Medium>Description</Text.P_Small_Medium>
             <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
+          </Flex>
+          <Flex direction="column" gap="1">
+            <Text.P_Small_Medium>INFO URL</Text.P_Small_Medium>
+            <ExternalLink to={infoUrl ?? ""}>
+              <Text.P_Small_Semibold_Link>{infoUrl}</Text.P_Small_Semibold_Link>
+            </ExternalLink>
           </Flex>
           <Flex direction="column" gap="1">
             <Text.P_Small_Medium>Social Channels</Text.P_Small_Medium>

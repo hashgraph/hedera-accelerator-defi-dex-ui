@@ -11,7 +11,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { ReactElement, cloneElement } from "react";
-import { Text, FormInput, Tag } from "@shared/ui-kit";
+import { Text, FormInput, Tag, ExternalLink } from "@shared/ui-kit";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { DAOType } from "@dao/services";
 import { DefaultLogoIcon, Color } from "@shared/ui-kit";
@@ -21,6 +21,7 @@ interface DAOReviewFormProps {
     name: string;
     description: string;
     logoUrl: string | undefined;
+    infoUrl: string | undefined;
     isPublic: boolean;
     type: DAOType | undefined;
   };
@@ -73,6 +74,12 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
                     isReadOnly: true,
                   }}
                 />
+                <Flex direction="column" gap="1">
+                  <Text.P_XSmall_Medium color={Color.Neutral._500}>INFO URL</Text.P_XSmall_Medium>
+                  <ExternalLink to={details.infoUrl ?? ""}>
+                    <Text.P_Small_Semibold_Link>{details.infoUrl}</Text.P_Small_Semibold_Link>
+                  </ExternalLink>
+                </Flex>
                 <Checkbox isChecked={details.isPublic} isReadOnly>
                   List DAO publicly
                 </Checkbox>

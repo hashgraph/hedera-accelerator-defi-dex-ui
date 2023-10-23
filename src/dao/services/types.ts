@@ -63,6 +63,7 @@ export interface MultiSigDAOCreatedEventArgs {
 export interface DAODetailsInfoEventArgs {
   name: string;
   logoUrl: string;
+  infoUrl: string;
   description: string;
   webLinks: string[];
 }
@@ -113,6 +114,7 @@ export interface MultiSigDAODetails {
   type: DAOType.MultiSig;
   title: string;
   description: string;
+  infoUrl: string | undefined;
   accountEVMAddress: string;
   adminId: string;
   name: string;
@@ -128,6 +130,7 @@ export interface DAOSettingsDetails {
   name: string;
   description: string;
   logoUrl: string;
+  infoUrl: string;
   webLinks: string[];
 }
 

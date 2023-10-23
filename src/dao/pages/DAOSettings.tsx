@@ -1,5 +1,5 @@
 import { Button, Divider, Flex, SimpleGrid, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
-import { Text, Color, MetricLabel, DefaultLogoIcon } from "@shared/ui-kit";
+import { Text, Color, MetricLabel, DefaultLogoIcon, ExternalLink } from "@shared/ui-kit";
 import { useOutletContext, useNavigate, Link as ReachLink } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
@@ -9,7 +9,7 @@ import { Routes } from "@dao/routes";
 
 export function DAOSettings() {
   const { dao, FTToken } = useOutletContext<GovernanceDAODetailsContext>();
-  const { name, logoUrl, description, webLinks, adminId } = dao;
+  const { name, logoUrl, description, webLinks, adminId, infoUrl } = dao;
   const daoLinkRecords = getDAOLinksRecordArray(webLinks);
   const { isWalletPaired, walletId } = usePairedWalletDetails();
   const isAdmin = isWalletPaired && walletId === adminId;
@@ -134,6 +134,12 @@ export function DAOSettings() {
           <Flex direction="column" gap="1">
             <Text.P_Small_Medium>Description</Text.P_Small_Medium>
             <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
+          </Flex>
+          <Flex direction="column" gap="1">
+            <Text.P_Small_Medium>INFO URL</Text.P_Small_Medium>
+            <ExternalLink to={infoUrl ?? ""}>
+              <Text.P_Small_Semibold_Link>{infoUrl}</Text.P_Small_Semibold_Link>
+            </ExternalLink>
           </Flex>
           <Flex direction="column" gap="1">
             <Text.P_Small_Medium>Social Channels</Text.P_Small_Medium>

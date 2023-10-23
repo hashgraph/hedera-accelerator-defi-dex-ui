@@ -6,12 +6,16 @@ import { DAOType } from "@dao/services";
 import { HandleOnSuccess, useDexContext } from "@dex/hooks";
 import { isNil } from "ramda";
 
-interface UseCreateGovernanceDAOParams {
+interface UseCreateDAOParamsBase {
   name: string;
   description: string;
   daoLinks: string[];
   logoUrl: string;
   isPrivate: boolean;
+  infoUrl: string;
+}
+
+interface UseCreateGovernanceDAOParams extends UseCreateDAOParamsBase {
   treasuryWalletAccountId: string;
   tokenId: string;
   quorum: number;
@@ -20,12 +24,7 @@ interface UseCreateGovernanceDAOParams {
   daoFeeConfig: DAOConfigDetails | undefined;
 }
 
-interface UseCreateNFTDAOParams {
-  name: string;
-  logoUrl: string;
-  description: string;
-  daoLinks: string[];
-  isPrivate: boolean;
+interface UseCreateNFTDAOParams extends UseCreateDAOParamsBase {
   treasuryWalletAccountId: string;
   tokenId: string;
   quorum: number;
@@ -34,15 +33,10 @@ interface UseCreateNFTDAOParams {
   daoFeeConfig: DAOConfigDetails | undefined;
 }
 
-interface UseCreateMultiSigDAOParams {
+interface UseCreateMultiSigDAOParams extends UseCreateDAOParamsBase {
   admin: string;
-  name: string;
-  description: string;
-  daoLinks: string[];
-  logoUrl: string;
   owners: string[];
   threshold: number;
-  isPrivate: boolean;
   daoFeeConfig: DAOConfigDetails | undefined;
 }
 

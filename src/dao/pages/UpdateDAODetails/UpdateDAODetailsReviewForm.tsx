@@ -1,5 +1,5 @@
 import { Flex, Link, ListItem, UnorderedList, Image } from "@chakra-ui/react";
-import { Text, Color, CopyTextButton, DefaultLogoIcon, FormInput } from "@shared/ui-kit";
+import { Text, Color, CopyTextButton, DefaultLogoIcon, FormInput, ExternalLink } from "@shared/ui-kit";
 import { useDexContext } from "@dex/hooks";
 import { useFormContext } from "react-hook-form";
 import { SettingsForm } from "./types";
@@ -7,7 +7,7 @@ import { Link as ReachLink } from "react-router-dom";
 
 export function UpdateDAODetailsReviewForm() {
   const { getValues } = useFormContext<SettingsForm>();
-  const { name, description, logoUrl, webLinks } = getValues();
+  const { name, description, logoUrl, webLinks, infoUrl } = getValues();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
 
@@ -47,6 +47,12 @@ export function UpdateDAODetailsReviewForm() {
               isReadOnly: true,
             }}
           />
+          <Flex direction="column" gap="1">
+            <Text.P_XSmall_Medium color={Color.Neutral._500}>Info Url</Text.P_XSmall_Medium>
+            <ExternalLink to={infoUrl ?? ""}>
+              <Text.P_Small_Semibold_Link>{infoUrl}</Text.P_Small_Semibold_Link>
+            </ExternalLink>
+          </Flex>
           <Flex direction="column">
             <Text.P_XSmall_Medium color={Color.Neutral._500}>Social Channels</Text.P_XSmall_Medium>
             <Flex direction="column" justifyContent="space-between">
