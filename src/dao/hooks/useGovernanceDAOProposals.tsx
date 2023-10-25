@@ -6,11 +6,12 @@ import {
   MirrorNodeDecodedProposalEvent,
 } from "@dex/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
-import { isEmpty, isNil } from "ramda";
+import { isEmpty, isNil, isNotNil } from "ramda";
 import BigNumber from "bignumber.js";
 import { ContractProposalState, GovernanceProposalType, ProposalState } from "@dex/store";
 import { solidityAddressToAccountIdString } from "@shared/utils";
 import { ProposalData } from "@dex/services/DexService/governance/type";
+import { useDexContext } from "@dex/hooks";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string];
 
@@ -127,6 +128,9 @@ export function useGovernanceDAOProposals(
     }
   };
 
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const currentWalletId = wallet?.savedPairingData?.accountIds[0] ?? "";
+
   const convertDataToProposal = (
     proposalData: ProposalData,
     index: number,
@@ -139,6 +143,11 @@ export function useGovernanceDAOProposals(
     const endTime = proposalData?.coreInformation?.voteEnd;
     const currentTime = new Date().getTime();
     const timeRemaining = currentTime < endTime ? (endTime - currentTime) / 1000 : 0;
+    const hasVoted = isNotNil(
+      proposalData.votersList?.find(
+        (voterInfo) => currentWalletId === solidityAddressToAccountIdString(voterInfo.voter)
+      )
+    );
     return {
       id: index,
       timeRemaining,
@@ -170,7 +179,7 @@ export function useGovernanceDAOProposals(
       threshold: 0,
       contractEvmAddress: proposalData.contractId,
       votes: getVotes(proposalData, godTokenData),
-      hasVoted: proposalData.votingInformation?.hasVoted,
+      hasVoted,
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
       votingEndTime: endTime,
       proposalState: ProposalState[proposalState],

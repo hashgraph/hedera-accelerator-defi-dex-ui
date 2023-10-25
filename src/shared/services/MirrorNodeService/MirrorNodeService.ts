@@ -259,13 +259,18 @@ function createMirrorNodeService() {
         },
       }
     );
-    const allEvents = decodeLog(abiSignatures, response, ["ProposalCoreInformation", "ProposalVotingInformation"]);
+    const allEvents = decodeLog(abiSignatures, response, [
+      "ProposalCoreInformation",
+      "ProposalVotingInformation",
+      "VoteCast",
+    ]);
     const proposalCreatedEvents = allEvents.get("ProposalCoreInformation") ?? [];
     const proposalVotingEvents = allEvents.get("ProposalVotingInformation") ?? [];
+    const voterListEvents = allEvents.get("VoteCast") ?? [];
     const proposals: MirrorNodeDecodedProposalEvent[] = proposalCreatedEvents.map((item: any) => {
       const votingInformation = proposalVotingEvents.find((e) => e.proposalId === item.proposalId).votingInformation;
-      // TODO: added the conversion from BigInt to String. Remove it with making changes in the Interface.
-      return { ...item, contractId, proposalId: item.proposalId + "", votingInformation };
+      const votersList = voterListEvents.filter((e) => e.proposalId === item.proposalId);
+      return { ...item, contractId, proposalId: `${item.proposalId}`, votingInformation, votersList };
     });
 
     const uniqueProposals = uniqBy((proposal: MirrorNodeDecodedProposalEvent) => proposal.proposalId, proposals);
