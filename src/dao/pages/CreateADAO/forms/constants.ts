@@ -31,6 +31,7 @@ export const DefaultTokenDAOGovernanceData = {
     id: "",
     treasuryWalletAccountId: "",
     mirrorNodeTokenId: "",
+    tokenType: "",
   },
 };
 

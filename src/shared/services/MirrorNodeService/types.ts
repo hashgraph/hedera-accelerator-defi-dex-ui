@@ -150,6 +150,11 @@ interface MirrorNodeDecodedProposalEvent {
   proposalId: string;
   timestamp: string;
   votingInformation?: VotingInformation;
+  votersList?: [
+    voterInfo: {
+      voter: string;
+    }
+  ];
   state: number;
 }
 interface MirrorNodeEventLog {

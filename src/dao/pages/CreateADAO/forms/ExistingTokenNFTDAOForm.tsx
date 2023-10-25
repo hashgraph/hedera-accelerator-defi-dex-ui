@@ -23,7 +23,7 @@ export function ExistingTokenNFTDAOForm() {
   const formValues = getValues();
   const { governance } = formValues;
 
-  const { refetch, isFetching, isSuccess, isError, data } = useFetchTokenData({
+  const { refetch, isFetching, isError } = useFetchTokenData({
     tokenId: governance?.existingNFT?.id,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
@@ -31,9 +31,9 @@ export function ExistingTokenNFTDAOForm() {
 
   function isValidNFTId() {
     return (
-      checkForValidTokenId(governance?.existingNFT?.id ?? "") &&
-      isNotNil(data?.data?.type) &&
-      data?.data?.type === TokenType.NFT
+      isNotNil(governance?.existingNFT?.id) &&
+      checkForValidTokenId(governance?.existingNFT?.id) &&
+      governance?.existingNFT?.tokenType === TokenType.NFT
     );
   }
 
@@ -44,6 +44,9 @@ export function ExistingTokenNFTDAOForm() {
     setValue("governance.existingNFT.maxSupply", Number(tokenData.data.max_supply));
     setValue("governance.existingNFT.tokenWalletAddress", tokenData.data.treasury_account_id);
     setValue("governance.existingNFT.treasuryWalletAccountId", tokenData?.data.treasury_account_id, {
+      shouldValidate: true,
+    });
+    setValue("governance.existingNFT.tokenType", tokenData?.data.type, {
       shouldValidate: true,
     });
     trigger("governance.existingNFT.id");

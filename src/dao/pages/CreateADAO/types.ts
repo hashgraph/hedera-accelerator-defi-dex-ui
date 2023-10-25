@@ -33,6 +33,7 @@ export interface TokenDAOGovernanceData {
     id: string;
     treasuryWalletAccountId: string;
     mirrorNodeTokenId: string | undefined;
+    tokenType: string | undefined;
   };
 }
 
@@ -70,6 +71,7 @@ export interface NFTDAOGovernanceData {
     id: string;
     tokenWalletAddress: string;
     treasuryWalletAccountId: string;
+    tokenType: string;
   };
 }
 

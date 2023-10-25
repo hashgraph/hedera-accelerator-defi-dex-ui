@@ -23,7 +23,7 @@ export function ExistingTokenDAOGovernanceForm() {
   } = useFormContext<CreateATokenDAOForm>();
   const formValues = getValues();
   const { governance } = isNotNil(formValues.governance) ? formValues : DefaultCreateATokenDAOFormData;
-  const { refetch, isFetching, isSuccess, data, isError } = useFetchTokenData({
+  const { refetch, isFetching, isError } = useFetchTokenData({
     tokenId: governance?.existingToken?.id,
     handleTokenSuccessResponse,
     handleTokenErrorResponse,
@@ -31,9 +31,9 @@ export function ExistingTokenDAOGovernanceForm() {
 
   function isValidTokenId() {
     return (
-      checkForValidTokenId(governance?.existingToken?.mirrorNodeTokenId ?? "") &&
-      isNotNil(data?.data?.type) &&
-      data?.data.type === TokenType.FungibleToken
+      isNotNil(governance?.existingToken?.mirrorNodeTokenId) &&
+      checkForValidTokenId(governance?.existingToken?.mirrorNodeTokenId) &&
+      governance?.existingToken?.tokenType === TokenType.FungibleToken
     );
   }
 
@@ -46,6 +46,7 @@ export function ExistingTokenDAOGovernanceForm() {
     setValue("governance.existingToken.supplyKey", tokenData.data.supply_key.key);
     setValue("governance.existingToken.supplyKey", tokenData.data.supply_key.key);
     setValue("governance.existingToken.mirrorNodeTokenId", tokenData?.data.token_id, { shouldValidate: true });
+    setValue("governance.existingToken.tokenType", tokenData?.data.type, { shouldValidate: true });
     trigger("governance.existingToken.id");
   }
 
