@@ -12,7 +12,6 @@ import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
-import SystemRoleBasedAccessJSON from "../../dex/services/abi/SystemRoleBasedAccess.json";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
