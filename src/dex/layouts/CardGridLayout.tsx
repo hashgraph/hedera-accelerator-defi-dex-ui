@@ -1,9 +1,8 @@
-import { Text, SimpleGrid } from "@chakra-ui/react";
+import { Text, SimpleGrid, Skeleton } from "@chakra-ui/react";
 import { isEmpty } from "ramda";
 import { PropsWithChildren } from "react";
 import { UseQueryResult } from "react-query";
 import { NotFound } from "./NotFoundLayout";
-import { LoadingSpinnerLayout } from "./LoadingSpinnerLayout";
 
 interface CardGridLayoutProps<QueryResultDataType> extends PropsWithChildren {
   columns: number | Record<string, number>;
@@ -38,7 +37,16 @@ export function CardGridLayout<QueryResultDataType>(props: CardGridLayoutProps<Q
   }
 
   if (queryResult.isLoading) {
-    return <LoadingSpinnerLayout />;
+    return (
+      <SimpleGrid minWidth="100%" columns={columns} spacingX={spacingX} spacingY={spacingY}>
+        <Skeleton height="5.25rem" speed={0.4} fadeDuration={0} />
+        <Skeleton height="5.25rem" speed={0.4} fadeDuration={0} />
+        <Skeleton height="5.25rem" speed={0.4} fadeDuration={0} />
+        <Skeleton height="5.25rem" speed={0.4} fadeDuration={0} />
+        <Skeleton height="5.25rem" speed={0.4} fadeDuration={0} />
+        <Skeleton height="5.25rem" speed={0.4} fadeDuration={0} />
+      </SimpleGrid>
+    );
   }
 
   if (queryResult.isSuccess && isEmpty(queryResult.data)) {

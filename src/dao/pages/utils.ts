@@ -12,11 +12,12 @@ import {
 } from "@dao/hooks";
 import { ProposalState } from "@dex/store";
 import { HBARTokenSymbol, SENTINEL_OWNER } from "@dex/services";
-import { DAOType } from "@dao/services";
+import { DAO, DAOType } from "@dao/services";
 import { isHbarToken } from "@dex/utils";
 import { Routes } from "../routes";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 import humanizeDuration from "humanize-duration";
+import BigNumber from "bignumber.js";
 
 export function getDAOLinksRecordArray(links: string[]): Record<"value", string>[] {
   const arrayOfRecords = links.map((linkString) => {
@@ -181,3 +182,40 @@ export const shortEnglishHumanizer = humanizeDuration.humanizer({
     },
   },
 });
+
+export function filterDAOs(
+  daoList: DAO[],
+  options: { searchText: string; type: string | undefined; isMyDAOsTabSelected: boolean; currentUser: string }
+) {
+  const { searchText, type, isMyDAOsTabSelected, currentUser } = options;
+  let filteredDAOs = daoList;
+  if (isMyDAOsTabSelected) {
+    filteredDAOs = filteredDAOs?.filter((dao) => {
+      if (dao.type === DAOType.MultiSig) {
+        return dao.ownerIds.includes(currentUser);
+      } else {
+        const lockedTokenAmount = dao.lockedTokenDetails?.find(
+          (item) => solidityAddressToAccountIdString(item.user) === currentUser
+        )?.idOrAmount;
+        const hasLockedTokens = lockedTokenAmount && BigNumber(lockedTokenAmount).toNumber() > 0;
+        return dao.adminId === currentUser || hasLockedTokens;
+      }
+    });
+  } else {
+    filteredDAOs = filteredDAOs.filter((dao) => !dao.isPrivate);
+  }
+  if (type) {
+    filteredDAOs = filteredDAOs?.filter((dao) => {
+      return dao.type === options.type;
+    });
+  }
+  if (searchText) {
+    filteredDAOs = filteredDAOs?.filter((dao) => {
+      return (
+        dao.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        dao.description.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
+  }
+  return filteredDAOs;
+}

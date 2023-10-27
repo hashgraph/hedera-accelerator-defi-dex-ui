@@ -35,6 +35,7 @@ import {
   DAODetailsInfoEventArgs,
   UpgradeContractDetails,
   ProposalDataDetails,
+  LockedTokenDetails,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
@@ -150,6 +151,8 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       description,
     } = initialDAODetails;
 
+    const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
+    const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
     const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
 
     let tokenId;
@@ -178,6 +181,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
       votingDelay: votingDelay.toNumber(),
       votingPeriod: votingPeriod.toNumber(),
       minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
+      lockedTokenDetails,
     };
   });
 
@@ -213,6 +217,8 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       votingDelay,
       votingPeriod,
     } = initialDAODetails;
+    const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
+    const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
     const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
 
     /** START - TODO: Need to apply a proper fix */
@@ -242,6 +248,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
       votingDelay: votingDelay.toNumber(),
       votingPeriod: votingPeriod.toNumber(),
       minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
+      lockedTokenDetails,
     };
   });
 

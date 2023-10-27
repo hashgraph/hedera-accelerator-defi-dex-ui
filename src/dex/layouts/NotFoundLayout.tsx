@@ -17,7 +17,7 @@ export function NotFound(props: NotFoundProps) {
       <Flex direction="column" width="fit-content" margin="auto" alignItems="center">
         <Box marginBottom="1rem">{icon}</Box>
         <Text.H3_Medium marginBottom="0.5rem">{message}</Text.H3_Medium>
-        <Flex alignItems="center">
+        <Flex alignItems="center" gap={1}>
           <Text.P_Small_Regular>{preLinkText}</Text.P_Small_Regular>
           <Link as={ReachLink} textStyle="p small regular link" color={Color.Primary._500} onClick={onLinkClick}>
             {linkText}
