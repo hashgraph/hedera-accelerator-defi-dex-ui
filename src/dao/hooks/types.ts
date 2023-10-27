@@ -226,3 +226,8 @@ export interface DAOConfig {
   ftDAOFeeConfig: DAOConfigDetails;
   nftDAOFeeConfig: DAOConfigDetails;
 }
+
+export enum DAOTabs {
+  All = "All",
+  MyDAOs = "My DAOs",
+}

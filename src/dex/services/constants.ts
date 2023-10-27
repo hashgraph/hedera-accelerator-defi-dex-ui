@@ -101,3 +101,5 @@ export const MINIMUM_DEPOSIT_AMOUNT = 1;
 
 export const Gas = 9000000;
 export const GasPrice = 100000000;
+
+export const DAOsPerPage = 30;

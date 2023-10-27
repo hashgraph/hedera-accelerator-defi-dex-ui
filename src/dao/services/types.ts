@@ -68,6 +68,11 @@ export interface DAODetailsInfoEventArgs {
   webLinks: string[];
 }
 
+export interface LockedTokenDetails {
+  idOrAmount: string;
+  operation: string;
+  user: string;
+}
 export interface GovernanceDAODetails {
   type: DAOType.GovernanceToken;
   accountEVMAddress: string;
@@ -87,6 +92,7 @@ export interface GovernanceDAODetails {
   votingDelay: number;
   votingPeriod: number;
   minimumProposalDeposit?: number;
+  lockedTokenDetails?: LockedTokenDetails[];
 }
 
 export interface NFTDAODetails {
@@ -108,6 +114,7 @@ export interface NFTDAODetails {
   votingDelay: number;
   votingPeriod: number;
   minimumProposalDeposit?: number;
+  lockedTokenDetails?: LockedTokenDetails[];
 }
 
 export interface MultiSigDAODetails {
