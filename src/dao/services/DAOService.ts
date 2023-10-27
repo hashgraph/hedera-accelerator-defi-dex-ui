@@ -700,6 +700,28 @@ export async function sendChangeAdminForProposalTransaction(
   return changeAdminTransactionResponse;
 }
 
+export interface SendTransferOwnershipTransactionParams {
+  newOwnerEVMAddress: string;
+  targetAddress: string;
+  signer: HashConnectSigner;
+}
+export async function sendTransferOwnershipTransaction(params: SendTransferOwnershipTransactionParams) {
+  const { newOwnerEVMAddress, targetAddress, signer } = params;
+  const targetContractId = await DexService.fetchContractId(targetAddress);
+  const contractFunctionParameters = new ContractFunctionParameters().addAddress(newOwnerEVMAddress);
+  const transferOwnershipTransaction = await new ContractExecuteTransaction()
+    .setContractId(targetContractId)
+    .setFunction(HederaGnosisSafeFunctions.ChangeFeeConfigController, contractFunctionParameters)
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+  const transferOwnershipTransactionResponse = await transferOwnershipTransaction.executeWithSigner(signer);
+  checkTransactionResponseForError(
+    transferOwnershipTransactionResponse,
+    HederaGnosisSafeFunctions.ChangeFeeConfigController
+  );
+  return transferOwnershipTransactionResponse;
+}
+
 interface ExecuteMultiSigTransactionParams {
   safeAccountId: string;
   to: string;

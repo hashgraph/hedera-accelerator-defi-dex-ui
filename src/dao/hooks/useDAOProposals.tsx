@@ -71,19 +71,19 @@ export function useDAOProposals(
         return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
           ? ProposalStatus.Success
           : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-          ? ProposalStatus.Failed
-          : isThresholdReached && isAdminApproved
-          ? ProposalStatus.Queued
-          : ProposalStatus.Pending;
+            ? ProposalStatus.Failed
+            : isThresholdReached && isAdminApproved
+              ? ProposalStatus.Queued
+              : ProposalStatus.Pending;
       }
       default: {
         return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
           ? ProposalStatus.Success
           : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-          ? ProposalStatus.Failed
-          : isThresholdReached
-          ? ProposalStatus.Queued
-          : ProposalStatus.Pending;
+            ? ProposalStatus.Failed
+            : isThresholdReached
+              ? ProposalStatus.Queued
+              : ProposalStatus.Pending;
       }
     }
   }
@@ -167,6 +167,9 @@ export function useDAOProposals(
             parsedData = { ...upgradeProposalData, proxyAdmin, proxyLogic, currentLogic };
             isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
           }
+          const currentOwner = proposalType === ProposalType.GenericProposal ? await getCurrentOwnerOfDAO() : "";
+          const targetId =
+            proposalType === ProposalType.GenericProposal ? (await DexService.fetchContractId(to)).toString() : "";
           const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
           const tokenId = token ? solidityAddressToTokenIdString(token) : "";
           if (!!tokenId && !tokenDataCache.has(tokenId)) {
@@ -202,6 +205,9 @@ export function useDAOProposals(
             link: linkToDiscussion,
             threshold,
             isContractUpgradeProposal,
+            showTransferOwnerShip: proposalType === ProposalType.GenericProposal && isThresholdReached,
+            currentOwner,
+            targetId,
           };
         })
       );

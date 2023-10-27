@@ -703,8 +703,16 @@ export function CreateDAOProposal() {
               "oldProxyAddress",
               "newImplementationAddress",
               "nftTokenSerialId",
+              "proxyAdmin",
             ])
-          : trigger(["title", "description", "linkToDiscussion", "oldProxyAddress", "newImplementationAddress"]);
+          : trigger([
+              "title",
+              "description",
+              "linkToDiscussion",
+              "oldProxyAddress",
+              "newImplementationAddress",
+              "proxyAdmin",
+            ]);
       case DAOProposalType.TokenTransfer: {
         return currentDaoType === Routes.Multisig
           ? trigger(["title", "description", "recipientAccountId", "tokenId", "amount"])

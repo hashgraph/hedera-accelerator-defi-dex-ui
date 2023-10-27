@@ -99,8 +99,8 @@ function createMirrorNodeService() {
   };
 
   const fetchContractId = async (pairAddress: string): Promise<ContractId> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
-    return ContractId.fromString(response.data.contract_id);
+    const response = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${pairAddress}`);
+    return ContractId.fromString(response.data.account);
   };
 
   const fetchContractEVMAddress = async (pairAddress: string): Promise<string> => {

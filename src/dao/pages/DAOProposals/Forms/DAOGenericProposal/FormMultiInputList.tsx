@@ -50,7 +50,7 @@ export function ArgumentsInputList(props: ArgumentInputsProps) {
       return "A value is required.";
     }
     if (SolidityAddress.safeParse(abiType).success) {
-      if (ethers.utils.isAddress(value)) {
+      if (ethers.utils.isAddress(value) || ethers.constants.AddressZero === value) {
         setValue(`${fieldArrayName}.${index}.transformedValue` as any, value);
         return true;
       }

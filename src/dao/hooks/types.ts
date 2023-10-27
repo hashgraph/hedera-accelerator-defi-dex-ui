@@ -188,7 +188,9 @@ export interface Proposal {
   votingEndTime?: number;
   proposalState?: ProposalState;
   coreInformation?: ProposalCoreInformation;
-
+  showTransferOwnerShip?: boolean;
+  currentOwner?: string | undefined;
+  targetId?: string;
   /**
    * TODO: To be removed
    * Extra objects to check for DAO upgrade Proposal

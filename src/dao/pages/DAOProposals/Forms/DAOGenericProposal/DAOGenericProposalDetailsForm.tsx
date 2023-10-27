@@ -227,6 +227,7 @@ export function DAOGenericProposalDetailsForm() {
           <InlineAlert message={errors?.encodedFunctionData?.message ?? ""} type={InlineAlertType.Error} />
         )}
       </SimpleGrid>
+      <InlineAlert message="Proceed with caution" type={InlineAlertType.Info} />
     </Flex>
   );
 }

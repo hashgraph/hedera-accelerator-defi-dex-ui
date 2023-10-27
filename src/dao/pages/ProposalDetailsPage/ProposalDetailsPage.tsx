@@ -91,6 +91,9 @@ export function ProposalDetailsPage() {
       link,
       isContractUpgradeProposal,
       data,
+      showTransferOwnerShip,
+      currentOwner,
+      targetId,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
@@ -147,6 +150,7 @@ export function ProposalDetailsPage() {
                 msgValue={msgValue}
                 operation={operation}
                 nonce={nonce}
+                targetId={targetId}
                 approveProposalMutation={approveProposalMutation}
                 executeProposalMutation={executeProposalMutation}
                 isContractUpgradeProposal={isContractUpgradeProposal}
