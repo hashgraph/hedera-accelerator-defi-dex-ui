@@ -37,6 +37,7 @@ export enum DAOMutations {
   LockNFTToken = "lockNFTToken",
   UnlockNFTToken = "unlockNFTToken",
   PinToIPFS = "PinToIPFS",
+  TransferOwnership = "TransferOwnership",
 }
 
 export enum ProposalStatus {
@@ -67,6 +68,7 @@ export enum ProposalType {
   TokenAssociate = "Token Associate",
   UpgradeContract = "Upgrade Contract",
   TextProposal = "Text Proposal",
+  GenericProposal = "Generic Proposal",
 }
 
 export interface Votes {
@@ -192,6 +194,7 @@ export interface Proposal {
   currentOwner?: string | undefined;
   targetId?: string;
   feeConfigControllerUser?: string;
+
   /**
    * TODO: To be removed
    * Extra objects to check for DAO upgrade Proposal

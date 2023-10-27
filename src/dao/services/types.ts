@@ -158,6 +158,7 @@ export enum DAOEvents {
 export enum HederaGnosisSafeFunctions {
   ApproveHash = "approveHash",
   ExecuteTransaction = "executeTransaction",
+  ChangeFeeConfigController = "changeFeeConfigController",
 }
 
 export enum MultiSigProposeTransactionType {

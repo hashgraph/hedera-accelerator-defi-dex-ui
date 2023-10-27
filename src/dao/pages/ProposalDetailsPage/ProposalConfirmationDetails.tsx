@@ -16,6 +16,7 @@ import {
   UseApproveProposalMutationResult,
   UseExecuteProposalMutationResult,
   UseChangeAdminMutationResult,
+  UseTransferOwnershipMutationResult,
   ProposalStatus,
   useFetchContract,
 } from "@dao/hooks";
@@ -37,6 +38,7 @@ interface ProposalConfirmationDetailsProps {
   executeProposalMutation: UseExecuteProposalMutationResult;
   changeAdminMutation: UseChangeAdminMutationResult;
   isContractUpgradeProposal?: boolean;
+  transferOwnershipMutation: UseTransferOwnershipMutationResult;
   showTransferOwnerShip?: boolean;
   currentOwner?: string;
   feeConfigControllerUser?: string;
@@ -71,6 +73,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     currentOwner = "",
     targetId = "",
     feeConfigControllerUser = "",
+    transferOwnershipMutation,
   } = props;
 
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress);

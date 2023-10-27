@@ -30,5 +30,6 @@ export * from "./useFetchDAOMembers";
 export * from "./useFetchContract";
 export * from "./useFetchDAOConfig";
 export * from "./useTimeInputPattern";
+export * from "./useTransferOwnership";
 export * from "./types";
 export * from "./IPFS";

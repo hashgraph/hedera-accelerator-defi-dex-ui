@@ -12,6 +12,7 @@ import { groupBy, isNil, isNotNil } from "ramda";
 import { LogDescription } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
+import { Contracts } from "@dex/services";
 
 type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
 
@@ -71,19 +72,19 @@ export function useDAOProposals(
         return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
           ? ProposalStatus.Success
           : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-            ? ProposalStatus.Failed
-            : isThresholdReached && isAdminApproved
-              ? ProposalStatus.Queued
-              : ProposalStatus.Pending;
+          ? ProposalStatus.Failed
+          : isThresholdReached && isAdminApproved
+          ? ProposalStatus.Queued
+          : ProposalStatus.Pending;
       }
       default: {
         return proposalLogs.find((log) => log.name === DAOEvents.ExecutionSuccess)
           ? ProposalStatus.Success
           : proposalLogs.find((log) => log.name === DAOEvents.ExecutionFailure)
-            ? ProposalStatus.Failed
-            : isThresholdReached
-              ? ProposalStatus.Queued
-              : ProposalStatus.Pending;
+          ? ProposalStatus.Failed
+          : isThresholdReached
+          ? ProposalStatus.Queued
+          : ProposalStatus.Pending;
       }
     }
   }
@@ -108,7 +109,7 @@ export function useDAOProposals(
       case MultiSigProposeTransactionType.UpgradeProxy:
         return ProposalType.UpgradeContract;
       case MultiSigProposeTransactionType.GenericProposal:
-        return ProposalType.TextProposal;
+        return ProposalType.GenericProposal;
       default:
         return ProposalType.TokenTransfer;
     }
