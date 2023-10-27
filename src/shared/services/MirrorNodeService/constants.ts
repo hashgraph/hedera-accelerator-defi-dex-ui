@@ -9,6 +9,7 @@ import FTDAOFactory from "../../../dex/services/abi/FTDAOFactory.json";
 import HederaGovernor from "../../../dex/services/abi/HederaGovernor.json";
 import AssetHolder from "../../../dex/services/abi/AssetHolder.json";
 import GovernorTransferToken from "../../../dex/services/abi/GovernorTransferToken.json";
+import SystemRoleBasedAccess from "../../../dex/services/abi/SystemRoleBasedAccess.json";
 import Web3 from "web3";
 import { EventAbi } from "../../../dex/services/abi/types";
 
@@ -29,6 +30,7 @@ function loadGovernorAbiEventSignatures() {
     ...GovernorTransferToken.abi,
     ...HederaGovernor.abi,
     ...AssetHolder.abi,
+    ...SystemRoleBasedAccess.abi,
   ];
   abis.forEach((abi: any) => {
     if (abi.type === "event") {

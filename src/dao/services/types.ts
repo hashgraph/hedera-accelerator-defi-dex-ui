@@ -151,6 +151,8 @@ export enum DAOEvents {
   Upgraded = "Upgraded",
   UpdatedAmount = "UpdatedAmount",
   DAOConfig = "FeeConfigUpdated",
+  FeeConfigControllerChanged = "FeeConfigControllerChanged",
+  UpdatedUsers = "UpdatedUsers",
 }
 
 export enum HederaGnosisSafeFunctions {

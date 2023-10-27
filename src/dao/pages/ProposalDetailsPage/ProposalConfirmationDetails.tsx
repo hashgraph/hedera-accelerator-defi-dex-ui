@@ -19,7 +19,6 @@ import {
   ProposalStatus,
   useFetchContract,
 } from "@dao/hooks";
-import { TREASURY_ID } from "@dex/services";
 
 interface ProposalConfirmationDetailsProps {
   safeEVMAddress: string;
@@ -40,6 +39,7 @@ interface ProposalConfirmationDetailsProps {
   isContractUpgradeProposal?: boolean;
   showTransferOwnerShip?: boolean;
   currentOwner?: string;
+  feeConfigControllerUser?: string;
   targetId?: string;
   proxyAddress?: string;
   proxyAdmin?: string;
@@ -70,6 +70,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
     showTransferOwnerShip,
     currentOwner = "",
     targetId = "",
+    feeConfigControllerUser = "",
   } = props;
 
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress);
@@ -154,13 +155,13 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
           <>
             <InlineAlert
               type={InlineAlertType.Warning}
-              message={`Connect your wallet with ${TREASURY_ID}
+              message={`Connect your wallet with ${feeConfigControllerUser} 
               to transfer the ownership of factory (${targetId}) to safe (${safeAccountId})`}
             />
             <InlineAlert type={InlineAlertType.Info} message={`Current Owner ${currentOwner}`} />
             <Button
               variant="primary"
-              isDisabled={connectedWalletId !== TREASURY_ID}
+              isDisabled={connectedWalletId !== feeConfigControllerUser}
               onClick={() => {
                 handleTransferOwnerShipClickTransaction();
               }}

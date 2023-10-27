@@ -21,6 +21,7 @@ enum ContractNames {
   FTDAOFactory = "ftdaofactory",
   MultiSigDAOFactory = "multisigdaofactory",
   NFTDAOFactory = "nftdaofactory",
+  SystemRoleBasedAccess = "systemrolebasedaccess",
 }
 
 function getProxyId(contractName: ContractNames): string {
@@ -59,6 +60,9 @@ export const Contracts = {
   },
   NFTDAOFactory: {
     ProxyId: getProxyId(ContractNames.NFTDAOFactory),
+  },
+  SystemRoleBasedAccess: {
+    ProxyId: getProxyId(ContractNames.SystemRoleBasedAccess),
   },
 };
 

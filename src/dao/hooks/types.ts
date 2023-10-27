@@ -191,6 +191,7 @@ export interface Proposal {
   showTransferOwnerShip?: boolean;
   currentOwner?: string | undefined;
   targetId?: string;
+  feeConfigControllerUser?: string;
   /**
    * TODO: To be removed
    * Extra objects to check for DAO upgrade Proposal

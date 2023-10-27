@@ -123,12 +123,12 @@
   },
   {
     "name": "systemrolebasedaccess",
-    "id": "0.0.89640",
-    "hash": "a5ea4708c335651dc09c3ada6486c30a",
-    "address": "0x0000000000000000000000000000000000015e28",
-    "timestamp": "2023-07-28T06:23:24.481Z",
-    "transparentProxyId": "0.0.89702",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000015e66"
+    "id": "0.0.5735989",
+    "hash": "0db6e8d793ea0f63b07d34b7bc5e7eae",
+    "address": "0x0000000000000000000000000000000000578635",
+    "timestamp": "2023-10-20T09:29:57.120Z",
+    "transparentProxyId": "0.0.5735994",
+    "transparentProxyAddress": "0x000000000000000000000000000000000057863a"
   },
   {
     "name": "lptoken",

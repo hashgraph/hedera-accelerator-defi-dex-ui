@@ -94,6 +94,7 @@ export function ProposalDetailsPage() {
       showTransferOwnerShip,
       currentOwner,
       targetId,
+      feeConfigControllerUser,
     } = proposalDetails;
 
     const isMultiSigProposal = daoType === DAOType.MultiSig;
@@ -157,6 +158,9 @@ export function ProposalDetailsPage() {
                 changeAdminMutation={changeAdminMutation}
                 proxyAddress={proxyId}
                 proxyAdmin={proxyAdmin}
+                showTransferOwnerShip={showTransferOwnerShip}
+                currentOwner={currentOwner}
+                feeConfigControllerUser={feeConfigControllerUser}
               />
             ) : (
               <ProposalVoteDetails />
