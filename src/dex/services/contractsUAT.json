@@ -69,12 +69,12 @@
   },
   {
     "name": "multisigdaofactory",
-    "id": "0.0.5735993",
+    "id": "0.0.5806762",
     "hash": "49d6245806e1f368f2177133ee7c43fd",
-    "address": "0x0000000000000000000000000000000000578639",
-    "timestamp": "2023-10-20T09:30:07.460Z",
-    "transparentProxyId": "0.0.5736003",
-    "transparentProxyAddress": "0x0000000000000000000000000000000000578643"
+    "address": "0x0000000000000000000000000000000000589aaa",
+    "timestamp": "2023-10-31T13:59:30.630Z",
+    "transparentProxyId": "0.0.5806769",
+    "transparentProxyAddress": "0x0000000000000000000000000000000000589ab1"
   },
   {
     "name": "ftdao",
