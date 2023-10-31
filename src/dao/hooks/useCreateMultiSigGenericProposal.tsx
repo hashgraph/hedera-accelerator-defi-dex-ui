@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "react-query";
-import { ContractId, TransactionResponse } from "@hashgraph/sdk";
+import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
 import { DAOType, MultiSigProposeTransactionType } from "@dao/services";
 import DAOService from "@dao/services";
+import { DexService } from "@dex/services";
 
 interface UseCreateMultiSigGenericProposalParams {
   title: string;
@@ -29,8 +30,9 @@ export function useCreateMultiSigGenericProposal(handleOnSuccess: HandleOnSucces
   >(
     async (params: UseCreateMultiSigGenericProposalParams) => {
       const { targetContractId, functionData, multiSigDAOContractId, title, description, linkToDiscussion } = params;
+      const safeEVMAddress = await DexService.fetchContractEVMAddress(targetContractId);
       return DAOService.sendProposeTransaction({
-        safeEVMAddress: ContractId.fromString(targetContractId).toSolidityAddress(),
+        safeEVMAddress,
         data: functionData,
         multiSigDAOContractId,
         transactionType: MultiSigProposeTransactionType.GenericProposal,
