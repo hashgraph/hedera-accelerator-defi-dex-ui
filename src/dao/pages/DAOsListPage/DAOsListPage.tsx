@@ -96,7 +96,7 @@ export function DAOsListPage() {
             />
             <Select
               variant="formTokenSelector"
-              width="7rem"
+              width="12rem"
               placeholder="All"
               value={daoType}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDAOTypeChange(e.target.value)}
