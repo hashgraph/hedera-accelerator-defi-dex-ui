@@ -13,7 +13,7 @@ interface NotFoundProps {
 export function NotFound(props: NotFoundProps) {
   const { icon, message, preLinkText, onLinkClick, linkText } = props;
   return (
-    <Flex width="100%" height="100%" flex="1" bg={Color.Primary_Bg} justifyContent="center" alignItems="center">
+    <Flex width="100%" height="100%" flex="1" justifyContent="center" alignItems="center">
       <Flex direction="column" width="fit-content" margin="auto" alignItems="center">
         <Box marginBottom="1rem">{icon}</Box>
         <Text.H3_Medium marginBottom="0.5rem">{message}</Text.H3_Medium>
