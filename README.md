@@ -1,9 +1,17 @@
 <div align="center">
+<<<<<<< Updated upstream
   <h1>
     Hedera DeFi UI Accelerator
   </h1>
 </div>
   
+=======
+<h1>
+  Hedera DeFi UI Accelerator
+</h1>
+</div>
+
+>>>>>>> Stashed changes
 <ul>
   <li><b><a href="https://dao.zilbo.com">DAO-as-a-Service</a></b></li>
   <li><b><a href="https://defi-ui.zilbo.com">DEX</a></b></li>
