@@ -1,11 +1,14 @@
 <div align="center">
-<h1>
-  Hedera DeFi UI Accelerator
-</h1>
+  <h1>
+    Hedera DeFi UI Accelerator
+  </h1>
+</div>
+  
 <ul>
-  <li><b><a href="https://dao.zilbo.com">DAO-as-a-Service App</a></b></li>
-  <li><b><a href="https://defi-ui.zilbo.com">DEX App</a></b></li>
+  <li><b><a href="https://dao.zilbo.com">DAO-as-a-Service</a></b></li>
+  <li><b><a href="https://defi-ui.zilbo.com">DEX</a></b></li>
 </ul>
+
 <hr />
 
 
@@ -89,7 +92,7 @@ VITE_PUBLIC_PINATA_GATEWAY_URL=/** Gateway URL **/
 
 ## Usage
 
-The DeFi apps utilize [Vercel Serverless Functions](https://vercel.com/docs/functions/serverless-functions) to communicate with some third party APIs such as IPFS. You will need to install the [Vercel CLI](https://vercel.com/docs/cli) to run the applications.
+The DeFi apps utilize [Vercel Serverless Functions](https://vercel.com/docs/functions/serverless-functions) to communicate with third-party APIs such as IPFS. You will need to install the [Vercel CLI](https://vercel.com/docs/cli) to run the applications.
 
 ### Run The Application
 
