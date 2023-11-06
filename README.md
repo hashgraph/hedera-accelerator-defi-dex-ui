@@ -1,14 +1,15 @@
 <div align="center">
 <h1>
-  Hedera DEX UI Accelerator 
+  Hedera DeFi UI Accelerator
 </h1>
-<p>Live App: <b><a href="https://defi-ui.zilbo.com">defi-dex</a></b></p>
-<p>Status: <b>POC</b></p>
-<p align="center" style="font-size: 1.2rem;">A DEX (Decentralized Exchange) UI accelerator that operates on the Hedera network. The DEX UI utilizes React primitives from the <a href="https://github.com/hashgraph/hedera-accelerator-defi-dex-ui-components">hedera-accelerator-defi-dex-ui-components</a> UI component library.</p>
-
-[**Read The Docs**](https://hashgraph.github.io/hedera-accelerator-defi-dex-ui/)
-</div>
+<ul>
+  <li><b><a href="https://dao.zilbo.com">DAO-as-a-Service App</a></b></li>
+  <li><b><a href="https://defi-ui.zilbo.com">DEX App</a></b></li>
+</ul>
 <hr />
+
+
+## Status: **POC**
 
 ## Table of Contents
 
@@ -28,7 +29,7 @@ yarn install
 
 ### Setup HTTPS for Local Wallet Pairing
 
-The Hedera DEX Accelerator utilizes the [hashconnect](https://github.com/Hashpack/hashconnect) library to pair with supported wallet extensions. Currently, the only supported wallet extension is [HashPack](https://www.hashpack.app/). The HashConnect 1-click pairing feature only works in an SSL secured environment (**https** URLs). To enable `HTTPS` in your local build:
+The Hedera DeFi Accelerator apps utilize the [hashconnect](https://github.com/Hashpack/hashconnect) library to pair with supported wallet extensions. Currently, the only supported wallet extension is [HashPack](https://www.hashpack.app/). The HashConnect 1-click pairing feature only works in an SSL secured environment (**https** URLs). To enable `HTTPS` in your local build:
 
 1. Create an `.env` file in the root of this project.
 2. In the `.env` file set the `HTTPS` environment variable to `true`. 
@@ -74,18 +75,24 @@ SSL_KEY_FILE=./.cert/key.pem
 
 5. Make sure to include `.env` and `.cert` in your `.gitignore` file so this information is not committed to version control.
 
-6. Run the application with `yarn start`. You should see `https://` prefixed to the localhost URL.
+6. Run the application with `vercel dev` (see [Usage](#usage) for Vercel installation). You should see `https://` prefixed to the localhost URL.
+
+### Setup Pinata Environment variables to use the Pinata IPFS API
+
+The DeFi apps store and retrieve  IPFS data using Pinata. A Pinata public key, secret key, and gateway URL are necessary for IPFS pinning and fetching features to work as intended. You will need to create a Pinata account to create a new set of keys and a gateway URL. A more comprehensive tutorial can be found in the [Pinata API Docs](https://docs.pinata.cloud/docs/welcome-to-pinata).
+
+```
+PRIVATE_PINATA_API_KEY=/** Public Key **/
+PRIVATE_PINATA_API_SECRET_KEY=/** Secret Key **/
+VITE_PUBLIC_PINATA_GATEWAY_URL=/** Gateway URL **/
+```
 
 ## Usage
+
+The DeFi apps utilize [Vercel Serverless Functions](https://vercel.com/docs/functions/serverless-functions) to communicate with some third party APIs such as IPFS. You will need to install the [Vercel CLI](https://vercel.com/docs/cli) to run the applications.
 
 ### Run The Application
 
 ```
-yarn start
-```
-
-### Run Tests
-
-```
-yarn test
+vercel dev
 ```
