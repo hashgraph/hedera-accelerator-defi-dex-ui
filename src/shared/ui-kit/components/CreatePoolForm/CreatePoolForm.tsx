@@ -11,22 +11,22 @@ import { TokenPair } from "../SwapTokensForm/types";
 import { TokenInput } from "../TokenInput";
 import { isNil } from "ramda";
 import { TokenState } from "../types";
-import { usePoolsData } from "../../../../dex/hooks";
-import { REFRESH_INTERVAL } from "../../../../dex/hooks/constants";
+import { usePoolsData } from "@dex/hooks";
+import { REFRESH_INTERVAL } from "@dex/hooks/constants";
 import {
   getTokenBalance,
   getUniqueTokensFromSelectedOne,
   getTokensByUniqueAccountIds,
   getCreatePoolExchangeRate,
 } from "@shared/utils";
-import { CreatePoolState, SendCreatePoolTransactionParams, Pool } from "../../../../dex/store/poolsSlice";
+import { CreatePoolState, SendCreatePoolTransactionParams, Pool } from "@dex/store/poolsSlice";
 import { AlertDialog, LoadingDialog } from "../../components";
 import { WarningIcon } from "@chakra-ui/icons";
-import { TransactionStatus } from "../../../../dex/store/appSlice";
-import { convertNumberOfMinsToSeconds } from "../../../../dex/utils";
+import { TransactionStatus } from "@dex/store/appSlice";
+import { convertNumberOfMinsToSeconds } from "@dex/utils";
 import { useCreatePoolFormData } from "./useCreatePoolForm";
 import { DropdownSelector } from "../../components";
-import { PoolTransactionFee } from "../../../../dex/hooks/pool/types";
+import { PoolTransactionFee } from "@dex/hooks/pool/types";
 
 interface CreatePoolFormProps {
   isLoading: boolean;
@@ -218,6 +218,7 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
         isSettingsOpen={formSettings.isSettingsOpen}
         formInputs={[
           <TokenInput
+            key="1"
             form={createPoolForm}
             fieldValue="firstToken"
             label="First Token"
@@ -232,8 +233,9 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
             onTokenSymbolChanged={handleFirstTokenSymbolChanged}
             onSetInputAmountWithFormula={handleFirstTokenAmountChanged}
           />,
-          <Spacer />,
+          <Spacer key="2" />,
           <TokenInput
+            key="3"
             form={createPoolForm}
             fieldValue="secondToken"
             label="Second Token"
@@ -248,8 +250,8 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
             onTokenSymbolChanged={handleSecondTokenSymbolChanged}
             onSetInputAmountWithFormula={handleSecondTokenAmountChanged}
           />,
-          <Spacer padding="0.4rem" />,
-          <Flex direction="column" justifyContent="center" gap="5px">
+          <Spacer padding="0.4rem" key="4" />,
+          <Flex direction="column" key="5" justifyContent="center" gap="5px">
             <Text textStyle="h4">Transaction Fee</Text>
             <DropdownSelector
               data={props.transactionFee}
@@ -263,11 +265,17 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
         ]}
         metrics={[
           //eslint-disable-next-line max-len
-          <MetricLabel label="Exchange Ratio" value={getCreatePoolExchangeRateDisplay} isLoading={props.isLoading} />,
+          <MetricLabel
+            key="1"
+            label="Exchange Ratio"
+            value={getCreatePoolExchangeRateDisplay}
+            isLoading={props.isLoading}
+          />,
         ]}
         actionButtonNotifications={[
           !formSettings.isTransactionDeadlineValid ? (
             <Notification
+              key="1"
               type={NotficationTypes.ERROR}
               textStyle="b3"
               message={formSettings.transactionDeadlineErrorMessage}
@@ -275,6 +283,7 @@ export function CreatePoolForm(props: CreatePoolFormProps) {
           ) : null,
           createPoolFormData.isSelectedPoolAlreadyExist ? (
             <Notification
+              key="2"
               type={NotficationTypes.ERROR}
               textStyle="b3"
               message={createPoolFormData.poolAlreadyExistMessage}

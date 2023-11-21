@@ -24,7 +24,7 @@ export function MultiSigDAOGovernanceForm() {
     return "";
   }
 
-  function handleAdminAddressChange(event: any) {
+  function handleAdminAddressChange(_event: any) {
     trigger("governance.admin");
   }
 

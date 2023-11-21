@@ -15,6 +15,7 @@ export const CompletedStepIcon = createIcon({
     20.8625 7.1125C21.35 7.6 21.35 8.3875 20.8625 8.875L11.375 18.3625C10.9 
     18.85 10.1 18.85 9.6125 18.3625Z`}
       fill={Color.Blue._500}
+      key="1"
     />,
   ],
 });

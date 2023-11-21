@@ -10,8 +10,8 @@ import { TokenPair } from "../SwapTokensForm/types";
 import { TokenInput } from "../TokenInput";
 import { isEmpty, isNil } from "ramda";
 import { TokenState } from "../types";
-import { usePoolsData, useSwapData } from "../../../../dex/hooks";
-import { REFRESH_INTERVAL } from "../../../../dex/hooks/constants";
+import { usePoolsData, useSwapData } from "@dex/hooks";
+import { REFRESH_INTERVAL } from "@dex/hooks/constants";
 import {
   calculatePoolRatio,
   getExchangeRateDisplay,
@@ -23,7 +23,7 @@ import {
   getTokensByUniqueAccountIds,
 } from "@shared/utils";
 import { InitialTokenState } from "../constants";
-import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "../../../../dex/store/poolsSlice";
+import { AddLiquidityState, SendAddLiquidityTransactionParams, UserPool } from "@dex/store/poolsSlice";
 import {
   AlertDialog,
   DropdownSelector,
@@ -35,8 +35,8 @@ import {
 } from "../../components";
 import { SettingsButton } from "../Button";
 import { WarningIcon } from "@chakra-ui/icons";
-import { TransactionStatus } from "../../../../dex/store/appSlice";
-import { convertNumberOfMinsToSeconds, getAllPoolTransactionFee } from "../../../../dex/utils";
+import { TransactionStatus } from "@dex/store/appSlice";
+import { convertNumberOfMinsToSeconds, getAllPoolTransactionFee } from "@dex/utils";
 import { isNotNil } from "ramda";
 import { Color } from "../../themes";
 
@@ -224,7 +224,7 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
     }
   }
 
-  function handleFirstTokenSymbolChanged(updatedToken: TokenState) {
+  function handleFirstTokenSymbolChanged(_updatedToken: TokenState) {
     addLiquidityForm.setValue("secondToken", InitialAddLiquidityFormState.secondToken);
     addLiquidityForm.setValue("poolName", "");
     addLiquidityForm.setValue("fee", 0);
@@ -330,8 +330,9 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
             onTokenAmountChanged={handleFirstTokenAmountChanged}
             onTokenSymbolChanged={handleFirstTokenSymbolChanged}
             onSetInputAmountWithFormula={handleFirstTokenAmountChanged}
+            key="1"
           />,
-          <Spacer />,
+          <Spacer key="2" />,
           <TokenInput
             form={addLiquidityForm}
             fieldValue="secondToken"
@@ -346,10 +347,11 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
             onTokenAmountChanged={handleSecondTokenAmountChanged}
             onTokenSymbolChanged={handleSecondTokenSymbolChanged}
             onSetInputAmountWithFormula={handleSecondTokenAmountChanged}
+            key="3"
           />,
-          <Spacer padding="0.4rem" />,
+          <Spacer padding="0.4rem" key="4" />,
           allPoolFee.length > 1 ? (
-            <Flex direction="column" justifyContent="center" gap="5px">
+            <Flex direction="column" justifyContent="center" gap="5px" key="5">
               <Text textStyle="h4">Transaction Fee</Text>
               <DropdownSelector
                 isLoading={props.isLoading}
@@ -363,8 +365,8 @@ export function AddLiquidityForm(props: AddLiquidityFormProps) {
           ) : null,
         ]}
         metrics={[
-          <MetricLabel label="Share of Pool" value={poolRatio} isLoading={props.isLoading} />,
-          <MetricLabel label="Exchange Ratio" value={exchangeRatio} isLoading={props.isLoading} />,
+          <MetricLabel key="1" label="Share of Pool" value={poolRatio} isLoading={props.isLoading} />,
+          <MetricLabel key="2" label="Exchange Ratio" value={exchangeRatio} isLoading={props.isLoading} />,
         ]}
         actionButtonNotifications={[
           !formSettings.isTransactionDeadlineValid ? (

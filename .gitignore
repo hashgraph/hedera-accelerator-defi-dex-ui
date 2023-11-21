@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 
+/.yarn/cache
 # testing
 /coverage
 
@@ -22,7 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-// keys & certs
+#// keys & certs
 *.pem
 
 .idea/

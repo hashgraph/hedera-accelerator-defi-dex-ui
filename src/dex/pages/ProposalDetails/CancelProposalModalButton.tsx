@@ -1,6 +1,6 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
-import { AlertDialog, Color } from "../../../shared/ui-kit";
-import { UseCancelProposalResult, useDexContext } from "../../hooks";
+import { AlertDialog, Color } from "@shared/ui-kit";
+import { UseCancelProposalResult, useDexContext } from "@dex/hooks";
 import { FormattedProposal } from "../Governance/types";
 
 interface CancelProposalModalButtonProps {
@@ -29,7 +29,8 @@ export function CancelProposalModalButton(props: CancelProposalModalButtonProps)
   function handleCancelProposalClicked() {
     props.resetServerState();
     if (props.proposal) {
-      const signer = wallet.getSigner();
+      wallet.getSigner;
+      //const signer = wallet.getSigner();
       //TODO: Dex Governance is deprecated and will be removed in the next ticket to no need to fix it.
       // props.cancelProposal.mutate({
       //   contractId: props.proposal?.contractId ?? "",
@@ -72,7 +73,7 @@ export function CancelProposalModalButton(props: CancelProposalModalButtonProps)
         <Flex flexDirection="column" width="100%" gap="0.5rem">
           <Button onClick={handleCancelProposalClicked}>Cancel Proposal</Button>
           <Button variant="secondary" onClick={handleCancelAlertDialog}>
-            Don't Cancel
+            Don&apos;t Cancel
           </Button>
         </Flex>
       }

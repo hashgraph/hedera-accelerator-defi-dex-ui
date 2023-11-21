@@ -5,14 +5,14 @@ import { Notification, NotficationTypes, CardList, Pagination, usePagination, Ra
 import { createHashScanTransactionLink } from "@dex/utils";
 import { CardListLayout, Page, PageHeader, TabFilter, TabFilters } from "@dex/layouts";
 import { useAllProposals, useTabFilters } from "@dex/hooks";
-import { ProposalStatus } from "../../store/governanceSlice";
+import { ProposalStatus } from "@dex/store";
 import { ProposalCard } from "./ProposalCard";
-import { useInput } from "../../hooks/useInput";
-import { useDateRange } from "../../hooks/useDateRange";
+import { useInput } from "@dex/hooks";
+import { useDateRange } from "@dex/hooks/useDateRange";
 import { FormattedProposal } from "./types";
 import { VotingPower } from "./VotingPower";
 import { Paths } from "@dex/routes";
-import { CreateProposalLocationProps } from "../CreateProposal";
+import { CreateProposalLocationProps } from "@dex/pages";
 import { GovernanceTokenId, Contracts } from "@dex/services";
 
 const PageLimit = 20;
@@ -88,9 +88,18 @@ export const Governance = (): ReactElement => {
             </Center>
           )}
           <PageHeader
-            leftContent={[<Text textStyle="h2">Proposals</Text>]}
+            leftContent={[
+              <Text key="1" textStyle="h2">
+                Proposals
+              </Text>,
+            ]}
             rightContent={[
-              <Button padding="0px 20px" data-testid="new-proposal-button" onClick={handleClickNewProposalButton}>
+              <Button
+                key="2"
+                padding="0px 20px"
+                data-testid="new-proposal-button"
+                onClick={handleClickNewProposalButton}
+              >
                 New Proposal
               </Button>,
             ]}
@@ -136,8 +145,8 @@ export const Governance = (): ReactElement => {
                   />
                 </>
               }
-              cardLists={proposalTabFilters.map(() => (
-                <CardList error={error} isSuccess={isSuccess} isLoading={isLoading} isError={isError}>
+              cardLists={proposalTabFilters.map((_, index2) => (
+                <CardList key={index2} error={error} isSuccess={isSuccess} isLoading={isLoading} isError={isError}>
                   {paginatedProposals?.map((proposal, index) => (
                     <ProposalCard proposal={proposal} key={index} />
                   ))}

@@ -61,9 +61,14 @@ export function TextProposalForm() {
     <Page
       header={
         <PageHeader
-          leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
+          leftContent={[
+            <Text textStyle="h2" key="1">
+              Create New Proposal
+            </Text>,
+          ]}
           rightContent={[
             <Breadcrumb
+              key="2"
               to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
               label="Back to Select Proposal Type"
             />,
