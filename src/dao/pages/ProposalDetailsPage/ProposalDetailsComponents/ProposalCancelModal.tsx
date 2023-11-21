@@ -45,7 +45,7 @@ export function ProposalCancelModal(props: ProposalCancelModalProps) {
         <Flex flexDirection="column" width="100%" gap="0.5rem">
           <Button onClick={handleCancelProposalClicked}>Cancel Proposal</Button>
           <Button variant="secondary" onClick={() => setDialogState({ ...dialogState, isCancelProposalOpen: false })}>
-            Don't Cancel
+            Don&apos;t Cancel
           </Button>
         </Flex>
       }

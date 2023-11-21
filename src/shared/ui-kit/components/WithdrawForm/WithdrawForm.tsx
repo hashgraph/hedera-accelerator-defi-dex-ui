@@ -9,10 +9,10 @@ import { FormSettings, useFormSettings } from "../FormSettings";
 import { DefiFormLayout } from "../layouts";
 import { isEmpty, isNil } from "ramda";
 import { LPTokenDetails, PoolLiquidityDetails } from "./types";
-import { SendWithdrawTransactionParams, WithdrawState } from "../../../../dex/store/poolsSlice";
-import { convertNumberOfMinsToSeconds } from "../../../../dex/utils";
+import { SendWithdrawTransactionParams, WithdrawState } from "@dex/store/poolsSlice";
+import { convertNumberOfMinsToSeconds } from "@dex/utils";
 import { AlertDialog, LoadingDialog } from "../../components";
-import { TransactionStatus } from "../../../../dex/store/appSlice";
+import { TransactionStatus } from "@dex/store/appSlice";
 import { WarningIcon } from "@chakra-ui/icons";
 import { LPTokenInput } from "../LPTokenInput";
 
@@ -105,7 +105,7 @@ export function WithdrawForm(props: WithdrawFormProps) {
         }
         isSettingsOpen={formSettings.isSettingsOpen}
         formInputs={[
-          <Text>{props.poolLpDetails?.tokenSymbol}</Text>,
+          <Text key="1">{props.poolLpDetails?.tokenSymbol}</Text>,
           <LPTokenInput
             form={withdrawForm}
             balance={props.poolLpDetails.userLpAmount}
@@ -114,6 +114,7 @@ export function WithdrawForm(props: WithdrawFormProps) {
             walletConnectionStatus={props.connectionStatus}
             isHalfAndMaxButtonsVisible
             isLoading={props.isLoading}
+            key="2"
           />,
         ]}
         metrics={[
@@ -122,12 +123,14 @@ export function WithdrawForm(props: WithdrawFormProps) {
               label={`${props.poolLiquidityDetails?.firstToken.tokenSymbol} in Pool`}
               value={`${props.poolLiquidityDetails?.firstToken.poolLiquidity.toFixed(6)}`}
               isLoading={props.isLoading}
+              key="1"
             />,
-            <Spacer padding="0.3rem" />,
+            <Spacer padding="0.3rem" key="2" />,
             <MetricLabel
               label={`${props.poolLiquidityDetails?.secondToken.tokenSymbol} in Pool`}
               value={`${props.poolLiquidityDetails?.secondToken.poolLiquidity.toFixed(6)}`}
               isLoading={props.isLoading}
+              key="3"
             />,
           ],
           [
@@ -135,12 +138,14 @@ export function WithdrawForm(props: WithdrawFormProps) {
               label={`${props.poolLiquidityDetails?.firstToken.tokenSymbol} to Withdraw`}
               value={`${props.poolLiquidityDetails?.firstToken.userProvidedLiquidity.toFixed(6)}`}
               isLoading={props.isLoading}
+              key="1"
             />,
-            <Spacer padding="0.3rem" />,
+            <Spacer padding="0.3rem" key="2" />,
             <MetricLabel
               label={`${props.poolLiquidityDetails?.secondToken.tokenSymbol} to Withdraw`}
               value={`${props.poolLiquidityDetails?.secondToken.userProvidedLiquidity.toFixed(6)}`}
               isLoading={props.isLoading}
+              key="3"
             />,
           ],
           [
@@ -148,6 +153,7 @@ export function WithdrawForm(props: WithdrawFormProps) {
               label={"Remaining share of pool"}
               value={props.poolLpDetails?.userLpPercentage ?? ""}
               isLoading={props.isLoading}
+              key="ml"
             />,
           ],
         ]}

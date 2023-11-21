@@ -14,7 +14,7 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { ChangeEvent, useEffect, useState } from "react";
 import { isNil, isNotNil } from "ramda";
 import { checkForValidAccountId, createHashScanTransactionLink } from "@dex/utils";
-import { DefaultCreateATokenDAOFormData } from "./constants";
+import { DefaultCreateATokenDAOFormData } from "@dao/pages";
 
 export function CreateTokenDAOGovernanceForm() {
   const {
@@ -132,8 +132,8 @@ export function CreateTokenDAOGovernanceForm() {
       <Flex gap="1.5rem" direction="column">
         <DAOFormContainer>
           <Text.P_Small_Medium paddingBottom="0.4rem">
-            To generate the token ID, define the following inputs. Once the token is created, the token's ID will be
-            automatically displayed.
+            To generate the token ID, define the following inputs. Once the token is created, the token&apos;s ID will
+            be automatically displayed.
           </Text.P_Small_Medium>
           <Flex direction="row" gap="4">
             <FormInput<"governance.newToken.name">

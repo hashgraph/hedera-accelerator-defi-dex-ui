@@ -11,6 +11,7 @@ export const TwoLayerSettingsIcon = createIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="1.667"
+      key="1"
     />,
     <path
       d="M16.167 13a1.375 1.375 0 0 0 .275 1.517l.05.05a1.668 1.668 0 
@@ -30,6 +31,7 @@ export const TwoLayerSettingsIcon = createIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="1.667"
+      key="2"
     />,
   ],
 });

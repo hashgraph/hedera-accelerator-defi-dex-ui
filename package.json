@@ -17,7 +17,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react-syntax-highlighter": "^15.5.9",
     "abitype": "^0.10.1",
-    "axios": "^1.4.0",
+    "axios": "^1.6.2",
     "chakra-ui-steps": "^2.1.0",
     "ethers": "^5.7.2",
     "framer-motion": "^6.5.0",
@@ -132,5 +132,6 @@
     "vite-plugin-node-polyfills": "^0.11.3",
     "vitest": "^0.34.2",
     "webpack": "^5.76.0"
-  }
+  },
+  "packageManager": "yarn@4.0.2"
 }

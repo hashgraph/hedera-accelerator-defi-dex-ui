@@ -32,7 +32,7 @@ const newProposalOptions = [
   },
 ];
 
-export const CreateNewProposal = (props: any) => {
+export const CreateNewProposal = (_props: any) => {
   const selectedProposalType = useRef<string>("new-token");
   const navigate = useNavigate();
 
@@ -50,8 +50,12 @@ export const CreateNewProposal = (props: any) => {
     <Page
       header={
         <PageHeader
-          leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
-          rightContent={[<Breadcrumb to={Paths.Governance.absolute} label="Back to Proposals" />]}
+          leftContent={[
+            <Text textStyle="h2" key="t">
+              Create New Proposal
+            </Text>,
+          ]}
+          rightContent={[<Breadcrumb to={Paths.Governance.absolute} label="Back to Proposals" key="1" />]}
         />
       }
       body={
@@ -62,7 +66,7 @@ export const CreateNewProposal = (props: any) => {
             {newProposalOptions.map((option, index) => {
               const radio = getRadioProps({ value: option.name });
               return (
-                <Box flex="1" width="255px" height="155px">
+                <Box flex="1" width="255px" height="155px" key={index}>
                   <RadioCard key={index} {...radio} padding="0.75rem">
                     <Flex height="100%" flexDirection="column" alignItems="center" justifyContent="space-between">
                       <Text textStyle="h3">{option.type}</Text>

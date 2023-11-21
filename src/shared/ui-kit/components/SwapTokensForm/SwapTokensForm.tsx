@@ -10,7 +10,7 @@ import {
 } from "../../components";
 import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
 import { AccountBalanceJson } from "@hashgraph/sdk";
-import { TransactionState } from "../../../../dex/store/swapSlice";
+import { TransactionState } from "@dex/store";
 import { DefiFormLayout } from "../layouts";
 import { SwapTokensFormData, Token, TokenPair } from "./types";
 import { TokenState } from "../types";
@@ -31,11 +31,11 @@ import {
 import { InitialTokenState } from "../constants";
 import { InitialSwapFormState } from "./constants";
 import { isEmpty, isNil } from "ramda";
-import { useSwapData } from "../../../../dex/hooks";
-import { REFRESH_INTERVAL } from "../../../../dex/hooks/constants";
+import { useSwapData } from "@dex/hooks";
+import { REFRESH_INTERVAL } from "@dex/hooks/constants";
 import { FormSettings, useFormSettings } from "../FormSettings";
-import { convertNumberOfMinsToSeconds } from "../../../../dex/utils";
-import { PairDataResponse } from "../../../../dex/hooks/swap/types";
+import { convertNumberOfMinsToSeconds } from "@dex/utils";
+import { PairDataResponse } from "@dex/hooks/swap/types";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 interface SwapTokensFormProps {
@@ -263,7 +263,7 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
     }
   }
 
-  function handleTokenToTradeSymbolChanged(updatedToken: TokenState) {
+  function handleTokenToTradeSymbolChanged(_updatedToken: TokenState) {
     swapTokensForm.setValue("tokenToReceive", InitialSwapFormState.tokenToReceive);
   }
 
@@ -352,8 +352,9 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
             onTokenAmountChanged={handleTokenToTradeAmountChanged}
             onTokenSymbolChanged={handleTokenToTradeSymbolChanged}
             onSetInputAmountWithFormula={handleTokenToTradeAmountChanged}
+            key="tokeninput"
           />,
-          <Flex direction="column" justifyContent="center" alignItems="end">
+          <Flex direction="column" justifyContent="center" alignItems="end" key="flex">
             <SwitchTokenButton onClick={handleSwapTokenInputsClicked} />
           </Flex>,
           <TokenInput
@@ -368,12 +369,13 @@ for ${formValues.tokenToReceive.amount.toFixed(8)} ${formValues.tokenToReceive.s
             isLoading={props.isLoading}
             tokenPairs={props.tokenPairs ?? []}
             onTokenSymbolChanged={handleTokenToReceiveSymbolChanged}
+            key="tokeninput2"
           />,
         ]}
         metrics={[
-          <MetricLabel label="Transaction Fee" value={transactionFee} isLoading={props.isLoading} />,
-          <MetricLabel label="Price Impact" value={`${priceImpact.toFixed(2)}%`} isLoading={props.isLoading} />,
-          <MetricLabel label="Exchange Rate" value={exchangeRate} isLoading={props.isLoading} />,
+          <MetricLabel label="Transaction Fee" value={transactionFee} isLoading={props.isLoading} key="1" />,
+          <MetricLabel label="Price Impact" value={`${priceImpact.toFixed(2)}%`} isLoading={props.isLoading} key="2" />,
+          <MetricLabel label="Exchange Rate" value={exchangeRate} isLoading={props.isLoading} key="3" />,
         ]}
         actionButtonNotifications={[
           !formSettings.isTransactionDeadlineValid ? (

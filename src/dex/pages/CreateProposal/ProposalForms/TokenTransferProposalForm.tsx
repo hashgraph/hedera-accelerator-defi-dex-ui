@@ -69,9 +69,14 @@ export function TokenTransferProposalForm(): ReactElement {
     <Page
       header={
         <PageHeader
-          leftContent={[<Text textStyle="h2">Create New Proposal</Text>]}
+          leftContent={[
+            <Text key="1" textStyle="h2">
+              Create New Proposal
+            </Text>,
+          ]}
           rightContent={[
             <Breadcrumb
+              key="2"
               to={`${Paths.Governance.absolute}/${Paths.Governance.CreateNewProposal}`}
               label="Back to Select Proposal Type"
             />,

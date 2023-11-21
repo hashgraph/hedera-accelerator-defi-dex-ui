@@ -5,6 +5,7 @@ export const SettingsIcon = createIcon({
   viewBox: "0 0 20 20",
   path: [
     <path
+      key="1"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="1.5"
@@ -12,6 +13,7 @@ export const SettingsIcon = createIcon({
       d="M10.5 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"
     />,
     <path
+      key="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="1.5"
