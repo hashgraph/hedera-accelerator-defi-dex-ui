@@ -16,7 +16,7 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
         <Flex direction="row" gap="4">
           <Flex direction="row" gap="2" alignItems="center">
             <HederaIcon boxSize="8" />
-            <Tag label="Pre-Alpha" />
+            <Tag label="HashDAO" />
           </Flex>
           <Flex direction="row" gap="1">
             {props.menuOptions.map((menuOption, index) => {

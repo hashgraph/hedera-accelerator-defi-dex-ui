@@ -1,4 +1,4 @@
-import { Button, Flex, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { Button, Flex, Link, Modal, ModalBody, ModalContent, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { Color, Text } from "@shared/ui-kit";
 import { LocalStorageKeys } from "../constants";
 import { useLocalStorage } from "@dex/hooks";
@@ -24,18 +24,21 @@ export function TermsConditionModal() {
         <ModalBody>
           <Flex direction="column" alignItems="flex-start" justifyContent="center" gap={5}>
             <Text.P_XSmall_Regular style={{ maxHeight: "16rem", overflowY: "auto" }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus in eros lobortis porta eget sed
-              sapien. Maecenas tristique ultrices sapien id aliquam. Pellentesque sollicitudin bibendum risus. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus in eros lobortis porta eget sed
-              sapien. Maecenas tristique ultrices sapien id aliquam. Pellentesque sollicitudin bibendum risus. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus in eros lobortis porta eget sed
-              sapien. Maecenas tristique ultrices sapien id aliquam. Pellentesque sollicitudin bibendum risus. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus in eros lobortis porta eget sed
-              sapien. Maecenas tristique ultrices sapien id aliquam. Pellentesque sollicitudin bibendum risus. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus in eros lobortis porta eget sed
-              sapien. Maecenas tristique ultrices sapien id aliquam. Pellentesque sollicitudin bibendum risus. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus in eros lobortis porta eget sed
-              sapien. Maecenas tristique ultrices sapien id aliquam. Pellentesque sollicitudin bibendum risus.
+              Our{" "}
+              <Link
+                style={{ color: "blue", textDecoration: "underline" }}
+                href="https://swirldslabs.com/terms-of-service/"
+              >
+                terms and conditions
+              </Link>
+              &nbsp; and our{" "}
+              <Link
+                style={{ color: "blue", textDecoration: "underline" }}
+                href="https://swirldslabs.com/privacy-policy/"
+              >
+                Privacy Policy
+              </Link>
+              &nbsp; are on our main site. Use of this service implies you have accepted these.
             </Text.P_XSmall_Regular>
             <Button variant="primary" width="100%" onClick={() => setStorageValue(true)}>
               <Text.P_Medium_Medium color={Color.White_02}>Accept</Text.P_Medium_Medium>
