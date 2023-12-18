@@ -8,6 +8,6 @@
       "src": "/api/pinToIPFS.ts",
       "methods": ["POST"]
     },
-    { "src": "/((?!api).)*", "dest": "/" }
+    { "src": "/(?!api)", "headers": {"location": "/" }}
   ]
 }
