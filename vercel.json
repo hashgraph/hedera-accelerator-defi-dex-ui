@@ -7,7 +7,7 @@
     {
       "src": "/api/pinToIPFS.ts",
       "methods": ["POST"]
-    }
-  ],
-  "rewrites": [{ "source": "/((?!api).)*", "destination": "/" }]
+    },
+    { "src": "/((?!api).)*", "dest": "/" }
+  ]
 }
