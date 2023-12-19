@@ -1,8 +1,8 @@
 import { Box, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@dex/layouts";
-import { Color, LayoutIcon, TransactionIcon, BoxIcon, LockIcon2, UsersIcon, SettingsIcon } from "@shared/ui-kit";
+import { BoxIcon, Color, LayoutIcon, LockIcon2, SettingsIcon, TransactionIcon, UsersIcon } from "@shared/ui-kit";
 import { useTabFilters } from "@dex/hooks";
-import { useLocation, NavLink, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PropsWithChildren } from "react";
 import { DAO, DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails } from "@dao/services";
 import { DashboardHeader } from "./DashboardHeader";
@@ -74,7 +74,9 @@ export function DAODashboard(props: DAODashboardProps) {
         return daoTabs.filter((tab) => tab.title !== "Staking");
       case DAOType.GovernanceToken:
       case DAOType.NFT:
-        return daoTabs;
+        return daoTabs.filter((tab) => tab.title !== "Staking");
+
+      //        return daoTabs;
       default:
         return [];
     }
