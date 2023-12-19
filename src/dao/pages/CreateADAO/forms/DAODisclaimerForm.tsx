@@ -1,4 +1,4 @@
-import { Checkbox, FormControl, FormErrorMessage } from "@chakra-ui/react";
+import { Checkbox, FormControl, FormErrorMessage, Link } from "@chakra-ui/react";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
@@ -13,8 +13,17 @@ export function DAODisclaimerForm() {
   return (
     <DAOFormContainer>
       <p>
-        布聽足上尾化書美尾喝里火行明己還我停肖拉。汁們就士消草以又巴朱走媽登；怕哥看婆化婆苗話封同胡汁七；星或安假過香米古入向具耍。
-        蝴苦里力坡友點麻更重婆夏做卜至只午欠經。
+        By creating a DAO using this site, you represent, warrant, and agree that your use is consistent with our&nbsp;
+        <Link
+          textDecoration={"underline"}
+          color={"#3078FF"}
+          isExternal={true}
+          href="https://swirldslabs.com/terms-of-service/"
+        >
+          Terms of Service
+        </Link>
+        , does not constitute a Prohibited Use under Section 6, and that any wallet address into which you generate DAO
+        tokens is a wallet address that you own and control.
       </p>
 
       <FormControl isInvalid={Boolean(errors.disclaimer)}>
