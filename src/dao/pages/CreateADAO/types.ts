@@ -96,6 +96,7 @@ export interface CreateADAOFormBase {
   isPublic?: boolean;
   daoLinks: Record<"value", string>[];
   type: DAOType;
+  disclaimer?: boolean;
 }
 
 export interface CreateATokenDAOForm extends CreateADAOFormBase {
