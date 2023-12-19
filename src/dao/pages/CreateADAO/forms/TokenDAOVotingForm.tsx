@@ -3,7 +3,7 @@ import { FormInput, TimeUnitSelector } from "@shared/ui-kit";
 import { CreateATokenDAOForm, DAOGovernanceTokenType } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
-import { DAOToolTips } from "./constants";
+import { DAOToolTips } from "@dao/pages";
 import { ChangeEvent, useState } from "react";
 import { useTimeInputPattern } from "@dao/hooks";
 
@@ -82,7 +82,7 @@ export function TokenDAOVotingForm() {
         <FormInput<"voting.lockingPeriod">
           inputProps={{
             id: "voting.lockingPeriod",
-            label: "Locking period",
+            label: "Delay Period",
             type: "number",
             isTooltipVisible: true,
             tooltipLabel: DAOToolTips.lockingPeriod,
@@ -92,7 +92,14 @@ export function TokenDAOVotingForm() {
             unit: <TimeUnitSelector selectControls={register("voting.lockingPeriodUnit", {})} />,
             register: {
               ...register("voting.lockingPeriod", {
-                required: { value: true, message: "A locking period is required." },
+                required: {
+                  value: true,
+
+                  message: "A vote delay period is required. set to zero if unsure.",
+                },
+                validate: () => {
+                  return voting.lockingPeriod < voting.duration;
+                },
                 onChange: handleLockingPeriodChangeWithPattern,
               }),
             },
