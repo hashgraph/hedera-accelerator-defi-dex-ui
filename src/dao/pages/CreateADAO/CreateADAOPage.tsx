@@ -1,15 +1,15 @@
 import { useForm } from "react-hook-form";
-import { Color, LoadingDialog } from "@shared/ui-kit";
+import { Color, LoadingDialog, Wizard } from "@shared/ui-kit";
 import { Page } from "@dex/layouts";
 import {
   CreateADAOForm,
   CreateAMultiSigDAOForm,
-  CreateATokenDAOForm,
   CreateANFTDAOForm,
-  TokenDAOGovernanceData,
+  CreateATokenDAOForm,
   DAOGovernanceTokenType,
   DAONFTTokenType,
   NFTDAOGovernanceData,
+  TokenDAOGovernanceData,
 } from "./types";
 import { useHandleTransactionSuccess } from "@dex/hooks";
 import { useCreateDAO, useFetchDAOConfig } from "@dao/hooks";
@@ -17,7 +17,6 @@ import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
 import { DAOType } from "@dao/services";
-import { Wizard } from "@shared/ui-kit";
 
 export function CreateADAOPage() {
   const backTo = Routes.Home;
@@ -109,6 +108,11 @@ export function CreateADAOPage() {
   }
 
   const steps = [
+    {
+      label: "Disclaimer",
+      route: `/${Routes.Create}/${Routes.DAODisclaimer}`,
+      validate: async () => trigger(["disclaimer"]),
+    },
     {
       label: "Details",
       route: `/${Routes.Create}/${Routes.DAODetails}`,

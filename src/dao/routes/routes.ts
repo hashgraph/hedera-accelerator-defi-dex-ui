@@ -3,6 +3,7 @@ export const Routes = {
   Create: "create",
   Overview: "overview",
   DAODetails: "details",
+  DAODisclaimer: "disclaimer",
   Type: "type",
   GovernanceToken: "governance-token",
   GovernanceTokenVoting: "governance-token/voting",

@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Navigate, Route } from "react-router-dom";
 import { AppLayout, NotFound } from "@dex/layouts";
 import { Routes } from "./routes";
 import * as Pages from "@dao/pages";
@@ -9,7 +9,8 @@ export const router = createBrowserRouter(
     <Route path={Routes.Home} element={<AppLayout navOptions={[]} />}>
       <Route index element={<Pages.DAOsListPage />} />
       <Route path={Routes.Create} element={<Pages.CreateADAOPage />}>
-        <Route index element={<Navigate to={Routes.DAODetails} />} />
+        <Route index element={<Navigate to={Routes.DAODisclaimer} />} />
+        <Route path={Routes.DAODisclaimer} element={<Pages.DAODisclaimerForm />} />
         <Route path={Routes.DAODetails} element={<Pages.DAODetailsForm />} />
         <Route path={Routes.Type} element={<Pages.DAOTypeForm />} />
         <Route path={Routes.GovernanceToken} element={<Pages.TokenDAOGovernanceForm />} />
