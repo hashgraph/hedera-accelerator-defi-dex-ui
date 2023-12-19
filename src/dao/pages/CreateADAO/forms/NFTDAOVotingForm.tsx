@@ -3,7 +3,7 @@ import { CreateANFTDAOForm, DAONFTTokenType } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useFormContext } from "react-hook-form";
 import { SimpleGrid } from "@chakra-ui/react";
-import { DAOToolTips } from "./constants";
+import { DAOToolTips } from "@dao/pages";
 import { useTimeInputPattern } from "@dao/hooks";
 
 export function NFTDAOVotingForm() {
@@ -13,7 +13,7 @@ export function NFTDAOVotingForm() {
     setValue,
     formState: { errors },
   } = useFormContext<CreateANFTDAOForm>();
-  const { governance } = getValues();
+  const { voting, governance } = getValues();
   const { handleTimeInputChangeWithPattern: handleDurationChangeWithPattern } = useTimeInputPattern((value: number) =>
     setValue("voting.duration", value)
   );
@@ -67,7 +67,7 @@ export function NFTDAOVotingForm() {
         <FormInput<"voting.lockingPeriod">
           inputProps={{
             id: "voting.lockingPeriod",
-            label: "Locking period",
+            label: "Delay Period",
             isTooltipVisible: true,
             tooltipLabel: DAOToolTips.lockingPeriod,
             toolTipLabelPlacement: "top",
@@ -77,7 +77,13 @@ export function NFTDAOVotingForm() {
             unit: <TimeUnitSelector selectControls={register("voting.lockingPeriodUnit", {})} />,
             register: {
               ...register("voting.lockingPeriod", {
-                required: { value: true, message: "A locking period is required." },
+                required: {
+                  value: true,
+                  message: "A proposal delay period is required. set to zero if unsure.",
+                },
+                validate: () => {
+                  return voting.lockingPeriod < voting.duration;
+                },
                 onChange: handleLockingPeriodChangeWithPattern,
               }),
             },
