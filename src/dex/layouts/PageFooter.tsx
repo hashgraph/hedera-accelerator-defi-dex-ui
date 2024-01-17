@@ -1,14 +1,14 @@
-import { Link, Flex } from "@chakra-ui/react";
-import { Text, Color, GithubIcon } from "@shared/ui-kit";
+import { Flex, Link } from "@chakra-ui/react";
+import { Color, GithubIcon, Text } from "@shared/ui-kit";
 
 export function PageFooter() {
   return (
     <Flex layerStyle="footer">
       <Text.P_XSmall_Regular>
         <Link href="https://swirldslabs.com" textStyle="p small regular link" color={Color.Primary._500}>
-          Swirldslabs
+          Swirlds Labs
         </Link>{" "}
-        © 2023
+        © 2023 - 2024
       </Text.P_XSmall_Regular>
       <Flex direction="row" alignItems="center" gap="8">
         <Link
