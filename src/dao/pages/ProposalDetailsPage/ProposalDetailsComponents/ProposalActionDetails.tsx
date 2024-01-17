@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { Text, Color, HashScanLink, HashscanData, HederaIcon, SendTokenIcon } from "@shared/ui-kit";
+import { Color, HashDaoIcon, HashscanData, HashScanLink, SendTokenIcon, Text } from "@shared/ui-kit";
 import { HBARTokenSymbol } from "@dex/services";
 import { formatTokenAmountWithDecimal } from "@dex/utils";
 import { ProposalEvent } from "@dao/hooks";
@@ -23,7 +23,7 @@ export function ProposalActionDetails(props: ProposalActionDetailsProps) {
       <Flex direction="column" gap="2">
         <Text.P_Small_Medium>{event}</Text.P_Small_Medium>
         <Flex direction="row" gap="1" alignItems="center">
-          <HederaIcon />
+          <HashDaoIcon />
           <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
           <Text.P_Medium_Regular color={Color.Neutral._700}>
             {isFungible(tokenType) && `${formatTokenAmountWithDecimal(amount, tokenDecimals)} ${tokenSymbol}`}

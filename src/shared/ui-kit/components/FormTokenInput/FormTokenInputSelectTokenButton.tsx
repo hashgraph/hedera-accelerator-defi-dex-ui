@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Image, Button } from "@chakra-ui/react";
+import { Button, Image } from "@chakra-ui/react";
 import { Color } from "../../themes";
-import { HederaIcon, DefaultLogoIcon } from "../Icons";
+import { DefaultLogoIcon, HashDaoIcon } from "../Icons";
 import { HBARTokenId } from "@dex/services";
 import { isEmpty } from "ramda";
 import { useFormTokenInputContext } from "./FormTokenInputContext";
@@ -29,7 +29,7 @@ export function FormTokenInputSelectTokenButton() {
                 boxSize="4rem"
                 fallback={
                   selectedToken?.tokenId === HBARTokenId ? (
-                    <HederaIcon boxSize="6" />
+                    <HashDaoIcon boxSize="6" />
                   ) : (
                     <DefaultLogoIcon boxSize="6" alignSelf="end" color={Color.Grey_Blue._100} />
                   )

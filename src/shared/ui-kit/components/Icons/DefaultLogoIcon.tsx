@@ -2,15 +2,30 @@ import { createIcon } from "@chakra-ui/react";
 
 export const DefaultLogoIcon = createIcon({
   displayName: "DefaultLogoIcon",
-  viewBox: "0 0 64 64",
+  viewBox: "-20 -10 100 110",
   path: [
-    <rect width="64" height="64" rx="32" fill="currentColor" key="1" />,
+    <path
+      key="1"
+      /* eslint-disable-next-line max-len */
+      d="M50.14,19.59l-13.4,7.99c-1.43.85-2.31,2.4-2.31,4.06v45.43c0,3.67,4,5.95,7.16,4.06l13.4-7.99c1.43-.85,2.31-2.4,2.31-4.06V23.65c0-3.67-4-5.95-7.16-4.06Z"
+      fill="currentcolor"
+      rx="62"
+      id="path20"
+    />,
     <path
       key="2"
-      d="M43.9998 45H40.251V36.9819H23.749V45H20V19H23.749V26.8252H40.251V19H44L43.9998 
-      45ZM23.9262 33.9822H40.4278V29.8396H23.9262V33.9822Z"
-      fill="#00A2AD"
-      rx="32"
+      /* eslint-disable-next-line max-len */
+      d="M22.86,29.16V4.74c0-3.67-4-5.95-7.16-4.06L2.31,8.67c-1.43.85-2.31,2.4-2.31,4.06v9.07c0,1.73.94,3.32,2.45,4.15l13.4,7.36c3.15,1.73,7.01-.55,7.01-4.15Z"
+      fill="currentcolor"
+      rx="62"
+      id="path22"
+    />,
+    <path
+      key="3"
+      d="M0,58.16h0c0,3.67,4,5.95,7.16,4.06h0c3.14-1.87,3.06-6.45-.15-8.21h0c-3.15-1.73-7.01.55-7.01,4.15Z"
+      fill="currentcolor"
+      rx="62"
+      id="path24"
     />,
   ],
 });
