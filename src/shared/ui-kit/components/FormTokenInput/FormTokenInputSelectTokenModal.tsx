@@ -1,23 +1,23 @@
 import { CloseIcon, SearchIcon } from "@chakra-ui/icons";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  Flex,
   Divider,
-  ModalBody,
+  Flex,
+  Image,
+  Input,
   InputGroup,
   InputLeftElement,
-  Input,
   List,
   ListItem,
-  Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
 } from "@chakra-ui/react";
 import { Text } from "@shared/ui-kit";
 import { Color } from "../../themes";
-import { HederaIcon, DefaultLogoIcon } from "../Icons";
-import { useInput, TokenBalance, useAccountTokenBalances } from "@dex/hooks";
+import { DefaultLogoIcon, HashDaoIcon } from "../Icons";
+import { TokenBalance, useAccountTokenBalances, useInput } from "@dex/hooks";
 import { isEmpty, isNil } from "ramda";
 import { FixedSizeList } from "react-window";
 import { useFormTokenInputContext } from "./FormTokenInputContext";
@@ -78,7 +78,7 @@ export function FormTokenInputSelectTokenModal() {
             boxSize="4rem"
             fallback={
               tokenId === HBARTokenId ? (
-                <HederaIcon boxSize="9" />
+                <HashDaoIcon boxSize="9" />
               ) : (
                 <DefaultLogoIcon boxSize="9" color={Color.Grey_Blue._100} />
               )

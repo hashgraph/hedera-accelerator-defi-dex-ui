@@ -1,7 +1,7 @@
-import { Flex, Image, Divider } from "@chakra-ui/react";
+import { Divider, Flex, Image } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatTokenAmountWithDecimal, getShortDescription, replaceLastRoute } from "@dex/utils";
-import { Text, Tag, Card, Color, TagVariant, SendTokenIcon, HederaIcon, DefaultLogoIcon } from "@shared/ui-kit";
+import { Card, Color, DefaultLogoIcon, HashDaoIcon, SendTokenIcon, Tag, TagVariant, Text } from "@shared/ui-kit";
 import { DAO, DAOType } from "@dao/services";
 import { ProposalStateAsTagVariant, ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
@@ -111,7 +111,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
               <>
                 {proposal.type === ProposalType.TokenTransfer && (
                   <Flex alignItems="center">
-                    <HederaIcon />
+                    <HashDaoIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
                       {isFungible(token?.data.type) &&
@@ -130,7 +130,7 @@ export const ProposalCard = (props: ProposalCardProps) => {
               <>
                 {proposal.type === ProposalType.TokenTransfer && (
                   <Flex alignItems="center">
-                    <HederaIcon />
+                    <HashDaoIcon />
                     <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
                     <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
                       {isFungible(token?.data.type) &&
