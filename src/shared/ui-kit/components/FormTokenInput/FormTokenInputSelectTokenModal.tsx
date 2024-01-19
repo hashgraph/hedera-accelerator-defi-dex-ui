@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { Text } from "@shared/ui-kit";
 import { Color } from "../../themes";
-import { DefaultLogoIcon, HashDaoIcon } from "../Icons";
+import { DefaultLogoIcon, HederaIcon } from "../Icons";
 import { TokenBalance, useAccountTokenBalances, useInput } from "@dex/hooks";
 import { isEmpty, isNil } from "ramda";
 import { FixedSizeList } from "react-window";
@@ -78,7 +78,7 @@ export function FormTokenInputSelectTokenModal() {
             boxSize="4rem"
             fallback={
               tokenId === HBARTokenId ? (
-                <HashDaoIcon boxSize="9" />
+                <HederaIcon boxSize="9" />
               ) : (
                 <DefaultLogoIcon boxSize="9" color={Color.Grey_Blue._100} />
               )
