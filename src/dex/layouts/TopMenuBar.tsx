@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { Box, Flex, Menu, MenuItem } from "@chakra-ui/react";
 import { useDexContext } from "@dex/hooks";
-import { Color, HashDaoIcon, Tag, Text, WalletConnection } from "@shared/ui-kit";
+import { Color, HashDaoLogo, Text, WalletConnection } from "@shared/ui-kit";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -15,8 +15,9 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
       <Menu>
         <Flex direction="row" gap="4">
           <Flex direction="row" gap="2" alignItems="center">
-            <HashDaoIcon boxSize="10" />
-            <Tag label="HashDAO" />
+            {/* <HashDaoIcon boxSize="10" />
+            <Tag label="HashDAO" />*/}
+            <HashDaoLogo width="60%" height="100%" />
           </Flex>
           <Flex direction="row" gap="1">
             {props.menuOptions.map((menuOption, index) => {

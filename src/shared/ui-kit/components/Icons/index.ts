@@ -12,6 +12,7 @@ export * from "./TokenIcon";
 export * from "./CircleMinusIcon";
 export * from "./HashDaoIcon";
 export * from "./HashDaoLogo";
+export * from "./HederaIcon";
 export * from "./LightningBoltIcon";
 export * from "./LockIcon";
 export * from "./TwoLayerSettingIcon";
