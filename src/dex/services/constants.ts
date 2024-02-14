@@ -69,11 +69,11 @@ export const Contracts = {
 /** The "hashconnectData" is the string used by the hashconnect lib to modify localStorage */
 export const WALLET_LOCAL_DATA_KEY = "hashconnectData";
 
-export const TREASURY_ID = "0.0.78619";
+export const TREASURY_ID = "0.0.2948681";
 export const TREASURY_KEY =
-  "302e020100300506032b657004220420c8cb72a0addffcbd898689e5b5641c0abff4399ddeb90a04071433e3724e14dd";
+  "3030020100300706052b8104000a04220420d750ddaf60e3089c856c5b9f7592483aeb3bf62f514a90e27c64e3aced6a3232";
 
-export const TOKEN_USER_ID = "0.0.65816";
+export const TOKEN_USER_ID = "0.0.3418035";
 export const TOKEN_USER_KEY =
   "302e020100300506032b657004220420899ec4fb7e8153a36bd37dd9500b9057982bf76bc1f0efa5b8cb170ee2329997";
 
@@ -84,18 +84,18 @@ export const EDITOR_DEFAULT_CHARACTER_COUNT = 7;
 
 export const Tokens = Object.freeze({
   TokenASymbol: "LAB49A",
-  TokenAAccountId: "0.0.80170",
+  TokenAAccountId: "0.0.3418198",
   TokenBSymbol: "LAB49B",
-  TokenBAccountId: "0.0.80174",
+  TokenBAccountId: "0.0.3418199",
   TokenCSymbol: "LAB49C",
-  TokenCAccountId: "0.0.80180",
+  TokenCAccountId: "0.0.3418200",
 });
 
 export const USDC_TOKEN_ID = "0.0.2276691";
 
-export const GovernanceTokenId = "0.0.80158";
+export const GovernanceTokenId = "0.0.3418196";
 
-export const HBARTokenId = "0.0.80165";
+export const HBARTokenId = "0.0.3418197";
 export const HBARTokenAddress = "0.0.0";
 export const HBARTokenSymbol = "HBAR";
 export const HBARSymbol = "ℏ";
