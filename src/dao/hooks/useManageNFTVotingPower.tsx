@@ -42,9 +42,9 @@ export function useManageNFTVotingPower(governanceTokenId: string, tokenHolderAd
 
   function getLoadingDialogMessage(): string {
     if (lockGODTokenSubmit.isLoading)
-      return `Please confirm the locking of ${tokenData.symbol} tokens in your wallet to proceed.`;
+      return `Please confirm the locking of ${tokenData.symbol} tokens in your account to proceed.`;
     if (unLockGODTokenSubmit.isLoading)
-      return `Please confirm the unlocking of ${tokenData.symbol} tokens in your wallet to proceed.`;
+      return `Please confirm the unlocking of ${tokenData.symbol} tokens in your account to proceed.`;
     return "";
   }
   const loadingDialogMessage = getLoadingDialogMessage();
