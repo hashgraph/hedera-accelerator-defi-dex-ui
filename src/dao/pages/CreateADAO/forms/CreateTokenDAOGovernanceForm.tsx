@@ -1,9 +1,9 @@
-import { Flex, Divider, Center, Button, Link } from "@chakra-ui/react";
+import { Button, Center, Divider, Flex, Link } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { Text, FormInput, LoadingDialog, Color, CopyTextButton, SuccessCheckIcon } from "@shared/ui-kit";
+import { Color, CopyTextButton, FormInput, LoadingDialog, SuccessCheckIcon, Text } from "@shared/ui-kit";
 import {
   useCreateToken,
   useFetchAccountInfo,
@@ -63,7 +63,7 @@ export function CreateTokenDAOGovernanceForm() {
   function getLoadingDialogMessage(): string {
     if (isLoadingDialogOpen)
       return `Please confirm the create ${governance.newToken.name} 
-      token transaction in your wallet to proceed.`;
+      token transaction in your account to proceed.`;
     return "";
   }
 
@@ -242,15 +242,15 @@ export function CreateTokenDAOGovernanceForm() {
             flex="3"
             inputProps={{
               id: "governance.newToken.tokenWalletAddress",
-              label: "Token wallet address",
+              label: "Token Account(wallet address)",
               type: "text",
-              placeholder: "Enter wallet address",
+              placeholder: "Enter account (wallet address)",
               isDisabled: isFormInReadOnlyMode,
               register: {
                 ...register("governance.newToken.tokenWalletAddress", {
-                  required: { value: true, message: "Token wallet address is required." },
+                  required: { value: true, message: "Token account (wallet address) is required." },
                   validate: (value) =>
-                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+                    checkForValidAccountId(value) || "Invalid account, please, enter a different one.",
                 }),
               },
             }}
@@ -302,14 +302,14 @@ export function CreateTokenDAOGovernanceForm() {
           <FormInput<"governance.newToken.treasuryWalletAccountId">
             inputProps={{
               id: "governance.newToken.treasuryWalletAccountId",
-              label: "Treasury wallet account id",
+              label: "Treasury account (wallet address)",
               type: "text",
-              placeholder: "Enter wallet account id",
+              placeholder: "Enter account (wallet address)",
               register: {
                 ...register("governance.newToken.treasuryWalletAccountId", {
                   required: { value: true, message: "A treasury account id is required." },
                   validate: (value) =>
-                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+                    checkForValidAccountId(value) || "Invalid account, please, enter a different one.",
                 }),
               },
             }}

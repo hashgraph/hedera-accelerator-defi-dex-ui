@@ -21,7 +21,7 @@ export function MultiSigDAOReviewForm() {
           key="governance.admin"
           inputProps={{
             id: "governance.admin",
-            label: "ADMIN WALLET",
+            label: "ADMIN ACCOUNT",
             type: "text",
             value: governance?.admin,
             isReadOnly: true,
@@ -34,7 +34,7 @@ export function MultiSigDAOReviewForm() {
               key={formInputId}
               inputProps={{
                 id: formInputId,
-                label: "MEMBER WALLET",
+                label: "MEMBER ACCOUNT",
                 type: "text",
                 value: owner.value,
                 isReadOnly: true,

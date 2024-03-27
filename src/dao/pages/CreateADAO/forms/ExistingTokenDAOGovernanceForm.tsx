@@ -1,10 +1,10 @@
 import { useFormContext } from "react-hook-form";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { Text, Color, FormInput, CancelledStepIcon } from "@shared/ui-kit";
+import { CancelledStepIcon, Color, FormInput, Text } from "@shared/ui-kit";
 import { useFetchTokenData } from "@dex/hooks";
 import { debounce } from "ts-debounce";
-import { Flex, Divider, CircularProgress } from "@chakra-ui/react";
+import { CircularProgress, Divider, Flex } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DEBOUNCE_TIME, MirrorNodeTokenById } from "@dex/services";
 import { checkForValidTokenId } from "@dex/utils";
@@ -112,9 +112,9 @@ export function ExistingTokenDAOGovernanceForm() {
         <FormInput<"governance.existingToken.treasuryWalletAccountId">
           inputProps={{
             id: "governance.existingToken.treasuryWalletAccountId",
-            label: "Treasury wallet account id",
+            label: "Treasury account id (wallet address)",
             type: "text",
-            placeholder: "Enter wallet account id",
+            placeholder: "Enter account id",
             register: {
               ...register("governance.existingToken.treasuryWalletAccountId", {
                 required: { value: true, message: "A treasury account id is required." },

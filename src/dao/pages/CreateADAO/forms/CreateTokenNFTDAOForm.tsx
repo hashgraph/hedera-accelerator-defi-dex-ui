@@ -1,4 +1,4 @@
-import { Text, FormInput, LoadingDialog, Color, SuccessCheckIcon, CopyTextButton } from "@shared/ui-kit";
+import { Color, CopyTextButton, FormInput, LoadingDialog, SuccessCheckIcon, Text } from "@shared/ui-kit";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateANFTDAOForm } from "../types";
 import { useFormContext } from "react-hook-form";
@@ -188,15 +188,15 @@ export function CreateTokenNFTDAOForm() {
           <FormInput<"governance.newNFT.tokenWalletAddress">
             inputProps={{
               id: "governance.newNFT.tokenWalletAddress",
-              label: "Token wallet address",
+              label: "Token account (wallet address)",
               type: "text",
-              placeholder: "Enter wallet address",
+              placeholder: "Enter account (wallet address)",
               isDisabled: isFormInReadOnlyMode,
               register: {
                 ...register("governance.newNFT.tokenWalletAddress", {
-                  required: { value: true, message: "Token wallet address is required." },
+                  required: { value: true, message: "Token account (wallet address) is required." },
                   validate: (value) =>
-                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+                    checkForValidAccountId(value) || "Invalid account, please, enter a different one.",
                 }),
               },
             }}
@@ -245,7 +245,7 @@ export function CreateTokenNFTDAOForm() {
                 ...register("governance.newNFT.treasuryWalletAccountId", {
                   required: { value: true, message: "A treasury account id is required." },
                   validate: (value) =>
-                    checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+                    checkForValidAccountId(value) || "Invalid account, please, enter a different one.",
                 }),
               },
             }}

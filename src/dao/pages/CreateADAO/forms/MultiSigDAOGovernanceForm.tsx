@@ -33,14 +33,14 @@ export function MultiSigDAOGovernanceForm() {
       <FormInput<"governance.admin">
         inputProps={{
           id: "governance.admin",
-          label: "Admin wallet address",
+          label: "Admin account id (wallet address)",
           type: "text",
-          placeholder: "Enter address",
+          placeholder: "Enter account id",
           unit: getAdminAddressStatusIcon(),
           register: {
             ...register("governance.admin", {
-              required: { value: true, message: "Admin wallet address is required." },
-              validate: (value) => checkForValidAccountId(value) || "Invalid address, please, enter a different one.",
+              required: { value: true, message: "Admin account id (wallet address) is required." },
+              validate: (value) => checkForValidAccountId(value) || "Invalid account, please, enter a different one.",
               onChange: debounce(handleAdminAddressChange, DEBOUNCE_TIME),
             }),
           },
@@ -52,8 +52,8 @@ export function MultiSigDAOGovernanceForm() {
         fields={fields}
         defaultFieldValue={{ value: "" }}
         formPath="governance.owners"
-        fieldLabel="Member wallet address"
-        fieldPlaceholder="Enter member address"
+        fieldLabel="Member account (wallet address)"
+        fieldPlaceholder="Enter member account"
         fieldButtonText="+ Add Member"
         append={append}
         remove={remove}
