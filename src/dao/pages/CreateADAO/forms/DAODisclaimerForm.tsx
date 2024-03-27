@@ -22,8 +22,8 @@ export function DAODisclaimerForm() {
         >
           Terms of Service
         </Link>
-        , does not constitute a Prohibited Use under Section 6, and that any wallet address into which you generate DAO
-        tokens is a wallet address that you own and control.
+        , does not constitute a Prohibited Use under Section 6, and that any account (wallet address) into which you
+        generate DAO tokens is an account that you own and control.
       </p>
 
       <FormControl isInvalid={Boolean(errors.disclaimer)}>
