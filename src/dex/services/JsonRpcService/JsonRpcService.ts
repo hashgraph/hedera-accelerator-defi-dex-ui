@@ -36,7 +36,8 @@ export function createJsonRpcService(walletAccountId: string = TOKEN_USER_ID) {
   }
 
   function setJsonRpcProviderAndSigner(walletAccountId: string = TOKEN_USER_ID) {
-    JsonRpcProvider = new ethers.providers.JsonRpcProvider(JsonRpcHashioUrl.testnet);
+    JsonRpcProvider = new ethers.providers.JsonRpcProvider(JsonRpcHashioUrl.mainnet);
+    //    JsonRpcProvider = new ethers.providers.JsonRpcProvider(JsonRpcHashioUrl.testnet);
     /**
      * getSigner() requires any solidity address to be passed in as a parameter.
      * Otherwise, the following error is throw in the console:

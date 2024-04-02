@@ -1,9 +1,9 @@
 import { HashConnectTypes } from "hashconnect";
 
 export const DEFAULT_APP_METADATA: HashConnectTypes.AppMetadata = {
-  name: "Hedera Open DEX",
-  description: "An example of a Hedera based DEX",
+  name: "HashDAO",
+  description: "HashDAO - Dao as a service",
   icon: "",
   publicKey: "",
-  url: "https://defi-ui.zilbo.com/",
+  url: "https://dao.zilbo.com/",
 };

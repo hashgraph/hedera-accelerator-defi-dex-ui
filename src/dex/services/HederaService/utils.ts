@@ -23,7 +23,8 @@ const getUser = () => {
 };
 
 const createClient = (accountId: AccountId, privateKey: PrivateKey): Client => {
-  const client = Client.forTestnet();
+  const client = Client.forMainnet();
+  //const client = Client.forTestnet();
   client.setOperator(accountId, privateKey);
   return client;
 };

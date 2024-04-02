@@ -21,18 +21,20 @@ import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
 import { Gas, GasPrice } from "@dex/services";
 
-const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
-/* TODO: Enable for Mainnet usage.
-  const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
-  */
+//const TESTNET_URL = `https://testnet.mirrornode.hedera.com`;
+///* TODO: Enable for Mainnet usage.
+const MAINNET_URL = `https://mainnet-public.mirrornode.hedera.com`;
+//  */
+/*
 const testnetMirrorNodeAPI = axios.create({
   baseURL: TESTNET_URL,
 });
-/* TODO: Enable for Mainnet usage.
-  const mainnetMirrorNodeAPI = axios.create({
-    baseURL: MAINNET_URL
-  });
-  */
+*/
+///* TODO: Enable for Mainnet usage.
+const mainnetMirrorNodeAPI = axios.create({
+  baseURL: MAINNET_URL,
+});
+//  */
 
 const GREATER_THAN = "gte";
 
@@ -55,7 +57,8 @@ function createMirrorNodeService() {
    * @returns The aggregate list of data gathered from the Mirror Node API calls.
    */
   const fetchNextBatch = async <T>(nextUrl: string, field: string, config: any = {}): Promise<T[]> => {
-    const response = await testnetMirrorNodeAPI.get(nextUrl, config);
+    const response = await mainnetMirrorNodeAPI.get(nextUrl, config);
+    //const response = await testnetMirrorNodeAPI.get(nextUrl, config);
     const { links } = response.data;
     const dataBatch = path<T[]>([field], response.data) ?? [];
     const isMoreData = !isNil(links.next);
@@ -95,16 +98,19 @@ function createMirrorNodeService() {
    * @returns Attributes associated with the provided token ID.
    */
   const fetchContract = async (pairAddress: string): Promise<MirrorNodeTokenPairResponse> => {
-    return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    // return await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    return await mainnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
   };
 
   const fetchContractId = async (pairAddress: string): Promise<ContractId> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${pairAddress}`);
+    const response = await mainnetMirrorNodeAPI.get(`/api/v1/accounts/${pairAddress}`);
+    //  const response = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${pairAddress}`);
     return ContractId.fromString(response.data.account);
   };
 
   const fetchContractEVMAddress = async (pairAddress: string): Promise<string> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    const response = await mainnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    //const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
     return response.data.evm_address;
   };
 
@@ -114,7 +120,8 @@ function createMirrorNodeService() {
    * @returns Attributes associated with the provided token ID.
    */
   const fetchTokenData = async (tokenId: string): Promise<MirrorNodeTokenById> => {
-    return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}`);
+    return await mainnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}`);
+    //return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}`);
   };
 
   /**
@@ -166,7 +173,8 @@ function createMirrorNodeService() {
 
   const callContract = async (payload: CallContractParams): Promise<any> => {
     const { block = "latest", data, estimate = false, from, gas = Gas, gasPrice = GasPrice, to, value = 0 } = payload;
-    return await testnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
+    return await mainnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
+      //return await testnetMirrorNodeAPI.post(`/api/v1/contracts/call`, {
       block,
       data,
       estimate,
@@ -185,7 +193,8 @@ function createMirrorNodeService() {
    * @returns The list of balances for the given token ID.
    */
   const fetchTokenBalances = async (tokenId: string): Promise<MirrorNodeBalanceResponse> => {
-    return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/balances`, {
+    //return await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/balances`, {
+    return await mainnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/balances`, {
       params: {
         order: "asc",
       },
@@ -198,7 +207,8 @@ function createMirrorNodeService() {
    * @returns The list of NFTs for the given token ID.
    */
   const fetchTokenNFTs = async (tokenId: string, accountId: string): Promise<MirrorNodeTokenNFTResponse> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/nfts`, {
+    //  const response = await testnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/nfts`, {
+    const response = await mainnetMirrorNodeAPI.get(`/api/v1/tokens/${tokenId}/nfts`, {
       params: {
         order: "asc",
         "account.id": accountId,
@@ -213,7 +223,8 @@ function createMirrorNodeService() {
    * @returns Information about the block.
    */
   const fetchBlock = async (blockNumber: string) => {
-    const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
+    //const block = await testnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
+    const block = await mainnetMirrorNodeAPI.get(`/api/v1/blocks/${blockNumber}`);
     return block.data;
   };
 
@@ -281,7 +292,8 @@ function createMirrorNodeService() {
     contractId: string,
     events: string[]
   ): Promise<Map<string, any[]> | undefined> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+    //const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+    const response = await mainnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
       },
@@ -291,7 +303,8 @@ function createMirrorNodeService() {
   };
 
   const fetchContractLogs = async (contractId: string): Promise<any> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+    //const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
+    const response = await mainnetMirrorNodeAPI.get(`/api/v1/contracts/${contractId.toString()}/results/logs`, {
       params: {
         order: "desc",
       },
@@ -301,7 +314,8 @@ function createMirrorNodeService() {
   };
 
   const fetchAccountInfo = async (accountAddress: string): Promise<MirrorNodeAccountById> => {
-    const { data: accountData } = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${accountAddress}`);
+    //const { data: accountData } = await testnetMirrorNodeAPI.get(`/api/v1/accounts/${accountAddress}`);
+    const { data: accountData } = await mainnetMirrorNodeAPI.get(`/api/v1/accounts/${accountAddress}`);
     return accountData;
   };
 
@@ -311,12 +325,14 @@ function createMirrorNodeService() {
    * @returns The list of transactions for the given associated with given TransactionId
    */
   const fetchTransactionRecord = async (transactionId: string): Promise<MirrorNodeTransaction[]> => {
-    const { data: transactions } = await testnetMirrorNodeAPI.get(`/api/v1/transactions/${transactionId}`);
+    //  const { data: transactions } = await testnetMirrorNodeAPI.get(`/api/v1/transactions/${transactionId}`);
+    const { data: transactions } = await mainnetMirrorNodeAPI.get(`/api/v1/transactions/${transactionId}`);
     return transactions.transactions;
   };
 
   const fetchLatestBlockNumber = async (timestamp: string): Promise<MirrorNodeBlocks[]> => {
-    const response = await testnetMirrorNodeAPI.get("/api/v1/blocks", {
+    // const response = await testnetMirrorNodeAPI.get("/api/v1/blocks", {
+    const response = await mainnetMirrorNodeAPI.get("/api/v1/blocks", {
       params: {
         order: "desc",
         timestamp: `gte:${timestamp}`,
@@ -328,7 +344,8 @@ function createMirrorNodeService() {
   };
 
   const fetchLatestContractId = async (pairAddress: string): Promise<ContractId> => {
-    const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    //const response = await testnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
+    const response = await mainnetMirrorNodeAPI.get(`/api/v1/contracts/${pairAddress}`);
     return ContractId.fromString(response.data.contract_id);
   };
 
