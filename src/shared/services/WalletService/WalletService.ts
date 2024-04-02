@@ -34,6 +34,7 @@ function createWalletService() {
      * fixes this issue. The DEXMetaData state is updated later in the set() function.
      * */
     const initializedDexMetaData = { ...DEXMetaData };
+    console.log("hashconnect=", hashconnect);
     const initData = await hashconnect.init(initializedDexMetaData, network, false);
     return {
       topic: initData.topic,

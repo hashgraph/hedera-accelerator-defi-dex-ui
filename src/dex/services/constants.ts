@@ -1,4 +1,5 @@
-import contractsUAT from "./contractsUAT.json";
+//import contractsUAT from "./contractsUAT.json";
+import contractsMainnet from "./contractsMainnet.json";
 
 interface ContractMetaData {
   name: string;
@@ -25,7 +26,11 @@ enum ContractNames {
 }
 
 function getProxyId(contractName: ContractNames): string {
-  return contractsUAT.find((contract: ContractMetaData) => contract.name === contractName)?.transparentProxyId ?? "";
+  //return contractsUAT.find((contract: ContractMetaData) => contract.name === contractName)?.transparentProxyId ?? "";
+
+  return (
+    contractsMainnet.find((contract: ContractMetaData) => contract.name === contractName)?.transparentProxyId ?? ""
+  );
 }
 
 export const Contracts = {
@@ -95,7 +100,7 @@ export const USDC_TOKEN_ID = "0.0.2276691";
 
 export const GovernanceTokenId = "0.0.3418196";
 
-export const HBARTokenId = "0.0.3418197";
+export const HBARTokenId = "0.0.5245759";
 export const HBARTokenAddress = "0.0.0";
 export const HBARTokenSymbol = "HBAR";
 export const HBARSymbol = "ℏ";

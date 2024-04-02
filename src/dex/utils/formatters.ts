@@ -26,7 +26,8 @@ export function createHashScanTransactionLink(transactionId: string | undefined)
   if (isNil(timestamp)) return "";
   const [seconds, nanoSeconds] = timestamp.split(".");
   // TODO: set testnet/mainnet based on network
-  return `${HashScanUrl}/testnet/transactionsById/${id}-${seconds}-${nanoSeconds}`;
+  // return `${HashScanUrl}/testnet/transactionsById/${id}-${seconds}-${nanoSeconds}`;
+  return `${HashScanUrl}/mainnet/transactionsById/${id}-${seconds}-${nanoSeconds}`;
 }
 
 /**
@@ -36,7 +37,8 @@ export function createHashScanTransactionLink(transactionId: string | undefined)
  */
 export function createHashScanAccountIdLink(accountId: string): HashScanAccountIdLink {
   // TODO: set testnet/mainnet based on network
-  return `${HashScanUrl}/testnet/account/${accountId}`;
+  //  return `${HashScanUrl}/testnet/account/${accountId}`;
+  return `${HashScanUrl}/mainnet/account/${accountId}`;
 }
 
 /**
@@ -46,7 +48,8 @@ export function createHashScanAccountIdLink(accountId: string): HashScanAccountI
  */
 export function createHashScanTokenIdLink(tokenId: string): HashScanTokenIdLink {
   // TODO: set testnet/mainnet based on network
-  return `${HashScanUrl}/testnet/token/${tokenId}`;
+  //return `${HashScanUrl}/testnet/token/${tokenId}`;
+  return `${HashScanUrl}/mainnet/token/${tokenId}`;
 }
 
 export function createHashScanLink(id: string, type: HashscanData): HashScanLink | "" {
