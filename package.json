@@ -21,7 +21,7 @@
     "chakra-ui-steps": "^2.1.0",
     "ethers": "^5.7.2",
     "framer-motion": "^6.5.0",
-    "hashconnect": "^0.2.4",
+    "hashconnect": "^0.2.9",
     "humanize-duration": "^3.30.0",
     "immer": "^10.0.2",
     "long": "^5.2.3",
@@ -47,7 +47,7 @@
     "vite-plugin-svgr": "^3.2.0",
     "vite-tsconfig-paths": "^4.2.0",
     "web-vitals": "^3.4.0",
-    "web3": "^4.1.1",
+    "web3": "^4.7.0",
     "zustand": "^4.1.1"
   },
   "scripts": {
@@ -134,5 +134,5 @@
     "vitest": "^0.34.2",
     "webpack": "^5.76.0"
   },
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.1.1"
 }

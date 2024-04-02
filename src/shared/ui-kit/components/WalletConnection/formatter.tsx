@@ -48,7 +48,8 @@ export const formatWalletConnectionData = (props: WalletConnectionProps) => {
   const { accountId, connectionState, accountBalances } = props;
   const isHbarBalanceZero =
     accountBalances?.hbars !== undefined && Number(accountBalances?.hbars.replace("ℏ", "")) === 0;
-  const hashScanAccountLink = `https://hashscan.io/testnet/account/${accountId}`;
+  //const hashScanAccountLink = `https://hashscan.io/testnet/account/${accountId}`;
+  const hashScanAccountLink = `https://hashscan.io/mainnet/account/${accountId}`;
   return {
     hashScanAccountLink,
     formattedHbarAmount: accountBalances?.hbars

@@ -7,6 +7,7 @@ import viteTsconfigPaths from "vite-tsconfig-paths";
 import svgrPlugin from "vite-plugin-svgr";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import dns from "dns";
+import * as fs from "fs";
 
 const resolvedAliases = Object.fromEntries(
   Object.entries(aliases).map(([key, value]) => [key, path.resolve(__dirname, value)])
@@ -36,6 +37,10 @@ export default defineConfig({
   server: {
     open: true,
     host: "localhost",
+    https:  {
+      key: fs.readFileSync('key.pem'),
+      cert: fs.readFileSync('cert.pem'),
+    }
   },
   plugins: [
     react(),
@@ -49,4 +54,5 @@ export default defineConfig({
       },
     }),
   ],
+
 });

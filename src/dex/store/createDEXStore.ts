@@ -20,7 +20,8 @@ type DEXStore = ReturnType<typeof createDEXStore>;
 
 export const DEFAULT_DEX_PROVIDER_PROPS: DEXProviderProps = {
   DEXMetaData: DEFAULT_APP_METADATA,
-  network: "testnet",
+  //  network: "testnet",
+  network: "mainnet",
   debug: false,
 };
 
