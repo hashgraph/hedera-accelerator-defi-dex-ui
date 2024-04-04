@@ -1,5 +1,5 @@
 import { Button, Divider, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
-import { Text, FormTokenInput, Color, NewTokenIcon, FormDropdown, InlineAlert, InlineAlertType } from "@shared/ui-kit";
+import { Color, FormDropdown, FormTokenInput, InlineAlert, InlineAlertType, NewTokenIcon, Text } from "@shared/ui-kit";
 import { useAccountTokenBalances, usePairedWalletDetails, useTabFilters, useTokenNFTs } from "@dex/hooks";
 import { useForm } from "react-hook-form";
 import { DAOFormContainer } from "../CreateADAO/forms/DAOFormContainer";
@@ -131,6 +131,15 @@ export function DepositTokensModal(props: DepositTokensModalBodyProps) {
             )}
           </Flex>
         )}
+        <Flex>
+          <InlineAlert
+            type={InlineAlertType.Info}
+            message={
+              "Be mindful of depositing governance tokens into the DAO's treasury. " +
+              "They are included in the total supply and you may not be able to pass a vote if you can't reach quorum"
+            }
+          />
+        </Flex>
         <Flex gap="4" backgroundColor={Color.Grey_Blue._50} marginX={-5} padding={5} marginBottom={-10}>
           <Button flex="1" variant="secondary" onClick={handleCancelClicked}>
             Cancel
