@@ -20486,6 +20486,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"web3-errors@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "web3-errors@npm:1.1.4"
+  dependencies:
+    web3-types: "npm:^1.3.1"
+  checksum: b0773a7df2338efc624963e55719894386303703ce393e5ce677fef0c7b4a5293556530386577010f1086a9fa7534346b83c4fc014e79c1107950e20a047b2f2
+  languageName: node
+  linkType: hard
+
 "web3-eth-abi@npm:^4.1.3":
   version: 4.1.3
   resolution: "web3-eth-abi@npm:4.1.3"
@@ -20658,15 +20667,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"web3-types@npm:^1.3.1, web3-types@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "web3-types@npm:1.5.0"
+  checksum: e0146bb69db33303d2e20113b4ccb59696a0f47e4dffb8c49ad96b19e9712a30a881def3771bad8de1fa3ea864b0ebb661cb4907edfaeb5af81abac97ed89d6b
+  languageName: node
+  linkType: hard
+
 "web3-utils@npm:^4.0.7":
-  version: 4.0.7
-  resolution: "web3-utils@npm:4.0.7"
+  version: 4.2.2
+  resolution: "web3-utils@npm:4.2.2"
   dependencies:
     ethereum-cryptography: "npm:^2.0.0"
-    web3-errors: "npm:^1.1.3"
-    web3-types: "npm:^1.3.0"
-    web3-validator: "npm:^2.0.3"
-  checksum: 2939ee3a3ee334da34a930a79e79cf8eebbe44ae1fba3b23211c26eb4e6e0e2abf97537c763f56e95ebed36aef9ab75f1002be2cd6f9a46d6e0b66a5f27edf83
+    eventemitter3: "npm:^5.0.1"
+    web3-errors: "npm:^1.1.4"
+    web3-types: "npm:^1.5.0"
+    web3-validator: "npm:^2.0.5"
+  checksum: fefd4ca450aeff60729da7c39a1949d33080991ffbadcf0cc91ed9104c333d40f7b63ab4a3375d14a29c0c700ba74df0fead8a903f7e3804af3844729e989e05
   languageName: node
   linkType: hard
 
@@ -20680,6 +20697,19 @@ __metadata:
     web3-types: "npm:^1.3.0"
     zod: "npm:^3.21.4"
   checksum: 47186254edb56e196367a7957eee1fc4b926e7053521c63fa55d8b22c9ed402165b48adddf6f173014efaaab8859a709fc5642f8ceba5ba60fba0006f795ee76
+  languageName: node
+  linkType: hard
+
+"web3-validator@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "web3-validator@npm:2.0.5"
+  dependencies:
+    ethereum-cryptography: "npm:^2.0.0"
+    util: "npm:^0.12.5"
+    web3-errors: "npm:^1.1.4"
+    web3-types: "npm:^1.5.0"
+    zod: "npm:^3.21.4"
+  checksum: d6aa3366d6fc7227f9451de300ea5a1370570ae52c1bb32dfe827e37a6acbb4b66fc9d6fd106c348f9041968a3824700174ef0a4c250e122e1b448f570c320bf
   languageName: node
   linkType: hard
 
