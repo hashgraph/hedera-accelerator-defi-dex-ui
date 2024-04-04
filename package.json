@@ -47,7 +47,7 @@
     "vite-plugin-svgr": "^3.2.0",
     "vite-tsconfig-paths": "^4.2.0",
     "web-vitals": "^3.4.0",
-    "web3": "^4.1.1",
+    "web3": "^4.7.1-dev.5341c3a.0",
     "zustand": "^4.1.1"
   },
   "scripts": {
@@ -134,5 +134,5 @@
     "vitest": "^0.34.2",
     "webpack": "^5.76.0"
   },
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.1.1"
 }
