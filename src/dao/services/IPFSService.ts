@@ -1,5 +1,6 @@
 import { PinataPinResponse } from "@pinata/sdk";
 import axios from "axios";
+import * as process from "node:process";
 
 export async function pinMarkdownToIPFS(metadata: string, fileName: string): Promise<PinataPinResponse> {
   const data = {
