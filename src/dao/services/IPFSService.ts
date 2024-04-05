@@ -23,6 +23,8 @@ export async function fetchFileByCID(CID: string): Promise<string> {
   let url = "/.netlify/functions/ipfs";
   if (process.env.VITE_PUBLIC_VERCEL) {
     url = "/api/ipfs";
+  } else {
+    console.log("env", process.env);
   }
   const pinataResponse = await axios.get(url, { params: { CID } });
   if (pinataResponse.status === 200) {
