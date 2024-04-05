@@ -8,7 +8,7 @@ export async function pinMarkdownToIPFS(metadata: string, fileName: string): Pro
     fileName,
   };
   let url = "/.netlify/functions/pinToIPFS";
-  if (process.env.VERCEL) {
+  if (process.env.VITE_PUBLIC_VERCEL) {
     url = "/api/pinToIPFS";
   }
   const pinataResponse = await axios.post<PinataPinResponse>(url, data);
@@ -21,7 +21,7 @@ export async function pinMarkdownToIPFS(metadata: string, fileName: string): Pro
 
 export async function fetchFileByCID(CID: string): Promise<string> {
   let url = "/.netlify/functions/ipfs";
-  if (process.env.VERCEL) {
+  if (process.env.VITE_PUBLIC_VERCEL) {
     url = "/api/ipfs";
   }
   const pinataResponse = await axios.get(url, { params: { CID } });
