@@ -1,7 +1,7 @@
 import { createIcon } from "@chakra-ui/react";
 
 export const HashDaoIcon = createIcon({
-  displayName: "HashDaoIcon",
+  displayName: "HashioDaoIcon",
   viewBox: "0 0 30 30",
   path: (
     <>
