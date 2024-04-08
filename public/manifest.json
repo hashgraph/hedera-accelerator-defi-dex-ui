@@ -1,6 +1,6 @@
 {
-  "short_name": "Open Hedera",
-  "name": "Open Hedera",
+  "short_name": "HashioDAO",
+  "name": "HashioDAO",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +18,16 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "description": "Open Source DAO Formation",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "screenshots": [
+    {"src": "/banner.png",
+      "type": "image/png",
+      "sizes": "1200x670",
+      "form_factor": "wide"
+    }
+  ]
 }
