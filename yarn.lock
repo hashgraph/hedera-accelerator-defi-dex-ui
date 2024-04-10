@@ -9015,9 +9015,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001541":
-  version: 1.0.30001551
-  resolution: "caniuse-lite@npm:1.0.30001551"
-  checksum: 10/3ab880797f2a47ce5e2db38700283219faacbddb4382a730883657b2155240aedda1931aac456bc957f61a41c99e15b42f452e5f68e62272def026fd3bf474a7
+  version: 1.0.30001608
+  resolution: "caniuse-lite@npm:1.0.30001608"
+  checksum: 10/302f278db93491b61de8f79047f0e05289be4a4993eed54b5c5c1e19ecf800339a17084ac6eae9051973f922cd0094e9b371d8b0551a34778c130041a3648513
   languageName: node
   linkType: hard
 
