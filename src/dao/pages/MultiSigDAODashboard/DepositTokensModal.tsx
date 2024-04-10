@@ -133,10 +133,10 @@ export function DepositTokensModal(props: DepositTokensModalBodyProps) {
         )}
         <Flex>
           <InlineAlert
-            type={InlineAlertType.Info}
+            type={InlineAlertType.Error}
             message={
               "Be mindful of depositing governance tokens into the DAO's treasury. " +
-              "They are included in the total supply and you may not be able to pass a vote if you can't reach quorum"
+              "Tokens in treasury cannot be used for voting on proposals and may prevent the ability to reach quorum."
             }
           />
         </Flex>
