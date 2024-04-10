@@ -1,4 +1,4 @@
-import { Box, Flex, Input, Select, Tab, TabList, Tabs, Text } from "@chakra-ui/react";
+import { Alert, Box, Flex, Input, Select, Tab, TabList, Tabs, Text } from "@chakra-ui/react";
 import { CardGridLayout, NotFound, Page, PageHeader } from "@dex/layouts";
 import { DAOTabs, useDAOs } from "@dao/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -11,6 +11,7 @@ import { Color, Pagination, usePagination } from "shared";
 import { ChangeEvent } from "react";
 import { filterDAOs } from "../utils";
 import { DAOsPerPage } from "@dex/services";
+import { isMobile } from "react-device-detect";
 
 export function DAOsListPage() {
   const daos = useDAOs();
@@ -65,7 +66,9 @@ export function DAOsListPage() {
               DAOs
             </Text>,
           ]}
-          rightContent={[<PrimaryHeaderButton name="Create new DAO" route={Routes.Create} key="create-new-dao" />]}
+          rightContent={
+            isMobile ? [] : [<PrimaryHeaderButton name="Create new DAO" route={Routes.Create} key="create-new-dao" />]
+          }
         />
       }
       body={
@@ -136,6 +139,14 @@ export function DAOsListPage() {
             isNextButtonVisible={isNextButtonVisible}
             handlePageClick={handlePageClick}
           />
+          <Flex fontSize={15}>
+            <Alert>
+              <p>
+                This is a permissionless system. This means anyone can create a DAO and call it whatever they like.
+                Please be aware of scammers
+              </p>
+            </Alert>
+          </Flex>
         </Flex>
       }
     />
