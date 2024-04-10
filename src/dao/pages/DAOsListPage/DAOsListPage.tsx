@@ -142,8 +142,11 @@ export function DAOsListPage() {
           <Flex fontSize={15}>
             <Alert>
               <p>
-                This is a permissionless system. This means anyone can create a DAO and call it whatever they like.
-                Please be aware of scammers
+                <strong>Caution</strong>: DAOs listed below are created and named by the DAO creators.
+                <br />
+                <strong>Please exercise caution and be aware of scammers and impersonators</strong>. We do not verify,
+                control, curate, endorse or adopt any Third-Party Content on this site, including the DAOs shown here,
+                and have no responsibility or liability for them.
               </p>
             </Alert>
           </Flex>
