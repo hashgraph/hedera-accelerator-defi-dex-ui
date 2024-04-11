@@ -142,7 +142,7 @@ export function DAOsListPage() {
           <Flex fontSize={15}>
             <Alert>
               <p>
-                <strong>Caution</strong>: DAOs listed below are created and named by the DAO creators.
+                <strong>Caution</strong>: DAOs listed above are created and named by the DAO creators.
                 <br />
                 <strong>Please exercise caution and be aware of scammers and impersonators</strong>. We do not verify,
                 control, curate, endorse or adopt any Third-Party Content on this site, including the DAOs shown here,
