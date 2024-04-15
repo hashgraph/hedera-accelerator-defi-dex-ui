@@ -5,8 +5,7 @@
 </div>
   
 <ul>
-  <li><b><a href="https://dao.zilbo.com">DAO-as-a-Service</a></b></li>
-  <li><b><a href="https://defi-ui.zilbo.com">DEX</a></b></li>
+  <li><b><a href="https://hashiodao.swirldslabs.com/">DAO-as-a-Service</a></b></li>
 </ul>
 
 <hr />
