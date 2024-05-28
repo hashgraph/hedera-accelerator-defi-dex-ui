@@ -23,7 +23,7 @@ jobs:
     - name: Install build tools
       run: sudo apt-get update && sudo apt-get install -y make gcc g++ # Install make and other build tools
 
-    - name: Install dependencies
+    - name: Install npm dependencies
       run: npm install
 
     - name: Set up Yarn
