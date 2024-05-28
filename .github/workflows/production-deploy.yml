@@ -20,6 +20,12 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
 
+    - name: Install build tools
+      run: sudo apt-get update && sudo apt-get install -y make gcc g++ # Install make and other build tools
+
+    - name: Install dependencies
+      run: npm install
+
     - name: Set up Yarn
       uses: Borales/actions-yarn@3766bb1335b98fb13c60eaf358fe20811b730a88 # v5.0.0
       with:
