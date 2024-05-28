@@ -10,27 +10,32 @@ jobs:
     runs-on: [self-hosted, Linux, medium, ephemeral]
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
 
-    - name: Setup Node
-      uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
-    - name: Set up Yarn
-      uses: Borales/actions-yarn@3766bb1335b98fb13c60eaf358fe20811b730a88 # v5.0.0
-      with:
-        cmd: install
-      
-    - name: Install Dependencies
-      run: yarn
-      
-    - name: Check Format
-      run: yarn format
-      
-    - name: Lint
-      run: yarn lint
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
 
-    - name: Build App
-      run: | 
-        yarn build
+      - name: Set up Yarn
+        uses: Borales/actions-yarn@3766bb1335b98fb13c60eaf358fe20811b730a88 # v5.0.0
+        with:
+          cmd: install
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Check Format
+        run: yarn format
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build App
+        run: | 
+          yarn build
       
