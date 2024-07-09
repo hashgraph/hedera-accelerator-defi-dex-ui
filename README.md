@@ -5,14 +5,15 @@
 </div>
   
 <ul>
-  <li><b><a href="https://dao.zilbo.com">DAO-as-a-Service</a></b></li>
-  <li><b><a href="https://defi-ui.zilbo.com">DEX</a></b></li>
+  <li><b><a href="https://dao.web3nomad.org/">DAO-as-a-Service (Testnet)</a></b></li>
+  <li><b><a href="https://hashiodao.swirldslabs.com/">DAO-as-a-Service (Mainnet)</a></b></li>
 </ul>
 
 <hr />
 
 
 ## Status: **POC**
+The DEX component is not active. 
 
 ## Table of Contents
 
