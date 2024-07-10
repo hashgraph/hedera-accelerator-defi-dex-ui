@@ -126,9 +126,23 @@ export function DAOsListPage() {
           >
             {paginatedDAOs?.map((dao: DAO, index: number) => {
               const { accountEVMAddress, name, type, isPrivate, logoUrl } = dao;
-              if (isPrivate) return null;
+              /*
+              if (isPrivate) {
+                <DAOCard key={index} accountEVMAddress={accountEVMAddress} name={name} type={type} logoUrl={logoUrl}
+                isPrivate={isPrivate} />
+              }
+                //return null;
+
+ */
               return (
-                <DAOCard key={index} accountEVMAddress={accountEVMAddress} name={name} type={type} logoUrl={logoUrl} />
+                <DAOCard
+                  key={index}
+                  accountEVMAddress={accountEVMAddress}
+                  name={name}
+                  type={type}
+                  logoUrl={logoUrl}
+                  isPrivate={isPrivate}
+                />
               );
             })}
           </CardGridLayout>

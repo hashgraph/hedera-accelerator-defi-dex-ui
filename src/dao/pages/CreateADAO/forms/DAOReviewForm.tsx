@@ -5,16 +5,15 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  SimpleGrid,
   Checkbox,
   Flex,
   Image,
+  SimpleGrid,
 } from "@chakra-ui/react";
-import { ReactElement, cloneElement } from "react";
-import { Text, FormInput, Tag, ExternalLink } from "@shared/ui-kit";
+import { cloneElement, ReactElement } from "react";
+import { Color, DefaultLogoIcon, ExternalLink, FormInput, Tag, Text } from "@shared/ui-kit";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { DAOType } from "@dao/services";
-import { DefaultLogoIcon, Color } from "@shared/ui-kit";
 
 interface DAOReviewFormProps {
   details: {
@@ -83,6 +82,12 @@ export function DAOReviewForm(props: DAOReviewFormProps) {
                 <Checkbox isChecked={details.isPublic} isReadOnly>
                   List DAO publicly
                 </Checkbox>
+                {details.isPublic ? (
+                  <small>This DAO will be publicly visible</small>
+                ) : (
+                  <small>This DAO will be accessible under the MyDAO TAB, and by anyone who has the address</small>
+                )}
+
                 <Flex direction="column" gap="0.2rem">
                   <Text.P_XSmall_Medium color={Color.Neutral._500}>TYPE</Text.P_XSmall_Medium>
                   <Tag label={details.type} />
