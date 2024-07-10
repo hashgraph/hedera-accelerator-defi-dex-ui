@@ -1,18 +1,18 @@
 import {
-  FormControl,
-  Flex,
-  Image,
   Accordion,
   AccordionButton,
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
   Box,
-  SimpleGrid,
   Checkbox,
+  Flex,
+  FormControl,
+  Image,
+  SimpleGrid,
 } from "@chakra-ui/react";
-import { Controller, useFormContext, useFieldArray } from "react-hook-form";
-import { Text, FormInput, FormTextArea, FormInputList, DefaultLogoIcon, Color } from "@shared/ui-kit";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { Color, DefaultLogoIcon, FormInput, FormInputList, FormTextArea, Text } from "@shared/ui-kit";
 import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useState } from "react";
@@ -121,9 +121,16 @@ export function DAODetailsForm() {
           defaultValue={true}
           render={({ field: { onChange, value, ref } }) => {
             return (
-              <Checkbox onChange={onChange} ref={ref} isChecked={value}>
-                List DAO publicly
-              </Checkbox>
+              <Box>
+                <Checkbox onChange={onChange} ref={ref} isChecked={value}>
+                  List DAO publicly.
+                </Checkbox>
+                <br />
+                <small>
+                  If unchecked, it will not appear in the general searches, but still be accessible by people who know
+                  the address
+                </small>
+              </Box>
             );
           }}
         />
