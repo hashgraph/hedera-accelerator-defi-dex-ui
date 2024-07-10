@@ -1,4 +1,4 @@
-import { Text, Grid, GridItem, Flex, Card, Image } from "@chakra-ui/react";
+import { Card, Flex, Grid, GridItem, Image, Text } from "@chakra-ui/react";
 import { Color, DefaultLogoIcon } from "@shared/ui-kit";
 import { useNavigate } from "react-router-dom";
 import { DAOType } from "@dao/services";
@@ -9,6 +9,7 @@ export interface DAOCardProps {
   name: string;
   type: DAOType;
   logoUrl: string;
+  isPrivate?: boolean;
 }
 
 export function DAOCard(props: DAOCardProps) {
@@ -16,6 +17,7 @@ export function DAOCard(props: DAOCardProps) {
   const navigate = useNavigate();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
+  const bgColor = props.isPrivate ? Color.Yellow_01 : Color.White;
 
   function handleDAOCardClicked() {
     const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
@@ -23,7 +25,13 @@ export function DAOCard(props: DAOCardProps) {
   }
 
   return (
-    <Card variant="dao-card" onClick={handleDAOCardClicked} cursor="pointer" _hover={{ bg: Color.Neutral._100 }}>
+    <Card
+      variant="dao-card"
+      onClick={handleDAOCardClicked}
+      cursor="pointer"
+      _hover={{ bg: Color.Neutral._100 }}
+      bg={bgColor}
+    >
       <Grid
         templateRows="repeat(2, 1fr)"
         templateColumns="repeat(6, 1fr)"

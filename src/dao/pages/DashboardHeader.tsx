@@ -1,15 +1,15 @@
-import { Flex, HStack, Button, Image, VStack } from "@chakra-ui/react";
+import { Button, Flex, HStack, Image, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import {
-  Text,
   Breadcrumb,
-  Color,
-  HashScanLink,
-  HashscanData,
-  Tag,
-  DefaultLogoIcon,
   CheckRightIcon,
+  Color,
+  DefaultLogoIcon,
   ExternalLink,
+  HashscanData,
+  HashScanLink,
+  Tag,
+  Text,
 } from "@shared/ui-kit";
 import { DAOType } from "@dao/services";
 import { MintNFTModal } from "./MintNFTModal";
@@ -27,6 +27,7 @@ interface DashboardHeaderProps {
   type: DAOType;
   logoUrl?: string;
   infoUrl?: string;
+  isPrivate?: boolean;
   handleMintNFT?: (tokenLinks: string[]) => void;
 }
 
@@ -41,6 +42,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
     isMember,
     isAdmin,
     infoUrl,
+    isPrivate,
     handleMintNFT,
   } = props;
   const navigate = useNavigate();
@@ -50,11 +52,11 @@ export function DashboardHeader(props: DashboardHeaderProps) {
   const safeId = daoSafeIdQueryResults.data?.data.contract_id;
   const { data: token } = useToken(govTokenId ?? "");
   const showMintNFTButton = type === DAOType.NFT && Number(token?.data.max_supply) > Number(token?.data.total_supply);
-
+  const colorBG = isPrivate ? Color.Yellow_01 : Color.White;
   return (
-    <Flex bg={Color.White} direction="column" padding="1rem 5rem 0.5rem">
-      <Flex bg={Color.White} direction="row" gap="4">
-        <Flex bg={Color.White} direction="column" gap="2">
+    <Flex bg={colorBG} direction="column" padding="1rem 5rem 0.5rem">
+      <Flex bg={colorBG} direction="row" gap="4">
+        <Flex bg={colorBG} direction="column" gap="2">
           <HStack gap="0.7rem">
             <Image
               boxSize="3.5rem"
@@ -97,7 +99,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             </VStack>
           </HStack>
         </Flex>
-        <Flex bg={Color.White_02} flexGrow="1" justifyContent="right" gap="8">
+        <Flex bg={colorBG} flexGrow="1" justifyContent="right" gap="8">
           <Flex height="40px" alignItems="center">
             <Breadcrumb to={Routes.Home} label="Back to DAOs" />
           </Flex>
@@ -115,9 +117,12 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             >
               New Proposal
             </Button>
-            {isMember || isAdmin ? (
+            {isMember || isAdmin || isPrivate ? (
               <Flex direction="row" justifyContent="right" gap="0.2rem" alignItems="center">
                 <Text.P_Small_Regular color={Color.Neutral._500}>{isAdmin ? "Admin" : "Member"}</Text.P_Small_Regular>
+                {isPrivate ? (
+                  <Text.P_Small_Regular color={Color.Neutral._500}>&nbsp;Private</Text.P_Small_Regular>
+                ) : undefined}
                 <CheckRightIcon boxSize="4" color={Color.Neutral._500} />
               </Flex>
             ) : undefined}
