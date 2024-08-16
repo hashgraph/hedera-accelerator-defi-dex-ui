@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-test-deploy-prod:
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: defi-dex-linux-medium
     
     steps:
     - name: Harden Runner
