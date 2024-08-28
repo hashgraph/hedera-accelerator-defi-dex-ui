@@ -18,7 +18,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/react-syntax-highlighter": "^15.5.13",
     "abitype": "^0.10.3",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "chakra-ui-steps": "^2.1.0",
     "ethers": "^5.7.2",
     "framer-motion": "^6.5.1",
