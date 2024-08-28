@@ -103,6 +103,8 @@ export function DAODashboard(props: DAODashboardProps) {
       />
     );
   }
+  /*
+ If you know the contract, you can view the DAO
 
   if (isDAOFound && dao?.isPrivate) {
     return (
@@ -114,7 +116,7 @@ export function DAODashboard(props: DAODashboardProps) {
       />
     );
   }
-
+*/
   if (dao && isDAOFound && isSuccess) {
     const { accountEVMAddress, type, name, logoUrl } = dao;
     const isGovernance = type === DAOType.GovernanceToken;
@@ -137,10 +139,11 @@ export function DAODashboard(props: DAODashboardProps) {
             govTokenId={tokenId}
             safeEVMAddress={safeEVMAddress}
             handleMintNFT={handleMintNFT}
+            isPrivate={dao.isPrivate}
           />
         }
         body={
-          <Flex direction="column" gap="0.75rem" height="100%">
+          <Flex direction="column" gap="0.75rem" height="100%" bg={dao.isPrivate ? Color.Yellow_01 : Color.White}>
             {isGovernance ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={daoTokenHolder} />
             ) : (
@@ -151,7 +154,7 @@ export function DAODashboard(props: DAODashboardProps) {
               defaultIndex={initialTabIndex}
               onChange={handleTabChange}
               isLazy
-              bg={Color.White}
+              bg={dao.isPrivate ? Color.Yellow_01 : Color.White}
               variant="dao-dashboard-tab"
               height="100%"
             >
