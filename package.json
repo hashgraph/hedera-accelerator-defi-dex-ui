@@ -30,6 +30,7 @@
     "ramda": "^0.29.0",
     "react": "^18.2.0",
     "react-datepicker": "^4.8.0",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.40.0",
@@ -136,5 +137,5 @@
     "vitest": "^0.34.2",
     "webpack": "^5.76.0"
   },
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.4.1"
 }

@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Box, Flex, Menu, MenuItem } from "@chakra-ui/react";
 import { useDexContext } from "@dex/hooks";
 import { Color, HashDaoLogo, Text, WalletConnection } from "@shared/ui-kit";
+import { isMobile } from "react-device-detect";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -33,16 +34,23 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
             })}
           </Flex>
         </Flex>
-        <Box textAlign="right" float="right" borderRadius="8px" width="fit-content">
-          <WalletConnection
-            accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
-            connectionState={wallet.hashConnectConnectionState}
-            accountBalances={wallet.pairedAccountBalance}
-            isLoading={app.isFeatureLoading("pairedAccountBalance")}
-            connectToWallet={wallet.connectToWallet}
-            disconnectFromWallet={wallet.disconnectWallet}
-          />
-        </Box>
+        {isMobile && (
+          <Box textAlign="right" float="right" borderRadius="8px" width="fit-content">
+            Desktop only
+          </Box>
+        )}
+        {!isMobile && (
+          <Box textAlign="right" float="right" borderRadius="8px" width="fit-content">
+            <WalletConnection
+              accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
+              connectionState={wallet.hashConnectConnectionState}
+              accountBalances={wallet.pairedAccountBalance}
+              isLoading={app.isFeatureLoading("pairedAccountBalance")}
+              connectToWallet={wallet.connectToWallet}
+              disconnectFromWallet={wallet.disconnectWallet}
+            />
+          </Box>
+        )}
       </Menu>
     </Flex>
   );
