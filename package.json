@@ -1,8 +1,8 @@
 {
   "type": "module",
   "name": "hts-open-dex-react-ui",
-  "author": "LAB49",
-  "version": "0.1.0",
+  "author": "HashGraph,LAB49",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "main": "./src/index.tsx",
@@ -138,6 +138,7 @@
     "husky": "^8.0.3",
     "jsdom": "^22.1.0",
     "lint-staged": "^13.3.0",
+    "netlify-cli": "^17.34.3",
     "prop-types": "^15.8.1",
     "storybook": "^7.6.20",
     "typescript": "^5.5.3",
