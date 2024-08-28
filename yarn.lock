@@ -16798,7 +16798,7 @@ __metadata:
     vite-tsconfig-paths: "npm:^4.3.2"
     vitest: "npm:^0.34.6"
     web-vitals: "npm:^3.5.2"
-    web3: "npm:^4.10.0"
+    web3: "npm:^4.7.1-dev.5341c3a.0"
     webpack: "npm:^5.92.1"
     zustand: "npm:^4.5.4"
   languageName: unknown
@@ -27358,7 +27358,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web3@npm:^4.10.0":
+"web3@npm:^4.7.1-dev.5341c3a.0":
   version: 4.12.1
   resolution: "web3@npm:4.12.1"
   dependencies:
