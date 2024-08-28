@@ -139,5 +139,10 @@
     "vitest": "^0.34.6",
     "webpack": "^5.92.1"
   },
+  "overrides": {
+    "simple-crypto-js": {
+      "crypto-js": "3.3.0"
+    }
+  },
   "packageManager": "yarn@4.4.1"
 }
