@@ -8903,7 +8903,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.4, axios@npm:^1.7.2":
+"axios@npm:^1.6.4":
   version: 1.7.2
   resolution: "axios@npm:1.7.2"
   dependencies:
@@ -8911,6 +8911,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10/6ae80dda9736bb4762ce717f1a26ff997d94672d3a5799ad9941c24d4fb019c1dff45be8272f08d1975d7950bac281f3ba24aff5ecd49ef5a04d872ec428782f
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.4":
+  version: 1.7.5
+  resolution: "axios@npm:1.7.5"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/6cbcfe943a84089f420a900a3a3aeb54ee94dcc9c2b81b150434896357be5d1079eff0b1bbb628597371e79f896b1bc5776df04184756ba99656ff31df9a75bf
   languageName: node
   linkType: hard
 
@@ -13785,7 +13796,7 @@ __metadata:
     "@vercel/node": "npm:^3.2.2"
     "@vitejs/plugin-react": "npm:^4.3.1"
     abitype: "npm:^0.10.3"
-    axios: "npm:^1.7.2"
+    axios: "npm:^1.7.4"
     babel-plugin-named-exports-order: "npm:^0.0.2"
     c8: "npm:^8.0.1"
     chakra-ui-steps: "npm:^2.1.0"
