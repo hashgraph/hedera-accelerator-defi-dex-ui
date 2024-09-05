@@ -138,4 +138,5 @@
     "webpack": "^5.76.0"
   },
   "packageManager": "yarn@4.1.1"
+
 }
