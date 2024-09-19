@@ -1,9 +1,8 @@
-import { HashConnectTypes } from "hashconnect";
+import { DappMetadata } from "hashconnect";
 
-export const DEFAULT_APP_METADATA: HashConnectTypes.AppMetadata = {
+export const DEFAULT_APP_METADATA: DappMetadata = {
   name: "Hedera Open DEX",
   description: "An example of a Hedera based DEX",
-  icon: "",
-  publicKey: "",
+  icons: [],
   url: "https://defi-ui.zilbo.com/",
 };

@@ -10,7 +10,7 @@ import {
   NftId,
   Hbar,
 } from "@hashgraph/sdk";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 import { checkTransactionResponseForError } from "./utils";
 import { BigNumber } from "bignumber.js";
 

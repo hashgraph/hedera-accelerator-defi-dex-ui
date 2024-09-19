@@ -12,7 +12,7 @@ export * from "./constants";
 export * from "./utils";
 
 const MirrorNodeService = createMirrorNodeService();
-const WalletService = createWalletService();
+const WalletService = createWalletService(MirrorNodeService);
 const HederaService = createHederaService();
 const JsonRpcService = createJsonRpcService();
 const DexAPIService = createDexService();

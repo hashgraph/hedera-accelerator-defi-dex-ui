@@ -9,7 +9,7 @@ import { formatTokenBalance, getTokenBalance, getTokenData, halfOf } from "@shar
 import { ChangeEvent, useEffect } from "react";
 import { Token as TokenInputType } from "./types";
 import { InitialTokenState } from "../constants";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 
 const DefaultTokenMeta = InitialTokenState.tokenMeta;
 

@@ -8,7 +8,7 @@ import {
   NotficationTypes,
   useNotification,
 } from "../../components";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { TransactionState } from "@dex/store";
 import { DefiFormLayout } from "../layouts";

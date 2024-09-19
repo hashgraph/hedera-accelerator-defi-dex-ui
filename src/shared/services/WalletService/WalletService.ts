@@ -1,97 +1,79 @@
-import { AccountId } from "@hashgraph/sdk";
-import { HashConnect, HashConnectTypes } from "hashconnect";
-import { HashConnectProvider } from "hashconnect/dist/esm/provider/provider";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { Networks } from "../../../dex/store/walletSlice";
+import { AccountBalanceJson, AccountId, LedgerId, Hbar } from "@hashgraph/sdk";
+import { HashConnect } from "hashconnect";
+import BigNumber from "bignumber.js";
 import { HashConnectEventHandlers } from "./types";
+import { DEFAULT_APP_METADATA } from "@dex/context/constants";
+import { HashConnectSigner } from "hashconnect/dist/signer";
+import { MirrorNodeServiceType, MirrorNodeTokenById } from "@dex/services";
 
 type WalletServiceType = ReturnType<typeof createWalletService>;
 
-function createWalletService() {
-  const hashconnect = new HashConnect(true);
+const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
-  const getHashconnectInstance = () => {
-    return hashconnect;
+function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
+  const appData = { ...DEFAULT_APP_METADATA };
+  const hashconnect = new HashConnect(LedgerId.MAINNET, projectId, appData, true);
+
+  const getSigner = (accountId: string): HashConnectSigner => {
+    return hashconnect.getSigner(AccountId.fromString(accountId));
   };
 
-  const getProvider = (network: string, topicId: string, signingAccount: string): HashConnectProvider => {
-    return hashconnect.getProvider(network, topicId, signingAccount);
-  };
-
-  const getSigner = (provider: HashConnectProvider): HashConnectSigner => {
-    return hashconnect.getSigner(provider);
-  };
-
-  const initWalletConnection = async (
-    DEXMetaData: HashConnectTypes.AppMetadata | HashConnectTypes.WalletMetadata,
-    network: Networks,
-    debug: boolean
-  ) => {
-    /**
-     * hashconnect.init mutates the metadata parameter. Since DEXMetaData is a part of the application store
-     * it should not be directly mutated. A Type error is throw when the hashconnect.init function
-     * is called with DEXMetaData. Passing in a clone of the DEXMetaData state to the hashconnect.init function
-     * fixes this issue. The DEXMetaData state is updated later in the set() function.
-     * */
-    const initializedDexMetaData = { ...DEXMetaData };
-    const initData = await hashconnect.init(initializedDexMetaData, network, false);
-    return {
-      topic: initData.topic,
-      pairingString: initData.pairingString,
-      savedPairings: initData.savedPairings[0],
-    };
+  const initWalletConnection = async () => {
+    await hashconnect.init();
   };
 
   const connectToWalletExtension = async () => {
-    return hashconnect.connectToLocalWallet();
+    return hashconnect.openPairingModal();
   };
 
-  const getAccountBalance = async (provider: HashConnectProvider, accountId: string | AccountId) => {
-    const walletBalance = await provider.getAccountBalance(accountId);
-    return walletBalance.toJSON();
+  const getAccountBalance = async (accountId: string): Promise<AccountBalanceJson> => {
+    const signer = hashconnect.getSigner(AccountId.fromString(accountId));
+
+    try {
+      const walletBalance = await signer.getAccountBalance();
+      return walletBalance.toJSON();
+    } catch (err) {
+      const balances = await mirrorNodeService.fetchAccountBalances(accountId);
+      const accountBalance = balances.find((b) => b.account === accountId);
+      const accountTokensData = await Promise.all(
+        accountBalance?.tokens.map((token) => mirrorNodeService.fetchTokenData(token.token_id)) || []
+      );
+
+      return {
+        hbars: Hbar.fromTinybars(accountBalance?.balance ?? 0).toString(),
+        tokens: (accountBalance?.tokens || []).map((token) => {
+          const tokenData = accountTokensData.find(
+            (tokenData) => tokenData.data.token_id === token.token_id
+          ) as MirrorNodeTokenById;
+          const tokenDecimals = Number(tokenData.data.decimals);
+
+          return {
+            decimals: tokenDecimals,
+            balance: BigNumber(token.balance).shiftedBy(-tokenDecimals).toString(),
+            tokenId: token.token_id,
+          };
+        }),
+      };
+    }
   };
 
-  const disconnect = async (topic: string) => {
-    await hashconnect.disconnect(topic);
+  const disconnect = async () => {
+    await hashconnect.disconnect();
   };
 
   const setupHashConnectEvents = (eventHandlers: HashConnectEventHandlers) => {
-    const {
-      handleFoundExtensionEvent,
-      handlePairingEvent,
-      handleAcknowledgeMessageEvent,
-      handleConnectionStatusChangeEvent,
-      handleTransactionEvent,
-      handleAdditionalAccountRequestEvent,
-    } = eventHandlers;
-    hashconnect.foundExtensionEvent.on(handleFoundExtensionEvent);
+    const { handlePairingEvent, handleConnectionStatusChangeEvent } = eventHandlers;
     hashconnect.pairingEvent.on(handlePairingEvent);
-    hashconnect.acknowledgeMessageEvent.on(handleAcknowledgeMessageEvent);
     hashconnect.connectionStatusChangeEvent.on(handleConnectionStatusChangeEvent);
-    hashconnect.transactionEvent.on(handleTransactionEvent);
-    hashconnect.additionalAccountRequestEvent.on(handleAdditionalAccountRequestEvent);
   };
 
   const destroyHashConnectEvents = (eventHandlers: HashConnectEventHandlers) => {
-    const {
-      handleFoundExtensionEvent,
-      handlePairingEvent,
-      handleAcknowledgeMessageEvent,
-      handleConnectionStatusChangeEvent,
-      handleTransactionEvent,
-      handleAdditionalAccountRequestEvent,
-    } = eventHandlers;
-    hashconnect.foundExtensionEvent.off(handleFoundExtensionEvent);
+    const { handlePairingEvent, handleConnectionStatusChangeEvent } = eventHandlers;
     hashconnect.pairingEvent.off(handlePairingEvent);
-    hashconnect.acknowledgeMessageEvent.off(handleAcknowledgeMessageEvent);
     hashconnect.connectionStatusChangeEvent.off(handleConnectionStatusChangeEvent);
-    hashconnect.transactionEvent.off(handleTransactionEvent);
-    hashconnect.additionalAccountRequestEvent.off(handleAdditionalAccountRequestEvent);
   };
 
   return {
-    getHashconnectInstance,
-    getProvider,
     getSigner,
     initWalletConnection,
     connectToWalletExtension,
@@ -103,4 +85,5 @@ function createWalletService() {
 }
 
 export type { WalletServiceType };
+
 export { createWalletService };

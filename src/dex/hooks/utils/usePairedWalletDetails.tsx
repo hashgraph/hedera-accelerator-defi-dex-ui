@@ -1,4 +1,4 @@
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { useDexContext } from "@dex/hooks";
 
 export function usePairedWalletDetails() {

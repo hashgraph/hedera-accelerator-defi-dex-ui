@@ -1,5 +1,5 @@
 import { Button } from "@chakra-ui/react";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { useNavigate } from "react-router-dom";
 import { useDexContext } from "../hooks";
 

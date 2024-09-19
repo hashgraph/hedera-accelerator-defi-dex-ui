@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 import {
   AccountId,
   ContractId,

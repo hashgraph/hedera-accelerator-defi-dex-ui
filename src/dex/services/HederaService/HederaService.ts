@@ -1,4 +1,4 @@
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 import { BigNumber } from "bignumber.js";
 import {
   AccountId,
