@@ -9,12 +9,11 @@ import {
 import { ContractId } from "@hashgraph/sdk";
 import { Contracts, DEX_PRECISION, DEX_TOKEN_PRECISION_VALUE, GovernanceTokenId } from "../constants";
 import { GovernorContractFunctions } from "./types";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 import { checkTransactionResponseForError } from "./utils";
 import { DexService } from "@dex/services";
 import { ethers } from "ethers";
 import { Proposal } from "@dao/hooks";
-// import { Proposal } from "@dex/store";
 
 /**
  * General format of service calls:

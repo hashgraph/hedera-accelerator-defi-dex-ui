@@ -1,12 +1,11 @@
 import { isEmpty, isNil, uniqBy } from "ramda";
 import { TokenState, CONNECT_TO_VIEW, SELECT_TOKEN_TO_VIEW, Token, TokenPair } from "@shared/ui-kit";
-import { TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
 import { HBARTokenId } from "@dex/services";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { formatBigNumberToPercent } from "@dex/utils";
 import { UserPool } from "@dex/store/poolsSlice";
 import { BigNumber } from "bignumber.js";
-import { TokenType, ContractId, TokenId, AccountId } from "@hashgraph/sdk";
+import { TokenType, ContractId, TokenId, AccountId, TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
 
 /**
  * Returns half of the input amount.

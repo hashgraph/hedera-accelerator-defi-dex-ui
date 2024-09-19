@@ -1,6 +1,6 @@
 import { TokenBalanceJson } from "@hashgraph/sdk/lib/account/AccountBalance";
 import { TransactionResponse } from "@hashgraph/sdk";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 import { useMutation } from "react-query";
 import { useDexContext } from "@dex/hooks";
 import { DexService, Tokens } from "@dex/services";

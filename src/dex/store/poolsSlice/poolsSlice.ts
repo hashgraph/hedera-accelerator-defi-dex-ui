@@ -147,8 +147,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
 
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-      const provider = DexService.getProvider(network, wallet.topicID, signingAccount);
-      const signer = DexService.getSigner(provider);
+      const signer = DexService.getSigner(signingAccount);
 
       const tokenAHbarQty = isHbarToken(inputToken.address) ? inputToken.amount : 0.0;
       const tokenBHbarQty = isHbarToken(outputToken.address) ? outputToken.amount : 0.0;
@@ -392,11 +391,9 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
       lpAccountId,
       transactionDeadline,
     }: SendWithdrawTransactionParams) => {
-      const { context, app, wallet } = get();
-      const { network } = context;
+      const { app, wallet } = get();
       app.setFeaturesAsLoading(["withdrawTransactionState"]);
-      const provider = DexService.getProvider(network, wallet.topicID, wallet.savedPairingData?.accountIds[0] ?? "");
-      const signer = DexService.getSigner(provider);
+      const signer = DexService.getSigner(wallet.savedPairingData?.accountIds[0] ?? "");
       const walletId = wallet.savedPairingData?.accountIds[0] ?? "";
       const lpTokenAmountBigNumber = wallet.getTokenAmountWithPrecision(lpAccountId, lpTokenAmount);
       try {
@@ -479,8 +476,7 @@ const createPoolsSlice: PoolsSlice = (set, get): PoolsStore => {
 
       const signingAccount = wallet.savedPairingData?.accountIds[0] ?? "";
       const walletAddress = AccountId.fromString(signingAccount).toSolidityAddress();
-      const provider = DexService.getProvider(network, wallet.topicID, signingAccount);
-      const signer = DexService.getSigner(provider);
+      const signer = DexService.getSigner(signingAccount);
 
       const tokenAHbarQty = isHbarToken(params.firstToken.address) ? params.firstToken.amount : 0.0;
       const tokenBHbarQty = isHbarToken(params.secondToken.address) ? params.secondToken.amount : 0.0;

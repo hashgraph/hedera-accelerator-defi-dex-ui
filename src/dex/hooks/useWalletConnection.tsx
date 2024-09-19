@@ -1,4 +1,4 @@
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { useCallback, useEffect } from "react";
 import { useDexContext } from ".";
 

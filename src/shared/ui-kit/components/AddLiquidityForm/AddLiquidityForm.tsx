@@ -1,5 +1,5 @@
 import { Text, Button, Flex, Spacer } from "@chakra-ui/react";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

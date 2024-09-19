@@ -4,6 +4,7 @@ import { DexService, MirrorNodeTokenById, MirrorNodeTokenPairResponse } from "..
 import { getErrorMessage, isHbarToken, withPrecision } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 import { isNil } from "ramda";
+import { Signer } from "@hashgraph/sdk/lib/Signer";
 
 const initialSwapState: SwapState = {
   pairInfo: {
@@ -222,7 +223,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       transactionDeadline: number,
       tokenToReceiveId: string
     ) => {
-      const { context, wallet, app, swap } = get();
+      const { wallet, app, swap } = get();
       app.setFeaturesAsLoading(["transactionState"]);
       set(
         ({ swap }) => {
@@ -242,12 +243,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
       );
       const tokenToTradeAmount = isHbarToken(tokenToTradeId) ? BigNumber(0) : tokenAmount;
       const HbarAmount = isHbarToken(tokenToTradeId) ? tokenToTrade.amount : 0.0;
-      const provider = DexService.getProvider(
-        context.network,
-        wallet.topicID,
-        wallet.savedPairingData?.accountIds[0] ?? ""
-      );
-      const signer = DexService.getSigner(provider);
+      const signer = DexService.getSigner(wallet.savedPairingData?.accountIds[0] ?? "");
       if (swap.pairInfo.precision === undefined) {
         throw Error("Precision not found");
       }

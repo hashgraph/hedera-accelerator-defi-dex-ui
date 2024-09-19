@@ -16,7 +16,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { WalletTokenAssociation } from "./WalletTokenAssociation";
 import { Color } from "../../themes";
@@ -48,7 +48,7 @@ export interface WalletConnectionProps {
  */
 export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement => {
   const { accountId, connectionState, isLoading, connectToWallet, disconnectFromWallet } = props;
-  const { hashScanAccountLink, formattedHbarAmount, connectionNotification, connectionStatusColor } =
+  const { hashScanAccountLink, formattedHbarAmount, formattedTokens, connectionNotification, connectionStatusColor } =
     formatWalletConnectionData(props);
   /**
    * A reference that tracks a timeout used to limit the length of time a
@@ -189,6 +189,28 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
                 <Text.P_XSmall_Regular color={Color.White_01}>-</Text.P_XSmall_Regular>
               </GridItem>
             </Grid>
+            {formattedTokens?.length && (
+              <Grid templateColumns="repeat(3, 1fr)">
+                <GridItem justifySelf="left" colSpan={1}>
+                  <Text.H4_Medium color={Color.White_01} marginBottom="1rem" marginRight="0.5rem">
+                    Tokens
+                  </Text.H4_Medium>
+                  {formattedTokens.map((token) => (
+                    <Text.P_XSmall_Regular color={Color.White_01} key={token.tokenId}>
+                      {token.tokenId}
+                    </Text.P_XSmall_Regular>
+                  ))}
+                </GridItem>
+                <GridItem justifySelf="right" colSpan={1}>
+                  <Text.H4_Medium color={Color.White_01} marginBottom="1rem">
+                    In Wallet
+                  </Text.H4_Medium>
+                  {formattedTokens.map((token) => (
+                    <Text.P_XSmall_Regular color={Color.White_01}>{token?.balance}</Text.P_XSmall_Regular>
+                  ))}
+                </GridItem>
+              </Grid>
+            )}
             <Center gap="2">
               <Link href={hashScanAccountLink} isExternal>
                 <Text.P_XSmall_Regular_Link>

@@ -4,7 +4,7 @@ import { TokenInputLayout } from "../layouts";
 import { formulaTypes, LPTokenState } from "../types";
 import { halfOf } from "@shared/utils";
 import { ChangeEvent } from "react";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { CONNECT_TO_VIEW } from "../TokenInput";
 
 interface LPTokenInputProps<T extends FieldValues> {

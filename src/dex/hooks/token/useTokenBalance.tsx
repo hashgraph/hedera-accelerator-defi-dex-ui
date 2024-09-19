@@ -3,7 +3,6 @@ import { useQuery } from "react-query";
 import { DexService } from "@dex/services";
 import { AccountBalanceJson } from "@hashgraph/sdk";
 import { useDexContext } from "..";
-import { getFormattedTokenBalances } from "../../store/walletSlice/utils";
 import { isNil } from "ramda";
 
 interface UseTokenBalanceProps {
@@ -16,21 +15,21 @@ type UseTokenBalanceQueryKey = [TokenQueries.TokenBalance, string | undefined];
 
 export function useTokenBalance(props: UseTokenBalanceProps) {
   const { tokenId, handleTokenBalanceSuccessResponse, handleTokenBalanceErrorResponse } = props;
-  const { context, wallet } = useDexContext(({ wallet, context }) => ({ wallet, context }));
-  const accountId = wallet.savedPairingData?.accountIds[0];
-  const provider = DexService.getProvider(context.network, wallet.topicID, accountId ?? "");
+  const { wallet } = useDexContext(({ wallet, context }) => ({ wallet, context }));
+  const accountId = wallet.savedPairingData?.accountIds[0] ?? "";
 
   return useQuery<AccountBalanceJson | undefined, Error, number | undefined, UseTokenBalanceQueryKey>(
     [TokenQueries.TokenBalance, accountId],
     async () => {
-      return DexService.getAccountBalance(provider, wallet.savedPairingData?.accountIds[0] ?? "");
+      return accountId ? DexService.getAccountBalance(accountId) : undefined;
     },
     {
       select: (data) => {
-        const token = data?.tokens.find((token) => token.tokenId === tokenId);
+        const token = data?.tokens.find((token: { tokenId: string }) => token.tokenId === tokenId);
+
         if (isNil(token)) return undefined;
-        const formattedTokenBalance = getFormattedTokenBalances([token]);
-        return Number(formattedTokenBalance.find((token) => token.tokenId === tokenId)?.balance ?? 0);
+
+        return Number(token.balance);
       },
       enabled: !!(accountId && tokenId),
       onSuccess: (data) => {

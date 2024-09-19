@@ -37,7 +37,7 @@ import {
   ProposalDataDetails,
   LockedTokenDetails,
 } from "./types";
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
 import { ProposalData } from "../../dex/services/DexService/governance/type";
 import { isNil, isNotNil } from "ramda";

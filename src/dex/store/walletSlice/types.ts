@@ -1,10 +1,9 @@
-import { HashConnectSigner } from "hashconnect/dist/esm/provider/signer";
-import { HashConnectTypes, MessageTypes } from "hashconnect";
 import { BigNumber } from "bignumber.js";
-import { DEXState } from "../createDEXStore";
 import { StateCreator } from "zustand";
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { AccountBalanceJson } from "@hashgraph/sdk";
+import { HashConnectSigner } from "hashconnect/dist/signer";
+import { DEXState } from "../createDEXStore";
 
 enum WalletActionType {
   INITIALIZE_WALLET_CONNECTION_STARTED = "wallet/INITIALIZE_WALLET_CONNECTION_STARTED",
@@ -37,11 +36,10 @@ type ConnectionStatus = "Paired" | "Connected" | "Connecting" | "Disconnected";
 type WalletConnectionStatusTypes = keyof typeof WalletConnectionStatus;
 
 interface WalletState {
-  availableExtension: HashConnectTypes.WalletMetadata | null;
   hashConnectConnectionState: HashConnectConnectionState;
-  topicID: string;
-  pairingString: string;
-  savedPairingData: HashConnectTypes.SavedPairingData | null;
+  savedPairingData: {
+    accountIds: string[];
+  } | null;
   pairedAccountBalance: AccountBalanceJson | null;
   errorMessage: string | null;
 }
@@ -55,12 +53,8 @@ interface WalletActions {
   fetchAccountBalance: () => Promise<void>;
   doesUserHaveGODTokensToVote: () => boolean;
   isPaired: () => boolean;
-  handleFoundExtensionEvent: (walletMetadata: HashConnectTypes.WalletMetadata) => void;
-  handlePairingEvent: (approvePairing: MessageTypes.ApprovePairing) => void;
-  handleAcknowledgeMessageEvent: (acknowledgeData: MessageTypes.Acknowledge) => void;
+  handlePairingEvent: (approvePairing: any) => void;
   handleConnectionStatusChangeEvent: (connectionStatus: HashConnectConnectionState) => void;
-  handleTransactionEvent: (transaction: MessageTypes.Transaction) => void;
-  handleAdditionalAccountRequestEvent: (additionalAccountResponse: MessageTypes.AdditionalAccountRequest) => void;
   setupHashConnectEvents: () => void;
   destroyHashConnectEvents: () => void;
 }

@@ -1,4 +1,4 @@
-import { HashConnectConnectionState } from "hashconnect/dist/esm/types";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { WalletConnectionProps } from ".";
 import { Color, Notification, NotficationTypes } from "../..";
 
@@ -49,8 +49,10 @@ export const formatWalletConnectionData = (props: WalletConnectionProps) => {
   const isHbarBalanceZero =
     accountBalances?.hbars !== undefined && Number(accountBalances?.hbars.replace("ℏ", "")) === 0;
   const hashScanAccountLink = `https://hashscan.io/testnet/account/${accountId}`;
+
   return {
     hashScanAccountLink,
+    formattedTokens: accountBalances?.tokens ?? [],
     formattedHbarAmount: accountBalances?.hbars
       ? `${Number(accountBalances.hbars.replace("ℏ", "")).toFixed(6)} ℏ`
       : "- ℏ",
