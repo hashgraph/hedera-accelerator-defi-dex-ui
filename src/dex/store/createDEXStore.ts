@@ -7,6 +7,7 @@ import { createSwapSlice, SwapStore } from "./swapSlice";
 import { createPoolsSlice, PoolsStore } from "./poolsSlice";
 import { DEXProviderProps } from "../context";
 import { DEFAULT_APP_METADATA } from "../context/constants";
+import { LedgerId } from "@hashgraph/sdk";
 
 interface DEXState {
   context: DEXProviderProps;
@@ -20,7 +21,7 @@ type DEXStore = ReturnType<typeof createDEXStore>;
 
 export const DEFAULT_DEX_PROVIDER_PROPS: DEXProviderProps = {
   DEXMetaData: DEFAULT_APP_METADATA,
-  network: "testnet",
+  network: LedgerId.TESTNET,
   debug: false,
 };
 
