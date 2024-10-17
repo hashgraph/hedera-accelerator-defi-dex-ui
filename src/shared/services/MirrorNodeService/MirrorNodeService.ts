@@ -20,9 +20,11 @@ import { ContractId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
 import { Gas, GasPrice } from "@dex/services";
+import { getDefaultLedgerId } from "shared";
 
 const mirrorNodeRPCUrls = {
-  mainnet: "https://mainnet-public.mirrornode.hedera.com",
+  // TODO: enable mainnet (current issue: no DAO's for "https://mainnet-public.mirrornode.hedera.com"
+  mainnet: "https://testnet.mirrornode.hedera.com",
   testnet: "https://testnet.mirrornode.hedera.com",
 };
 
@@ -54,7 +56,7 @@ type FetchParams = { network: Networks };
  */
 function createMirrorNodeService(
   params: FetchParams = {
-    network: (localStorage.getItem("activeNetwork") as Networks) || "mainnet",
+    network: getDefaultLedgerId() as unknown as Networks,
   }
 ) {
   /**
