@@ -419,7 +419,7 @@ export async function fetchGovernanceDAOLogs(
   const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
 
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
-    return await DexService.fetchContractProposalEvents(governorAddress, false);
+    return await DexService.fetchContractProposalEvents(governorAddress);
   };
 
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {

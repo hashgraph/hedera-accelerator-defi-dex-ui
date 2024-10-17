@@ -53,9 +53,12 @@ export const formatWalletConnectionData = (props: WalletConnectionProps) => {
   return {
     hashScanAccountLink,
     formattedTokens: accountBalances?.tokens ?? [],
-    formattedHbarAmount: accountBalances?.hbars
-      ? `${Number(accountBalances.hbars.replace("ℏ", "")).toFixed(6)} ℏ`
-      : "- ℏ",
+    formattedHbarAmount:
+      accountBalances?.hbars && accountBalances?.hbars !== "0 tℏ"
+        ? `${Number(accountBalances.hbars.replace("ℏ", "")).toFixed(6)} ℏ`
+        : accountBalances?.hbars === "0 tℏ"
+        ? "0 ℏ"
+        : "- ℏ",
     connectionNotification: getConnectionStateNotification({ connectionState, hashScanAccountLink, isHbarBalanceZero }),
     connectionStatusColor: getConnectionStatusColor(connectionState, isHbarBalanceZero),
   };

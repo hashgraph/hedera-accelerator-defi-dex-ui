@@ -20,7 +20,6 @@ import { ContractId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
 import { Gas, GasPrice } from "@dex/services";
-import { Networks } from "@dex/store/walletSlice";
 
 const mirrorNodeRPCUrls = {
   mainnet: "https://mainnet-public.mirrornode.hedera.com",
@@ -43,6 +42,8 @@ const GREATER_THAN = "gte";
 
 type MirrorNodeServiceType = ReturnType<typeof createMirrorNodeService>;
 
+type Networks = "mainnet" | "testnet" | "previewnet";
+
 type FetchParams = { network: Networks };
 
 /**
@@ -51,7 +52,11 @@ type FetchParams = { network: Networks };
  * @returns The state of the mirror node data as well as functions that can be used to fetch
  * the latest mirror node network data.
  */
-function createMirrorNodeService(params: FetchParams = { network: "mainnet" }) {
+function createMirrorNodeService(
+  params: FetchParams = {
+    network: (localStorage.getItem("activeNetwork") as Networks) || "mainnet",
+  }
+) {
   /**
    * Continues to call a mirror node endpoint to fetch subsiquent batches of data until all query data is
    * retrieved. The Mirror Node API is limited to returning a maximum of 100 records. When there are additional
@@ -253,10 +258,7 @@ function createMirrorNodeService(params: FetchParams = { network: "mainnet" }) {
   }
 
   // TODO: Move to Governance Service
-  const fetchContractProposalEvents = async (
-    contractId: string,
-    limitResults = true
-  ): Promise<MirrorNodeDecodedProposalEvent[]> => {
+  const fetchContractProposalEvents = async (contractId: string): Promise<MirrorNodeDecodedProposalEvent[]> => {
     const response: MirrorNodeProposalEventLog[] = await fetchNextBatch(
       `/api/v1/contracts/${contractId.toString()}/results/logs`,
       "logs",

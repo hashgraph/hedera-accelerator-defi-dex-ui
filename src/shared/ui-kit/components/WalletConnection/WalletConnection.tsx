@@ -24,6 +24,7 @@ import { formatWalletConnectionData } from "./formatter";
 import { DexService, TOKEN_USER_ID } from "@dex/services";
 import { isEmpty } from "ramda";
 import { Text } from "../Text";
+import { NetworkSwitcher } from "@dex/components/NetworkSwitcher";
 
 export interface WalletConnectionProps {
   /** The account ID the application is paired with. */
@@ -227,6 +228,9 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
             <Center>
               <WalletTokenAssociation />
             </Center>
+            <Center>
+              <NetworkSwitcher />
+            </Center>
           </Flex>
         </PopoverContent>
       </Popover>
@@ -235,4 +239,5 @@ export const WalletConnectionBase = (props: WalletConnectionProps): ReactElement
 };
 
 const WalletConnection = chakra(WalletConnectionBase);
+
 export { WalletConnection };

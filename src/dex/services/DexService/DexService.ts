@@ -1,4 +1,5 @@
 import daoSDK from "@dao/services";
+import { LedgerId } from "@hashgraph/sdk";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
 
@@ -37,6 +38,8 @@ function createDexService() {
     proposeMultiSigTextProposal: daoSDK.proposeMultiSigTextProposal,
     sendChangeAdminForProposalTransaction: daoSDK.sendChangeAdminForProposalTransaction,
     sendTransferOwnershipTransaction: daoSDK.sendTransferOwnershipTransaction,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    reconnectToOtherNetwork: async (_network: LedgerId) => {},
   };
 }
 

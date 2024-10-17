@@ -4,6 +4,7 @@ import { getErrorMessage } from "../../utils";
 import { WalletSlice, WalletStore, WalletActionType, WalletState } from "./types";
 import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { GovernanceTokenId, DexService } from "../../services";
+import { LedgerId } from "@hashgraph/sdk";
 
 const initialWalletState: WalletState = {
   hashConnectConnectionState: HashConnectConnectionState.Disconnected,
@@ -144,6 +145,9 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
         handlePairingEvent,
         handleConnectionStatusChangeEvent,
       });
+    },
+    reconnect: (newNetwork: LedgerId) => {
+      DexService.reconnectToOtherNetwork(newNetwork);
     },
   };
 };
