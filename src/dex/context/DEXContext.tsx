@@ -1,12 +1,12 @@
 import { createContext, useRef } from "react";
 import { createDEXStore, DEXStore } from "../store";
-import { Networks } from "../store/walletSlice";
 import { DappMetadata } from "hashconnect";
+import { LedgerId } from "@hashgraph/sdk";
 
 interface DEXProviderProps {
   children?: React.ReactNode;
   DEXMetaData: DappMetadata;
-  network: Networks;
+  network: LedgerId;
   debug: boolean;
 }
 

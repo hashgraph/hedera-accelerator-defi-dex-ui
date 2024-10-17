@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { StateCreator } from "zustand";
 import { HashConnectConnectionState } from "hashconnect/dist/types";
-import { AccountBalanceJson } from "@hashgraph/sdk";
+import { AccountBalanceJson, LedgerId } from "@hashgraph/sdk";
 import { HashConnectSigner } from "hashconnect/dist/signer";
 import { DEXState } from "../createDEXStore";
 
@@ -29,8 +29,6 @@ enum WalletConnectionStatus {
   PAIRED = "Paired",
 }
 
-type Networks = "testnet" | "mainnet" | "previewnet";
-
 type ConnectionStatus = "Paired" | "Connected" | "Connecting" | "Disconnected";
 
 type WalletConnectionStatusTypes = keyof typeof WalletConnectionStatus;
@@ -57,6 +55,7 @@ interface WalletActions {
   handleConnectionStatusChangeEvent: (connectionStatus: HashConnectConnectionState) => void;
   setupHashConnectEvents: () => void;
   destroyHashConnectEvents: () => void;
+  reconnect: (newNetwork: LedgerId) => void;
 }
 
 interface WalletStore extends WalletState, WalletActions {}
@@ -69,12 +68,4 @@ type WalletSlice = StateCreator<
 >;
 
 export { WalletActionType, WalletConnectionStatus };
-export type {
-  WalletSlice,
-  WalletStore,
-  WalletState,
-  WalletActions,
-  Networks,
-  ConnectionStatus,
-  WalletConnectionStatusTypes,
-};
+export type { WalletSlice, WalletStore, WalletState, WalletActions, ConnectionStatus, WalletConnectionStatusTypes };
