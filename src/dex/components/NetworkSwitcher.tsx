@@ -2,11 +2,10 @@ import { Flex, Select, Button } from "@chakra-ui/react";
 import { LedgerId } from "@hashgraph/sdk";
 import { useState } from "react";
 import { useDexContext } from "@dex/hooks";
+import { getDefaultLedgerId } from "shared";
 
 const networkSelectOptions: LedgerId[] = [LedgerId.MAINNET, LedgerId.TESTNET, LedgerId.PREVIEWNET];
-const defaultSelectedNetwork =
-  (localStorage.getItem("activeNetwork") && LedgerId.fromString(localStorage.getItem("activeNetwork") ?? "")) ||
-  LedgerId.MAINNET;
+const defaultSelectedNetwork = getDefaultLedgerId();
 
 export function NetworkSwitcher() {
   const [selectedNetwork, setSelectedNetwork] = useState<LedgerId>(defaultSelectedNetwork);
