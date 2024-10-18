@@ -432,7 +432,6 @@ export const solidityAddressToContractIdString = (address: string): string => {
 
 export function getDefaultLedgerId() {
   const isDevEnvironment = devDomains.includes(window.location.hostname);
-
   const storedNetwork =
     localStorage.getItem("activeNetwork") && LedgerId.fromString(localStorage.getItem("activeNetwork") as string);
 

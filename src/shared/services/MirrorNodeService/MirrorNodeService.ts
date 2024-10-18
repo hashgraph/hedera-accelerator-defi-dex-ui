@@ -23,7 +23,8 @@ import { Gas, GasPrice } from "@dex/services";
 import { getDefaultLedgerId } from "shared";
 
 const mirrorNodeRPCUrls = {
-  mainnet: "https://mainnet-public.mirrornode.hedera.com",
+  // TODO: enable mainnet (current issue: no DAO's for "https://mainnet-public.mirrornode.hedera.com"
+  mainnet: "https://testnet.mirrornode.hedera.com",
   testnet: "https://testnet.mirrornode.hedera.com",
 };
 
