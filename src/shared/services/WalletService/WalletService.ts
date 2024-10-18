@@ -1,10 +1,11 @@
-import { AccountBalanceJson, AccountId, LedgerId, Hbar } from "@hashgraph/sdk";
+import { AccountBalanceJson, AccountId, Hbar, LedgerId } from "@hashgraph/sdk";
 import { HashConnect } from "hashconnect";
 import BigNumber from "bignumber.js";
 import { HashConnectEventHandlers } from "./types";
 import { DEFAULT_APP_METADATA } from "@dex/context/constants";
 import { HashConnectSigner } from "hashconnect/dist/signer";
 import { MirrorNodeServiceType, MirrorNodeTokenById } from "@dex/services";
+import { getDefaultLedgerId } from "shared";
 
 type WalletServiceType = ReturnType<typeof createWalletService>;
 
@@ -12,10 +13,17 @@ const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
   const appData = { ...DEFAULT_APP_METADATA };
-  const hashconnect = new HashConnect(LedgerId.MAINNET, projectId, appData, true);
+  const hashconnect = new HashConnect(getDefaultLedgerId(), projectId, appData, true);
 
   const getSigner = (accountId: string): HashConnectSigner => {
     return hashconnect.getSigner(AccountId.fromString(accountId));
+  };
+
+  const reconnectToOtherNetwork = (network: LedgerId) => {
+    disconnect().then(() => {
+      localStorage.setItem("activeNetwork", network.toString());
+      setTimeout(() => window.location.reload(), 2000);
+    });
   };
 
   const initWalletConnection = async () => {
@@ -81,6 +89,7 @@ function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
     disconnect,
     setupHashConnectEvents,
     destroyHashConnectEvents,
+    reconnectToOtherNetwork,
   };
 }
 

@@ -5,7 +5,17 @@ import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { formatBigNumberToPercent } from "@dex/utils";
 import { UserPool } from "@dex/store/poolsSlice";
 import { BigNumber } from "bignumber.js";
-import { TokenType, ContractId, TokenId, AccountId, TokenBalanceJson, AccountBalanceJson } from "@hashgraph/sdk";
+import {
+  TokenType,
+  ContractId,
+  TokenId,
+  AccountId,
+  TokenBalanceJson,
+  AccountBalanceJson,
+  LedgerId,
+} from "@hashgraph/sdk";
+
+export const devDomains = ["dao.web3nomad.org", "localhost"];
 
 /**
  * Returns half of the input amount.
@@ -419,3 +429,12 @@ export const solidityAddressToContractIdString = (address: string): string => {
     return address;
   }
 };
+
+export function getDefaultLedgerId() {
+  const isDevEnvironment = devDomains.includes(window.location.hostname);
+
+  const storedNetwork =
+    localStorage.getItem("activeNetwork") && LedgerId.fromString(localStorage.getItem("activeNetwork") as string);
+
+  return storedNetwork || (isDevEnvironment ? LedgerId.TESTNET : LedgerId.MAINNET);
+}
