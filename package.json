@@ -22,7 +22,7 @@
     "axios": "^1.7.2",
     "bignumber.js": "^9.1.2",
     "chakra-ui-steps": "^2.1.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.0.0",
     "framer-motion": "^6.5.1",
     "hashconnect": "3.0.10",
     "humanize-duration": "^3.32.1",
