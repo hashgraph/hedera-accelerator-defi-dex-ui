@@ -19,11 +19,10 @@ function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
     return hashconnect.getSigner(AccountId.fromString(accountId));
   };
 
-  const reconnectToOtherNetwork = (network: LedgerId) => {
-    disconnect().then(() => {
-      localStorage.setItem("activeNetwork", network.toString());
-      setTimeout(() => window.location.reload(), 2000);
-    });
+  const reconnectToOtherNetwork = async (network: LedgerId) => {
+    localStorage.setItem("activeNetwork", network.toString());
+    await disconnect();
+    setTimeout(() => window.location.reload(), 2000);
   };
 
   const initWalletConnection = async () => {
