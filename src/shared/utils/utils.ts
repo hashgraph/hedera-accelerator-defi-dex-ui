@@ -15,6 +15,8 @@ import {
   LedgerId,
 } from "@hashgraph/sdk";
 
+export const devDomains = ["dao.web3nomad.org", "localhost"];
+
 /**
  * Returns half of the input amount.
  * @param amount - An amount of a tokens.
@@ -429,8 +431,9 @@ export const solidityAddressToContractIdString = (address: string): string => {
 };
 
 export function getDefaultLedgerId() {
-  return (
-    (localStorage.getItem("activeNetwork") && LedgerId.fromString(localStorage.getItem("activeNetwork") ?? "")) ||
-    LedgerId.MAINNET
-  );
+  const isDevEnvironment = devDomains.includes(window.location.hostname);
+  const storedNetwork =
+    localStorage.getItem("activeNetwork") && LedgerId.fromString(localStorage.getItem("activeNetwork") as string);
+
+  return storedNetwork || (isDevEnvironment ? LedgerId.TESTNET : LedgerId.MAINNET);
 }

@@ -1,4 +1,6 @@
+import { getDefaultLedgerId } from "shared";
 import contractsUAT from "./contractsUAT.json";
+import contractsMainnet from "./contractsMainnet.json";
 
 interface ContractMetaData {
   name: string;
@@ -25,7 +27,13 @@ enum ContractNames {
 }
 
 function getProxyId(contractName: ContractNames): string {
-  return contractsUAT.find((contract: ContractMetaData) => contract.name === contractName)?.transparentProxyId ?? "";
+  const activeNetwork = getDefaultLedgerId();
+
+  return (
+    (activeNetwork.toString() === "mainnet" ? contractsMainnet : contractsUAT).find(
+      (contract: ContractMetaData) => contract.name === contractName
+    )?.transparentProxyId ?? ""
+  );
 }
 
 export const Contracts = {
