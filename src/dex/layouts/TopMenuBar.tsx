@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
-import { Box, Flex, Menu, MenuItem } from "@chakra-ui/react";
+import { Box, Flex, Menu, MenuItem, Alert, Text } from "@chakra-ui/react";
 import { useDexContext } from "@dex/hooks";
-import { Color, HashDaoLogo, Text, WalletConnection } from "@shared/ui-kit";
+import { Color, HashDaoLogo, WalletConnection } from "@shared/ui-kit";
 import { isMobile } from "react-device-detect";
+import { useEffect, useState } from "react";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
@@ -10,6 +11,18 @@ export interface TopMenuBarProps {
 
 export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
   const { app, wallet } = useDexContext(({ app, context, wallet }) => ({ app, context, wallet }));
+  const [reconnectionInProgress, setReconnectionInProgress] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("reconnectionInProgress")) {
+      setReconnectionInProgress(true);
+
+      setTimeout(() => {
+        localStorage.removeItem("reconnectionInProgress");
+        setReconnectionInProgress(false);
+      }, 10000);
+    }
+  }, []);
 
   return (
     <Flex as="header" layerStyle="navbar">
@@ -20,6 +33,14 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
             <Tag label="HashDAO" />*/}
             <HashDaoLogo width="60%" height="100%" />
           </Flex>
+          <Alert variant="">
+            {reconnectionInProgress && (
+              <Text fontSize={13} fontStyle="italic">
+                Network switching detected. If you {"don't"} have any accounts in selected network since we unable check
+                it, you can back to previous one.
+              </Text>
+            )}
+          </Alert>
           <Flex direction="row" gap="1">
             {props.menuOptions.map((menuOption, index) => {
               return (
