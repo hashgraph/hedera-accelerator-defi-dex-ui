@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { Box, Flex, Menu, MenuItem, Alert, Text } from "@chakra-ui/react";
+import { Box, Flex, Menu, MenuItem, Alert } from "@chakra-ui/react";
 import { useDexContext } from "@dex/hooks";
-import { Color, HashDaoLogo, WalletConnection } from "@shared/ui-kit";
+import { Color, HashDaoLogo, WalletConnection, Text } from "@shared/ui-kit";
 import { isMobile } from "react-device-detect";
 import { useEffect, useState } from "react";
 
@@ -35,10 +35,10 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
           </Flex>
           <Alert variant="">
             {reconnectionInProgress && (
-              <Text fontSize={13} fontStyle="italic">
-                Network switching detected. If you {"don't"} have any accounts in selected network since we unable check
-                it, you can back to previous one.
-              </Text>
+              <Text.P_Small_Regular fontStyle="italic">
+                Network switching detected. If you {"don't"} have any accounts on the selected network since we are
+                unable to check it, you can switch back to the previous one.
+              </Text.P_Small_Regular>
             )}
           </Alert>
           <Flex direction="row" gap="1">
