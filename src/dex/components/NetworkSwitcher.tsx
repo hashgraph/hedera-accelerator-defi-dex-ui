@@ -25,7 +25,7 @@ export function NetworkSwitcher() {
   };
 
   return (
-    <Flex direction="column" width="62%">
+    <Flex direction="column" maxWidth={200}>
       <Select
         value={selectedNetwork?.toString()}
         height={39}
@@ -49,7 +49,7 @@ export function NetworkSwitcher() {
             </option>
           ))}
       </Select>
-      <Button variant="ternary" onClick={handleSwitchNetwork} disabled={selectedNetwork == defaultSelectedNetwork}>
+      <Button variant="primary" onClick={handleSwitchNetwork} disabled={selectedNetwork == defaultSelectedNetwork}>
         Change network
       </Button>
     </Flex>

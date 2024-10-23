@@ -21,6 +21,7 @@ function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
 
   const reconnectToOtherNetwork = async (network: LedgerId) => {
     localStorage.setItem("activeNetwork", network.toString());
+    localStorage.setItem("reconnectionInProgress", "true");
     await disconnect();
     setTimeout(() => window.location.reload(), 2000);
   };
