@@ -1,4 +1,5 @@
 import { Flex, Link } from "@chakra-ui/react";
+import { NetworkSwitcher } from "@dex/components";
 import { Color, GithubIcon, Text } from "@shared/ui-kit";
 
 export function PageFooter() {
@@ -55,6 +56,9 @@ export function PageFooter() {
             <GithubIcon fill={Color.Primary._500} /> Smart Contracts
           </Flex>
         </Link>
+        <Flex pt={5} pb={5}>
+          <NetworkSwitcher />
+        </Flex>
       </Flex>
     </Flex>
   );

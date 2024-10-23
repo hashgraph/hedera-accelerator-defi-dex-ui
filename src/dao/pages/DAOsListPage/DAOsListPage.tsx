@@ -2,7 +2,7 @@ import { Alert, Box, Flex, Input, Select, Tab, TabList, Tabs, Text } from "@chak
 import { CardGridLayout, NotFound, Page, PageHeader } from "@dex/layouts";
 import { DAOTabs, useDAOs } from "@dao/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { PrimaryHeaderButton, NetworkSwitcher } from "@dex/components";
+import { PrimaryHeaderButton } from "@dex/components";
 import { DAOCard } from "./DAOCard";
 import { Routes } from "@dao/routes";
 import { DAO, DAOType } from "@dao/services";
@@ -67,12 +67,7 @@ export function DAOsListPage() {
             </Text>,
           ]}
           rightContent={
-            isMobile
-              ? [<NetworkSwitcher key="switch-network" />]
-              : [
-                  <PrimaryHeaderButton name="Create new DAO" route={Routes.Create} key="create-new-dao" />,
-                  <NetworkSwitcher key="switch-network" />,
-                ]
+            isMobile ? [] : [<PrimaryHeaderButton name="Create new DAO" route={Routes.Create} key="create-new-dao" />]
           }
         />
       }
