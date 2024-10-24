@@ -4,14 +4,14 @@ import { Color, GithubIcon, Text } from "@shared/ui-kit";
 
 export function PageFooter() {
   return (
-    <Flex layerStyle="footer">
+    <Flex layerStyle="footer" alignItems="flex-end" mt="5">
       <Text.P_XSmall_Regular>
         <Link href="https://swirldslabs.com" textStyle="p small regular link" color={Color.Primary._500}>
           Swirlds Labs
         </Link>{" "}
         © 2023 - 2024
       </Text.P_XSmall_Regular>
-      <Flex direction="row" alignItems="center" gap="8">
+      <Flex direction="row" alignItems="flex-end" gap="8">
         <Link
           textStyle="p small regular link"
           color={Color.Primary._500}
@@ -56,9 +56,7 @@ export function PageFooter() {
             <GithubIcon fill={Color.Primary._500} /> Smart Contracts
           </Flex>
         </Link>
-        <Flex pt={5} pb={5}>
-          <NetworkSwitcher />
-        </Flex>
+        <NetworkSwitcher />
       </Flex>
     </Flex>
   );
