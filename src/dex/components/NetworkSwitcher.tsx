@@ -3,6 +3,7 @@ import { LedgerId } from "@hashgraph/sdk";
 import { useState } from "react";
 import { useDexContext } from "@dex/hooks";
 import { getDefaultLedgerId } from "shared";
+import { Text, Color } from "@shared/ui-kit";
 
 const networkSelectOptions: LedgerId[] = [LedgerId.MAINNET, LedgerId.TESTNET];
 const defaultSelectedNetwork = getDefaultLedgerId();
@@ -25,11 +26,14 @@ export function NetworkSwitcher() {
   };
 
   return (
-    <Flex direction="column" maxWidth={200}>
+    <Flex direction="row" gap="2">
       <Select
         value={selectedNetwork?.toString()}
         height={39}
-        mb="1"
+        color={Color.Primary._500}
+        textColor={Color.Primary._500}
+        fontSize={14}
+        minWidth={120}
         variant="dropDownSelector"
         id="network-switcher-select"
         onChange={handleSelectNetwork}
@@ -49,8 +53,13 @@ export function NetworkSwitcher() {
             </option>
           ))}
       </Select>
-      <Button variant="primary" onClick={handleSwitchNetwork} disabled={selectedNetwork == defaultSelectedNetwork}>
-        Change network
+      <Button
+        variant="primary"
+        minWidth={128}
+        onClick={handleSwitchNetwork}
+        disabled={selectedNetwork == defaultSelectedNetwork}
+      >
+        <Text.P_Small_Regular color={Color.White}>Change network</Text.P_Small_Regular>
       </Button>
     </Flex>
   );
