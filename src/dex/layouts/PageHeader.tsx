@@ -8,7 +8,7 @@ interface PageHeaderProps {
 
 export function PageHeader(props: PageHeaderProps) {
   return (
-    <Flex direction="row" alignItems="flex-start" gap="4" padding="24px 80px 16px" height="88px">
+    <Flex direction="row" alignItems="center" padding="24px 80px 16px" height="88px">
       {props.leftContent}
       <Spacer />
       {props.rightContent}
