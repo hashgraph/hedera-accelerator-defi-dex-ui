@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDexContext } from "@dex/hooks";
 import { getDefaultLedgerId } from "shared";
 
-const networkSelectOptions: LedgerId[] = [LedgerId.MAINNET, LedgerId.TESTNET, LedgerId.PREVIEWNET];
+const networkSelectOptions: LedgerId[] = [LedgerId.MAINNET, LedgerId.TESTNET];
 const defaultSelectedNetwork = getDefaultLedgerId();
 
 export function NetworkSwitcher() {
