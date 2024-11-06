@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { Contracts, DEX_PRECISION, DEX_TOKEN_PRECISION_VALUE } from "../constants";
+import { Contracts, DEX_TOKEN_PRECISION_VALUE } from "../constants";
 import Factory from "../abi/Factory.json";
 import { convertEthersBigNumberToBigNumberJS, createContract } from "./utils";
 import { TokenId } from "@hashgraph/sdk";
@@ -64,7 +64,9 @@ async function getPair(tokenAAddress: string, secondTokenAddress: string, transa
  */
 async function getBestSwapPairAvailable(params: GetBestSwapPairAvailableProps): Promise<PairDataResponse | undefined> {
   const { tokenAAddress, tokenBAddress, tokenAQty } = params;
-  const tokenToTradeAmount = BigNumber(tokenAQty).times(DEX_PRECISION).toString();
+  const tokenToTradeAmount = BigNumber(tokenAQty)
+    .times((await DexService.fetchTokenData(tokenAAddress)).data.precision)
+    .toString();
 
   const factoryContract = createFactoryContract();
   const pairData: RawPairDataResponse = await factoryContract.recommendedPairToSwap(

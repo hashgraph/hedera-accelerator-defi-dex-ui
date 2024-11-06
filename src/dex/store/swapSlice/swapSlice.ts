@@ -5,6 +5,7 @@ import { getErrorMessage, isHbarToken, withPrecision } from "../../utils";
 import { SwapActionType, SwapSlice, SwapStore, SwapState, Token, TokenPair } from "./types";
 import { isNil } from "ramda";
 import { Signer } from "@hashgraph/sdk/lib/Signer";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 
 const initialSwapState: SwapState = {
   pairInfo: {
@@ -265,7 +266,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
             walletId: signingAccount,
             spenderContractId: tokenToTrade.tokenMeta.pairAccountId ?? "",
             tokenAmount: tokenAmount.toNumber(),
-            signer,
+            signer: signer as HashConnectSigner,
           });
         } else {
           await DexService.setTokenAllowance({
@@ -273,7 +274,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
             walletId: signingAccount,
             spenderContractId: tokenToTrade.tokenMeta.pairAccountId ?? "",
             tokenAmount: tokenAmount.toNumber(),
-            signer,
+            signer: signer as HashConnectSigner,
           });
         }
 
@@ -287,8 +288,8 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           const tokenAssociateTx = new TokenAssociateTransaction()
             .setAccountId(signingAccount)
             .setTokenIds([tokenToReceiveId]);
-          const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer);
-          await tokenAssociateSignedTx.executeWithSigner(signer);
+          const tokenAssociateSignedTx = await tokenAssociateTx.freezeWithSigner(signer as HashConnectSigner);
+          await tokenAssociateSignedTx.executeWithSigner(signer as HashConnectSigner);
         }
 
         const result = await DexService.swapToken({
@@ -299,7 +300,7 @@ const createSwapSlice: SwapSlice = (set, get): SwapStore => {
           slippageTolerance: preciseSlippage,
           transactionDeadline,
           HbarAmount,
-          signer,
+          signer: signer as HashConnectSigner,
         });
         set(
           ({ swap }) => {

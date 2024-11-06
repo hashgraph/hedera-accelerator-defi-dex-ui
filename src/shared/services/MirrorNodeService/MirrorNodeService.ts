@@ -23,7 +23,7 @@ import { Gas, GasPrice } from "@dex/services";
 import { getDefaultLedgerId } from "shared";
 
 const mirrorNodeRPCUrls = {
-  mainnet: "https://mainnet-public.mirrornode.hedera.com",
+  mainnet: "https://mainnet.mirrornode.hedera.com",
   testnet: "https://testnet.mirrornode.hedera.com",
 };
 
@@ -40,6 +40,8 @@ const nodeAPIs = {
 };
 
 const GREATER_THAN = "gte";
+
+const DEX_PRECISION_DEFAULT = 1e8;
 
 type MirrorNodeServiceType = ReturnType<typeof createMirrorNodeService>;
 
@@ -127,7 +129,19 @@ function createMirrorNodeService(
    * @returns Attributes associated with the provided token ID.
    */
   const fetchTokenData = async (tokenId: string): Promise<MirrorNodeTokenById> => {
-    return await nodeAPIs[params.network].get(`/api/v1/tokens/${tokenId}`);
+    try {
+      const response: MirrorNodeTokenById = await nodeAPIs[params.network].get(`/api/v1/tokens/${tokenId}`);
+      const precision = Number(response.data?.decimals) ** 10;
+
+      return { data: { ...response.data, precision } };
+    } catch (err) {
+      return {
+        data: {
+          precision: DEX_PRECISION_DEFAULT,
+          decimals: "0",
+        },
+      } as MirrorNodeTokenById;
+    }
   };
 
   /**

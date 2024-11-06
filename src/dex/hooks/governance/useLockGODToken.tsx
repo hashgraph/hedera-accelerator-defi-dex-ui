@@ -1,7 +1,7 @@
 import { GovernanceMutations, GovernanceQueries } from "./types";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { useMutation, useQueryClient } from "react-query";
-import { DexService, DEX_PRECISION } from "@dex/services";
+import { DexService } from "@dex/services";
 import { useDexContext, HandleOnSuccess } from "@dex/hooks";
 import { isNil } from "ramda";
 import { DAOQueries } from "@dao/hooks";
@@ -24,14 +24,20 @@ export function useLockGODToken(
   return useMutation<TransactionResponse | undefined, Error, UseLockGODTokenParams, GovernanceMutations.ClaimGODToken>(
     async (params: UseLockGODTokenParams) => {
       const { amount, tokenHolderAddress, governanceTokenId } = params;
+      const { precision, decimals } = (await DexService.fetchTokenData(governanceTokenId)).data;
       await DexService.setTokenAllowance({
         tokenId: governanceTokenId,
         walletId: wallet.savedPairingData?.accountIds[0] ?? "",
         spenderContractId: tokenHolderAddress,
-        tokenAmount: DEX_PRECISION * amount,
+        tokenAmount: amount * precision,
         signer: signer,
       });
-      return DexService.sendLockGODTokenTransaction({ signer, tokenHolderAddress, tokenAmount: amount });
+      return DexService.sendLockGODTokenTransaction({
+        signer,
+        tokenHolderAddress,
+        tokenAmount: amount,
+        tokenDecimals: decimals,
+      });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

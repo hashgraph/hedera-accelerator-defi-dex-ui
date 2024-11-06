@@ -20,7 +20,12 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const lockedGOVToken = useFetchLockedGovToken(walletId, tokenHolderAddress);
   const canClaimGODTokens = useCanUserUnlockGODToken(walletId, tokenHolderAddress);
   const lockGODTokenSubmit = useLockGODToken(walletId, tokenHolderAddress, handleLockedGODTokenSuccess);
-  const unLockGODTokenSubmit = useUnlockGODToken(walletId, tokenHolderAddress, handleUnLockedGODTokenSuccess);
+  const unLockGODTokenSubmit = useUnlockGODToken(
+    walletId,
+    tokenHolderAddress,
+    token?.data.decimals ?? "0",
+    handleUnLockedGODTokenSuccess
+  );
 
   const totalGodToken = (lockedGOVToken.data ?? 0) + (govTokenBalance?.data ?? 0);
   const tokenData = {
