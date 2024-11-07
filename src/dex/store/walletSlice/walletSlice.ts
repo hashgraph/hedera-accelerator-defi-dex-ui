@@ -5,6 +5,7 @@ import { WalletSlice, WalletStore, WalletActionType, WalletState } from "./types
 import { HashConnectConnectionState } from "hashconnect/dist/types";
 import { GovernanceTokenId, DexService } from "../../services";
 import { LedgerId } from "@hashgraph/sdk";
+import { HashConnectSigner } from "hashconnect/dist/signer";
 
 const initialWalletState: WalletState = {
   hashConnectConnectionState: HashConnectConnectionState.Disconnected,
@@ -24,7 +25,7 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
       const { wallet } = get();
       const accountId = wallet.savedPairingData?.accountIds[0] ?? "";
       const signer = DexService.getSigner(accountId);
-      return signer;
+      return signer as HashConnectSigner;
     },
     getTokenAmountWithPrecision: (tokenId: string, tokenAmount: number) => {
       const { wallet } = get();

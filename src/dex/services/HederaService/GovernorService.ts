@@ -7,7 +7,7 @@ import {
   TransactionResponse,
 } from "@hashgraph/sdk";
 import { ContractId } from "@hashgraph/sdk";
-import { Contracts, DEX_PRECISION, DEX_TOKEN_PRECISION_VALUE, GovernanceTokenId } from "../constants";
+import { Contracts, GovernanceTokenId } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/signer";
 import { checkTransactionResponseForError } from "./utils";
@@ -119,7 +119,7 @@ const sendCreateTransferTokenProposalTransaction = async (
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.TransferToken.ProxyId,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount: (await DexService.fetchTokenData(GovernanceTokenId)).data.precision,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()
@@ -171,7 +171,7 @@ const sendCreateContractUpgradeProposalTransaction = async (
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.ContractUpgrade.ProxyId,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount: (await DexService.fetchTokenData(GovernanceTokenId)).data.precision,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()
@@ -211,11 +211,13 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
   const walletId = signer.getAccountId().toString();
   /* NOTE: Metadata is not currently in use for this proposal type. Should be removed from the Smart Contracts */
   const metadata = "";
+  const tokenAmount = (await DexService.fetchTokenData(GovernanceTokenId)).data.precision;
+
   await DexService.setTokenAllowance({
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.TextProposal.ProxyId,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()
@@ -310,13 +312,14 @@ const sendClaimGODTokenTransaction = async (params: SendClaimGODTokenTransaction
 interface SendLockGODTokenTransactionParams {
   tokenAmount: number;
   tokenHolderAddress: string;
+  tokenDecimals: string;
   signer: HashConnectSigner;
 }
 
 const sendLockGODTokenTransaction = async (params: SendLockGODTokenTransactionParams) => {
-  const { tokenAmount, signer, tokenHolderAddress } = params;
+  const { tokenAmount, signer, tokenHolderAddress, tokenDecimals } = params;
   const godHolderContractId = ContractId.fromString(tokenHolderAddress);
-  const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
+  const amount = BigNumber(tokenAmount).shiftedBy(Number(tokenDecimals));
   const contractFunctionParameters = new ContractFunctionParameters().addUint256(amount);
   const executeSendLockGODTokenTransaction = await new ContractExecuteTransaction()
     .setContractId(godHolderContractId)
@@ -331,13 +334,14 @@ const sendLockGODTokenTransaction = async (params: SendLockGODTokenTransactionPa
 interface SendUnLockGODTokenTransactionParams {
   tokenAmount: number;
   tokenHolderAddress: string;
+  tokenDecimals: string;
   signer: HashConnectSigner;
 }
 
 const sendUnLockGODTokenTransaction = async (params: SendUnLockGODTokenTransactionParams) => {
-  const { tokenAmount, signer, tokenHolderAddress } = params;
+  const { tokenAmount, signer, tokenHolderAddress, tokenDecimals } = params;
   const godHolderContractId = ContractId.fromString(tokenHolderAddress);
-  const amount = BigNumber(tokenAmount).shiftedBy(DEX_TOKEN_PRECISION_VALUE);
+  const amount = BigNumber(tokenAmount).shiftedBy(Number(tokenDecimals));
   const contractFunctionParameters = new ContractFunctionParameters().addUint256(amount);
   const executeSendUnLockGODTokenTransaction = await new ContractExecuteTransaction()
     .setContractId(godHolderContractId)

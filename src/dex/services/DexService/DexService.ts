@@ -1,5 +1,4 @@
 import daoSDK from "@dao/services";
-import { LedgerId } from "@hashgraph/sdk";
 import { fetchProposal, fetchAllProposals, fetchAllProposalEvents, fetchCanUserClaimGODTokens } from "./governance";
 import { fetchAccountTokenBalances } from "./token";
 
