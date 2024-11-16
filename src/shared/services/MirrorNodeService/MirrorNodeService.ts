@@ -133,7 +133,7 @@ function createMirrorNodeService(
       const response: MirrorNodeTokenById = await nodeAPIs[params.network].get(`/api/v1/tokens/${tokenId}`);
       const precision = Number(response.data?.decimals) ** 10;
 
-      return { data: { ...response.data, precision } };
+      return { data: { ...response.data, precision: precision === 0 ? DEX_PRECISION_DEFAULT : precision } };
     } catch (err) {
       return {
         data: {
