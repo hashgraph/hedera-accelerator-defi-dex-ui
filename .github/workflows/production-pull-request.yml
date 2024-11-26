@@ -4,7 +4,10 @@ on:
  pull_request:
    branches: [main]
    types: [opened, reopened, synchronize , edited]
-   
+  
+permissions:
+  contents: read
+
 jobs:
   build-test-deploy-prod:
     runs-on: defi-dex-linux-medium
