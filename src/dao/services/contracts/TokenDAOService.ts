@@ -11,7 +11,7 @@ import {
   HbarUnit,
 } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./types";
-import { DexService, checkTransactionResponseForError, Contracts, DEX_PRECISION } from "@dex/services";
+import { DexService, checkTransactionResponseForError, Contracts } from "@dex/services";
 import { DAOType, TokenType } from "@dao/services";
 import FTDAOFactoryJSON from "@dex/services/abi/FTDAOFactory.json";
 import HederaGovernorJSON from "@dex/services/abi/HederaGovernor.json";
@@ -142,11 +142,13 @@ async function createTokenTransferProposal(params: CreateTokenTransferProposalPa
 
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
   const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
+  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(governanceTokenId);
+
   await DexService.setUpAllowance({
     tokenId: governanceTokenId,
     nftSerialId: governanceNftTokenSerialId,
     spenderContractId: governorContractId,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount: tokenResponse.data.precision,
     tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
     signer,
   });
@@ -206,13 +208,14 @@ async function createGOVTokenAssociateProposal(params: CreateTokenAssociationPro
     signer,
   } = params;
   const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
+  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(tokenId);
 
   await DexService.setUpAllowance({
     tokenId: governanceTokenId,
     nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
     tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount: tokenResponse.data.precision,
     signer,
   });
   const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
@@ -262,13 +265,14 @@ async function createUpgradeProxyProposal(params: CreateUpgradeProxyProposalPara
     daoType,
     nftTokenSerialId,
   } = params;
+  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(governanceTokenId);
 
   await DexService.setUpAllowance({
     tokenId: governanceTokenId,
     nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
     tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount: tokenResponse.data.precision,
     signer,
   });
   const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
@@ -369,6 +373,7 @@ interface CreateTextProposalParams {
 const createTextProposal = async (params: CreateTextProposalParams) => {
   const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
   const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.SetText, []);
+  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(params.governanceTokenId);
   const {
     title,
     description,
@@ -385,7 +390,7 @@ const createTextProposal = async (params: CreateTextProposalParams) => {
     tokenId: governanceTokenId,
     nftSerialId: nftTokenSerialId,
     spenderContractId: governorContractId,
-    tokenAmount: DEX_PRECISION,
+    tokenAmount: tokenResponse.data.precision,
     tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
     signer,
   });

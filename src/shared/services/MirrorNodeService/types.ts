@@ -8,8 +8,13 @@ interface MirrorNodeLinks {
   };
 }
 
+interface TokenProperties {
+  decimals: string;
+  precision: number;
+}
+
 interface MirrorNodeTokenById {
-  data: {
+  data: TokenProperties & {
     admin_key: {
       _type: string;
       key: string;

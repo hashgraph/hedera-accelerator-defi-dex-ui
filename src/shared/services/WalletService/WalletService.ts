@@ -15,8 +15,12 @@ function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
   const appData = { ...DEFAULT_APP_METADATA };
   const hashconnect = new HashConnect(getDefaultLedgerId(), projectId, appData, true);
 
-  const getSigner = (accountId: string): HashConnectSigner => {
-    return hashconnect.getSigner(AccountId.fromString(accountId));
+  const getSigner = (accountId: string): HashConnectSigner | null => {
+    if (accountId) {
+      return hashconnect.getSigner(AccountId.fromString(accountId));
+    }
+
+    return null;
   };
 
   const reconnectToOtherNetwork = async (network: LedgerId) => {
@@ -90,6 +94,7 @@ function createWalletService(mirrorNodeService: MirrorNodeServiceType) {
     setupHashConnectEvents,
     destroyHashConnectEvents,
     reconnectToOtherNetwork,
+    mirrorNodeService,
   };
 }
 

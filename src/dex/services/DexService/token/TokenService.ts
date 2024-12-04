@@ -32,6 +32,6 @@ export async function fetchAccountTokenBalances(accountId: string): Promise<Mirr
   return {
     account: accountId,
     tokens: tokenBalances,
-    balance: BigNumber(account.balance).shiftedBy(-Number(DEX_TOKEN_PRECISION_VALUE)),
+    balance: BigNumber(account.balance).shiftedBy(-DEX_TOKEN_PRECISION_VALUE),
   };
 }

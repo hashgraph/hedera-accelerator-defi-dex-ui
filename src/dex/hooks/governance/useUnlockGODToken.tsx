@@ -14,6 +14,7 @@ interface UseUnLockGODTokenParams {
 export function useUnlockGODToken(
   accountId: string | undefined,
   tokenHolderAddress: string | undefined,
+  tokenDecimals: string,
   handleOnSuccess: HandleOnSuccess
 ) {
   const queryClient = useQueryClient();
@@ -26,7 +27,7 @@ export function useUnlockGODToken(
     GovernanceMutations.ClaimGODToken
   >(
     async (params: UseUnLockGODTokenParams) => {
-      return DexService.sendUnLockGODTokenTransaction({ ...params, signer });
+      return DexService.sendUnLockGODTokenTransaction({ ...params, signer, tokenDecimals });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {
