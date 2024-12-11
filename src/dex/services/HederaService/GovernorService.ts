@@ -211,13 +211,12 @@ const sendCreateTextProposalTransaction = async (params: CreateTextProposalParam
   const walletId = signer.getAccountId().toString();
   /* NOTE: Metadata is not currently in use for this proposal type. Should be removed from the Smart Contracts */
   const metadata = "";
-  const tokenAmount = (await DexService.fetchTokenData(GovernanceTokenId)).data.precision;
 
   await DexService.setTokenAllowance({
     tokenId: GovernanceTokenId,
     walletId,
     spenderContractId: Contracts.Governor.TextProposal.ProxyId,
-    tokenAmount,
+    tokenAmount: (await DexService.fetchTokenData(GovernanceTokenId)).data.precision,
     signer,
   });
   const contractCallParams = new ContractFunctionParameters()
