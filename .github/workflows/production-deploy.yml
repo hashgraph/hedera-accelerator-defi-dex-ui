@@ -4,6 +4,9 @@ on:
  push:
    branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   build-test-deploy-prod:
     runs-on: defi-dex-linux-medium
