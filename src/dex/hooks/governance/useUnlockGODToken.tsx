@@ -14,7 +14,7 @@ interface UseUnLockGODTokenParams {
 export function useUnlockGODToken(
   accountId: string | undefined,
   tokenHolderAddress: string | undefined,
-  tokenDecimals: string,
+  tokenDecimals: string = "0",
   handleOnSuccess: HandleOnSuccess
 ) {
   const queryClient = useQueryClient();
