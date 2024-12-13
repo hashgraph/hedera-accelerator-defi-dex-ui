@@ -17,13 +17,13 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const { data: token } = useToken(governanceTokenId);
   const govTokenBalance = useTokenBalance({ tokenId: governanceTokenId });
 
-  const lockedGOVToken = useFetchLockedGovToken(walletId, tokenHolderAddress);
+  const lockedGOVToken = useFetchLockedGovToken(walletId, tokenHolderAddress, Number(token?.data.decimals));
   const canClaimGODTokens = useCanUserUnlockGODToken(walletId, tokenHolderAddress);
   const lockGODTokenSubmit = useLockGODToken(walletId, tokenHolderAddress, handleLockedGODTokenSuccess);
   const unLockGODTokenSubmit = useUnlockGODToken(
     walletId,
     tokenHolderAddress,
-    token?.data.decimals ?? "0",
+    token?.data.decimals,
     handleUnLockedGODTokenSuccess
   );
 
