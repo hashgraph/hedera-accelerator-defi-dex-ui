@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "hts-open-dex-react-ui",
+  "name": "@hashgraph/hts-open-dex-react-ui",
   "author": "LAB49",
   "version": "0.1.0",
   "private": true,
