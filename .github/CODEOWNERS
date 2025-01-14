@@ -11,16 +11,17 @@
 # NOTE: Must be placed last to ensure enforcement over all other rules
 
 # Protection Rules for Github Configuration Files and Actions Workflows
-/.github/                                       @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/developer-advocates
-/.github/workflows/                             @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/developer-advocates
+/.github/                                       @hashgraph/platform-ci @hashgraph/release-engineering-managers
+/.github/workflows/                             @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
+/.github/dependabot.yml                         @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/developer-advocates
 
 # Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
 /CODEOWNERS                                     @hashgraph/release-engineering-managers
 
 # Protect the repository root files
-/README.md                                      @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
+/README.md                                      @hashgraph/platform-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
 **/LICENSE                                      @hashgraph/release-engineering-managers
 
 # Git Ignore definitions
-**/.gitignore                                   @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
-**/.gitignore.*                                 @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
+**/.gitignore                                   @hashgraph/platform-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
+**/.gitignore.*                                 @hashgraph/platform-ci @hashgraph/release-engineering-managers @hashgraph/developer-advocates
