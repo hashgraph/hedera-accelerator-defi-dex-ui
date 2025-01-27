@@ -19,7 +19,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/react-syntax-highlighter": "^15.5.13",
     "abitype": "^0.10.3",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "bignumber.js": "^9.1.2",
     "chakra-ui-steps": "^2.1.0",
     "ethers": "^5.7.2",
@@ -71,6 +71,14 @@
     "format:write": "npx prettier -c src --write",
     "prepare": "husky install",
     "postinstall": "husky install"
+  },
+  "resolutions": {
+    "elliptic": "6.6.0",
+    "ws": "8.17.1",
+    "axios": "1.7.4",
+    "crypto-js": "4.2.0",
+    "braces": "3.0.3",
+    "cross-spawn": "7.0.5"
   },
   "browserslist": {
     "production": [
