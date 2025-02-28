@@ -6,12 +6,15 @@
   "private": true,
   "license": "MIT",
   "main": "./src/index.tsx",
+  "resolutions": {
+    "elliptic": "6.6.1"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@hashgraph/sdk": "2.40.0",
+    "@hashgraph/sdk": "2.59.0",
     "@netlify/functions": "^2.8.1",
     "@pinata/sdk": "^2.1.0",
     "@testing-library/jest-dom": "^6.4.6",
@@ -22,9 +25,9 @@
     "axios": "^1.7.2",
     "bignumber.js": "^9.1.2",
     "chakra-ui-steps": "^2.1.0",
-    "ethers": "^5.7.2",
+    "ethers": "^5.8.0",
     "framer-motion": "^6.5.1",
-    "hashconnect": "3.0.10",
+    "hashconnect": "3.0.13",
     "humanize-duration": "^3.32.1",
     "immer": "^10.1.1",
     "long": "^5.2.3",
