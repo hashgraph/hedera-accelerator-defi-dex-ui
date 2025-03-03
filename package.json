@@ -6,12 +6,15 @@
   "private": true,
   "license": "MIT",
   "main": "./src/index.tsx",
+  "resolutions": {
+    "elliptic": "6.6.1"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@hashgraph/sdk": "2.40.0",
+    "@hashgraph/sdk": "2.59.0",
     "@netlify/functions": "^2.8.1",
     "@pinata/sdk": "^2.1.0",
     "@testing-library/jest-dom": "^6.4.6",
