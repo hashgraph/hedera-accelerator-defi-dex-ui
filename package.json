@@ -6,6 +6,9 @@
   "private": true,
   "license": "MIT",
   "main": "./src/index.tsx",
+  "resolutions": {
+    "elliptic": "6.6.1"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
