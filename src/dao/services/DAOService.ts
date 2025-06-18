@@ -18,6 +18,7 @@ import MultiSigDAOJSON from "../../dex/services/abi/MultiSigDAO.json";
 import BaseDAOJSON from "../../dex/services/abi/BaseDAO.json";
 import HederaGovernorJSON from "../../dex/services/abi/HederaGovernor.json";
 import AssetHolderJSON from "../../dex/services/abi/AssetHolder.json";
+import GODHolderJSON from "../../dex/services/abi/GODHolder.json";
 
 import {
   MultiSigDAODetails,
@@ -65,6 +66,18 @@ export async function getThreshold(safeAddress: string): Promise<number> {
   });
   const threshold = contractInterface.decodeFunctionResult("getThreshold", ethers.utils.arrayify(response.data.result));
   return threshold[0].toNumber();
+}
+
+export async function getVotingPower(callContract: string, owner: string) {
+  const contractInterface = new ethers.utils.Interface(GODHolderJSON.abi);
+  const response = await DexService.callContract({
+    data: contractInterface.encodeFunctionData("balanceOfVoter", [owner]),
+    from: owner,
+    to: callContract,
+  });
+
+  const balance = contractInterface.decodeFunctionResult("balanceOfVoter", ethers.utils.arrayify(response.data.result));
+  return balance[0].toNumber();
 }
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
