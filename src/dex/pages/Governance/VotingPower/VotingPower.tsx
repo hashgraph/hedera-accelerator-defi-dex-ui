@@ -5,6 +5,7 @@ import { ManageVotingPower } from "./ManageVotingPower";
 import { useManageVotingPower } from "./useManageVotingPower";
 import { InputTokenAmountData } from "./types";
 import { Text, LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, Color } from "@shared/ui-kit";
+
 export interface VotingPowerComponentProps {
   governanceTokenId: string;
   tokenHolderAddress: string;
@@ -12,7 +13,9 @@ export interface VotingPowerComponentProps {
 
 export const VotingPower = (props: VotingPowerComponentProps) => {
   const { governanceTokenId, tokenHolderAddress } = props;
+
   const {
+    votingPower,
     tokenData,
     isFormLoading,
     isLoading,
@@ -66,7 +69,7 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
         labelTextColor={Color.Neutral._500}
         labelTextStyle="p xsmall medium"
         labelOpacity="1.0"
-        value={tokenData.locked}
+        value={votingPower!}
         valueTextColor={Color.Primary._600}
         valueStyle="h3 medium"
         valueUnitSymbol={tokenData.symbol}
@@ -76,7 +79,7 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
       <HStack padding="8px 24px" gap="40px" justify="right" borderRadius="8px" background={Color.Neutral._50}>
         <GOVTokenDetails
           tokenSymbol={tokenData.symbol ?? ""}
-          lockedGODToken={tokenData.locked}
+          lockedGODToken={votingPower!}
           totalGODTokenBalance={tokenData.total}
           availableGODTokenBalance={tokenData.available}
           isLoading={isFormLoading}
@@ -87,7 +90,7 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
             tokenSymbol={tokenData.symbol ?? ""}
             isLoading={isFormLoading}
             canUserClaimGODTokens={canUserClaimGODTokens}
-            lockedGODToken={tokenData.locked}
+            lockedGODToken={votingPower!}
             totalGODTokenBalance={tokenData.total}
             availableGODTokenBalance={tokenData.available}
             onLockClick={handleClickLockGodTokenButton}

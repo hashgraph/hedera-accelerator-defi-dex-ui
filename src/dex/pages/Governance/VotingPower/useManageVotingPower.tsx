@@ -8,7 +8,11 @@ import {
   useHandleTransactionSuccess,
   useToken,
 } from "@dex/hooks";
-import { TransactionResponse } from "@hashgraph/sdk";
+import { AccountId, TransactionResponse } from "@hashgraph/sdk";
+import daoSDK from "@dao/services";
+import { useQuery } from "react-query";
+import { BigNumber } from "bignumber.js";
+import { DEX_TOKEN_PRECISION_VALUE } from "@dex/services";
 
 export function useManageVotingPower(governanceTokenId: string, tokenHolderAddress: string) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -16,6 +20,24 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const { data: token } = useToken(governanceTokenId);
   const govTokenBalance = useTokenBalance({ tokenId: governanceTokenId });
+  const { data: votingPower } = useQuery<string | undefined, Error, string>(
+    [walletId, tokenHolderAddress],
+    async () => {
+      const votingPower = await daoSDK.getVotingPower(
+        AccountId.fromString(tokenHolderAddress).toSolidityAddress(),
+        AccountId.fromString(walletId).toSolidityAddress()
+      );
+
+      if (votingPower) {
+        return new BigNumber(votingPower).shiftedBy(-DEX_TOKEN_PRECISION_VALUE).toFixed(4);
+      }
+
+      return "0.0000";
+    },
+    {
+      enabled: !!(walletId && tokenHolderAddress),
+    }
+  );
 
   const lockedGOVToken = useFetchLockedGovToken(walletId, tokenHolderAddress, Number(token?.data.decimals));
   const canClaimGODTokens = useCanUserUnlockGODToken(walletId, tokenHolderAddress);
@@ -27,11 +49,11 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
     handleUnLockedGODTokenSuccess
   );
 
-  const totalGodToken = (lockedGOVToken.data ?? 0) + (govTokenBalance?.data ?? 0);
+  const totalGodToken = parseFloat(votingPower!) + (govTokenBalance?.data ?? 0);
   const tokenData = {
     symbol: token?.data.symbol,
-    locked: isWalletConnected ? `${lockedGOVToken.data?.toFixed(4) ?? 0}` : "-",
-    available: isWalletConnected ? `${govTokenBalance?.data?.toFixed(4) ?? 0}` : "-",
+    locked: isWalletConnected ? `${lockedGOVToken.data?.toFixed(4) ?? "0.0000"}` : "-",
+    available: isWalletConnected ? `${govTokenBalance?.data?.toFixed(4) ?? "0.0000"}` : "-",
     total: isWalletConnected ? `${totalGodToken.toFixed(4)}` : "-",
   };
 
@@ -85,5 +107,6 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
     unLockGODTokenSubmit,
     walletId,
     wallet,
+    votingPower,
   };
 }
