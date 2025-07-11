@@ -14,6 +14,8 @@ import { useQuery } from "react-query";
 import { BigNumber } from "bignumber.js";
 import { DEX_TOKEN_PRECISION_VALUE } from "@dex/services";
 
+const HARDCODED_WALLET_ID = "0.0.6755247";
+
 export function useManageVotingPower(governanceTokenId: string, tokenHolderAddress: string) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const isWalletConnected = wallet.isPaired();
@@ -25,7 +27,7 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
     async () => {
       const votingPower = await daoSDK.getVotingPower(
         AccountId.fromString(tokenHolderAddress).toSolidityAddress(),
-        AccountId.fromString(walletId).toSolidityAddress()
+        AccountId.fromString(HARDCODED_WALLET_ID).toSolidityAddress()
       );
 
       if (votingPower) {

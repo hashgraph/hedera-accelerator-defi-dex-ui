@@ -61,70 +61,77 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
   }
 
   return (
-    <Flex direction="row" alignItems="center" height="120px" padding="16px 80px 0 80px" maxWidth="100%">
-      <MetricLabel
-        label="VOTING POWER"
-        isLoading={isFormLoading}
-        labelLeftIcon={<LightningBoltIcon />}
-        labelTextColor={Color.Neutral._500}
-        labelTextStyle="p xsmall medium"
-        labelOpacity="1.0"
-        value={votingPower!}
-        valueTextColor={Color.Primary._600}
-        valueStyle="h3 medium"
-        valueUnitSymbol={tokenData.symbol}
-        amount="$--.--"
-      />
-      <Spacer />
-      <HStack padding="8px 24px" gap="40px" justify="right" borderRadius="8px" background={Color.Neutral._50}>
-        <GOVTokenDetails
-          tokenSymbol={tokenData.symbol ?? ""}
-          lockedGODToken={votingPower!}
-          totalGODTokenBalance={tokenData.total}
-          availableGODTokenBalance={tokenData.available}
+    <>
+      {walletId && (
+        <Flex padding="16px 80px 0 80px">
+          <p>Connected wallet ID: {walletId}</p>
+        </Flex>
+      )}
+      <Flex direction="row" alignItems="center" height="120px" padding="16px 80px 0 80px" maxWidth="100%">
+        <MetricLabel
+          label="VOTING POWER"
           isLoading={isFormLoading}
-          hidePendingStatus
+          labelLeftIcon={<LightningBoltIcon />}
+          labelTextColor={Color.Neutral._500}
+          labelTextStyle="p xsmall medium"
+          labelOpacity="1.0"
+          value={votingPower!}
+          valueTextColor={Color.Primary._600}
+          valueStyle="h3 medium"
+          valueUnitSymbol={tokenData.symbol}
+          amount="$--.--"
         />
-        {doesUserHaveGOVTokensToLockAndUnlock ? (
-          <ManageVotingPower
+        <Spacer />
+        <HStack padding="8px 24px" gap="40px" justify="right" borderRadius="8px" background={Color.Neutral._50}>
+          <GOVTokenDetails
             tokenSymbol={tokenData.symbol ?? ""}
-            isLoading={isFormLoading}
-            canUserClaimGODTokens={canUserClaimGODTokens}
             lockedGODToken={votingPower!}
             totalGODTokenBalance={tokenData.total}
             availableGODTokenBalance={tokenData.available}
-            onLockClick={handleClickLockGodTokenButton}
-            onUnlockClick={handleClickUnLockGodTokenButton}
+            isLoading={isFormLoading}
+            hidePendingStatus
           />
-        ) : isWalletConnected ? (
-          <Button
-            as="a"
-            key="swap"
-            variant="secondary"
-            width="105px"
-            leftIcon={<SwapIcon />}
-            href={"https://defi-ui.zilbo.com/swap"}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
-          </Button>
-        ) : (
-          <Button key="swap" variant="secondary" width="155px" onClick={handleConnectToWalletClick}>
-            <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
-          </Button>
-        )}
-      </HStack>
-      <LoadingDialog isOpen={isLoading} message={loadingDialogMessage} />
-      <LoadingDialog
-        isOpen={isErrorDialogOpen}
-        message={errorDialogMessage}
-        icon={<WarningIcon h={10} w={10} />}
-        buttonConfig={{
-          text: "Dismiss",
-          onClick: handleErrorDialogDismissButtonClicked,
-        }}
-      />
-    </Flex>
+          {doesUserHaveGOVTokensToLockAndUnlock ? (
+            <ManageVotingPower
+              tokenSymbol={tokenData.symbol ?? ""}
+              isLoading={isFormLoading}
+              canUserClaimGODTokens={canUserClaimGODTokens}
+              lockedGODToken={votingPower!}
+              totalGODTokenBalance={tokenData.total}
+              availableGODTokenBalance={tokenData.available}
+              onLockClick={handleClickLockGodTokenButton}
+              onUnlockClick={handleClickUnLockGodTokenButton}
+            />
+          ) : isWalletConnected ? (
+            <Button
+              as="a"
+              key="swap"
+              variant="secondary"
+              width="105px"
+              leftIcon={<SwapIcon />}
+              href={"https://defi-ui.zilbo.com/swap"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
+            </Button>
+          ) : (
+            <Button key="swap" variant="secondary" width="155px" onClick={handleConnectToWalletClick}>
+              <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
+            </Button>
+          )}
+        </HStack>
+        <LoadingDialog isOpen={isLoading} message={loadingDialogMessage} />
+        <LoadingDialog
+          isOpen={isErrorDialogOpen}
+          message={errorDialogMessage}
+          icon={<WarningIcon h={10} w={10} />}
+          buttonConfig={{
+            text: "Dismiss",
+            onClick: handleErrorDialogDismissButtonClicked,
+          }}
+        />
+      </Flex>
+    </>
   );
 };
