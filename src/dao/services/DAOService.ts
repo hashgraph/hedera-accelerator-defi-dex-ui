@@ -50,7 +50,6 @@ export async function getOwners(safeAddress: string): Promise<string[]> {
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const response = await DexService.callContract({
     data: contractInterface.encodeFunctionData("getOwners"),
-    from: safeAddress,
     to: safeAddress,
   });
   const ownersList = contractInterface.decodeFunctionResult("getOwners", ethers.utils.arrayify(response.data.result));
@@ -61,7 +60,6 @@ export async function getThreshold(safeAddress: string): Promise<number> {
   const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
   const response = await DexService.callContract({
     data: contractInterface.encodeFunctionData("getThreshold"),
-    from: safeAddress,
     to: safeAddress,
   });
   const threshold = contractInterface.decodeFunctionResult("getThreshold", ethers.utils.arrayify(response.data.result));

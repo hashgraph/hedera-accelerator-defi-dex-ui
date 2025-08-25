@@ -178,7 +178,7 @@ function createMirrorNodeService(
     block?: string;
     data: string;
     estimate?: boolean;
-    from: string;
+    from?: string;
     gas?: number;
     gasPrice?: number;
     to: string;
