@@ -3,7 +3,7 @@ import { isNil } from "ramda";
 import { MirrorNodeTransaction, MirrorNodeTokenTransfer, MirrorNodeAccountBalance } from "@shared/services";
 import { TokenPair } from "@dex/store/poolsSlice";
 import { getTimestamp24HoursAgo } from "./time";
-import { HBARTokenId } from "@dex/services";
+import { HBARTokenId, HBARTokenId_MAINNET } from "@dex/services";
 import { getTransactionFeeRateDisplay } from "@shared/utils";
 import { ethers } from "ethers";
 
@@ -182,6 +182,7 @@ const calculatePercentOfPoolFromTotalSupply = (params: calculatePercentOfPoolFro
 const isHbarToken = (tokenIdOrAddress: string): boolean => {
   return (
     tokenIdOrAddress === HBARTokenId ||
+    tokenIdOrAddress === HBARTokenId_MAINNET ||
     tokenIdOrAddress === ethers.constants.AddressZero ||
     tokenIdOrAddress === "0.0.0"
   );

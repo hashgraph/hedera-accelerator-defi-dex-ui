@@ -103,6 +103,7 @@ export const USDC_TOKEN_ID = "0.0.2276691";
 export const GovernanceTokenId = "0.0.3418196";
 
 export const HBARTokenId = "0.0.3418197";
+export const HBARTokenId_MAINNET = "0.0.0";
 export const HBARTokenAddress = "0.0.0";
 export const HBARTokenSymbol = "HBAR";
 export const HBARSymbol = "ℏ";
