@@ -81,37 +81,42 @@ export async function getVotingPower(callContract: string, owner: string) {
 }
 
 async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
-  const logs = await DexService.fetchParsedEventLogs(
-    Contracts.MultiSigDAOFactory.ProxyId,
-    new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi),
-    eventTypes
-  );
+  try {
+    const logs = await DexService.fetchParsedEventLogs(
+      Contracts.MultiSigDAOFactory.ProxyId,
+      new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi),
+      eventTypes
+    );
 
-  const multiSigEventResults = logs.map(async (log: ethers.utils.LogDescription): Promise<MultiSigDAODetails> => {
-    const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
-    const { inputs: initialDAODetails, safeAddress: safeEVMAddress, daoAddress } = argsWithName;
-    const owners = await getOwners(safeEVMAddress);
-    const threshold = await getThreshold(safeEVMAddress);
-    const { admin, isPrivate, name, description, logoUrl, webLinks, infoUrl } = initialDAODetails;
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(daoAddress, [DAOEvents.DAOInfoUpdated]);
-    return {
-      type: DAOType.MultiSig,
-      accountEVMAddress: daoAddress,
-      adminId: solidityAddressToAccountIdString(admin),
-      name: updatedDAODetails?.name ?? name,
-      logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
-      title: updatedDAODetails?.name ?? name,
-      description: updatedDAODetails?.description ?? description,
-      isPrivate,
-      webLinks: updatedDAODetails?.webLinks ?? webLinks,
-      safeEVMAddress,
-      ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
-      threshold,
-      infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
-    };
-  });
+    const multiSigEventResults = logs.map(async (log: ethers.utils.LogDescription): Promise<MultiSigDAODetails> => {
+      const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
+      const { inputs: initialDAODetails, safeAddress: safeEVMAddress, daoAddress } = argsWithName;
+      const owners = await getOwners(safeEVMAddress);
+      const threshold = await getThreshold(safeEVMAddress);
+      const { admin, isPrivate, name, description, logoUrl, webLinks, infoUrl } = initialDAODetails;
+      const updatedDAODetails = await fetchDAOSettingsPageDetails(daoAddress, [DAOEvents.DAOInfoUpdated]);
+      return {
+        type: DAOType.MultiSig,
+        accountEVMAddress: daoAddress,
+        adminId: solidityAddressToAccountIdString(admin),
+        name: updatedDAODetails?.name ?? name,
+        logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
+        title: updatedDAODetails?.name ?? name,
+        description: updatedDAODetails?.description ?? description,
+        isPrivate,
+        webLinks: updatedDAODetails?.webLinks ?? webLinks,
+        safeEVMAddress,
+        ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
+        threshold,
+        infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
+      };
+    });
 
-  return Promise.all(multiSigEventResults);
+    return Promise.all(multiSigEventResults);
+  } catch (error) {
+    console.error("Error fetching MultiSig DAOs:", error);
+    return [];
+  }
 }
 
 async function fetchDAOSettingsPageDetails(
@@ -135,146 +140,169 @@ async function fetchDAOSettingsPageDetails(
 }
 
 async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAODetails[]> {
-  const logs = await DexService.fetchParsedEventLogs(
-    Contracts.FTDAOFactory.ProxyId,
-    new ethers.utils.Interface(FTDAOFactoryJSON.abi),
-    eventTypes
-  );
-  const allPromises = logs.map(async (log): Promise<GovernanceDAODetails> => {
-    const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
+  try {
+    const logs = await DexService.fetchParsedEventLogs(
+      Contracts.FTDAOFactory.ProxyId,
+      new ethers.utils.Interface(FTDAOFactoryJSON.abi),
+      eventTypes
+    );
+    const allPromises = logs.map(async (log): Promise<GovernanceDAODetails> => {
+      const argsWithName = getEventArgumentsByName<GovernanceDAOCreatedEventArgs>(log.args, ["webLinks"]);
 
-    const {
-      daoAddress: accountId,
-      assetsHolderAddress,
-      governorAddress,
-      tokenHolderAddress,
-      inputs: initialDAODetails,
-    } = argsWithName;
-    const {
-      admin,
-      isPrivate,
-      tokenAddress,
-      quorumThreshold,
-      votingDelay,
-      votingPeriod,
-      name,
-      logoUrl,
-      infoUrl,
-      webLinks,
-      description,
-    } = initialDAODetails;
+      const {
+        daoAddress: accountId,
+        assetsHolderAddress,
+        governorAddress,
+        tokenHolderAddress,
+        inputs: initialDAODetails,
+      } = argsWithName;
+      const {
+        admin,
+        isPrivate,
+        tokenAddress,
+        quorumThreshold,
+        votingDelay,
+        votingPeriod,
+        name,
+        logoUrl,
+        infoUrl,
+        webLinks,
+        description,
+      } = initialDAODetails;
 
-    const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
-    const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
+      const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
+      const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
+      const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
 
-    let tokenId;
-    try {
-      tokenId = solidityAddressToTokenIdString(tokenAddress);
-    } catch (error) {
-      tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
-    }
+      let tokenId;
+      try {
+        tokenId = solidityAddressToTokenIdString(tokenAddress);
+      } catch (error) {
+        tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
+      }
 
-    return {
-      type: DAOType.GovernanceToken,
-      accountEVMAddress: accountId,
-      adminId: solidityAddressToAccountIdString(admin),
-      name: updatedDAODetails?.name ?? name,
-      logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
-      infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
-      isPrivate,
-      title: updatedDAODetails?.name ?? name,
-      webLinks: updatedDAODetails?.webLinks ?? webLinks,
-      description: updatedDAODetails?.description ?? description,
-      governorAddress,
-      assetsHolderAddress,
-      tokenHolderAddress,
-      tokenId: tokenId,
-      quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
-      votingDelay: votingDelay.toNumber(),
-      votingPeriod: votingPeriod.toNumber(),
-      minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
-      lockedTokenDetails,
-    };
-  });
+      return {
+        type: DAOType.GovernanceToken,
+        accountEVMAddress: accountId,
+        adminId: solidityAddressToAccountIdString(admin),
+        name: updatedDAODetails?.name ?? name,
+        logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
+        infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
+        isPrivate,
+        title: updatedDAODetails?.name ?? name,
+        webLinks: updatedDAODetails?.webLinks ?? webLinks,
+        description: updatedDAODetails?.description ?? description,
+        governorAddress,
+        assetsHolderAddress,
+        tokenHolderAddress,
+        tokenId: tokenId,
+        quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
+        votingDelay: votingDelay.toNumber(),
+        votingPeriod: votingPeriod.toNumber(),
+        minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
+        lockedTokenDetails,
+      };
+    });
 
-  return await Promise.all(allPromises);
+    return await Promise.all(allPromises);
+  } catch (error) {
+    console.error("Error fetching Governance Token DAOs:", error);
+    return [];
+  }
 }
 
 async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
-  //TODO: Change the ABI to NFTDAOFactory, for now its not working for fetching the NFT logs using NFTDAOFactory ABI
-  const logs = await DexService.fetchParsedEventLogs(
-    Contracts.NFTDAOFactory.ProxyId,
-    new ethers.utils.Interface(FTDAOFactoryJSON.abi),
-    eventTypes
-  );
-  const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
-    const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
-    const {
-      daoAddress: accountId,
-      assetsHolderAddress,
-      governorAddress,
-      tokenHolderAddress,
-      inputs: initialDAODetails,
-    } = argsWithName;
-    const {
-      admin,
-      isPrivate,
-      name,
-      description,
-      webLinks,
-      logoUrl,
-      infoUrl,
-      tokenAddress,
-      quorumThreshold,
-      votingDelay,
-      votingPeriod,
-    } = initialDAODetails;
-    const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
-    const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
+  try {
+    //TODO: Change the ABI to NFTDAOFactory, for now its not working for fetching the NFT logs using NFTDAOFactory ABI
+    const logs = await DexService.fetchParsedEventLogs(
+      Contracts.NFTDAOFactory.ProxyId,
+      new ethers.utils.Interface(FTDAOFactoryJSON.abi),
+      eventTypes
+    );
+    const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
+      const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
+      const {
+        daoAddress: accountId,
+        assetsHolderAddress,
+        governorAddress,
+        tokenHolderAddress,
+        inputs: initialDAODetails,
+      } = argsWithName;
+      const {
+        admin,
+        isPrivate,
+        name,
+        description,
+        webLinks,
+        logoUrl,
+        infoUrl,
+        tokenAddress,
+        quorumThreshold,
+        votingDelay,
+        votingPeriod,
+      } = initialDAODetails;
+      const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
+      const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
+      const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
 
-    /** START - TODO: Need to apply a proper fix */
-    let tokenId;
-    try {
-      tokenId = solidityAddressToTokenIdString(tokenAddress).toString();
-    } catch (error) {
-      tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
-    }
-    /** END - TODO: Need to apply a proper fix */
-    return {
-      type: DAOType.NFT,
-      accountEVMAddress: accountId,
-      adminId: solidityAddressToAccountIdString(admin),
-      name: updatedDAODetails?.name ?? name,
-      title: updatedDAODetails?.name ?? name,
-      description: updatedDAODetails?.description ?? description,
-      webLinks: updatedDAODetails?.webLinks ?? webLinks,
-      infoUrl,
-      governorAddress,
-      assetsHolderAddress,
-      tokenHolderAddress,
-      logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
-      isPrivate,
-      tokenId,
-      quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
-      votingDelay: votingDelay.toNumber(),
-      votingPeriod: votingPeriod.toNumber(),
-      minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
-      lockedTokenDetails,
-    };
-  });
+      /** START - TODO: Need to apply a proper fix */
+      let tokenId;
+      try {
+        tokenId = solidityAddressToTokenIdString(tokenAddress).toString();
+      } catch (error) {
+        tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
+      }
+      /** END - TODO: Need to apply a proper fix */
+      return {
+        type: DAOType.NFT,
+        accountEVMAddress: accountId,
+        adminId: solidityAddressToAccountIdString(admin),
+        name: updatedDAODetails?.name ?? name,
+        title: updatedDAODetails?.name ?? name,
+        description: updatedDAODetails?.description ?? description,
+        webLinks: updatedDAODetails?.webLinks ?? webLinks,
+        infoUrl,
+        governorAddress,
+        assetsHolderAddress,
+        tokenHolderAddress,
+        logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
+        isPrivate,
+        tokenId,
+        quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
+        votingDelay: votingDelay.toNumber(),
+        votingPeriod: votingPeriod.toNumber(),
+        minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
+        lockedTokenDetails,
+      };
+    });
 
-  return Promise.all(allPromises);
+    return Promise.all(allPromises);
+  } catch (error) {
+    console.error("Error fetching NFT DAOs:", error);
+    return [];
+  }
 }
 
 export async function fetchAllDAOs(): Promise<DAO[]> {
-  const daos = await Promise.all([
+  const results = await Promise.allSettled([
     fetchMultiSigDAOs([DAOEvents.DAOCreated]),
     fetchGovernanceDAOs([DAOEvents.DAOCreated]),
     fetchNFTDAOs([DAOEvents.DAOCreated]),
   ]);
-  return daos.flat();
+
+  const daos: DAO[] = results
+    .map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      } else {
+        const daoTypes = ["MultiSig", "GovernanceToken", "NFT"];
+        console.error(`Failed to fetch ${daoTypes[index]} DAOs:`, result.reason);
+        return [];
+      }
+    })
+    .flat();
+
+  return daos;
 }
 
 export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
