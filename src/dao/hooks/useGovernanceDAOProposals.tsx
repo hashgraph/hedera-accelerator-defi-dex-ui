@@ -170,9 +170,7 @@ export function useGovernanceDAOProposals(
       hexStringData: "",
       msgValue: 0,
       title: proposalData.coreInformation.inputs.title,
-      author: proposalData.coreInformation.creator
-        ? solidityAddressToAccountIdString(proposalData.coreInformation.creator)
-        : "",
+      author: proposalData.coreInformation.creator ?? "",
       description: proposalData.coreInformation.inputs.description,
       metadata: proposalData.coreInformation.inputs.metadata,
       link: proposalData.coreInformation.inputs.discussionLink,
@@ -202,17 +200,19 @@ export function useGovernanceDAOProposals(
       ]);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
       const proposals = await Promise.all(
-        data[0].map(async (proposal, index) => {
-          const tokenId = proposal.tokenToTransfer ?? "";
-          let tokenData;
-          if (!isEmpty(tokenId)) {
-            if (!tokenDataCache.has(tokenId)) {
-              tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
+        data[0]
+          .filter((proposal) => proposal !== undefined && proposal !== null)
+          .map(async (proposal, index) => {
+            const tokenId = proposal.tokenToTransfer ?? "";
+            let tokenData;
+            if (!isEmpty(tokenId)) {
+              if (!tokenDataCache.has(tokenId)) {
+                tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
+              }
+              tokenData = await tokenDataCache.get(tokenId);
             }
-            tokenData = await tokenDataCache.get(tokenId);
-          }
-          return convertDataToProposal(proposal, index, data[1], tokenData);
-        })
+            return convertDataToProposal(proposal, index, data[1], tokenData);
+          })
       );
       return proposals;
     },

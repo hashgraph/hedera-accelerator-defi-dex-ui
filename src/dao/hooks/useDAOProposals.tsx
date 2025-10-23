@@ -218,7 +218,7 @@ export function useDAOProposals(
             data: isContractUpgradeProposal ? parsedData : { ...data },
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
             title,
-            author: creator ? solidityAddressToAccountIdString(creator) : "",
+            author: creator ?? "",
             description,
             link: linkToDiscussion,
             threshold,

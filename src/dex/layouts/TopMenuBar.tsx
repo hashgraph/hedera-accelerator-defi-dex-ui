@@ -31,7 +31,9 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
           <Flex direction="row" gap="2" alignItems="center">
             {/* <HashDaoIcon boxSize="10" />
             <Tag label="HashDAO" />*/}
-            <HashDaoLogo width="60%" height="100%" />
+            <NavLink to="/">
+              <HashDaoLogo width="60%" height="100%" cursor="pointer" />
+            </NavLink>
           </Flex>
           <Alert variant="">
             {reconnectionInProgress && (

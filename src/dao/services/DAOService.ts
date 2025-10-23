@@ -455,79 +455,108 @@ export async function fetchGovernanceDAOLogs(
   governorAddress: string,
   assetsHolderAddress: string
 ): Promise<ProposalData[]> {
-  const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
+  try {
+    const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
 
-  const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
-    return await DexService.fetchContractProposalEvents(governorAddress);
-  };
+    const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
+      return await DexService.fetchContractProposalEvents(governorAddress);
+    };
 
-  const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
-    const proposalEventsWithDetailsResults = await Promise.allSettled(
-      proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-        const proposalDetailsData = getProposalData(
-          proposalEvent.coreInformation.inputs.proposalType,
-          proposalEvent.coreInformation.inputs.calldatas[0]
-        );
-        let contractId = proposalEvent.contractId;
-        if (contractId.includes("0.0")) {
-          contractId = ContractId.fromString(contractId).toSolidityAddress();
-        }
-        const response = await DexService.callContract({
-          data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
-          from: contractId.toString(),
-          to: contractId.toString(),
-        });
-        const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
-        /**
-         * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
-         * proposalDetails should override the same field found in the proposalEvent.
-         */
+    const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
+      const proposalEventsWithDetailsResults = await Promise.allSettled(
+        proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
+          const proposalDetailsData = getProposalData(
+            proposalEvent.coreInformation.inputs.proposalType,
+            proposalEvent.coreInformation.inputs.calldatas[0]
+          );
+          let contractId = proposalEvent.contractId;
+          if (contractId.includes("0.0")) {
+            contractId = ContractId.fromString(contractId).toSolidityAddress();
+          }
 
-        const isContractUpgradeProposal =
-          Number(proposalEvent.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY;
-        let isAdminApproved = false;
-        let parsedData;
-        if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
-          const proposalData = proposalDetailsData as UpgradeContractDetails;
-          const logs = await DexService.fetchContractLogs(proposalData?.proxy ?? "");
-          const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
-          const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
-          const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
-          const currentLogic = isNotNil(upgradedLogs[0])
-            ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
-            : "";
-          const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
-          const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
-          const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === assetsHolderAddress.toLocaleLowerCase();
-          parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
-        }
-        const isAdminApprovalButtonVisible =
-          dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved && isContractUpgradeProposal;
-        const currentStateOfProposal = isContractUpgradeProposal
-          ? dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved
-            ? ContractProposalState.Active
-            : dataParsed.at(0)
-          : dataParsed.at(0);
-        return {
-          ...proposalEvent,
-          state: currentStateOfProposal,
-          ...proposalDetailsData,
-          ...parsedData,
-          isAdminApproved,
-          isAdminApprovalButtonVisible,
-        };
-      })
-    );
-    const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {
-      return event.status === "fulfilled" ? event.value : undefined;
-    });
-    return proposalEventsWithDetails;
-  };
+          // Try to get the current state from the contract, but fall back to event data if it fails
+          let currentStateOfProposal;
+          let isAdminApprovalButtonVisible = false;
+          try {
+            const response = await DexService.callContract({
+              data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
+              from: contractId.toString(),
+              to: contractId.toString(),
+            });
+            const dataParsed = contractInterface.decodeFunctionResult(
+              "state",
+              ethers.utils.arrayify(response.data.result)
+            );
+            /**
+             * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
+             * proposalDetails should override the same field found in the proposalEvent.
+             */
 
-  const proposalEvents = await fetchDAOProposalEvents();
-  const proposalDetails = await fetchDAOProposalData(proposalEvents);
-  return proposalDetails;
+            const isContractUpgradeProposal =
+              Number(proposalEvent.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY;
+            isAdminApprovalButtonVisible =
+              dataParsed.at(0) === ContractProposalState.Succeeded && isContractUpgradeProposal;
+            currentStateOfProposal = isContractUpgradeProposal
+              ? dataParsed.at(0) === ContractProposalState.Succeeded
+                ? ContractProposalState.Active
+                : dataParsed.at(0)
+              : dataParsed.at(0);
+          } catch (error) {
+            console.warn(`Could not fetch state for proposal ${proposalEvent.proposalId}, using event data:`, error);
+            // Use state from the proposal event if available, otherwise default to Pending (0)
+            currentStateOfProposal = proposalEvent.state ?? ContractProposalState.Pending;
+          }
+
+          const isContractUpgradeProposal =
+            Number(proposalEvent.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY;
+          let isAdminApproved = false;
+          let parsedData;
+          if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
+            const proposalData = proposalDetailsData as UpgradeContractDetails;
+            const logs = await DexService.fetchContractLogs(proposalData?.proxy ?? "");
+            const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
+            const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
+            const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+            const currentLogic = isNotNil(upgradedLogs[0])
+              ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
+              : "";
+            const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
+            const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
+            const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
+            isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === assetsHolderAddress.toLocaleLowerCase();
+            parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
+          }
+
+          return {
+            ...proposalEvent,
+            state: currentStateOfProposal,
+            ...proposalDetailsData,
+            ...parsedData,
+            isAdminApproved,
+            isAdminApprovalButtonVisible,
+          };
+        })
+      );
+      const proposalEventsWithDetails = proposalEventsWithDetailsResults
+        .map((event: PromiseSettledResult<any>) => {
+          if (event.status === "fulfilled") {
+            return event.value;
+          } else {
+            console.error("Failed to fetch proposal details:", event.reason);
+            return undefined;
+          }
+        })
+        .filter((proposal) => proposal !== undefined);
+      return proposalEventsWithDetails;
+    };
+
+    const proposalEvents = await fetchDAOProposalEvents();
+    const proposalDetails = await fetchDAOProposalData(proposalEvents);
+    return proposalDetails;
+  } catch (error) {
+    console.error("Error fetching governance DAO proposals:", error);
+    return [];
+  }
 }
 
 export async function fetchHederaGnosisSafeLogs(safeAccountId: string) {
