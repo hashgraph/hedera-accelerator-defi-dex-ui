@@ -33,7 +33,7 @@ export function DAO() {
         <ToastContainer />
         <TermsConditionModal />
         <RouterProvider router={router} />
-        <ReactQueryDevtools initialIsOpen={true} />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ChakraProvider>
   );

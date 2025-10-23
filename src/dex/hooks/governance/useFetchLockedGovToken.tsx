@@ -35,7 +35,7 @@ export function useFetchLockedGovToken(
       return DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
     },
     {
-      enabled: !!(accountId && tokenHolderAddress),
+      enabled: !!accountId && !!tokenHolderAddress,
       select: formatBalance,
     }
   );

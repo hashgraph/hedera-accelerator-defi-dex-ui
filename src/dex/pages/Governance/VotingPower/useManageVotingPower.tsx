@@ -12,9 +12,7 @@ import { AccountId, TransactionResponse } from "@hashgraph/sdk";
 import daoSDK from "@dao/services";
 import { useQuery } from "react-query";
 import { BigNumber } from "bignumber.js";
-import { DEX_TOKEN_PRECISION_VALUE } from "@dex/services";
-
-const HARDCODED_WALLET_ID = "0.0.6755247";
+import { DEX_TOKEN_PRECISION_VALUE, DexService } from "@dex/services";
 
 export function useManageVotingPower(governanceTokenId: string, tokenHolderAddress: string) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -22,12 +20,24 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const { data: token } = useToken(governanceTokenId);
   const govTokenBalance = useTokenBalance({ tokenId: governanceTokenId });
+
   const { data: votingPower } = useQuery<string | undefined, Error, string>(
-    [walletId, tokenHolderAddress],
+    ["USER_VOTING_POWER", walletId, tokenHolderAddress],
     async () => {
+      // Resolve Hedera account to EVM address that matches msg.sender in contracts.
+      // Use evm_address (alias) from mirror node if available, else fall back to
+      // 0x-prefixed toSolidityAddress() to ensure contract mapping consistency.
+      let evm_address;
+      try {
+        const accountInfo = await DexService.fetchAccountInfo(walletId);
+        evm_address = accountInfo.evm_address;
+      } catch (e) {
+        evm_address = AccountId.fromString(walletId).toSolidityAddress();
+      }
+
       const votingPower = await daoSDK.getVotingPower(
         AccountId.fromString(tokenHolderAddress).toSolidityAddress(),
-        AccountId.fromString(HARDCODED_WALLET_ID).toSolidityAddress()
+        evm_address!
       );
 
       if (votingPower) {
@@ -37,7 +47,7 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
       return "0.0000";
     },
     {
-      enabled: !!(walletId && tokenHolderAddress),
+      enabled: !!walletId && !!tokenHolderAddress,
     }
   );
 

@@ -84,6 +84,7 @@ async function sendCreateGovernanceDAOTransaction(
 
   const isHbar = isHbarToken(daoFeeTokenId);
   const hBarPayable = Hbar.fromTinybars(isHbar ? daoFee : 0);
+
   await DexService.setUpAllowance({
     tokenId: daoFeeTokenId,
     tokenAmount: daoFee,
