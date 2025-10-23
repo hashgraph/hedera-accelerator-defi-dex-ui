@@ -177,7 +177,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
             </Button>
           ) : (
             <>
-              <Flex gap="4">
+              <Flex direction="column" gap="1rem">
                 <AlertDialog
                   openDialogButtonStyles={{ flex: "1" }}
                   openDialogButtonText="Vote"
@@ -194,6 +194,12 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                   onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteOpen: true })}
                   onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteOpen: false })}
                 />
+                {isVotingDisabled && (
+                  <InlineAlert
+                    type={InlineAlertType.Warning}
+                    message="You need to lock governance tokens to vote on this proposal"
+                  />
+                )}
               </Flex>
             </>
           )
@@ -205,7 +211,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               </Button>
             ) : (
               <>
-                <Flex gap="4">
+                <Flex direction="column" gap="1rem">
                   <AlertDialog
                     openDialogButtonStyles={{ flex: "1" }}
                     openDialogButtonText="Vote"
@@ -222,6 +228,12 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                     onAlertDialogOpen={() => setDialogState({ ...dialogState, isVoteOpen: true })}
                     onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteOpen: false })}
                   />
+                  {isVotingDisabled && (
+                    <InlineAlert
+                      type={InlineAlertType.Warning}
+                      message="You need to lock governance tokens to vote on this proposal"
+                    />
+                  )}
                 </Flex>
               </>
             )}
