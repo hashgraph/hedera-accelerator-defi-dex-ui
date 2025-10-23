@@ -3,7 +3,6 @@ import { useQuery } from "react-query";
 import { isNil } from "ramda";
 import { DAOQueries, UpdateAmountEventData } from "./types";
 import { DAOEvents, Member } from "@dao/services";
-import { solidityAddressToAccountIdString } from "@shared/utils";
 
 type UseFetchDAOMembersQueryKey = [DAOQueries.FetchDAOMembers, string | undefined];
 
@@ -27,11 +26,19 @@ export function useFetchDAOMembers(tokenHolderAddress: string) {
             daoMembers[memberIndex] = { ...log };
           }
         });
-      const activeMemberWithLockedBalance = daoMembers
-        .filter((member) => member.idOrAmount > 0)
-        .map((member) => {
-          return { name: "-", logo: "", accountId: solidityAddressToAccountIdString(member.user) };
-        });
+      const activeMemberWithLockedBalance = await Promise.all(
+        daoMembers
+          .filter((member) => member.idOrAmount > 0)
+          .map(async (member) => {
+            try {
+              const accountInfo = await DexService.fetchAccountInfo(member.user);
+              return { name: "-", logo: "", accountId: accountInfo.account };
+            } catch (error) {
+              console.warn(`Could not fetch account info for ${member.user}, using EVM address:`, error);
+              return { name: "-", logo: "", accountId: member.user };
+            }
+          })
+      );
       return activeMemberWithLockedBalance;
     },
     {
