@@ -306,11 +306,50 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
     }
     return votesCount;
   };
-  const votingEndTime = new Date(Number(proposal.votingEndTime) * 1000).toLocaleString();
+  // Convert BigInt to number for calculations
+  const voteEndTimestamp = Number(proposal.votingEndTime);
+  const voteStartTimestamp = proposal.coreInformation?.voteStart ? Number(proposal.coreInformation.voteStart) : 0;
+
+  const votingEndTime = new Date(voteEndTimestamp * 1000).toLocaleString();
+  const votingStartTime = voteStartTimestamp ? new Date(voteStartTimestamp * 1000).toLocaleString() : "N/A";
+
+  const now = Math.floor(Date.now() / 1000);
+  const timeUntilEnd = voteEndTimestamp - now;
+
   return (
     <Flex layerStyle="content-box" direction="column" height="100%">
       <Flex direction="column" gap={4} minWidth="250px" height="100%">
         <Text.H4_Medium>Vote details</Text.H4_Medium>
+
+        {/* DEBUG INFO - Remove this after diagnosing */}
+        <Flex direction="column" gap={1} padding={2} backgroundColor="yellow.100" borderRadius={4}>
+          <Text.P_XSmall_Regular color="black">🐛 DEBUG INFO:</Text.P_XSmall_Regular>
+          <Text.P_XSmall_Regular color="black">
+            Vote Start: {voteStartTimestamp} ({votingStartTime})
+          </Text.P_XSmall_Regular>
+          <Text.P_XSmall_Regular color="black">
+            Vote End: {voteEndTimestamp} ({votingEndTime})
+          </Text.P_XSmall_Regular>
+          <Text.P_XSmall_Regular color="black">Current Time: {now}</Text.P_XSmall_Regular>
+          <Text.P_XSmall_Regular color="black">
+            Time Until End: {timeUntilEnd}s ({Math.floor(timeUntilEnd / 60)}min)
+          </Text.P_XSmall_Regular>
+          <Text.P_XSmall_Regular color="black">Contract State: {proposal.proposalState}</Text.P_XSmall_Regular>
+          <Text.P_XSmall_Regular color="black" fontWeight="bold">
+            {timeUntilEnd < 0 ? "❌ SHOULD BE EXPIRED!" : "✅ Still active"}
+          </Text.P_XSmall_Regular>
+        </Flex>
+
+        <Flex gap={2} justify="space-between" align="center">
+          <Flex direction="column" alignItems="flex-start">
+            <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
+              Voting start time
+            </Text.P_XSmall_Regular>
+            <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
+              {votingStartTime}
+            </Text.P_XSmall_Semibold>
+          </Flex>
+        </Flex>
         <Flex gap={2} justify="space-between" align="center">
           <Flex direction="column" alignItems="flex-start">
             <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">

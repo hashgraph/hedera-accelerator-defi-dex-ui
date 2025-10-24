@@ -480,7 +480,7 @@ export async function fetchGovernanceDAOLogs(
           try {
             const response = await DexService.callContract({
               data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
-              from: contractId.toString(),
+              // Remove 'from' parameter - Mirror Node rejects when from=contract address
               to: contractId.toString(),
             });
             const dataParsed = contractInterface.decodeFunctionResult(
