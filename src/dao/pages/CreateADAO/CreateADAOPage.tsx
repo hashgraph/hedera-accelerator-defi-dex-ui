@@ -143,7 +143,6 @@ export function CreateADAOPage() {
 
   async function onSubmit(data: CreateADAOForm) {
     const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl = "" } = data;
-    // Contract requires infoUrl to not be empty, use placeholder if not provided
     const finalInfoUrl = infoUrl.trim() || "#";
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;

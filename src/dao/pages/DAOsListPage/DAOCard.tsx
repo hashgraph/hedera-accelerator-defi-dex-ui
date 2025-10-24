@@ -17,7 +17,7 @@ export function DAOCard(props: DAOCardProps) {
   const navigate = useNavigate();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
-  const bgColor = props.isPrivate ? Color.Yellow_01 : Color.White;
+  const bgColor = props.isPrivate ? Color.Neutral._100 : Color.White;
 
   function handleDAOCardClicked() {
     const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
