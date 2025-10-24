@@ -137,12 +137,54 @@ export function useGovernanceDAOProposals(
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
   ): Promise<Proposal> => {
-    const proposalState = proposalData.state
+    let proposalState = proposalData.state
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);
-    const endTime = proposalData?.coreInformation?.voteEnd;
-    const currentTime = new Date().getTime();
-    const timeRemaining = currentTime < endTime ? (endTime - currentTime) / 1000 : 0;
+
+    const startTime = proposalData?.coreInformation?.voteStart; // in seconds (BigInt or number)
+    const endTime = proposalData?.coreInformation?.voteEnd; // in seconds (BigInt or number)
+    const currentTime = new Date().getTime(); // in milliseconds
+    const startTimeMs = Number(startTime) * 1000; // convert to milliseconds
+    const endTimeMs = Number(endTime) * 1000; // convert to milliseconds
+    const timeRemaining = currentTime < endTimeMs ? (endTimeMs - currentTime) / 1000 : 0;
+
+    const isQuorumReached = proposalData.votingInformation?.isQuorumReached ?? false;
+    const forVotes = proposalData.votingInformation?.forVotes ?? 0;
+    const againstVotes = proposalData.votingInformation?.againstVotes ?? 0;
+    const abstainVotes = proposalData.votingInformation?.abstainVotes ?? 0;
+    const quorumValue = proposalData.votingInformation?.quorumValue ?? 0;
+
+    console.log(`[Proposal ${proposalData.proposalId}] State from contract:`, proposalState);
+    console.log(`[Proposal ${proposalData.proposalId}] Start time:`, new Date(startTimeMs).toLocaleString());
+    console.log(`[Proposal ${proposalData.proposalId}] End time:`, new Date(endTimeMs).toLocaleString());
+    console.log(`[Proposal ${proposalData.proposalId}] Current time:`, new Date(currentTime).toLocaleString());
+    console.log(`[Proposal ${proposalData.proposalId}] Time remaining (seconds):`, timeRemaining);
+    console.log(
+      `[Proposal ${proposalData.proposalId}] Votes - For:`,
+      forVotes,
+      "Against:",
+      againstVotes,
+      "Abstain:",
+      abstainVotes
+    );
+    console.log(`[Proposal ${proposalData.proposalId}] Quorum value:`, quorumValue);
+    console.log(`[Proposal ${proposalData.proposalId}] Quorum reached:`, isQuorumReached);
+    console.log(`[Proposal ${proposalData.proposalId}] For > Against:`, forVotes > againstVotes);
+
+    // DON'T override the contract state for execution purposes
+    // The contract's state() function determines what actions are available
+    // We only use time-based predictions for user messages, not for showing action buttons
+
+    // Only override Pending -> Active if voting has clearly started
+    // This is safe because it only enables voting, which the contract will validate anyway
+    if (proposalState === ContractProposalState[ContractProposalState.Pending] && currentTime >= startTimeMs) {
+      console.log(`[Proposal ${proposalData.proposalId}] Overriding state to Active (voting has started)`);
+      proposalState = ContractProposalState[ContractProposalState.Active] as keyof typeof ContractProposalState;
+    }
+
+    // DO NOT override to Succeeded/Expired - let the contract state be the source of truth
+    // The contract's state() function will transition when block.timestamp passes the deadline
+
     const hasVoted = isNotNil(
       proposalData.votersList?.find(
         (voterInfo) => currentWalletId === solidityAddressToAccountIdString(voterInfo.voter)

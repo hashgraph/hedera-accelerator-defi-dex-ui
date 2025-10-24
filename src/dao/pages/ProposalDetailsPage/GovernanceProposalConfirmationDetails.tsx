@@ -88,11 +88,48 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
   const contractEvmAddress = proposal?.contractEvmAddress ?? "";
   const contractIdQueryResults = useFetchContract(contractEvmAddress);
   const contractId = contractIdQueryResults.data?.data.contract_id ?? "";
-  const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0;
+  // Voting is only allowed when the proposal is in Active state
+  const isProposalActive = state === ProposalState.Active;
+  const isProposalPending = state === ProposalState.Pending;
+  const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0 || !isProposalActive;
   const isAdminApprovalButtonVisible =
     (proposal?.data as GOVUpgradeProposalDetails)?.isAdminApprovalButtonVisible ?? false;
   const isApproveAdminButtonDisabled = walletId !== (proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin;
   const isContractUpgradeProposal = proposal?.isContractUpgradeProposal;
+
+  // Check if voting time has ended (client-side calculation)
+  const votingEndTimeMs = proposal?.votingEndTime ? Number(proposal.votingEndTime) * 1000 : 0;
+  const hasVotingTimeEnded = votingEndTimeMs > 0 && Date.now() >= votingEndTimeMs;
+
+  // Determine the appropriate warning message based on proposal state
+  const getVotingDisabledMessage = () => {
+    if (isProposalPending) {
+      return "Voting has not started yet for this proposal";
+    }
+
+    // If voting time ended but state is still Active, show helpful message
+    if (state === ProposalState.Active && hasVotingTimeEnded) {
+      return "Voting period has ended. The proposal state will update shortly.";
+    }
+
+    // Provide specific messages for different end states
+    switch (state) {
+      case ProposalState.Defeated:
+        return "This proposal was defeated";
+      case ProposalState.Canceled:
+        return "This proposal was canceled";
+      case ProposalState.Expired:
+        return "Voting period has expired for this proposal";
+      case ProposalState.Executed:
+        return "This proposal has been executed";
+      case ProposalState.Succeeded:
+      case ProposalState.Queued:
+        return "This proposal passed and is awaiting execution";
+      default:
+        // Active state with no voting power
+        return "You need to lock governance tokens to vote on this proposal";
+    }
+  };
 
   async function handleVoteButtonClicked(voteType: VoteType) {
     resetServerState();
@@ -195,10 +232,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                   onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteOpen: false })}
                 />
                 {isVotingDisabled && (
-                  <InlineAlert
-                    type={InlineAlertType.Warning}
-                    message="You need to lock governance tokens to vote on this proposal"
-                  />
+                  <InlineAlert type={InlineAlertType.Warning} message={getVotingDisabledMessage()} />
                 )}
               </Flex>
             </>
@@ -229,10 +263,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                     onAlertDialogClose={() => setDialogState({ ...dialogState, isVoteOpen: false })}
                   />
                   {isVotingDisabled && (
-                    <InlineAlert
-                      type={InlineAlertType.Warning}
-                      message="You need to lock governance tokens to vote on this proposal"
-                    />
+                    <InlineAlert type={InlineAlertType.Warning} message={getVotingDisabledMessage()} />
                   )}
                 </Flex>
               </>
