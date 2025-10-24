@@ -134,12 +134,12 @@ export function DAOTokenTransferDetailsForm() {
           <FormInput<"linkToDiscussion">
             inputProps={{
               id: "linkToDiscussion",
-              label: "Link to discussion",
+              label: "Link to discussion (optional)",
               type: "text",
               placeholder: "Enter URL",
               register: {
                 ...register("linkToDiscussion", {
-                  validate: (value) => isValidUrl(value) || "Invalid URL, Please try again.",
+                  validate: (value) => !value || isValidUrl(value) || "Invalid URL, Please try again.",
                 }),
               },
             }}

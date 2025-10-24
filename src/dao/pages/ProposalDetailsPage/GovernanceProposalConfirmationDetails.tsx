@@ -26,7 +26,7 @@ import {
   UseChangeAdminMutationResult,
   useFetchContract,
 } from "@dao/hooks";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UseMutationResult } from "react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
 import { ProposalCancelModal } from "./ProposalDetailsComponents";
@@ -239,7 +239,10 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
             )}
           </>
         )}
-        {isAuthor ? (
+        {isAuthor &&
+        state !== ProposalState.Executed &&
+        state !== ProposalState.Expired &&
+        state !== ProposalState.Canceled ? (
           <ProposalCancelModal
             title={proposal?.title}
             tokenSymbol={tokenSymbol}
@@ -258,22 +261,28 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
         <Button variant="primary" onClick={() => handleClickExecuteTransaction()}>
           Execute
         </Button>
-        {isAuthor && (
-          <ProposalCancelModal
-            title={proposal?.title}
-            tokenSymbol={tokenSymbol}
-            votingPower={votingPower}
-            handleCancelProposalClicked={handleCancelProposalClicked}
-            setDialogState={setDialogState}
-            dialogState={dialogState}
-          />
-        )}
+        {isAuthor &&
+          state !== ProposalState.Executed &&
+          state !== ProposalState.Expired &&
+          state !== ProposalState.Canceled && (
+            <ProposalCancelModal
+              title={proposal?.title}
+              tokenSymbol={tokenSymbol}
+              votingPower={votingPower}
+              handleCancelProposalClicked={handleCancelProposalClicked}
+              setDialogState={setDialogState}
+              dialogState={dialogState}
+            />
+          )}
       </>
     ),
     [ProposalStatus.Success]: <></>,
     [ProposalStatus.Failed]: (
       <>
-        {isAuthor && state !== ProposalState.Canceled ? (
+        {isAuthor &&
+        state !== ProposalState.Canceled &&
+        state !== ProposalState.Executed &&
+        state !== ProposalState.Expired ? (
           <ProposalCancelModal
             title={proposal?.title}
             tokenSymbol={tokenSymbol}
@@ -313,32 +322,32 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
   const votingEndTime = new Date(voteEndTimestamp * 1000).toLocaleString();
   const votingStartTime = voteStartTimestamp ? new Date(voteStartTimestamp * 1000).toLocaleString() : "N/A";
 
-  const now = Math.floor(Date.now() / 1000);
-  const timeUntilEnd = voteEndTimestamp - now;
+  // Countdown timer
+  const [timeRemaining, setTimeRemaining] = useState(0);
+
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = Math.floor(Date.now() / 1000);
+      const remaining = voteEndTimestamp - now;
+      setTimeRemaining(remaining);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [voteEndTimestamp]);
+
+  const formatTimeRemaining = (seconds: number) => {
+    if (seconds <= 0) return "Voting ended";
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}m ${secs}s`;
+  };
 
   return (
     <Flex layerStyle="content-box" direction="column" height="100%">
       <Flex direction="column" gap={4} minWidth="250px" height="100%">
         <Text.H4_Medium>Vote details</Text.H4_Medium>
-
-        {/* DEBUG INFO - Remove this after diagnosing */}
-        <Flex direction="column" gap={1} padding={2} backgroundColor="yellow.100" borderRadius={4}>
-          <Text.P_XSmall_Regular color="black">🐛 DEBUG INFO:</Text.P_XSmall_Regular>
-          <Text.P_XSmall_Regular color="black">
-            Vote Start: {voteStartTimestamp} ({votingStartTime})
-          </Text.P_XSmall_Regular>
-          <Text.P_XSmall_Regular color="black">
-            Vote End: {voteEndTimestamp} ({votingEndTime})
-          </Text.P_XSmall_Regular>
-          <Text.P_XSmall_Regular color="black">Current Time: {now}</Text.P_XSmall_Regular>
-          <Text.P_XSmall_Regular color="black">
-            Time Until End: {timeUntilEnd}s ({Math.floor(timeUntilEnd / 60)}min)
-          </Text.P_XSmall_Regular>
-          <Text.P_XSmall_Regular color="black">Contract State: {proposal.proposalState}</Text.P_XSmall_Regular>
-          <Text.P_XSmall_Regular color="black" fontWeight="bold">
-            {timeUntilEnd < 0 ? "❌ SHOULD BE EXPIRED!" : "✅ Still active"}
-          </Text.P_XSmall_Regular>
-        </Flex>
 
         <Flex gap={2} justify="space-between" align="center">
           <Flex direction="column" alignItems="flex-start">
@@ -359,6 +368,21 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               {votingEndTime}
             </Text.P_XSmall_Semibold>
           </Flex>
+        </Flex>
+        {timeRemaining > 0 && (
+          <Flex gap={2} justify="space-between" align="center">
+            <Flex direction="column" alignItems="flex-start">
+              <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
+                Time remaining
+              </Text.P_XSmall_Regular>
+              <Text.P_XSmall_Semibold color={Color.Success._600} textAlign="start">
+                {formatTimeRemaining(timeRemaining)}
+              </Text.P_XSmall_Semibold>
+            </Flex>
+          </Flex>
+        )}
+        <Flex gap={2} justify="space-between" align="center">
+          <Flex direction="column" alignItems="flex-start"></Flex>
           <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">
             <Text.P_Small_Medium
               color={Color.Success._600}

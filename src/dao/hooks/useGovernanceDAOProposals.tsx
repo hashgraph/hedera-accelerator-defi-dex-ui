@@ -137,15 +137,6 @@ export function useGovernanceDAOProposals(
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
   ): Promise<Proposal> => {
-    // DEBUG: Log raw proposal data
-    console.log("[DEBUG] Raw proposal data:", {
-      proposalId: proposalData.proposalId,
-      voteStart: proposalData?.coreInformation?.voteStart,
-      voteEnd: proposalData?.coreInformation?.voteEnd,
-      state: proposalData.state,
-      coreInformation: proposalData.coreInformation,
-    });
-
     const proposalState = proposalData.state
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);

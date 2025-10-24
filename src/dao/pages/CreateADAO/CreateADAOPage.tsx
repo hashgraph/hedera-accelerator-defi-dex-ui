@@ -142,7 +142,9 @@ export function CreateADAOPage() {
   ];
 
   async function onSubmit(data: CreateADAOForm) {
-    const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl } = data;
+    const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl = "" } = data;
+    // Contract requires infoUrl to not be empty, use placeholder if not provided
+    const finalInfoUrl = infoUrl.trim() || "#";
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
       const { governance, voting } = tokenDAOData;
@@ -151,7 +153,7 @@ export function CreateADAOPage() {
         name,
         logoUrl,
         description,
-        infoUrl,
+        infoUrl: finalInfoUrl,
         daoLinks: daoLinks.map((link) => link.value),
         isPrivate: !isPublic,
         tokenId:
@@ -179,7 +181,7 @@ export function CreateADAOPage() {
         admin: governance.admin,
         name,
         logoUrl,
-        infoUrl,
+        infoUrl: finalInfoUrl,
         owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
@@ -195,7 +197,7 @@ export function CreateADAOPage() {
         description,
         daoLinks: daoLinks.map((link) => link.value),
         logoUrl,
-        infoUrl,
+        infoUrl: finalInfoUrl,
         isPrivate: !isPublic,
         tokenId:
           governance.tokenType === DAONFTTokenType.NewNFT
