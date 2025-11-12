@@ -1,9 +1,10 @@
 import { Box, Flex, useRadioGroup } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
-import { Text, RadioCard } from "@shared/ui-kit";
+import { InlineAlert, InlineAlertType, RadioCard, Text } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import {
   CreateADAOForm,
+  CreateDAOContext,
   DAOGovernanceTokenType,
   DAONFTTokenType,
   MultiSigDAOGovernanceData,
@@ -12,12 +13,10 @@ import {
   NFTDAOVotingData,
   TokenDAOGovernanceData,
   TokenDAOVotingData,
-  CreateDAOContext,
 } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useEffect } from "react";
 import { DAOType } from "@dao/services";
-import { InlineAlert, InlineAlertType } from "@shared/ui-kit";
 
 const newDAOOptions = [
   {
@@ -136,6 +135,7 @@ export function DAOTypeForm() {
   });
 
   const getDAOFeeAndTokenSymbol = (daoType: DAOType) => {
+    console.log("getDAOFee", daoType);
     switch (daoType) {
       case DAOType.MultiSig:
         return { daoFee: multisigDAOFeeConfig?.preciseDAOFee, tokenSymbol: multisigDAOFeeConfig?.symbol };
@@ -143,6 +143,8 @@ export function DAOTypeForm() {
         return { daoFee: ftDAOFeeConfig?.preciseDAOFee, tokenSymbol: ftDAOFeeConfig?.symbol };
       case DAOType.NFT:
         return { daoFee: nftDAOFeeConfig?.preciseDAOFee, tokenSymbol: nftDAOFeeConfig?.symbol };
+      case DAOType.Huffy:
+        return { daoFee: ftDAOFeeConfig?.preciseDAOFee, tokenSymbol: ftDAOFeeConfig?.symbol };
     }
   };
   const { multisigDAOFeeConfig, ftDAOFeeConfig, nftDAOFeeConfig } = useOutletContext<CreateDAOContext>();

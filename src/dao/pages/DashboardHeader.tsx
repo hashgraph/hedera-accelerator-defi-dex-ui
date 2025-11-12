@@ -1,7 +1,6 @@
 import { Button, Flex, HStack, Image, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import {
-  Breadcrumb,
   CheckRightIcon,
   Color,
   DefaultLogoIcon,
@@ -14,7 +13,6 @@ import {
 import { DAOType } from "@dao/services";
 import { MintNFTModal } from "./MintNFTModal";
 import { useToken } from "@dex/hooks";
-import { Routes } from "@dao/routes";
 import { useFetchContract } from "@dao/hooks";
 
 interface DashboardHeaderProps {
@@ -52,7 +50,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
   const safeId = daoSafeIdQueryResults.data?.data.contract_id;
   const { data: token } = useToken(govTokenId ?? "");
   const showMintNFTButton = type === DAOType.NFT && Number(token?.data.max_supply) > Number(token?.data.total_supply);
-  const colorBG = isPrivate ? Color.Yellow_01 : Color.White;
+  const colorBG = Color.White;
   return (
     <Flex bg={colorBG} direction="column" padding="1rem 5rem 0.5rem">
       <Flex bg={colorBG} direction="row" gap="4">
@@ -77,7 +75,10 @@ export function DashboardHeader(props: DashboardHeaderProps) {
                 </HStack>
                 {govTokenId ? (
                   <HStack>
-                    <Text.H6_Medium opacity="0.8">{`${token?.data.symbol} TOKEN ID:`}</Text.H6_Medium>
+                    {/* eslint-disable-next-line max-len */}
+                    <Text.H6_Medium opacity="0.8">{`${
+                      token?.data.symbol === "GOD" ? "HUFFY" : token?.data.symbol
+                    } TOKEN ID:`}</Text.H6_Medium>
                     <HashScanLink id={govTokenId} type={HashscanData.Token} />
                   </HStack>
                 ) : undefined}
@@ -100,9 +101,6 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           </HStack>
         </Flex>
         <Flex bg={colorBG} flexGrow="1" justifyContent="right" gap="8">
-          <Flex height="40px" alignItems="center">
-            <Breadcrumb to={Routes.Home} label="Back to DAOs" />
-          </Flex>
           {showMintNFTButton && token && (
             <Flex height="40px" alignItems="center">
               <MintNFTModal token={token} handleMintNFT={handleMintNFT} />
@@ -112,7 +110,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             <Button
               variant="primary"
               onClick={() => {
-                navigate("new-proposal");
+                navigate(`/${"new-proposal"}`);
               }}
             >
               New Proposal
@@ -120,9 +118,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             {isMember || isAdmin || isPrivate ? (
               <Flex direction="row" justifyContent="right" gap="0.2rem" alignItems="center">
                 <Text.P_Small_Regular color={Color.Neutral._500}>{isAdmin ? "Admin" : "Member"}</Text.P_Small_Regular>
-                {isPrivate ? (
-                  <Text.P_Small_Regular color={Color.Neutral._500}>&nbsp;Private</Text.P_Small_Regular>
-                ) : undefined}
+                {isPrivate ? <Text.P_Small_Regular color={Color.Neutral._500}>&nbsp;</Text.P_Small_Regular> : undefined}
                 <CheckRightIcon boxSize="4" color={Color.Neutral._500} />
               </Flex>
             ) : undefined}

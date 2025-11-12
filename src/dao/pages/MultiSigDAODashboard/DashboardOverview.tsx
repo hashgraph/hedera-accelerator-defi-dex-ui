@@ -14,7 +14,7 @@ export function DashboardOverview() {
   const tokenCountDisplay = tokenBalances?.length;
   const memberCountDisplay = String(members.length);
   const thresholdDisplay = `${String(threshold)} / ${String(members.length)}`;
-  const daoTransactionsQueryResults = useDAOProposals(accountId, safeEVMAddress);
+  const daoTransactionsQueryResults = useDAOProposals(accountId);
   const { isSuccess, isLoading, isError, error, data: proposals } = daoTransactionsQueryResults;
   const daoLinks = getDAOLinksRecordArray(dao.webLinks);
   const recentProposals = proposals?.sort((proposalA, proposalB) => proposalA.id - proposalB.id).slice(0, 3);

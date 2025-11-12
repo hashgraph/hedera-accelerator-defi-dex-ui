@@ -16,3 +16,10 @@ export * from "./DAOContractUpgradeDetailsForm";
 export * from "./DAOTokenAssociateDetailsForm";
 export * from "./DAOTokenAssociateReviewForm";
 export * from "./DAOGenericProposal";
+
+export * from "./DAOHuffyDetailsForm";
+export * from "./DAOHuffyRiskParamsDetailsForm";
+export * from "./DAOHuffyAddTradingPairForm";
+export * from "./DAOHuffyRemoveTradingPairForm";
+export * from "./DAOHuffyRiskParamsReviewForm";
+export * from "./DAOHuffyTraidingPairReviewForm";

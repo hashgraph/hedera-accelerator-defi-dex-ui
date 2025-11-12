@@ -2,14 +2,14 @@ import { Box, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@dex/layouts";
 import { BoxIcon, Color, LayoutIcon, LockIcon2, SettingsIcon, TransactionIcon, UsersIcon } from "@shared/ui-kit";
 import { useTabFilters } from "@dex/hooks";
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { PropsWithChildren } from "react";
 import { DAO, DAOType, GovernanceDAODetails, MultiSigDAODetails, NFTDAODetails } from "@dao/services";
 import { DashboardHeader } from "./DashboardHeader";
-import { Routes } from "@dao/routes";
 import { VotingPower } from "@dex/pages/Governance/VotingPower";
 import { NFTVotingPower } from "./NFTVotingPower";
 import { useFetchContract } from "@dao/hooks";
+import { DEFAULT_DAO_OVERVIEW_PATH } from "@dao/config/singleDao";
 
 const TabsHeight = 44;
 
@@ -55,7 +55,6 @@ export function DAODashboard(props: DAODashboardProps) {
       title: "Settings",
     },
   ];
-  const { accountId: daoAccountId = "" } = useParams();
   const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin, handleMintNFT } =
     props;
   const { type = "", infoUrl } = dao ?? {};
@@ -82,7 +81,7 @@ export function DAODashboard(props: DAODashboardProps) {
     }
   }
   function onBackToDAOsLinkClick() {
-    navigate(Routes.Home);
+    navigate(DEFAULT_DAO_OVERVIEW_PATH);
   }
 
   if (isError) {
@@ -96,9 +95,9 @@ export function DAODashboard(props: DAODashboardProps) {
   if (isNotFound) {
     return (
       <NotFound
-        message={`We didn't find any data for this DAO (${daoAccountId}).`}
+        message={"We didn't find any data for this DAO."}
         preLinkText={""}
-        linkText={"Click here to return to the DAOs list page."}
+        linkText={"Go to the DAO overview"}
         onLinkClick={onBackToDAOsLinkClick}
       />
     );
@@ -143,7 +142,7 @@ export function DAODashboard(props: DAODashboardProps) {
           />
         }
         body={
-          <Flex direction="column" gap="0.75rem" height="100%" bg={dao.isPrivate ? Color.Yellow_01 : Color.White}>
+          <Flex direction="column" gap="0.75rem" height="100%" bg={Color.White}>
             {isGovernance ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={daoTokenHolder} />
             ) : (
@@ -154,7 +153,7 @@ export function DAODashboard(props: DAODashboardProps) {
               defaultIndex={initialTabIndex}
               onChange={handleTabChange}
               isLazy
-              bg={dao.isPrivate ? Color.Yellow_01 : Color.White}
+              bg={Color.White}
               variant="dao-dashboard-tab"
               height="100%"
             >
@@ -162,7 +161,7 @@ export function DAODashboard(props: DAODashboardProps) {
                 <TabList borderBottom="0">
                   {daoNavigationTabs.map((tab, index: number) => {
                     return (
-                      <NavLink to={tab.title.toLowerCase()} key={index}>
+                      <NavLink to={`/${tab.title.toLowerCase()}`} key={index}>
                         <Tab tabIndex={index}>
                           <Flex gap={2.5} alignItems="center" justifyContent="center">
                             {tab.icon}

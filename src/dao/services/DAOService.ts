@@ -1,42 +1,42 @@
 import { ethers } from "ethers";
 import { BigNumber } from "bignumber.js";
-import { AccountId, ContractId, ContractExecuteTransaction, ContractFunctionParameters, TokenId } from "@hashgraph/sdk";
+import { AccountId, ContractExecuteTransaction, ContractFunctionParameters, ContractId } from "@hashgraph/sdk";
 import {
   abiSignatures,
   checkTransactionResponseForError,
+  Contracts,
   convertEthersBigNumberToBigNumberJS,
   decodeLog,
   DexService,
+  Gas,
+  HBARTokenId,
+  MINIMUM_DEPOSIT_AMOUNT,
   MirrorNodeDecodedProposalEvent,
 } from "@dex/services";
-import { Contracts, Gas, HBARTokenId, MINIMUM_DEPOSIT_AMOUNT } from "@dex/services";
 import { getEventArgumentsByName } from "../../dex/services/utils";
 import FTDAOFactoryJSON from "../../dex/services/abi/FTDAOFactory.json";
-import MultiSigDAOFactoryJSON from "../../dex/services/abi/MultiSigDAOFactory.json";
 import HederaGnosisSafeJSON from "../../dex/services/abi/HederaGnosisSafe.json";
 import MultiSigDAOJSON from "../../dex/services/abi/MultiSigDAO.json";
 import BaseDAOJSON from "../../dex/services/abi/BaseDAO.json";
 import HederaGovernorJSON from "../../dex/services/abi/HederaGovernor.json";
 import AssetHolderJSON from "../../dex/services/abi/AssetHolder.json";
 import GODHolderJSON from "../../dex/services/abi/GODHolder.json";
+import ParameterStoreJSON from "../../dao/config/abi/ParameterStore.json";
+import PairWhitelistJSON from "../../dao/config/abi/PairWhitelist.json";
 
 import {
-  MultiSigDAODetails,
-  MultiSigDAOCreatedEventArgs,
-  DAOType,
-  GovernanceDAODetails,
-  NFTDAODetails,
-  GovernanceDAOCreatedEventArgs,
   DAO,
-  DAOEvents,
-  NFTDAOCreatedEventArgs,
-  HederaGnosisSafeFunctions,
-  MultiSigProposeTransactionType,
-  DAOSettingsDetails,
   DAODetailsInfoEventArgs,
-  UpgradeContractDetails,
-  ProposalDataDetails,
+  DAOEvents,
+  DAOSettingsDetails,
+  DAOType,
+  GovernanceDAOCreatedEventArgs,
+  GovernanceDAODetails,
+  HederaGnosisSafeFunctions,
   LockedTokenDetails,
+  MultiSigProposeTransactionType,
+  ProposalDataDetails,
+  UpgradeContractDetails,
 } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
@@ -45,26 +45,6 @@ import { isNil, isNotNil } from "ramda";
 import { ContractProposalState, GovernanceProposalType } from "@dex/store";
 import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
 import { GovernorDAOContractFunctions } from "./contracts";
-
-export async function getOwners(safeAddress: string): Promise<string[]> {
-  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
-  const response = await DexService.callContract({
-    data: contractInterface.encodeFunctionData("getOwners"),
-    to: safeAddress,
-  });
-  const ownersList = contractInterface.decodeFunctionResult("getOwners", ethers.utils.arrayify(response.data.result));
-  return ownersList[0];
-}
-
-export async function getThreshold(safeAddress: string): Promise<number> {
-  const contractInterface = new ethers.utils.Interface(HederaGnosisSafeJSON.abi);
-  const response = await DexService.callContract({
-    data: contractInterface.encodeFunctionData("getThreshold"),
-    to: safeAddress,
-  });
-  const threshold = contractInterface.decodeFunctionResult("getThreshold", ethers.utils.arrayify(response.data.result));
-  return threshold[0].toNumber();
-}
 
 export async function getVotingPower(callContract: string, owner: string) {
   const contractInterface = new ethers.utils.Interface(GODHolderJSON.abi);
@@ -76,40 +56,6 @@ export async function getVotingPower(callContract: string, owner: string) {
 
   const balance = contractInterface.decodeFunctionResult("balanceOfVoter", ethers.utils.arrayify(response.data.result));
   return balance[0].toNumber();
-}
-
-async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODetails[]> {
-  const logs = await DexService.fetchParsedEventLogs(
-    Contracts.MultiSigDAOFactory.ProxyId,
-    new ethers.utils.Interface(MultiSigDAOFactoryJSON.abi),
-    eventTypes
-  );
-
-  const multiSigEventResults = logs.map(async (log: ethers.utils.LogDescription): Promise<MultiSigDAODetails> => {
-    const argsWithName = getEventArgumentsByName<MultiSigDAOCreatedEventArgs>(log.args, ["owners", "webLinks"]);
-    const { inputs: initialDAODetails, safeAddress: safeEVMAddress, daoAddress } = argsWithName;
-    const owners = await getOwners(safeEVMAddress);
-    const threshold = await getThreshold(safeEVMAddress);
-    const { admin, isPrivate, name, description, logoUrl, webLinks, infoUrl } = initialDAODetails;
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(daoAddress, [DAOEvents.DAOInfoUpdated]);
-    return {
-      type: DAOType.MultiSig,
-      accountEVMAddress: daoAddress,
-      adminId: solidityAddressToAccountIdString(admin),
-      name: updatedDAODetails?.name ?? name,
-      logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
-      title: updatedDAODetails?.name ?? name,
-      description: updatedDAODetails?.description ?? description,
-      isPrivate,
-      webLinks: updatedDAODetails?.webLinks ?? webLinks,
-      safeEVMAddress,
-      ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
-      threshold,
-      infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
-    };
-  });
-
-  return Promise.all(multiSigEventResults);
 }
 
 async function fetchDAOSettingsPageDetails(
@@ -199,171 +145,9 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
   return await Promise.all(allPromises);
 }
 
-async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
-  //TODO: Change the ABI to NFTDAOFactory, for now its not working for fetching the NFT logs using NFTDAOFactory ABI
-  const logs = await DexService.fetchParsedEventLogs(
-    Contracts.NFTDAOFactory.ProxyId,
-    new ethers.utils.Interface(FTDAOFactoryJSON.abi),
-    eventTypes
-  );
-  const allPromises = logs.map(async (log): Promise<NFTDAODetails> => {
-    const argsWithName = getEventArgumentsByName<NFTDAOCreatedEventArgs>(log.args, ["webLinks"]);
-    const {
-      daoAddress: accountId,
-      assetsHolderAddress,
-      governorAddress,
-      tokenHolderAddress,
-      inputs: initialDAODetails,
-    } = argsWithName;
-    const {
-      admin,
-      isPrivate,
-      name,
-      description,
-      webLinks,
-      logoUrl,
-      infoUrl,
-      tokenAddress,
-      quorumThreshold,
-      votingDelay,
-      votingPeriod,
-    } = initialDAODetails;
-    const tokenHolderEvents = await DexService.fetchUpgradeContractEvents(tokenHolderAddress, ["UpdatedAmount"]);
-    const lockedTokenDetails: LockedTokenDetails[] = tokenHolderEvents?.get("UpdatedAmount") ?? [];
-    const updatedDAODetails = await fetchDAOSettingsPageDetails(accountId, [DAOEvents.DAOInfoUpdated]);
-
-    /** START - TODO: Need to apply a proper fix */
-    let tokenId;
-    try {
-      tokenId = solidityAddressToTokenIdString(tokenAddress).toString();
-    } catch (error) {
-      tokenId = (await DexService.fetchContractId(tokenAddress)).toString();
-    }
-    /** END - TODO: Need to apply a proper fix */
-    return {
-      type: DAOType.NFT,
-      accountEVMAddress: accountId,
-      adminId: solidityAddressToAccountIdString(admin),
-      name: updatedDAODetails?.name ?? name,
-      title: updatedDAODetails?.name ?? name,
-      description: updatedDAODetails?.description ?? description,
-      webLinks: updatedDAODetails?.webLinks ?? webLinks,
-      infoUrl,
-      governorAddress,
-      assetsHolderAddress,
-      tokenHolderAddress,
-      logoUrl: updatedDAODetails?.logoUrl ?? logoUrl,
-      isPrivate,
-      tokenId,
-      quorumThreshold: convertNumberToPercentage(quorumThreshold.toNumber()),
-      votingDelay: votingDelay.toNumber(),
-      votingPeriod: votingPeriod.toNumber(),
-      minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
-      lockedTokenDetails,
-    };
-  });
-
-  return Promise.all(allPromises);
-}
-
 export async function fetchAllDAOs(): Promise<DAO[]> {
-  const daos = await Promise.all([
-    fetchMultiSigDAOs([DAOEvents.DAOCreated]),
-    fetchGovernanceDAOs([DAOEvents.DAOCreated]),
-    fetchNFTDAOs([DAOEvents.DAOCreated]),
-  ]);
+  const daos = await Promise.all([fetchGovernanceDAOs([DAOEvents.DAOCreated])]);
   return daos.flat();
-}
-
-export async function fetchMultiSigDAOLogs(daoAccountId: string): Promise<ethers.utils.LogDescription[]> {
-  const contractInterface = new ethers.utils.Interface(MultiSigDAOJSON.abi);
-  const abiCoder = ethers.utils.defaultAbiCoder;
-  const parsedEvents = await DexService.fetchParsedEventLogs(daoAccountId, contractInterface);
-
-  const parsedEventsWithData = parsedEvents.map((event) => {
-    if (event.name === DAOEvents.TransactionCreated) {
-      const transactionType: MultiSigProposeTransactionType = event.args.info.transactionType.toNumber();
-      let parsedData;
-      switch (transactionType) {
-        case MultiSigProposeTransactionType.AddMember: {
-          parsedData = abiCoder.decode(
-            ["address owner", "uint256 _threshold"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          break;
-        }
-        case MultiSigProposeTransactionType.DeleteMember: {
-          parsedData = abiCoder.decode(
-            ["address prevOwner", "address owner", "uint256 _threshold"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          break;
-        }
-        case MultiSigProposeTransactionType.ReplaceMember: {
-          parsedData = abiCoder.decode(
-            ["address prevOwner", "address oldOwner", "address newOwner"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          break;
-        }
-        case MultiSigProposeTransactionType.ChangeThreshold: {
-          parsedData = abiCoder.decode(["uint256 _threshold"], ethers.utils.hexDataSlice(event.args.info.data, 4));
-          break;
-        }
-        case MultiSigProposeTransactionType.TokenTransfer: {
-          parsedData = abiCoder.decode(
-            ["address", "address token", "address receiver", "uint256 amount"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          if (parsedData.token === ethers.constants.AddressZero) {
-            parsedData = {
-              ...parsedData,
-              token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
-            };
-          }
-          break;
-        }
-        case MultiSigProposeTransactionType.TokenAssociation: {
-          parsedData = abiCoder.decode(
-            ["address", "address tokenAddress"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          break;
-        }
-        case MultiSigProposeTransactionType.HBARTokenTransfer: {
-          parsedData = {
-            amount: event.args.info.value,
-            receiver: event.args.info.to,
-            token: TokenId.fromString(HBARTokenId).toSolidityAddress(),
-          };
-          break;
-        }
-        case MultiSigProposeTransactionType.TypeSetText: {
-          parsedData = abiCoder.decode(
-            ["address account", "string title"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          break;
-        }
-        case MultiSigProposeTransactionType.UpgradeProxy: {
-          parsedData = abiCoder.decode(
-            ["address proxy", "address proxyLogic", "address proxyAdmin"],
-            ethers.utils.hexDataSlice(event.args.info.data, 4)
-          );
-          break;
-        }
-        case MultiSigProposeTransactionType.GenericProposal: {
-          parsedData = event.args.info.data;
-        }
-      }
-      const eventClone: ethers.utils.LogDescription = structuredClone(event);
-      eventClone.args.info.data = parsedData;
-      eventClone.args.info.hexStringData = event.args.info.data;
-      return eventClone;
-    }
-    return event;
-  });
-  return parsedEventsWithData;
 }
 
 function getProposalData(type: GovernanceProposalType, data: string | undefined): ProposalDataDetails {
@@ -411,6 +195,43 @@ function getProposalData(type: GovernanceProposalType, data: string | undefined)
     };
   };
 
+  const getHuffyRiskParamsProposalDataFromHexData = (data: string | undefined) => {
+    if (isNil(data)) return;
+
+    const contractInterface = new ethers.utils.Interface(ParameterStoreJSON.abi);
+    const parsedData = contractInterface.decodeFunctionData("setParameters", ethers.utils.arrayify(data));
+    return {
+      type: GovernanceProposalType.RiskParametersProposal,
+      maxTradeBps: Number(parsedData.newMaxTradeBps),
+      maxSlippageBps: Number(parsedData.newMaxSlippageBps),
+      tradeCooldownSec: Number(parsedData.newTradeCooldownSec),
+    };
+  };
+
+  const getHuffyAddTraidingPairProposalDataFromHexData = (data: string | undefined) => {
+    if (isNil(data)) return;
+
+    const contractInterface = new ethers.utils.Interface(PairWhitelistJSON.abi);
+    const parsedData = contractInterface.decodeFunctionData("addPair", ethers.utils.arrayify(data));
+    return {
+      type: GovernanceProposalType.AddTradingPairProposal,
+      tokenIn: parsedData.tokenIn,
+      tokenOut: parsedData.tokenOut,
+    };
+  };
+
+  const getHuffyRemoveTraidingPairProposalDataFromHexData = (data: string | undefined) => {
+    if (isNil(data)) return;
+
+    const contractInterface = new ethers.utils.Interface(PairWhitelistJSON.abi);
+    const parsedData = contractInterface.decodeFunctionData("removePair", ethers.utils.arrayify(data));
+    return {
+      type: GovernanceProposalType.RemoveTradingPairProposal,
+      tokenIn: parsedData.tokenIn,
+      tokenOut: parsedData.tokenOut,
+    };
+  };
+
   switch (Number(type)) {
     case GovernanceProposalType.TRANSFER:
       return getTokenTransferProposalDataFromHexData(data);
@@ -418,15 +239,18 @@ function getProposalData(type: GovernanceProposalType, data: string | undefined)
       return getAssociateProposalDataFromHexData(data);
     case GovernanceProposalType.UPGRADE_PROXY:
       return getUpgradeContractProposalData(data);
+    case GovernanceProposalType.RiskParametersProposal:
+      return getHuffyRiskParamsProposalDataFromHexData(data);
+    case GovernanceProposalType.AddTradingPairProposal:
+      return getHuffyAddTraidingPairProposalDataFromHexData(data);
+    case GovernanceProposalType.RemoveTradingPairProposal:
+      return getHuffyRemoveTraidingPairProposalDataFromHexData(data);
     default:
       return;
   }
 }
 
-export async function fetchGovernanceDAOLogs(
-  governorAddress: string,
-  assetsHolderAddress: string
-): Promise<ProposalData[]> {
+export async function fetchGovernanceDAOLogs(governorAddress: string): Promise<ProposalData[]> {
   const contractInterface = new ethers.utils.Interface(HederaGovernorJSON.abi);
 
   const fetchDAOProposalEvents = async (): Promise<MirrorNodeDecodedProposalEvent[]> => {
@@ -436,70 +260,98 @@ export async function fetchGovernanceDAOLogs(
   const fetchDAOProposalData = async (proposalEvents: MirrorNodeDecodedProposalEvent[]): Promise<ProposalData[]> => {
     const proposalEventsWithDetailsResults = await Promise.allSettled(
       proposalEvents.map(async (proposalEvent: MirrorNodeDecodedProposalEvent) => {
-        const proposalDetailsData = getProposalData(
-          proposalEvent.coreInformation.inputs.proposalType,
-          proposalEvent.coreInformation.inputs.calldatas[0]
-        );
-        let contractId = proposalEvent.contractId;
-        if (contractId.includes("0.0")) {
-          contractId = ContractId.fromString(contractId).toSolidityAddress();
-        }
-        const response = await DexService.callContract({
-          data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
-          from: contractId.toString(),
-          to: contractId.toString(),
-        });
-        const dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
-        /**
-         * proposalDetails contain the latest proposal state. Therefore, the common fields derived from
-         * proposalDetails should override the same field found in the proposalEvent.
-         */
+        try {
+          const proposalDetailsData = getProposalData(
+            proposalEvent.coreInformation.inputs.proposalType,
+            proposalEvent.coreInformation.inputs.calldatas?.[0]
+          );
 
-        const isContractUpgradeProposal =
-          Number(proposalEvent.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY;
-        let isAdminApproved = false;
-        let parsedData;
-        if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
-          const proposalData = proposalDetailsData as UpgradeContractDetails;
-          const logs = await DexService.fetchContractLogs(proposalData?.proxy ?? "");
-          const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
-          const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
-          const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
-          const currentLogic = isNotNil(upgradedLogs[0])
-            ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
-            : "";
-          const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
-          const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
-          const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-          isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === assetsHolderAddress.toLocaleLowerCase();
-          parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
+          let contractId = proposalEvent.contractId;
+          if (contractId.includes("0.0")) {
+            contractId = ContractId.fromString(contractId).toSolidityAddress();
+          }
+
+          const response = await DexService.callContract({
+            data: contractInterface.encodeFunctionData("state", [proposalEvent.proposalId]),
+            // from: contractId.toString(),
+            to: contractId.toString(),
+          });
+
+          if (!response?.data?.result) {
+            console.warn(`No callContract result for proposalId=${proposalEvent.proposalId}, contract=${contractId}`);
+            return {
+              ...proposalEvent,
+              ...proposalDetailsData,
+            };
+          }
+
+          let dataParsed;
+          try {
+            dataParsed = contractInterface.decodeFunctionResult("state", ethers.utils.arrayify(response.data.result));
+          } catch (err) {
+            console.error(`Failed to decode state for proposalId=${proposalEvent.proposalId}`, err);
+            return {
+              ...proposalEvent,
+              ...proposalDetailsData,
+            };
+          }
+          const isContractUpgradeProposal =
+            Number(proposalEvent.coreInformation.inputs.proposalType) === GovernanceProposalType.UPGRADE_PROXY;
+
+          let isAdminApproved = false;
+          let parsedData;
+          if (isContractUpgradeProposal && isNotNil(proposalDetailsData)) {
+            const proposalData = proposalDetailsData as UpgradeContractDetails;
+            const logs = await DexService.fetchContractLogs(proposalData?.proxy ?? "");
+            const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
+            const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
+            const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+            const currentLogic = isNotNil(upgradedLogs[0])
+              ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
+              : "";
+            const proxyAdmin = solidityAddressToAccountIdString(proposalData?.proxyAdmin);
+            const proxyLogic = (await DexService.fetchContractId(proposalData.proxyLogic)).toString();
+            const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
+            isAdminApproved =
+              latestAdminLog?.newAdmin?.toLocaleLowerCase() === (proposalEvent.contractId ?? "").toLocaleLowerCase() ||
+              (proposalEvent.contractId?.includes("0.0") &&
+                latestAdminLog?.newAdmin?.toLocaleLowerCase() === proposalEvent.contractId.toLocaleLowerCase());
+            parsedData = { ...proposalDetailsData, currentLogic, proxyAdmin, proxyLogic };
+          }
+
+          const firstStateValue = Array.isArray(dataParsed) ? dataParsed.at(0) : undefined;
+
+          const isAdminApprovalButtonVisible =
+            firstStateValue === ContractProposalState.Succeeded && !isAdminApproved && isContractUpgradeProposal;
+
+          const currentStateOfProposal = isContractUpgradeProposal
+            ? firstStateValue === ContractProposalState.Succeeded && !isAdminApproved
+              ? ContractProposalState.Active
+              : firstStateValue
+            : firstStateValue;
+
+          return {
+            ...proposalEvent,
+            state: currentStateOfProposal,
+            ...proposalDetailsData,
+            ...parsedData,
+            isAdminApproved,
+            isAdminApprovalButtonVisible,
+          };
+        } catch (err) {
+          console.error(`Error processing proposal ${proposalEvent?.proposalId ?? "<unknown>"}:`, err);
+          return undefined;
         }
-        const isAdminApprovalButtonVisible =
-          dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved && isContractUpgradeProposal;
-        const currentStateOfProposal = isContractUpgradeProposal
-          ? dataParsed.at(0) === ContractProposalState.Succeeded && !isAdminApproved
-            ? ContractProposalState.Active
-            : dataParsed.at(0)
-          : dataParsed.at(0);
-        return {
-          ...proposalEvent,
-          state: currentStateOfProposal,
-          ...proposalDetailsData,
-          ...parsedData,
-          isAdminApproved,
-          isAdminApprovalButtonVisible,
-        };
       })
     );
-    const proposalEventsWithDetails = proposalEventsWithDetailsResults.map((event: PromiseSettledResult<any>) => {
-      return event.status === "fulfilled" ? event.value : undefined;
-    });
-    return proposalEventsWithDetails;
-  };
 
+    return proposalEventsWithDetailsResults
+      .map((r) => (r.status === "fulfilled" ? r.value : undefined))
+      .filter((v): v is ProposalData => v !== undefined);
+  };
   const proposalEvents = await fetchDAOProposalEvents();
-  const proposalDetails = await fetchDAOProposalData(proposalEvents);
-  return proposalDetails;
+
+  return await fetchDAOProposalData(proposalEvents);
 }
 
 export async function fetchHederaGnosisSafeLogs(safeAccountId: string) {

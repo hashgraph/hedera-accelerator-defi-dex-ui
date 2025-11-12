@@ -1,23 +1,14 @@
-import { Button, Divider, Flex, SimpleGrid, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
+import { Divider, Flex, SimpleGrid, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
 import { Text, Color, MetricLabel, DefaultLogoIcon, ExternalLink } from "@shared/ui-kit";
-import { useOutletContext, useNavigate, Link as ReachLink } from "react-router-dom";
+import { useOutletContext, Link as ReachLink } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
 import { DAOFormContainer } from "./CreateADAO/forms/DAOFormContainer";
 import { getDAOLinksRecordArray, shortEnglishHumanizer } from "./utils";
-import { usePairedWalletDetails } from "@dex/hooks";
-import { Routes } from "@dao/routes";
 
 export function DAOSettings() {
   const { dao, FTToken } = useOutletContext<GovernanceDAODetailsContext>();
-  const { name, logoUrl, description, webLinks, adminId, infoUrl } = dao;
+  const { name, logoUrl, description, webLinks, infoUrl } = dao;
   const daoLinkRecords = getDAOLinksRecordArray(webLinks);
-  const { isWalletPaired, walletId } = usePairedWalletDetails();
-  const isAdmin = isWalletPaired && walletId === adminId;
-  const navigate = useNavigate();
-
-  function handleChangeDAODetailsClick() {
-    navigate(Routes.ChangeDAOSettings);
-  }
 
   return (
     <form id="dao-settings-submit">
@@ -40,7 +31,7 @@ export function DAOSettings() {
                 value={dao.minimumProposalDeposit ?? 0}
                 valueStyle="p large medium"
                 valueTextColor={Color.Neutral._900}
-                valueUnitSymbol={FTToken?.data.symbol}
+                valueUnitSymbol={FTToken?.data.symbol === "GOD" ? "HTK" : FTToken?.data.symbol}
                 valueUnitSymbolColor={Color.Neutral._900}
               />
             </Flex>
@@ -164,20 +155,6 @@ export function DAOSettings() {
               </UnorderedList>
             </Flex>
           </Flex>
-          {isAdmin ? (
-            <Flex alignItems="flex-end" gap="1rem" direction="column">
-              <Divider />
-              <Button
-                type="button"
-                variant="primary"
-                padding="10px 15px"
-                height="40px"
-                onClick={handleChangeDAODetailsClick}
-              >
-                Change
-              </Button>
-            </Flex>
-          ) : undefined}
         </DAOFormContainer>
       </Flex>
     </form>

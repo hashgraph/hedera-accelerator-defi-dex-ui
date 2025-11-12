@@ -1,14 +1,14 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { GovernanceDAODetails, Member } from "@dao/services";
 import { TokenBalance, useAccountTokenBalances, usePairedWalletDetails, useToken } from "@dex/hooks";
 import { useFetchContract, useDAOs, useFetchDAOMembers } from "@dao/hooks";
 import { isNil, isNotNil, uniqBy } from "ramda";
 import { DAODashboard } from "../DAODashboard";
 import { GovernanceDAODetailsContext } from "./types";
+import { SINGLE_DAO_ID } from "@dao/config/singleDao";
 
 export function GovernanceDAODashboard() {
-  const { accountId = "" } = useParams();
-  const daoAccountIdQueryResults = useFetchContract(accountId);
+  const daoAccountIdQueryResults = useFetchContract(SINGLE_DAO_ID);
   const daoAccountEVMAddress = daoAccountIdQueryResults.data?.data.evm_address;
   const daosQueryResults = useDAOs<GovernanceDAODetails>();
   const { data: daos } = daosQueryResults;

@@ -1,38 +1,40 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { SINGLE_DAO_ID } from "@dao/config/singleDao";
 import { ProposalDetails } from "./ProposalDetails";
 import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
-import { ProposalVoteDetails } from "./ProposalVoteDetails";
+import { ProposalDetailsStepper } from "./ProposalDetailsStepper";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
-import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
+import { Button, Flex, Grid, GridItem } from "@chakra-ui/react";
 import { DAOType } from "@dao/services";
-import { isNil, isNotNil, isEmpty } from "ramda";
+import { isEmpty, isNil, isNotNil } from "ramda";
 import { Routes } from "@dao/routes";
 import { useGovernanceProposalDetails } from "./useGovernanceProposalDetails";
-import { GovernanceProposalConfirmationDetails } from "./GovernanceProposalConfirmationDetails";
-import { GovernanceProposalDetailsStepper } from "./GovernanceProposalDetailsStepper";
+// eslint-disable-next-line max-len
+import { GovernanceProposalConfirmationDetails } from "@dao/pages/ProposalDetailsPage/GovernanceProposalConfirmationDetails";
 
 export function GovernanceProposalDetailsPage() {
   const navigate = useNavigate();
-  const { accountId: daoAccountId = "", proposalId = "" } = useParams();
+  const { transactionHash = "" } = useParams();
   const {
     proposalDetails,
     isSuccess,
     isLoading,
     isError,
     error,
+    executeProposal,
+    hasVoted,
     castVote,
     cancelProposal,
-    executeProposal,
-    votingPower,
-    hasVoted,
     changeAdminMutation,
+    votingPower,
+    isAuthor,
     contractUpgradeLogic,
     assetHolderContractId,
     subDescription,
-    isAuthor,
-  } = useGovernanceProposalDetails(daoAccountId, proposalId);
+  } = useGovernanceProposalDetails(SINGLE_DAO_ID, transactionHash);
 
-  const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposal;
+  const isProposalBeingExecuted = executeProposal?.isLoading ?? false;
+  const hasProposalExecutionFailed = executeProposal?.isError ?? false;
 
   function onBackToDAODashboardLinkClick() {
     navigate(Routes.Home);
@@ -47,12 +49,14 @@ export function GovernanceProposalDetailsPage() {
   }
 
   if (isSuccess && isNil(proposalDetails)) {
-    <NotFound
-      message={`We didn't find any data for this proposal.`}
-      preLinkText={""}
-      linkText={"Click here to return to the DAO dashboard page."}
-      onLinkClick={onBackToDAODashboardLinkClick}
-    />;
+    return (
+      <NotFound
+        message={`We didn't find any data for this proposal.`}
+        preLinkText={""}
+        linkText={"Click here to return to the DAO dashboard page."}
+        onLinkClick={onBackToDAODashboardLinkClick}
+      />
+    );
   }
 
   function onViewDiscussionLinkTap() {
@@ -63,54 +67,56 @@ export function GovernanceProposalDetailsPage() {
 
   if (isSuccess && isNotNil(proposalDetails)) {
     const {
+      description,
+      approvalCount,
+      transactionHash,
       amount,
-      receiver,
       token,
       event,
       status,
       type,
+      metadata,
       author,
-      hexStringData,
-      msgValue,
-      operation,
-      nonce,
-      daoType,
-      proposalState,
+      title,
       link,
     } = proposalDetails;
 
-    const isGovernanceProposal = daoType === DAOType.GovernanceToken;
-    const isNFTProposal = daoType === DAOType.NFT;
+    const dataObj = proposalDetails.data as Record<string, unknown> | undefined;
+    const str =
+      dataObj && typeof dataObj === "object"
+        ? Object.entries(dataObj)
+            .map(([key, value]) => `${key}=${String(value)}`)
+            .join(", ")
+        : "";
 
-    /** TODO: Update contracts to support a "queued" status. */
-    const proposalStatus = status;
+    const descriptionArray = [description, subDescription, str].filter(
+      (s): s is string => typeof s === "string" && s.trim().length > 0
+    );
 
     return (
       <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
         <GridItem colSpan={3}>
           <Flex direction="column" gap="8">
-            <ProposalDetailsHeader
-              daoAccountId={daoAccountId}
-              title={proposalDetails.title}
-              daoType={daoType}
-              author={author}
-            />
-            <GovernanceProposalDetailsStepper
-              state={proposalState}
+            <ProposalDetailsHeader title={title} daoType={DAOType.GovernanceToken} author={author} />
+            <ProposalDetailsStepper
+              status={status}
               isExecutionProcessing={isProposalBeingExecuted}
               hasExecutionFailed={hasProposalExecutionFailed}
             />
             <ProposalDetails
-              description={[proposalDetails.description, subDescription]}
-              metadata={proposalDetails.metadata}
+              description={descriptionArray}
+              metadata={metadata}
               amount={amount}
-              receiver={receiver}
+              receiver={""}
               tokenId={token?.data.token_id ?? "-"}
-              tokenSymbol={token?.data.symbol ?? "-"}
+              tokenSymbol={(token?.data.symbol === "GOD" ? "HTK" : token?.data.symbol) ?? "-"}
               tokenDecimals={+(token?.data.decimals ?? 0)}
               tokenType={token?.data.type ?? ""}
               event={event}
               type={type}
+              approvers={[]}
+              approvalCount={approvalCount}
+              transactionHash={transactionHash ?? ""}
             />
           </Flex>
         </GridItem>
@@ -121,29 +127,25 @@ export function GovernanceProposalDetailsPage() {
                 View Discussion
               </Button>
             ) : undefined}
-            {isGovernanceProposal || isNFTProposal ? (
-              <GovernanceProposalConfirmationDetails
-                tokenSymbol={""}
-                contractUpgradeLogic={contractUpgradeLogic ?? ""}
-                assetHolderContractId={assetHolderContractId ?? ""}
-                proposal={proposalDetails}
-                hasConnectedWalletVoted={hasVoted}
-                status={proposalStatus}
-                state={proposalState}
-                hexStringData={hexStringData}
-                msgValue={msgValue}
-                operation={operation}
-                nonce={nonce}
-                votingPower={votingPower}
-                castVote={castVote}
-                executeProposal={executeProposal}
-                changeAdminMutation={changeAdminMutation}
-                cancelProposal={cancelProposal}
-                isAuthor={isAuthor}
-              />
-            ) : (
-              <ProposalVoteDetails />
-            )}
+            <GovernanceProposalConfirmationDetails
+              tokenSymbol={(token?.data.symbol === "GOD" ? "HTK" : token?.data.symbol) ?? ""}
+              contractUpgradeLogic={contractUpgradeLogic ?? ""}
+              assetHolderContractId={assetHolderContractId ?? ""}
+              proposal={proposalDetails}
+              hasConnectedWalletVoted={hasVoted}
+              status={status}
+              state={proposalDetails.proposalState}
+              hexStringData={proposalDetails.hexStringData ?? ""}
+              msgValue={proposalDetails.msgValue ?? 0}
+              operation={proposalDetails.operation ?? 0}
+              nonce={proposalDetails.nonce ?? 0}
+              votingPower={votingPower}
+              castVote={castVote}
+              executeProposal={executeProposal}
+              changeAdminMutation={changeAdminMutation}
+              cancelProposal={cancelProposal}
+              isAuthor={isAuthor}
+            />
           </Flex>
         </GridItem>
       </Grid>

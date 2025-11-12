@@ -1,3 +1,4 @@
+import { useQuery } from "react-query";
 import {
   useDexContext,
   useCastVote,
@@ -13,11 +14,14 @@ import {
   useFetchLockedNFTToken,
   useChangeAdmin,
   useFetchContract,
+  DAOQueries,
 } from "@dao/hooks";
 import { DAOType, GovernanceDAODetails, NFTDAODetails } from "@dao/services";
 import { isNotNil } from "ramda";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { getProposalData } from "../utils";
+import { DEX_TOKEN_PRECISION_VALUE, DexService } from "@dex/services";
+import BigNumber from "bignumber.js";
 
 export function useGovernanceProposalDetails(daoAccountId: string, proposalId: string | undefined) {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
@@ -51,9 +55,35 @@ export function useGovernanceProposalDetails(daoAccountId: string, proposalId: s
   const fetchLockGODTokens = useFetchLockedGovToken(walletId, dao?.tokenHolderAddress ?? "");
   const lockedNFTToken = useFetchLockedNFTToken(walletId, dao?.tokenHolderAddress ?? "");
 
+  // eslint-disable-next-line max-len
+  const snapshotVotingPowerQuery = useQuery<
+    number,
+    Error,
+    number,
+    [DAOQueries, string, string, string | undefined, string | undefined]
+  >(
+    [DAOQueries.Proposals, "VotingPower", dao?.tokenId ?? "", proposalId, walletId],
+    async () => {
+      if (!dao?.tokenId || !proposal?.timestamp || !walletId) return 0;
+      const resp: any = await DexService.fetchTokenBalancesAt(dao.tokenId, proposal.timestamp);
+      const balances: any[] = resp?.data?.balances ?? resp?.balances ?? [];
+      // eslint-disable-next-line max-len
+      const precisionValue = proposal?.token?.data?.decimals
+        ? +proposal.token.data.decimals
+        : DEX_TOKEN_PRECISION_VALUE;
+      const entry = balances.find((b: any) => b?.account === walletId);
+      const balRaw = new BigNumber((entry?.balance ?? 0).toString());
+      return balRaw.shiftedBy(-precisionValue).toNumber();
+    },
+    {
+      enabled: !!dao?.tokenId && !!proposal?.timestamp && !!walletId && dao?.type === DAOType.GovernanceToken,
+      staleTime: 5,
+    }
+  );
+
   const votingPower =
     dao?.type === DAOType.GovernanceToken
-      ? `${(fetchLockGODTokens.data ?? 0).toFixed(4)}`
+      ? `${(snapshotVotingPowerQuery.data ?? 0).toFixed(4)}`
       : `${(Number(lockedNFTToken.data) ? 1 : 0).toFixed(4)}`;
   const areVoteButtonsVisible = !hasVoted && proposal?.status === ProposalStatus.Pending;
   const isAuthor = walletId === proposal?.author;

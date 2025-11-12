@@ -38,6 +38,9 @@ export enum DAOMutations {
   UnlockNFTToken = "unlockNFTToken",
   PinToIPFS = "PinToIPFS",
   TransferOwnership = "TransferOwnership",
+  CreateHuffyRiskParametersProposal = "CreateHuffyRiskParametersProposal",
+  CreateHuffyRemoveTradingPairProposal = "CreateHuffyRemoveTradingPairProposal",
+  CreateHuffyAddTradingPairProposal = "CreateHuffyAddTradingPairProposal",
 }
 
 export enum ProposalStatus {
@@ -69,6 +72,9 @@ export enum ProposalType {
   UpgradeContract = "Upgrade Contract",
   TextProposal = "Text Proposal",
   GenericProposal = "Generic Proposal",
+  RiskParametersProposal = "Risk Parameters",
+  AddTraidingPairProposal = "Add Traiding Pair",
+  RemoveTraidingPairProposal = "Remove Traiding Pair",
 }
 
 export interface Votes {
@@ -81,74 +87,18 @@ export interface Votes {
   turnout: number | undefined;
 }
 
-export interface ProposalDataTokenTransfer {
-  token: string;
-  receiver: string;
-  amount: string;
+export interface GOVHuffyRiskParametersProposalDetails {
+  maxTradeBps: number;
+  maxSlippageBps: number;
+  tradeCooldownSec: number;
 }
 
-export interface ProposalDataHbarTransfer {
-  token: string;
-  receiver: string;
-  amount: string;
-}
-export interface ProposalDataTokenAssociation {
-  tokenAddress: string;
+export interface GOVHuffyTraidingPairProposalDetails {
+  tokenIn: string;
+  tokenOut: string;
 }
 
-export interface ProposalDataAddMember {
-  owner: string;
-  _threshold: string;
-}
-
-export interface ProposalDataDeleteMember {
-  owner: string;
-  _threshold: string;
-}
-
-export interface ProposalDataReplaceMember {
-  oldOwner: string;
-  newOwner: string;
-}
-
-export interface ProposalDataChangeThreshold {
-  _threshold: string;
-}
-
-export interface ProposalDataGovernanceTokenTransfer {
-  transferFromAccount: string;
-  transferToAccount: string;
-  tokenToTransfer: string;
-  transferTokenAmount: number;
-}
-
-export interface DAOUpgradeProposal {
-  proxy: string;
-  proxyLogic: string;
-  proxyAdmin: string;
-  currentLogic: string;
-}
-
-export interface GOVUpgradeProposalDetails {
-  proxy: string;
-  proxyAdmin: string;
-  proxyLogic: string;
-  currentLogic: string;
-  isAdminApproved: boolean;
-  isAdminApprovalButtonVisible: boolean;
-}
-
-export type ProposalData =
-  | ProposalDataTokenTransfer
-  | ProposalDataHbarTransfer
-  | ProposalDataTokenAssociation
-  | ProposalDataAddMember
-  | ProposalDataDeleteMember
-  | ProposalDataReplaceMember
-  | ProposalDataChangeThreshold
-  | ProposalDataGovernanceTokenTransfer
-  | DAOUpgradeProposal
-  | GOVUpgradeProposalDetails;
+export type ProposalData = GOVHuffyTraidingPairProposalDetails | GOVHuffyRiskParametersProposalDetails;
 
 export interface Proposal {
   id: number;

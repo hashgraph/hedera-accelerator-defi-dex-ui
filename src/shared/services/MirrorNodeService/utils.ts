@@ -28,6 +28,9 @@ export function decodeLog(signatureMap: Map<string, any>, logs: MirrorNodePropos
         const requiredTopics = eventAbi.anonymous === true ? topics : topics.splice(1);
         const event = web3.eth.abi.decodeLog(eventAbi.inputs, data, requiredTopics);
         event["timestamp"] = timeStamp;
+        if (event["proposalId"] !== undefined) {
+          event["proposalId"] = `0x${(event.proposalId as bigint).toString(16)}`;
+        }
         const events = eventsMap.get(eventAbi.name) ?? [];
         eventsMap.set(eventAbi.name, [...events, event]);
       }

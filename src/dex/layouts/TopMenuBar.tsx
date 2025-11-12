@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 export interface TopMenuBarProps {
   menuOptions: Array<string>;
+  brandText?: string;
 }
 
 export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
@@ -31,7 +32,11 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
           <Flex direction="row" gap="2" alignItems="center">
             {/* <HashDaoIcon boxSize="10" />
             <Tag label="HashDAO" />*/}
-            <HashDaoLogo width="60%" height="100%" />
+            {props.brandText ? (
+              <Text.H3_Medium>{props.brandText}</Text.H3_Medium>
+            ) : (
+              <HashDaoLogo width="60%" height="100%" />
+            )}
           </Flex>
           <Alert variant="">
             {reconnectionInProgress && (

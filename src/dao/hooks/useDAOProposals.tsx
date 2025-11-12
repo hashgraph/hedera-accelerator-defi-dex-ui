@@ -1,64 +1,28 @@
 import { useQuery } from "react-query";
+import { DexService, convertEthersBigNumberToBigNumberJS } from "@dex/services";
 import {
-  DexService,
-  convertEthersBigNumberToBigNumberJS,
-  MirrorNodeTokenById,
-  decodeLog,
-  abiSignatures,
-} from "@dex/services";
-import daoSDK, { DAOEvents, MultiSigProposeTransactionType } from "@dao/services";
-import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType } from "./types";
-import { groupBy, isNil, isNotNil } from "ramda";
-import { LogDescription } from "ethers/lib/utils";
+  DAOQueries,
+  GOVHuffyRiskParametersProposalDetails,
+  Proposal,
+  ProposalEvent,
+  ProposalStatus,
+  ProposalType,
+  Votes,
+} from "./types";
+import { groupBy } from "lodash";
 import { BigNumber } from "ethers";
-import { solidityAddressToAccountIdString, solidityAddressToTokenIdString } from "@shared/utils";
-import { Contracts } from "@dex/services";
+import { solidityAddressToAccountIdString } from "@shared/utils";
+import { LogDescription } from "ethers/lib/utils";
+import { DAOEvents } from "@dao/services";
+import { GovernanceProposalType } from "@dex/store";
 
-type UseDAOQueryKey = [DAOQueries.DAOs, DAOQueries.Proposals, string, string];
+export const GOVERNOR_ADDRESS: string = import.meta.env.VITE_GOVERNOR_ADDRESS.trim();
 
-export function useDAOProposals(
-  daoAccountId: string,
-  safeEVMAddress: string,
-  proposalFilter: ProposalStatus[] = AllFilters
-) {
-  function filterProposalsByStatus(proposals: Proposal[]): Proposal[] {
-    return proposals.filter((proposal) => proposalFilter.includes(proposal.status));
-  }
-
-  const groupByTransactionHash = groupBy(function (log: LogDescription) {
-    if (isNil(log?.args)) return "undefined";
-    const { txHash, approvedHash, txnHash } = log.args;
-    return txHash || approvedHash || txnHash;
-  });
-
-  function groupLogsByTransactionHash(logs: LogDescription[]): [string, LogDescription[]][] {
-    const logsGroupedByTransactionHash = groupByTransactionHash(logs);
-    delete logsGroupedByTransactionHash["undefined"];
-    const proposalEntries = Object.entries(logsGroupedByTransactionHash);
-    const filteredProposalEntries = proposalEntries.reduce(
-      (acc, [transactionHash, proposalLogs]): [string, LogDescription[]][] => {
-        if (proposalLogs === undefined) return acc;
-        return [...acc, [transactionHash, proposalLogs]];
-      },
-      [] as [string, LogDescription[]][]
-    );
-    return filteredProposalEntries;
-  }
-
-  function getApprovers(proposalLogs: LogDescription[], transactionHash: string): string[] {
-    const approverCache = new Set<string>();
-    proposalLogs.forEach((log: LogDescription) => {
-      if (
-        log?.name === DAOEvents.ApproveHash &&
-        !approverCache.has(log?.args.owner) &&
-        transactionHash === log?.args?.approvedHash
-      ) {
-        const { args } = log;
-        const ownerId = solidityAddressToAccountIdString(args.owner);
-        approverCache.add(ownerId);
-      }
-    });
-    return Array.from(approverCache);
+export function useDAOProposals(daoAccountId: string) {
+  function groupByProposalId(logs: any[]): [string, any[]][] {
+    const grouped = groupBy(logs, (log: any) => log?.proposalId?.toString() ?? "undefined");
+    delete (grouped as Record<string, any[]>).undefined;
+    return Object.entries(grouped);
   }
 
   function getProposalStatus(
@@ -89,153 +53,123 @@ export function useDAOProposals(
     }
   }
 
-  function getProposalType(transactionType: number): ProposalType {
-    switch (transactionType) {
-      case MultiSigProposeTransactionType.TokenTransfer:
-      case MultiSigProposeTransactionType.HBARTokenTransfer:
-        return ProposalType.TokenTransfer;
-      case MultiSigProposeTransactionType.AddMember:
-        return ProposalType.AddNewMember;
-      case MultiSigProposeTransactionType.DeleteMember:
-        return ProposalType.RemoveMember;
-      case MultiSigProposeTransactionType.ReplaceMember:
-        return ProposalType.ReplaceMember;
-      case MultiSigProposeTransactionType.ChangeThreshold:
-        return ProposalType.ChangeThreshold;
-      case MultiSigProposeTransactionType.TokenAssociation:
-        return ProposalType.TokenAssociate;
-      case MultiSigProposeTransactionType.TypeSetText:
-        return ProposalType.TextProposal;
-      case MultiSigProposeTransactionType.UpgradeProxy:
-        return ProposalType.UpgradeContract;
-      case MultiSigProposeTransactionType.GenericProposal:
-        return ProposalType.GenericProposal;
-      default:
-        return ProposalType.TokenTransfer;
-    }
-  }
-
-  return useQuery<Proposal[], Error, Proposal[], UseDAOQueryKey>(
-    [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId, safeEVMAddress],
+  return useQuery<Proposal[], Error>(
+    [DAOQueries.DAOs, DAOQueries.Proposals, daoAccountId],
     async () => {
-      const logs = await Promise.all([
-        DexService.fetchMultiSigDAOLogs(daoAccountId),
-        DexService.fetchHederaGnosisSafeLogs(safeEVMAddress),
-      ]);
-      const daoAndSafeLogs = logs ? logs.flat() : [];
-      const groupedProposalEntries = groupLogsByTransactionHash(daoAndSafeLogs);
-      const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
+      const logs: any[] = await DexService.fetchGovernanceDAOLogs(GOVERNOR_ADDRESS);
+      const groupedProposals = groupByProposalId(logs);
 
-      const getCurrentOwnerOfDAO = async () => {
-        const logs = await DexService.fetchContractLogs(Contracts.MultiSigDAOFactory.ProxyId);
-        const currentOwnerEvents =
-          decodeLog(abiSignatures, logs, [DAOEvents.FeeConfigControllerChanged]).get(
-            DAOEvents.FeeConfigControllerChanged
-          ) ?? [];
-        return (await DexService.fetchContractId(currentOwnerEvents[0].newController)).toString();
-      };
-
-      const getFeeConfigControllerUser = async () => {
-        const logs = await DexService.fetchContractLogs(Contracts.SystemRoleBasedAccess.ProxyId);
-        const currentOwnerEvents =
-          decodeLog(abiSignatures, logs, [DAOEvents.UpdatedUsers]).get(DAOEvents.UpdatedUsers) ?? [];
-        return solidityAddressToAccountIdString(currentOwnerEvents[0].users.feeConfigControllerUser);
-      };
       const proposals: Proposal[] = await Promise.all(
-        groupedProposalEntries.map(async ([transactionHash, proposalLogs], index) => {
-          const proposalInfo: any = proposalLogs.find((log) => log.name === DAOEvents.TransactionCreated)?.args.info;
-          const {
-            nonce,
-            to,
-            value,
-            data,
-            operation,
-            hexStringData,
-            title,
-            description,
-            creator,
-            linkToDiscussion,
-            transactionType,
-            metaData,
-          } = proposalInfo;
-          const { amount, receiver, token } = data ?? {};
-          const threshold = await daoSDK.getThreshold(safeEVMAddress);
-          const approvers = getApprovers(proposalLogs, transactionHash);
-          const approvalCount = approvers.length;
-          const isThresholdReached = approvalCount >= threshold;
-          const proposalType = getProposalType(BigNumber.from(transactionType).toNumber());
-          const isContractUpgradeProposal = proposalType === ProposalType.UpgradeContract;
-          let isAdminApproved = false;
-          let parsedData;
-          if (isContractUpgradeProposal) {
-            const upgradeProposalData = { ...data };
-            const logs = await DexService.fetchContractLogs(upgradeProposalData.proxy);
+        groupedProposals.map(async ([proposalId, proposalLogs], index) => {
+          const proposalInfo = proposalLogs?.[0] ?? {};
+          // eslint-disable-next-line max-len
+          const status = getProposalStatus(
+            proposalLogs,
+            proposalInfo.isThresholdReached,
+            proposalInfo.type,
+            proposalInfo.isAdminApproved
+          );
 
-            const allEvents = decodeLog(abiSignatures, logs, [DAOEvents.ChangeAdmin, DAOEvents.Upgraded]);
-            const changeAdminLogs = allEvents.get(DAOEvents.ChangeAdmin) ?? [];
-            const upgradedLogs = allEvents.get(DAOEvents.Upgraded) ?? [];
+          const forVotesBn = BigNumber.from(proposalInfo.forVotes ?? 0);
+          const againstVotesBn = BigNumber.from(proposalInfo.againstVotes ?? 0);
+          const abstainVotesBn = BigNumber.from(proposalInfo.abstainVotes ?? 0);
+          const quorumBn = BigNumber.from(proposalInfo.quorumValue ?? 0);
 
-            const currentLogic = isNotNil(upgradedLogs[0])
-              ? (await DexService.fetchContractId(upgradedLogs[0].implementation)).toString()
-              : "";
-            const latestAdminLog = isNotNil(changeAdminLogs[0]) ? changeAdminLogs[0] : "";
-            const proxyAdmin = solidityAddressToAccountIdString(upgradeProposalData.proxyAdmin);
-            const proxyLogic = (await DexService.fetchContractId(upgradeProposalData.proxyLogic)).toString();
-            parsedData = { ...upgradeProposalData, proxyAdmin, proxyLogic, currentLogic };
-            isAdminApproved = latestAdminLog?.newAdmin?.toLocaleLowerCase() === safeEVMAddress.toLocaleLowerCase();
+          const yes = convertEthersBigNumberToBigNumberJS(forVotesBn).toNumber();
+          const no = convertEthersBigNumberToBigNumberJS(againstVotesBn).toNumber();
+          const abstain = convertEthersBigNumberToBigNumberJS(abstainVotesBn).toNumber();
+          const quorum = convertEthersBigNumberToBigNumberJS(quorumBn).toNumber();
+
+          const max = yes + no + abstain;
+          const remaining = quorum > 0 ? Math.max(quorum - max, 0) : undefined;
+          const turnout = quorum > 0 ? Math.min((max / quorum) * 100, 100) : undefined;
+
+          const votes: Votes = {
+            yes,
+            no,
+            abstain,
+            quorum,
+            remaining,
+            max,
+            turnout,
+          };
+
+          console.log("proposalInfo", proposalInfo);
+          const timestamp = proposalInfo.timestamp ?? proposalInfo.coreInformation.createdAt ?? "";
+          const title = proposalInfo.coreInformation.inputs.title;
+          const description = proposalInfo.coreInformation.inputs.description;
+          const authorRaw = proposalInfo.coreInformation.creator;
+          const author = authorRaw ? solidityAddressToAccountIdString(authorRaw) : "";
+          const amount = yes;
+          const typeValue = Number(proposalInfo.coreInformation.inputs.proposalType);
+          const typeKey = GovernanceProposalType[typeValue as unknown as keyof typeof GovernanceProposalType];
+
+          let preparedData;
+          switch (typeValue) {
+            case GovernanceProposalType.RiskParametersProposal:
+              preparedData = {
+                maxTradeBps: proposalInfo.maxTradeBps,
+                maxSlippageBps: proposalInfo.maxSlippageBps,
+                tradeCooldownSec: proposalInfo.tradeCooldownSec,
+              } as GOVHuffyRiskParametersProposalDetails;
+              break;
+            case GovernanceProposalType.AddTradingPairProposal:
+            case GovernanceProposalType.RemoveTradingPairProposal:
+              preparedData = {
+                tokenIn: proposalInfo.tokenIn,
+                tokenOut: proposalInfo.tokenOut,
+              };
           }
-          const isGenericProposal = proposalType === ProposalType.GenericProposal;
-          const feeConfigControllerUser = isGenericProposal ? await getFeeConfigControllerUser() : "";
-          const currentOwner = isGenericProposal ? await getCurrentOwnerOfDAO() : "";
-          const targetId = isGenericProposal ? (await DexService.fetchContractId(to)).toString() : "";
-          const status = getProposalStatus(proposalLogs, isThresholdReached, proposalType, isAdminApproved);
-          const tokenId = token ? solidityAddressToTokenIdString(token) : "";
-          if (!!tokenId && !tokenDataCache.has(tokenId)) {
-            tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
-          }
-          const tokenData = await tokenDataCache.get(tokenId);
 
           return {
             id: index,
-            nonce: nonce ? BigNumber.from(nonce).toNumber() : 0,
-            amount: amount ? convertEthersBigNumberToBigNumberJS(amount).toNumber() : 0,
-            transactionHash,
-            type: proposalType,
-            approvalCount,
-            approvers,
-            event: ProposalEvent.Send,
+            nonce: 0,
+            transactionHash: proposalId ?? "",
+            amount,
+            type: typeKey as any,
+            approvalCount: yes,
+            approvers: [],
+            event: ProposalEvent.Governance,
             status,
-            /* TODO: Add real value for timestamp */
-            timestamp: "",
-            metadata: metaData,
-            tokenId: tokenId,
-            token: tokenData,
-            receiver: receiver ? solidityAddressToAccountIdString(receiver) : "",
-            safeEVMAddress,
-            to,
-            operation,
-            hexStringData,
-            data: isContractUpgradeProposal ? parsedData : { ...data },
-            msgValue: value ? BigNumber.from(value).toNumber() : 0,
+            timestamp: String(timestamp),
+            tokenId: "",
+            token: undefined,
+            receiver: "",
+            sender: undefined,
+            safeEVMAddress: "",
+            to: "",
+            operation: 0,
+            hexStringData: "",
+            data: preparedData,
+            msgValue: 0,
             title,
-            author: creator ? solidityAddressToAccountIdString(creator) : "",
+            author,
             description,
-            link: linkToDiscussion,
-            threshold,
-            isContractUpgradeProposal,
-            showTransferOwnerShip: isGenericProposal && isThresholdReached,
-            currentOwner,
-            targetId,
-            feeConfigControllerUser,
-          };
+            metadata: proposalInfo.metadata ?? "",
+            link: proposalInfo.discussionLink ?? "",
+            threshold: 0,
+            proposalId: String(proposalId ?? ""),
+            contractEvmAddress: proposalInfo.contractId ?? undefined,
+            timeRemaining: undefined,
+            votes,
+            hasVoted: proposalInfo.hasVoted ?? false,
+            isQuorumReached: proposalInfo.isQuorumReached ?? false,
+            votingEndTime: proposalInfo.voteEnd ? Number(proposalInfo.voteEnd) : undefined,
+            proposalState: proposalInfo.proposalState,
+            coreInformation: proposalInfo.coreInformation ?? undefined,
+            showTransferOwnerShip: false,
+            currentOwner: undefined,
+            targetId: undefined,
+            feeConfigControllerUser: "",
+            isContractUpgradeProposal: false,
+          } as Proposal;
         })
       );
 
       return proposals;
     },
     {
-      enabled: !!daoAccountId && !!safeEVMAddress,
-      select: filterProposalsByStatus,
+      enabled: !!daoAccountId,
       staleTime: 5,
       keepPreviousData: true,
     }

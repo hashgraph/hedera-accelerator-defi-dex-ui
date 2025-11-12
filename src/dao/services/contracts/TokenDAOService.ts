@@ -1,15 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { ethers } from "ethers";
 import { HashConnectSigner } from "hashconnect/dist/signer";
-import {
-  AccountId,
-  TokenId,
-  ContractId,
-  ContractExecuteTransaction,
-  TransactionResponse,
-  Hbar,
-  HbarUnit,
-} from "@hashgraph/sdk";
+import { AccountId, TokenId, ContractId, ContractExecuteTransaction, TransactionResponse, Hbar } from "@hashgraph/sdk";
 import { BaseDAOContractFunctions, GovernorDAOContractFunctions } from "./types";
 import { DexService, checkTransactionResponseForError, Contracts } from "@dex/services";
 import { DAOType, TokenType } from "@dao/services";
@@ -17,7 +9,6 @@ import FTDAOFactoryJSON from "@dex/services/abi/FTDAOFactory.json";
 import HederaGovernorJSON from "@dex/services/abi/HederaGovernor.json";
 import AssetHolderJSON from "@dex/services/abi/AssetHolder.json";
 import { isHbarToken } from "@dex/utils";
-import { isNFT } from "@shared/utils";
 import { GovernanceProposalType } from "@dex/store";
 import { DAOConfigDetails } from "@dao/hooks";
 import { isNotNil } from "ramda";
@@ -104,202 +95,6 @@ async function sendCreateGovernanceDAOTransaction(
   return createGovernanceDAOResponse;
 }
 
-interface CreateTokenTransferProposalParams {
-  tokenId: string;
-  governanceTokenId: string;
-  title: string;
-  linkToDiscussion: string;
-  description: string;
-  receiverId: string;
-  amount: number;
-  decimals: number;
-  tokenType: string;
-  nftSerialId: number;
-  governanceNftTokenSerialId: number;
-  governorContractId: string;
-  assetHolderEVMAddress: string;
-  signer: HashConnectSigner;
-  daoType: DAOType;
-}
-
-async function createTokenTransferProposal(params: CreateTokenTransferProposalParams) {
-  const {
-    tokenId,
-    governanceTokenId,
-    receiverId,
-    amount,
-    decimals,
-    signer,
-    title,
-    description,
-    linkToDiscussion,
-    tokenType,
-    nftSerialId,
-    governorContractId,
-    assetHolderEVMAddress,
-    governanceNftTokenSerialId,
-    daoType,
-  } = params;
-
-  const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
-  const receiverSolidityAddress = AccountId.fromString(receiverId).toSolidityAddress();
-  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(governanceTokenId);
-
-  await DexService.setUpAllowance({
-    tokenId: governanceTokenId,
-    nftSerialId: governanceNftTokenSerialId,
-    spenderContractId: governorContractId,
-    tokenAmount: tokenResponse.data.precision,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
-    signer,
-  });
-  let transferDetails: string[] = [];
-  if (isHbarToken(tokenId)) {
-    const preciseAmount = Hbar.from(amount, HbarUnit.Hbar).to(HbarUnit.Tinybar).toString();
-    transferDetails = [receiverSolidityAddress, ethers.constants.AddressZero, preciseAmount];
-  } else if (isNFT(tokenType)) {
-    transferDetails = [receiverSolidityAddress, tokenSolidityAddress, nftSerialId.toString()];
-  } else {
-    const preciseAmount = BigNumber(amount).shiftedBy(decimals).integerValue().toString();
-    transferDetails = [receiverSolidityAddress, tokenSolidityAddress, preciseAmount];
-  }
-
-  const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
-  const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.TRANSFER, transferDetails);
-
-  return await createProposal({
-    proposalType: GovernanceProposalType.TRANSFER,
-    title,
-    description,
-    discussionLink: linkToDiscussion,
-    metadata: "",
-    amountOrId: governanceNftTokenSerialId,
-    targets: [assetHolderEVMAddress],
-    values: [0],
-    calldatas: [ethers.utils.arrayify(data)],
-    governorContractId,
-    signer,
-  });
-}
-
-interface CreateTokenAssociationProposalParams {
-  title: string;
-  description: string;
-  linkToDiscussion: string;
-  tokenId: string;
-  governanceTokenId: string;
-  governorContractId: string;
-  assetHolderEVMAddress: string;
-  nftTokenSerialId: number;
-  daoType: DAOType;
-  signer: HashConnectSigner;
-}
-
-async function createGOVTokenAssociateProposal(params: CreateTokenAssociationProposalParams) {
-  const {
-    title,
-    description,
-    linkToDiscussion,
-    tokenId,
-    governanceTokenId,
-    governorContractId,
-    assetHolderEVMAddress,
-    nftTokenSerialId,
-    daoType,
-    signer,
-  } = params;
-  const tokenSolidityAddress = TokenId.fromString(tokenId).toSolidityAddress();
-  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(tokenId);
-
-  await DexService.setUpAllowance({
-    tokenId: governanceTokenId,
-    nftSerialId: nftTokenSerialId,
-    spenderContractId: governorContractId,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
-    tokenAmount: tokenResponse.data.precision,
-    signer,
-  });
-  const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
-  const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.Associate, [tokenSolidityAddress]);
-
-  return await createProposal({
-    proposalType: GovernanceProposalType.ASSOCIATE,
-    title,
-    description,
-    discussionLink: linkToDiscussion,
-    metadata: "",
-    amountOrId: nftTokenSerialId,
-    targets: [assetHolderEVMAddress],
-    values: [0],
-    calldatas: [ethers.utils.arrayify(data)],
-    governorContractId,
-    signer,
-  });
-}
-interface CreateUpgradeProxyProposalParams {
-  governanceTokenId: string;
-  governorContractId: string;
-  assetHolderEVMAddress: string;
-  title: string;
-  description: string;
-  linkToDiscussion: string;
-  newImplementationAddress: string;
-  oldProxyAddress: string;
-  proxyAdmin: string;
-  nftTokenSerialId: number;
-  daoType: string;
-  signer: HashConnectSigner;
-}
-
-async function createUpgradeProxyProposal(params: CreateUpgradeProxyProposalParams) {
-  const {
-    governanceTokenId,
-    signer,
-    title,
-    description,
-    governorContractId,
-    assetHolderEVMAddress,
-    linkToDiscussion,
-    oldProxyAddress,
-    newImplementationAddress,
-    proxyAdmin,
-    daoType,
-    nftTokenSerialId,
-  } = params;
-  const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(governanceTokenId);
-
-  await DexService.setUpAllowance({
-    tokenId: governanceTokenId,
-    nftSerialId: nftTokenSerialId,
-    spenderContractId: governorContractId,
-    tokenType: daoType === DAOType.NFT ? TokenType.NFT : TokenType.FungibleToken,
-    tokenAmount: tokenResponse.data.precision,
-    signer,
-  });
-  const proxyEVMAddress = await DexService.fetchContractEVMAddress(oldProxyAddress);
-  const proxyLogicEVMAddress = await DexService.fetchContractEVMAddress(newImplementationAddress);
-  const { evm_address: proxyAdminEVMAddress } = await DexService.fetchAccountInfo(proxyAdmin);
-  const contractInterface = new ethers.utils.Interface(AssetHolderJSON.abi);
-  const data = contractInterface.encodeFunctionData(GovernorDAOContractFunctions.UpgradeProxy, [
-    proxyEVMAddress,
-    proxyLogicEVMAddress,
-    proxyAdminEVMAddress,
-  ]);
-
-  return await createProposal({
-    proposalType: GovernanceProposalType.UPGRADE_PROXY,
-    title,
-    description,
-    discussionLink: linkToDiscussion,
-    metadata: "",
-    amountOrId: nftTokenSerialId,
-    targets: [assetHolderEVMAddress],
-    values: [0],
-    calldatas: [ethers.utils.arrayify(data)],
-    governorContractId,
-    signer,
-  });
-}
 interface CreateProposalParams {
   governorContractId: string;
   proposalType: number;
@@ -459,11 +254,83 @@ async function setUpAllowance(params: SetUpAllowanceParams) {
   }
 }
 
+interface CreateGovernanceProposalParams {
+  governorContractId: string;
+  governanceTokenId?: string;
+  nftTokenSerialId?: number;
+  daoType?: string;
+  proposalType: number;
+  title: string;
+  description: string;
+  discussionLink?: string;
+  metadata?: string;
+  amountOrId: number;
+  target: string;
+  calldata: string;
+  signer: HashConnectSigner;
+}
+
+async function createGovernanceProposal(params: CreateGovernanceProposalParams) {
+  const {
+    governanceTokenId,
+    signer,
+    title,
+    description,
+    governorContractId,
+    target,
+    discussionLink = "",
+    daoType,
+    nftTokenSerialId = 0,
+    calldata,
+    proposalType,
+    metadata = "",
+    amountOrId = 0,
+  } = params;
+
+  if (governanceTokenId) {
+    const tokenResponse = await DexService.mirrorNodeService.fetchTokenData(governanceTokenId);
+    await DexService.setUpAllowance({
+      tokenId: governanceTokenId,
+      nftSerialId: nftTokenSerialId,
+      spenderContractId: governorContractId,
+      tokenAmount: tokenResponse.data.precision,
+      tokenType: daoType === (DAOType as any).NFT ? TokenType.NFT : TokenType.FungibleToken,
+      signer,
+    });
+  }
+
+  return await createProposal({
+    proposalType,
+    title,
+    description,
+    discussionLink,
+    metadata,
+    amountOrId,
+    targets: [target],
+    values: [0],
+    calldatas: [ethers.utils.arrayify(calldata)],
+    governorContractId,
+    signer,
+  });
+}
+
+async function sendHuffyRiskParametersProposal(params: any) {
+  return createGovernanceProposal({ ...params, proposalType: GovernanceProposalType.RiskParametersProposal });
+}
+
+async function sendHuffyAddTradingPairProposal(params: any) {
+  return createGovernanceProposal({ ...params, proposalType: GovernanceProposalType.AddTradingPairProposal });
+}
+
+async function sendHuffyRemoveTradingPairProposal(params: any) {
+  return createGovernanceProposal({ ...params, proposalType: GovernanceProposalType.RemoveTradingPairProposal });
+}
+
 export {
   sendCreateGovernanceDAOTransaction,
   createTextProposal,
-  createGOVTokenAssociateProposal,
-  createTokenTransferProposal,
-  createUpgradeProxyProposal,
   setUpAllowance,
+  sendHuffyRiskParametersProposal,
+  sendHuffyAddTradingPairProposal,
+  sendHuffyRemoveTradingPairProposal,
 };

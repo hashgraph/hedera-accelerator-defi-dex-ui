@@ -24,7 +24,6 @@ function createDexService() {
     fetchAllProposalEvents,
     fetchAccountTokenBalances,
     fetchAllDAOs: daoSDK.fetchAllDAOs,
-    fetchMultiSigDAOLogs: daoSDK.fetchMultiSigDAOLogs,
     fetchGovernanceDAOLogs: daoSDK.fetchGovernanceDAOLogs,
     fetchHederaGnosisSafeLogs: daoSDK.fetchHederaGnosisSafeLogs,
     proposeAddOwnerWithThreshold: daoSDK.proposeAddOwnerWithThreshold,

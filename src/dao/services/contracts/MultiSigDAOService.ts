@@ -15,6 +15,7 @@ import { checkTransactionResponseForError } from "@dex/services/HederaService/ut
 import { Contracts } from "@dex/services/constants";
 import { ethers } from "ethers";
 import MultiSigDAOFactoryJSON from "@dex/services/abi/MultiSigDAOFactory.json";
+import MultiSigDAOJSON from "@dex/services/abi/MultiSigDAO.json";
 import { isHbarToken } from "@dex/utils";
 import BaseDAOJSON from "@dex/services/abi/BaseDAO.json";
 import { DexService } from "@dex/services";
@@ -300,6 +301,50 @@ async function proposeMultiSigDAOUpgradeProposal(params: ProposeMultiSigDAOUpgra
   return sendProposeDAOUpgradeResponse;
 }
 
+export interface SendProposeBatchTransactionParams {
+  multiSigDAOContractId: string;
+  targets: string[];
+  values: number[];
+  calldatas: string[];
+  title: string;
+  description: string;
+  linkToDiscussion?: string;
+  signer: HashConnectSigner;
+}
+
+async function sendProposeBatchTransaction(params: SendProposeBatchTransactionParams) {
+  const {
+    multiSigDAOContractId,
+    targets,
+    values,
+    calldatas,
+    title,
+    description,
+    linkToDiscussion = "",
+    signer,
+  } = params;
+
+  const contractInterface = new ethers.utils.Interface(MultiSigDAOJSON.abi);
+  const data = contractInterface.encodeFunctionData(MultiSigDAOContractFunctions.ProposeBatchTransaction, [
+    targets,
+    values,
+    calldatas,
+    title,
+    description,
+    linkToDiscussion,
+  ]);
+
+  const tx = await new ContractExecuteTransaction()
+    .setContractId(multiSigDAOContractId)
+    .setFunctionParameters(ethers.utils.arrayify(data))
+    .setGas(Gas)
+    .freezeWithSigner(signer);
+
+  const resp = await tx.executeWithSigner(signer);
+  checkTransactionResponseForError(resp, MultiSigDAOContractFunctions.ProposeBatchTransaction);
+  return resp;
+}
+
 export {
   sendCreateMultiSigDAOTransaction,
   sendProposeTransferTransaction,
@@ -308,4 +353,5 @@ export {
   sendDAOTokenAssociateTransaction,
   sendTokensTransaction,
   proposeMultiSigDAOUpgradeProposal,
+  sendProposeBatchTransaction,
 };

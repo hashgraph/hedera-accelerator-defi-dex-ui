@@ -1,0 +1,268 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        { "name": "_timelock", "type": "address", "internalType": "address" },
+        { "name": "_maxTradeBps", "type": "uint256", "internalType": "uint256" },
+        { "name": "_maxSlippageBps", "type": "uint256", "internalType": "uint256" },
+        { "name": "_tradeCooldownSec", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "TIMELOCK",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getRiskParameters",
+      "inputs": [],
+      "outputs": [
+        { "name": "_maxTradeBps", "type": "uint256", "internalType": "uint256" },
+        { "name": "_maxSlippageBps", "type": "uint256", "internalType": "uint256" },
+        { "name": "_tradeCooldownSec", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "maxSlippageBps",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "maxTradeBps",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "setMaxSlippageBps",
+      "inputs": [{ "name": "newMaxSlippageBps", "type": "uint256", "internalType": "uint256" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setMaxTradeBps",
+      "inputs": [{ "name": "newMaxTradeBps", "type": "uint256", "internalType": "uint256" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setParameters",
+      "inputs": [
+        { "name": "newMaxTradeBps", "type": "uint256", "internalType": "uint256" },
+        { "name": "newMaxSlippageBps", "type": "uint256", "internalType": "uint256" },
+        { "name": "newTradeCooldownSec", "type": "uint256", "internalType": "uint256" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setTradeCooldownSec",
+      "inputs": [{ "name": "newTradeCooldownSec", "type": "uint256", "internalType": "uint256" }],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "tradeCooldownSec",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "ParamsUpdated",
+      "inputs": [
+        { "name": "oldMaxTradeBps", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "newMaxTradeBps", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "oldMaxSlippageBps", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "newMaxSlippageBps", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "oldTradeCooldownSec", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "newTradeCooldownSec", "type": "uint256", "indexed": false, "internalType": "uint256" },
+        { "name": "timestamp", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      ],
+      "anonymous": false
+    }
+  ],
+  "bytecode": {
+    "object": "0x60a03461018a57601f61055d38819003918201601f191683019291906001600160401b0384118385101761018e57816080928492604096875283398101031261018a5780516001600160a01b038116919082810361018a576020820151906060858401519301519315610147576127108083116100f75783116100a4576080525f55600155600255516103ba90816101a3823960805181818161010d01526101f70152f35b845162461bcd60e51b815260206004820152602660248201527f506172616d6574657253746f72653a20696e76616c6964206d6178536c69707060448201526561676542707360d01b6064820152608490fd5b855162461bcd60e51b815260206004820152602360248201527f506172616d6574657253746f72653a20696e76616c6964206d6178547261646560448201526242707360e81b6064820152608490fd5b6064855162461bcd60e51b815260206004820152602060248201527f506172616d6574657253746f72653a20696e76616c69642074696d656c6f636b6044820152fd5b5f80fd5b634e487b7160e01b5f52604160045260245ffdfe6040608081526004361015610012575f80fd5b5f3560e01c90816325fc1b3d146101ca57816334c5d2ce146101a05781634656988b146101845781635ce942ee1461015957816371e630121461013c5781637aadef8b146100fa578163ba94626c146100cd578163c4aa7395146100b0575063ff3a24d41461007f575f80fd5b346100ac5760203660031901126100ac576100986101f5565b6100aa6001546002549060043561026c565b005b5f80fd5b346100ac575f3660031901126100ac576020906001549051908152f35b346100ac575f3660031901126100ac576060905f5490600154906002549181519384526020840152820152f35b346100ac575f3660031901126100ac57517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b346100ac575f3660031901126100ac576020906002549051908152f35b346100ac5760203660031901126100ac576101726101f5565b6100aa5f54600435906001549061026c565b346100ac575f3660031901126100ac576020905f549051908152f35b346100ac5760603660031901126100ac576101b96101f5565b6100aa60443560243560043561026c565b346100ac5760203660031901126100ac576101e36101f5565b6100aa5f54600254906004359061026c565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316330361022757565b60405162461bcd60e51b815260206004820152601d60248201527f506172616d6574657253746f72653a206f6e6c792054696d656c6f636b0000006044820152606490fd5b906127108083116103335781116102df577f0a44ab5c83303e6925191b58cd03588db45a8a693a5bb383fd98ecd456cd7e4d9260e0925f549260015460025492805f558260015584600255604051958652602086015260408501526060840152608083015260a08201524260c0820152a1565b60405162461bcd60e51b815260206004820152602660248201527f506172616d6574657253746f72653a20696e76616c6964206d6178536c69707060448201526561676542707360d01b6064820152608490fd5b60405162461bcd60e51b815260206004820152602360248201527f506172616d6574657253746f72653a20696e76616c6964206d6178547261646560448201526242707360e81b6064820152608490fdfea2646970667358221220f4a5ec34a55662a0ac7d122928878c7e5a0db07e2f828ca0443ecfcf510de8c364736f6c63430008190033",
+    "sourceMap": "278:3435:87:-:0;;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;;;-1:-1:-1;;;;;278:3435:87;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;278:3435:87;;;;;;;;;;;;;;;;;;;;;;1536:23;;278:3435;;1630:5;1614:21;;;278:3435;;1693:24;;278:3435;;;1771:20;-1:-1:-1;278:3435:87;;;1880:36;278:3435;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;278:3435:87;;;;;;-1:-1:-1;278:3435:87;;;;;-1:-1:-1;278:3435:87",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x6040608081526004361015610012575f80fd5b5f3560e01c90816325fc1b3d146101ca57816334c5d2ce146101a05781634656988b146101845781635ce942ee1461015957816371e630121461013c5781637aadef8b146100fa578163ba94626c146100cd578163c4aa7395146100b0575063ff3a24d41461007f575f80fd5b346100ac5760203660031901126100ac576100986101f5565b6100aa6001546002549060043561026c565b005b5f80fd5b346100ac575f3660031901126100ac576020906001549051908152f35b346100ac575f3660031901126100ac576060905f5490600154906002549181519384526020840152820152f35b346100ac575f3660031901126100ac57517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b346100ac575f3660031901126100ac576020906002549051908152f35b346100ac5760203660031901126100ac576101726101f5565b6100aa5f54600435906001549061026c565b346100ac575f3660031901126100ac576020905f549051908152f35b346100ac5760603660031901126100ac576101b96101f5565b6100aa60443560243560043561026c565b346100ac5760203660031901126100ac576101e36101f5565b6100aa5f54600254906004359061026c565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316330361022757565b60405162461bcd60e51b815260206004820152601d60248201527f506172616d6574657253746f72653a206f6e6c792054696d656c6f636b0000006044820152606490fd5b906127108083116103335781116102df577f0a44ab5c83303e6925191b58cd03588db45a8a693a5bb383fd98ecd456cd7e4d9260e0925f549260015460025492805f558260015584600255604051958652602086015260408501526060840152608083015260a08201524260c0820152a1565b60405162461bcd60e51b815260206004820152602660248201527f506172616d6574657253746f72653a20696e76616c6964206d6178536c69707060448201526561676542707360d01b6064820152608490fd5b60405162461bcd60e51b815260206004820152602360248201527f506172616d6574657253746f72653a20696e76616c6964206d6178547261646560448201526242707360e81b6064820152608490fdfea2646970667358221220f4a5ec34a55662a0ac7d122928878c7e5a0db07e2f828ca0443ecfcf510de8c364736f6c63430008190033",
+    "sourceMap": "278:3435:87:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;916:67;;:::i;:::-;2294:16;278:3435;;2294:16;278:3435;;;;2294:16;:::i;:::-;278:3435;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;;;503:29;278:3435;;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;;;;;;2839:14;278:3435;;2855:16;278:3435;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;;308:33;-1:-1:-1;;;;;278:3435:87;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;;;577:31;278:3435;;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;916:67;;:::i;:::-;2621:19;278:3435;;;;;;;2621:19;;:::i;278:3435::-;;;;;;-1:-1:-1;;278:3435:87;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;278:3435:87;;;;916:67;;:::i;:::-;2134:19;278:3435;;;;;;2134:19;:::i;278:3435::-;;;;;;-1:-1:-1;;278:3435:87;;;;916:67;;:::i;:::-;2457:16;278:3435;;2457:16;278:3435;;;;2457:16;;:::i;989:120::-;1060:8;-1:-1:-1;;;;;278:3435:87;1046:10;:22;278:3435;;989:120::o;278:3435::-;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;;;;;;;;;;;2885:826;;3034:5;3016:23;;;278:3435;;3097:26;;278:3435;;3468:236;278:3435;;;3202:11;278:3435;;3251:14;278:3435;3305:16;278:3435;;;3202:11;278:3435;;3251:14;278:3435;;3305:16;278:3435;;;;;;;;;;;;;;;;;;;;;;;;;;3679:15;278:3435;;;;3468:236;2885:826::o;278:3435::-;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;;;;;;;;;;;;-1:-1:-1;;;278:3435:87;;;;;;",
+    "linkReferences": {},
+    "immutableReferences": {
+      "58700": [
+        { "start": 269, "length": 32 },
+        { "start": 503, "length": 32 }
+      ]
+    }
+  },
+  "methodIdentifiers": {
+    "TIMELOCK()": "7aadef8b",
+    "getRiskParameters()": "ba94626c",
+    "maxSlippageBps()": "c4aa7395",
+    "maxTradeBps()": "4656988b",
+    "setMaxSlippageBps(uint256)": "25fc1b3d",
+    "setMaxTradeBps(uint256)": "ff3a24d4",
+    "setParameters(uint256,uint256,uint256)": "34c5d2ce",
+    "setTradeCooldownSec(uint256)": "5ce942ee",
+    "tradeCooldownSec()": "71e63012"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.25+commit.b61c2a91\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_timelock\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_maxTradeBps\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_maxSlippageBps\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tradeCooldownSec\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldMaxTradeBps\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newMaxTradeBps\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldMaxSlippageBps\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newMaxSlippageBps\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldTradeCooldownSec\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newTradeCooldownSec\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"ParamsUpdated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"TIMELOCK\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getRiskParameters\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_maxTradeBps\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_maxSlippageBps\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tradeCooldownSec\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxSlippageBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxTradeBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newMaxSlippageBps\",\"type\":\"uint256\"}],\"name\":\"setMaxSlippageBps\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newMaxTradeBps\",\"type\":\"uint256\"}],\"name\":\"setMaxTradeBps\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newMaxTradeBps\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"newMaxSlippageBps\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"newTradeCooldownSec\",\"type\":\"uint256\"}],\"name\":\"setParameters\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"newTradeCooldownSec\",\"type\":\"uint256\"}],\"name\":\"setTradeCooldownSec\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"tradeCooldownSec\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Centralizes configuration to a single contract. Mutations are only allowed by the Timelock.\",\"kind\":\"dev\",\"methods\":{\"constructor\":{\"params\":{\"_maxSlippageBps\":\"Initial max slippage in basis points\",\"_maxTradeBps\":\"Initial max trade size in basis points\",\"_timelock\":\"Address of governance Timelock\",\"_tradeCooldownSec\":\"Initial cooldown period in seconds\"}}},\"title\":\"ParameterStore\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"constructor\":{\"notice\":\"Constructor\"}},\"notice\":\"Timelock-governed store for risk parameters used by Relay and other modules\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/ParameterStore.sol\":\"ParameterStore\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"src/ParameterStore.sol\":{\"keccak256\":\"0xbce2bbbcc4bd9f7df3465a6f843f76678d42326af9cc687dca415e65fa025bc7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e50ca51752d653ae3f0a7f3e3ed119e6c057af46e802ef91ba7fa46bec72e890\",\"dweb:/ipfs/QmW4K1x2N2QQ6FkU1R9jHrenSmEEugJLhhHKFohN7ex56T\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": { "version": "0.8.25+commit.b61c2a91" },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            { "internalType": "address", "name": "_timelock", "type": "address" },
+            { "internalType": "uint256", "name": "_maxTradeBps", "type": "uint256" },
+            { "internalType": "uint256", "name": "_maxSlippageBps", "type": "uint256" },
+            { "internalType": "uint256", "name": "_tradeCooldownSec", "type": "uint256" }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            { "internalType": "uint256", "name": "oldMaxTradeBps", "type": "uint256", "indexed": false },
+            { "internalType": "uint256", "name": "newMaxTradeBps", "type": "uint256", "indexed": false },
+            { "internalType": "uint256", "name": "oldMaxSlippageBps", "type": "uint256", "indexed": false },
+            { "internalType": "uint256", "name": "newMaxSlippageBps", "type": "uint256", "indexed": false },
+            { "internalType": "uint256", "name": "oldTradeCooldownSec", "type": "uint256", "indexed": false },
+            { "internalType": "uint256", "name": "newTradeCooldownSec", "type": "uint256", "indexed": false },
+            { "internalType": "uint256", "name": "timestamp", "type": "uint256", "indexed": false }
+          ],
+          "type": "event",
+          "name": "ParamsUpdated",
+          "anonymous": false
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "TIMELOCK",
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getRiskParameters",
+          "outputs": [
+            { "internalType": "uint256", "name": "_maxTradeBps", "type": "uint256" },
+            { "internalType": "uint256", "name": "_maxSlippageBps", "type": "uint256" },
+            { "internalType": "uint256", "name": "_tradeCooldownSec", "type": "uint256" }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "maxSlippageBps",
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "maxTradeBps",
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+        },
+        {
+          "inputs": [{ "internalType": "uint256", "name": "newMaxSlippageBps", "type": "uint256" }],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setMaxSlippageBps"
+        },
+        {
+          "inputs": [{ "internalType": "uint256", "name": "newMaxTradeBps", "type": "uint256" }],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setMaxTradeBps"
+        },
+        {
+          "inputs": [
+            { "internalType": "uint256", "name": "newMaxTradeBps", "type": "uint256" },
+            { "internalType": "uint256", "name": "newMaxSlippageBps", "type": "uint256" },
+            { "internalType": "uint256", "name": "newTradeCooldownSec", "type": "uint256" }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setParameters"
+        },
+        {
+          "inputs": [{ "internalType": "uint256", "name": "newTradeCooldownSec", "type": "uint256" }],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setTradeCooldownSec"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "tradeCooldownSec",
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "constructor": {
+            "params": {
+              "_maxSlippageBps": "Initial max slippage in basis points",
+              "_maxTradeBps": "Initial max trade size in basis points",
+              "_timelock": "Address of governance Timelock",
+              "_tradeCooldownSec": "Initial cooldown period in seconds"
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": { "kind": "user", "methods": { "constructor": { "notice": "Constructor" } }, "version": 1 }
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+        "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+        "forge-std/=lib/forge-std/src/",
+        "halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/",
+        "openzeppelin-contracts/=lib/openzeppelin-contracts/"
+      ],
+      "optimizer": { "enabled": true, "runs": 200 },
+      "metadata": { "bytecodeHash": "ipfs" },
+      "compilationTarget": { "src/ParameterStore.sol": "ParameterStore" },
+      "evmVersion": "cancun",
+      "libraries": {},
+      "viaIR": true
+    },
+    "sources": {
+      "src/ParameterStore.sol": {
+        "keccak256": "0xbce2bbbcc4bd9f7df3465a6f843f76678d42326af9cc687dca415e65fa025bc7",
+        "urls": [
+          "bzz-raw://e50ca51752d653ae3f0a7f3e3ed119e6c057af46e802ef91ba7fa46bec72e890",
+          "dweb:/ipfs/QmW4K1x2N2QQ6FkU1R9jHrenSmEEugJLhhHKFohN7ex56T"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "id": 87
+}

@@ -37,7 +37,7 @@ const HorizontalStackBarChartBase = (props: HorizontalSStackedBarChartProps) => 
       >
         <Box bg={Color.Black_01} padding="0.125rem 0.25rem">
           <Text textStyle="h4" color={Color.White_01}>
-            {quorum}%
+            {quorum?.toFixed(2)}%
           </Text>
         </Box>
         <Box width="0" border={`1px solid ${Color.Black_01}`} height={`${stackBarHeight + 5}px`} />

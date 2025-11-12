@@ -1,24 +1,21 @@
 import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
-import { DexService } from "@dex/services";
-import { useDexContext, HandleOnSuccess } from "@dex/hooks";
+import { HandleOnSuccess, useDexContext } from "@dex/hooks";
+import DAOService from "@dao/services";
 import { isNil } from "ramda";
-import { DAOType } from "@dao/services";
 
-interface UseCreateGOVTokenAssociateProposalParams {
+export interface UseCreateMultiSigBatchProposalParams {
+  multiSigDAOContractId: string;
+  targets: string[];
+  values: number[];
+  calldatas: string[];
   title: string;
   description: string;
-  linkToDiscussion: string;
-  tokenId: string;
-  governanceTokenId: string;
-  governorContractId: string;
-  assetHolderEVMAddress: string;
-  nftTokenSerialId: number;
-  daoType: DAOType;
+  linkToDiscussion?: string;
 }
 
-export function useCreateGOVTokenAssociateProposal(handleOnSuccess: HandleOnSuccess) {
+export function useCreateMultiSigBatchProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -26,11 +23,11 @@ export function useCreateGOVTokenAssociateProposal(handleOnSuccess: HandleOnSucc
   return useMutation<
     TransactionResponse | undefined,
     Error,
-    UseCreateGOVTokenAssociateProposalParams,
-    DAOMutations.CreateGOVTokenAssociateProposal
+    UseCreateMultiSigBatchProposalParams,
+    DAOMutations.CreateMultiSigProposal
   >(
-    async (params: UseCreateGOVTokenAssociateProposalParams) => {
-      return DexService.createGOVTokenAssociateProposal({ ...params, signer });
+    async (params: UseCreateMultiSigBatchProposalParams) => {
+      return await DAOService.sendProposeBatchTransaction({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

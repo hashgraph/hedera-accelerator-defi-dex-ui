@@ -14,6 +14,7 @@ export const Routes = {
   NFT: "nft",
   NFTVoting: "nft/voting",
   NFTReview: "nft/review",
+  HuffyDAO: "huffy-dao",
   Proposals: "proposals",
   Assets: "assets",
   Members: "members",
@@ -46,4 +47,10 @@ export const Routes = {
   DAOTokenAssociateReview: "token-associate/review",
   DAOGenericProposalDetails: "generic-proposal/details",
   DAOGenericProposalReview: "generic-proposal/review",
+  DAOHuffyDetails: "huffy-settings/details",
+  DAOHuffyRiskParamsDetails: "huffy-settings/set-risk-params",
+  DAOHuffyAddTradingPairDetails: "huffy-settings/add-trading-pair",
+  DAOHuffyRemoveTradingPairDetails: "huffy-settings/remove-trading-pair",
+  DAOHuffyRiskParamsReview: "huffy-settings/risk-params-review",
+  DAOHuffyTradingPairReview: "huffy-settings/trading-pair-review",
 };

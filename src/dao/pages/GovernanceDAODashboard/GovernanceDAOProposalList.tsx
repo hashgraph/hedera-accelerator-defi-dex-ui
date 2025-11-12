@@ -8,15 +8,16 @@ import {
   TabFilters,
 } from "@dex/layouts";
 import { useTabFilters } from "@dex/hooks";
-import { Proposal, ProposalStatus, useDAOProposals, useGovernanceDAOProposals } from "@dao/hooks";
-import { useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { Proposal, ProposalStatus, useGovernanceDAOProposals } from "@dao/hooks";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
-import { DAODetailsContext, GovernanceDAODetails, MultiSigDAODetails } from "@dao/services";
+import { DAODetailsContext, GovernanceDAODetails } from "@dao/services";
 import { TransactionIcon, Color, usePagination, Pagination } from "@shared/ui-kit";
 import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@dex/utils";
 import { Routes } from "@dao/routes";
+import { SINGLE_DAO_ID } from "@dao/config/singleDao";
 
 const PageLimit = 10;
 
@@ -36,24 +37,14 @@ const transactionTabs = [
   { name: "History", filter: [] },
 ];
 
-export function ProposalList() {
-  const { accountId: daoAccountId = "" } = useParams();
+export function GovernanceDAOProposalList() {
+  const daoAccountId = SINGLE_DAO_ID;
   const navigate = useNavigate();
   const location = useLocation();
   const { dao } = useOutletContext<DAODetailsContext>();
-  const { safeEVMAddress } = dao as MultiSigDAODetails;
   const { tokenId = "", governorAddress, assetsHolderAddress } = dao as GovernanceDAODetails;
   const { tabIndex, handleTabChange } = useTabFilters();
   const transactionFilters = transactionTabFilters.at(tabIndex) ?? defaultTransactionFilters;
-
-  const multiSigDAOTransactionsQueryResults = useDAOProposals(daoAccountId);
-  const {
-    isSuccess: multiSigTransactionSuccess,
-    isLoading: multiSigTransactionLoading,
-    isError: multiSigTransactionFailed,
-    error: multiSigTransactionError,
-    data: multiSigTransactions,
-  } = multiSigDAOTransactionsQueryResults;
 
   const governanceDaoTransactionsQueryResults = useGovernanceDAOProposals(
     daoAccountId,
@@ -70,11 +61,11 @@ export function ProposalList() {
     data: govTransactions,
   } = governanceDaoTransactionsQueryResults;
 
-  const transactions = multiSigTransactions || govTransactions;
-  const isError = multiSigTransactionFailed || govTransactionFailed;
-  const isSuccess = multiSigTransactionSuccess || govTransactionSuccess;
-  const isLoading = multiSigTransactionLoading || govTransactionLoading;
-  const error = multiSigTransactionError || govTransactionError;
+  const transactions = govTransactions;
+  const isError = govTransactionFailed;
+  const isSuccess = govTransactionSuccess;
+  const isLoading = govTransactionLoading;
+  const error = govTransactionError;
 
   const hasTransactions = isNotNil(transactions) && !isEmpty(transactions);
 

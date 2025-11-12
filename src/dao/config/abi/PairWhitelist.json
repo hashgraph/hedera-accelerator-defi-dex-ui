@@ -1,0 +1,242 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [{ "name": "_timelock", "type": "address", "internalType": "address" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "TIMELOCK",
+      "inputs": [],
+      "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "addPair",
+      "inputs": [
+        { "name": "tokenIn", "type": "address", "internalType": "address" },
+        { "name": "tokenOut", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "getAllWhitelistedPairs",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "pairs",
+          "type": "tuple[]",
+          "internalType": "struct PairWhitelist.Pair[]",
+          "components": [
+            { "name": "tokenIn", "type": "address", "internalType": "address" },
+            { "name": "tokenOut", "type": "address", "internalType": "address" }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "isPairWhitelisted",
+      "inputs": [
+        { "name": "tokenIn", "type": "address", "internalType": "address" },
+        { "name": "tokenOut", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "removePair",
+      "inputs": [
+        { "name": "tokenIn", "type": "address", "internalType": "address" },
+        { "name": "tokenOut", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "PairAdded",
+      "inputs": [
+        { "name": "tokenIn", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "tokenOut", "type": "address", "indexed": true, "internalType": "address" }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "PairRemoved",
+      "inputs": [
+        { "name": "tokenIn", "type": "address", "indexed": true, "internalType": "address" },
+        { "name": "tokenOut", "type": "address", "indexed": true, "internalType": "address" }
+      ],
+      "anonymous": false
+    }
+  ],
+  "bytecode": {
+    "object": "0x60a03460b757601f6108cc38819003918201601f19168301916001600160401b0383118484101760bb5780849260209460405283398101031260b757516001600160a01b03811680820360b757156072576080526040516107fc90816100d0823960805181818161042801526107510152f35b60405162461bcd60e51b815260206004820152601f60248201527f5061697257686974656c6973743a20696e76616c69642074696d656c6f636b006044820152606490fd5b5f80fd5b634e487b7160e01b5f52604160045260245ffdfe604060808152600480361015610013575f80fd5b5f3560e01c9081635861b227146104575781637aadef8b14610414578163828bd5e9146102c3578163b6f3e087146100a4575063c5924e9d14610054575f80fd5b346100a057806003193601126100a05760209061006f610677565b61007761068d565b9060018060a01b038091165f525f8452825f2091165f52825260ff815f20541690519015158152f35b5f80fd5b82346100a057806003193601126100a0576100bd610677565b6100c561068d565b916100ce61074f565b6001600160a01b0391821692831515806102b8575b156102755782169384841461023357835f526020925f8452825f20865f52845260ff835f2054166101f157845f525f8452825f20865f528452825f20916001928360ff198254161790556101356106ef565b91868352858301928884528454680100000000000000008110156101de578086610161920187556106a3565b9390936101cc57508185915116926bffffffffffffffffffffffff60a01b938482541617815501925116908254161790555491835f5260028152815f2090855f52525f20557fc26cc79589f7c5b1fb18650002371abf239e6083ab356e4179c11da5185611ec5f80a3005b5f90634e487b7160e01b82525260245ffd5b604184634e487b7160e01b5f525260245ffd5b5082606492519162461bcd60e51b8352820152601c60248201527f5061697257686974656c6973743a20616c7265616479206164646564000000006044820152fd5b6020606492519162461bcd60e51b8352820152601960248201527f5061697257686974656c6973743a2073616d6520746f6b656e000000000000006044820152fd5b815162461bcd60e51b8152602081870152601c60248201527f5061697257686974656c6973743a20696e76616c696420746f6b656e000000006044820152606490fd5b5082811615156100e3565b9050346100a0575f3660031901126100a057601f916001906001546102e781610723565b938251948619968791011685019085821067ffffffffffffffff831117610401575082959493955280835261031b81610723565b602094015f5b8181106103dc5750505f5b81811061038b5750508051938385948501908086528451809252808487019501935f905b83821061035d5787870388f35b855180516001600160a01b039081168952908401511687840152889750958601959482019490840190610350565b9485610399829596976106a3565b508054908301546001600160a01b0391821691166103b56106ef565b918252888201526103c6828861073b565b526103d1818761073b565b50019493929461032c565b94809694956103e96106ef565b5f81525f838201528282890101520195949395610321565b604190634e487b7160e01b5f525260245ffd5b82346100a0575f3660031901126100a057517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b82346100a057806003193601126100a057610470610677565b61047861068d565b9161048161074f565b60018060a01b0380921691825f526020905f825280835f20951694855f52825260ff835f2054161561063457835f525f8252825f20855f528252825f2060ff198154169055835f5260028252825f20855f528252825f205480610507575b85857fcfacf9d602eaae62e56c577b2340ef89b971ff33287fa964a1d17027e8ea2d425f80a3005b5f199080820181811161062157600193845484810190811161060e57808303610586575b5050505081548015610573570190610542826106a3565b9790976101cc57505f8188828098999a550155558383526002815281832090858452528120558190838080806104df565b603188634e487b7160e01b5f525260245ffd5b610592610599916106a3565b50926106a3565b6105fc578281036105c9575b50808254165f526002865284875f20920154165f528452845f20558780808061052b565b8582845416916bffffffffffffffffffffffff60a01b92838254161781550190828785015416908254161790558a6105a5565b5f8b634e487b7160e01b82525260245ffd5b60118b634e487b7160e01b5f525260245ffd5b601189634e487b7160e01b5f525260245ffd5b825162461bcd60e51b8152808701839052601a60248201527f5061697257686974656c6973743a206e6f742070726573656e740000000000006044820152606490fd5b600435906001600160a01b03821682036100a057565b602435906001600160a01b03821682036100a057565b6001548110156106db5760015f5260011b7fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf601905f90565b634e487b7160e01b5f52603260045260245ffd5b604051906040820182811067ffffffffffffffff82111761070f57604052565b634e487b7160e01b5f52604160045260245ffd5b67ffffffffffffffff811161070f5760051b60200190565b80518210156106db5760209160051b010190565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316330361078157565b60405162461bcd60e51b815260206004820152601c60248201527f5061697257686974656c6973743a206f6e6c792054696d656c6f636b000000006044820152606490fdfea264697066735822122059ffb760a9aff84a123d6232e3dd4341e09fd89b516fef8541a35936929d2aea64736f6c63430008190033",
+    "sourceMap": "215:3609:86:-:0;;;;;;;;;;;;;-1:-1:-1;;215:3609:86;;;;-1:-1:-1;;;;;215:3609:86;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;215:3609:86;;;;;;;918:23;215:3609;;987:20;;215:3609;;;;;;;;987:20;215:3609;;;;;;;;;;;;;;-1:-1:-1;;;215:3609:86;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;215:3609:86;;;;;;-1:-1:-1;215:3609:86;;;;;-1:-1:-1;215:3609:86",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x604060808152600480361015610013575f80fd5b5f3560e01c9081635861b227146104575781637aadef8b14610414578163828bd5e9146102c3578163b6f3e087146100a4575063c5924e9d14610054575f80fd5b346100a057806003193601126100a05760209061006f610677565b61007761068d565b9060018060a01b038091165f525f8452825f2091165f52825260ff815f20541690519015158152f35b5f80fd5b82346100a057806003193601126100a0576100bd610677565b6100c561068d565b916100ce61074f565b6001600160a01b0391821692831515806102b8575b156102755782169384841461023357835f526020925f8452825f20865f52845260ff835f2054166101f157845f525f8452825f20865f528452825f20916001928360ff198254161790556101356106ef565b91868352858301928884528454680100000000000000008110156101de578086610161920187556106a3565b9390936101cc57508185915116926bffffffffffffffffffffffff60a01b938482541617815501925116908254161790555491835f5260028152815f2090855f52525f20557fc26cc79589f7c5b1fb18650002371abf239e6083ab356e4179c11da5185611ec5f80a3005b5f90634e487b7160e01b82525260245ffd5b604184634e487b7160e01b5f525260245ffd5b5082606492519162461bcd60e51b8352820152601c60248201527f5061697257686974656c6973743a20616c7265616479206164646564000000006044820152fd5b6020606492519162461bcd60e51b8352820152601960248201527f5061697257686974656c6973743a2073616d6520746f6b656e000000000000006044820152fd5b815162461bcd60e51b8152602081870152601c60248201527f5061697257686974656c6973743a20696e76616c696420746f6b656e000000006044820152606490fd5b5082811615156100e3565b9050346100a0575f3660031901126100a057601f916001906001546102e781610723565b938251948619968791011685019085821067ffffffffffffffff831117610401575082959493955280835261031b81610723565b602094015f5b8181106103dc5750505f5b81811061038b5750508051938385948501908086528451809252808487019501935f905b83821061035d5787870388f35b855180516001600160a01b039081168952908401511687840152889750958601959482019490840190610350565b9485610399829596976106a3565b508054908301546001600160a01b0391821691166103b56106ef565b918252888201526103c6828861073b565b526103d1818761073b565b50019493929461032c565b94809694956103e96106ef565b5f81525f838201528282890101520195949395610321565b604190634e487b7160e01b5f525260245ffd5b82346100a0575f3660031901126100a057517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b82346100a057806003193601126100a057610470610677565b61047861068d565b9161048161074f565b60018060a01b0380921691825f526020905f825280835f20951694855f52825260ff835f2054161561063457835f525f8252825f20855f528252825f2060ff198154169055835f5260028252825f20855f528252825f205480610507575b85857fcfacf9d602eaae62e56c577b2340ef89b971ff33287fa964a1d17027e8ea2d425f80a3005b5f199080820181811161062157600193845484810190811161060e57808303610586575b5050505081548015610573570190610542826106a3565b9790976101cc57505f8188828098999a550155558383526002815281832090858452528120558190838080806104df565b603188634e487b7160e01b5f525260245ffd5b610592610599916106a3565b50926106a3565b6105fc578281036105c9575b50808254165f526002865284875f20920154165f528452845f20558780808061052b565b8582845416916bffffffffffffffffffffffff60a01b92838254161781550190828785015416908254161790558a6105a5565b5f8b634e487b7160e01b82525260245ffd5b60118b634e487b7160e01b5f525260245ffd5b601189634e487b7160e01b5f525260245ffd5b825162461bcd60e51b8152808701839052601a60248201527f5061697257686974656c6973743a206e6f742070726573656e740000000000006044820152606490fd5b600435906001600160a01b03821682036100a057565b602435906001600160a01b03821682036100a057565b6001548110156106db5760015f5260011b7fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf601905f90565b634e487b7160e01b5f52603260045260245ffd5b604051906040820182811067ffffffffffffffff82111761070f57604052565b634e487b7160e01b5f52604160045260245ffd5b67ffffffffffffffff811161070f5760051b60200190565b80518210156106db5760209160051b010190565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316330361078157565b60405162461bcd60e51b815260206004820152601c60248201527f5061697257686974656c6973743a206f6e6c792054696d656c6f636b000000006044820152606490fdfea264697066735822122059ffb760a9aff84a123d6232e3dd4341e09fd89b516fef8541a35936929d2aea64736f6c63430008190033",
+    "sourceMap": "215:3609:86:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::i;:::-;1020:67;;;:::i;:::-;-1:-1:-1;;;;;215:3609:86;;;;1477:21;;;;:47;;215:3609;;;;;;1575:19;;;;215:3609;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1748:4;;215:3609;;;;;;;;;;;;:::i;:::-;;;;;1804:44;;;215:3609;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1859:14;215:3609;;;;;;;;;;;;;1927:28;215:3609;1927:28;;215:3609;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;215:3609:86;;;;;;;;;;;;;;;;;;;;1477:47;215:3609;;;;1502:22;;1477:47;;215:3609;;;;;;;;-1:-1:-1;;215:3609:86;;;;;3574:9;;215:3609;3574:9;215:3609;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;3638:13;;215:3609;3653:7;;;;;;215:3609;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;215:3609:86;;;;;;;;;;;;;;;;-1:-1:-1;215:3609:86;;;;;;;;;;;;;;3662:3;3698:12;;;;;;;;:::i;:::-;-1:-1:-1;215:3609:86;;3771:10;;;215:3609;-1:-1:-1;;;;;215:3609:86;;;;;;;:::i;:::-;;;;3735:48;;;215:3609;3724:59;;;;:::i;:::-;;;;;;:::i;:::-;;215:3609;3638:13;;;;;;215:3609;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;215:3609:86;;;;;244:33;-1:-1:-1;;;;;215:3609:86;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;:::i;:::-;1020:67;;;:::i;:::-;215:3609;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2411:14;215:3609;;;;;;;;;;;;;;2458:13;2454:470;;215:3609;2939:30;;;215:3609;2939:30;;215:3609;2454:470;-1:-1:-1;;215:3609:86;;;;;;;;;;;;;;;;;;;;;2593:24;;;2589:242;;2454:470;215:3609;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;2411:14;215:3609;;;;;;;;;;;;;2454:470;;;;;;;;215:3609;;;;;;;;;;;;2589:242;2661:23;2702:19;2661:23;;:::i;:::-;2702:19;;;:::i;:::-;215:3609;;;;;;;2589:242;215:3609;;;;;;;2411:14;215:3609;;;;;;2783:17;;215:3609;;;;;;;;;;2589:242;;;;;;215:3609;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;215:3609:86;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;215:3609:86;;;;;;:::o;:::-;;;;-1:-1:-1;;;;;215:3609:86;;;;;;:::o;:::-;2517:1;215:3609;;;;;;2517:1;-1:-1:-1;215:3609:86;2517:1;215:3609;;;;-1:-1:-1;215:3609:86;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;:::o;1093:119::-;1164:8;-1:-1:-1;;;;;215:3609:86;1150:10;:22;215:3609;;1093:119::o;215:3609::-;;;-1:-1:-1;;;215:3609:86;;;;;;;;;;;;;;;;;;;",
+    "linkReferences": {},
+    "immutableReferences": {
+      "58373": [
+        { "start": 1064, "length": 32 },
+        { "start": 1873, "length": 32 }
+      ]
+    }
+  },
+  "methodIdentifiers": {
+    "TIMELOCK()": "7aadef8b",
+    "addPair(address,address)": "b6f3e087",
+    "getAllWhitelistedPairs()": "828bd5e9",
+    "isPairWhitelisted(address,address)": "c5924e9d",
+    "removePair(address,address)": "5861b227"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.25+commit.b61c2a91\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_timelock\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"}],\"name\":\"PairAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"}],\"name\":\"PairRemoved\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"TIMELOCK\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"}],\"name\":\"addPair\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllWhitelistedPairs\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"}],\"internalType\":\"struct PairWhitelist.Pair[]\",\"name\":\"pairs\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"}],\"name\":\"isPairWhitelisted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"}],\"name\":\"removePair\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Timelock-controlled: only the Timelock can add/remove pairs\",\"kind\":\"dev\",\"methods\":{\"addPair(address,address)\":{\"params\":{\"tokenIn\":\"Address of the input token\",\"tokenOut\":\"Address of the output token\"}},\"getAllWhitelistedPairs()\":{\"returns\":{\"pairs\":\"Array of all whitelisted (tokenIn, tokenOut) pairs\"}},\"isPairWhitelisted(address,address)\":{\"params\":{\"tokenIn\":\"Address of the input token\",\"tokenOut\":\"Address of the output token\"},\"returns\":{\"_0\":\"bool True if whitelisted\"}},\"removePair(address,address)\":{\"params\":{\"tokenIn\":\"Address of the input token\",\"tokenOut\":\"Address of the output token\"}}},\"title\":\"PairWhitelist\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"addPair(address,address)\":{\"notice\":\"Add a trading pair to the whitelist\"},\"getAllWhitelistedPairs()\":{\"notice\":\"Get all whitelisted pairs\"},\"isPairWhitelisted(address,address)\":{\"notice\":\"Check if a trading pair is whitelisted\"},\"removePair(address,address)\":{\"notice\":\"Remove a trading pair from the whitelist\"}},\"notice\":\"Registry of governance-approved trading pairs\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/PairWhitelist.sol\":\"PairWhitelist\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"src/PairWhitelist.sol\":{\"keccak256\":\"0x24f0911b03980a8f34677bc03789d9dfba7c00997952b80183627200598ba696\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d84f031708b8174bb2558c36f2188add6198a63d05f345a695545e7a032ab45c\",\"dweb:/ipfs/QmRNJzGfYCYqY49b1hmH9JW3eZXEm4TxDp2sWW2dSPxf7r\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": { "version": "0.8.25+commit.b61c2a91" },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [{ "internalType": "address", "name": "_timelock", "type": "address" }],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            { "internalType": "address", "name": "tokenIn", "type": "address", "indexed": true },
+            { "internalType": "address", "name": "tokenOut", "type": "address", "indexed": true }
+          ],
+          "type": "event",
+          "name": "PairAdded",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            { "internalType": "address", "name": "tokenIn", "type": "address", "indexed": true },
+            { "internalType": "address", "name": "tokenOut", "type": "address", "indexed": true }
+          ],
+          "type": "event",
+          "name": "PairRemoved",
+          "anonymous": false
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "TIMELOCK",
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }]
+        },
+        {
+          "inputs": [
+            { "internalType": "address", "name": "tokenIn", "type": "address" },
+            { "internalType": "address", "name": "tokenOut", "type": "address" }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "addPair"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getAllWhitelistedPairs",
+          "outputs": [
+            {
+              "internalType": "struct PairWhitelist.Pair[]",
+              "name": "pairs",
+              "type": "tuple[]",
+              "components": [
+                { "internalType": "address", "name": "tokenIn", "type": "address" },
+                { "internalType": "address", "name": "tokenOut", "type": "address" }
+              ]
+            }
+          ]
+        },
+        {
+          "inputs": [
+            { "internalType": "address", "name": "tokenIn", "type": "address" },
+            { "internalType": "address", "name": "tokenOut", "type": "address" }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "isPairWhitelisted",
+          "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }]
+        },
+        {
+          "inputs": [
+            { "internalType": "address", "name": "tokenIn", "type": "address" },
+            { "internalType": "address", "name": "tokenOut", "type": "address" }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "removePair"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "addPair(address,address)": {
+            "params": { "tokenIn": "Address of the input token", "tokenOut": "Address of the output token" }
+          },
+          "getAllWhitelistedPairs()": { "returns": { "pairs": "Array of all whitelisted (tokenIn, tokenOut) pairs" } },
+          "isPairWhitelisted(address,address)": {
+            "params": { "tokenIn": "Address of the input token", "tokenOut": "Address of the output token" },
+            "returns": { "_0": "bool True if whitelisted" }
+          },
+          "removePair(address,address)": {
+            "params": { "tokenIn": "Address of the input token", "tokenOut": "Address of the output token" }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {
+          "addPair(address,address)": { "notice": "Add a trading pair to the whitelist" },
+          "getAllWhitelistedPairs()": { "notice": "Get all whitelisted pairs" },
+          "isPairWhitelisted(address,address)": { "notice": "Check if a trading pair is whitelisted" },
+          "removePair(address,address)": { "notice": "Remove a trading pair from the whitelist" }
+        },
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+        "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+        "forge-std/=lib/forge-std/src/",
+        "halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/",
+        "openzeppelin-contracts/=lib/openzeppelin-contracts/"
+      ],
+      "optimizer": { "enabled": true, "runs": 200 },
+      "metadata": { "bytecodeHash": "ipfs" },
+      "compilationTarget": { "src/PairWhitelist.sol": "PairWhitelist" },
+      "evmVersion": "cancun",
+      "libraries": {},
+      "viaIR": true
+    },
+    "sources": {
+      "src/PairWhitelist.sol": {
+        "keccak256": "0x24f0911b03980a8f34677bc03789d9dfba7c00997952b80183627200598ba696",
+        "urls": [
+          "bzz-raw://d84f031708b8174bb2558c36f2188add6198a63d05f345a695545e7a032ab45c",
+          "dweb:/ipfs/QmRNJzGfYCYqY49b1hmH9JW3eZXEm4TxDp2sWW2dSPxf7r"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "id": 86
+}

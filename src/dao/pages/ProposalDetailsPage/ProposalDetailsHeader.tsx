@@ -4,7 +4,6 @@ import { DAOType } from "@dao/services";
 import { Routes } from "@dao/routes";
 
 interface ProposalDetailsHeaderProps {
-  daoAccountId: string;
   title: string;
   daoType: DAOType;
   author: string;
@@ -12,14 +11,8 @@ interface ProposalDetailsHeaderProps {
 }
 
 export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
-  const { daoAccountId, title, daoType, author } = props;
-  const to = `/${
-    daoType === DAOType.GovernanceToken
-      ? Routes.GovernanceToken
-      : daoType === DAOType.NFT
-      ? Routes.NFT
-      : Routes.Multisig
-  }/${daoAccountId}/${Routes.Proposals}`;
+  const { title, author } = props;
+  const to = `/${Routes.Proposals}`;
   return (
     <>
       <Flex direction="row" justifyContent="space-between" flexWrap="wrap-reverse" gap="2">

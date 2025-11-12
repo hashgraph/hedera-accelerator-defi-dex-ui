@@ -3,6 +3,7 @@ import { Color, DefaultLogoIcon } from "@shared/ui-kit";
 import { useNavigate } from "react-router-dom";
 import { DAOType } from "@dao/services";
 import { useFetchContract } from "@dao/hooks";
+import { DEFAULT_DAO_OVERVIEW_PATH } from "@dao/config/singleDao";
 
 export interface DAOCardProps {
   accountEVMAddress: string;
@@ -17,11 +18,10 @@ export function DAOCard(props: DAOCardProps) {
   const navigate = useNavigate();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
-  const bgColor = props.isPrivate ? Color.Yellow_01 : Color.White;
+  const bgColor = Color.White;
 
   function handleDAOCardClicked() {
-    const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
-    navigate(`${daoTypePath}/${daoAccountId}`);
+    navigate(DEFAULT_DAO_OVERVIEW_PATH);
   }
 
   return (

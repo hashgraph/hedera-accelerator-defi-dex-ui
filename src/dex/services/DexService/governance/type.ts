@@ -41,7 +41,18 @@ interface ProposalDetailsResponse {
   state?: number;
 }
 
-export type ProposalData = MirrorNodeDecodedProposalEvent & ProposalDetailsResponse;
+interface RiskParamsData {
+  maxTradeBps: number;
+  maxSlippageBps: number;
+  tradeCooldownSec: number;
+}
+
+interface TraidingPairData {
+  tokenIn: string;
+  tokenOut: string;
+}
+
+export type ProposalData = MirrorNodeDecodedProposalEvent & ProposalDetailsResponse & RiskParamsData & TraidingPairData;
 
 export interface CanClaimDetails {
   canClaim: boolean;

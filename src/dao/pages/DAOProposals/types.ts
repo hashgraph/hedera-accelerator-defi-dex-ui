@@ -14,6 +14,10 @@ export enum DAOProposalType {
   Message = "Message",
   ContractUpgrade = "Upgrade DAO",
   Generic = "Generic",
+  DEXSettings = "DEX Settings",
+  HuffyRiskParametersProposal = "Set risk parameters",
+  HuffyAddTradingPairProposal = "Add a trading pair",
+  HuffyRemoveTradingPairProposal = "Remove a trading pair",
 }
 
 export interface CreateDAOProposalFormBase {
@@ -101,6 +105,20 @@ export interface CreateDAOGenericProposalForm extends CreateDAOProposalFormBase 
   encodedFunctionData: string;
 }
 
+export interface DexWhitelistPairInput {
+  tokenA: string;
+  tokenB: string;
+}
+
+export interface CreateDAODexSettingsForm extends CreateDAOProposalFormBase {
+  maxTradeBps: number | undefined;
+  maxSlippageBps: number | undefined;
+  tradeCooldownSec: number | undefined;
+  whitelistAdd: DexWhitelistPairInput[];
+  whitelistRemove: DexWhitelistPairInput[];
+  linkToDiscussion?: string;
+}
+
 export type CreateDAOProposalForm =
   | CreateDAOTextProposalForm
   | CreateDAOTokenTransferForm
@@ -108,7 +126,8 @@ export type CreateDAOProposalForm =
   | CreateDAOUpgradeThresholdForm
   | CreateDAOContractUpgradeForm
   | CreateDAOTokenAssociateForm
-  | CreateDAOGenericProposalForm;
+  | CreateDAOGenericProposalForm
+  | CreateDAODexSettingsForm;
 
 export type CreateDAOProposalContext = {
   daoType: string;

@@ -118,6 +118,7 @@ export type CreateDAOContext = {
   multisigDAOFeeConfig: DAOConfigDetails;
   ftDAOFeeConfig: DAOConfigDetails;
   nftDAOFeeConfig: DAOConfigDetails;
+  huffyDAOFeeConfig: DAOConfigDetails;
 };
 
 export type CreateADAOForm = CreateATokenDAOForm | CreateAMultiSigDAOForm | CreateANFTDAOForm;

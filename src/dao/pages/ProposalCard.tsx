@@ -3,11 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formatTokenAmountWithDecimal, getShortDescription, replaceLastRoute } from "@dex/utils";
 import { Card, Color, DefaultLogoIcon, HederaIcon, SendTokenIcon, Tag, TagVariant, Text } from "@shared/ui-kit";
 import { DAO, DAOType } from "@dao/services";
-import { ProposalStateAsTagVariant, ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";
 import { Proposal, ProposalType } from "@dao/hooks";
 import { Routes } from "@dao/routes";
-import { ProposalState } from "@dex/store";
 import { getProposalData } from "./utils";
 import { isFungible, isNFT } from "shared";
 
@@ -23,22 +21,14 @@ export const ProposalCard = (props: ProposalCardProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isMultiSig = dao.type === DAOType.MultiSig;
   const isGovernanceOrNFT = dao.type === DAOType.GovernanceToken || dao.type === DAOType.NFT;
   const timeRemaining = "";
   const votingEndTime = "";
   const { amount, token, transactionHash, proposalId } = proposal;
-  const getLabel = (proposal: Proposal) => {
-    if (proposal.proposalState === ProposalState.Canceled) {
-      return ProposalState.Canceled;
-    }
-    return proposal.status;
-  };
-
-  const tokenSymbol = token?.data.symbol;
+  const tokenSymbol = token?.data.symbol === "GOD" ? "HTK" : token?.data.symbol;
   const RightContent = () => (
     <Flex gap="4" alignItems="center">
-      {!isMultiSig && (
+      {
         <>
           {timeRemaining ? (
             <Text.P_Small_Regular color={Color.Neutral._400}>{`${timeRemaining} left`}</Text.P_Small_Regular>
@@ -52,16 +42,9 @@ export const ProposalCard = (props: ProposalCardProps) => {
             </>
           )}
         </>
-      )}
+      }
       {showTypeTag ? <Tag variant={TagVariant.Secondary} label={`${dao.type} DAO`} /> : <></>}
       <Tag variant={TagVariant.Primary} label={proposal.type} />
-      {isMultiSig && proposal.status ? (
-        <Tag variant={ProposalStatusAsTagVariant[proposal.status]} label={proposal.status} />
-      ) : proposal.proposalState ? (
-        <Tag variant={ProposalStateAsTagVariant[proposal.proposalState]} label={getLabel(proposal)} />
-      ) : (
-        <></>
-      )}
     </Flex>
   );
 
@@ -106,25 +89,6 @@ export const ProposalCard = (props: ProposalCardProps) => {
               <Text.P_Small_Regular color={Color.Grey_Blue._400} textAlign="start">
                 {proposal.link}
               </Text.P_Small_Regular>
-            )}
-            {isMultiSig && (
-              <>
-                {proposal.type === ProposalType.TokenTransfer && (
-                  <Flex alignItems="center">
-                    <HederaIcon />
-                    <SendTokenIcon boxSize={5} stroke={Color.Destructive._400} marginRight={1} marginLeft={2} />
-                    <Text.P_Medium_Regular color={Color.Neutral._900} textAlign="start">
-                      {isFungible(token?.data.type) &&
-                        `${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))} ${tokenSymbol}`}
-                      {isNFT(token?.data.type) &&
-                        ` ${tokenSymbol} ${formatTokenAmountWithDecimal(amount, Number(token?.data.decimals ?? 0))}`}
-                    </Text.P_Medium_Regular>
-                  </Flex>
-                )}
-                <Text.P_Small_Regular color={Color.Neutral._900} textAlign="start">
-                  {getProposalData(proposal)}
-                </Text.P_Small_Regular>
-              </>
             )}
             {isGovernanceOrNFT && (
               <>

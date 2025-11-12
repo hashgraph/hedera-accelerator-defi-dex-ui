@@ -1,25 +1,23 @@
 import { useMutation, useQueryClient } from "react-query";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { DAOMutations, DAOQueries } from "./types";
-import { DexService } from "@dex/services";
-import { useDexContext, HandleOnSuccess } from "@dex/hooks";
+import { HandleOnSuccess, useDexContext } from "@dex/hooks";
+import DAOService from "@dao/services";
 import { isNil } from "ramda";
 
-interface UseCreateDAOUpgradeProposal {
+export interface UseCreateHuffyRiskParametersProposalParams {
   governanceTokenId: string;
   governorContractId: string;
-  assetHolderEVMAddress: string;
   title: string;
   description: string;
-  linkToDiscussion: string;
-  newImplementationAddress: string;
-  oldProxyAddress: string;
-  proxyAdmin: string;
+  linkToDiscussion?: string;
+  calldata: string;
+  target: string;
   nftTokenSerialId: number;
   daoType: string;
 }
 
-export function useCreateDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
+export function useCreateHuffyRiskParametersProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const signer = wallet.getSigner();
@@ -27,11 +25,11 @@ export function useCreateDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
   return useMutation<
     TransactionResponse | undefined,
     Error,
-    UseCreateDAOUpgradeProposal,
-    DAOMutations.CreateDAOUpgradeProposal
+    UseCreateHuffyRiskParametersProposalParams,
+    DAOMutations.CreateHuffyRiskParametersProposal
   >(
-    async (params: UseCreateDAOUpgradeProposal) => {
-      return DexService.createUpgradeProxyProposal({ ...params, signer });
+    async (params: UseCreateHuffyRiskParametersProposalParams) => {
+      return await DAOService.sendHuffyRiskParametersProposal({ ...params, signer });
     },
     {
       onSuccess: (transactionResponse: TransactionResponse | undefined) => {

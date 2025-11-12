@@ -51,13 +51,20 @@ export function WizardFooter() {
       Back
     </Button>
   );
-
+  const selectedType = form.watch?.("type");
+  const disableNext = formState?.isSubmitting || (!selectedType && activeStep === 0);
   const RightFooterAction = isLastStep ? (
     <Button key="submit" type="submit" form={id} isDisabled={formState?.isSubmitting}>
       Submit
     </Button>
   ) : (
-    <Button type="button" key="next" onClick={handleNextClicked} rightIcon={<ChevronRightIcon w="2.5" h="2.5" />}>
+    <Button
+      type="button"
+      key="next"
+      onClick={handleNextClicked}
+      rightIcon={<ChevronRightIcon w="2.5" h="2.5" />}
+      isDisabled={disableNext}
+    >
       Next
     </Button>
   );

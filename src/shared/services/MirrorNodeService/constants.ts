@@ -12,6 +12,8 @@ import GovernorTransferToken from "../../../dex/services/abi/GovernorTransferTok
 import SystemRoleBasedAccess from "../../../dex/services/abi/SystemRoleBasedAccess.json";
 import Web3 from "web3";
 import { EventAbi } from "../../../dex/services/abi/types";
+import ParameterStoreJSON from "../../..//dao/config/abi/ParameterStore.json";
+import PairWhitelistJSON from "../../..//dao/config/abi/PairWhitelist.json";
 
 const web3 = new Web3();
 const abiSignatures = loadGovernorAbiEventSignatures();
@@ -31,6 +33,8 @@ function loadGovernorAbiEventSignatures() {
     ...HederaGovernor.abi,
     ...AssetHolder.abi,
     ...SystemRoleBasedAccess.abi,
+    ...ParameterStoreJSON.abi,
+    ...PairWhitelistJSON.abi,
   ];
   abis.forEach((abi: any) => {
     if (abi.type === "event") {

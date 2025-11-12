@@ -18,6 +18,9 @@ enum GovernanceProposalType {
   TRANSFER = 1002,
   SET_TEXT = 1003,
   UPGRADE_PROXY = 1007,
+  RiskParametersProposal = 2001,
+  AddTradingPairProposal = 2002,
+  RemoveTradingPairProposal = 2003,
 }
 
 /**

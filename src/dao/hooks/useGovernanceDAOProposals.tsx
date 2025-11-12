@@ -1,9 +1,9 @@
 import { useQuery } from "react-query";
 import {
-  DexService,
   DEX_TOKEN_PRECISION_VALUE,
-  MirrorNodeTokenById,
+  DexService,
   MirrorNodeDecodedProposalEvent,
+  MirrorNodeTokenById,
 } from "@dex/services";
 import { AllFilters, DAOQueries, Proposal, ProposalEvent, ProposalStatus, ProposalType, Votes } from "./types";
 import { isEmpty, isNil, isNotNil } from "ramda";
@@ -47,18 +47,50 @@ export function useGovernanceDAOProposals(
     return Number(BigNumber(voteNumber).shiftedBy(-precisionValue).toFixed(3));
   };
 
-  const getVotes = (
+  const getVotes = async (
     proposalData: MirrorNodeDecodedProposalEvent,
     godTokenData: MirrorNodeTokenById | null | undefined
-  ): Votes => {
-    const totalGodTokenSupply = godTokenData?.data?.total_supply;
+  ): Promise<Votes> => {
     const precisionValue = godTokenData?.data.decimals ? +godTokenData?.data.decimals : DEX_TOKEN_PRECISION_VALUE;
     const yes = convertVoteNumbers(proposalData.votingInformation?.forVotes, precisionValue);
     const no = convertVoteNumbers(proposalData.votingInformation?.againstVotes, precisionValue);
     const abstain = convertVoteNumbers(proposalData.votingInformation?.abstainVotes, precisionValue);
-    const max = !isNil(totalGodTokenSupply)
-      ? BigNumber(totalGodTokenSupply.toString()).shiftedBy(-precisionValue).toNumber()
-      : 0;
+
+    let max = 0;
+    try {
+      if (daoTokenId && proposalData.timestamp) {
+        const snapshotResp: any = await DexService.fetchTokenBalancesAt(daoTokenId, proposalData.timestamp);
+        const balances = snapshotResp?.data?.balances ?? snapshotResp?.balances ?? [];
+
+        const governorId = governorAddress ? solidityAddressToAccountIdString(governorAddress) : undefined;
+        const assetHolderId = assetHolderEVMAddress
+          ? solidityAddressToAccountIdString(assetHolderEVMAddress)
+          : undefined;
+        const blacklist = new Set([governorId, assetHolderId].filter(Boolean) as string[]);
+
+        const eligibleBalances = balances.filter((b: any) => {
+          const bal = new BigNumber((b?.balance ?? 0).toString());
+          const accountId = b?.account;
+          return bal.gt(0) && !blacklist.has(accountId);
+        });
+
+        const snapshotEligibleSupplyRaw = eligibleBalances.reduce(
+          (acc: BigNumber, b: any) => acc.plus(new BigNumber((b?.balance ?? 0).toString())),
+          new BigNumber(0)
+        );
+        max = snapshotEligibleSupplyRaw.shiftedBy(-precisionValue).toNumber();
+      }
+    } catch (e) {
+      /* empty */
+    }
+
+    if (!max) {
+      const totalGodTokenSupply = godTokenData?.data?.total_supply;
+      max = !isNil(totalGodTokenSupply)
+        ? BigNumber(totalGodTokenSupply.toString()).shiftedBy(-precisionValue).toNumber()
+        : 0;
+    }
+
     const totalVotes = yes + no + abstain;
     const remaining = max - totalVotes;
     const quorum = max
@@ -80,27 +112,23 @@ export function useGovernanceDAOProposals(
 
   const getFormattedProposalData = (proposalType: number, proposalData: ProposalData) => {
     switch (proposalType) {
-      case GovernanceProposalType.TRANSFER: {
+      case GovernanceProposalType.RiskParametersProposal: {
         return {
-          transferFromAccount: proposalData.transferFromAccount ?? "",
-          transferToAccount: proposalData.transferToAccount ?? "",
-          tokenToTransfer: proposalData.tokenToTransfer ?? "",
-          transferTokenAmount: proposalData.transferTokenAmount ?? 0,
+          maxTradeBps: proposalData.maxTradeBps ?? 0,
+          maxSlippageBps: proposalData.maxSlippageBps ?? 0,
+          tradeCooldownSec: proposalData.tradeCooldownSec ?? 0,
         };
       }
-      case GovernanceProposalType.ASSOCIATE: {
+      case GovernanceProposalType.AddTradingPairProposal: {
         return {
-          tokenAddress: proposalData.tokenAddress ?? "",
+          tokenIn: proposalData.tokenIn ?? "",
+          tokenOut: proposalData.tokenOut ?? "",
         };
       }
-      case GovernanceProposalType.UPGRADE_PROXY: {
+      case GovernanceProposalType.RemoveTradingPairProposal: {
         return {
-          proxy: proposalData?.proxy ?? "",
-          proxyAdmin: proposalData?.proxyAdmin ?? "",
-          proxyLogic: proposalData?.proxyLogic ?? "",
-          currentLogic: proposalData?.currentLogic ?? "",
-          isAdminApproved: proposalData?.isAdminApproved ?? false,
-          isAdminApprovalButtonVisible: proposalData?.isAdminApprovalButtonVisible ?? false,
+          tokenIn: proposalData.tokenIn ?? "",
+          tokenOut: proposalData.tokenOut ?? "",
         };
       }
       default:
@@ -110,17 +138,14 @@ export function useGovernanceDAOProposals(
 
   const getProposalType = (type: GovernanceProposalType) => {
     switch (Number(type)) {
-      case GovernanceProposalType.ASSOCIATE: {
-        return ProposalType.TokenAssociate;
+      case GovernanceProposalType.RiskParametersProposal: {
+        return ProposalType.RiskParametersProposal;
       }
-      case GovernanceProposalType.SET_TEXT: {
-        return ProposalType.TextProposal;
+      case GovernanceProposalType.AddTradingPairProposal: {
+        return ProposalType.AddTraidingPairProposal;
       }
-      case GovernanceProposalType.TRANSFER: {
-        return ProposalType.TokenTransfer;
-      }
-      case GovernanceProposalType.UPGRADE_PROXY: {
-        return ProposalType.UpgradeContract;
+      case GovernanceProposalType.RemoveTradingPairProposal: {
+        return ProposalType.RemoveTraidingPairProposal;
       }
       default: {
         return ProposalType.TokenTransfer;
@@ -131,12 +156,12 @@ export function useGovernanceDAOProposals(
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const currentWalletId = wallet?.savedPairingData?.accountIds[0] ?? "";
 
-  const convertDataToProposal = (
+  const convertDataToProposal = async (
     proposalData: ProposalData,
     index: number,
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
-  ): Proposal => {
+  ): Promise<Proposal> => {
     const proposalState = proposalData.state
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);
@@ -178,7 +203,7 @@ export function useGovernanceDAOProposals(
       link: proposalData.coreInformation.inputs.discussionLink,
       threshold: 0,
       contractEvmAddress: proposalData.contractId,
-      votes: getVotes(proposalData, godTokenData),
+      votes: await getVotes(proposalData, godTokenData),
       hasVoted,
       isQuorumReached: proposalData.votingInformation?.isQuorumReached,
       votingEndTime: endTime,
@@ -197,11 +222,11 @@ export function useGovernanceDAOProposals(
         return [];
       }
       const data = await Promise.all([
-        DexService.fetchGovernanceDAOLogs(governorAddress, assetHolderEVMAddress),
+        DexService.fetchGovernanceDAOLogs(governorAddress),
         DexService.fetchTokenData(daoTokenId),
       ]);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
-      const proposals = await Promise.all(
+      return await Promise.all(
         data[0].map(async (proposal, index) => {
           const tokenId = proposal.tokenToTransfer ?? "";
           let tokenData;
@@ -214,7 +239,6 @@ export function useGovernanceDAOProposals(
           return convertDataToProposal(proposal, index, data[1], tokenData);
         })
       );
-      return proposals;
     },
     {
       enabled: !!daoAccountId && !!governorAddress && !!daoTokenId && !!assetHolderEVMAddress,

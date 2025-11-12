@@ -1,116 +1,27 @@
-import { useOutletContext } from "react-router-dom";
-import { DAOType } from "@dao/services";
 import { Flex, useRadioGroup, Box } from "@chakra-ui/react";
-import { CreateDAOProposalContext, CreateDAOProposalForm, DAOProposalType } from "../types";
-import {
-  Text,
-  Color,
-  NewTokenIcon,
-  MemberIcon,
-  RadioCard,
-  TextProposalIcon,
-  TwoLayerSettingsIcon,
-  SettingsToolIcon,
-} from "@shared/ui-kit";
+import { CreateDAOProposalForm, DAOProposalType } from "../types";
+import { Text, Color, RadioCard, SettingsToolIcon } from "@shared/ui-kit";
 import { useFormContext } from "react-hook-form";
-import { getDAOType } from "../../utils";
 
-const MultiSigProposals = [
+const HuffyProposals = [
   {
-    title: DAOProposalType.Text,
-    label: "Create a text only proposal.",
-    icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.TokenTransfer,
-    label: "Propose a token transfer.",
-    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.TokenAssociate,
-    label: "Propose a token associate.",
-    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.UpgradeThreshold,
-    label: "Propose to upgrade the member threshold weight.",
-    icon: <TwoLayerSettingsIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.AddMember,
-    label: "Propose to add new member to the team.",
-    icon: <MemberIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.ReplaceMember,
-    label: "Propose to replace an existing team member with a new one.",
-    icon: <MemberIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.RemoveMember,
-    label: "Propose to remove a member from the team.",
-    icon: <MemberIcon boxSize="3.5" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.ContractUpgrade,
-    label: "Propose to upgrade to the latest version of the DAO's contract.",
+    title: DAOProposalType.HuffyRiskParametersProposal,
+    label: "Set risk parameters (Max trade size, Max allowed slippage, Minimum seconds between trades).",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
   {
-    title: DAOProposalType.Generic,
-    label: "Create a new generic proposal.",
+    title: DAOProposalType.HuffyAddTradingPairProposal,
+    label: "Add a trading pair (Provide the address of the input/output token).",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
-];
-
-const GovernanceProposals = [
   {
-    title: DAOProposalType.Text,
-    label: "Create a text only proposal.",
-    icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.TokenTransfer,
-    label: "Propose a token transfer.",
-    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.TokenAssociate,
-    label: "Propose a token associate.",
-    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.ContractUpgrade,
-    label: "Propose to upgrade to the latest version of the DAO's contract.",
-    icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-];
-
-const NFTProposals = [
-  {
-    title: DAOProposalType.Text,
-    label: "Create a text only proposal.",
-    icon: <TextProposalIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.TokenTransfer,
-    label: "Propose a token transfer.",
-    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.TokenAssociate,
-    label: "Propose a token associate.",
-    icon: <NewTokenIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
-  },
-  {
-    title: DAOProposalType.ContractUpgrade,
-    label: "Propose to upgrade to the latest version of the DAO's contract.",
+    title: DAOProposalType.HuffyRemoveTradingPairProposal,
+    label: "Remove a trading pair (Provide the address of the input/output token).",
     icon: <SettingsToolIcon boxSize="4" color={Color.Grey_Blue._500} marginTop="0.2rem" />,
   },
 ];
 
 export function DAOProposalTypeForm() {
-  const { daoType } = useOutletContext<CreateDAOProposalContext>();
   const { setValue, getValues } = useFormContext<CreateDAOProposalForm>();
   const { type } = getValues();
   const { getRootProps, getRadioProps } = useRadioGroup({
@@ -125,11 +36,7 @@ export function DAOProposalTypeForm() {
   }
 
   function getProposalsArray() {
-    const currentDAO = getDAOType(daoType);
-    if (currentDAO === DAOType.MultiSig) return MultiSigProposals;
-    if (currentDAO === DAOType.GovernanceToken) return GovernanceProposals;
-    if (currentDAO === DAOType.NFT) return NFTProposals;
-    return [];
+    return HuffyProposals;
   }
 
   return (

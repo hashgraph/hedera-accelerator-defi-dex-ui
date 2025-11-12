@@ -19,13 +19,7 @@ import {
   UseExecuteProposalParams,
   usePairedWalletDetails,
 } from "@dex/hooks";
-import {
-  GOVUpgradeProposalDetails,
-  Proposal,
-  ProposalStatus,
-  UseChangeAdminMutationResult,
-  useFetchContract,
-} from "@dao/hooks";
+import { Proposal, ProposalStatus, UseChangeAdminMutationResult, useFetchContract } from "@dao/hooks";
 import { useState } from "react";
 import { UseMutationResult } from "react-query";
 import { ProposalVoteModal } from "./ProposalVoteModal";
@@ -89,9 +83,8 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
   const contractIdQueryResults = useFetchContract(contractEvmAddress);
   const contractId = contractIdQueryResults.data?.data.contract_id ?? "";
   const isVotingDisabled = !proposal || isNaN(Number(votingPower)) || Number(votingPower) <= 0;
-  const isAdminApprovalButtonVisible =
-    (proposal?.data as GOVUpgradeProposalDetails)?.isAdminApprovalButtonVisible ?? false;
-  const isApproveAdminButtonDisabled = walletId !== (proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin;
+  const isAdminApprovalButtonVisible = (proposal?.data as any)?.isAdminApprovalButtonVisible ?? false;
+  const isApproveAdminButtonDisabled = walletId !== (proposal?.data as any)?.proxyAdmin;
   const isContractUpgradeProposal = proposal?.isContractUpgradeProposal;
 
   async function handleVoteButtonClicked(voteType: VoteType) {
@@ -156,10 +149,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 variant="primary"
                 isDisabled={isApproveAdminButtonDisabled}
                 onClick={() => {
-                  handleClickChangeAdminTransaction(
-                    contractUpgradeLogic,
-                    (proposal?.data as GOVUpgradeProposalDetails)?.proxy ?? ""
-                  );
+                  handleClickChangeAdminTransaction(contractUpgradeLogic, (proposal?.data as any)?.proxy ?? "");
                 }}
               >
                 Transfer Ownership
@@ -167,7 +157,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               <InlineAlert
                 type={InlineAlertType.Warning}
                 message={`Connect your wallet with 
-                ${(proposal?.data as GOVUpgradeProposalDetails)?.proxyAdmin} 
+                ${(proposal?.data as any)?.proxyAdmin} 
                 to approve the transfer of ownership to ${assetHolderContractId}`}
               />
             </Flex>
@@ -342,7 +332,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 <Text.P_Small_Semibold color={Color.Neutral._900}>{`${getVotesPercentage(yes).toFixed(
                   2
                 )}%`}</Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(yes)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Regular color={Color.Neutral._400}></Text.P_Small_Regular>
               </Flex>
             </Flex>
             <Flex direction="column">
@@ -354,7 +344,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 <Text.P_Small_Semibold color={Color.Neutral._900}>{`${getVotesPercentage(no).toFixed(
                   2
                 )}%`}</Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(no)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Regular color={Color.Neutral._400}></Text.P_Small_Regular>
               </Flex>
             </Flex>
             <Flex direction="column">
@@ -366,7 +356,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 <Text.P_Small_Semibold color={Color.Neutral._900}>
                   {`${getVotesPercentage(abstain).toFixed(2)}%`}
                 </Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(abstain)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Regular color={Color.Neutral._400}></Text.P_Small_Regular>
               </Flex>
             </Flex>
             <Flex direction="column">
@@ -378,7 +368,7 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
                 <Text.P_Small_Semibold color={Color.Neutral._900}>
                   {`${getVotesPercentage(remaining).toFixed(2)}%`}
                 </Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(remaining)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Regular color={Color.Neutral._400}></Text.P_Small_Regular>
               </Flex>
             </Flex>
           </SimpleGrid>

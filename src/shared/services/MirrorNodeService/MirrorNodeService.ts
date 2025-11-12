@@ -220,6 +220,25 @@ function createMirrorNodeService(
   };
 
   /**
+   * Fetches the list of token balances for a given token ID at or before a specific consensus timestamp.
+   * Useful for reconstructing the token totalSupply snapshot at proposal creation time.
+   * @param tokenId - The ID of the token to return balances for.
+   * @param timestamp - Consensus timestamp string (seconds[.nanoseconds]) or number; uses lte filter.
+   */
+  const fetchTokenBalancesAt = async (
+    tokenId: string,
+    timestamp: string | number
+  ): Promise<MirrorNodeBalanceResponse> => {
+    const ts = typeof timestamp === "number" ? String(timestamp) : timestamp;
+    return await nodeAPIs[params.network].get(`/api/v1/tokens/${tokenId}/balances`, {
+      params: {
+        order: "asc",
+        timestamp: `lte:${ts}`,
+      },
+    });
+  };
+
+  /**
    * Fetches the list of nfts associated with a token ID for a given account ID
    * @param tokenId - The ID of the token to return NFTs for.
    * @returns The list of NFTs for the given token ID.
@@ -377,6 +396,7 @@ function createMirrorNodeService(
     fetchTokenNFTs,
     fetchContractEVMAddress,
     fetchContractLogs,
+    fetchTokenBalancesAt,
   };
 }
 

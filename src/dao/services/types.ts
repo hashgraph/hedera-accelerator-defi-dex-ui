@@ -5,6 +5,7 @@ export enum DAOType {
   GovernanceToken = "Governance Token",
   MultiSig = "MultiSig",
   NFT = "NFT",
+  Huffy = "Huffy",
 }
 export interface DAOCreatedEventArgs {
   admin: string;
@@ -14,18 +15,6 @@ export interface DAOCreatedEventArgs {
   isPrivate: boolean;
   description: string;
   webLinks: string[];
-}
-
-export type MultiSigDAOCreatedEventInputs = DAOCreatedEventArgs & {
-  owners: string[];
-  threshold: BigNumber;
-};
-
-export interface DAOProposalGovernors {
-  contractUpgradeLogic: string;
-  createTokenLogic: string;
-  textLogic: string;
-  tokenTransferLogic: string;
 }
 
 export interface GovernanceDAOCreatedEventArgs {
@@ -39,25 +28,6 @@ export interface GovernanceDAOCreatedEventArgs {
     votingDelay: BigNumber;
     votingPeriod: BigNumber;
   };
-}
-
-export interface NFTDAOCreatedEventArgs {
-  daoAddress: string;
-  governorAddress: string;
-  assetsHolderAddress: string;
-  tokenHolderAddress: string;
-  inputs: DAOCreatedEventArgs & {
-    tokenAddress: string;
-    quorumThreshold: BigNumber;
-    votingDelay: BigNumber;
-    votingPeriod: BigNumber;
-  };
-}
-
-export interface MultiSigDAOCreatedEventArgs {
-  daoAddress: string;
-  safeAddress: string;
-  inputs: MultiSigDAOCreatedEventInputs;
 }
 
 export interface DAODetailsInfoEventArgs {
@@ -192,11 +162,6 @@ export type DAODetailsContext = {
   tokenBalances: TokenBalance[];
 };
 
-export enum GovernanceProposalOperationType {
-  TokenTransfer = 1,
-  TokenAssociation,
-  HBarTransfer,
-}
 export interface UpgradeContractDetails {
   type: number;
   proxy: string;
@@ -214,10 +179,25 @@ export interface TokenAssociateProposalDetails {
   tokenAddress: string;
 }
 
+export interface ParameterStoreDetails {
+  type: number;
+  maxTradeBps: number;
+  maxSlippageBps: number;
+  tradeCooldownSec: number;
+}
+
+export interface TraidingPairDetails {
+  type: number;
+  tokenIn: string;
+  tokenOut: string;
+}
+
 export type ProposalDataDetails =
   | UpgradeContractDetails
   | TokenTransferDetails
   | TokenAssociateProposalDetails
+  | ParameterStoreDetails
+  | TraidingPairDetails
   | undefined;
 
 export enum NFTDAOFunctions {

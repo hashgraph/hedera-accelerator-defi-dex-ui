@@ -15,7 +15,8 @@ interface GOVTokenDetailsProps {
 
 export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
   const { tokenSymbol, lockedGODToken, totalGODTokenBalance, availableGODTokenBalance } = props;
-  const toolTipString = `Pending amount of ${tokenSymbol} token unlocks until
+  const displaySymbol = tokenSymbol === "GOD" ? "HTK" : tokenSymbol;
+  const toolTipString = `Pending amount of ${displaySymbol} token unlocks until
     the in-progress proposals are either complete or canceled`;
   return (
     <Flex height="6rem" alignItems="center" justify="center" gap="2.5rem">
@@ -28,7 +29,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
         value={totalGODTokenBalance}
         valueStyle="p large semibold"
         valueTextColor={Color.Grey_Blue._800}
-        valueUnitSymbol={tokenSymbol}
+        valueUnitSymbol={displaySymbol}
         valueUnitSymbolColor={Color.Grey_Blue._900}
         amount="$--.--"
         amountLabelColor={Color.Neutral._700}
@@ -44,7 +45,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
         value={lockedGODToken}
         valueStyle="p medium medium"
         valueTextColor={Color.Grey_Blue._700}
-        valueUnitSymbol={tokenSymbol}
+        valueUnitSymbol={displaySymbol}
         valueUnitSymbolColor={Color.Grey_Blue._700}
         amount="$--.--"
         amountLabelColor={Color.Neutral._500}
@@ -58,7 +59,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
         value={availableGODTokenBalance}
         valueStyle="p medium medium"
         valueTextColor={Color.Grey_Blue._700}
-        valueUnitSymbol={tokenSymbol}
+        valueUnitSymbol={displaySymbol}
         valueUnitSymbolColor={Color.Grey_Blue._700}
         amount="$--.--"
         amountLabelColor={Color.Neutral._500}
@@ -74,7 +75,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
           value="200000.00"
           valueStyle="p large semibold"
           valueTextColor={Color.Grey_Blue._700}
-          valueUnitSymbol={tokenSymbol}
+          valueUnitSymbol={displaySymbol}
           valueUnitSymbolColor={Color.Grey_Blue._700}
           amount="$--.--"
           amountLabelColor={Color.Neutral._500}
