@@ -19,7 +19,7 @@ export type DexSettingsConfig = {
       maxTradeBps?: string;
       maxSlippageBps?: string;
       tradeCooldownSec?: string;
-      readAll?: string;
+      getRiskParameters?: string;
     };
     minMax?: {
       maxTradeBps?: DexMinMax;
@@ -42,7 +42,12 @@ export const SINGLE_DAO_DEX_SETTINGS: DexSettingsConfig = {
   parameterStore: {
     contractId: PARAMETER_STORE_CONTRACT_ID,
     abi: (ParameterStore as any).abi,
-    methods: { maxTradeBps: "maxTradeBps", maxSlippageBps: "maxSlippageBps", tradeCooldownSec: "tradeCooldownSec" },
+    methods: {
+      maxTradeBps: "maxTradeBps",
+      maxSlippageBps: "maxSlippageBps",
+      tradeCooldownSec: "tradeCooldownSec",
+      getRiskParameters: "getRiskParameters",
+    },
     minMax: {
       maxTradeBps: { min: 0, max: 10000 },
       maxSlippageBps: { min: 0, max: 10000 },
@@ -52,6 +57,10 @@ export const SINGLE_DAO_DEX_SETTINGS: DexSettingsConfig = {
   pairWhitelist: {
     contractId: PAIR_WHITELIST_CONTRACT_ID,
     abi: (PairWhitelist as any).abi,
-    methods: { getPairs: "getAllWhitelistedPairs", removePair: "removePair", addPair: "addPair" },
+    methods: {
+      getPairs: "getAllWhitelistedPairs",
+      removePair: "removePair",
+      addPair: "addPair",
+    },
   },
 };

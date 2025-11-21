@@ -27,34 +27,19 @@ function useParamStoreValues() {
         let maxTradeBps: number | undefined;
         let maxSlippageBps: number | undefined;
         let tradeCooldownSec: number | undefined;
+
         try {
-          if (cfg.methods?.maxTradeBps) {
-            const v = await contract[cfg.methods.maxTradeBps]();
-            maxTradeBps = Number(v.toString());
-          }
+          maxTradeBps = Number(await contract[cfg.methods!.maxTradeBps!]().toString());
+          maxSlippageBps = Number(await contract[cfg.methods!.maxSlippageBps!]().toString());
+          tradeCooldownSec = Number(await contract[cfg.methods!.tradeCooldownSec!]().toString());
         } catch {
-          /* empty */
+          console.error("Failed to read maxTradeBps, maxSlippageBps or tradeCooldownSec from ParameterStore");
         }
-        try {
-          if (cfg.methods?.maxSlippageBps) {
-            const v = await contract[cfg.methods.maxSlippageBps]();
-            maxSlippageBps = Number(v.toString());
-          }
-        } catch {
-          /* empty */
-        }
-        try {
-          if (cfg.methods?.tradeCooldownSec) {
-            const v = await contract[cfg.methods.tradeCooldownSec]();
-            tradeCooldownSec = Number(v.toString());
-          }
-        } catch {
-          /* empty */
-        }
+
         if (!maxTradeBps && !maxSlippageBps && !tradeCooldownSec) {
           try {
-            const readAllMethod = cfg.methods?.readAll || "getRiskParameters";
-            const tuple = await contract[readAllMethod]();
+            const readAllMethod = cfg.methods?.getRiskParameters;
+            const tuple = await contract[readAllMethod!]();
             if (Array.isArray(tuple) && tuple.length >= 3) {
               maxTradeBps = Number(tuple[0].toString());
               maxSlippageBps = Number(tuple[1].toString());

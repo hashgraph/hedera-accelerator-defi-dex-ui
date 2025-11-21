@@ -1,12 +1,12 @@
 import { BigNumber } from "bignumber.js";
 import {
-  TokenId,
   AccountId,
   ContractExecuteTransaction,
   ContractFunctionParameters,
+  ContractId,
+  TokenId,
   TransactionResponse,
 } from "@hashgraph/sdk";
-import { ContractId } from "@hashgraph/sdk";
 import { Contracts, GovernanceTokenId } from "../constants";
 import { GovernorContractFunctions } from "./types";
 import { HashConnectSigner } from "hashconnect/dist/signer";
@@ -30,11 +30,6 @@ interface CastVoteParams {
   signer: HashConnectSigner;
 }
 
-/**
- * TODO
- * @param params -
- * @returns
- */
 const castVote = async (params: CastVoteParams) => {
   const { contractId, proposalId, voteType, signer } = params;
   const governorContractId = ContractId.fromString(contractId);
@@ -56,11 +51,6 @@ interface CancelProposalParams {
   signer: HashConnectSigner;
 }
 
-/**
- * TODO
- * @param params -
- * @returns
- */
 const cancelProposal = async (params: CancelProposalParams) => {
   const { contractId, proposal, signer } = params;
   const governorContractId = ContractId.fromString(contractId);
@@ -92,11 +82,6 @@ interface CreateTransferTokenProposalParams {
   signer: HashConnectSigner;
 }
 
-/**
- * TODO
- * @param params -
- * @returns
- */
 const sendCreateTransferTokenProposalTransaction = async (
   params: CreateTransferTokenProposalParams
 ): Promise<TransactionResponse> => {
@@ -137,8 +122,7 @@ const sendCreateTransferTokenProposalTransaction = async (
     .setFunction(GovernorContractFunctions.CreateProposal, contractCallParams)
     .setGas(9000000)
     .freezeWithSigner(signer);
-  const proposalTransactionResponse = await createProposalTransaction.executeWithSigner(signer);
-  return proposalTransactionResponse;
+  return await createProposalTransaction.executeWithSigner(signer);
 };
 
 interface CreateContractUpgradeProposalParams {
@@ -151,11 +135,6 @@ interface CreateContractUpgradeProposalParams {
   signer: HashConnectSigner;
 }
 
-/**
- * TODO
- * @param params -
- * @returns
- */
 const sendCreateContractUpgradeProposalTransaction = async (
   params: CreateContractUpgradeProposalParams
 ): Promise<TransactionResponse> => {
@@ -199,12 +178,7 @@ interface CreateTextProposalParams {
   nftTokenSerialId: number;
   signer: HashConnectSigner;
 }
-/**
- * TODO
- * @param description -
- * @param signer -
- * @returns
- */
+
 const sendCreateTextProposalTransaction = async (params: CreateTextProposalParams): Promise<TransactionResponse> => {
   const { title, linkToDiscussion, description, nftTokenSerialId, signer } = params;
   const textProposalContractId = ContractId.fromString(Contracts.Governor.TextProposal.ProxyId);
@@ -245,15 +219,10 @@ interface ExecuteProposalParams {
   tokenAmount?: number;
 }
 
-/**
- * TODO
- * @param params -
- * @returns
- */
 const executeProposal = async (params: ExecuteProposalParams) => {
   const { contractId, proposal, signer, transfersFromAccount, tokenId, tokenAmount } = params;
   const governorContractId = ContractId.fromString(contractId);
-  /** This parameter is named 'description' on the contract function */
+
   const contractFunctionParameters = new ContractFunctionParameters()
     .addAddressArray(proposal.coreInformation?.inputs?.targets ?? [])
     .addUint256Array(proposal.coreInformation?.inputs?._values?.map((value) => Number(value)) ?? [])
@@ -274,7 +243,7 @@ const executeProposal = async (params: ExecuteProposalParams) => {
   const executeProposalTransaction = await new ContractExecuteTransaction()
     .setContractId(governorContractId)
     .setFunction(GovernorContractFunctions.Execute, contractFunctionParameters)
-    .setGas(1000000)
+    .setGas(9000000)
     .freezeWithSigner(signer);
   const executeTransactionResponse = await executeProposalTransaction.executeWithSigner(signer);
   checkTransactionResponseForError(executeTransactionResponse, GovernorContractFunctions.Execute);

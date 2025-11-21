@@ -117,8 +117,12 @@ export function TokenDAOVotingForm() {
             placeholder: "Enter amount",
             unit:
               governance?.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance?.newToken?.symbol ?? ""
-                : governance?.existingToken?.symbol ?? "",
+                ? governance?.newToken?.symbol == "GOD"
+                  ? "HTK"
+                  : governance.newToken.symbol ?? ""
+                : governance?.existingToken?.symbol == "GOD"
+                ? "HTK"
+                : governance.existingToken.symbol ?? "",
             isTooltipVisible: true,
             tooltipLabel: DAOToolTips.minimumDeposit,
           }}

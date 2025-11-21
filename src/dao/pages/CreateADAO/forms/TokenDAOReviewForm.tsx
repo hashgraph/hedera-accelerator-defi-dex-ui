@@ -151,8 +151,12 @@ export function TokenDAOReviewForm() {
             type: "number",
             unit:
               governance?.tokenType === DAOGovernanceTokenType.NewToken
-                ? governance?.newToken?.symbol ?? ""
-                : governance?.existingToken?.symbol ?? "",
+                ? governance?.newToken?.symbol == "GOD"
+                  ? "HTK"
+                  : governance.newToken.symbol ?? ""
+                : governance?.existingToken?.symbol == "GOD"
+                ? "HTK"
+                : governance.existingToken.symbol ?? "",
             value: "1",
             isReadOnly: true,
           }}

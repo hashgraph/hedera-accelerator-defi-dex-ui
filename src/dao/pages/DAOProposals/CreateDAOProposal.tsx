@@ -317,7 +317,7 @@ export function CreateDAOProposal() {
         }
         if (currentMaxTrade === undefined || currentMaxSlippage === undefined || currentCooldown === undefined) {
           try {
-            const readAllMethod = psCfg.methods?.readAll;
+            const readAllMethod = psCfg.methods?.getRiskParameters;
             const tuple = await readContract[readAllMethod!]();
             if (Array.isArray(tuple) && tuple?.length >= 3) {
               currentMaxTrade = Number(tuple[0].toString());

@@ -127,7 +127,7 @@ export function AssetsList() {
                 <Divider />
                 <Flex direction="row" justifyContent="space-between">
                   <Box>
-                    <MetricLabel label="BALANCE" value={`${balance} ${symbol}`} />
+                    <MetricLabel label="BALANCE" value={`${balance} ${symbol == "GOD" ? "HTK" : symbol}`} />
                   </Box>
                 </Flex>
               </Flex>

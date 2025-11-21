@@ -56,13 +56,13 @@ export const VotingPower = (props: VotingPowerProps) => {
         value={tokenData.locked}
         valueTextColor={Color.Primary._600}
         valueStyle="h3 medium"
-        valueUnitSymbol={tokenData.symbol}
+        valueUnitSymbol={tokenData.symbol == "GOD" ? "HTK" : tokenData.symbol ?? ""}
         amount="$--.--"
       />
       <Spacer />
       <HStack padding="0.5rem 1.5rem" gap="2.5rem" justify="right" borderRadius="0.5rem" background={Color.Neutral._50}>
         <GOVTokenDetails
-          tokenSymbol={tokenData.symbol ?? ""}
+          tokenSymbol={tokenData.symbol == "GOD" ? "HTK" : tokenData.symbol ?? ""}
           lockedGODToken={tokenData.locked}
           totalGODTokenBalance={tokenData.total}
           availableGODTokenBalance={tokenData.available}
@@ -71,7 +71,7 @@ export const VotingPower = (props: VotingPowerProps) => {
         />
         {doesUserHaveGOVTokensToLockAndUnlock ? (
           <ManageVotingPower
-            tokenSymbol={tokenData.symbol ?? ""}
+            tokenSymbol={tokenData.symbol == "GOD" ? "HTK" : tokenData.symbol ?? ""}
             tokenNFTs={tokenNFTs}
             isLoading={isFormLoading}
             canUserClaimGODTokens={canUserClaimGODTokens}
