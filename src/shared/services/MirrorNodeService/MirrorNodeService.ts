@@ -376,6 +376,22 @@ function createMirrorNodeService(
     return ContractId.fromString(response.data.contract_id);
   };
 
+  /**
+   * Checks if an account is associated with a specific token.
+   * @param accountId - The ID of the account to check.
+   * @param tokenId - The ID of the token to check association for.
+   * @returns True if the account is associated with the token, false otherwise.
+   */
+  const isAccountAssociatedWithToken = async (accountId: string, tokenId: string): Promise<boolean> => {
+    try {
+      const tokens = await fetchTokensBalance(accountId);
+      return tokens.some((token) => token.token_id === tokenId);
+    } catch (error) {
+      // If account doesn't exist or has no tokens, it's not associated
+      return false;
+    }
+  };
+
   return {
     fetchAccountTransactions,
     fetchTokenBalances,
@@ -399,6 +415,7 @@ function createMirrorNodeService(
     fetchAccountEVMAddress,
     fetchAccountIdFromEVMAddress,
     fetchContractLogs,
+    isAccountAssociatedWithToken,
   };
 }
 

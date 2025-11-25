@@ -15,7 +15,7 @@ import { useFormContext } from "react-hook-form";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { CreateDAOTokenTransferForm, CreateDAOProposalContext, DAOProposalType } from "../types";
 import { isValidUrl } from "@dex/utils";
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useAccountTokenBalances, useTabFilters, useTokenNFTs } from "@dex/hooks";
 import { Routes } from "@dao/routes";
 import { TokenType } from "@hashgraph/sdk";
@@ -23,6 +23,7 @@ import { useGetBlockedTokenBalance } from "@dao/hooks";
 import { DAOFormContainer } from "@dao/pages/CreateADAO/forms/DAOFormContainer";
 import { DepositTokenModalTabs } from "@dao/pages/MultiSigDAODashboard/types";
 import { isNFT } from "shared";
+import { DexService } from "@dex/services";
 
 export interface TokenTransferLocationState {
   state: {
@@ -47,6 +48,10 @@ export function DAOTokenTransferDetailsForm() {
   const { data: tokens = [] } = tokensQueryResults;
   const { data: blockedNFTs } = useGetBlockedTokenBalance(safeAccountId, governanceTokenId);
   const { tabIndex, handleTabChange } = useTabFilters(isNFT(state?.tokenType) ? 1 : 0);
+
+  // Token association check state
+  const [isCheckingAssociation, setIsCheckingAssociation] = useState(false);
+  const [associationWarning, setAssociationWarning] = useState<string | null>(null);
 
   const changeTab = (tabIndex: number) => {
     handleTabChange(tabIndex);
@@ -77,7 +82,55 @@ export function DAOTokenTransferDetailsForm() {
       ? tokenNFTs?.filter((nft) => !(blockedNFTs as number[])?.find((block) => Number(block) === nft.serial_number))
       : tokenNFTs;
 
-  watch(["tokenId", "tokenType"]);
+  watch(["tokenId", "tokenType", "recipientAccountId"]);
+
+  // Check token association when recipient or token changes
+  useEffect(() => {
+    const checkTokenAssociation = async () => {
+      const recipientAccountId = getValues("recipientAccountId");
+      const selectedTokenId = getValues("tokenId");
+
+      // Reset warning and skip if fields are empty or not valid
+      if (!recipientAccountId || !selectedTokenId || recipientAccountId.trim() === "") {
+        setAssociationWarning(null);
+        return;
+      }
+
+      // Skip check if recipient is the same as the safe (DAO account)
+      if (recipientAccountId === safeAccountId) {
+        setAssociationWarning(null);
+        return;
+      }
+
+      try {
+        setIsCheckingAssociation(true);
+        const isAssociated = await DexService.isAccountAssociatedWithToken(recipientAccountId, selectedTokenId);
+
+        if (!isAssociated) {
+          const tokenName = tokens.find((t) => t.tokenId === selectedTokenId)?.name || selectedTokenId;
+          setAssociationWarning(
+            `Warning: The recipient account ${recipientAccountId} is not associated with the token ${tokenName}. ` +
+              `The transfer will fail unless the recipient associates with this token first. ` +
+              `They can associate via HashPack or any Hedera wallet.`
+          );
+        } else {
+          setAssociationWarning(null);
+        }
+      } catch (error) {
+        // If there's an error checking (e.g., invalid account ID), show a generic warning
+        setAssociationWarning(
+          `Could not verify token association for recipient account. ` +
+            `Please ensure the account ID is valid and the recipient is associated with the token.`
+        );
+      } finally {
+        setIsCheckingAssociation(false);
+      }
+    };
+
+    // Debounce the check slightly to avoid excessive API calls while typing
+    const timeoutId = setTimeout(checkTokenAssociation, 500);
+    return () => clearTimeout(timeoutId);
+  }, [getValues, safeAccountId, tokens]);
 
   return (
     <Flex direction="column" gap="4" width="100%">
@@ -166,6 +219,12 @@ export function DAOTokenTransferDetailsForm() {
           isInvalid={Boolean(errors?.recipientAccountId)}
           errorMessage={errors?.recipientAccountId && errors?.recipientAccountId?.message}
         />
+        {isCheckingAssociation && (
+          <InlineAlert type={InlineAlertType.Info} message="Checking token association for recipient account..." />
+        )}
+        {associationWarning && !isCheckingAssociation && (
+          <InlineAlert type={InlineAlertType.Warning} message={associationWarning} />
+        )}
         {tabIndex === DepositTokenModalTabs.Fungible && (
           <FormTokenInput
             amountFormId="amount"

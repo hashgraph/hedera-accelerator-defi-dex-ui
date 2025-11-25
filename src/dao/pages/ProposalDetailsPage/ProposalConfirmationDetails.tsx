@@ -90,6 +90,7 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
   // For accurate check, we'd need to query the Safe contract directly,
   // but for now we can check if the user has already voted or is in the approvers list
   const [showOwnerWarning, setShowOwnerWarning] = React.useState(false);
+  const [showTokenAssociationError, setShowTokenAssociationError] = React.useState(false);
 
   // Watch for GS030 errors from the mutation
   React.useEffect(() => {
@@ -100,6 +101,22 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
       }
     }
   }, [approveProposalMutation.isError, approveProposalMutation.error]);
+
+  // Watch for token association errors during execution
+  React.useEffect(() => {
+    if (executeProposalMutation.isError && executeProposalMutation.error) {
+      const errorMessage = (executeProposalMutation.error as Error).message.toLowerCase();
+      // Check for various token association error patterns
+      if (
+        errorMessage.includes("token not associated") ||
+        errorMessage.includes("not associated with") ||
+        errorMessage.includes("call reverted without message") ||
+        errorMessage.includes("token_not_associated_to_account")
+      ) {
+        setShowTokenAssociationError(true);
+      }
+    }
+  }, [executeProposalMutation.isError, executeProposalMutation.error]);
 
   // Check Safe owners on mount for debugging
   React.useEffect(() => {
@@ -242,6 +259,16 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
         >
           Execute
         </Button>
+        {showTokenAssociationError && (
+          <InlineAlert
+            type={InlineAlertType.Error}
+            message={
+              `The transaction failed because the recipient account is not associated with the token. ` +
+              `The recipient must first associate with the token using their Hedera wallet (like HashPack) ` +
+              `before they can receive it. Once associated, you can execute the proposal again.`
+            }
+          />
+        )}
       </Flex>
     ),
     [ProposalStatus.Success]: <></>,
