@@ -22,11 +22,14 @@ export function useManageNFTVotingPower(governanceTokenId: string, tokenHolderAd
   const lockGODTokenSubmit = useLockNFTToken(walletId, tokenHolderAddress, handleLockedGODTokenSuccess);
   const unLockGODTokenSubmit = useUnlockNFTToken(walletId, tokenHolderAddress, handleUnLockedGODTokenSuccess);
 
-  const totalGodToken = (Number(lockedNFTToken.data) ? 1 : 0) + (govTokenBalance?.data ?? 0);
+  // For NFTs, use tokenNFTs.length instead of govTokenBalance since NFT balance
+  // is represented by the number of NFTs owned, not a balance field
+  const availableNFTCount = tokenNFTs.length;
+  const totalGodToken = (Number(lockedNFTToken.data) ? 1 : 0) + availableNFTCount;
   const tokenData = {
     symbol: token?.data.symbol,
     locked: isWalletConnected ? `${Number(lockedNFTToken.data) ? 1 : 0}` : "-",
-    available: isWalletConnected ? `${govTokenBalance.data ?? 0}` : "-",
+    available: isWalletConnected ? `${availableNFTCount}` : "-",
     total: isWalletConnected ? `${totalGodToken}` : "-",
   };
   const lockedNFTSerialId = lockedNFTToken.data;
