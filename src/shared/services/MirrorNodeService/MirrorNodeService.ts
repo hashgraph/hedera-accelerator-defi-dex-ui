@@ -16,7 +16,7 @@ import {
 } from "./types";
 import { ethers } from "ethers";
 import { LogDescription } from "ethers/lib/utils";
-import { ContractId } from "@hashgraph/sdk";
+import { AccountId, ContractId } from "@hashgraph/sdk";
 import { abiSignatures } from "./constants";
 import { decodeLog } from "./utils";
 import { Gas, GasPrice } from "@dex/services";
@@ -121,6 +121,26 @@ function createMirrorNodeService(
   const fetchContractEVMAddress = async (pairAddress: string): Promise<string> => {
     const response = await nodeAPIs[params.network].get(`/api/v1/contracts/${pairAddress}`);
     return response.data.evm_address;
+  };
+
+  const fetchAccountEVMAddress = async (accountId: string): Promise<string> => {
+    const response = await nodeAPIs[params.network].get(`/api/v1/accounts/${accountId}`);
+    return response.data.evm_address;
+  };
+
+  const fetchAccountIdFromEVMAddress = async (evmAddress: string): Promise<string> => {
+    try {
+      const response = await nodeAPIs[params.network].get(`/api/v1/accounts/${evmAddress}`);
+      return response.data.account;
+    } catch (error) {
+      // If it's a short-form address, try converting directly
+      try {
+        return AccountId.fromSolidityAddress(evmAddress).toString();
+      } catch {
+        // If both fail, return the EVM address as-is
+        return evmAddress;
+      }
+    }
   };
 
   /**
@@ -376,6 +396,8 @@ function createMirrorNodeService(
     fetchUpgradeContractEvents,
     fetchTokenNFTs,
     fetchContractEVMAddress,
+    fetchAccountEVMAddress,
+    fetchAccountIdFromEVMAddress,
     fetchContractLogs,
   };
 }

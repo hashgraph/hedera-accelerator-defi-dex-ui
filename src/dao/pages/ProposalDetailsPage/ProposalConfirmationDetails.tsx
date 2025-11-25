@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Flex, Button } from "@chakra-ui/react";
 import {
   Text,
@@ -84,6 +85,38 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
   const isApproveAdminButtonVisible = isContractUpgradeProposal && approvalCount >= threshold;
   const isApproveAdminButtonDisabled = connectedWalletId !== proxyAdmin;
 
+  // Check if connected wallet is an owner of the Safe
+  // Note: In MultiSig DAO, owners are stored in the proposal's context
+  // For accurate check, we'd need to query the Safe contract directly,
+  // but for now we can check if the user has already voted or is in the approvers list
+  const [showOwnerWarning, setShowOwnerWarning] = React.useState(false);
+
+  // Watch for GS030 errors from the mutation
+  React.useEffect(() => {
+    if (approveProposalMutation.isError && approveProposalMutation.error) {
+      const errorMessage = (approveProposalMutation.error as Error).message;
+      if (errorMessage?.includes("GS030") || errorMessage?.includes("not an owner")) {
+        setShowOwnerWarning(true);
+      }
+    }
+  }, [approveProposalMutation.isError, approveProposalMutation.error]);
+
+  // Check Safe owners on mount for debugging
+  React.useEffect(() => {
+    async function checkActualOwners() {
+      if (!safeEVMAddress || process.env.NODE_ENV !== "development") return;
+
+      try {
+        const { checkSafeOwners } = await import("@shared/utils/checkSafeOwners");
+        await checkSafeOwners(safeEVMAddress, "testnet");
+      } catch (error) {
+        console.error("[DEBUG] Failed to check Safe owners:", error);
+      }
+    }
+
+    checkActualOwners();
+  }, [safeEVMAddress]);
+
   /*
    * TODO: Added loading modals and states for proposal approval and execution.
    * const { isLoading: isProposalBeingApproved, isError: hasProposalApprovalFailed } = approveTransactionMutation;
@@ -91,7 +124,16 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
    */
 
   async function handleClickConfirmProposal(safeId: string, transactionHash: string) {
-    approveProposalMutation.mutate({ safeId, transactionHash });
+    console.log("[UI] Confirming proposal with Safe ID:", safeId);
+    console.log("[UI] Connected wallet:", connectedWalletId);
+    try {
+      approveProposalMutation.mutate({ safeId, transactionHash });
+    } catch (error: any) {
+      console.error("[UI] Error confirming proposal:", error);
+      if (error.message?.includes("GS030")) {
+        setShowOwnerWarning(true);
+      }
+    }
   }
 
   interface HandleClickExecuteTransactionParams {
@@ -148,9 +190,21 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
         Confirmed by you
       </Button>
     ) : (
-      <Button variant="primary" onClick={() => handleClickConfirmProposal(safeAccountId, transactionHash)}>
-        Confirm
-      </Button>
+      <Flex direction="column" gap="1rem">
+        <Button variant="primary" onClick={() => handleClickConfirmProposal(safeAccountId, transactionHash)}>
+          Confirm
+        </Button>
+        {showOwnerWarning && (
+          <InlineAlert
+            type={InlineAlertType.Error}
+            message={
+              `Only Safe owners can approve proposals. ` +
+              `The account ${connectedWalletId} is not an owner of Safe ${safeAccountId}. ` +
+              `Please connect with an owner account.`
+            }
+          />
+        )}
+      </Flex>
     ),
     [ProposalStatus.Queued]: (
       <Flex direction="column" gap="1rem">
@@ -201,6 +255,15 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
           <Text.H4_Medium>Confirmation details</Text.H4_Medium>
           <Tag variant={ProposalStatusAsTagVariant[status]} />
         </Flex>
+        {/* Debug info: Show connected account */}
+        {process.env.NODE_ENV === "development" && (
+          <Box p="2" bg={Color.Grey_Blue._50} borderRadius="4px" fontSize="xs">
+            <Text.P_Small_Semibold>Debug Info:</Text.P_Small_Semibold>
+            <Text.P_Small_Regular>Connected: {connectedWalletId}</Text.P_Small_Regular>
+            <Text.P_Small_Regular>Safe: {safeAccountId}</Text.P_Small_Regular>
+            <Text.P_Small_Regular>Members: {memberCount}</Text.P_Small_Regular>
+          </Box>
+        )}
         <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
           <Flex direction="row" alignItems="center" gap="4">
             <ProgressBar

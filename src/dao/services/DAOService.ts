@@ -104,7 +104,17 @@ async function fetchMultiSigDAOs(eventTypes?: string[]): Promise<MultiSigDAODeta
         isPrivate,
         webLinks: updatedDAODetails?.webLinks ?? webLinks,
         safeEVMAddress,
-        ownerIds: owners.map((owner) => solidityAddressToAccountIdString(owner)),
+        ownerIds: await Promise.all(
+          owners.map(async (owner) => {
+            // Try to convert EVM address to account ID
+            // Works for both short-form and long-form addresses
+            try {
+              return await DexService.fetchAccountIdFromEVMAddress(owner);
+            } catch {
+              return solidityAddressToAccountIdString(owner);
+            }
+          })
+        ),
         threshold,
         infoUrl: updatedDAODetails?.infoUrl ?? infoUrl,
       };
@@ -743,17 +753,45 @@ export async function sendApproveMultiSigTransaction(
   transactionHash: string,
   signer: HashConnectSigner
 ) {
+  const signerAccountId = signer.getAccountId().toString();
+  console.log("[DEBUG] ========================================");
+  console.log("[DEBUG] Attempting to approve proposal:");
+  console.log("[DEBUG]   Safe ID passed in:", safeId);
+  console.log("[DEBUG]   Transaction Hash:", transactionHash);
+  console.log("[DEBUG]   Signer Account:", signerAccountId);
+  console.log("[DEBUG] ========================================");
+
   const safeContractId = await DexService.fetchContractId(safeId);
+  console.log("[DEBUG] Safe Contract ID resolved:", safeContractId.toString());
+  console.log("[DEBUG] These should match: safeId=" + safeId + " vs contractId=" + safeContractId.toString());
+
   const utf8BytesTransactionHash = convertToByte32(transactionHash);
   const contractFunctionParameters = new ContractFunctionParameters().addBytes32(utf8BytesTransactionHash);
-  const approveMultiSigTransaction = await new ContractExecuteTransaction()
-    .setContractId(safeContractId)
-    .setFunction(HederaGnosisSafeFunctions.ApproveHash, contractFunctionParameters)
-    .setGas(Gas)
-    .freezeWithSigner(signer);
-  const approveMultiSigTransactionResponse = await approveMultiSigTransaction.executeWithSigner(signer);
-  checkTransactionResponseForError(approveMultiSigTransactionResponse, HederaGnosisSafeFunctions.ApproveHash);
-  return approveMultiSigTransactionResponse;
+
+  try {
+    const approveMultiSigTransaction = await new ContractExecuteTransaction()
+      .setContractId(safeContractId)
+      .setFunction(HederaGnosisSafeFunctions.ApproveHash, contractFunctionParameters)
+      .setGas(Gas)
+      .freezeWithSigner(signer);
+    const approveMultiSigTransactionResponse = await approveMultiSigTransaction.executeWithSigner(signer);
+    checkTransactionResponseForError(approveMultiSigTransactionResponse, HederaGnosisSafeFunctions.ApproveHash);
+    return approveMultiSigTransactionResponse;
+  } catch (error: any) {
+    if (error.message?.includes("GS030") || error.message?.includes("CONTRACT_REVERT_EXECUTED")) {
+      console.error("[ERROR] GS030: Only owners can approve. Details:", {
+        safeContractId: safeContractId.toString(),
+        signerAccountId,
+        errorMessage: error.message,
+      });
+      throw new Error(
+        `GS030 Error: Only owners of the Safe can approve proposals. ` +
+          `The account ${signerAccountId} is not an owner of Safe ${safeContractId.toString()}. ` +
+          `Please connect with an owner account to approve this proposal.`
+      );
+    }
+    throw error;
+  }
 }
 
 export async function sendChangeAdminForProposalTransaction(
