@@ -164,11 +164,14 @@ function createHederaService() {
       .addTokenTransfer(Tokens.TokenBAccountId, treasuryId, -tokenQuantity)
       .addTokenTransfer(Tokens.TokenBAccountId, targetAccountId, tokenQuantity)
       .addTokenTransfer(Tokens.TokenCAccountId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(Tokens.TokenCAccountId, targetAccountId, tokenQuantity)
-      .freezeWith(client);
+      .addTokenTransfer(Tokens.TokenCAccountId, targetAccountId, tokenQuantity);
 
-    const signTx = await transaction.sign(treasuryKey);
-    const txResponse = await signTx.execute(client);
+    // Sign with treasury key first (server-side)
+    const treasurySignedTx = await transaction.sign(treasuryKey);
+
+    // Then freeze and sign with user's wallet (HashConnect)
+    const freezeTx = await treasurySignedTx.freezeWithSigner(signer);
+    const txResponse = await freezeTx.executeWithSigner(signer);
     return txResponse;
   };
 
