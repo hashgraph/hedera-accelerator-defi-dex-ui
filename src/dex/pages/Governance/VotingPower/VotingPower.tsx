@@ -111,7 +111,7 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
               onClick={() => {
                 const protocol = window.location.protocol;
                 const port = window.location.port ? `:${window.location.port}` : "";
-                window.location.href = `${protocol}//defi-ui.localhost${port}/swap`;
+                window.open(`${protocol}//defi-ui.localhost${port}/swap`, "_blank");
               }}
             >
               <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>

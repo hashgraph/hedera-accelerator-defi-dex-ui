@@ -82,7 +82,13 @@ export const VotingPower = (props: VotingPowerProps) => {
             onUnlockClick={handleClickUnLockGodTokenButton}
           />
         ) : isWalletConnected ? (
-          <Button key="swap" variant="secondary" width="6.5rem" leftIcon={<SwapIcon />} onClick={handleClickSwapButton}>
+          <Button
+            key="swap"
+            variant="secondary"
+            width="6.5rem"
+            leftIcon={<SwapIcon />}
+            onClick={() => window.open("/swap", "_blank")}
+          >
             <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
           </Button>
         ) : (

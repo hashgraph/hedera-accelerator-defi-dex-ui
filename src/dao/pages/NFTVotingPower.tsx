@@ -29,7 +29,7 @@ export const NFTVotingPower = (props: NFTVotingPowerComponentProps) => {
   const navigate = useNavigate();
 
   function handleClickSwapButton() {
-    navigate("/swap");
+    window.open("/swap", "_blank");
   }
 
   function handleConnectToWalletClick() {

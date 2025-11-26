@@ -156,7 +156,7 @@ const createWalletSlice: WalletSlice = (set, get): WalletStore => {
           ? "https://mainnet-public.mirrornode.hedera.com"
           : "https://testnet.mirrornode.hedera.com";
 
-      const validAccounts = [];
+      const validAccounts: string[] = [];
       for (const accountId of accountIds) {
         try {
           const response = await fetch(`${mirrorNodeUrl}/api/v1/accounts/${accountId}`, {

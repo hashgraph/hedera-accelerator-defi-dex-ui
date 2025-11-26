@@ -20,6 +20,7 @@ export function useCreateToken(handleOnSuccess: HandleOnSuccess) {
   }));
   return useMutation<TransactionResponse, Error, UseCreateTokenParams, HTSMutations.CreateToken>(
     (params: UseCreateTokenParams) => {
+      const signer = wallet.getSigner();
       return DexService.createToken({ ...params, signer });
     },
     {

@@ -12,7 +12,7 @@ import {
 } from "@hashgraph/sdk";
 import { Contracts, Tokens, TREASURY_ID } from "../constants";
 import { PairContractFunctions } from "./types";
-import { client, getTreasurer } from "./utils";
+import { client, getTreasurer, createTreasuryClient } from "./utils";
 import GovernorService from "./GovernorService";
 import TokenService from "./TokenService";
 import DAOService from "../../../dao/services/contracts";
@@ -158,20 +158,24 @@ function createHederaService() {
       await tokenAssociateSignedTx.executeWithSigner(signer);
     }
 
-    const transaction = new TransferTransaction()
+    // Use treasury client since we're sending from treasury account
+    const treasuryClient = createTreasuryClient();
+
+    // Build and freeze the transfer transaction with treasury client
+    const transaction = await new TransferTransaction()
       .addTokenTransfer(Tokens.TokenAAccountId, treasuryId, -tokenQuantity)
       .addTokenTransfer(Tokens.TokenAAccountId, targetAccountId, tokenQuantity)
       .addTokenTransfer(Tokens.TokenBAccountId, treasuryId, -tokenQuantity)
       .addTokenTransfer(Tokens.TokenBAccountId, targetAccountId, tokenQuantity)
       .addTokenTransfer(Tokens.TokenCAccountId, treasuryId, -tokenQuantity)
-      .addTokenTransfer(Tokens.TokenCAccountId, targetAccountId, tokenQuantity);
+      .addTokenTransfer(Tokens.TokenCAccountId, targetAccountId, tokenQuantity)
+      .freezeWith(treasuryClient);
 
-    // Sign with treasury key first (server-side)
-    const treasurySignedTx = await transaction.sign(treasuryKey);
+    // Sign with treasury key
+    const signedTx = await transaction.sign(treasuryKey);
 
-    // Then freeze and sign with user's wallet (HashConnect)
-    const freezeTx = await treasurySignedTx.freezeWithSigner(signer);
-    const txResponse = await freezeTx.executeWithSigner(signer);
+    // Execute with treasury client (operator matches signer)
+    const txResponse = await signedTx.execute(treasuryClient);
     return txResponse;
   };
 
@@ -186,7 +190,9 @@ function createHederaService() {
 
   const createPool = async (createPoolDetails: CreatePoolDetails): Promise<TransactionResponse> => {
     const factoryContractId = ContractId.fromString(Contracts.Factory.ProxyId);
-    const { firstTokenAddress, secondTokenAddress, transactionFee, transactionDeadline, signer } = createPoolDetails;
+    const { firstTokenAddress, secondTokenAddress, transactionFee, signer } = createPoolDetails;
+
+    // Build and freeze transaction in one chain (like other working transactions)
     const createPoolTransaction = await new ContractExecuteTransaction()
       .setContractId(factoryContractId)
       .setGas(9000000)
@@ -201,9 +207,9 @@ function createHederaService() {
       .setMaxTransactionFee(new Hbar(100))
       .setPayableAmount(new Hbar(100))
       .setNodeAccountIds([new AccountId(3)])
-      .setTransactionValidDuration(transactionDeadline)
       .freezeWithSigner(signer);
-    const transactionResponse = createPoolTransaction.executeWithSigner(signer);
+
+    const transactionResponse = await createPoolTransaction.executeWithSigner(signer);
     return transactionResponse;
   };
 
