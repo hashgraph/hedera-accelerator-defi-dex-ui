@@ -14,7 +14,7 @@ import {
   useTransferOwnership,
 } from "@dao/hooks";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
-import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
+import { Grid, GridItem, Flex, Button, useBreakpointValue } from "@chakra-ui/react";
 import { DAOType } from "@dao/services";
 import { isEmpty, isNil, isNotNil } from "ramda";
 import { Routes } from "@dao/routes";
@@ -31,6 +31,11 @@ export function ProposalDetailsPage() {
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const transferOwnershipMutation = useTransferOwnership(handleTransferOwnershipSuccess);
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposalMutation;
+
+  // Responsive layout
+  const gridTemplateColumns = useBreakpointValue({ base: "1fr", lg: "repeat(4, 1fr)" });
+  const mainColSpan = useBreakpointValue({ base: 1, lg: 3 });
+  const sideColSpan = useBreakpointValue({ base: 1, lg: 1 });
 
   function handleApproveProposalSuccess(transactionResponse: TransactionResponse) {
     approveProposalMutation.reset();
@@ -117,9 +122,9 @@ export function ProposalDetailsPage() {
     const descriptionArray = [description, getProposalData(proposalDetails)];
 
     return (
-      <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
-        <GridItem colSpan={3}>
-          <Flex direction="column" gap="8">
+      <Grid layerStyle="proposal-details__page" templateColumns={gridTemplateColumns} gap={{ base: 4, lg: 4 }}>
+        <GridItem colSpan={mainColSpan}>
+          <Flex direction="column" gap={{ base: 4, md: 6, lg: 8 }}>
             <ProposalDetailsHeader daoAccountId={daoAccountId} title={title} daoType={daoType} author={author} />
             <ProposalDetailsStepper
               status={status}
@@ -143,10 +148,10 @@ export function ProposalDetailsPage() {
             />
           </Flex>
         </GridItem>
-        <GridItem colSpan={1}>
+        <GridItem colSpan={sideColSpan}>
           <Flex gap="1rem" width="100%" direction="column" height="100%">
             {isNotNil(link) && !isEmpty(link) ? (
-              <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
+              <Button variant="secondary" onClick={onViewDiscussionLinkTap} size={{ base: "sm", md: "md" }}>
                 View Discussion
               </Button>
             ) : undefined}

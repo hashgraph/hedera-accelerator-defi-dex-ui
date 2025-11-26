@@ -134,7 +134,7 @@ export function ProposalList() {
             paginationComponent={
               <Pagination
                 pageCount={pageCount}
-                customPaginationStyles={{ paddingRight: "5rem" }}
+                customPaginationStyles={{ paddingRight: "1rem" }}
                 isPaginationVisible={isPaginationVisible}
                 isPreviousButtonVisible={isPreviousButtonVisible}
                 isNextButtonVisible={isNextButtonVisible}

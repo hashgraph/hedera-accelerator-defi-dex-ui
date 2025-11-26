@@ -3,7 +3,7 @@ import { ProposalDetails } from "./ProposalDetails";
 import { ProposalDetailsHeader } from "./ProposalDetailsHeader";
 import { ProposalVoteDetails } from "./ProposalVoteDetails";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound } from "@dex/layouts";
-import { Grid, GridItem, Flex, Button } from "@chakra-ui/react";
+import { Grid, GridItem, Flex, Button, useBreakpointValue } from "@chakra-ui/react";
 import { DAOType } from "@dao/services";
 import { isNil, isNotNil, isEmpty } from "ramda";
 import { Routes } from "@dao/routes";
@@ -33,6 +33,11 @@ export function GovernanceProposalDetailsPage() {
   } = useGovernanceProposalDetails(daoAccountId, proposalId);
 
   const { isLoading: isProposalBeingExecuted, isError: hasProposalExecutionFailed } = executeProposal;
+
+  // Responsive layout
+  const gridTemplateColumns = useBreakpointValue({ base: "1fr", lg: "repeat(4, 1fr)" });
+  const mainColSpan = useBreakpointValue({ base: 1, lg: 3 });
+  const sideColSpan = useBreakpointValue({ base: 1, lg: 1 });
 
   function onBackToDAODashboardLinkClick() {
     navigate(Routes.Home);
@@ -86,9 +91,9 @@ export function GovernanceProposalDetailsPage() {
     const proposalStatus = status;
 
     return (
-      <Grid layerStyle="proposal-details__page" templateColumns="repeat(4, 1fr)">
-        <GridItem colSpan={3}>
-          <Flex direction="column" gap="8">
+      <Grid layerStyle="proposal-details__page" templateColumns={gridTemplateColumns} gap={{ base: 4, lg: 4 }}>
+        <GridItem colSpan={mainColSpan}>
+          <Flex direction="column" gap={{ base: 4, md: 6, lg: 8 }}>
             <ProposalDetailsHeader
               daoAccountId={daoAccountId}
               title={proposalDetails.title}
@@ -114,10 +119,10 @@ export function GovernanceProposalDetailsPage() {
             />
           </Flex>
         </GridItem>
-        <GridItem colSpan={1}>
+        <GridItem colSpan={sideColSpan}>
           <Flex gap="1rem" width="100%" direction="column" height="100%">
             {isNotNil(link) && !isEmpty(link) ? (
-              <Button variant="secondary" onClick={onViewDiscussionLinkTap}>
+              <Button variant="secondary" onClick={onViewDiscussionLinkTap} size={{ base: "sm", md: "md" }}>
                 View Discussion
               </Button>
             ) : undefined}

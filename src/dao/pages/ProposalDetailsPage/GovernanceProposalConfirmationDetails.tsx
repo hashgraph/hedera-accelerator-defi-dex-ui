@@ -346,25 +346,33 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
 
   return (
     <Flex layerStyle="content-box" direction="column" height="100%">
-      <Flex direction="column" gap={4} minWidth="250px" height="100%">
-        <Text.H4_Medium>Vote details</Text.H4_Medium>
+      <Flex direction="column" gap={{ base: 3, md: 4 }} minWidth={{ base: "auto", md: "250px" }} height="100%">
+        <Text.H4_Medium fontSize={{ base: "md", md: "lg" }}>Vote details</Text.H4_Medium>
 
         <Flex gap={2} justify="space-between" align="center">
           <Flex direction="column" alignItems="flex-start">
-            <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
+            <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start" fontSize={{ base: "10px", md: "xs" }}>
               Voting start time
             </Text.P_XSmall_Regular>
-            <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
+            <Text.P_XSmall_Semibold
+              color={Color.Grey_Blue._600}
+              textAlign="start"
+              fontSize={{ base: "10px", md: "xs" }}
+            >
               {votingStartTime}
             </Text.P_XSmall_Semibold>
           </Flex>
         </Flex>
         <Flex gap={2} justify="space-between" align="center">
           <Flex direction="column" alignItems="flex-start">
-            <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
+            <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start" fontSize={{ base: "10px", md: "xs" }}>
               Voting end time
             </Text.P_XSmall_Regular>
-            <Text.P_XSmall_Semibold color={Color.Grey_Blue._600} textAlign="start">
+            <Text.P_XSmall_Semibold
+              color={Color.Grey_Blue._600}
+              textAlign="start"
+              fontSize={{ base: "10px", md: "xs" }}
+            >
               {votingEndTime}
             </Text.P_XSmall_Semibold>
           </Flex>
@@ -372,30 +380,45 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
         {timeRemaining > 0 && (
           <Flex gap={2} justify="space-between" align="center">
             <Flex direction="column" alignItems="flex-start">
-              <Text.P_XSmall_Regular color={Color.Grey_Blue._600} textAlign="start">
+              <Text.P_XSmall_Regular
+                color={Color.Grey_Blue._600}
+                textAlign="start"
+                fontSize={{ base: "10px", md: "xs" }}
+              >
                 Time remaining
               </Text.P_XSmall_Regular>
-              <Text.P_XSmall_Semibold color={Color.Success._600} textAlign="start">
+              <Text.P_XSmall_Semibold color={Color.Success._600} textAlign="start" fontSize={{ base: "xs", md: "sm" }}>
                 {formatTimeRemaining(timeRemaining)}
               </Text.P_XSmall_Semibold>
             </Flex>
           </Flex>
         )}
-        <Flex gap={2} justify="space-between" align="center">
-          <Flex direction="column" alignItems="flex-start"></Flex>
-          <Flex border={`1px solid ${Color.Success._600}`} paddingX={3} borderRadius={4} textAlign="center">
+        <Flex gap={2} justify="flex-end" align="center">
+          <Flex
+            border={`1px solid ${Color.Success._600}`}
+            paddingX={{ base: 2, md: 3 }}
+            borderRadius={4}
+            textAlign="center"
+          >
             <Text.P_Small_Medium
               color={Color.Success._600}
               overflow="hidden"
               textOverflow="ellipsis"
               whiteSpace="nowrap"
+              fontSize={{ base: "xs", md: "sm" }}
             >
               Turnout: {`${turnout}%`}
             </Text.P_Small_Medium>
           </Flex>
         </Flex>
-        <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
-          <Box flex="4" margin="auto 1rem auto 0">
+        <Flex
+          direction="column"
+          bg={Color.Grey_Blue._50}
+          borderRadius="8px"
+          padding={{ base: "0.75rem", md: "1rem" }}
+          gap={{ base: 3, md: 4 }}
+        >
+          <Box flex="4" margin={{ base: "auto 0", md: "auto 1rem auto 0" }}>
             <HorizontalStackBarChart
               quorum={getVotesPercentage(quorum)}
               stackBarHeight={12}
@@ -407,53 +430,90 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
               ]}
             />
           </Box>
-          <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="1.2rem">
+          <SimpleGrid
+            minWidth="100%"
+            columns={2}
+            spacingX={{ base: "1rem", md: "2rem" }}
+            spacingY={{ base: "0.8rem", md: "1.2rem" }}
+          >
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
-                <Box bg={Color.Grey_Blue._300} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>Yes</Text.P_Small_Semibold>
+                <Box
+                  bg={Color.Grey_Blue._300}
+                  width={{ base: "0.5rem", md: "0.75rem" }}
+                  height={{ base: "0.5rem", md: "0.75rem" }}
+                />
+                <Text.P_Small_Semibold color={Color.Neutral._600} fontSize={{ base: "xs", md: "sm" }}>
+                  Yes
+                </Text.P_Small_Semibold>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>{`${getVotesPercentage(yes).toFixed(
-                  2
-                )}%`}</Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(yes)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Semibold color={Color.Neutral._900} fontSize={{ base: "xs", md: "sm" }}>
+                  {`${getVotesPercentage(yes).toFixed(2)}%`}
+                </Text.P_Small_Semibold>
+                <Text.P_Small_Regular color={Color.Neutral._400} fontSize={{ base: "10px", md: "xs" }}>
+                  {`${getVotesCount(yes)}`}
+                </Text.P_Small_Regular>
               </Flex>
             </Flex>
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
-                <Box bg={Color.Grey_Blue._900} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>No</Text.P_Small_Semibold>
+                <Box
+                  bg={Color.Grey_Blue._900}
+                  width={{ base: "0.5rem", md: "0.75rem" }}
+                  height={{ base: "0.5rem", md: "0.75rem" }}
+                />
+                <Text.P_Small_Semibold color={Color.Neutral._600} fontSize={{ base: "xs", md: "sm" }}>
+                  No
+                </Text.P_Small_Semibold>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>{`${getVotesPercentage(no).toFixed(
-                  2
-                )}%`}</Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(no)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Semibold color={Color.Neutral._900} fontSize={{ base: "xs", md: "sm" }}>
+                  {`${getVotesPercentage(no).toFixed(2)}%`}
+                </Text.P_Small_Semibold>
+                <Text.P_Small_Regular color={Color.Neutral._400} fontSize={{ base: "10px", md: "xs" }}>
+                  {`${getVotesCount(no)}`}
+                </Text.P_Small_Regular>
               </Flex>
             </Flex>
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
-                <Box bg={Color.Grey_Blue._600} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>Abstain</Text.P_Small_Semibold>
+                <Box
+                  bg={Color.Grey_Blue._600}
+                  width={{ base: "0.5rem", md: "0.75rem" }}
+                  height={{ base: "0.5rem", md: "0.75rem" }}
+                />
+                <Text.P_Small_Semibold color={Color.Neutral._600} fontSize={{ base: "xs", md: "sm" }}>
+                  Abstain
+                </Text.P_Small_Semibold>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>
+                <Text.P_Small_Semibold color={Color.Neutral._900} fontSize={{ base: "xs", md: "sm" }}>
                   {`${getVotesPercentage(abstain).toFixed(2)}%`}
                 </Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(abstain)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Regular color={Color.Neutral._400} fontSize={{ base: "10px", md: "xs" }}>
+                  {`${getVotesCount(abstain)}`}
+                </Text.P_Small_Regular>
               </Flex>
             </Flex>
             <Flex direction="column">
               <Flex gap={1} alignItems="center">
-                <Box bg={Color.Grey_01} width="0.75rem" height="0.75rem"></Box>
-                <Text.P_Small_Semibold color={Color.Neutral._600}>Remaining</Text.P_Small_Semibold>
+                <Box
+                  bg={Color.Grey_01}
+                  width={{ base: "0.5rem", md: "0.75rem" }}
+                  height={{ base: "0.5rem", md: "0.75rem" }}
+                />
+                <Text.P_Small_Semibold color={Color.Neutral._600} fontSize={{ base: "xs", md: "sm" }}>
+                  Remaining
+                </Text.P_Small_Semibold>
               </Flex>
               <Flex gap={1} alignItems="center">
-                <Text.P_Small_Semibold color={Color.Neutral._900}>
+                <Text.P_Small_Semibold color={Color.Neutral._900} fontSize={{ base: "xs", md: "sm" }}>
                   {`${getVotesPercentage(remaining).toFixed(2)}%`}
                 </Text.P_Small_Semibold>
-                <Text.P_Small_Regular color={Color.Neutral._400}>{`${getVotesCount(remaining)}`}</Text.P_Small_Regular>
+                <Text.P_Small_Regular color={Color.Neutral._400} fontSize={{ base: "10px", md: "xs" }}>
+                  {`${getVotesCount(remaining)}`}
+                </Text.P_Small_Regular>
               </Flex>
             </Flex>
           </SimpleGrid>
@@ -461,11 +521,15 @@ export function GovernanceProposalConfirmationDetails(props: GovernanceProposalC
         <Flex direction="column" gap={1}>
           <Flex justify="center" align="center" color={Color.Neutral._500} gap={1}>
             <LightningBoltIcon />
-            <Text.Overline_Small>Voting Power</Text.Overline_Small>
+            <Text.Overline_Small fontSize={{ base: "10px", md: "xs" }}>Voting Power</Text.Overline_Small>
           </Flex>
           <Flex align="center" justify="center" gap={1}>
-            <Text.H4_Medium color={Color.Primary._600}>{votingPower}</Text.H4_Medium>
-            <Text.P_Small_Medium color={Color.Primary._600}>{tokenSymbol}</Text.P_Small_Medium>
+            <Text.H4_Medium color={Color.Primary._600} fontSize={{ base: "md", md: "lg" }}>
+              {votingPower}
+            </Text.H4_Medium>
+            <Text.P_Small_Medium color={Color.Primary._600} fontSize={{ base: "xs", md: "sm" }}>
+              {tokenSymbol}
+            </Text.P_Small_Medium>
           </Flex>
         </Flex>
         {ConfirmationDetailsButtons[status]}

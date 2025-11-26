@@ -1,4 +1,4 @@
-import { Alert, Box, Flex, Input, Select, Tab, TabList, Tabs, Text } from "@chakra-ui/react";
+import { Alert, Box, Flex, Input, Select, Tab, TabList, Tabs, Text, useBreakpointValue } from "@chakra-ui/react";
 import { CardGridLayout, NotFound, Page, PageHeader } from "@dex/layouts";
 import { DAOTabs, useDAOs } from "@dao/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -88,18 +88,23 @@ export function DAOsListPage() {
               </Tab>
             </TabList>
           </Tabs>
-          <Flex justifyContent="flex-end" gap={4}>
+          <Flex
+            justifyContent={{ base: "stretch", sm: "flex-end" }}
+            gap={{ base: 2, md: 4 }}
+            direction={{ base: "column", sm: "row" }}
+            width={{ base: "100%", sm: "auto" }}
+          >
             <Input
               variant="filter"
               value={searchText}
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchTextChange(e.target.value)}
               placeholder="Search"
-              width="fit-content"
-              minWidth="unset"
+              width={{ base: "100%", sm: "fit-content" }}
+              minWidth={{ base: "100%", sm: "200px", md: "280px" }}
             />
             <Select
               variant="formTokenSelector"
-              width="12rem"
+              width={{ base: "100%", sm: "10rem", md: "12rem" }}
               placeholder="All"
               value={daoType}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDAOTypeChange(e.target.value)}
@@ -117,7 +122,7 @@ export function DAOsListPage() {
             <NotFound message="No DAOs have been found with the filters selected" />
           )}
           <CardGridLayout<DAO[]>
-            columns={{ md: 2, lg: 3 }}
+            columns={{ base: 1, sm: 2, lg: 3 }}
             queryResult={daos}
             message={"It looks like no DAOs have been created yet."}
             preLinkText={"Click on this link to"}
@@ -153,8 +158,8 @@ export function DAOsListPage() {
             isNextButtonVisible={isNextButtonVisible}
             handlePageClick={handlePageClick}
           />
-          <Flex fontSize={15}>
-            <Alert>
+          <Flex fontSize={{ base: 13, md: 15 }}>
+            <Alert borderRadius="12px">
               <p>
                 <strong>Caution</strong>: DAOs listed above are created and named by the DAO creators.
                 <br />

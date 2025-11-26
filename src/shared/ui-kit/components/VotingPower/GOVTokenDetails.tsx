@@ -1,4 +1,4 @@
-import { Divider, Flex } from "@chakra-ui/react";
+import { Divider, Flex, useBreakpointValue } from "@chakra-ui/react";
 import { Color, LockIcon, MetricLabel, Tooltip } from "@shared/ui-kit";
 
 interface GOVTokenDetailsProps {
@@ -17,8 +17,19 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
   const { tokenSymbol, lockedGODToken, totalGODTokenBalance, availableGODTokenBalance } = props;
   const toolTipString = `Pending amount of ${tokenSymbol} token unlocks until
     the in-progress proposals are either complete or canceled`;
+
+  const gap = useBreakpointValue({ base: "1rem", md: "1.5rem", lg: "2.5rem" });
+  const showDivider = useBreakpointValue({ base: false, lg: true });
+
   return (
-    <Flex height="6rem" alignItems="center" justify="center" gap="2.5rem">
+    <Flex
+      height={{ base: "auto", lg: "6rem" }}
+      alignItems="center"
+      justify="center"
+      gap={gap}
+      flexWrap="wrap"
+      py={{ base: 2, lg: 0 }}
+    >
       <MetricLabel
         isLoading={props.isLoading}
         label="TOTAL BALANCE"
@@ -33,7 +44,7 @@ export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
         amount="$--.--"
         amountLabelColor={Color.Neutral._700}
       />
-      <Divider orientation="vertical" />
+      {showDivider && <Divider orientation="vertical" />}
       <MetricLabel
         label="LOCKED"
         isLoading={props.isLoading}

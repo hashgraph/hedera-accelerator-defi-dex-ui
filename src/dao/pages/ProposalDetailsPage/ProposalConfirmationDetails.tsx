@@ -277,22 +277,19 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
 
   return (
     <Flex layerStyle="content-box" direction="column" height="100%">
-      <Flex direction="column" gap="8" minWidth="250px" height="100%">
-        <Flex justifyContent="space-between" gap="1">
-          <Text.H4_Medium>Confirmation details</Text.H4_Medium>
+      <Flex direction="column" gap={{ base: 4, md: 8 }} minWidth={{ base: "auto", md: "250px" }} height="100%">
+        <Flex justifyContent="space-between" gap="1" flexWrap="wrap" alignItems="center">
+          <Text.H4_Medium fontSize={{ base: "md", md: "lg" }}>Confirmation details</Text.H4_Medium>
           <Tag variant={ProposalStatusAsTagVariant[status]} />
         </Flex>
-        {/* Debug info: Show connected account */}
-        {process.env.NODE_ENV === "development" && (
-          <Box p="2" bg={Color.Grey_Blue._50} borderRadius="4px" fontSize="xs">
-            <Text.P_Small_Semibold>Debug Info:</Text.P_Small_Semibold>
-            <Text.P_Small_Regular>Connected: {connectedWalletId}</Text.P_Small_Regular>
-            <Text.P_Small_Regular>Safe: {safeAccountId}</Text.P_Small_Regular>
-            <Text.P_Small_Regular>Members: {memberCount}</Text.P_Small_Regular>
-          </Box>
-        )}
-        <Flex direction="column" bg={Color.Grey_Blue._50} borderRadius="4px" padding="1rem" gap="4">
-          <Flex direction="row" alignItems="center" gap="4">
+        <Flex
+          direction="column"
+          bg={Color.Grey_Blue._50}
+          borderRadius="8px"
+          padding={{ base: "0.75rem", md: "1rem" }}
+          gap={{ base: 3, md: 4 }}
+        >
+          <Flex direction="row" alignItems="center" gap={{ base: 2, md: 4 }}>
             <ProgressBar
               width="100%"
               height="8px"
@@ -300,12 +297,14 @@ export function ProposalConfirmationDetails(props: ProposalConfirmationDetailsPr
               value={confirmationProgress}
               progressBarColor={Color.Grey_Blue._300}
             />
-            <Flex direction="row" alignItems="center" gap="2">
-              <Text.P_Small_Semibold>{`${approvalCount}/${threshold}`}</Text.P_Small_Semibold>
-              <PeopleIcon boxSize={3.5} />
+            <Flex direction="row" alignItems="center" gap="2" flexShrink={0}>
+              <Text.P_Small_Semibold fontSize={{ base: "xs", md: "sm" }}>
+                {`${approvalCount}/${threshold}`}
+              </Text.P_Small_Semibold>
+              <PeopleIcon boxSize={{ base: 3, md: 3.5 }} />
             </Flex>
           </Flex>
-          <Flex direction="row" justifyContent="space-between" gap="4">
+          <Flex direction={{ base: "column", sm: "row" }} justifyContent="space-between" gap={{ base: 2, sm: 4 }}>
             <MetricLabel
               labelLeftIcon={<Box bg={Color.Grey_Blue._300} width="0.75rem" height="0.75rem" />}
               label="Confirmed"

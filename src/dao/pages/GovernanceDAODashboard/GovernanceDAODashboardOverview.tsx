@@ -1,4 +1,4 @@
-import { Flex, Grid, GridItem, Link } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Link, useBreakpointValue } from "@chakra-ui/react";
 import { Text, Color, MetricLabel } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import { GovernanceDAODetailsContext } from "./types";
@@ -20,15 +20,18 @@ export function GovernanceDAODashboardOverview() {
     ?.sort((proposalA, proposalB) => +proposalB.timestamp - +proposalA.timestamp)
     .slice(0, 3);
 
+  const gridColumns = useBreakpointValue({ base: "1fr", md: "repeat(2, 1fr)" });
+  const governanceDirection = useBreakpointValue({ base: "column", lg: "row" }) as "column" | "row";
+
   return (
-    <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
+    <Flex gap={{ base: 4, md: 8 }} direction="column" layerStyle="dao-dashboard__content-body">
       <Flex gap="2" direction="column">
         <Text.H4_Medium>Overview</Text.H4_Medium>
-        <Grid templateColumns="repeat(2, 1fr)" gap="2">
+        <Grid templateColumns={gridColumns} gap={{ base: 2, md: 3 }}>
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
               <Text.P_Medium_Semibold>Assets</Text.P_Medium_Semibold>
-              <Flex direction="row">
+              <Flex direction={{ base: "column", sm: "row" }} gap={{ base: 4, sm: 0 }}>
                 <Flex flex={1}>
                   <MetricLabel
                     label="TOTAL ASSETS"
@@ -59,7 +62,7 @@ export function GovernanceDAODashboardOverview() {
           <GridItem>
             <Flex layerStyle="dao-dashboard__card">
               <Text.P_Medium_Semibold>Governance</Text.P_Medium_Semibold>
-              <Flex direction="row" justifyContent="space-between">
+              <Grid templateColumns={{ base: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={{ base: 3, md: 4 }}>
                 <MetricLabel
                   label="QUORUM"
                   labelTextColor={Color.Neutral._500}
@@ -81,7 +84,6 @@ export function GovernanceDAODashboardOverview() {
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
-
                 <MetricLabel
                   label="LOCKING PERIOD"
                   labelTextColor={Color.Neutral._500}
@@ -92,9 +94,8 @@ export function GovernanceDAODashboardOverview() {
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
-
                 <MetricLabel
-                  label="MINIMUM PROPOSAL DEPOSIT"
+                  label="MIN DEPOSIT"
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
@@ -104,7 +105,7 @@ export function GovernanceDAODashboardOverview() {
                   valueUnitSymbol={FTToken?.data?.symbol}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
-              </Flex>
+              </Grid>
             </Flex>
           </GridItem>
           <GridItem>
@@ -114,7 +115,7 @@ export function GovernanceDAODashboardOverview() {
             </Flex>
           </GridItem>
           <GridItem>
-            <Flex layerStyle="dao-dashboard__card" gap={6}>
+            <Flex layerStyle="dao-dashboard__card" gap={4}>
               <Text.P_Medium_Semibold>Social Channels</Text.P_Medium_Semibold>
               <Flex direction="column" gap={2} justifyContent="space-between">
                 {daoLinks.map((link, index) => {
@@ -125,6 +126,7 @@ export function GovernanceDAODashboardOverview() {
                       color={Color.Neutral._700}
                       href={link.value}
                       isExternal
+                      wordBreak="break-all"
                     >
                       {link.value}
                     </Link>
@@ -137,7 +139,7 @@ export function GovernanceDAODashboardOverview() {
       </Flex>
       <Flex gap="2" direction="column">
         <Text.H4_Medium>Recent Proposals</Text.H4_Medium>
-        <Flex direction="column" gap="2" minHeight="300px">
+        <Flex direction="column" gap="2" minHeight={{ base: "200px", md: "300px" }}>
           <RecentProposals
             proposals={recentProposals}
             dao={dao}

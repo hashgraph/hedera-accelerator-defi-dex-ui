@@ -22,10 +22,17 @@ export const CardStyles: ComponentStyleConfig = {
   baseStyle: {
     height: "max-content",
     bg: Color.White,
-    borderRadius: "4px",
-    border: `1px solid ${Color.Neutral._200}`,
-    padding: "1rem",
+    borderRadius: "12px",
+    border: `1px solid ${Color.Neutral._100}`,
+    padding: { base: "0.75rem", sm: "1rem", md: "1.25rem" },
     width: "100%",
+    boxShadow: Color.Shadow.Card,
+    transition: "all 0.25s ease-in-out",
+    _hover: {
+      boxShadow: Color.Shadow.CardHover,
+      borderColor: Color.Neutral._200,
+      transform: "translateY(-2px)",
+    },
   },
   sizes: {},
   variants: {

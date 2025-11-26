@@ -9,9 +9,17 @@ const formTokenSelector = definePartsStyle({
     ...TextStyles["p small regular"],
     height: "40px",
     padding: "0.125rem 1rem",
-    background: Color.Grey_Blue._50,
-    border: `1px solid ${Color.Neutral._300}`,
-    borderRadius: "0.25rem",
+    background: Color.White,
+    border: `1px solid ${Color.Neutral._200}`,
+    borderRadius: "8px",
+    transition: "all 0.2s ease-in-out",
+    _hover: {
+      borderColor: Color.Neutral._300,
+    },
+    _focus: {
+      borderColor: Color.Primary._500,
+      boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.15)`,
+    },
   },
 });
 

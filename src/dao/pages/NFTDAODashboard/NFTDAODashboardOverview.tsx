@@ -1,4 +1,4 @@
-import { Flex, Grid, GridItem, Link } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Link, useBreakpointValue } from "@chakra-ui/react";
 import { Text, Color, MetricLabel } from "@shared/ui-kit";
 import { useOutletContext } from "react-router-dom";
 import { NFTDAODetailsContext } from "./types";
@@ -20,25 +20,17 @@ export function NFTDAODashboardOverview() {
     ?.sort((proposalA, proposalB) => +proposalB.timestamp - +proposalA.timestamp)
     .slice(0, 3);
 
+  const gridColumns = useBreakpointValue({ base: "1fr", md: "repeat(2, 1fr)" });
+
   return (
-    <Flex gap="8" direction="column" layerStyle="dao-dashboard__content-body">
+    <Flex gap={{ base: 4, md: 8 }} direction="column" layerStyle="dao-dashboard__content-body">
       <Flex gap="4" direction="column">
         <Text.H4_Medium>Overview</Text.H4_Medium>
-        <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+        <Grid templateColumns={gridColumns} gap={{ base: 2, md: 3 }}>
           <GridItem>
-            <Flex
-              direction="column"
-              width="100%"
-              height="100%"
-              bg={Color.White_02}
-              justifyContent="space-between"
-              border={`1px solid ${Color.Neutral._200}`}
-              borderRadius="4px"
-              padding="1.5rem"
-              gap="8"
-            >
+            <Flex layerStyle="dao-dashboard__card">
               <Text.P_Medium_Semibold>Assets</Text.P_Medium_Semibold>
-              <Flex direction="row">
+              <Flex direction={{ base: "column", sm: "row" }} gap={{ base: 4, sm: 0 }}>
                 <Flex flex={1}>
                   <MetricLabel
                     label="TOTAL ASSETS"
@@ -67,18 +59,9 @@ export function NFTDAODashboardOverview() {
             </Flex>
           </GridItem>
           <GridItem>
-            <Flex
-              direction="column"
-              width="100%"
-              height="100%"
-              bg={Color.White_02}
-              border={`1px solid ${Color.Neutral._200}`}
-              borderRadius="4px"
-              padding="1.5rem"
-              gap="8"
-            >
+            <Flex layerStyle="dao-dashboard__card">
               <Text.P_Medium_Semibold>Governance</Text.P_Medium_Semibold>
-              <Flex direction="row" justifyContent="space-between">
+              <Grid templateColumns={{ base: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={{ base: 3, md: 4 }}>
                 <MetricLabel
                   label="QUORUM"
                   labelTextColor={Color.Neutral._500}
@@ -100,7 +83,6 @@ export function NFTDAODashboardOverview() {
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
-
                 <MetricLabel
                   label="LOCKING PERIOD"
                   labelTextColor={Color.Neutral._500}
@@ -111,9 +93,8 @@ export function NFTDAODashboardOverview() {
                   valueTextColor={Color.Neutral._900}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
-
                 <MetricLabel
-                  label="MINIMUM PROPOSAL DEPOSIT"
+                  label="MIN DEPOSIT"
                   labelTextColor={Color.Neutral._500}
                   labelTextStyle="p xsmall medium"
                   labelOpacity="1.0"
@@ -123,37 +104,17 @@ export function NFTDAODashboardOverview() {
                   valueUnitSymbol={NFTToken?.data?.symbol}
                   valueUnitSymbolColor={Color.Neutral._900}
                 />
-              </Flex>
+              </Grid>
             </Flex>
           </GridItem>
           <GridItem>
-            <Flex
-              width="100%"
-              height="100%"
-              direction="column"
-              bg={Color.White_02}
-              justifyContent="space-between"
-              border={`1px solid ${Color.Neutral._200}`}
-              borderRadius="4px"
-              padding="1.5rem"
-              gap="8"
-            >
+            <Flex layerStyle="dao-dashboard__card">
               <Text.P_Medium_Semibold>About</Text.P_Medium_Semibold>
               <Text.P_Small_Regular color={Color.Neutral._700}>{dao.description}</Text.P_Small_Regular>
             </Flex>
           </GridItem>
           <GridItem>
-            <Flex
-              width="100%"
-              height="100%"
-              gap={6}
-              direction="column"
-              bg={Color.White_02}
-              justifyContent="space-between"
-              border={`1px solid ${Color.Neutral._200}`}
-              borderRadius="4px"
-              padding="1.5rem"
-            >
+            <Flex layerStyle="dao-dashboard__card" gap={4}>
               <Text.P_Medium_Semibold>Social Channels</Text.P_Medium_Semibold>
               <Flex direction="column" gap={2} justifyContent="space-between">
                 {daoLinks.map((link, index) => {
@@ -164,6 +125,7 @@ export function NFTDAODashboardOverview() {
                       color={Color.Neutral._700}
                       href={link.value}
                       isExternal
+                      wordBreak="break-all"
                     >
                       {link.value}
                     </Link>
@@ -176,7 +138,7 @@ export function NFTDAODashboardOverview() {
       </Flex>
       <Flex gap="2" direction="column">
         <Text.H4_Medium>Recent Proposals</Text.H4_Medium>
-        <Flex direction="column" gap="2" minHeight="300px">
+        <Flex direction="column" gap="2" minHeight={{ base: "200px", md: "300px" }}>
           <RecentProposals
             proposals={recentProposals}
             dao={dao}

@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
+import { Box, Flex, Grid, GridItem, useBreakpointValue } from "@chakra-ui/react";
 import { isEmpty } from "ramda";
 
 interface DefiFormLayoutProps {
@@ -14,17 +14,21 @@ interface DefiFormLayoutProps {
 }
 
 export function DefiFormLayout(props: DefiFormLayoutProps) {
-  const gridGap = "1.25rem";
+  const gridGap = useBreakpointValue({ base: "1rem", md: "1.25rem" }) || "1.25rem";
+  const metricsColumns = useBreakpointValue({ base: 1, sm: 3 });
+  const titleColSpan = useBreakpointValue({ base: 2, sm: 1 });
+
   return (
-    <Grid
-      data-testid="defi-form-component" // use dynamic id here from props
-      layerStyle="defi-form"
-    >
-      <GridItem marginBottom={gridGap} colSpan={1}>
+    <Grid data-testid="defi-form-component" layerStyle="defi-form" width="100%">
+      <GridItem marginBottom={gridGap} colSpan={titleColSpan}>
         {props.title}
       </GridItem>
-      <GridItem colSpan={1}>
+      <GridItem colSpan={titleColSpan} display={{ base: "none", sm: "block" }}>
         <Flex justifyContent="end">{props.settingsButton}</Flex>
+      </GridItem>
+      {/* Mobile settings button */}
+      <GridItem colSpan={2} display={{ base: "block", sm: "none" }} mb={2}>
+        <Flex justifyContent="flex-start">{props.settingsButton}</Flex>
       </GridItem>
       <GridItem marginBottom={props.isSettingsOpen ? gridGap : 0} colSpan={2}>
         {props.settingsInputs}
@@ -33,14 +37,14 @@ export function DefiFormLayout(props: DefiFormLayoutProps) {
         {props.notification}
       </GridItem>
       <GridItem marginBottom={gridGap} colSpan={2}>
-        <Flex direction="column" alignItems="stretch" gap="1">
+        <Flex direction="column" alignItems="stretch" gap={{ base: "2", md: "1" }}>
           {props.formInputs?.map((input: React.ReactNode, index: number) => (
             <Box key={index}>{input}</Box>
           ))}
         </Flex>
       </GridItem>
       <GridItem marginBottom={gridGap} colSpan={2}>
-        <Grid templateColumns="repeat(3, 1fr)" gap="4">
+        <Grid templateColumns={{ base: "1fr", sm: "repeat(3, 1fr)" }} gap={{ base: "3", md: "4" }}>
           {props.metrics?.map((metric: React.ReactNode, index: number) => (
             <GridItem colSpan={1} key={index}>
               {metric}

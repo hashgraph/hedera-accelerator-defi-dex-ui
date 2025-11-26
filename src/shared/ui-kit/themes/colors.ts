@@ -27,7 +27,7 @@ export const Color = {
   /**
    * V2 Colors
    */
-  Primary_Bg: "#FAFBFC",
+  Primary_Bg: "#F8FAFC",
   Neutral: {
     _50: "#fafafa",
     _100: "#f5f5f5",
@@ -114,4 +114,31 @@ export const Color = {
   },
   White: "#FFFFFF",
   Black: "#000000",
+  /**
+   * Modern UI Effects
+   */
+  Gradient: {
+    Primary: "linear-gradient(135deg, #00BAC6 0%, #007FC6 100%)",
+    PrimaryHover: "linear-gradient(135deg, #00A2AD 0%, #0069C5 100%)",
+    Success: "linear-gradient(135deg, #3FC600 0%, #20AF00 100%)",
+    Subtle: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
+  },
+  Shadow: {
+    Soft: "0 2px 8px rgba(0, 0, 0, 0.06)",
+    Medium: "0 4px 16px rgba(0, 0, 0, 0.08)",
+    Strong: "0 8px 32px rgba(0, 0, 0, 0.12)",
+    Primary: "0 4px 14px rgba(0, 186, 198, 0.25)",
+    PrimaryHover: "0 6px 20px rgba(0, 186, 198, 0.35)",
+    Card: "0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05)",
+    CardHover: "0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.08)",
+  },
+  /**
+   * Private DAO indicator - subtle purple/violet tint instead of harsh yellow
+   */
+  Private: {
+    Bg: "#F8F5FF",
+    BgHover: "#F0EBFF",
+    Border: "#E4D9FC",
+    Accent: "#8B5CF6",
+  },
 };

@@ -1,5 +1,5 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import { HStack, Button, Spacer, Flex } from "@chakra-ui/react";
+import { HStack, Button, Spacer, Flex, useBreakpointValue, Box } from "@chakra-ui/react";
 import { MirrorNodeTokenNFT } from "@dex/services";
 import { Text, Color, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon } from "@shared/ui-kit";
 import { GOVTokenDetails } from "./GOVTokenDetails";
@@ -44,8 +44,21 @@ export const VotingPower = (props: VotingPowerProps) => {
     handleErrorDialogDismissButtonClicked,
     isWalletConnected,
   } = props;
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const padding = useBreakpointValue({ base: "0.75rem 1rem", sm: "1rem 1.5rem", md: "1rem 3rem", lg: "1rem 5rem" });
+  const flexDirection = useBreakpointValue({ base: "column", lg: "row" }) as "column" | "row";
+  const showTokenDetails = useBreakpointValue({ base: false, md: true });
+
   return (
-    <Flex direction="row" alignItems="center" height="7.5rem" padding="1rem 5rem 0 5rem" maxWidth="100%">
+    <Flex
+      direction={flexDirection}
+      alignItems={{ base: "stretch", lg: "center" }}
+      minHeight={{ base: "auto", lg: "7.5rem" }}
+      padding={padding}
+      maxWidth="100%"
+      gap={{ base: 3, lg: 0 }}
+    >
       <MetricLabel
         label="VOTING POWER"
         isLoading={isFormLoading}
@@ -59,44 +72,64 @@ export const VotingPower = (props: VotingPowerProps) => {
         valueUnitSymbol={tokenData.symbol}
         amount="$--.--"
       />
-      <Spacer />
-      <HStack padding="0.5rem 1.5rem" gap="2.5rem" justify="right" borderRadius="0.5rem" background={Color.Neutral._50}>
-        <GOVTokenDetails
-          tokenSymbol={tokenData.symbol ?? ""}
-          lockedGODToken={tokenData.locked}
-          totalGODTokenBalance={tokenData.total}
-          availableGODTokenBalance={tokenData.available}
-          isLoading={isFormLoading}
-          hidePendingStatus
-        />
-        {doesUserHaveGOVTokensToLockAndUnlock ? (
-          <ManageVotingPower
+      <Spacer display={{ base: "none", lg: "block" }} />
+      <Flex
+        direction={{ base: "column", sm: "row" }}
+        padding={{ base: "0.5rem", sm: "0.5rem 1rem", md: "0.5rem 1.5rem" }}
+        gap={{ base: 2, sm: 3, md: "2.5rem" }}
+        justify={{ base: "center", sm: "space-between", md: "right" }}
+        alignItems={{ base: "stretch", sm: "center" }}
+        borderRadius="0.5rem"
+        background={Color.Neutral._50}
+        flexWrap="wrap"
+      >
+        {showTokenDetails && (
+          <GOVTokenDetails
             tokenSymbol={tokenData.symbol ?? ""}
-            tokenNFTs={tokenNFTs}
-            isLoading={isFormLoading}
-            canUserClaimGODTokens={canUserClaimGODTokens}
-            lockedNFTSerialId={lockedNFTSerialId}
+            lockedGODToken={tokenData.locked}
             totalGODTokenBalance={tokenData.total}
             availableGODTokenBalance={tokenData.available}
-            onLockClick={(data: InputTokenData) => handleClickLockGodTokenButton(Number(data.lockNFTSerialId))}
-            onUnlockClick={handleClickUnLockGodTokenButton}
+            isLoading={isFormLoading}
+            hidePendingStatus
           />
-        ) : isWalletConnected ? (
-          <Button
-            key="swap"
-            variant="secondary"
-            width="6.5rem"
-            leftIcon={<SwapIcon />}
-            onClick={() => window.open("/swap", "_blank")}
-          >
-            <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
-          </Button>
-        ) : (
-          <Button key="swap" variant="secondary" width="9.5rem" onClick={handleConnectToWalletClick}>
-            <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
-          </Button>
         )}
-      </HStack>
+        <Flex justify={{ base: "center", sm: "flex-end" }} gap={2}>
+          {doesUserHaveGOVTokensToLockAndUnlock ? (
+            <ManageVotingPower
+              tokenSymbol={tokenData.symbol ?? ""}
+              tokenNFTs={tokenNFTs}
+              isLoading={isFormLoading}
+              canUserClaimGODTokens={canUserClaimGODTokens}
+              lockedNFTSerialId={lockedNFTSerialId}
+              totalGODTokenBalance={tokenData.total}
+              availableGODTokenBalance={tokenData.available}
+              onLockClick={(data: InputTokenData) => handleClickLockGodTokenButton(Number(data.lockNFTSerialId))}
+              onUnlockClick={handleClickUnLockGodTokenButton}
+            />
+          ) : isWalletConnected ? (
+            <Button
+              key="swap"
+              variant="secondary"
+              width={{ base: "100%", sm: "6.5rem" }}
+              size={{ base: "sm", md: "md" }}
+              leftIcon={<SwapIcon />}
+              onClick={() => window.open("/swap", "_blank")}
+            >
+              <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
+            </Button>
+          ) : (
+            <Button
+              key="swap"
+              variant="secondary"
+              width={{ base: "100%", sm: "auto" }}
+              size={{ base: "sm", md: "md" }}
+              onClick={handleConnectToWalletClick}
+            >
+              <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
+            </Button>
+          )}
+        </Flex>
+      </Flex>
       <LoadingDialog isOpen={isLoading} message={loadingDialogMessage} />
       <LoadingDialog
         isOpen={isErrorDialogOpen}
