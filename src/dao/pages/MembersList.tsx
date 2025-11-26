@@ -14,9 +14,6 @@ export function MembersList() {
   const { dao, members } = context;
   const { adminId } = dao;
 
-  // Check if DAO has teamMembers (for Governance Token and NFT DAOs)
-  const teamMembers = "teamMembers" in dao ? dao.teamMembers ?? [] : [];
-
   const adminIndex = members?.findIndex((member) => member.accountId === adminId);
   // @ts-ignore - @types/ramda has not yet been updated with a type for R.swap
   const membersWithAdminFirst: Member[] = R.swap(0, adminIndex, members);
@@ -31,7 +28,6 @@ export function MembersList() {
           {membersWithAdminFirst?.map((member, index) => {
             const { accountId } = member;
             const isAdmin = accountId === adminId;
-            const isTeamMember = teamMembers.includes(accountId);
             return (
               <Flex
                 key={index}
@@ -44,10 +40,11 @@ export function MembersList() {
               >
                 <Flex direction="row" justifyContent="space-between" gap="4">
                   <HashScanLink id={accountId} type={HashscanData.Account} />
-                  <Flex direction="row" gap="2">
-                    {isAdmin && <Tag label="Admin" />}
-                    {isTeamMember && <Tag label="Team" />}
-                  </Flex>
+                  {isAdmin && (
+                    <Flex direction="row" gap="2">
+                      <Tag label="Admin" />
+                    </Flex>
+                  )}
                 </Flex>
               </Flex>
             );

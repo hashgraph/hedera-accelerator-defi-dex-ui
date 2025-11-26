@@ -13,10 +13,10 @@ interface UseMintNFTParams {
 export function useMintNFT(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<TransactionResponse | undefined, Error, UseMintNFTParams, DAOMutations.MintNFTTokens>(
     async (params: UseMintNFTParams) => {
+      const signer = wallet.getSigner();
       return DexService.sendMintNFTTokensTransaction({ ...params, signer });
     },
     {

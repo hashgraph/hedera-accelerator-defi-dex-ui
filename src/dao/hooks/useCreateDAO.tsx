@@ -50,9 +50,9 @@ export function useCreateDAO(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseCreateDAOParams, DAOMutations.CreateDAO>(
     async (params: UseCreateDAOParams) => {
+      const signer = wallet.getSigner();
       const { type, daoFeeConfig, ...data } = params;
       if (isNil(daoFeeConfig)) return;
       if (type === DAOType.GovernanceToken) {

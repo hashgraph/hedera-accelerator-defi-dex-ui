@@ -20,7 +20,6 @@ interface UseCreateMultiSigGenericProposalParams {
 export function useCreateMultiSigGenericProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -29,6 +28,7 @@ export function useCreateMultiSigGenericProposal(handleOnSuccess: HandleOnSucces
     DAOMutations.CreateGOVTokenAssociateProposal
   >(
     async (params: UseCreateMultiSigGenericProposalParams) => {
+      const signer = wallet.getSigner();
       const { targetContractId, functionData, multiSigDAOContractId, title, description, linkToDiscussion } = params;
       const safeEVMAddress = await DexService.fetchContractEVMAddress(targetContractId);
       return DAOService.sendProposeTransaction({

@@ -17,7 +17,6 @@ export function useCreateNonFungibleToken(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse, Error, UseCreateNFTParams, HTSMutations.CreateToken>(
     (params: UseCreateNFTParams) => {
       return DexService.createNFT({ ...params, signer });

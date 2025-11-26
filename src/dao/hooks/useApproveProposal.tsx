@@ -22,9 +22,9 @@ export function useApproveProposal(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseApproveProposalParams, DAOMutations.ApproveProposal>(
     async (params: UseApproveProposalParams) => {
+      const signer = wallet.getSigner();
       const { safeId, transactionHash } = params;
       return DexService.sendApproveMultiSigTransaction(safeId, transactionHash, signer);
     },

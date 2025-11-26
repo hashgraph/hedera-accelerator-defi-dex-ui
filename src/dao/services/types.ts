@@ -93,7 +93,6 @@ export interface GovernanceDAODetails {
   votingPeriod: number;
   minimumProposalDeposit?: number;
   lockedTokenDetails?: LockedTokenDetails[];
-  teamMembers?: string[];
 }
 
 export interface NFTDAODetails {
@@ -116,7 +115,6 @@ export interface NFTDAODetails {
   votingPeriod: number;
   minimumProposalDeposit?: number;
   lockedTokenDetails?: LockedTokenDetails[];
-  teamMembers?: string[];
 }
 
 export interface MultiSigDAODetails {

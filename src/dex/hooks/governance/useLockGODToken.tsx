@@ -20,10 +20,10 @@ export function useLockGODToken(
 ) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseLockGODTokenParams, GovernanceMutations.ClaimGODToken>(
     async (params: UseLockGODTokenParams) => {
       const { amount, tokenHolderAddress, governanceTokenId } = params;
+      const signer = wallet.getSigner();
       const { precision, decimals } = (await DexService.fetchTokenData(governanceTokenId)).data;
       await DexService.setTokenAllowance({
         tokenId: governanceTokenId,

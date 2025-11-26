@@ -61,7 +61,10 @@ export function useManageVotingPower(governanceTokenId: string, tokenHolderAddre
     handleUnLockedGODTokenSuccess
   );
 
-  const totalGodToken = parseFloat(votingPower!) + (govTokenBalance?.data ?? 0);
+  const votingPowerValue = votingPower ? parseFloat(votingPower) : 0;
+  const govTokenBalanceValue = govTokenBalance?.data ?? 0;
+  const totalGodToken = (isNaN(votingPowerValue) ? 0 : votingPowerValue) + govTokenBalanceValue;
+
   const tokenData = {
     symbol: token?.data.symbol,
     locked: isWalletConnected ? `${lockedGOVToken.data?.toFixed(4) ?? "0.0000"}` : "-",

@@ -19,7 +19,6 @@ export function useUnlockGODToken(
 ) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
   return useMutation<
     TransactionResponse | undefined,
     Error,
@@ -27,6 +26,7 @@ export function useUnlockGODToken(
     GovernanceMutations.ClaimGODToken
   >(
     async (params: UseUnLockGODTokenParams) => {
+      const signer = wallet.getSigner();
       return DexService.sendUnLockGODTokenTransaction({ ...params, signer, tokenDecimals });
     },
     {

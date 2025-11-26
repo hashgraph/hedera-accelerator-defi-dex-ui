@@ -22,7 +22,6 @@ interface UseCreateDAOUpgradeProposal {
 export function useCreateDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -31,6 +30,7 @@ export function useCreateDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.CreateDAOUpgradeProposal
   >(
     async (params: UseCreateDAOUpgradeProposal) => {
+      const signer = wallet.getSigner();
       return DexService.createUpgradeProxyProposal({ ...params, signer });
     },
     {

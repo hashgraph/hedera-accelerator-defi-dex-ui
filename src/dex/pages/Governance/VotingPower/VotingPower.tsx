@@ -104,14 +104,15 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
             />
           ) : isWalletConnected ? (
             <Button
-              as="a"
               key="swap"
               variant="secondary"
               width="105px"
               leftIcon={<SwapIcon />}
-              href={"https://defi-ui.zilbo.com/swap"}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => {
+                const protocol = window.location.protocol;
+                const port = window.location.port ? `:${window.location.port}` : "";
+                window.location.href = `${protocol}//defi-ui.localhost${port}/swap`;
+              }}
             >
               <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
             </Button>

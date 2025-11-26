@@ -14,7 +14,7 @@ export function useManageNFTVotingPower(governanceTokenId: string, tokenHolderAd
   const isWalletConnected = wallet.isPaired();
   const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
   const { data: token } = useToken(governanceTokenId);
-  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId);
+  const { data: tokenNFTs = [] } = useTokenNFTs(governanceTokenId, walletId || undefined);
   const govTokenBalance = useTokenBalance({ tokenId: governanceTokenId });
 
   const lockedNFTToken = useFetchLockedNFTToken(walletId, tokenHolderAddress);

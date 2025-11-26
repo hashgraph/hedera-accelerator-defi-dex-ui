@@ -25,9 +25,9 @@ export function useExecuteProposal(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseExecuteProposalParams, DAOMutations.ExecuteProposal>(
     async (params: UseExecuteProposalParams) => {
+      const signer = wallet.getSigner();
       return DexService.sendExecuteMultiSigTransaction({ ...params, signer });
     },
     {

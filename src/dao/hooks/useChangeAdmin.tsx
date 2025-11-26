@@ -22,10 +22,10 @@ export function useChangeAdmin(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseChangeAdminParams, DAOMutations.ChangeAdmin>(
     async (params: UseChangeAdminParams) => {
       const { safeAccountId, proxyAddress } = params;
+      const signer = wallet.getSigner();
       return DexService.sendChangeAdminForProposalTransaction(safeAccountId, proxyAddress, signer);
     },
     {

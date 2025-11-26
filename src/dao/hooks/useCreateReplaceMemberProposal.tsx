@@ -18,7 +18,6 @@ interface ReplaceMemberForm {
 export function useCreateReplaceMemberProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -27,6 +26,7 @@ export function useCreateReplaceMemberProposal(handleOnSuccess: HandleOnSuccess)
     DAOMutations.CreateReplaceMemberProposal
   >(
     async (params: ReplaceMemberForm) => {
+      const signer = wallet.getSigner();
       return DexService.proposeSwapOwnerWithThreshold({ ...params, signer });
     },
     {

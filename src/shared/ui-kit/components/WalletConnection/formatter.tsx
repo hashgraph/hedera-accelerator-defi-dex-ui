@@ -46,19 +46,35 @@ const getConnectionStateNotification = ({
 
 export const formatWalletConnectionData = (props: WalletConnectionProps) => {
   const { accountId, connectionState, accountBalances } = props;
+
+  console.log("(formatter) Account balances:", accountBalances);
+  console.log("(formatter) HBAR value:", accountBalances?.hbars);
+
+  // Parse HBAR balance - handle formats like "100 ℏ", "0 tℏ", or undefined
+  let formattedHbarAmount = "- ℏ";
+  if (accountBalances?.hbars) {
+    const hbarString = accountBalances.hbars;
+    console.log("(formatter) HBAR string before parsing:", hbarString);
+
+    // Remove both "ℏ" and "t" (tinybars indicator), then parse
+    const hbarValue = Number(hbarString.replace(/[ℏt\s]/g, ""));
+    console.log("(formatter) HBAR value after parsing:", hbarValue);
+
+    if (!isNaN(hbarValue)) {
+      formattedHbarAmount = `${hbarValue.toFixed(6)} ℏ`;
+    }
+  }
+
+  console.log("(formatter) Final formatted HBAR:", formattedHbarAmount);
+
   const isHbarBalanceZero =
-    accountBalances?.hbars !== undefined && Number(accountBalances?.hbars.replace("ℏ", "")) === 0;
+    accountBalances?.hbars !== undefined && Number(accountBalances.hbars.replace(/[ℏt\s]/g, "")) === 0;
   const hashScanAccountLink = `https://hashscan.io/testnet/account/${accountId}`;
 
   return {
     hashScanAccountLink,
     formattedTokens: accountBalances?.tokens ?? [],
-    formattedHbarAmount:
-      accountBalances?.hbars && accountBalances?.hbars !== "0 tℏ"
-        ? `${Number(accountBalances.hbars.replace("ℏ", "")).toFixed(6)} ℏ`
-        : accountBalances?.hbars === "0 tℏ"
-        ? "0 ℏ"
-        : "- ℏ",
+    formattedHbarAmount,
     connectionNotification: getConnectionStateNotification({ connectionState, hashScanAccountLink, isHbarBalanceZero }),
     connectionStatusColor: getConnectionStatusColor(connectionState, isHbarBalanceZero),
   };

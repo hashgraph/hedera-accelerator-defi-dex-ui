@@ -97,7 +97,6 @@ export interface CreateADAOFormBase {
   daoLinks: Record<"value", string>[];
   type: DAOType;
   disclaimer?: boolean;
-  teamMembers?: Record<"value", string>[];
 }
 
 export interface CreateATokenDAOForm extends CreateADAOFormBase {

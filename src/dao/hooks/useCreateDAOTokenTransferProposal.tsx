@@ -26,7 +26,6 @@ interface UseCreateDAOTokenTransferProposalParams {
 export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -35,6 +34,7 @@ export function useCreateDAOTokenTransferProposal(handleOnSuccess: HandleOnSucce
     DAOMutations.CreateTokenTransferProposal
   >(
     async (params: UseCreateDAOTokenTransferProposalParams) => {
+      const signer = wallet.getSigner();
       return DexService.createTokenTransferProposal({ ...params, signer });
     },
     {
