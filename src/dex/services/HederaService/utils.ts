@@ -1,6 +1,7 @@
 import { TREASURY_ID, TREASURY_KEY, TOKEN_USER_ID, TOKEN_USER_KEY } from "../constants";
-import { PrivateKey, Client, AccountId, TransactionResponse, TransactionReceipt } from "@hashgraph/sdk";
+import { PrivateKey, Client, AccountId, TransactionResponse, TransactionReceipt, LedgerId } from "@hashgraph/sdk";
 import { isNil } from "ramda";
+import { getDefaultLedgerId } from "shared";
 
 const treasuryId = AccountId.fromString(TREASURY_ID);
 const treasuryKey = PrivateKey.fromString(TREASURY_KEY);
@@ -23,7 +24,8 @@ const getUser = () => {
 };
 
 const createClient = (accountId: AccountId, privateKey: PrivateKey): Client => {
-  const client = Client.forTestnet();
+  const network = getDefaultLedgerId();
+  const client = network.toString() === LedgerId.MAINNET.toString() ? Client.forMainnet() : Client.forTestnet();
   client.setOperator(accountId, privateKey);
   return client;
 };
