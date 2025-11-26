@@ -17,6 +17,7 @@ import { CreateADAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
 import { useState } from "react";
 import { isValidUrl } from "@dex/utils";
+import { DAOType } from "@dao/services";
 
 export function DAODetailsForm() {
   const {
@@ -30,6 +31,17 @@ export function DAODetailsForm() {
     control,
     name: "daoLinks",
   });
+
+  const {
+    fields: teamMemberFields,
+    append: appendTeamMember,
+    remove: removeTeamMember,
+  } = useFieldArray({
+    control,
+    name: "teamMembers",
+  });
+
+  const isTokenOrNFTDAO = daoDetails.type === DAOType.GovernanceToken || daoDetails.type === DAOType.NFT;
 
   const [imageUrl, setImageUrl] = useState(() => {
     return daoDetails.logoUrl ?? "";
@@ -160,6 +172,38 @@ export function DAODetailsForm() {
             </SimpleGrid>
           </AccordionPanel>
         </AccordionItem>
+        {isTokenOrNFTDAO && (
+          <AccordionItem>
+            <Text.P_Medium_Medium>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  Team Members (optional)
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </Text.P_Medium_Medium>
+            <AccordionPanel pb={4}>
+              <Box mb={2}>
+                <Text.P_Small_Regular color={Color.Neutral._500}>
+                  Add account IDs of team members to display them with a "Team" badge in the Members tab
+                </Text.P_Small_Regular>
+              </Box>
+              <SimpleGrid row={1} spacingX="1rem" spacingY="0.75rem">
+                <FormInputList<CreateADAOForm, "teamMembers">
+                  fields={teamMemberFields}
+                  defaultFieldValue={{ value: "" }}
+                  formPath="teamMembers"
+                  fieldPlaceholder="Enter account ID (e.g., 0.0.123456)"
+                  fieldLabel=""
+                  fieldButtonText="+ Add Team Member"
+                  append={appendTeamMember}
+                  remove={removeTeamMember}
+                  register={register}
+                />
+              </SimpleGrid>
+            </AccordionPanel>
+          </AccordionItem>
+        )}
       </Accordion>
     </DAOFormContainer>
   );

@@ -38,6 +38,7 @@ import {
   ProposalDataDetails,
   LockedTokenDetails,
 } from "./types";
+import { getTeamMembers, migrateTeamMembers } from "@dao/utils/teamMembersStorage";
 import { HashConnectSigner } from "hashconnect/dist/signer";
 import { convertNumberToPercentage, convertToByte32 } from "@dex/utils";
 import { ProposalData } from "../../dex/services/DexService/governance/type";
@@ -209,6 +210,7 @@ async function fetchGovernanceDAOs(eventTypes?: string[]): Promise<GovernanceDAO
         votingPeriod: votingPeriod.toNumber(),
         minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
         lockedTokenDetails,
+        teamMembers: getTeamMembers(accountId, name),
       };
     });
 
@@ -281,6 +283,7 @@ async function fetchNFTDAOs(eventTypes?: string[]): Promise<NFTDAODetails[]> {
         votingPeriod: votingPeriod.toNumber(),
         minimumProposalDeposit: MINIMUM_DEPOSIT_AMOUNT,
         lockedTokenDetails,
+        teamMembers: getTeamMembers(accountId, name),
       };
     });
 

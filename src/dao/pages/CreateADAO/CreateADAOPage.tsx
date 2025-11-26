@@ -11,16 +11,19 @@ import {
   NFTDAOGovernanceData,
   TokenDAOGovernanceData,
 } from "./types";
-import { useHandleTransactionSuccess } from "@dex/hooks";
+import { useHandleTransactionSuccess, useDexContext } from "@dex/hooks";
 import { useCreateDAO, useFetchDAOConfig } from "@dao/hooks";
 import { WarningIcon } from "@chakra-ui/icons";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { Routes } from "@dao/routes";
 import { DAOType } from "@dao/services";
+import { storeTeamMembersByName } from "@dao/utils/teamMembersStorage";
 
 export function CreateADAOPage() {
   const backTo = Routes.Home;
   const handleTransactionSuccess = useHandleTransactionSuccess();
+  const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
+  const walletId = wallet?.savedPairingData?.accountIds[0] ?? "";
 
   const createDAOPageForm = useForm<CreateADAOForm>({
     defaultValues: {
@@ -38,7 +41,7 @@ export function CreateADAOPage() {
     register,
     formState: { isSubmitting },
   } = createDAOPageForm;
-  const { isPublic, type, name, governance } = getValues();
+  const { isPublic, type, name, governance, teamMembers = [] } = getValues();
   watch("type");
   const isNewTokenIdRequired =
     type === DAOType.GovernanceToken &&
@@ -142,8 +145,15 @@ export function CreateADAOPage() {
   ];
 
   async function onSubmit(data: CreateADAOForm) {
-    const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl = "" } = data;
+    const { type, name, isPublic, description, daoLinks = [], teamMembers = [], logoUrl = "", infoUrl = "" } = data;
     const finalInfoUrl = infoUrl.trim() || "#";
+
+    // Store team members by name for later retrieval (for Token and NFT DAOs)
+    const teamMembersList = teamMembers.map((member) => member.value).filter((value) => value.trim() !== "");
+    if ((type === DAOType.GovernanceToken || type === DAOType.NFT) && teamMembersList.length > 0 && walletId) {
+      storeTeamMembersByName(walletId, name, teamMembersList);
+    }
+
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
       const { governance, voting } = tokenDAOData;
@@ -154,6 +164,7 @@ export function CreateADAOPage() {
         description,
         infoUrl: finalInfoUrl,
         daoLinks: daoLinks.map((link) => link.value),
+        teamMembers: teamMembersList,
         isPrivate: !isPublic,
         tokenId:
           governance.tokenType === DAOGovernanceTokenType.NewToken
@@ -195,6 +206,7 @@ export function CreateADAOPage() {
         name,
         description,
         daoLinks: daoLinks.map((link) => link.value),
+        teamMembers: teamMembersList,
         logoUrl,
         infoUrl: finalInfoUrl,
         isPrivate: !isPublic,

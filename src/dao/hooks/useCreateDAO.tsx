@@ -13,6 +13,7 @@ interface UseCreateDAOParamsBase {
   logoUrl: string;
   isPrivate: boolean;
   infoUrl: string;
+  teamMembers?: string[];
 }
 
 interface UseCreateGovernanceDAOParams extends UseCreateDAOParamsBase {
