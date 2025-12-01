@@ -7,20 +7,20 @@ const primary = {
   color: Color.White,
   padding: "0 24px",
   borderRadius: "8px",
-  boxShadow: Color.Shadow.Primary,
+  boxShadow: "none",
   transition: "all 0.2s ease-in-out",
   ":hover": {
     bg: Color.Primary._600,
-    boxShadow: Color.Shadow.PrimaryHover,
+    boxShadow: "none",
     transform: "translateY(-1px)",
   },
   ":focus": {
     bg: Color.Primary._500,
-    boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.3)`,
+    boxShadow: "none",
   },
   ":active": {
     transform: "translateY(0)",
-    boxShadow: Color.Shadow.Soft,
+    boxShadow: "none",
   },
   ":disabled": {
     bg: Color.Neutral._200,
@@ -51,17 +51,17 @@ export const ButtonStyles: ComponentStyleConfig = {
       padding: "0 24px",
       borderRadius: "8px",
       border: `1px solid ${Color.Grey_Blue._200}`,
-      boxShadow: Color.Shadow.Soft,
+      boxShadow: "none",
       transition: "all 0.2s ease-in-out",
       ":hover": {
         bg: Color.Grey_Blue._200,
         borderColor: Color.Grey_Blue._300,
-        boxShadow: Color.Shadow.Medium,
+        boxShadow: "none",
         transform: "translateY(-1px)",
       },
       ":focus": {
         bg: Color.Grey_Blue._100,
-        boxShadow: `0 0 0 3px rgba(131, 156, 165, 0.2)`,
+        boxShadow: "none",
       },
       ":active": {
         transform: "translateY(0)",
@@ -92,6 +92,39 @@ export const ButtonStyles: ComponentStyleConfig = {
       },
     },
     cancel: {},
+    purple: {
+      ...TextStyles["p small semibold"],
+      bg: Color.Private.Accent,
+      color: Color.White,
+      padding: "0 24px",
+      borderRadius: "8px",
+      boxShadow: "none",
+      transition: "all 0.2s ease-in-out",
+      ":hover": {
+        bg: "#7C3AED",
+        boxShadow: "none",
+        transform: "translateY(-1px)",
+      },
+      ":focus": {
+        bg: Color.Private.Accent,
+        boxShadow: "none",
+      },
+      ":active": {
+        transform: "translateY(0)",
+        boxShadow: "none",
+      },
+      ":disabled": {
+        bg: Color.Neutral._200,
+        color: Color.Neutral._500,
+        boxShadow: "none",
+        transform: "none",
+      },
+      ":hover:disabled": {
+        bg: Color.Neutral._200,
+        color: Color.Neutral._500,
+        transform: "none",
+      },
+    },
     "new-proposal": {
       ...primary,
       minWidth: "250px",
@@ -101,7 +134,7 @@ export const ButtonStyles: ComponentStyleConfig = {
       height: "48px",
       width: "48px",
       bg: Color.White_01,
-      boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.15)",
+      boxShadow: "none",
     }),
     settings: {
       height: "36px",
@@ -110,12 +143,12 @@ export const ButtonStyles: ComponentStyleConfig = {
       bg: Color.White,
       border: `1px solid ${Color.Neutral._200}`,
       borderRadius: "8px",
-      boxShadow: Color.Shadow.Soft,
+      boxShadow: "none",
       transition: "all 0.2s ease-in-out",
       ":hover": {
         bg: Color.Neutral._50,
         borderColor: Color.Neutral._300,
-        boxShadow: Color.Shadow.Medium,
+        boxShadow: "none",
       },
     },
     link: {
@@ -134,8 +167,8 @@ export const ButtonStyles: ComponentStyleConfig = {
       color: Color.Black,
       _hover: {
         bg: "transparent",
-        border: `1px solid ${Color.Blue._300}`,
-        boxShadow: `0px 0px 0px 4px ${Color.Blue._100}`,
+        border: `1px solid ${Color.Primary._300}`,
+        boxShadow: "none",
       },
       _focus: {
         bg: "transparent",

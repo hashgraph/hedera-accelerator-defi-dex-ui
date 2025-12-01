@@ -2,7 +2,7 @@ import { Color } from "../../themes";
 
 export const ToastStyles = `
   --toastify-color-light: ${Color.White};
-  --toastify-color-info: ${Color.Blue._500};
+  --toastify-color-info: ${Color.Primary._500};
   --toastify-color-success: ${Color.Success._700};
   --toastify-color-error: ${Color.Destructive._700};
 

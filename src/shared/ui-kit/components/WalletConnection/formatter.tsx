@@ -61,7 +61,7 @@ export const formatWalletConnectionData = (props: WalletConnectionProps) => {
     console.log("(formatter) HBAR value after parsing:", hbarValue);
 
     if (!isNaN(hbarValue)) {
-      formattedHbarAmount = `${hbarValue.toFixed(6)} ℏ`;
+      formattedHbarAmount = `${hbarValue.toFixed(1)} ℏ`;
     }
   }
 

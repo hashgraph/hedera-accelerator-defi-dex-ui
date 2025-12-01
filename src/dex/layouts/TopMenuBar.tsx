@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useDexContext } from "@dex/hooks";
+import { NetworkSwitcher } from "@dex/components";
 import { Color, HashDaoLogo, WalletConnection, Text } from "@shared/ui-kit";
 import { useEffect, useState } from "react";
 
@@ -64,18 +65,19 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
           </Alert>
 
           {/* Desktop Navigation */}
-          <Flex direction="row" gap="1" display={{ base: "none", md: "flex" }}>
+          <Flex direction="row" gap="2" display={{ base: "none", md: "flex" }} alignItems="center">
             {props.menuOptions.map((menuOption, index) => {
               return (
                 <Box width="fit-content" key={index}>
                   <NavLink key={menuOption} to={`${menuOption.toLowerCase()}`}>
                     <MenuItem
                       justifyContent="center"
-                      borderRadius="8px"
-                      _hover={{ bg: Color.Neutral._100 }}
-                      px={{ base: "2", lg: "4" }}
+                      borderRadius="6px"
+                      _hover={{ bg: Color.Neutral._50 }}
+                      px={{ base: "3", lg: "4" }}
+                      py="2"
                     >
-                      <Text.P_Medium_Medium>{menuOption}</Text.P_Medium_Medium>
+                      <Text.P_Medium_Medium color={Color.Neutral._700}>{menuOption}</Text.P_Medium_Medium>
                     </MenuItem>
                   </NavLink>
                 </Box>
@@ -95,14 +97,9 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
           />
         )}
 
-        {/* Desktop wallet connection */}
-        <Box
-          textAlign="right"
-          borderRadius="8px"
-          width="fit-content"
-          display={{ base: "none", md: "block" }}
-          flexShrink={0}
-        >
+        {/* Desktop network switcher and wallet connection */}
+        <Flex direction="row" gap="3" alignItems="center" display={{ base: "none", md: "flex" }} flexShrink={0}>
+          <NetworkSwitcher />
           <WalletConnection
             accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
             connectionState={wallet.hashConnectConnectionState}
@@ -111,7 +108,7 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
             connectToWallet={wallet.connectToWallet}
             disconnectFromWallet={wallet.disconnectWallet}
           />
-        </Box>
+        </Flex>
       </Menu>
 
       {/* Mobile Drawer Menu */}
@@ -130,14 +127,17 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
                 </NavLink>
               ))}
               <Box pt={4} borderTopWidth="1px">
-                <WalletConnection
-                  accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
-                  connectionState={wallet.hashConnectConnectionState}
-                  accountBalances={wallet.pairedAccountBalance}
-                  isLoading={app.isFeatureLoading("pairedAccountBalance")}
-                  connectToWallet={wallet.connectToWallet}
-                  disconnectFromWallet={wallet.disconnectWallet}
-                />
+                <VStack spacing={4} align="stretch">
+                  <NetworkSwitcher />
+                  <WalletConnection
+                    accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
+                    connectionState={wallet.hashConnectConnectionState}
+                    accountBalances={wallet.pairedAccountBalance}
+                    isLoading={app.isFeatureLoading("pairedAccountBalance")}
+                    connectToWallet={wallet.connectToWallet}
+                    disconnectFromWallet={wallet.disconnectWallet}
+                  />
+                </VStack>
               </Box>
             </VStack>
           </DrawerBody>

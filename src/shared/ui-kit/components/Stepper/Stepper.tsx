@@ -7,7 +7,7 @@ import { Text } from "../Text";
 const GetStatusIcon = (iconType: string) => {
   switch (iconType) {
     case ProposalStateIcon.Active:
-      return <ActiveStepIcon color={Color.Blue._500} boxSize="7" />;
+      return <ActiveStepIcon color={Color.Primary._500} boxSize="7" />;
     case ProposalStateIcon.Completed:
       return <CompletedStepIcon />;
     case ProposalStateIcon.Disabled:

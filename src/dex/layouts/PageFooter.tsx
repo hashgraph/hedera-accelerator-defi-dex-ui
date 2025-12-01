@@ -1,17 +1,21 @@
-import { Flex, Link } from "@chakra-ui/react";
-import { NetworkSwitcher } from "@dex/components";
+import { Flex, Link, Spacer } from "@chakra-ui/react";
 import { Color, GithubIcon, Text } from "@shared/ui-kit";
 
 export function PageFooter() {
   return (
-    <Flex layerStyle="footer" alignItems="flex-end" mt="5">
-      <Text.P_XSmall_Regular>
-        <Link href="https://swirldslabs.com" textStyle="p small regular link" color={Color.Primary._500}>
-          Swirlds Labs
+    <Flex layerStyle="footer" mt="5">
+      {/* Left - Copyright */}
+      <Text.P_XSmall_Regular color={Color.Neutral._500}>
+        <Link href="https://hedera.com" textStyle="p small regular link" color={Color.Primary._500}>
+          Hashgraph
         </Link>{" "}
-        © 2023 - 2024
+        © 2025
       </Text.P_XSmall_Regular>
-      <Flex direction="row" alignItems="flex-end" gap="8">
+
+      <Spacer />
+
+      {/* Center - Legal links */}
+      <Flex direction="row" alignItems="center" gap={{ base: 3, md: 6 }}>
         <Link
           textStyle="p small regular link"
           color={Color.Primary._500}
@@ -36,6 +40,12 @@ export function PageFooter() {
         >
           Audit by Certik
         </Link>
+      </Flex>
+
+      <Spacer />
+
+      {/* Right - GitHub links */}
+      <Flex direction="row" alignItems="center" gap={{ base: 3, md: 6 }}>
         <Link
           textStyle="p small regular link"
           color={Color.Primary._500}
@@ -56,7 +66,6 @@ export function PageFooter() {
             <GithubIcon fill={Color.Primary._500} /> Smart Contracts
           </Flex>
         </Link>
-        <NetworkSwitcher />
       </Flex>
     </Flex>
   );

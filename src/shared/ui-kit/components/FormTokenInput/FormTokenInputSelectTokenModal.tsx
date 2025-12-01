@@ -65,7 +65,7 @@ export function FormTokenInputSelectTokenModal() {
 
     return (
       <ListItem
-        bg={tokenId === selectedToken?.tokenId ? Color.Blue._100 : Color.White}
+        bg={tokenId === selectedToken?.tokenId ? Color.Primary._100 : Color.White}
         onClick={() => handleTokenClicked(fungibleTokens[index])}
       >
         <Flex direction="row" alignItems="center" gap="2">
