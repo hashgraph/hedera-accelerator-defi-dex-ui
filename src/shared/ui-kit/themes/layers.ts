@@ -149,7 +149,7 @@ export const LayerStyles = {
     maxWidth: "100%",
     minHeight: `calc(100vh - ${BodyHeight}px)`,
     height: "100%",
-    bg: Color.White,
+    bg: "linear-gradient(180deg, #EBF8FF 0%, #F8FAFC 15%, #FFFFFF 100%)",
     padding: "0",
     marginTop: "4rem",
   },

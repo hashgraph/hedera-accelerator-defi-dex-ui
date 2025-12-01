@@ -98,8 +98,14 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
         )}
 
         {/* Desktop network switcher and wallet connection */}
-        <Flex direction="row" gap="3" alignItems="center" display={{ base: "none", md: "flex" }} flexShrink={0}>
-          <NetworkSwitcher />
+        <Flex
+          direction="row"
+          gap="3"
+          alignItems="center"
+          display={{ base: "none", md: "flex" }}
+          flexShrink={0}
+          marginLeft="auto"
+        >
           <WalletConnection
             accountId={wallet.savedPairingData?.accountIds[0] ?? ""}
             connectionState={wallet.hashConnectConnectionState}
@@ -108,6 +114,7 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
             connectToWallet={wallet.connectToWallet}
             disconnectFromWallet={wallet.disconnectWallet}
           />
+          <NetworkSwitcher />
         </Flex>
       </Menu>
 
