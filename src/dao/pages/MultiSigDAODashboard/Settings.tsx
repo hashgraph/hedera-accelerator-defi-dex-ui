@@ -1,6 +1,6 @@
 import { Button, Divider, Flex, SimpleGrid, IconButton, Image, Link, UnorderedList, ListItem } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { Text, RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon, ExternalLink } from "@shared/ui-kit";
+import { Text, RefreshIcon, Color, Tag, CopyTextButton, DefaultLogoIcon, ExternalLink, useTheme } from "@shared/ui-kit";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./types";
 import { Member } from "@dao/services";
@@ -16,6 +16,7 @@ const { Multisig, DAOAddMemberDetails, DAODeleteMemberDetails, DAOReplaceMemberD
   Routes;
 
 export function Settings() {
+  const theme = useTheme();
   const { accountId: daoAccountId = "" } = useParams();
   const navigate = useNavigate();
   const { dao, members } = useOutletContext<MultiSigDAODetailsContext>();
@@ -60,14 +61,14 @@ export function Settings() {
       <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" padding="1rem 0">
         <DAOFormContainer>
           <Flex direction="column" gap={2} marginBottom="0.4rem">
-            <Text.P_Medium_Medium>Members</Text.P_Medium_Medium>
-            <Text.P_Small_Regular marginBottom="0.7rem" color={Color.Neutral._500}>
+            <Text.P_Medium_Medium color={theme.text}>Members</Text.P_Medium_Medium>
+            <Text.P_Small_Regular marginBottom="0.7rem" color={theme.textSecondary}>
               Manage the member preferences, add, remove or rename them.
             </Text.P_Small_Regular>
-            <Divider />
+            <Divider borderColor={theme.border} />
           </Flex>
           <Flex direction="row" alignItems="center" marginBottom="0.4rem" justifyContent="space-between">
-            <Text.P_Small_Regular>{members.length} Members</Text.P_Small_Regular>
+            <Text.P_Small_Regular color={theme.text}>{members.length} Members</Text.P_Small_Regular>
             <Button type="button" variant="primary" onClick={handleAddNewMemberClicked}>
               + Add Member
             </Button>
@@ -80,12 +81,14 @@ export function Settings() {
                 <Flex
                   key={index}
                   direction="row"
-                  bg={Color.White_02}
+                  bg={theme.bgSecondary}
                   justifyContent="space-between"
                   alignItems="center"
+                  padding="0.5rem"
+                  borderRadius="8px"
                 >
                   <Flex direction="row" gap="2" alignItems="center">
-                    <Text.P_Small_Regular color={Color.Neutral._500}>{accountId}</Text.P_Small_Regular>
+                    <Text.P_Small_Regular color={theme.textSecondary}>{accountId}</Text.P_Small_Regular>
                     <CopyTextButton onClick={handleCopyMemberId} iconSize="17" />
                     {isAdminTag ? <Tag label="Admin" /> : <></>}
                   </Flex>
@@ -96,7 +99,7 @@ export function Settings() {
                         variant="link"
                         aria-label="refresh-member"
                         onClick={() => handleReplaceMemberClick(member.accountId)}
-                        icon={<RefreshIcon boxSize="17" color={Color.Teal_01} />}
+                        icon={<RefreshIcon boxSize="17" color={theme.accentLight} />}
                       />
                     ) : undefined}
                     {!isAdminTag ? (
@@ -105,7 +108,7 @@ export function Settings() {
                         onClick={() => handleDeleteMemberClick(member.accountId)}
                         variant="link"
                         aria-label="delete-member-id"
-                        icon={<DeleteIcon color={Color.Teal_01} boxSize="17" />}
+                        icon={<DeleteIcon color={theme.error} boxSize="17" />}
                       />
                     ) : undefined}
                   </Flex>
@@ -116,25 +119,27 @@ export function Settings() {
         </DAOFormContainer>
         <DAOFormContainer>
           <Flex direction="column" gap={2} marginBottom="0.4rem">
-            <Text.P_Medium_Medium>Governance</Text.P_Medium_Medium>
-            <Text.P_Small_Regular marginBottom="0.7rem" color={Color.Neutral._500}>
+            <Text.P_Medium_Medium color={theme.text}>Governance</Text.P_Medium_Medium>
+            <Text.P_Small_Regular marginBottom="0.7rem" color={theme.textSecondary}>
               Manage the governance related DAO properties.
             </Text.P_Small_Regular>
-            <Divider />
+            <Divider borderColor={theme.border} />
           </Flex>
           <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="1.2rem">
             <Flex
               direction="column"
-              bg={Color.White_02}
+              bg={theme.bgSecondary}
               justifyContent="space-between"
-              border={`1px solid ${Color.Neutral._200}`}
-              borderRadius="4px"
+              border={`1px solid ${theme.border}`}
+              borderRadius="12px"
               padding="1.5rem"
             >
               <Flex direction="row" justifyContent="space-between" alignItems="center">
                 <Flex direction="column" gap="1">
-                  <Text.P_XSmall_Medium color={Color.Neutral._500}>THRESHOLD</Text.P_XSmall_Medium>
-                  <Text.P_Large_Medium>{`${threshold ?? 0} / ${members.length}`}</Text.P_Large_Medium>
+                  <Text.P_XSmall_Medium color={theme.textMuted}>THRESHOLD</Text.P_XSmall_Medium>
+                  <Text.P_Large_Medium color={theme.text}>
+                    {`${threshold ?? 0} / ${members.length}`}
+                  </Text.P_Large_Medium>
                 </Flex>
                 <Button
                   type="button"
@@ -151,30 +156,30 @@ export function Settings() {
         </DAOFormContainer>
         <DAOFormContainer rest={{ gap: 6 }}>
           <Flex direction="column" gap={2}>
-            <Text.P_Medium_Medium>General</Text.P_Medium_Medium>
-            <Text.P_Small_Regular marginBottom="0.7rem" color={Color.Neutral._500}>
+            <Text.P_Medium_Medium color={theme.text}>General</Text.P_Medium_Medium>
+            <Text.P_Small_Regular marginBottom="0.7rem" color={theme.textSecondary}>
               Manage the general DAO properties.
             </Text.P_Small_Regular>
-            <Divider />
+            <Divider borderColor={theme.border} />
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Name</Text.P_Small_Medium>
-            <Text.P_Small_Regular color={Color.Neutral._700}>{name}</Text.P_Small_Regular>
+            <Text.P_Small_Medium color={theme.text}>Name</Text.P_Small_Medium>
+            <Text.P_Small_Regular color={theme.textSecondary}>{name}</Text.P_Small_Regular>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Logo URL</Text.P_Small_Medium>
+            <Text.P_Small_Medium color={theme.text}>Logo URL</Text.P_Small_Medium>
             <Flex direction="row" gap="2" alignItems="center">
               <Image
                 src={logoUrl}
                 boxSize="4rem"
                 objectFit="contain"
                 alt="Logo Url"
-                fallback={<DefaultLogoIcon boxSize="4rem" color={Color.Grey_Blue._100} />}
+                fallback={<DefaultLogoIcon boxSize="4rem" color={theme.textMuted} />}
               />
               <Link
                 as={ReachLink}
                 textStyle="p small regular link"
-                color={Color.Primary._500}
+                color={theme.accentLight}
                 to={logoUrl}
                 isExternal
                 maxWidth="90%"
@@ -184,19 +189,19 @@ export function Settings() {
             </Flex>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Description</Text.P_Small_Medium>
-            <Text.P_Small_Regular color={Color.Neutral._700}>{description}</Text.P_Small_Regular>
+            <Text.P_Small_Medium color={theme.text}>Description</Text.P_Small_Medium>
+            <Text.P_Small_Regular color={theme.textSecondary}>{description}</Text.P_Small_Regular>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>INFO URL</Text.P_Small_Medium>
+            <Text.P_Small_Medium color={theme.text}>INFO URL</Text.P_Small_Medium>
             <ExternalLink to={infoUrl ?? ""}>
-              <Text.P_Small_Semibold_Link>{infoUrl}</Text.P_Small_Semibold_Link>
+              <Text.P_Small_Semibold_Link color={theme.accentLight}>{infoUrl}</Text.P_Small_Semibold_Link>
             </ExternalLink>
           </Flex>
           <Flex direction="column" gap="1">
-            <Text.P_Small_Medium>Social Channels</Text.P_Small_Medium>
+            <Text.P_Small_Medium color={theme.text}>Social Channels</Text.P_Small_Medium>
             <Flex direction="column" gap={2} justifyContent="space-between">
-              <UnorderedList>
+              <UnorderedList color={theme.textSecondary}>
                 {daoLinkRecords.map((link, index) => {
                   return (
                     <ListItem key={index}>
@@ -204,7 +209,7 @@ export function Settings() {
                         key={index}
                         as={ReachLink}
                         textStyle="p small regular link"
-                        color={Color.Primary._500}
+                        color={theme.accentLight}
                         to={link.value}
                         isExternal
                       >
@@ -218,7 +223,7 @@ export function Settings() {
           </Flex>
           {isAdmin ? (
             <Flex alignItems="flex-end" gap="1rem" direction="column">
-              <Divider />
+              <Divider borderColor={theme.border} />
               <Button
                 type="button"
                 variant="primary"

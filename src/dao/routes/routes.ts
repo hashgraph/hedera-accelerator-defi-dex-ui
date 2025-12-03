@@ -1,6 +1,8 @@
 export const Routes = {
   Home: "/",
-  Create: "create",
+  App: "app",
+  Create: "/app/create",
+  CreateDAO: "create",
   Overview: "overview",
   DAODetails: "details",
   DAODisclaimer: "disclaimer",

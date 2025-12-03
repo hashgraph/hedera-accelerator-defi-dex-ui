@@ -13,7 +13,7 @@ import { useLocation, useNavigate, useOutletContext, useParams } from "react-rou
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
 import { DAODetailsContext, GovernanceDAODetails, MultiSigDAODetails } from "@dao/services";
-import { TransactionIcon, Color, usePagination, Pagination } from "@shared/ui-kit";
+import { TransactionIcon, Color, usePagination, Pagination, useTheme } from "@shared/ui-kit";
 import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@dex/utils";
 import { Routes } from "@dao/routes";
@@ -37,6 +37,7 @@ const transactionTabs = [
 ];
 
 export function ProposalList() {
+  const theme = useTheme();
   const { accountId: daoAccountId = "" } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,7 +109,11 @@ export function ProposalList() {
           <CardListLayout
             onTabChange={handleTabChange}
             tabFilters={
-              <Flex layerStyle="dao-dashboard__content-header--with-tabs">
+              <Flex
+                layerStyle="dao-dashboard__content-header--with-tabs"
+                bg={theme.bgSecondary}
+                borderBottom={`1px solid ${theme.border}`}
+              >
                 <TabFilters filters={transactionTabs} />
               </Flex>
             }

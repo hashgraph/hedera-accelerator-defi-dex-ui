@@ -1,4 +1,4 @@
-import { Color, TextStyles } from "../../../themes";
+import { Color, DarkTheme, TextStyles } from "../../../themes";
 import { ComponentStyleConfig } from "@chakra-ui/react";
 
 /**
@@ -17,45 +17,51 @@ export const InputStyles: ComponentStyleConfig = {
       field: {
         ...TextStyles.h2,
         height: "fit-content",
-        background: Color.White,
+        background: DarkTheme.bgInput,
+        color: DarkTheme.text,
         padding: "14px 12px",
-        border: `1px solid ${Color.Neutral._200}`,
-        borderRadius: "10px",
+        border: `1px solid ${DarkTheme.border}`,
+        borderRadius: "12px",
         transition: "all 0.2s ease-in-out",
+        _placeholder: {
+          color: DarkTheme.textMuted,
+        },
         _hover: {
-          borderColor: Color.Primary._300,
+          borderColor: DarkTheme.borderHover,
         },
         _focus: {
-          borderColor: Color.Primary._500,
-          boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.15)`,
+          borderColor: DarkTheme.accent,
+          boxShadow: `0 0 0 3px rgba(126, 34, 206, 0.2)`,
         },
       },
     },
     "input-v2": {
       field: {
-        bg: Color.White,
-        border: `1px solid ${Color.Neutral._200}`,
-        borderRadius: "8px",
+        bg: DarkTheme.bgInput,
+        color: DarkTheme.text,
+        border: `1px solid ${DarkTheme.border}`,
+        borderRadius: "12px",
         transition: "all 0.2s ease-in-out",
-        ":placeholder": {
+        _placeholder: {
           ...TextStyles["p small regular"],
-          color: Color.Neutral._400,
+          color: DarkTheme.textMuted,
         },
         _hover: {
-          borderColor: Color.Neutral._300,
+          borderColor: DarkTheme.borderHover,
         },
         _focus: {
-          borderColor: Color.Primary._500,
-          boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.15)`,
+          borderColor: DarkTheme.accent,
+          boxShadow: `0 0 0 3px rgba(126, 34, 206, 0.2)`,
         },
       },
     },
     "form-input": {
       field: {
-        bg: Color.White,
-        border: `1px solid ${Color.Neutral._200}`,
-        boxShadow: Color.Shadow.Soft,
-        borderRadius: "10px",
+        bg: DarkTheme.bgInput,
+        color: DarkTheme.text,
+        border: `1px solid ${DarkTheme.border}`,
+        boxShadow: "none",
+        borderRadius: "12px",
         padding: "16px",
         height: "52px",
         transition: "all 0.2s ease-in-out",
@@ -63,39 +69,39 @@ export const InputStyles: ComponentStyleConfig = {
           fontSize: "16px",
           lineHeight: "19px",
           fontWeight: "400",
-          color: Color.Neutral._400,
+          color: DarkTheme.textMuted,
         },
         _hover: {
-          borderColor: Color.Neutral._300,
-          boxShadow: Color.Shadow.Medium,
+          borderColor: DarkTheme.borderHover,
         },
         _focus: {
-          borderColor: Color.Primary._500,
-          boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.15)`,
+          borderColor: DarkTheme.accent,
+          boxShadow: `0 0 0 3px rgba(126, 34, 206, 0.2)`,
         },
         _invalid: {
-          borderColor: Color.Destructive._500,
-          boxShadow: `0 0 0 3px rgba(238, 43, 0, 0.15)`,
+          borderColor: DarkTheme.error,
+          boxShadow: `0 0 0 3px rgba(248, 113, 113, 0.2)`,
         },
       },
     },
     filter: {
       field: {
-        bg: Color.White,
-        border: `1px solid ${Color.Neutral._200}`,
-        minWidth: "280px",
-        borderRadius: "8px",
-        padding: "0.5rem 0.75rem",
+        bg: DarkTheme.bgInput,
+        color: DarkTheme.text,
+        border: `1px solid ${DarkTheme.border}`,
+        minWidth: "200px",
+        borderRadius: "full",
+        padding: "0.5rem 1rem",
         transition: "all 0.2s ease-in-out",
         _placeholder: {
-          color: Color.Neutral._400,
+          color: DarkTheme.textMuted,
         },
         _hover: {
-          borderColor: Color.Neutral._300,
+          borderColor: DarkTheme.borderHover,
         },
         _focus: {
-          borderColor: Color.Primary._500,
-          boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.15)`,
+          borderColor: DarkTheme.accent,
+          boxShadow: `0 0 0 3px rgba(126, 34, 206, 0.2)`,
         },
       },
     },

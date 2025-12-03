@@ -1,7 +1,7 @@
 import { WarningIcon } from "@chakra-ui/icons";
 import { HStack, Button, Spacer, Flex, useBreakpointValue, Box } from "@chakra-ui/react";
 import { MirrorNodeTokenNFT } from "@dex/services";
-import { Text, Color, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon } from "@shared/ui-kit";
+import { Text, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon, useTheme } from "@shared/ui-kit";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { ManageVotingPower } from "./ManageVotingPower";
 import { InputTokenData } from "./types";
@@ -26,6 +26,7 @@ export interface VotingPowerProps {
 }
 
 export const VotingPower = (props: VotingPowerProps) => {
+  const theme = useTheme();
   const {
     tokenData,
     tokenNFTs,
@@ -63,14 +64,15 @@ export const VotingPower = (props: VotingPowerProps) => {
         label="VOTING POWER"
         isLoading={isFormLoading}
         labelLeftIcon={<LightningBoltIcon />}
-        labelTextColor={Color.Neutral._500}
+        labelTextColor={theme.textMuted}
         labelTextStyle="p xsmall medium"
         labelOpacity="1.0"
         value={tokenData.locked}
-        valueTextColor={Color.Primary._600}
+        valueTextColor={theme.accent}
         valueStyle="h3 medium"
         valueUnitSymbol={tokenData.symbol}
         amount="$--.--"
+        amountLabelColor={theme.textMuted}
       />
       <Spacer display={{ base: "none", lg: "block" }} />
       <Flex
@@ -80,7 +82,8 @@ export const VotingPower = (props: VotingPowerProps) => {
         justify={{ base: "center", sm: "space-between", md: "right" }}
         alignItems={{ base: "stretch", sm: "center" }}
         borderRadius="0.5rem"
-        background={Color.Neutral._50}
+        background={theme.bgSecondary}
+        border={`1px solid ${theme.border}`}
         flexWrap="wrap"
       >
         {showTokenDetails && (

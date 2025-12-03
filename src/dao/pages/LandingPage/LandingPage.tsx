@@ -1,0 +1,556 @@
+import { Box, Button, Container, Flex, Grid, Heading, Text, VStack, HStack, keyframes, Image } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { Color } from "@shared/ui-kit";
+import { Routes } from "@dao/routes";
+
+const float = keyframes`
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(5deg); }
+`;
+
+const glow = keyframes`
+  0%, 100% { box-shadow: 0 0 60px rgba(126, 34, 206, 0.3); }
+  50% { box-shadow: 0 0 100px rgba(126, 34, 206, 0.6); }
+`;
+
+const slideUp = keyframes`
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const orbit = keyframes`
+  from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+`;
+
+export function LandingPage() {
+  const navigate = useNavigate();
+
+  return (
+    <Box bg="#0A0A0F" minH="100vh" overflow="hidden" position="relative">
+      {/* Gradient Orbs */}
+      <Box
+        position="absolute"
+        top="-20%"
+        left="-10%"
+        w="600px"
+        h="600px"
+        borderRadius="full"
+        bg="radial-gradient(circle, rgba(126, 34, 206, 0.4) 0%, transparent 70%)"
+        filter="blur(80px)"
+        pointerEvents="none"
+      />
+      <Box
+        position="absolute"
+        bottom="-10%"
+        right="-5%"
+        w="500px"
+        h="500px"
+        borderRadius="full"
+        bg="radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)"
+        filter="blur(80px)"
+        pointerEvents="none"
+      />
+      <Box
+        position="absolute"
+        top="40%"
+        right="20%"
+        w="300px"
+        h="300px"
+        borderRadius="full"
+        bg="radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)"
+        filter="blur(60px)"
+        pointerEvents="none"
+      />
+
+      {/* Navigation */}
+      <Flex
+        as="nav"
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        zIndex="100"
+        px={{ base: 4, md: 8, lg: 16 }}
+        py={4}
+        justify="space-between"
+        align="center"
+        bg="rgba(10, 10, 15, 0.8)"
+        backdropFilter="blur(20px)"
+        borderBottom="1px solid rgba(255,255,255,0.05)"
+      >
+        <HStack spacing={2}>
+          <Box
+            w="36px"
+            h="36px"
+            borderRadius="10px"
+            bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text fontSize="lg" fontWeight="900" color="white">
+              H
+            </Text>
+          </Box>
+          <Text fontSize="xl" fontWeight="700" color="white" letterSpacing="-0.5px">
+            HashioDAO
+          </Text>
+        </HStack>
+        <HStack spacing={4}>
+          <Button
+            variant="ghost"
+            color="whiteAlpha.700"
+            fontWeight="500"
+            _hover={{ color: "white", bg: "whiteAlpha.100" }}
+            onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            Features
+          </Button>
+          <Button
+            px={6}
+            py={5}
+            bg="white"
+            color="#0A0A0F"
+            fontWeight="600"
+            borderRadius="full"
+            _hover={{
+              transform: "scale(1.05)",
+              boxShadow: "0 0 30px rgba(255,255,255,0.3)",
+            }}
+            transition="all 0.2s"
+            onClick={() => navigate(Routes.App)}
+          >
+            Open App
+          </Button>
+        </HStack>
+      </Flex>
+
+      {/* Hero Section */}
+      <Container maxW="1400px" pt={{ base: 32, md: 40 }} pb={20} px={{ base: 4, md: 8 }}>
+        <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={12} alignItems="center">
+          {/* Left Content */}
+          <VStack align={{ base: "center", lg: "flex-start" }} spacing={8} textAlign={{ base: "center", lg: "left" }}>
+            <Box
+              px={4}
+              py={2}
+              bg="rgba(126, 34, 206, 0.15)"
+              borderRadius="full"
+              border="1px solid rgba(126, 34, 206, 0.3)"
+              animation={`${slideUp} 0.6s ease-out`}
+            >
+              <Text fontSize="sm" color={Color.Primary._300} fontWeight="600">
+                Powered by Hedera Hashgraph
+              </Text>
+            </Box>
+
+            <Heading
+              fontSize={{ base: "4xl", md: "5xl", lg: "6xl", xl: "7xl" }}
+              fontWeight="800"
+              color="white"
+              lineHeight="1.05"
+              letterSpacing="-2px"
+              animation={`${slideUp} 0.6s ease-out 0.1s both`}
+            >
+              Governance
+              <br />
+              <Text as="span" bgGradient="linear(to-r, #A855F7, #6366F1, #A855F7)" bgClip="text" bgSize="200% auto">
+                Reimagined
+              </Text>
+            </Heading>
+
+            <Text
+              fontSize={{ base: "lg", md: "xl" }}
+              color="whiteAlpha.700"
+              maxW="500px"
+              lineHeight="1.8"
+              animation={`${slideUp} 0.6s ease-out 0.2s both`}
+            >
+              Create unstoppable organizations. Vote on-chain. Manage treasuries together. All with enterprise-grade
+              security and instant finality.
+            </Text>
+
+            <HStack spacing={4} pt={4} animation={`${slideUp} 0.6s ease-out 0.3s both`}>
+              <Button
+                size="lg"
+                px={8}
+                py={7}
+                bg="linear-gradient(135deg, #7E22CE 0%, #9333EA 100%)"
+                color="white"
+                fontWeight="600"
+                borderRadius="full"
+                fontSize="md"
+                _hover={{
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 20px 40px rgba(126, 34, 206, 0.4)",
+                }}
+                transition="all 0.2s"
+                onClick={() => navigate(Routes.App)}
+              >
+                Launch App
+              </Button>
+              <Button
+                size="lg"
+                px={8}
+                py={7}
+                bg="transparent"
+                color="white"
+                fontWeight="600"
+                borderRadius="full"
+                fontSize="md"
+                border="1px solid rgba(255,255,255,0.2)"
+                _hover={{
+                  bg: "whiteAlpha.100",
+                  borderColor: "whiteAlpha.400",
+                }}
+                transition="all 0.2s"
+                onClick={() => window.open("https://docs.hedera.com", "_blank")}
+              >
+                Learn More
+              </Button>
+            </HStack>
+          </VStack>
+
+          {/* Right Visual - 3D Card Stack */}
+          <Flex
+            justify="center"
+            align="center"
+            position="relative"
+            minH={{ base: "300px", lg: "500px" }}
+            display={{ base: "none", lg: "flex" }}
+          >
+            {/* Orbiting Elements */}
+            <Box
+              position="absolute"
+              w="20px"
+              h="20px"
+              borderRadius="full"
+              bg={Color.Primary._500}
+              animation={`${orbit} 8s linear infinite`}
+            />
+            <Box
+              position="absolute"
+              w="12px"
+              h="12px"
+              borderRadius="full"
+              bg="#6366F1"
+              animation={`${orbit} 12s linear infinite reverse`}
+            />
+
+            {/* Main Card */}
+            <Box
+              position="relative"
+              w="340px"
+              h="420px"
+              borderRadius="24px"
+              bg="linear-gradient(145deg, rgba(30,30,40,0.9) 0%, rgba(20,20,28,0.9) 100%)"
+              border="1px solid rgba(255,255,255,0.1)"
+              backdropFilter="blur(20px)"
+              p={6}
+              animation={`${float} 6s ease-in-out infinite, ${glow} 4s ease-in-out infinite`}
+              transform="perspective(1000px) rotateY(-5deg) rotateX(5deg)"
+              _hover={{
+                transform: "perspective(1000px) rotateY(0deg) rotateX(0deg)",
+              }}
+              transition="transform 0.4s ease-out"
+            >
+              {/* Card Header */}
+              <HStack justify="space-between" mb={6}>
+                <HStack spacing={3}>
+                  <Box w="44px" h="44px" borderRadius="12px" bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)" />
+                  <VStack align="start" spacing={0}>
+                    <Text color="white" fontWeight="700" fontSize="md">
+                      Acme DAO
+                    </Text>
+                    <Text color="whiteAlpha.500" fontSize="xs">
+                      Multi-Sig
+                    </Text>
+                  </VStack>
+                </HStack>
+                <Box
+                  px={3}
+                  py={1}
+                  borderRadius="full"
+                  bg="rgba(74, 222, 128, 0.15)"
+                  border="1px solid rgba(74, 222, 128, 0.3)"
+                >
+                  <Text fontSize="xs" color="#4ADE80" fontWeight="600">
+                    Active
+                  </Text>
+                </Box>
+              </HStack>
+
+              {/* Proposal Preview */}
+              <Box
+                bg="rgba(255,255,255,0.03)"
+                borderRadius="16px"
+                p={4}
+                mb={4}
+                border="1px solid rgba(255,255,255,0.05)"
+              >
+                <Text color="whiteAlpha.600" fontSize="xs" mb={2}>
+                  ACTIVE PROPOSAL
+                </Text>
+                <Text color="white" fontWeight="600" fontSize="sm" mb={3}>
+                  Allocate 50,000 HBAR for Q1 Development
+                </Text>
+                <Flex justify="space-between" align="center">
+                  <HStack spacing={1}>
+                    <Box w="full" h="6px" borderRadius="full" bg="whiteAlpha.100" overflow="hidden">
+                      <Box w="72%" h="full" bg="linear-gradient(90deg, #7E22CE, #A855F7)" borderRadius="full" />
+                    </Box>
+                  </HStack>
+                  <Text color={Color.Primary._400} fontSize="xs" fontWeight="600" ml={3}>
+                    72%
+                  </Text>
+                </Flex>
+              </Box>
+
+              {/* Treasury */}
+              <Box bg="rgba(255,255,255,0.03)" borderRadius="16px" p={4} border="1px solid rgba(255,255,255,0.05)">
+                <Text color="whiteAlpha.600" fontSize="xs" mb={2}>
+                  TREASURY
+                </Text>
+                <HStack justify="space-between">
+                  <Text color="white" fontWeight="700" fontSize="2xl">
+                    $847,231
+                  </Text>
+                  <Text color="#4ADE80" fontSize="sm" fontWeight="600">
+                    +12.4%
+                  </Text>
+                </HStack>
+              </Box>
+
+              {/* Members */}
+              <HStack mt={6} spacing={-2}>
+                {[Color.Primary._500, "#6366F1", "#EC4899", "#F59E0B"].map((color, i) => (
+                  <Box key={i} w="32px" h="32px" borderRadius="full" bg={color} border="2px solid rgba(20,20,28,1)" />
+                ))}
+                <Box
+                  w="32px"
+                  h="32px"
+                  borderRadius="full"
+                  bg="whiteAlpha.100"
+                  border="2px solid rgba(20,20,28,1)"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Text fontSize="xs" color="whiteAlpha.700" fontWeight="600">
+                    +8
+                  </Text>
+                </Box>
+              </HStack>
+            </Box>
+
+            {/* Background Cards */}
+            <Box
+              position="absolute"
+              w="340px"
+              h="420px"
+              borderRadius="24px"
+              bg="rgba(30,30,40,0.4)"
+              border="1px solid rgba(255,255,255,0.05)"
+              transform="translateX(30px) translateY(30px) scale(0.95)"
+              zIndex={-1}
+            />
+            <Box
+              position="absolute"
+              w="340px"
+              h="420px"
+              borderRadius="24px"
+              bg="rgba(30,30,40,0.2)"
+              border="1px solid rgba(255,255,255,0.02)"
+              transform="translateX(60px) translateY(60px) scale(0.9)"
+              zIndex={-2}
+            />
+          </Flex>
+        </Grid>
+      </Container>
+
+      {/* Features Section */}
+      <Box id="features" py={{ base: 16, md: 24 }} position="relative">
+        <Container maxW="1400px" px={{ base: 4, md: 8 }}>
+          <VStack spacing={16}>
+            <VStack spacing={4} textAlign="center">
+              <Text
+                fontSize="sm"
+                color={Color.Primary._400}
+                fontWeight="700"
+                textTransform="uppercase"
+                letterSpacing="2px"
+              >
+                Why HashioDAO
+              </Text>
+              <Heading fontSize={{ base: "3xl", md: "5xl" }} fontWeight="800" color="white" letterSpacing="-1px">
+                Built for the Future
+              </Heading>
+            </VStack>
+
+            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6} w="full">
+              {[
+                {
+                  title: "Lightning Fast",
+                  description: "3-5 second finality with 10,000+ TPS. No more waiting for block confirmations.",
+                  icon: "⚡",
+                  gradient: "linear(to-br, #7E22CE, #4C1D95)",
+                },
+                {
+                  title: "Battle Tested",
+                  description: "Audited smart contracts protecting millions in assets across DAOs worldwide.",
+                  icon: "🛡️",
+                  gradient: "linear(to-br, #6366F1, #4338CA)",
+                },
+                {
+                  title: "True Ownership",
+                  description: "Your keys, your votes, your treasury. Fully decentralized governance.",
+                  icon: "🔑",
+                  gradient: "linear(to-br, #EC4899, #BE185D)",
+                },
+              ].map((feature, index) => (
+                <Box
+                  key={index}
+                  p={8}
+                  borderRadius="24px"
+                  bg="rgba(255,255,255,0.02)"
+                  border="1px solid rgba(255,255,255,0.06)"
+                  transition="all 0.3s"
+                  _hover={{
+                    bg: "rgba(255,255,255,0.04)",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    transform: "translateY(-4px)",
+                  }}
+                >
+                  <Box
+                    w="60px"
+                    h="60px"
+                    borderRadius="16px"
+                    bgGradient={feature.gradient}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="2xl"
+                    mb={6}
+                  >
+                    {feature.icon}
+                  </Box>
+                  <Text color="white" fontSize="xl" fontWeight="700" mb={3}>
+                    {feature.title}
+                  </Text>
+                  <Text color="whiteAlpha.600" lineHeight="1.7">
+                    {feature.description}
+                  </Text>
+                </Box>
+              ))}
+            </Grid>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* CTA Section */}
+      <Box py={{ base: 16, md: 24 }}>
+        <Container maxW="900px" px={{ base: 4, md: 8 }}>
+          <Box
+            p={{ base: 8, md: 16 }}
+            borderRadius="32px"
+            bg="linear-gradient(135deg, rgba(126, 34, 206, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)"
+            border="1px solid rgba(255,255,255,0.1)"
+            textAlign="center"
+            position="relative"
+            overflow="hidden"
+          >
+            {/* Decorative Elements */}
+            <Box
+              position="absolute"
+              top="-50px"
+              right="-50px"
+              w="200px"
+              h="200px"
+              borderRadius="full"
+              bg="rgba(126, 34, 206, 0.3)"
+              filter="blur(60px)"
+            />
+            <Box
+              position="absolute"
+              bottom="-50px"
+              left="-50px"
+              w="200px"
+              h="200px"
+              borderRadius="full"
+              bg="rgba(99, 102, 241, 0.3)"
+              filter="blur(60px)"
+            />
+
+            <VStack spacing={6} position="relative" zIndex={1}>
+              <Heading fontSize={{ base: "2xl", md: "4xl" }} fontWeight="800" color="white" letterSpacing="-1px">
+                Ready to launch your DAO?
+              </Heading>
+              <Text color="whiteAlpha.700" fontSize={{ base: "md", md: "lg" }} maxW="500px">
+                Join the future of decentralized governance. Create your first DAO in minutes.
+              </Text>
+              <Button
+                size="lg"
+                px={10}
+                py={7}
+                bg="white"
+                color="#0A0A0F"
+                fontWeight="700"
+                borderRadius="full"
+                fontSize="md"
+                _hover={{
+                  transform: "scale(1.05)",
+                  boxShadow: "0 20px 40px rgba(255,255,255,0.2)",
+                }}
+                transition="all 0.2s"
+                onClick={() => navigate(Routes.App)}
+              >
+                Get Started Free
+              </Button>
+            </VStack>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Footer */}
+      <Box py={8} borderTop="1px solid rgba(255,255,255,0.05)">
+        <Container maxW="1400px" px={{ base: 4, md: 8 }}>
+          <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" gap={4}>
+            <HStack spacing={2}>
+              <Box
+                w="28px"
+                h="28px"
+                borderRadius="8px"
+                bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text fontSize="sm" fontWeight="900" color="white">
+                  H
+                </Text>
+              </Box>
+              <Text fontSize="sm" color="whiteAlpha.500">
+                2025 HashioDAO. Built on Hedera.
+              </Text>
+            </HStack>
+            <HStack spacing={6}>
+              {["Terms", "Privacy", "Docs", "GitHub"].map((link) => (
+                <Text
+                  key={link}
+                  as="a"
+                  href="#"
+                  fontSize="sm"
+                  color="whiteAlpha.500"
+                  _hover={{ color: "white" }}
+                  transition="color 0.2s"
+                >
+                  {link}
+                </Text>
+              ))}
+            </HStack>
+          </Flex>
+        </Container>
+      </Box>
+    </Box>
+  );
+}

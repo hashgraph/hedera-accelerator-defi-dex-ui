@@ -10,6 +10,7 @@ import {
   HashScanLink,
   Tag,
   Text,
+  useTheme,
 } from "@shared/ui-kit";
 import { DAOType } from "@dao/services";
 import { MintNFTModal } from "./MintNFTModal";
@@ -46,13 +47,13 @@ export function DashboardHeader(props: DashboardHeaderProps) {
     handleMintNFT,
   } = props;
   const navigate = useNavigate();
+  const theme = useTheme();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress ?? "");
   const safeId = daoSafeIdQueryResults.data?.data.contract_id;
   const { data: token } = useToken(govTokenId ?? "");
   const showMintNFTButton = type === DAOType.NFT && Number(token?.data.max_supply) > Number(token?.data.total_supply);
-  const colorBG = isPrivate ? Color.Private.Bg : Color.White;
 
   const padding = useBreakpointValue({
     base: "1rem 1rem 0.5rem",
@@ -67,45 +68,45 @@ export function DashboardHeader(props: DashboardHeaderProps) {
   const showFullIds = useBreakpointValue({ base: false, md: true });
 
   return (
-    <Flex bg={colorBG} direction="column" padding={padding}>
+    <Flex bg={theme.bgSecondary} direction="column" padding={padding} borderBottom={`1px solid ${theme.border}`}>
       <Flex
-        bg={colorBG}
+        bg={theme.bgSecondary}
         direction={direction}
         gap={{ base: 3, lg: 4 }}
         alignItems={{ base: "stretch", lg: "flex-start" }}
       >
-        <Flex bg={colorBG} direction="column" gap="2" flex="1" minWidth="0">
+        <Flex bg={theme.bgSecondary} direction="column" gap="2" flex="1" minWidth="0">
           <HStack gap={{ base: "0.5rem", md: "0.7rem" }} flexWrap="wrap">
             <Image
               boxSize={logoSize}
               objectFit="contain"
               src={logoUrl}
               alt="dao logo"
-              fallback={<DefaultLogoIcon boxSize={logoSize} color={Color.Grey_Blue._100} />}
+              fallback={<DefaultLogoIcon boxSize={logoSize} color={theme.textMuted} />}
               flexShrink={0}
             />
             <VStack alignItems="flex-start" gap="0.2rem" flex="1" minWidth="0">
               <HStack gap="0.5rem" flexWrap="wrap">
-                <Text.H3_Medium fontSize={{ base: "lg", md: "xl" }} isTruncated maxWidth="100%">
+                <Text.H3_Medium fontSize={{ base: "lg", md: "xl" }} isTruncated maxWidth="100%" color={theme.text}>
                   {name}
                 </Text.H3_Medium>
                 <Tag label={type} />
                 {isPrivate && (
-                  <Badge bg={Color.Private.Accent} color="white" fontSize="xs" px="2" borderRadius="4px">
+                  <Badge bg={theme.accentGradient} color="white" fontSize="xs" px="2" borderRadius="4px">
                     Private
                   </Badge>
                 )}
               </HStack>
               <Flex direction={{ base: "column", md: "row" }} gap={{ base: 1, md: 2 }} flexWrap="wrap">
                 <HStack>
-                  <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }}>
+                  <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }} color={theme.textSecondary}>
                     DAO ID:
                   </Text.H6_Medium>
                   {daoAccountId && <HashScanLink id={daoAccountId} type={HashscanData.Account} />}
                 </HStack>
                 {govTokenId && showFullIds ? (
                   <HStack>
-                    <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }}>
+                    <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }} color={theme.textSecondary}>
                       {`${token?.data.symbol} TOKEN:`}
                     </Text.H6_Medium>
                     <HashScanLink id={govTokenId} type={HashscanData.Token} />
@@ -113,7 +114,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
                 ) : undefined}
                 {safeId && showFullIds ? (
                   <HStack>
-                    <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }}>
+                    <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }} color={theme.textSecondary}>
                       SAFE ID:
                     </Text.H6_Medium>
                     <HashScanLink id={safeId} type={HashscanData.Account} />
@@ -121,7 +122,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
                 ) : undefined}
                 {infoUrl && showFullIds ? (
                   <HStack>
-                    <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }}>
+                    <Text.H6_Medium opacity="0.8" fontSize={{ base: "xs", md: "sm" }} color={theme.textSecondary}>
                       More Info:
                     </Text.H6_Medium>
                     <ExternalLink to={infoUrl ?? ""}>
@@ -134,7 +135,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           </HStack>
         </Flex>
         <Flex
-          bg={colorBG}
+          bg={theme.bgSecondary}
           direction={{ base: "row", lg: "row" }}
           justifyContent={{ base: "space-between", lg: "flex-end" }}
           alignItems="center"
@@ -162,10 +163,10 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             </Button>
             {(isMember || isAdmin) && (
               <Flex direction="row" justifyContent="flex-end" gap="0.2rem" alignItems="center">
-                <Text.P_Small_Regular color={Color.Neutral._500} fontSize={{ base: "xs", md: "sm" }}>
+                <Text.P_Small_Regular color={theme.textMuted} fontSize={{ base: "xs", md: "sm" }}>
                   {isAdmin ? "Admin" : "Member"}
                 </Text.P_Small_Regular>
-                <CheckRightIcon boxSize="4" color={Color.Neutral._500} />
+                <CheckRightIcon boxSize="4" color={theme.textMuted} />
               </Flex>
             )}
           </Flex>

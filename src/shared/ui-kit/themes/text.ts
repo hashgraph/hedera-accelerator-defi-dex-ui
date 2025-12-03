@@ -87,12 +87,12 @@ const baseStyles = {
   },
   link: {
     ...fontType,
-    color: Color.Primary._500,
+    color: Color.Primary._700,
     textDecoration: "none",
     ":hover": {
       textDecoration: "underline",
-      textDecorationColor: Color.Primary._500,
-      webkitTextDecorationColor: Color.Primary._500,
+      textDecorationColor: Color.Primary._700,
+      webkitTextDecorationColor: Color.Primary._700,
     },
   },
 };

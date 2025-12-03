@@ -4,7 +4,7 @@ import { GOVTokenDetails } from "./GOVTokenDetails";
 import { ManageVotingPower } from "./ManageVotingPower";
 import { useManageVotingPower } from "./useManageVotingPower";
 import { InputTokenAmountData } from "./types";
-import { Text, LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, Color } from "@shared/ui-kit";
+import { Text, LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, useTheme } from "@shared/ui-kit";
 
 export interface VotingPowerComponentProps {
   governanceTokenId: string;
@@ -12,6 +12,7 @@ export interface VotingPowerComponentProps {
 }
 
 export const VotingPower = (props: VotingPowerComponentProps) => {
+  const theme = useTheme();
   const { governanceTokenId, tokenHolderAddress } = props;
 
   const {
@@ -83,14 +84,15 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
           label="VOTING POWER"
           isLoading={isFormLoading}
           labelLeftIcon={<LightningBoltIcon />}
-          labelTextColor={Color.Neutral._500}
+          labelTextColor={theme.textMuted}
           labelTextStyle="p xsmall medium"
           labelOpacity="1.0"
           value={votingPower!}
-          valueTextColor={Color.Primary._600}
+          valueTextColor={theme.accent}
           valueStyle="h3 medium"
           valueUnitSymbol={tokenData.symbol}
           amount="$--.--"
+          amountLabelColor={theme.textMuted}
         />
         <Spacer display={{ base: "none", lg: "block" }} />
         <Flex
@@ -100,7 +102,8 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
           justify={{ base: "center", sm: "space-between", md: "right" }}
           alignItems={{ base: "stretch", sm: "center" }}
           borderRadius="8px"
-          background={Color.Neutral._50}
+          background={theme.bgSecondary}
+          border={`1px solid ${theme.border}`}
           flexWrap="wrap"
         >
           {showTokenDetails && (

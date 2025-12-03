@@ -1,6 +1,6 @@
 import { selectAnatomy } from "@chakra-ui/anatomy";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
-import { TextStyles, Color } from "../../themes";
+import { TextStyles, Color, DarkTheme } from "../../themes";
 
 const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(selectAnatomy.keys);
 
@@ -9,17 +9,21 @@ const formTokenSelector = definePartsStyle({
     ...TextStyles["p small regular"],
     height: "40px",
     padding: "0.125rem 1rem",
-    background: Color.White,
-    border: `1px solid ${Color.Neutral._200}`,
-    borderRadius: "8px",
+    background: DarkTheme.bgInput,
+    color: DarkTheme.text,
+    border: `1px solid ${DarkTheme.border}`,
+    borderRadius: "full",
     transition: "all 0.2s ease-in-out",
     _hover: {
-      borderColor: Color.Neutral._300,
+      borderColor: DarkTheme.borderHover,
     },
     _focus: {
-      borderColor: Color.Primary._500,
-      boxShadow: `0 0 0 3px rgba(0, 186, 198, 0.15)`,
+      borderColor: DarkTheme.accent,
+      boxShadow: `0 0 0 3px rgba(126, 34, 206, 0.2)`,
     },
+  },
+  icon: {
+    color: DarkTheme.textSecondary,
   },
 });
 
@@ -28,13 +32,14 @@ const tokenSymbolSelector = definePartsStyle({
     ...TextStyles.b1,
     height: "61px",
     padding: "0.5rem",
-    background: Color.White_01,
-    border: `1px solid ${Color.Grey_01}`,
+    background: DarkTheme.bgInput,
+    color: DarkTheme.text,
+    border: `1px solid ${DarkTheme.border}`,
     borderLeft: "none",
     borderRadius: 0,
   },
   icon: {
-    color: Color.Black_01,
+    color: DarkTheme.textSecondary,
     fontSize: "0.5rem",
   },
 });
@@ -44,12 +49,13 @@ const dropDownSelector = definePartsStyle({
     ...TextStyles.b1,
     height: "45.52px",
     padding: "0.5rem",
-    background: Color.White_01,
-    border: `1px solid ${Color.Grey_01}`,
-    borderRadius: 0,
+    background: DarkTheme.bgInput,
+    color: DarkTheme.text,
+    border: `1px solid ${DarkTheme.border}`,
+    borderRadius: "12px",
   },
   icon: {
-    color: Color.Black_01,
+    color: DarkTheme.textSecondary,
     fontSize: "0.5rem",
   },
 });

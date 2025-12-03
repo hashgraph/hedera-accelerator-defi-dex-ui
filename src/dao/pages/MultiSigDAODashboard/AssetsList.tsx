@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Flex, SimpleGrid, Tooltip } from "@chakra-ui/react";
-import { Text, Color, HashScanLink, HashscanData, MetricLabel, AlertDialog } from "@shared/ui-kit";
+import { Text, HashScanLink, HashscanData, MetricLabel, AlertDialog, useTheme } from "@shared/ui-kit";
 import * as R from "ramda";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { HBARTokenId, HBARTokenSymbol, HBARSymbol } from "@dex/services";
@@ -12,6 +12,7 @@ import { useHandleTransactionSuccess, usePairedWalletDetails } from "@dex/hooks"
 import { useFetchContract, useDepositTokens } from "@dao/hooks";
 
 export function AssetsList() {
+  const theme = useTheme();
   const { tokenBalances: assets, dao } = useOutletContext<DAODetailsContext>();
   const { safeEVMAddress = "" } = dao as MultiSigDAODetails;
   const { assetsHolderAddress } = dao as GovernanceDAODetails | NFTDAODetails;
@@ -54,8 +55,13 @@ export function AssetsList() {
 
   return (
     <>
-      <Flex layerStyle="dao-dashboard__content-header" justifyContent="space-between">
-        <Text.P_Medium_Medium>Total Assets: {assets.length}</Text.P_Medium_Medium>
+      <Flex
+        layerStyle="dao-dashboard__content-header"
+        justifyContent="space-between"
+        bg={theme.bgSecondary}
+        borderBottom={`1px solid ${theme.border}`}
+      >
+        <Text.P_Medium_Medium color={theme.text}>Total Assets: {assets.length}</Text.P_Medium_Medium>
         <Flex>
           <AlertDialog
             openDialogButtonStyles={{ flex: "1" }}
@@ -89,15 +95,15 @@ export function AssetsList() {
               <Flex
                 key={tokenId}
                 direction="column"
-                bg={Color.White_02}
+                bg={theme.bgSecondary}
                 justifyContent="space-between"
                 height="150px"
-                border={`1px solid ${Color.Neutral._200}`}
+                border={`1px solid ${theme.border}`}
                 borderRadius="4px"
                 padding="1.5rem"
               >
                 <Flex direction="row" justifyContent="space-between" gap="2">
-                  <Text.P_Medium_Semibold>{name}</Text.P_Medium_Semibold>
+                  <Text.P_Medium_Semibold color={theme.text}>{name}</Text.P_Medium_Semibold>
                   <Flex gap="2">
                     {symbol !== HBARSymbol ? <HashScanLink id={tokenId} type={HashscanData.Token} /> : null}
                     <Tooltip
@@ -124,10 +130,15 @@ export function AssetsList() {
                     </Tooltip>
                   </Flex>
                 </Flex>
-                <Divider />
+                <Divider borderColor={theme.border} />
                 <Flex direction="row" justifyContent="space-between">
                   <Box>
-                    <MetricLabel label="BALANCE" value={`${balance} ${symbol}`} />
+                    <MetricLabel
+                      label="BALANCE"
+                      value={`${balance} ${symbol}`}
+                      labelTextColor={theme.textMuted}
+                      valueTextColor={theme.text}
+                    />
                   </Box>
                 </Flex>
               </Flex>

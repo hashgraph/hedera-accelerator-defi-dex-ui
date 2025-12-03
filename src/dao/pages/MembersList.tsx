@@ -1,5 +1,5 @@
 import { Flex, SimpleGrid } from "@chakra-ui/react";
-import { Text, Color, HashScanLink, HashscanData, Tag } from "@shared/ui-kit";
+import { Text, HashScanLink, HashscanData, Tag, useTheme } from "@shared/ui-kit";
 import * as R from "ramda";
 import { MultiSigDAODetailsContext } from "./MultiSigDAODashboard/types";
 import { GovernanceDAODetailsContext } from "./GovernanceDAODashboard/types";
@@ -10,6 +10,7 @@ import { Member } from "@dao/services";
 type DAODetailsContext = MultiSigDAODetailsContext | GovernanceDAODetailsContext | NFTDAODetailsContext;
 
 export function MembersList() {
+  const theme = useTheme();
   const context = useOutletContext<DAODetailsContext>();
   const { dao, members } = context;
   const { adminId } = dao;
@@ -20,8 +21,12 @@ export function MembersList() {
 
   return (
     <>
-      <Flex layerStyle="dao-dashboard__content-header">
-        <Text.P_Medium_Medium>{members.length} Members</Text.P_Medium_Medium>
+      <Flex
+        layerStyle="dao-dashboard__content-header"
+        bg={theme.bgSecondary}
+        borderBottom={`1px solid ${theme.border}`}
+      >
+        <Text.P_Medium_Medium color={theme.text}>{members.length} Members</Text.P_Medium_Medium>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
         <SimpleGrid minWidth="100%" columns={3} spacing="1rem">
@@ -32,9 +37,9 @@ export function MembersList() {
               <Flex
                 key={index}
                 direction="column"
-                bg={Color.White_02}
+                bg={theme.bgSecondary}
                 justifyContent="space-between"
-                border={`1px solid ${Color.Neutral._200}`}
+                border={`1px solid ${theme.border}`}
                 borderRadius="4px"
                 padding="1.5rem"
               >

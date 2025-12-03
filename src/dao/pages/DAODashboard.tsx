@@ -1,6 +1,6 @@
 import { Box, Flex, Tab, TabList, Tabs, useBreakpointValue } from "@chakra-ui/react";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@dex/layouts";
-import { BoxIcon, Color, LayoutIcon, LockIcon2, SettingsIcon, TransactionIcon, UsersIcon } from "@shared/ui-kit";
+import { BoxIcon, LayoutIcon, LockIcon2, SettingsIcon, TransactionIcon, UsersIcon, useTheme } from "@shared/ui-kit";
 import { useTabFilters } from "@dex/hooks";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PropsWithChildren } from "react";
@@ -29,6 +29,7 @@ interface DAODashboardProps extends PropsWithChildren {
 export function DAODashboard(props: DAODashboardProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const theme = useTheme();
   const { accountId: daoAccountId = "" } = useParams();
 
   // All hooks must be called before any early returns
@@ -135,7 +136,6 @@ export function DAODashboard(props: DAODashboardProps) {
     const isGovernance = type === DAOType.GovernanceToken;
     const isNFT = type === DAOType.NFT;
     const { safeEVMAddress } = dao as MultiSigDAODetails;
-    const privateBg = dao.isPrivate ? Color.Private.Bg : Color.White;
 
     return (
       <Page
@@ -157,7 +157,7 @@ export function DAODashboard(props: DAODashboardProps) {
           />
         }
         body={
-          <Flex direction="column" gap="0.75rem" height="100%" bg={privateBg}>
+          <Flex direction="column" gap="0.75rem" height="100%" bg={theme.bg}>
             {isGovernance ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={daoTokenHolder} />
             ) : (
@@ -168,14 +168,14 @@ export function DAODashboard(props: DAODashboardProps) {
               defaultIndex={initialTabIndex}
               onChange={handleTabChange}
               isLazy
-              bg={privateBg}
+              bg={theme.bg}
               variant="dao-dashboard-tab"
               height="100%"
             >
               <Flex
                 flex="row"
                 padding={tabPadding}
-                borderBottom={`1px solid ${Color.Neutral._100}`}
+                borderBottom={`1px solid ${theme.border}`}
                 overflowX="auto"
                 css={{
                   "&::-webkit-scrollbar": { display: "none" },
@@ -186,7 +186,19 @@ export function DAODashboard(props: DAODashboardProps) {
                   {daoNavigationTabs.map((tab, index: number) => {
                     return (
                       <NavLink to={tab.title.toLowerCase()} key={index}>
-                        <Tab tabIndex={index} px={{ base: 2, md: 4 }} py={2}>
+                        <Tab
+                          tabIndex={index}
+                          px={{ base: 2, md: 4 }}
+                          py={2}
+                          color={theme.textMuted}
+                          _selected={{
+                            color: theme.accentLight,
+                            borderBottom: `2px solid ${theme.accentLight}`,
+                          }}
+                          _hover={{
+                            color: theme.text,
+                          }}
+                        >
                           <Flex gap={{ base: 0, md: 2.5 }} alignItems="center" justifyContent="center">
                             {tab.icon}
                             {showTabText && <Box>{tab.title}</Box>}
@@ -197,7 +209,7 @@ export function DAODashboard(props: DAODashboardProps) {
                   })}
                 </TabList>
               </Flex>
-              <Box bg={Color.Primary_Bg} height={`calc(100% - ${TabsHeight}px)`}>
+              <Box bg={theme.bg} height={`calc(100% - ${TabsHeight}px)`}>
                 {props.children}
               </Box>
             </Tabs>

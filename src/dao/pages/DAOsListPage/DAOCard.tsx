@@ -1,5 +1,5 @@
-import { Card, Flex, Grid, GridItem, Image, Text, Badge } from "@chakra-ui/react";
-import { Color, DefaultLogoIcon } from "@shared/ui-kit";
+import { Card, Flex, Grid, GridItem, Image, Text, Badge, Box } from "@chakra-ui/react";
+import { Color, useTheme, DefaultLogoIcon } from "@shared/ui-kit";
 import { useNavigate } from "react-router-dom";
 import { DAOType } from "@dao/services";
 import { useFetchContract } from "@dao/hooks";
@@ -15,11 +15,9 @@ export interface DAOCardProps {
 export function DAOCard(props: DAOCardProps) {
   const { name, type, accountEVMAddress, logoUrl, isPrivate } = props;
   const navigate = useNavigate();
+  const theme = useTheme();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
-  const bgColor = isPrivate ? Color.Private.Bg : Color.White;
-  const borderColor = isPrivate ? Color.Private.Border : Color.Neutral._200;
-  const hoverBgColor = isPrivate ? Color.Private.BgHover : Color.Neutral._50;
 
   function handleDAOCardClicked() {
     const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
@@ -31,55 +29,80 @@ export function DAOCard(props: DAOCardProps) {
       variant="dao-card"
       onClick={handleDAOCardClicked}
       cursor="pointer"
-      _hover={{ bg: hoverBgColor, transform: "translateY(-2px)" }}
-      bg={bgColor}
-      transition="all 0.2s ease-in-out"
+      bg={theme.bgCard}
+      border={`1px solid ${theme.border}`}
+      borderRadius="16px"
+      padding={{ base: "1rem", md: "1.25rem" }}
+      transition="all 0.3s ease-in-out"
+      _hover={{
+        bg: theme.bgCardHover,
+        borderColor: theme.borderHover,
+        transform: "translateY(-4px)",
+        boxShadow: "0 10px 40px rgba(126, 34, 206, 0.15)",
+      }}
       position="relative"
+      backdropFilter="blur(20px)"
     >
       {isPrivate && (
         <Badge
           position="absolute"
-          top="0.5rem"
-          right="0.5rem"
-          bg={Color.Private.Accent}
+          top="0.75rem"
+          right="0.75rem"
+          bg={theme.accentGradient}
           color="white"
           fontSize="10px"
-          px="2"
-          py="0.5"
-          borderRadius="4px"
+          px="2.5"
+          py="1"
+          borderRadius="full"
+          fontWeight="600"
         >
           Private
         </Badge>
       )}
-      <Grid
-        templateRows="repeat(2, 1fr)"
-        templateColumns={{ base: "auto 1fr", sm: "repeat(6, 1fr)" }}
-        gap={{ base: 2, md: 4 }}
-        rowGap={1}
-        border={`1px solid ${borderColor}`}
-        borderRadius="12px"
-        padding={{ base: "0.75rem", md: "1rem" }}
-      >
-        <GridItem rowSpan={2} colSpan={1} maxW="64px">
+      <Flex direction="row" align="center" gap={4}>
+        <Box
+          w="56px"
+          h="56px"
+          borderRadius="14px"
+          bg="rgba(126, 34, 206, 0.1)"
+          border={`1px solid ${theme.border}`}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          overflow="hidden"
+          flexShrink={0}
+        >
           <Image
             src={logoUrl}
             objectFit="contain"
-            alt="DAO Logo URl"
-            boxSize="3.5rem"
-            fallback={<DefaultLogoIcon boxSize="3.5rem" color={Color.Grey_Blue._100} />}
+            alt="DAO Logo"
+            boxSize="40px"
+            fallback={
+              <Box
+                w="40px"
+                h="40px"
+                borderRadius="10px"
+                bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text fontSize="lg" fontWeight="800" color="white">
+                  {name.charAt(0).toUpperCase()}
+                </Text>
+              </Box>
+            }
           />
-        </GridItem>
-        <GridItem colSpan={5}>
-          <Flex height="100%">
-            <Text textStyle="b1" alignSelf="end" isTruncated>
-              {name}
-            </Text>
-          </Flex>
-        </GridItem>
-        <GridItem colSpan={5}>
-          <Text textStyle="b3">{type}</Text>
-        </GridItem>
-      </Grid>
+        </Box>
+        <Flex direction="column" gap={1} flex={1} minW={0}>
+          <Text fontSize="md" fontWeight="700" color={theme.text} isTruncated>
+            {name}
+          </Text>
+          <Text fontSize="sm" fontWeight="500" color={theme.textMuted}>
+            {type}
+          </Text>
+        </Flex>
+      </Flex>
     </Card>
   );
 }

@@ -1,12 +1,12 @@
 import { Alert, Box, Button, Flex, Heading, Input, Select, Tab, TabList, Tabs, Text, VStack } from "@chakra-ui/react";
-import { CardGridLayout, NotFound, Page } from "@dex/layouts";
+import { CardGridLayout, Page } from "@dex/layouts";
 import { DAOTabs, useDAOs } from "@dao/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DAOCard } from "./DAOCard";
 import { Routes } from "@dao/routes";
 import { DAO, DAOType } from "@dao/services";
 import { useDexContext } from "@dex/hooks";
-import { Color, Pagination, usePagination } from "shared";
+import { useTheme, Pagination, usePagination } from "shared";
 import { ChangeEvent } from "react";
 import { filterDAOs } from "../utils";
 import { DAOsPerPage } from "@dex/services";
@@ -21,6 +21,7 @@ export function DAOsListPage() {
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const currentUser = wallet.savedPairingData?.accountIds[0] ?? "";
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const isWalletPaired = wallet.hashConnectConnectionState === HashConnectConnectionState.Paired;
 
@@ -69,20 +70,37 @@ export function DAOsListPage() {
         <Flex direction="column" gap={4}>
           {/* Hero Section */}
           <Box py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }} mb={4}>
-            <VStack spacing={4} align="center" textAlign="center">
+            <VStack spacing={6} align="center" textAlign="center">
+              {/* Badge */}
+              <Flex
+                px={4}
+                py={2}
+                bg="rgba(126, 34, 206, 0.15)"
+                borderRadius="full"
+                border="1px solid rgba(126, 34, 206, 0.3)"
+                align="center"
+                gap={2}
+              >
+                <Box w="8px" h="8px" borderRadius="full" bg={theme.accentLight} />
+                <Text fontSize="sm" fontWeight="600" color={theme.accentLight}>
+                  Decentralized Governance
+                </Text>
+              </Flex>
+
               <Heading
                 as="h1"
                 fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
                 fontWeight="800"
-                color={Color.Neutral._900}
+                color={theme.text}
                 lineHeight="1.1"
+                letterSpacing="-1px"
               >
-                Decentralized Governance
-                <Text as="span" display="block" color={Color.Primary._500}>
-                  On Hedera
+                Explore
+                <Text as="span" display="block" bgGradient="linear(to-r, #A855F7, #6366F1)" bgClip="text">
+                  DAOs on Hedera
                 </Text>
               </Heading>
-              <Text fontSize={{ base: "md", md: "lg" }} color={Color.Neutral._600} maxW="600px">
+              <Text fontSize={{ base: "md", md: "lg" }} color={theme.textSecondary} maxW="600px">
                 Create, manage, and participate in DAOs. Empower your community with transparent and secure
                 decision-making.
               </Text>
@@ -95,8 +113,14 @@ export function DAOsListPage() {
                   size="lg"
                   onClick={() => document.getElementById("dao-list")?.scrollIntoView({ behavior: "smooth" })}
                   px={8}
+                  color={theme.text}
+                  borderColor={theme.border}
+                  _hover={{
+                    bg: theme.bgCardHover,
+                    borderColor: theme.borderHover,
+                  }}
                 >
-                  Explore DAOs
+                  Browse DAOs
                 </Button>
               </Flex>
             </VStack>
@@ -116,11 +140,29 @@ export function DAOsListPage() {
                 bg="transparent"
                 variant="dao-dashboard-tab"
               >
-                <TabList borderBottom="0">
-                  <Tab>
+                <TabList borderBottom={`1px solid ${theme.border}`}>
+                  <Tab
+                    color={theme.textMuted}
+                    _selected={{
+                      color: theme.accentLight,
+                      borderBottom: `2px solid ${theme.accentLight}`,
+                    }}
+                    _hover={{
+                      color: theme.text,
+                    }}
+                  >
                     <Box>{DAOTabs.All}</Box>
                   </Tab>
-                  <Tab>
+                  <Tab
+                    color={theme.textMuted}
+                    _selected={{
+                      color: theme.accentLight,
+                      borderBottom: `2px solid ${theme.accentLight}`,
+                    }}
+                    _hover={{
+                      color: theme.text,
+                    }}
+                  >
                     <Box>{DAOTabs.MyDAOs}</Box>
                   </Tab>
                 </TabList>
@@ -134,19 +176,19 @@ export function DAOsListPage() {
                   variant="filter"
                   value={searchText}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchTextChange(e.target.value)}
-                  placeholder="Search"
+                  placeholder="Search DAOs..."
                   width={{ base: "100%", sm: "200px", md: "220px" }}
                 />
                 <Select
                   variant="formTokenSelector"
                   width={{ base: "100%", sm: "10rem", md: "12rem" }}
-                  placeholder="All"
+                  placeholder="All Types"
                   value={daoType}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDAOTypeChange(e.target.value)}
                 >
                   {Object.values(DAOType).map((option) => {
                     return (
-                      <option key={option} value={option}>
+                      <option key={option} value={option} style={{ background: theme.bgSecondary }}>
                         {option}
                       </option>
                     );
@@ -155,7 +197,9 @@ export function DAOsListPage() {
               </Flex>
             </Flex>
             {paginatedDAOs?.length === 0 && !daos.isLoading && (
-              <NotFound message="No DAOs have been found with the filters selected" />
+              <Box p={8} borderRadius="16px" bg={theme.bgCard} border={`1px solid ${theme.border}`} textAlign="center">
+                <Text color={theme.textMuted}>No DAOs found with the selected filters</Text>
+              </Box>
             )}
             <CardGridLayout<DAO[]>
               columns={{ base: 1, sm: 2, lg: 3 }}
@@ -167,14 +211,6 @@ export function DAOsListPage() {
             >
               {paginatedDAOs?.map((dao: DAO, index: number) => {
                 const { accountEVMAddress, name, type, isPrivate, logoUrl } = dao;
-                /*
-              if (isPrivate) {
-                <DAOCard key={index} accountEVMAddress={accountEVMAddress} name={name} type={type} logoUrl={logoUrl}
-                isPrivate={isPrivate} />
-              }
-                //return null;
-
- */
                 return (
                   <DAOCard
                     key={index}
@@ -198,14 +234,22 @@ export function DAOsListPage() {
             </Box>
           </Box>
           <Flex fontSize={{ base: 13, md: 15 }}>
-            <Alert borderRadius="12px">
-              <p>
-                <strong>Caution</strong>: DAOs listed above are created and named by the DAO creators.
-                <br />
-                <strong>Please exercise caution and be aware of scammers and impersonators</strong>. We do not verify,
-                control, curate, endorse or adopt any Third-Party Content on this site, including the DAOs shown here,
-                and have no responsibility or liability for them.
-              </p>
+            <Alert
+              borderRadius="16px"
+              bg={theme.bgCard}
+              border={`1px solid ${theme.border}`}
+              color={theme.textSecondary}
+            >
+              <Box>
+                <Text fontWeight="700" color={theme.text} mb={1}>
+                  Caution
+                </Text>
+                <Text>
+                  DAOs listed above are created and named by the DAO creators. Please exercise caution and be aware of
+                  scammers and impersonators. We do not verify, control, curate, endorse or adopt any Third-Party
+                  Content on this site, including the DAOs shown here, and have no responsibility or liability for them.
+                </Text>
+              </Box>
             </Alert>
           </Flex>
         </Flex>

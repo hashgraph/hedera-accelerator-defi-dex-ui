@@ -1,3 +1,51 @@
+/**
+ * Dark theme colors matching the landing page
+ */
+export const DarkTheme = {
+  bg: "#0A0A0F",
+  bgSecondary: "#12121A",
+  bgCard: "rgba(255,255,255,0.02)",
+  bgCardHover: "rgba(255,255,255,0.04)",
+  bgInput: "rgba(255,255,255,0.03)",
+  border: "rgba(255,255,255,0.06)",
+  borderHover: "rgba(255,255,255,0.1)",
+  borderFocus: "rgba(126, 34, 206, 0.5)",
+  text: "#FFFFFF",
+  textSecondary: "rgba(255,255,255,0.7)",
+  textMuted: "rgba(255,255,255,0.5)",
+  accent: "#7E22CE",
+  accentLight: "#A855F7",
+  accentGradient: "linear-gradient(135deg, #7E22CE 0%, #9333EA 100%)",
+  success: "#4ADE80",
+  error: "#F87171",
+  navbarBg: "rgba(10, 10, 15, 0.8)",
+};
+
+/**
+ * Light theme colors
+ */
+export const LightTheme = {
+  bg: "#F8FAFC",
+  bgSecondary: "#FFFFFF",
+  bgCard: "rgba(255,255,255,0.8)",
+  bgCardHover: "rgba(255,255,255,0.95)",
+  bgInput: "#FFFFFF",
+  border: "rgba(0,0,0,0.08)",
+  borderHover: "rgba(0,0,0,0.15)",
+  borderFocus: "rgba(126, 34, 206, 0.5)",
+  text: "#1A1A2E",
+  textSecondary: "rgba(26,26,46,0.7)",
+  textMuted: "rgba(26,26,46,0.5)",
+  accent: "#7E22CE",
+  accentLight: "#A855F7",
+  accentGradient: "linear-gradient(135deg, #7E22CE 0%, #9333EA 100%)",
+  success: "#22C55E",
+  error: "#EF4444",
+  navbarBg: "rgba(255, 255, 255, 0.9)",
+};
+
+export type ThemeColors = typeof DarkTheme;
+
 export const Color = {
   /**
    * V1 Colors [Deprecated] - Remove once all colors are migrated to the V2 color palette.
@@ -41,16 +89,16 @@ export const Color = {
     _900: "#171717",
   },
   Primary: {
-    _50: "#EBF8FF",
-    _100: "#BEE3F8",
-    _200: "#90CDF4",
-    _300: "#63B3ED",
-    _400: "#4299E1",
-    _500: "#3182CE",
-    _600: "#2B6CB0",
-    _700: "#2C5282",
-    _800: "#2A4365",
-    _900: "#1A365D",
+    _50: "#FAF5FF",
+    _100: "#F3E8FF",
+    _200: "#E9D5FF",
+    _300: "#D8B4FE",
+    _400: "#C084FC",
+    _500: "#A855F7",
+    _600: "#9333EA",
+    _700: "#7E22CE",
+    _800: "#6B21A8",
+    _900: "#581C87",
   },
   Grey_Blue: {
     _50: "#F7F9FA",
@@ -118,8 +166,8 @@ export const Color = {
    * Modern UI Effects
    */
   Gradient: {
-    Primary: "linear-gradient(135deg, #3182CE 0%, #2C5282 100%)",
-    PrimaryHover: "linear-gradient(135deg, #2B6CB0 0%, #2A4365 100%)",
+    Primary: "linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)",
+    PrimaryHover: "linear-gradient(135deg, #9333EA 0%, #6B21A8 100%)",
     Success: "linear-gradient(135deg, #3FC600 0%, #20AF00 100%)",
     Subtle: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
   },
@@ -127,8 +175,8 @@ export const Color = {
     Soft: "0 2px 8px rgba(0, 0, 0, 0.06)",
     Medium: "0 4px 16px rgba(0, 0, 0, 0.08)",
     Strong: "0 8px 32px rgba(0, 0, 0, 0.12)",
-    Primary: "0 4px 14px rgba(49, 130, 206, 0.25)",
-    PrimaryHover: "0 6px 20px rgba(49, 130, 206, 0.35)",
+    Primary: "0 4px 14px rgba(168, 85, 247, 0.25)",
+    PrimaryHover: "0 6px 20px rgba(168, 85, 247, 0.35)",
     Card: "0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05)",
     CardHover: "0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.08)",
   },
