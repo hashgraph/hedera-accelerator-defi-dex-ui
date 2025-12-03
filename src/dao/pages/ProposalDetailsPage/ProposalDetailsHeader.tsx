@@ -12,7 +12,7 @@ interface ProposalDetailsHeaderProps {
 
 export function ProposalDetailsHeader(props: ProposalDetailsHeaderProps) {
   const { daoAccountId, title, daoType, author } = props;
-  const to = `/${
+  const to = `/${Routes.App}/${
     daoType === DAOType.GovernanceToken
       ? Routes.GovernanceToken
       : daoType === DAOType.NFT

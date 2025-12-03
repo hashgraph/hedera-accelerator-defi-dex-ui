@@ -32,7 +32,7 @@ export function DAOCard(props: DAOCardProps) {
       bg={theme.bgCard}
       border={`1px solid ${theme.border}`}
       borderRadius="16px"
-      padding={{ base: "1rem", md: "1.25rem" }}
+      padding={{ base: "0.5rem", md: "0.65rem" }}
       transition="all 0.3s ease-in-out"
       _hover={{
         bg: theme.bgCardHover,
@@ -48,7 +48,7 @@ export function DAOCard(props: DAOCardProps) {
           position="absolute"
           top="0.75rem"
           right="0.75rem"
-          bg={theme.accentGradient}
+          bg="#22D3EE"
           color="white"
           fontSize="10px"
           px="2.5"
@@ -60,40 +60,31 @@ export function DAOCard(props: DAOCardProps) {
         </Badge>
       )}
       <Flex direction="row" align="center" gap={4}>
-        <Box
-          w="56px"
-          h="56px"
-          borderRadius="14px"
-          bg="rgba(126, 34, 206, 0.1)"
-          border={`1px solid ${theme.border}`}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          overflow="hidden"
+        <Image
+          src={logoUrl}
+          objectFit="cover"
+          alt="DAO Logo"
+          w="64px"
+          h="64px"
+          borderRadius="12px"
           flexShrink={0}
-        >
-          <Image
-            src={logoUrl}
-            objectFit="contain"
-            alt="DAO Logo"
-            boxSize="40px"
-            fallback={
-              <Box
-                w="40px"
-                h="40px"
-                borderRadius="10px"
-                bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text fontSize="lg" fontWeight="800" color="white">
-                  {name.charAt(0).toUpperCase()}
-                </Text>
-              </Box>
-            }
-          />
-        </Box>
+          fallback={
+            <Box
+              w="64px"
+              h="64px"
+              borderRadius="12px"
+              bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              flexShrink={0}
+            >
+              <Text fontSize="2xl" fontWeight="800" color="white">
+                {name.charAt(0).toUpperCase()}
+              </Text>
+            </Box>
+          }
+        />
         <Flex direction="column" gap={1} flex={1} minW={0}>
           <Text fontSize="md" fontWeight="700" color={theme.text} isTruncated>
             {name}

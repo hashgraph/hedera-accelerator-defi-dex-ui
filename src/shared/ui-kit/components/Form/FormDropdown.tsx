@@ -1,6 +1,7 @@
 import { FormControl, Select, FormErrorMessage } from "@chakra-ui/react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Text } from "../Text";
+import { useTheme } from "../../themes";
 
 export interface DropdownOption {
   label: string;
@@ -19,11 +20,14 @@ interface FormDropdownProps {
 }
 
 export function FormDropdown(props: FormDropdownProps) {
+  const theme = useTheme();
   const { label, placeholder, data, selectedOptions, isDisabled, isInvalid, errorMessage, register } = props;
 
   return (
     <FormControl isInvalid={isInvalid} isDisabled={isDisabled}>
-      <Text.P_Small_Medium marginBottom="0.25rem">{label}</Text.P_Small_Medium>
+      <Text.P_Small_Medium marginBottom="0.25rem" color={theme.text}>
+        {label}
+      </Text.P_Small_Medium>
       <Select variant="formTokenSelector" placeholder={placeholder} {...register}>
         {data.map((option: DropdownOption) => {
           return (

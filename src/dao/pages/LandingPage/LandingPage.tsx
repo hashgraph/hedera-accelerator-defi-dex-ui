@@ -1,6 +1,6 @@
 import { Box, Button, Container, Flex, Grid, Heading, Text, VStack, HStack, keyframes, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { Color } from "@shared/ui-kit";
+import { Color, useTheme, useThemeMode, ThemeToggle } from "@shared/ui-kit";
 import { Routes } from "@dao/routes";
 
 const float = keyframes`
@@ -25,9 +25,11 @@ const orbit = keyframes`
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const { isDark } = useThemeMode();
 
   return (
-    <Box bg="#0A0A0F" minH="100vh" overflow="hidden" position="relative">
+    <Box bg={theme.bg} minH="100vh" overflow="hidden" position="relative">
       {/* Gradient Orbs */}
       <Box
         position="absolute"
@@ -36,7 +38,11 @@ export function LandingPage() {
         w="600px"
         h="600px"
         borderRadius="full"
-        bg="radial-gradient(circle, rgba(126, 34, 206, 0.4) 0%, transparent 70%)"
+        bg={
+          isDark
+            ? "radial-gradient(circle, rgba(126, 34, 206, 0.4) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(126, 34, 206, 0.15) 0%, transparent 70%)"
+        }
         filter="blur(80px)"
         pointerEvents="none"
       />
@@ -47,7 +53,11 @@ export function LandingPage() {
         w="500px"
         h="500px"
         borderRadius="full"
-        bg="radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)"
+        bg={
+          isDark
+            ? "radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)"
+        }
         filter="blur(80px)"
         pointerEvents="none"
       />
@@ -58,7 +68,11 @@ export function LandingPage() {
         w="300px"
         h="300px"
         borderRadius="full"
-        bg="radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)"
+        bg={
+          isDark
+            ? "radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)"
+            : "radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%)"
+        }
         filter="blur(60px)"
         pointerEvents="none"
       />
@@ -70,14 +84,15 @@ export function LandingPage() {
         top="0"
         left="0"
         right="0"
-        zIndex="100"
-        px={{ base: 4, md: 8, lg: 16 }}
-        py={4}
+        zIndex={200}
+        padding={{ base: "0.75rem 1rem", sm: "1rem 1.5rem", md: "1rem 2rem" }}
+        height="65px"
         justify="space-between"
         align="center"
-        bg="rgba(10, 10, 15, 0.8)"
+        bg={theme.navbarBg}
         backdropFilter="blur(20px)"
-        borderBottom="1px solid rgba(255,255,255,0.05)"
+        borderBottom={`1px solid ${theme.border}`}
+        gap={{ base: "2", md: "4" }}
       >
         <HStack spacing={2}>
           <Box
@@ -93,30 +108,31 @@ export function LandingPage() {
               H
             </Text>
           </Box>
-          <Text fontSize="xl" fontWeight="700" color="white" letterSpacing="-0.5px">
+          <Text fontSize="md" fontWeight="600" color={theme.text} display={{ base: "none", sm: "block" }}>
             HashioDAO
           </Text>
         </HStack>
         <HStack spacing={4}>
           <Button
             variant="ghost"
-            color="whiteAlpha.700"
+            color={theme.textSecondary}
             fontWeight="500"
-            _hover={{ color: "white", bg: "whiteAlpha.100" }}
+            _hover={{ color: theme.text, bg: isDark ? "whiteAlpha.100" : "blackAlpha.50" }}
             onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
           >
-            Features
+            Learn
           </Button>
+          <ThemeToggle />
           <Button
             px={6}
             py={5}
-            bg="white"
-            color="#0A0A0F"
+            bg={isDark ? "white" : theme.accent}
+            color={isDark ? "#0A0A0F" : "white"}
             fontWeight="600"
             borderRadius="full"
             _hover={{
               transform: "scale(1.05)",
-              boxShadow: "0 0 30px rgba(255,255,255,0.3)",
+              boxShadow: isDark ? "0 0 30px rgba(255,255,255,0.3)" : "0 0 30px rgba(126, 34, 206, 0.4)",
             }}
             transition="all 0.2s"
             onClick={() => navigate(Routes.App)}
@@ -139,15 +155,15 @@ export function LandingPage() {
               border="1px solid rgba(126, 34, 206, 0.3)"
               animation={`${slideUp} 0.6s ease-out`}
             >
-              <Text fontSize="sm" color={Color.Primary._300} fontWeight="600">
-                Powered by Hedera Hashgraph
+              <Text fontSize="sm" color={isDark ? Color.Primary._300 : Color.Primary._700} fontWeight="600">
+                Powered by Hedera
               </Text>
             </Box>
 
             <Heading
               fontSize={{ base: "4xl", md: "5xl", lg: "6xl", xl: "7xl" }}
               fontWeight="800"
-              color="white"
+              color={theme.text}
               lineHeight="1.05"
               letterSpacing="-2px"
               animation={`${slideUp} 0.6s ease-out 0.1s both`}
@@ -161,7 +177,7 @@ export function LandingPage() {
 
             <Text
               fontSize={{ base: "lg", md: "xl" }}
-              color="whiteAlpha.700"
+              color={theme.textSecondary}
               maxW="500px"
               lineHeight="1.8"
               animation={`${slideUp} 0.6s ease-out 0.2s both`}
@@ -194,17 +210,17 @@ export function LandingPage() {
                 px={8}
                 py={7}
                 bg="transparent"
-                color="white"
+                color={theme.text}
                 fontWeight="600"
                 borderRadius="full"
                 fontSize="md"
-                border="1px solid rgba(255,255,255,0.2)"
+                border={`1px solid ${theme.border}`}
                 _hover={{
-                  bg: "whiteAlpha.100",
-                  borderColor: "whiteAlpha.400",
+                  bg: isDark ? "whiteAlpha.100" : "blackAlpha.50",
+                  borderColor: theme.borderHover,
                 }}
                 transition="all 0.2s"
-                onClick={() => window.open("https://docs.hedera.com", "_blank")}
+                onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
               >
                 Learn More
               </Button>
@@ -309,11 +325,11 @@ export function LandingPage() {
               {/* Treasury */}
               <Box bg="rgba(255,255,255,0.03)" borderRadius="16px" p={4} border="1px solid rgba(255,255,255,0.05)">
                 <Text color="whiteAlpha.600" fontSize="xs" mb={2}>
-                  TREASURY
+                  VOTING POWER
                 </Text>
                 <HStack justify="space-between">
                   <Text color="white" fontWeight="700" fontSize="2xl">
-                    $847,231
+                    1653
                   </Text>
                   <Text color="#4ADE80" fontSize="sm" fontWeight="600">
                     +12.4%
@@ -368,7 +384,7 @@ export function LandingPage() {
         </Grid>
       </Container>
 
-      {/* Features Section */}
+      {/* Knowledge Hub Section */}
       <Box id="features" py={{ base: 16, md: 24 }} position="relative">
         <Container maxW="1400px" px={{ base: 4, md: 8 }}>
           <VStack spacing={16}>
@@ -380,66 +396,89 @@ export function LandingPage() {
                 textTransform="uppercase"
                 letterSpacing="2px"
               >
-                Why HashioDAO
+                Resources
               </Text>
-              <Heading fontSize={{ base: "3xl", md: "5xl" }} fontWeight="800" color="white" letterSpacing="-1px">
-                Built for the Future
+              <Heading fontSize={{ base: "3xl", md: "5xl" }} fontWeight="800" color={theme.text} letterSpacing="-1px">
+                Knowledge Hub
               </Heading>
+              <Text fontSize={{ base: "md", md: "lg" }} color={theme.textSecondary} maxW="600px">
+                Learn more about HashioDAO and decentralized governance on Hedera
+              </Text>
             </VStack>
 
-            <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6} w="full">
+            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} w="full">
               {[
                 {
-                  title: "Lightning Fast",
-                  description: "3-5 second finality with 10,000+ TPS. No more waiting for block confirmations.",
-                  icon: "⚡",
+                  title: "HashioDAO Overview",
+                  description: "Learn about HashioDAO and its features on the official Hashgraph website.",
+                  icon: "🏛️",
                   gradient: "linear(to-br, #7E22CE, #4C1D95)",
+                  url: "https://www.hashgraph.com/hashiodao/",
                 },
                 {
-                  title: "Battle Tested",
-                  description: "Audited smart contracts protecting millions in assets across DAOs worldwide.",
-                  icon: "🛡️",
+                  title: "HashioDAO Documentation",
+                  description: "Technical documentation and guides for building with HashioDAO.",
+                  icon: "📚",
                   gradient: "linear(to-br, #6366F1, #4338CA)",
+                  url: "https://docs.hedera.com/hedera/open-source-solutions/hashiodao",
                 },
                 {
-                  title: "True Ownership",
-                  description: "Your keys, your votes, your treasury. Fully decentralized governance.",
-                  icon: "🔑",
+                  title: "What is a DAO?",
+                  description: "Understand Decentralized Autonomous Organizations and how they work.",
+                  icon: "🔍",
                   gradient: "linear(to-br, #EC4899, #BE185D)",
+                  url: "https://hedera.com/learning/decentralized-finance/decentralized-autonomous-organization",
                 },
-              ].map((feature, index) => (
+                {
+                  title: "How to Start a DAO",
+                  description: "Step-by-step guide to launching your own decentralized organization.",
+                  icon: "🚀",
+                  gradient: "linear(to-br, #F59E0B, #D97706)",
+                  url: "https://hedera.com/learning/decentralized-finance/how-to-start-a-dao",
+                },
+              ].map((resource, index) => (
                 <Box
                   key={index}
+                  as="a"
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   p={8}
                   borderRadius="24px"
-                  bg="rgba(255,255,255,0.02)"
-                  border="1px solid rgba(255,255,255,0.06)"
+                  bg={theme.bgCard}
+                  border={`1px solid ${theme.border}`}
                   transition="all 0.3s"
+                  cursor="pointer"
                   _hover={{
-                    bg: "rgba(255,255,255,0.04)",
-                    borderColor: "rgba(255,255,255,0.1)",
+                    bg: theme.bgCardHover,
+                    borderColor: theme.borderHover,
                     transform: "translateY(-4px)",
+                    textDecoration: "none",
                   }}
                 >
-                  <Box
-                    w="60px"
-                    h="60px"
-                    borderRadius="16px"
-                    bgGradient={feature.gradient}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="2xl"
-                    mb={6}
-                  >
-                    {feature.icon}
-                  </Box>
-                  <Text color="white" fontSize="xl" fontWeight="700" mb={3}>
-                    {feature.title}
-                  </Text>
-                  <Text color="whiteAlpha.600" lineHeight="1.7">
-                    {feature.description}
-                  </Text>
+                  <HStack spacing={4} align="flex-start">
+                    <Box
+                      w="60px"
+                      h="60px"
+                      borderRadius="16px"
+                      bgGradient={resource.gradient}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      fontSize="2xl"
+                      flexShrink={0}
+                    >
+                      {resource.icon}
+                    </Box>
+                    <VStack align="flex-start" spacing={2}>
+                      <Text color={theme.text} fontSize="xl" fontWeight="700">
+                        {resource.title}
+                      </Text>
+                      <Text color={theme.textSecondary} lineHeight="1.7">
+                        {resource.description}
+                      </Text>
+                    </VStack>
+                  </HStack>
                 </Box>
               ))}
             </Grid>
@@ -453,8 +492,12 @@ export function LandingPage() {
           <Box
             p={{ base: 8, md: 16 }}
             borderRadius="32px"
-            bg="linear-gradient(135deg, rgba(126, 34, 206, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)"
-            border="1px solid rgba(255,255,255,0.1)"
+            bg={
+              isDark
+                ? "linear-gradient(135deg, rgba(126, 34, 206, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%)"
+                : "linear-gradient(135deg, rgba(126, 34, 206, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)"
+            }
+            border={`1px solid ${theme.border}`}
             textAlign="center"
             position="relative"
             overflow="hidden"
@@ -467,7 +510,7 @@ export function LandingPage() {
               w="200px"
               h="200px"
               borderRadius="full"
-              bg="rgba(126, 34, 206, 0.3)"
+              bg={isDark ? "rgba(126, 34, 206, 0.3)" : "rgba(126, 34, 206, 0.15)"}
               filter="blur(60px)"
             />
             <Box
@@ -477,34 +520,34 @@ export function LandingPage() {
               w="200px"
               h="200px"
               borderRadius="full"
-              bg="rgba(99, 102, 241, 0.3)"
+              bg={isDark ? "rgba(99, 102, 241, 0.3)" : "rgba(99, 102, 241, 0.15)"}
               filter="blur(60px)"
             />
 
             <VStack spacing={6} position="relative" zIndex={1}>
-              <Heading fontSize={{ base: "2xl", md: "4xl" }} fontWeight="800" color="white" letterSpacing="-1px">
+              <Heading fontSize={{ base: "2xl", md: "4xl" }} fontWeight="800" color={theme.text} letterSpacing="-1px">
                 Ready to launch your DAO?
               </Heading>
-              <Text color="whiteAlpha.700" fontSize={{ base: "md", md: "lg" }} maxW="500px">
+              <Text color={theme.textSecondary} fontSize={{ base: "md", md: "lg" }} maxW="500px">
                 Join the future of decentralized governance. Create your first DAO in minutes.
               </Text>
               <Button
                 size="lg"
                 px={10}
                 py={7}
-                bg="white"
-                color="#0A0A0F"
+                bg={isDark ? "white" : theme.accent}
+                color={isDark ? "#0A0A0F" : "white"}
                 fontWeight="700"
                 borderRadius="full"
                 fontSize="md"
                 _hover={{
                   transform: "scale(1.05)",
-                  boxShadow: "0 20px 40px rgba(255,255,255,0.2)",
+                  boxShadow: isDark ? "0 20px 40px rgba(255,255,255,0.2)" : "0 20px 40px rgba(126, 34, 206, 0.3)",
                 }}
                 transition="all 0.2s"
                 onClick={() => navigate(Routes.App)}
               >
-                Get Started Free
+                Get Started
               </Button>
             </VStack>
           </Box>
@@ -512,7 +555,7 @@ export function LandingPage() {
       </Box>
 
       {/* Footer */}
-      <Box py={8} borderTop="1px solid rgba(255,255,255,0.05)">
+      <Box py={8} borderTop={`1px solid ${theme.border}`}>
         <Container maxW="1400px" px={{ base: 4, md: 8 }}>
           <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" gap={4}>
             <HStack spacing={2}>
@@ -529,24 +572,59 @@ export function LandingPage() {
                   H
                 </Text>
               </Box>
-              <Text fontSize="sm" color="whiteAlpha.500">
-                2025 HashioDAO. Built on Hedera.
+              <Text fontSize="sm" color={theme.textMuted}>
+                2025 Hashgraph
               </Text>
             </HStack>
             <HStack spacing={6}>
-              {["Terms", "Privacy", "Docs", "GitHub"].map((link) => (
-                <Text
-                  key={link}
-                  as="a"
-                  href="#"
-                  fontSize="sm"
-                  color="whiteAlpha.500"
-                  _hover={{ color: "white" }}
-                  transition="color 0.2s"
-                >
-                  {link}
-                </Text>
-              ))}
+              <Text
+                as="a"
+                href="https://www.hashgraph.com/terms-of-service/"
+                target="_blank"
+                rel="noopener noreferrer"
+                fontSize="sm"
+                color={theme.textMuted}
+                _hover={{ color: theme.text }}
+                transition="color 0.2s"
+              >
+                Terms
+              </Text>
+              <Text
+                as="a"
+                href="https://www.hashgraph.com/privacy-policy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                fontSize="sm"
+                color={theme.textMuted}
+                _hover={{ color: theme.text }}
+                transition="color 0.2s"
+              >
+                Privacy
+              </Text>
+              <Text
+                as="a"
+                href="https://skynet.certik.com/projects/swirlds-labs-dao-as-a-service"
+                target="_blank"
+                rel="noopener noreferrer"
+                fontSize="sm"
+                color={theme.textMuted}
+                _hover={{ color: theme.text }}
+                transition="color 0.2s"
+              >
+                Audit
+              </Text>
+              <Text
+                as="a"
+                href="https://github.com/hashgraph/hedera-accelerator-defi-dex-ui"
+                target="_blank"
+                rel="noopener noreferrer"
+                fontSize="sm"
+                color={theme.textMuted}
+                _hover={{ color: theme.text }}
+                transition="color 0.2s"
+              >
+                GitHub
+              </Text>
             </HStack>
           </Flex>
         </Container>

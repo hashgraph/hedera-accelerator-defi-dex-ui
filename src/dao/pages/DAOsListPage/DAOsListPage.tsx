@@ -111,7 +111,7 @@ export function DAOsListPage() {
                 <Button
                   variant="secondary"
                   size="lg"
-                  onClick={() => document.getElementById("dao-list")?.scrollIntoView({ behavior: "smooth" })}
+                  onClick={() => navigate("/")}
                   px={8}
                   color={theme.text}
                   borderColor={theme.border}
@@ -120,7 +120,7 @@ export function DAOsListPage() {
                     borderColor: theme.borderHover,
                   }}
                 >
-                  Browse DAOs
+                  About
                 </Button>
               </Flex>
             </VStack>

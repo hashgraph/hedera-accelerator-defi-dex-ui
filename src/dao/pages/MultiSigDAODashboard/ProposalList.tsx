@@ -13,7 +13,7 @@ import { useLocation, useNavigate, useOutletContext, useParams } from "react-rou
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
 import { DAODetailsContext, GovernanceDAODetails, MultiSigDAODetails } from "@dao/services";
-import { TransactionIcon, Color, usePagination, Pagination, useTheme } from "@shared/ui-kit";
+import { TransactionIcon, usePagination, Pagination, useTheme } from "@shared/ui-kit";
 import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@dex/utils";
 import { Routes } from "@dao/routes";
@@ -128,9 +128,9 @@ export function ProposalList() {
                 : [<></>, <></>].map(() => (
                     <Flex direction="column" gap="2" minHeight="300px" key="not-found">
                       <NotFound
-                        icon={<TransactionIcon boxSize="4rem" stroke={Color.Neutral._900} />}
-                        message={`We didn't find any ${tabIndex === 0 ? "active" : "past"} proposals.`}
-                        linkText="Create a proposal."
+                        icon={<TransactionIcon boxSize="4rem" stroke={theme.textMuted} />}
+                        message={`No ${tabIndex === 0 ? "active" : "past"} proposals found`}
+                        linkText="Create Proposal"
                         onLinkClick={handleClickCreateProposal}
                       />
                     </Flex>

@@ -33,23 +33,23 @@ export function Settings() {
   }
 
   function handleAddNewMemberClicked() {
-    navigate(`/${Multisig}/${daoAccountId}/new-proposal/${DAOAddMemberDetails}`);
+    navigate(`/${Routes.App}/${Multisig}/${daoAccountId}/new-proposal/${DAOAddMemberDetails}`);
   }
 
   function handleDeleteMemberClick(memberId: string) {
-    navigate(`/${Multisig}/${daoAccountId}/new-proposal/${DAODeleteMemberDetails}`, {
+    navigate(`/${Routes.App}/${Multisig}/${daoAccountId}/new-proposal/${DAODeleteMemberDetails}`, {
       state: { memberId },
     } as RemoveMemberLocationState);
   }
 
   function handleReplaceMemberClick(memberId: string) {
-    navigate(`/${Multisig}/${daoAccountId}/new-proposal/${DAOReplaceMemberDetails}`, {
+    navigate(`/${Routes.App}/${Multisig}/${daoAccountId}/new-proposal/${DAOReplaceMemberDetails}`, {
       state: { memberId },
     } as ReplaceMemberLocationState);
   }
 
   function handleChangeThresholdClick() {
-    navigate(`/${Multisig}/${daoAccountId}/new-proposal/${DAOUpgradeThresholdDetails}`);
+    navigate(`/${Routes.App}/${Multisig}/${daoAccountId}/new-proposal/${DAOUpgradeThresholdDetails}`);
   }
 
   function handleChangeDAODetailsClick() {
@@ -58,7 +58,14 @@ export function Settings() {
 
   return (
     <form id="dao-settings-submit">
-      <Flex direction="column" alignItems="center" maxWidth="841px" margin="auto" gap="4" padding="1rem 0">
+      <Flex
+        direction="column"
+        alignItems="center"
+        maxWidth="841px"
+        margin="auto"
+        gap="4"
+        padding={{ base: "1rem", sm: "1rem 1.5rem", md: "1rem 2rem" }}
+      >
         <DAOFormContainer>
           <Flex direction="column" gap={2} marginBottom="0.4rem">
             <Text.P_Medium_Medium color={theme.text}>Members</Text.P_Medium_Medium>
@@ -125,14 +132,14 @@ export function Settings() {
             </Text.P_Small_Regular>
             <Divider borderColor={theme.border} />
           </Flex>
-          <SimpleGrid minWidth="100%" columns={2} spacingX="2rem" spacingY="1.2rem">
+          <SimpleGrid minWidth="100%" columns={{ base: 1, md: 2 }} spacingX="2rem" spacingY="1.2rem">
             <Flex
               direction="column"
               bg={theme.bgSecondary}
               justifyContent="space-between"
               border={`1px solid ${theme.border}`}
               borderRadius="12px"
-              padding="1.5rem"
+              padding={{ base: "1rem", md: "1.5rem" }}
             >
               <Flex direction="row" justifyContent="space-between" alignItems="center">
                 <Flex direction="column" gap="1">

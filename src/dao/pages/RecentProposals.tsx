@@ -5,7 +5,7 @@ import { replaceLastRoute } from "@dex/utils";
 import { isEmpty, isNotNil } from "ramda";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ProposalCard } from "./ProposalCard";
-import { Color, TransactionIcon, useTheme } from "@shared/ui-kit";
+import { TransactionIcon, useTheme } from "@shared/ui-kit";
 import { DAO } from "@dao/services";
 
 interface RecentProposalsProps {
@@ -47,8 +47,8 @@ export function RecentProposals(props: RecentProposalsProps) {
   return (
     <NotFound
       icon={<TransactionIcon boxSize="4rem" stroke={theme.textMuted} />}
-      message={`We didn't find any recent proposals.`}
-      linkText="Create a proposal."
+      message="No recent proposals found"
+      linkText="Create Proposal"
       onLinkClick={handleClickCreateProposal}
     />
   );

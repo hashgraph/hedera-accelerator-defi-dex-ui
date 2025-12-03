@@ -31,6 +31,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(THEME_STORAGE_KEY, themeMode);
   }, [themeMode]);
 
+  // Set CSS variables when theme changes
+  useEffect(() => {
+    const theme = themeMode === "dark" ? DarkTheme : LightTheme;
+    const root = document.documentElement;
+
+    root.style.setProperty("--input-bg", theme.bgInput);
+    root.style.setProperty("--text-color", theme.text);
+    root.style.setProperty("--text-muted", theme.textMuted);
+    root.style.setProperty("--border-color", theme.border);
+    root.style.setProperty("--border-hover", theme.borderHover);
+    root.style.setProperty("--bg-secondary", theme.bgSecondary);
+    root.style.setProperty("--bg-card", theme.bgCard);
+  }, [themeMode]);
+
   const toggleTheme = () => {
     setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
   };

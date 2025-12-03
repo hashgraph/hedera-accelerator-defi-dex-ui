@@ -29,28 +29,24 @@ export function MembersList() {
         <Text.P_Medium_Medium color={theme.text}>{members.length} Members</Text.P_Medium_Medium>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
-        <SimpleGrid minWidth="100%" columns={3} spacing="1rem">
+        <SimpleGrid minWidth="100%" columns={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: "0.75rem", md: "1rem" }}>
           {membersWithAdminFirst?.map((member, index) => {
             const { accountId } = member;
             const isAdmin = accountId === adminId;
             return (
               <Flex
                 key={index}
-                direction="column"
+                direction="row"
                 bg={theme.bgSecondary}
                 justifyContent="space-between"
+                alignItems="center"
                 border={`1px solid ${theme.border}`}
-                borderRadius="4px"
-                padding="1.5rem"
+                borderRadius="12px"
+                padding={{ base: "1rem", md: "1.5rem" }}
+                gap="2"
               >
-                <Flex direction="row" justifyContent="space-between" gap="4">
-                  <HashScanLink id={accountId} type={HashscanData.Account} />
-                  {isAdmin && (
-                    <Flex direction="row" gap="2">
-                      <Tag label="Admin" />
-                    </Flex>
-                  )}
-                </Flex>
+                <HashScanLink id={accountId} type={HashscanData.Account} />
+                {isAdmin && <Tag label="Admin" />}
               </Flex>
             );
           })}

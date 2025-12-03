@@ -301,7 +301,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
             width="104px"
             leftIcon={<TwoLayerSettingsIcon />}
           >
-            <Text.P_Small_Semibold>Manage</Text.P_Small_Semibold>
+            <Text.P_Small_Semibold color="inherit">Manage</Text.P_Small_Semibold>
           </Button>
         }
         openDialogButtonText="Manage"

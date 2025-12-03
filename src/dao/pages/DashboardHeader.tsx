@@ -64,7 +64,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
   });
 
   const direction = useBreakpointValue({ base: "column", lg: "row" }) as "column" | "row";
-  const logoSize = useBreakpointValue({ base: "2.5rem", md: "3.5rem" });
+  const logoSize = useBreakpointValue({ base: "8rem", md: "14rem" });
   const showFullIds = useBreakpointValue({ base: false, md: true });
 
   return (
@@ -92,7 +92,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
                 </Text.H3_Medium>
                 <Tag label={type} />
                 {isPrivate && (
-                  <Badge bg={theme.accentGradient} color="white" fontSize="xs" px="2" borderRadius="4px">
+                  <Badge bg="#22D3EE" color="white" fontSize="xs" px="2" borderRadius="4px">
                     Private
                   </Badge>
                 )}
@@ -144,7 +144,7 @@ export function DashboardHeader(props: DashboardHeaderProps) {
           flexShrink={0}
         >
           <Box display={{ base: "block", lg: "block" }}>
-            <Breadcrumb to={Routes.Home} label="Back to DAOs" />
+            <Breadcrumb to={`/${Routes.App}`} label="Back to DAOs" />
           </Box>
           {showMintNFTButton && token && (
             <Box>

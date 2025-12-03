@@ -10,7 +10,7 @@ import {
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
-import { Color } from "../../themes";
+import { Color, useTheme } from "../../themes";
 import { Text } from "../Text";
 
 export interface InputProps<T extends string> {
@@ -33,6 +33,7 @@ export interface InputProps<T extends string> {
 }
 
 export function Input<T extends string>(props: InputProps<T>) {
+  const theme = useTheme();
   const {
     flex,
     label,
@@ -74,7 +75,7 @@ export function Input<T extends string>(props: InputProps<T>) {
         ) : (
           <ChakraText
             textStyle={isReadOnly ? "p xsmall medium" : "p small medium"}
-            color={isReadOnly ? Color.Neutral._500 : Color.Neutral._900}
+            color={isReadOnly ? theme.textMuted : theme.text}
           >
             {label}
           </ChakraText>
@@ -83,8 +84,8 @@ export function Input<T extends string>(props: InputProps<T>) {
       </Flex>
       {isReadOnly ? (
         <Flex gap="0.2rem">
-          <Text.P_Small_Regular color={Color.Neutral._900}>{value}</Text.P_Small_Regular>
-          {React.isValidElement(unit) ? unit : <Text.P_Small_Regular>{unit}</Text.P_Small_Regular>}
+          <Text.P_Small_Regular color={theme.text}>{value}</Text.P_Small_Regular>
+          {React.isValidElement(unit) ? unit : <Text.P_Small_Regular color={theme.text}>{unit}</Text.P_Small_Regular>}
         </Flex>
       ) : (
         <InputGroup>
@@ -99,7 +100,7 @@ export function Input<T extends string>(props: InputProps<T>) {
             isDisabled={isDisabled}
             isReadOnly={isReadOnly}
             {...register}
-            borderColor={isError ? Color.Destructive._300 : Color.Neutral._300}
+            borderColor={isError ? Color.Destructive._300 : theme.border}
             /** TODO: Move boxShadow style to theme. */
             sx={{
               _focus: {

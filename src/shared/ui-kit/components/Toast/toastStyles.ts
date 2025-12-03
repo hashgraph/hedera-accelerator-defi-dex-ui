@@ -1,7 +1,7 @@
 import { Color } from "../../themes";
 
 export const ToastStyles = `
-  --toastify-color-light: ${Color.White};
+  --toastify-color-light: var(--bg-secondary, ${Color.White});
   --toastify-color-info: ${Color.Primary._500};
   --toastify-color-success: ${Color.Success._700};
   --toastify-color-error: ${Color.Destructive._700};
@@ -10,7 +10,7 @@ export const ToastStyles = `
   --toastify-icon-color-success: var(--toastify-color-success);
   --toastify-icon-color-error: var(--toastify-color-error);
 
-  --toastify-text-color-light: ${Color.Neutral._900};
+  --toastify-text-color-light: var(--text-color, ${Color.Neutral._900});
 
   --toastify-text-color-info: ${Color.White};
   --toastify-text-color-success: ${Color.White};
@@ -25,6 +25,8 @@ export const ToastStyles = `
   }
   .Toastify__toast {
     padding: 0;
+    background: var(--bg-secondary, ${Color.White});
+    border-radius: 12px;
   }
   .Toastify__toast-body {
     padding: 0;

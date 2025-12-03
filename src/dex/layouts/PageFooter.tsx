@@ -22,7 +22,7 @@ export function PageFooter() {
           </Text>
         </Box>
         <Text fontSize="sm" color={theme.textMuted}>
-          2025 HashioDAO
+          2025 Hashgraph
         </Text>
       </HStack>
 
@@ -33,7 +33,7 @@ export function PageFooter() {
         <Link
           fontSize="sm"
           color={theme.textMuted}
-          href="https://swirldslabs.com/terms-of-service/"
+          href="https://www.hashgraph.com/terms-of-service/"
           isExternal={true}
           _hover={{ color: theme.text }}
           transition="color 0.2s"
@@ -43,7 +43,7 @@ export function PageFooter() {
         <Link
           fontSize="sm"
           color={theme.textMuted}
-          href="https://swirldslabs.com/privacy-policy"
+          href="https://www.hashgraph.com/privacy-policy/"
           isExternal={true}
           _hover={{ color: theme.text }}
           transition="color 0.2s"

@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { Color } from "../../themes";
+import { Color, useTheme } from "../../themes";
 import { ReactNode } from "react";
 import { ToastWarningIcon, ToastErrorIcon, ToastInfoIcon, ToastSuccessIcon } from "../Icons";
 import { Text } from "../Text";
@@ -14,7 +14,7 @@ export enum InlineAlertType {
 interface InlineAlertTypeStyles {
   icon: ReactNode;
   borderColor: string;
-  bg: string;
+  bgOpacity: string;
 }
 
 function getInlineAlertTypeStyles(type: InlineAlertType): InlineAlertTypeStyles {
@@ -22,36 +22,36 @@ function getInlineAlertTypeStyles(type: InlineAlertType): InlineAlertTypeStyles 
     case InlineAlertType.Info: {
       return {
         icon: <ToastInfoIcon h={4} w={4} marginTop="2px" />,
-        borderColor: Color.Primary._300,
-        bg: Color.Primary._50,
+        borderColor: Color.Primary._500,
+        bgOpacity: "rgba(126, 34, 206, 0.15)",
       };
     }
     case InlineAlertType.Warning: {
       return {
         icon: <ToastWarningIcon h={4} w={4} marginTop="2px" />,
-        borderColor: Color.Warning._300,
-        bg: Color.Warning._50,
+        borderColor: Color.Warning._500,
+        bgOpacity: "rgba(245, 158, 11, 0.15)",
       };
     }
     case InlineAlertType.Error: {
       return {
         icon: <ToastErrorIcon h={5} w={5} />,
-        borderColor: Color.Destructive._300,
-        bg: Color.Destructive._50,
+        borderColor: Color.Destructive._500,
+        bgOpacity: "rgba(239, 68, 68, 0.15)",
       };
     }
     case InlineAlertType.Success: {
       return {
         icon: <ToastSuccessIcon h={5} w={5} />,
-        borderColor: Color.Success._300,
-        bg: Color.Success._50,
+        borderColor: Color.Success._500,
+        bgOpacity: "rgba(34, 197, 94, 0.15)",
       };
     }
     default:
       return {
         icon: <></>,
         borderColor: "",
-        bg: "",
+        bgOpacity: "",
       };
   }
 }
@@ -67,14 +67,22 @@ interface InlineAlertProps {
  * as close as possible to the thing that it's about.
  */
 export function InlineAlert(props: InlineAlertProps) {
+  const theme = useTheme();
   const { title, message, type = InlineAlertType.Info } = props;
-  const { icon, borderColor, bg } = getInlineAlertTypeStyles(type);
+  const { icon, borderColor, bgOpacity } = getInlineAlertTypeStyles(type);
   return (
-    <Flex direction="row" gap="2" padding="0.5rem" borderRadius="0.375rem" bg={bg} border={`1px solid ${borderColor}`}>
+    <Flex
+      direction="row"
+      gap="2"
+      padding="0.75rem"
+      borderRadius="12px"
+      bg={bgOpacity}
+      border={`1px solid ${borderColor}`}
+    >
       {icon}
       <Flex direction="column" gap="1">
-        {title && <Text.P_Small_Medium>{title}</Text.P_Small_Medium>}
-        <Text.P_Small_Regular color={Color.Neutral._700}>{message}</Text.P_Small_Regular>
+        {title && <Text.P_Small_Medium color={theme.text}>{title}</Text.P_Small_Medium>}
+        <Text.P_Small_Regular color={theme.text}>{message}</Text.P_Small_Regular>
       </Flex>
     </Flex>
   );

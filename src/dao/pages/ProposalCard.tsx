@@ -1,7 +1,17 @@
 import { Divider, Flex, Image, useBreakpointValue } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatTokenAmountWithDecimal, getShortDescription, replaceLastRoute } from "@dex/utils";
-import { Card, DefaultLogoIcon, HederaIcon, SendTokenIcon, Tag, TagVariant, Text, useTheme } from "@shared/ui-kit";
+import {
+  Card,
+  Color,
+  DefaultLogoIcon,
+  HederaIcon,
+  SendTokenIcon,
+  Tag,
+  TagVariant,
+  Text,
+  useTheme,
+} from "@shared/ui-kit";
 import { DAO, DAOType } from "@dao/services";
 import { ProposalStateAsTagVariant, ProposalStatusAsTagVariant } from "./constants";
 import { DAOProposalVoting } from "./DAOProposalVoting";

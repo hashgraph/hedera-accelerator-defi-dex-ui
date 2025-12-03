@@ -51,7 +51,7 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
       <Menu>
         <Flex direction="row" gap={{ base: "2", md: "4" }} alignItems="center" flex="1">
           <Flex direction="row" gap="2" alignItems="center" flexShrink={0}>
-            <NavLink to="/">
+            <NavLink to="/app">
               <HStack spacing={2}>
                 <Box
                   w="36px"

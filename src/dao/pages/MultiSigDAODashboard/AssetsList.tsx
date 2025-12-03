@@ -88,7 +88,7 @@ export function AssetsList() {
         </Flex>
       </Flex>
       <Flex direction="row" layerStyle="dao-dashboard__content-body">
-        <SimpleGrid minWidth="100%" columns={2} spacing="1rem">
+        <SimpleGrid minWidth="100%" columns={{ base: 1, md: 2 }} spacing={{ base: "0.75rem", md: "1rem" }}>
           {assetsWithHBARFirst.map((asset) => {
             const { name, tokenId, balance, symbol, isNFT } = asset;
             return (
@@ -97,10 +97,11 @@ export function AssetsList() {
                 direction="column"
                 bg={theme.bgSecondary}
                 justifyContent="space-between"
-                height="150px"
+                height={{ base: "auto", md: "150px" }}
+                minHeight="120px"
                 border={`1px solid ${theme.border}`}
-                borderRadius="4px"
-                padding="1.5rem"
+                borderRadius="12px"
+                padding={{ base: "1rem", md: "1.5rem" }}
               >
                 <Flex direction="row" justifyContent="space-between" gap="2">
                   <Text.P_Medium_Semibold color={theme.text}>{name}</Text.P_Medium_Semibold>

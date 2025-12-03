@@ -9,13 +9,13 @@ const formTokenSelector = definePartsStyle({
     ...TextStyles["p small regular"],
     height: "40px",
     padding: "0.125rem 1rem",
-    background: DarkTheme.bgInput,
-    color: DarkTheme.text,
-    border: `1px solid ${DarkTheme.border}`,
+    background: "var(--input-bg, transparent)",
+    color: "var(--text-color, inherit)",
+    border: "1px solid var(--border-color, rgba(255,255,255,0.06))",
     borderRadius: "full",
     transition: "all 0.2s ease-in-out",
     _hover: {
-      borderColor: DarkTheme.borderHover,
+      borderColor: "var(--border-hover, rgba(255,255,255,0.1))",
     },
     _focus: {
       borderColor: DarkTheme.accent,
@@ -23,7 +23,7 @@ const formTokenSelector = definePartsStyle({
     },
   },
   icon: {
-    color: DarkTheme.textSecondary,
+    color: "var(--text-muted, rgba(255,255,255,0.5))",
   },
 });
 
@@ -32,14 +32,14 @@ const tokenSymbolSelector = definePartsStyle({
     ...TextStyles.b1,
     height: "61px",
     padding: "0.5rem",
-    background: DarkTheme.bgInput,
-    color: DarkTheme.text,
-    border: `1px solid ${DarkTheme.border}`,
+    background: "var(--input-bg, transparent)",
+    color: "var(--text-color, inherit)",
+    border: "1px solid var(--border-color, rgba(255,255,255,0.06))",
     borderLeft: "none",
     borderRadius: 0,
   },
   icon: {
-    color: DarkTheme.textSecondary,
+    color: "var(--text-muted, rgba(255,255,255,0.5))",
     fontSize: "0.5rem",
   },
 });
@@ -49,13 +49,13 @@ const dropDownSelector = definePartsStyle({
     ...TextStyles.b1,
     height: "45.52px",
     padding: "0.5rem",
-    background: DarkTheme.bgInput,
-    color: DarkTheme.text,
-    border: `1px solid ${DarkTheme.border}`,
+    background: "var(--input-bg, transparent)",
+    color: "var(--text-color, inherit)",
+    border: "1px solid var(--border-color, rgba(255,255,255,0.06))",
     borderRadius: "12px",
   },
   icon: {
-    color: DarkTheme.textSecondary,
+    color: "var(--text-muted, rgba(255,255,255,0.5))",
     fontSize: "0.5rem",
   },
 });

@@ -19,7 +19,7 @@ import { Routes } from "@dao/routes";
 import { DAOType } from "@dao/services";
 
 export function CreateADAOPage() {
-  const backTo = Routes.Home;
+  const backTo = `/${Routes.App}`;
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const createDAOPageForm = useForm<CreateADAOForm>({
@@ -60,23 +60,23 @@ export function CreateADAOPage() {
   const { data: { multisigDAOFeeConfig, nftDAOFeeConfig, ftDAOFeeConfig } = {} } = useFetchDAOConfig();
 
   function GovernanceForm(): string {
-    if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceToken}`;
-    if (type === DAOType.MultiSig) return `/${Routes.Create}/${Routes.Multisig}`;
-    if (type === DAOType.NFT) return `/${Routes.Create}/${Routes.NFT}`;
+    if (type === DAOType.GovernanceToken) return `${Routes.Create}/${Routes.GovernanceToken}`;
+    if (type === DAOType.MultiSig) return `${Routes.Create}/${Routes.Multisig}`;
+    if (type === DAOType.NFT) return `${Routes.Create}/${Routes.NFT}`;
     return ``;
   }
 
   function VotingForm(): string {
-    if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceTokenVoting}`;
-    if (type === DAOType.MultiSig) return `/${Routes.Create}/${Routes.MultisigVoting}`;
-    if (type === DAOType.NFT) return `/${Routes.Create}/${Routes.NFTVoting}`;
+    if (type === DAOType.GovernanceToken) return `${Routes.Create}/${Routes.GovernanceTokenVoting}`;
+    if (type === DAOType.MultiSig) return `${Routes.Create}/${Routes.MultisigVoting}`;
+    if (type === DAOType.NFT) return `${Routes.Create}/${Routes.NFTVoting}`;
     return ``;
   }
 
   function ReviewForm(): string {
-    if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceTokenReview}`;
-    if (type === DAOType.MultiSig) return `/${Routes.Create}/${Routes.MultisigReview}`;
-    if (type === DAOType.NFT) return `/${Routes.Create}/${Routes.NFTReview}`;
+    if (type === DAOType.GovernanceToken) return `${Routes.Create}/${Routes.GovernanceTokenReview}`;
+    if (type === DAOType.MultiSig) return `${Routes.Create}/${Routes.MultisigReview}`;
+    if (type === DAOType.NFT) return `${Routes.Create}/${Routes.NFTReview}`;
     return ``;
   }
 
@@ -110,17 +110,17 @@ export function CreateADAOPage() {
   const steps = [
     {
       label: "Disclaimer",
-      route: `/${Routes.Create}/${Routes.DAODisclaimer}`,
+      route: `${Routes.Create}/${Routes.DAODisclaimer}`,
       validate: async () => trigger(["disclaimer"]),
     },
     {
       label: "Details",
-      route: `/${Routes.Create}/${Routes.DAODetails}`,
+      route: `${Routes.Create}/${Routes.DAODetails}`,
       validate: async () => trigger(["name", "logoUrl", "isPublic", "description", "infoUrl"]),
     },
     {
       label: "Type",
-      route: `/${Routes.Create}/${Routes.Type}`,
+      route: `${Routes.Create}/${Routes.Type}`,
       validate: async () => trigger(["type"]),
     },
     {
