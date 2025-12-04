@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Grid, Heading, Text, VStack, HStack, keyframes, Image } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Grid, Heading, Text, VStack, HStack, keyframes } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { Color, useTheme, useThemeMode, ThemeToggle, HashDaoIcon } from "@shared/ui-kit";
 import { Routes } from "@dao/routes";
@@ -245,12 +245,11 @@ export function LandingPage() {
             <Box
               position="relative"
               w="340px"
-              h="420px"
               borderRadius="24px"
               bg="linear-gradient(145deg, rgba(30,30,40,0.9) 0%, rgba(20,20,28,0.9) 100%)"
               border="1px solid rgba(255,255,255,0.1)"
               backdropFilter="blur(20px)"
-              p={6}
+              p={5}
               animation={`${float} 6s ease-in-out infinite, ${glow} 4s ease-in-out infinite`}
               transform="perspective(1000px) rotateY(-5deg) rotateX(5deg)"
               _hover={{
@@ -259,113 +258,116 @@ export function LandingPage() {
               transition="transform 0.4s ease-out"
             >
               {/* Card Header */}
-              <HStack justify="space-between" mb={6}>
+              <HStack justify="space-between" mb={5}>
                 <HStack spacing={3}>
-                  <Box w="44px" h="44px" borderRadius="12px" bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)" />
-                  <VStack align="start" spacing={0}>
+                  <HashDaoIcon boxSize="48px" />
+                  <VStack align="start" spacing={1}>
                     <Text color="white" fontWeight="700" fontSize="md">
                       Acme DAO
                     </Text>
-                    <Text color="whiteAlpha.500" fontSize="xs">
-                      Multi-Sig
-                    </Text>
+                    <HStack spacing={2}>
+                      <Box
+                        px={2}
+                        py={0.5}
+                        borderRadius="full"
+                        bg="rgba(126, 34, 206, 0.2)"
+                        border="1px solid rgba(126, 34, 206, 0.3)"
+                      >
+                        <Text fontSize="10px" color={Color.Primary._400} fontWeight="600">
+                          Governance Token
+                        </Text>
+                      </Box>
+                      <Box
+                        px={2}
+                        py={0.5}
+                        borderRadius="full"
+                        bg="rgba(74, 222, 128, 0.15)"
+                        border="1px solid rgba(74, 222, 128, 0.3)"
+                      >
+                        <Text fontSize="10px" color="#4ADE80" fontWeight="600">
+                          Admin
+                        </Text>
+                      </Box>
+                    </HStack>
                   </VStack>
                 </HStack>
-                <Box
-                  px={3}
-                  py={1}
-                  borderRadius="full"
-                  bg="rgba(74, 222, 128, 0.15)"
-                  border="1px solid rgba(74, 222, 128, 0.3)"
-                >
-                  <Text fontSize="xs" color="#4ADE80" fontWeight="600">
-                    Active
-                  </Text>
-                </Box>
               </HStack>
 
-              {/* Proposal Preview */}
+              {/* Voting Power */}
               <Box
                 bg="rgba(255,255,255,0.03)"
                 borderRadius="16px"
                 p={4}
-                mb={4}
+                mb={3}
                 border="1px solid rgba(255,255,255,0.05)"
               >
                 <Text color="whiteAlpha.600" fontSize="xs" mb={2}>
-                  ACTIVE PROPOSAL
-                </Text>
-                <Text color="white" fontWeight="600" fontSize="sm" mb={3}>
-                  Allocate 50,000 HBAR for Q1 Development
-                </Text>
-                <Flex justify="space-between" align="center">
-                  <HStack spacing={1}>
-                    <Box w="full" h="6px" borderRadius="full" bg="whiteAlpha.100" overflow="hidden">
-                      <Box w="72%" h="full" bg="linear-gradient(90deg, #7E22CE, #A855F7)" borderRadius="full" />
-                    </Box>
-                  </HStack>
-                  <Text color={Color.Primary._400} fontSize="xs" fontWeight="600" ml={3}>
-                    72%
-                  </Text>
-                </Flex>
-              </Box>
-
-              {/* Treasury */}
-              <Box bg="rgba(255,255,255,0.03)" borderRadius="16px" p={4} border="1px solid rgba(255,255,255,0.05)">
-                <Text color="whiteAlpha.600" fontSize="xs" mb={2}>
                   VOTING POWER
                 </Text>
-                <HStack justify="space-between">
-                  <Text color="white" fontWeight="700" fontSize="2xl">
-                    1653
+                <HStack align="baseline" spacing={2}>
+                  <Text color={Color.Primary._400} fontWeight="700" fontSize="2xl">
+                    5000
                   </Text>
-                  <Text color="#4ADE80" fontSize="sm" fontWeight="600">
-                    +12.4%
+                  <Text color={Color.Primary._400} fontWeight="600" fontSize="sm">
+                    ACME
                   </Text>
                 </HStack>
               </Box>
 
-              {/* Members */}
-              <HStack mt={6} spacing={-2}>
-                {[Color.Primary._500, "#6366F1", "#EC4899", "#F59E0B"].map((color, i) => (
-                  <Box key={i} w="32px" h="32px" borderRadius="full" bg={color} border="2px solid rgba(20,20,28,1)" />
-                ))}
-                <Box
-                  w="32px"
-                  h="32px"
-                  borderRadius="full"
-                  bg="whiteAlpha.100"
-                  border="2px solid rgba(20,20,28,1)"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Text fontSize="xs" color="whiteAlpha.700" fontWeight="600">
-                    +8
+              {/* Recent Proposal */}
+              <Box bg="rgba(255,255,255,0.03)" borderRadius="16px" p={4} border="1px solid rgba(255,255,255,0.05)">
+                <Text color="whiteAlpha.600" fontSize="xs" mb={2}>
+                  RECENT PROPOSAL
+                </Text>
+                <Text color="white" fontWeight="600" fontSize="sm" mb={2}>
+                  Allocate 50,000 HBAR for Q1
+                </Text>
+                <HStack spacing={2}>
+                  <Box px={2} py={0.5} borderRadius="full" bg="rgba(74, 222, 128, 0.15)">
+                    <Text fontSize="10px" color="#4ADE80" fontWeight="600">
+                      Executed
+                    </Text>
+                  </Box>
+                  <Text fontSize="xs" color="whiteAlpha.500">
+                    Turnout: 72%
                   </Text>
-                </Box>
-              </HStack>
+                </HStack>
+              </Box>
+
+              {/* New Proposal Button */}
+              <Button
+                mt={4}
+                w="full"
+                size="sm"
+                bg="linear-gradient(135deg, #7E22CE 0%, #9333EA 100%)"
+                color="white"
+                fontWeight="600"
+                borderRadius="full"
+                _hover={{ opacity: 0.9 }}
+              >
+                New Proposal
+              </Button>
             </Box>
 
             {/* Background Cards */}
             <Box
               position="absolute"
               w="340px"
-              h="420px"
+              h="380px"
               borderRadius="24px"
               bg="rgba(30,30,40,0.4)"
               border="1px solid rgba(255,255,255,0.05)"
-              transform="translateX(30px) translateY(30px) scale(0.95)"
+              transform="translateX(25px) translateY(25px) scale(0.96)"
               zIndex={-1}
             />
             <Box
               position="absolute"
               w="340px"
-              h="420px"
+              h="380px"
               borderRadius="24px"
               bg="rgba(30,30,40,0.2)"
               border="1px solid rgba(255,255,255,0.02)"
-              transform="translateX(60px) translateY(60px) scale(0.9)"
+              transform="translateX(50px) translateY(50px) scale(0.92)"
               zIndex={-2}
             />
           </Flex>

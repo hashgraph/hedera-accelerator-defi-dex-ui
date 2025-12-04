@@ -1,5 +1,5 @@
-import { Card, Flex, Grid, GridItem, Image, Text, Badge, Box } from "@chakra-ui/react";
-import { Color, useTheme, DefaultLogoIcon } from "@shared/ui-kit";
+import { Card, Flex, Image, Text, Badge } from "@chakra-ui/react";
+import { useTheme, DefaultLogoIcon } from "@shared/ui-kit";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DAOType } from "@dao/services";
 import { useFetchContract } from "@dao/hooks";
