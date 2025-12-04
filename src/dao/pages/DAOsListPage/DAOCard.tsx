@@ -1,6 +1,6 @@
 import { Card, Flex, Grid, GridItem, Image, Text, Badge, Box } from "@chakra-ui/react";
 import { Color, useTheme, DefaultLogoIcon } from "@shared/ui-kit";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DAOType } from "@dao/services";
 import { useFetchContract } from "@dao/hooks";
 
@@ -15,13 +15,16 @@ export interface DAOCardProps {
 export function DAOCard(props: DAOCardProps) {
   const { name, type, accountEVMAddress, logoUrl, isPrivate } = props;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const theme = useTheme();
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
+  const isFromMyDAOs = searchParams.get("filter") === "myDAOs";
 
   function handleDAOCardClicked() {
     const daoTypePath = type.toLowerCase().replaceAll(" ", "-");
-    navigate(`${daoTypePath}/${daoAccountId}`);
+    const fromParam = isFromMyDAOs ? "?from=myDAOs" : "";
+    navigate(`${daoTypePath}/${daoAccountId}${fromParam}`);
   }
 
   return (
@@ -68,22 +71,7 @@ export function DAOCard(props: DAOCardProps) {
           h="64px"
           borderRadius="12px"
           flexShrink={0}
-          fallback={
-            <Box
-              w="64px"
-              h="64px"
-              borderRadius="12px"
-              bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              flexShrink={0}
-            >
-              <Text fontSize="2xl" fontWeight="800" color="white">
-                {name.charAt(0).toUpperCase()}
-              </Text>
-            </Box>
-          }
+          fallback={<DefaultLogoIcon boxSize="64px" />}
         />
         <Flex direction="column" gap={1} flex={1} minW={0}>
           <Text fontSize="md" fontWeight="700" color={theme.text} isTruncated>

@@ -43,6 +43,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--border-hover", theme.borderHover);
     root.style.setProperty("--bg-secondary", theme.bgSecondary);
     root.style.setProperty("--bg-card", theme.bgCard);
+    root.style.setProperty("--bg-card-hover", theme.bgCardHover);
   }, [themeMode]);
 
   const toggleTheme = () => {

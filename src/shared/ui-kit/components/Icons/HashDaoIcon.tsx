@@ -2,41 +2,18 @@ import { createIcon } from "@chakra-ui/react";
 
 export const HashDaoIcon = createIcon({
   displayName: "HashioDaoIcon",
-  viewBox: "0 0 30 30",
+  viewBox: "0 0 100 100",
   path: (
     <>
-      <path
-        /* eslint-disable-next-line max-len */
-        d="m 21.524792,8.9408272 -3.54542,2.1140198 c -0.37836,0.22489 -0.61119,0.635 -0.61119,1.07421 v 12.02002 c 0,0.97102 1.05833,1.57427 1.89442,1.07421 l 3.54541,-2.11403 c 0.37836,-0.22489 0.61119,-0.635 0.61119,-1.0742 v -12.02002 c 0,-0.9710298 -1.05833,-1.5742798 -1.89441,-1.0742098 z"
-        id="path20"
-        fill="#3a72be"
-        strokeWidth={0}
-      />
-      <path
-        /* eslint-disable-next-line max-len */
-        d="m 14.306952,11.472887 v -6.4611293 c 0,-0.97102 -1.05833,-1.57427 -1.89441,-1.0742 l -3.5427758,2.11402 c -0.378354,0.22489 -0.611187,0.635 -0.611187,1.07421 v 2.3997695 c 0,0.45773 0.248708,0.8784098 0.648229,1.0980198 l 3.5454138,1.94733 c 0.83344,0.45773 1.85473,-0.14552 1.85473,-1.09802 z"
-        id="path22"
-        fill="#3a72be"
-        strokeWidth={0}
-      />
-      <path
-        /* eslint-disable-next-line max-len */
-        d="m 8.2585792,19.145807 v 0 c 0,0.97102 1.058333,1.57427 1.8944168,1.0742 v 0 c 0.830791,-0.49477 0.809625,-1.70656 -0.03969,-2.17222 v 0 c -0.8334368,-0.45773 -1.8547288,0.14552 -1.8547288,1.09802 z"
-        id="path24"
-        fill="#47b94b"
-        strokeWidth={0}
-      />
+      {/* Blue circle background */}
+      <circle cx="50" cy="50" r="50" fill="#4A90D9" />
+      {/* Hashtag symbol - white */}
+      {/* Vertical bars */}
+      <rect x="32" y="22" width="8" height="56" rx="2" fill="white" />
+      <rect x="60" y="22" width="8" height="56" rx="2" fill="white" />
+      {/* Horizontal bars */}
+      <rect x="22" y="34" width="56" height="8" rx="2" fill="white" />
+      <rect x="22" y="58" width="56" height="8" rx="2" fill="white" />
     </>
   ),
 });
-
-/*
-
-  <defs
-     id="defs199" />
-  <g
-     id="layer1">
-
-  </g>
-
- */

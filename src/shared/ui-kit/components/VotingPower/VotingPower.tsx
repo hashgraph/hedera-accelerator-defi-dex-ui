@@ -23,6 +23,7 @@ export interface VotingPowerProps {
   handleClickSwapButton: () => void;
   handleErrorDialogDismissButtonClicked: () => void;
   isWalletConnected: boolean;
+  hideSwapButton?: boolean;
 }
 
 export const VotingPower = (props: VotingPowerProps) => {
@@ -44,6 +45,7 @@ export const VotingPower = (props: VotingPowerProps) => {
     handleClickSwapButton,
     handleErrorDialogDismissButtonClicked,
     isWalletConnected,
+    hideSwapButton = false,
   } = props;
 
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -109,7 +111,7 @@ export const VotingPower = (props: VotingPowerProps) => {
               onLockClick={(data: InputTokenData) => handleClickLockGodTokenButton(Number(data.lockNFTSerialId))}
               onUnlockClick={handleClickUnLockGodTokenButton}
             />
-          ) : isWalletConnected ? (
+          ) : isWalletConnected && !hideSwapButton ? (
             <Button
               key="swap"
               variant="secondary"
@@ -118,9 +120,9 @@ export const VotingPower = (props: VotingPowerProps) => {
               leftIcon={<SwapIcon />}
               onClick={() => window.open("/swap", "_blank")}
             >
-              <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
+              Swap
             </Button>
-          ) : (
+          ) : !isWalletConnected ? (
             <Button
               key="swap"
               variant="secondary"
@@ -128,9 +130,9 @@ export const VotingPower = (props: VotingPowerProps) => {
               size={{ base: "sm", md: "md" }}
               onClick={handleConnectToWalletClick}
             >
-              <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
+              Connect To Wallet
             </Button>
-          )}
+          ) : null}
         </Flex>
       </Flex>
       <LoadingDialog isOpen={isLoading} message={loadingDialogMessage} />

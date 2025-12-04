@@ -20,7 +20,7 @@ import {
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { useDexContext } from "@dex/hooks";
 import { NetworkSwitcher } from "@dex/components";
-import { useTheme, useThemeMode, WalletConnection, Text, ThemeToggle } from "@shared/ui-kit";
+import { useTheme, useThemeMode, WalletConnection, Text, ThemeToggle, HashDaoIcon } from "@shared/ui-kit";
 import { useEffect, useState } from "react";
 
 export interface TopMenuBarProps {
@@ -53,19 +53,7 @@ export function TopMenuBar(props: TopMenuBarProps): JSX.Element {
           <Flex direction="row" gap="2" alignItems="center" flexShrink={0}>
             <NavLink to="/app">
               <HStack spacing={2}>
-                <Box
-                  w="36px"
-                  h="36px"
-                  borderRadius="10px"
-                  bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Text.P_Medium_Semibold color="white" fontSize="lg" fontWeight="900">
-                    H
-                  </Text.P_Medium_Semibold>
-                </Box>
+                <HashDaoIcon boxSize="36px" />
                 <Text.P_Medium_Semibold color={theme.text} display={{ base: "none", sm: "block" }}>
                   HashioDAO
                 </Text.P_Medium_Semibold>

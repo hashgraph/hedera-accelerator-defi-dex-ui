@@ -56,8 +56,8 @@ export const TabsStyles = defineMultiStyleConfig({
     },
     "dao-create-new": {
       tab: {
-        color: DarkTheme.textMuted,
-        stroke: DarkTheme.textMuted,
+        color: Color.Neutral._500,
+        stroke: Color.Neutral._500,
         borderRadius: "full",
         padding: "0.5rem 1rem",
         transition: "all 0.2s ease-in-out",
@@ -68,7 +68,7 @@ export const TabsStyles = defineMultiStyleConfig({
           boxShadow: "0 4px 14px rgba(126, 34, 206, 0.3)",
         },
         _hover: {
-          color: DarkTheme.text,
+          color: Color.Neutral._700,
         },
       },
     },

@@ -1,7 +1,7 @@
 import { Button, Flex, HStack, Image, VStack, useBreakpointValue, Badge, Box } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink, useSearchParams } from "react-router-dom";
 import {
-  Breadcrumb,
+  ArrowLeftIcon,
   CheckRightIcon,
   Color,
   DefaultLogoIcon,
@@ -47,7 +47,11 @@ export function DashboardHeader(props: DashboardHeaderProps) {
     handleMintNFT,
   } = props;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const theme = useTheme();
+  const isFromMyDAOs = searchParams.get("from") === "myDAOs";
+  const backUrl = isFromMyDAOs ? `/${Routes.App}?filter=myDAOs` : `/${Routes.App}`;
+  const backLabel = isFromMyDAOs ? "My DAOs" : "All DAOs";
   const daoAccountIdQueryResults = useFetchContract(accountEVMAddress);
   const daoAccountId = daoAccountIdQueryResults.data?.data.contract_id;
   const daoSafeIdQueryResults = useFetchContract(safeEVMAddress ?? "");
@@ -65,10 +69,27 @@ export function DashboardHeader(props: DashboardHeaderProps) {
 
   const direction = useBreakpointValue({ base: "column", lg: "row" }) as "column" | "row";
   const logoSize = useBreakpointValue({ base: "8rem", md: "14rem" });
+  const defaultLogoSize = useBreakpointValue({ base: "4rem", md: "6rem" });
   const showFullIds = useBreakpointValue({ base: false, md: true });
 
   return (
     <Flex bg={theme.bgSecondary} direction="column" padding={padding} borderBottom={`1px solid ${theme.border}`}>
+      {/* Back navigation */}
+      <Box mb={3}>
+        <HStack
+          as={RouterLink}
+          to={backUrl}
+          spacing={2}
+          fontSize="sm"
+          fontWeight="500"
+          _hover={{ "& p": { color: Color.Primary._500 } }}
+          transition="all 0.2s"
+          width="fit-content"
+        >
+          <ArrowLeftIcon fill={theme.textSecondary} options={{ boxSize: "0.6rem" }} />
+          <Text.P_Small_Medium color={theme.textSecondary}>{backLabel}</Text.P_Small_Medium>
+        </HStack>
+      </Box>
       <Flex
         bg={theme.bgSecondary}
         direction={direction}
@@ -77,14 +98,18 @@ export function DashboardHeader(props: DashboardHeaderProps) {
       >
         <Flex bg={theme.bgSecondary} direction="column" gap="2" flex="1" minWidth="0">
           <HStack gap={{ base: "0.5rem", md: "0.7rem" }} flexWrap="wrap">
-            <Image
-              boxSize={logoSize}
-              objectFit="contain"
-              src={logoUrl}
-              alt="dao logo"
-              fallback={<DefaultLogoIcon boxSize={logoSize} color={theme.textMuted} />}
-              flexShrink={0}
-            />
+            {logoUrl ? (
+              <Image
+                boxSize={logoSize}
+                objectFit="contain"
+                src={logoUrl}
+                alt="dao logo"
+                fallback={<DefaultLogoIcon boxSize={defaultLogoSize} />}
+                flexShrink={0}
+              />
+            ) : (
+              <DefaultLogoIcon boxSize={defaultLogoSize} />
+            )}
             <VStack alignItems="flex-start" gap="0.2rem" flex="1" minWidth="0">
               <HStack gap="0.5rem" flexWrap="wrap">
                 <Text.H3_Medium fontSize={{ base: "lg", md: "xl" }} isTruncated maxWidth="100%" color={theme.text}>
@@ -136,22 +161,13 @@ export function DashboardHeader(props: DashboardHeaderProps) {
         </Flex>
         <Flex
           bg={theme.bgSecondary}
-          direction={{ base: "row", lg: "row" }}
-          justifyContent={{ base: "space-between", lg: "flex-end" }}
-          alignItems="center"
-          gap={{ base: 2, md: 4, lg: 8 }}
-          flexWrap="wrap"
+          direction="column"
+          gap="0.4rem"
+          alignItems={{ base: "flex-start", lg: "flex-end" }}
           flexShrink={0}
         >
-          <Box display={{ base: "block", lg: "block" }}>
-            <Breadcrumb to={`/${Routes.App}`} label="Back to DAOs" />
-          </Box>
-          {showMintNFTButton && token && (
-            <Box>
-              <MintNFTModal token={token} handleMintNFT={handleMintNFT} />
-            </Box>
-          )}
-          <Flex direction="column" gap="0.4rem" alignItems={{ base: "flex-end", lg: "flex-end" }}>
+          <HStack gap={2}>
+            {showMintNFTButton && token && <MintNFTModal token={token} handleMintNFT={handleMintNFT} />}
             <Button
               variant="primary"
               size={{ base: "sm", md: "md" }}
@@ -161,15 +177,15 @@ export function DashboardHeader(props: DashboardHeaderProps) {
             >
               New Proposal
             </Button>
-            {(isMember || isAdmin) && (
-              <Flex direction="row" justifyContent="flex-end" gap="0.2rem" alignItems="center">
-                <Text.P_Small_Regular color={theme.textMuted} fontSize={{ base: "xs", md: "sm" }}>
-                  {isAdmin ? "Admin" : "Member"}
-                </Text.P_Small_Regular>
-                <CheckRightIcon boxSize="4" color={theme.textMuted} />
-              </Flex>
-            )}
-          </Flex>
+          </HStack>
+          {(isMember || isAdmin) && (
+            <Flex direction="row" justifyContent="flex-end" gap="0.2rem" alignItems="center">
+              <Text.P_Small_Regular color={theme.textMuted} fontSize={{ base: "xs", md: "sm" }}>
+                {isAdmin ? "Admin" : "Member"}
+              </Text.P_Small_Regular>
+              <CheckRightIcon boxSize="4" color={theme.textMuted} />
+            </Flex>
+          )}
         </Flex>
       </Flex>
     </Flex>

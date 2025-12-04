@@ -1,6 +1,6 @@
 import { Box, Button, Container, Flex, Grid, Heading, Text, VStack, HStack, keyframes, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { Color, useTheme, useThemeMode, ThemeToggle } from "@shared/ui-kit";
+import { Color, useTheme, useThemeMode, ThemeToggle, HashDaoIcon } from "@shared/ui-kit";
 import { Routes } from "@dao/routes";
 
 const float = keyframes`
@@ -95,19 +95,7 @@ export function LandingPage() {
         gap={{ base: "2", md: "4" }}
       >
         <HStack spacing={2}>
-          <Box
-            w="36px"
-            h="36px"
-            borderRadius="10px"
-            bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Text fontSize="lg" fontWeight="900" color="white">
-              H
-            </Text>
-          </Box>
+          <HashDaoIcon boxSize="36px" />
           <Text fontSize="md" fontWeight="600" color={theme.text} display={{ base: "none", sm: "block" }}>
             HashioDAO
           </Text>
