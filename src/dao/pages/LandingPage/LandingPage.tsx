@@ -170,8 +170,8 @@ export function LandingPage() {
               lineHeight="1.8"
               animation={`${slideUp} 0.6s ease-out 0.2s both`}
             >
-              Create unstoppable organizations. Vote on-chain. Manage treasuries together. All with enterprise-grade
-              security and instant finality.
+              Create unstoppable organizations. Vote on-chain. Manage shared treasuries. Built for Governance Tokens,
+              Multisig, and NFTs.
             </Text>
 
             <HStack spacing={4} pt={4} animation={`${slideUp} 0.6s ease-out 0.3s both`}>
