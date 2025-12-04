@@ -548,24 +548,18 @@ export function LandingPage() {
       <Box py={8} borderTop={`1px solid ${theme.border}`}>
         <Container maxW="1400px" px={{ base: 4, md: 8 }}>
           <Flex direction={{ base: "column", md: "row" }} justify="space-between" align="center" gap={4}>
-            <HStack spacing={2}>
-              <Box
-                w="28px"
-                h="28px"
-                borderRadius="8px"
-                bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text fontSize="sm" fontWeight="900" color="white">
-                  H
-                </Text>
-              </Box>
-              <Text fontSize="sm" color={theme.textMuted}>
-                2025 Hashgraph
-              </Text>
-            </HStack>
+            <Text
+              as="a"
+              href="https://www.hashgraph.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              fontSize="sm"
+              color={theme.textMuted}
+              _hover={{ color: theme.text }}
+              transition="color 0.2s"
+            >
+              © 2025 Hashgraph
+            </Text>
             <HStack spacing={6}>
               <Text
                 as="a"

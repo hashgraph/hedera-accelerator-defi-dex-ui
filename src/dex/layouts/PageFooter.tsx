@@ -1,4 +1,4 @@
-import { Flex, Link, Spacer, Box, HStack, Text } from "@chakra-ui/react";
+import { Flex, Link, Spacer, HStack, Text } from "@chakra-ui/react";
 import { useTheme, GithubIcon } from "@shared/ui-kit";
 
 export function PageFooter() {
@@ -6,25 +6,17 @@ export function PageFooter() {
 
   return (
     <Flex layerStyle="footer" bg={theme.bg} borderTop={`1px solid ${theme.border}`}>
-      {/* Left - Logo & Copyright */}
-      <HStack spacing={2}>
-        <Box
-          w="24px"
-          h="24px"
-          borderRadius="6px"
-          bg="linear-gradient(135deg, #7E22CE 0%, #A855F7 100%)"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Text fontSize="xs" fontWeight="900" color="white">
-            H
-          </Text>
-        </Box>
+      {/* Left - Copyright */}
+      <Link
+        href="https://www.hashgraph.com/"
+        isExternal={true}
+        _hover={{ color: theme.text, textDecoration: "none" }}
+        transition="color 0.2s"
+      >
         <Text fontSize="sm" color={theme.textMuted}>
-          2025 Hashgraph
+          © 2025 Hashgraph
         </Text>
-      </HStack>
+      </Link>
 
       <Spacer />
 

@@ -6,7 +6,7 @@ export const HashDaoIcon = createIcon({
   path: (
     <>
       {/* Blue circle background */}
-      <circle cx="50" cy="50" r="50" fill="#4A90D9" />
+      <circle cx="50" cy="50" r="50" fill="#5B8EC2" />
       {/* Hashtag symbol - white */}
       {/* Vertical bars */}
       <rect x="32" y="22" width="8" height="56" rx="2" fill="white" />
