@@ -17,7 +17,6 @@ interface UseCreateMultiSigDAOUpgradeProposalParams {
 export function useCreateMultiSigDAOUpgradeProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -26,6 +25,7 @@ export function useCreateMultiSigDAOUpgradeProposal(handleOnSuccess: HandleOnSuc
     DAOMutations.CreateMultiSigDAOUpgradeProposal
   >(
     async (params: UseCreateMultiSigDAOUpgradeProposalParams) => {
+      const signer = wallet.getSigner();
       return DexService.proposeMultiSigDAOUpgradeProposal({ ...params, signer });
     },
     {

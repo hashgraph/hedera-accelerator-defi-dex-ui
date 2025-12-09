@@ -22,7 +22,38 @@ export const DefaultTheme = extendTheme({
       body: {
         background: Color.Primary_Bg,
       },
+      "*": {
+        transition: "background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+      },
     },
+  },
+  config: {
+    cssVarPrefix: "hedera",
+  },
+  breakpoints: {
+    sm: "480px",
+    md: "768px",
+    lg: "992px",
+    xl: "1280px",
+    "2xl": "1536px",
+  },
+  shadows: {
+    soft: Color.Shadow.Soft,
+    medium: Color.Shadow.Medium,
+    strong: Color.Shadow.Strong,
+    primary: Color.Shadow.Primary,
+    card: Color.Shadow.Card,
+  },
+  radii: {
+    sm: "6px",
+    md: "8px",
+    lg: "12px",
+    xl: "16px",
+  },
+  space: {
+    "page-x-sm": "1rem",
+    "page-x-md": "2rem",
+    "page-x-lg": "5rem",
   },
   textStyles: TextStyles,
   layerStyles: LayerStyles,

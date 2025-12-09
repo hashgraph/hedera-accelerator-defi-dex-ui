@@ -9,7 +9,7 @@ interface GetStepIconParams {
 
 function getStepIcon(params: GetStepIconParams) {
   const { isLoading, isError } = params;
-  if (isLoading) return <Spinner color={Color.Blue._500} borderWidth="3px" boxSize="6" />;
+  if (isLoading) return <Spinner color={Color.Primary._500} borderWidth="3px" boxSize="6" />;
   if (isError) return <CancelledStepIcon position="relative" top="1px" left="1px" boxSize="6" />;
   return (
     <StepStatus

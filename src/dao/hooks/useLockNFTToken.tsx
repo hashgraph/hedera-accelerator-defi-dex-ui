@@ -19,10 +19,10 @@ export function useLockNFTToken(
 ) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseLockNFTTokenParams, DAOMutations.LockNFTToken>(
     async (params: UseLockNFTTokenParams) => {
       const { nftSerialId, spenderContractId, tokenId } = params;
+      const signer = wallet.getSigner();
       await DexService.setNFTAllowance({
         tokenId,
         nftSerialId,

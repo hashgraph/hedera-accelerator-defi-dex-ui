@@ -13,7 +13,7 @@ import { useLocation, useNavigate, useOutletContext, useParams } from "react-rou
 import { ProposalCard } from "../ProposalCard";
 import { Flex } from "@chakra-ui/react";
 import { DAODetailsContext, GovernanceDAODetails, MultiSigDAODetails } from "@dao/services";
-import { TransactionIcon, Color, usePagination, Pagination } from "@shared/ui-kit";
+import { TransactionIcon, usePagination, Pagination, useTheme } from "@shared/ui-kit";
 import { isNotNil, isEmpty } from "ramda";
 import { replaceLastRoute } from "@dex/utils";
 import { Routes } from "@dao/routes";
@@ -37,6 +37,7 @@ const transactionTabs = [
 ];
 
 export function ProposalList() {
+  const theme = useTheme();
   const { accountId: daoAccountId = "" } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,7 +109,11 @@ export function ProposalList() {
           <CardListLayout
             onTabChange={handleTabChange}
             tabFilters={
-              <Flex layerStyle="dao-dashboard__content-header--with-tabs">
+              <Flex
+                layerStyle="dao-dashboard__content-header--with-tabs"
+                bg={theme.bgSecondary}
+                borderBottom={`1px solid ${theme.border}`}
+              >
                 <TabFilters filters={transactionTabs} />
               </Flex>
             }
@@ -123,9 +128,9 @@ export function ProposalList() {
                 : [<></>, <></>].map(() => (
                     <Flex direction="column" gap="2" minHeight="300px" key="not-found">
                       <NotFound
-                        icon={<TransactionIcon boxSize="4rem" stroke={Color.Neutral._900} />}
-                        message={`We didn't find any ${tabIndex === 0 ? "active" : "past"} proposals.`}
-                        linkText="Create a proposal."
+                        icon={<TransactionIcon boxSize="4rem" stroke={theme.textMuted} />}
+                        message={`No ${tabIndex === 0 ? "active" : "past"} proposals found`}
+                        linkText="Create Proposal"
                         onLinkClick={handleClickCreateProposal}
                       />
                     </Flex>
@@ -134,7 +139,7 @@ export function ProposalList() {
             paginationComponent={
               <Pagination
                 pageCount={pageCount}
-                customPaginationStyles={{ paddingRight: "5rem" }}
+                customPaginationStyles={{ paddingRight: "1rem" }}
                 isPaginationVisible={isPaginationVisible}
                 isPreviousButtonVisible={isPreviousButtonVisible}
                 isNextButtonVisible={isNextButtonVisible}

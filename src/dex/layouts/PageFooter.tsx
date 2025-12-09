@@ -1,63 +1,88 @@
-import { Flex, Link } from "@chakra-ui/react";
-import { NetworkSwitcher } from "@dex/components";
-import { Color, GithubIcon, Text } from "@shared/ui-kit";
+import { Flex, Link, Spacer, HStack, Text } from "@chakra-ui/react";
+import { useTheme, GithubIcon } from "@shared/ui-kit";
 
 export function PageFooter() {
+  const theme = useTheme();
+
   return (
-    <Flex layerStyle="footer" alignItems="flex-end" mt="5">
-      <Text.P_XSmall_Regular>
-        <Link href="https://swirldslabs.com" textStyle="p small regular link" color={Color.Primary._500}>
-          Swirlds Labs
-        </Link>{" "}
-        © 2023 - 2024
-      </Text.P_XSmall_Regular>
-      <Flex direction="row" alignItems="flex-end" gap="8">
+    <Flex layerStyle="footer" bg={theme.bg} borderTop={`1px solid ${theme.border}`}>
+      {/* Left - Copyright */}
+      <Link
+        href="https://www.hashgraph.com/"
+        isExternal={true}
+        _hover={{ color: theme.text, textDecoration: "none" }}
+        transition="color 0.2s"
+      >
+        <Text fontSize="sm" color={theme.textMuted}>
+          © 2025 Hashgraph
+        </Text>
+      </Link>
+
+      <Spacer />
+
+      {/* Center - Legal links */}
+      <HStack spacing={{ base: 3, md: 6 }}>
         <Link
-          textStyle="p small regular link"
-          color={Color.Primary._500}
-          href="https://swirldslabs.com/terms-of-service/"
+          fontSize="sm"
+          color={theme.textMuted}
+          href="https://www.hashgraph.com/terms-of-service/"
           isExternal={true}
+          _hover={{ color: theme.text }}
+          transition="color 0.2s"
         >
-          Terms &amp; Conditions
+          Terms
         </Link>
         <Link
-          textStyle="p small regular link"
-          color={Color.Primary._500}
-          href="https://swirldslabs.com/privacy-policy"
+          fontSize="sm"
+          color={theme.textMuted}
+          href="https://www.hashgraph.com/privacy-policy/"
           isExternal={true}
+          _hover={{ color: theme.text }}
+          transition="color 0.2s"
         >
-          Privacy Policy
+          Privacy
         </Link>
         <Link
-          textStyle="p small regular link"
-          color={Color.Primary._500}
+          fontSize="sm"
+          color={theme.textMuted}
           href="https://skynet.certik.com/projects/swirlds-labs-dao-as-a-service"
           isExternal={true}
+          _hover={{ color: theme.text }}
+          transition="color 0.2s"
         >
-          Audit by Certik
+          Audit
         </Link>
+      </HStack>
+
+      <Spacer />
+
+      {/* Right - GitHub links */}
+      <HStack spacing={{ base: 3, md: 6 }}>
         <Link
-          textStyle="p small regular link"
-          color={Color.Primary._500}
+          fontSize="sm"
+          color={theme.textMuted}
           href="https://github.com/hashgraph/hedera-accelerator-defi-dex-ui"
           isExternal={true}
+          _hover={{ color: theme.text }}
+          transition="color 0.2s"
         >
           <Flex direction="row" gap="1" alignItems="center">
-            <GithubIcon fill={Color.Primary._500} /> UI
+            <GithubIcon fill={theme.textMuted} boxSize="14px" /> UI
           </Flex>
         </Link>
         <Link
-          textStyle="p small regular link"
-          color={Color.Primary._500}
+          fontSize="sm"
+          color={theme.textMuted}
           href="https://github.com/hashgraph/hedera-accelerator-defi-dex"
           isExternal={true}
+          _hover={{ color: theme.text }}
+          transition="color 0.2s"
         >
           <Flex direction="row" gap="1" alignItems="center">
-            <GithubIcon fill={Color.Primary._500} /> Smart Contracts
+            <GithubIcon fill={theme.textMuted} boxSize="14px" /> Contracts
           </Flex>
         </Link>
-        <NetworkSwitcher />
-      </Flex>
+      </HStack>
     </Flex>
   );
 }

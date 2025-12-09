@@ -84,9 +84,9 @@ export function CreateDAOProposal() {
   watch("type");
   const location = useLocation();
   const navigate = useNavigate();
-  const currentDaoType = location.pathname.split("/").at(1) ?? "";
+  const currentDaoType = location.pathname.split("/").at(2) ?? "";
   const currentWizardStep = getLastPathInRoute(location.pathname);
-  const backTo = `/${currentDaoType}/${daoAccountId}/${Routes.Overview}`;
+  const backTo = `/${Routes.App}/${currentDaoType}/${daoAccountId}/${Routes.Overview}`;
   const handleTransactionSuccess = useHandleTransactionSuccess();
   const isNotFound = daosQueryResults.isSuccess && isNil(dao);
   const { ownerIds, threshold, safeEVMAddress } = (dao as MultiSigDAODetails) ?? {};
@@ -259,7 +259,7 @@ export function CreateDAOProposal() {
   const steps = [
     {
       label: "Type",
-      route: `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOProposalType}`,
+      route: `/${Routes.App}/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOProposalType}`,
       validate: async () => trigger(["type"]),
     },
     {
@@ -320,7 +320,7 @@ export function CreateDAOProposal() {
   function handleCreateDAOProposalSuccess(transactionResponse: TransactionResponse) {
     reset();
     const message = `Created a new '${type}' proposal.`;
-    const pathTo = `/${currentDaoType}/${daoAccountId}/${Routes.Overview}`;
+    const pathTo = `/${Routes.App}/${currentDaoType}/${daoAccountId}/${Routes.Overview}`;
     handleTransactionSuccess(transactionResponse, message, pathTo);
   }
 
@@ -609,62 +609,52 @@ export function CreateDAOProposal() {
   }
 
   function ProposalsDetailsForm(): string {
+    const basePath = `/${Routes.App}/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}`;
     switch (type) {
       case DAOProposalType.Text:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOTextProposalDetails}`;
+        return `${basePath}/${Routes.DAOTextProposalDetails}`;
       case DAOProposalType.TokenTransfer:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOTokenTransferDetails}`;
+        return `${basePath}/${Routes.DAOTokenTransferDetails}`;
       case DAOProposalType.AddMember:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOAddMemberDetails}`;
+        return `${basePath}/${Routes.DAOAddMemberDetails}`;
       case DAOProposalType.RemoveMember:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAODeleteMemberDetails}`;
+        return `${basePath}/${Routes.DAODeleteMemberDetails}`;
       case DAOProposalType.ReplaceMember:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOReplaceMemberDetails}`;
+        return `${basePath}/${Routes.DAOReplaceMemberDetails}`;
       case DAOProposalType.UpgradeThreshold:
-        return `/${currentDaoType}/${daoAccountId}/`.concat(
-          `${Routes.CreateDAOProposal}/${Routes.DAOUpgradeThresholdDetails}`
-        );
+        return `${basePath}/${Routes.DAOUpgradeThresholdDetails}`;
       case DAOProposalType.ContractUpgrade:
-        return `/${currentDaoType}/${daoAccountId}/`.concat(
-          `${Routes.CreateDAOProposal}/${Routes.DAOContractUpgradeDetails}`
-        );
+        return `${basePath}/${Routes.DAOContractUpgradeDetails}`;
       case DAOProposalType.TokenAssociate:
-        return `/${currentDaoType}/${daoAccountId}/`.concat(
-          `${Routes.CreateDAOProposal}/${Routes.DAOTokenAssociateDetails}`
-        );
+        return `${basePath}/${Routes.DAOTokenAssociateDetails}`;
       case DAOProposalType.Generic:
-        return `/${currentDaoType}/${daoAccountId}/`.concat(
-          `${Routes.CreateDAOProposal}/${Routes.DAOGenericProposalDetails}`
-        );
+        return `${basePath}/${Routes.DAOGenericProposalDetails}`;
       default:
         return "";
     }
   }
 
   function ProposalsReviewForm(): string {
+    const basePath = `/${Routes.App}/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}`;
     switch (type) {
       case DAOProposalType.Text:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOTextProposalReview}`;
+        return `${basePath}/${Routes.DAOTextProposalReview}`;
       case DAOProposalType.TokenTransfer:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOTokenTransferReview}`;
+        return `${basePath}/${Routes.DAOTokenTransferReview}`;
       case DAOProposalType.AddMember:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOAddMemberReview}`;
+        return `${basePath}/${Routes.DAOAddMemberReview}`;
       case DAOProposalType.RemoveMember:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAODeleteMemberReview}`;
+        return `${basePath}/${Routes.DAODeleteMemberReview}`;
       case DAOProposalType.ReplaceMember:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOReplaceMemberReview}`;
+        return `${basePath}/${Routes.DAOReplaceMemberReview}`;
       case DAOProposalType.UpgradeThreshold:
-        return `/${currentDaoType}/${daoAccountId}/`.concat(
-          `${Routes.CreateDAOProposal}/${Routes.DAOUpgradeThresholdReview}`
-        );
+        return `${basePath}/${Routes.DAOUpgradeThresholdReview}`;
       case DAOProposalType.ContractUpgrade:
-        return `/${currentDaoType}/${daoAccountId}/`.concat(
-          `${Routes.CreateDAOProposal}/${Routes.DAOContractUpgradeReview}`
-        );
+        return `${basePath}/${Routes.DAOContractUpgradeReview}`;
       case DAOProposalType.TokenAssociate:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOTokenAssociateReview}`;
+        return `${basePath}/${Routes.DAOTokenAssociateReview}`;
       case DAOProposalType.Generic:
-        return `/${currentDaoType}/${daoAccountId}/${Routes.CreateDAOProposal}/${Routes.DAOGenericProposalReview}`;
+        return `${basePath}/${Routes.DAOGenericProposalReview}`;
       default:
         return "";
     }

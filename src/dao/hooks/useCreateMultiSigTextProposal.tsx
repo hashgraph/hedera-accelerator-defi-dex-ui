@@ -17,7 +17,6 @@ interface UseCreateMultiSigTextProposalParams {
 export function useCreateMultiSigTextProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
   const signerAccountId = wallet.savedPairingData?.accountIds[0] ?? "";
 
   return useMutation<
@@ -27,6 +26,7 @@ export function useCreateMultiSigTextProposal(handleOnSuccess: HandleOnSuccess) 
     DAOMutations.CreateMultiSigDAOTextProposal
   >(
     async (params: UseCreateMultiSigTextProposalParams) => {
+      const signer = wallet.getSigner();
       return DexService.proposeMultiSigTextProposal({
         ...params,
         signer,

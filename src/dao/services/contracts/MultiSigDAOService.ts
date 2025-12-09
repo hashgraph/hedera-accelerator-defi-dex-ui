@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { HashConnectSigner } from "hashconnect/dist/signer";
 import {
-  AccountId,
   ContractId,
   ContractExecuteTransaction,
   ContractFunctionParameters,
@@ -43,9 +42,12 @@ async function sendCreateMultiSigDAOTransaction(
     params;
   const { daoFee, tokenType, tokenId } = daoFeeConfig;
   const multiSigDAOFactoryContractId = ContractId.fromString(Contracts.MultiSigDAOFactory.ProxyId);
-  const daoAdminAddress = AccountId.fromString(admin).toSolidityAddress();
+
+  // CRITICAL FIX: Use long-form EVM addresses instead of short-form
+  // This ensures msg.sender (from HashConnect) matches the stored owner addresses
+  const daoAdminAddress = await DexService.fetchAccountEVMAddress(admin);
   const preciseThreshold = BigNumber(threshold);
-  const ownersSolidityAddresses = owners.map((owner) => AccountId.fromString(owner).toSolidityAddress());
+  const ownersSolidityAddresses = await Promise.all(owners.map((owner) => DexService.fetchAccountEVMAddress(owner)));
   const createDaoParams: any[] = [
     daoAdminAddress,
     name,

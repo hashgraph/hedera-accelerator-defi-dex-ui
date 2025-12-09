@@ -3,12 +3,12 @@ import { Button, Divider, Flex, HStack } from "@chakra-ui/react";
 import {
   Text,
   AlertDialog,
-  Color,
   TwoLayerSettingsIcon,
   FormDropdown,
   InlineAlert,
   InlineAlertType,
   FormInput,
+  useTheme,
 } from "@shared/ui-kit";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { FieldErrorsImpl, useForm, UseFormReturn } from "react-hook-form";
@@ -35,6 +35,7 @@ interface ManageVotingPowerModalBodyProps {
 }
 
 function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
+  const theme = useTheme();
   const isUnlockButtonEnabled = props.canUserClaimGODTokens;
   const warningMessage = `You have voted on proposals where the voting period is still in progress, so 
   any locked ${props.tokenSymbol} tokens can not be unlocked until the in-progress
@@ -47,8 +48,15 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
 
   return (
     <Flex flexDirection="column" height="fit-content" gap={4}>
-      <Divider />
-      <HStack height="7.5rem" justify="center" borderRadius="0.5rem" background={Color.Neutral._50} paddingX={4}>
+      <Divider borderColor={theme.border} />
+      <HStack
+        height="7.5rem"
+        justify="center"
+        borderRadius="0.5rem"
+        background={theme.bgSecondary}
+        border={`1px solid ${theme.border}`}
+        paddingX={4}
+      >
         <GOVTokenDetails
           tokenSymbol={props.tokenSymbol}
           lockedGODToken={`${Number(props.lockedNFTSerialId) ? 1 : 0}`}
@@ -174,7 +182,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
             width="6.5rem"
             leftIcon={<TwoLayerSettingsIcon />}
           >
-            <Text.P_Small_Semibold>Manage</Text.P_Small_Semibold>
+            <Text.P_Small_Semibold color="inherit">Manage</Text.P_Small_Semibold>
           </Button>
         }
         openDialogButtonText="Manage"

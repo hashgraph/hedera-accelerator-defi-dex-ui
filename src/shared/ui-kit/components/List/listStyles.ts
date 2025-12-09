@@ -16,7 +16,7 @@ const selectTokenList = definePartsStyle({
       bg: Color.Neutral._100,
     },
     _selected: {
-      bg: Color.Blue._100,
+      bg: Color.Primary._100,
     },
   },
 });

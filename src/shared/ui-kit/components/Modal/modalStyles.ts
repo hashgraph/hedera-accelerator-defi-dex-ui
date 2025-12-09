@@ -9,7 +9,8 @@ const primary = definePartsStyle({
     padding: "1.5rem 2rem",
   },
   overlay: {
-    bg: "rgba(0, 0, 0, 0.5)",
+    bg: "rgba(0, 0, 0, 0.6)",
+    backdropFilter: "blur(4px)",
   },
   body: {
     padding: "1.5rem 2rem",
@@ -17,18 +18,21 @@ const primary = definePartsStyle({
   dialog: {
     height: "473px",
     width: "406px",
-    border: `1px solid ${Color.Neutral._200}`,
-    borderRadius: "0.25rem",
+    bg: Color.White,
+    border: `1px solid ${Color.Neutral._100}`,
+    borderRadius: "16px",
+    boxShadow: Color.Shadow.Strong,
   },
 });
 
 const termsConditionModal = definePartsStyle({
   header: {
     padding: "1.25rem",
-    borderBottom: `1px solid ${Color.Neutral._200}`,
+    borderBottom: `1px solid ${Color.Neutral._100}`,
   },
   overlay: {
-    bg: "rgba(0, 0, 0, 0.5)",
+    bg: "rgba(0, 0, 0, 0.6)",
+    backdropFilter: "blur(4px)",
   },
   body: {
     marginTop: "1.5rem",
@@ -36,8 +40,10 @@ const termsConditionModal = definePartsStyle({
   },
   dialog: {
     width: "370px",
-    border: `1px solid ${Color.Neutral._200}`,
-    borderRadius: "2px",
+    bg: Color.White,
+    border: `1px solid ${Color.Neutral._100}`,
+    borderRadius: "16px",
+    boxShadow: Color.Shadow.Strong,
   },
 });
 

@@ -19,7 +19,7 @@ import { Routes } from "@dao/routes";
 import { DAOType } from "@dao/services";
 
 export function CreateADAOPage() {
-  const backTo = Routes.Home;
+  const backTo = `/${Routes.App}`;
   const handleTransactionSuccess = useHandleTransactionSuccess();
 
   const createDAOPageForm = useForm<CreateADAOForm>({
@@ -60,23 +60,23 @@ export function CreateADAOPage() {
   const { data: { multisigDAOFeeConfig, nftDAOFeeConfig, ftDAOFeeConfig } = {} } = useFetchDAOConfig();
 
   function GovernanceForm(): string {
-    if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceToken}`;
-    if (type === DAOType.MultiSig) return `/${Routes.Create}/${Routes.Multisig}`;
-    if (type === DAOType.NFT) return `/${Routes.Create}/${Routes.NFT}`;
+    if (type === DAOType.GovernanceToken) return `${Routes.Create}/${Routes.GovernanceToken}`;
+    if (type === DAOType.MultiSig) return `${Routes.Create}/${Routes.Multisig}`;
+    if (type === DAOType.NFT) return `${Routes.Create}/${Routes.NFT}`;
     return ``;
   }
 
   function VotingForm(): string {
-    if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceTokenVoting}`;
-    if (type === DAOType.MultiSig) return `/${Routes.Create}/${Routes.MultisigVoting}`;
-    if (type === DAOType.NFT) return `/${Routes.Create}/${Routes.NFTVoting}`;
+    if (type === DAOType.GovernanceToken) return `${Routes.Create}/${Routes.GovernanceTokenVoting}`;
+    if (type === DAOType.MultiSig) return `${Routes.Create}/${Routes.MultisigVoting}`;
+    if (type === DAOType.NFT) return `${Routes.Create}/${Routes.NFTVoting}`;
     return ``;
   }
 
   function ReviewForm(): string {
-    if (type === DAOType.GovernanceToken) return `/${Routes.Create}/${Routes.GovernanceTokenReview}`;
-    if (type === DAOType.MultiSig) return `/${Routes.Create}/${Routes.MultisigReview}`;
-    if (type === DAOType.NFT) return `/${Routes.Create}/${Routes.NFTReview}`;
+    if (type === DAOType.GovernanceToken) return `${Routes.Create}/${Routes.GovernanceTokenReview}`;
+    if (type === DAOType.MultiSig) return `${Routes.Create}/${Routes.MultisigReview}`;
+    if (type === DAOType.NFT) return `${Routes.Create}/${Routes.NFTReview}`;
     return ``;
   }
 
@@ -110,17 +110,17 @@ export function CreateADAOPage() {
   const steps = [
     {
       label: "Disclaimer",
-      route: `/${Routes.Create}/${Routes.DAODisclaimer}`,
+      route: `${Routes.Create}/${Routes.DAODisclaimer}`,
       validate: async () => trigger(["disclaimer"]),
     },
     {
       label: "Details",
-      route: `/${Routes.Create}/${Routes.DAODetails}`,
+      route: `${Routes.Create}/${Routes.DAODetails}`,
       validate: async () => trigger(["name", "logoUrl", "isPublic", "description", "infoUrl"]),
     },
     {
       label: "Type",
-      route: `/${Routes.Create}/${Routes.Type}`,
+      route: `${Routes.Create}/${Routes.Type}`,
       validate: async () => trigger(["type"]),
     },
     {
@@ -142,7 +142,9 @@ export function CreateADAOPage() {
   ];
 
   async function onSubmit(data: CreateADAOForm) {
-    const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl } = data;
+    const { type, name, isPublic, description, daoLinks = [], logoUrl = "", infoUrl = "" } = data;
+    const finalInfoUrl = infoUrl.trim() || "#";
+
     if (data.type === DAOType.GovernanceToken) {
       const tokenDAOData = data as CreateATokenDAOForm;
       const { governance, voting } = tokenDAOData;
@@ -151,7 +153,7 @@ export function CreateADAOPage() {
         name,
         logoUrl,
         description,
-        infoUrl,
+        infoUrl: finalInfoUrl,
         daoLinks: daoLinks.map((link) => link.value),
         isPrivate: !isPublic,
         tokenId:
@@ -179,7 +181,7 @@ export function CreateADAOPage() {
         admin: governance.admin,
         name,
         logoUrl,
-        infoUrl,
+        infoUrl: finalInfoUrl,
         owners: [governance.admin, ...governance.owners.map((owner) => owner.value)],
         threshold: voting.threshold,
         isPrivate: !isPublic,
@@ -195,7 +197,7 @@ export function CreateADAOPage() {
         description,
         daoLinks: daoLinks.map((link) => link.value),
         logoUrl,
-        infoUrl,
+        infoUrl: finalInfoUrl,
         isPrivate: !isPublic,
         tokenId:
           governance.tokenType === DAONFTTokenType.NewNFT

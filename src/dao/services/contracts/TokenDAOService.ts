@@ -31,6 +31,7 @@ interface SendCreateGovernanceDAOTransactionParams {
   description: string;
   infoUrl: string;
   daoLinks: string[];
+  teamMembers?: string[];
   tokenId: string;
   treasuryWalletAccountId: string;
   quorum: number;

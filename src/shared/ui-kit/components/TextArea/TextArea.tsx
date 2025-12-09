@@ -2,7 +2,7 @@ import { Flex, Box, Textarea as ChakraTextArea, PlacementWithLogical } from "@ch
 import React from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { Tooltip } from "..";
-import { Color } from "../..";
+import { Color, useTheme } from "../..";
 import { Text } from "../Text";
 
 export interface TextAreaProps<T extends string> {
@@ -24,6 +24,7 @@ export interface TextAreaProps<T extends string> {
 }
 
 export function TextArea<T extends string>(props: TextAreaProps<T>) {
+  const theme = useTheme();
   const {
     flex,
     label,
@@ -44,7 +45,7 @@ export function TextArea<T extends string>(props: TextAreaProps<T>) {
   return (
     <Box flex={flex} width="100%">
       <Flex direction="row" gap="1" marginBottom="0.25rem">
-        {React.isValidElement(label) ? label : <Text.P_Small_Medium>{label}</Text.P_Small_Medium>}
+        {React.isValidElement(label) ? label : <Text.P_Small_Medium color={theme.text}>{label}</Text.P_Small_Medium>}
         {isTooltipVisible && <Tooltip label={tooltipLabel ?? ""} placement={toolTipLabelPlacement} />}
       </Flex>
       <ChakraTextArea
@@ -57,7 +58,7 @@ export function TextArea<T extends string>(props: TextAreaProps<T>) {
         placeholder={placeholder}
         isDisabled={isDisabled}
         isReadOnly={isReadOnly}
-        borderColor={isError ? Color.Destructive._300 : Color.Neutral._300}
+        borderColor={isError ? Color.Destructive._300 : theme.border}
         {...register}
         /** TODO: Move boxShadow style to theme. */
         sx={{

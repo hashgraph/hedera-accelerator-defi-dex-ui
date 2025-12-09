@@ -1,5 +1,5 @@
 import { ComponentStyleConfig } from "@chakra-ui/react";
-import { Color } from "../../themes";
+import { Color, DarkTheme } from "../../themes";
 
 const defaultFileUploaderStyles = {
   body: {
@@ -21,11 +21,17 @@ const defaultFileUploaderStyles = {
 export const CardStyles: ComponentStyleConfig = {
   baseStyle: {
     height: "max-content",
-    bg: Color.White,
-    borderRadius: "4px",
-    border: `1px solid ${Color.Neutral._200}`,
-    padding: "1rem",
+    bg: "inherit",
+    borderRadius: "12px",
+    border: "inherit",
+    padding: { base: "0.75rem", sm: "1rem", md: "1.25rem" },
     width: "100%",
+    boxShadow: "none",
+    transition: "all 0.25s ease-in-out",
+    _hover: {
+      boxShadow: "none",
+      transform: "translateY(-2px)",
+    },
   },
   sizes: {},
   variants: {

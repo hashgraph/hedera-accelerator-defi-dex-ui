@@ -1,30 +1,36 @@
-import { Alert, Box, Flex, Input, Select, Tab, TabList, Tabs, Text } from "@chakra-ui/react";
-import { CardGridLayout, NotFound, Page, PageHeader } from "@dex/layouts";
+import { Alert, Box, Button, Flex, Heading, Input, Select, Tab, TabList, Tabs, Text, VStack } from "@chakra-ui/react";
+import { CardGridLayout, Page } from "@dex/layouts";
 import { DAOTabs, useDAOs } from "@dao/hooks";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { PrimaryHeaderButton } from "@dex/components";
 import { DAOCard } from "./DAOCard";
 import { Routes } from "@dao/routes";
 import { DAO, DAOType } from "@dao/services";
 import { useDexContext } from "@dex/hooks";
-import { Color, Pagination, usePagination } from "shared";
+import { useTheme, Pagination, usePagination } from "shared";
 import { ChangeEvent } from "react";
 import { filterDAOs } from "../utils";
 import { DAOsPerPage } from "@dex/services";
-import { isMobile } from "react-device-detect";
+import { HashConnectConnectionState } from "hashconnect/dist/types";
 
 export function DAOsListPage() {
   const daos = useDAOs();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get("search") ?? "";
   const daoType = searchParams.get("type") ?? "";
-  const isMyDAOsTabSelected = !!searchParams.get("filter") ?? false;
+  const isMyDAOsTabSelected = !!searchParams.get("filter");
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const currentUser = wallet.savedPairingData?.accountIds[0] ?? "";
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  const isWalletPaired = wallet.hashConnectConnectionState === HashConnectConnectionState.Paired;
 
   function handleLinkClick() {
     navigate(Routes.Create);
+  }
+
+  function handleCreateDAOClick() {
+    isWalletPaired ? navigate(Routes.Create) : wallet.connectToWallet();
   }
 
   function handleSearchTextChange(searchText: string) {
@@ -59,109 +65,191 @@ export function DAOsListPage() {
 
   return (
     <Page
-      header={
-        <PageHeader
-          leftContent={[
-            <Text textStyle="h2" key="daos">
-              DAOs
-            </Text>,
-          ]}
-          rightContent={
-            isMobile ? [] : [<PrimaryHeaderButton name="Create new DAO" route={Routes.Create} key="create-new-dao" />]
-          }
-        />
-      }
+      header={<></>}
       body={
         <Flex direction="column" gap={4}>
-          <Tabs
-            defaultIndex={isMyDAOsTabSelected ? 1 : 0}
-            onChange={handleTabChange}
-            bg={Color.White}
-            variant="dao-dashboard-tab"
-          >
-            <TabList borderBottom="0">
-              <Tab>
-                <Box>{DAOTabs.All}</Box>
-              </Tab>
-              <Tab>
-                <Box>{DAOTabs.MyDAOs}</Box>
-              </Tab>
-            </TabList>
-          </Tabs>
-          <Flex justifyContent="flex-end" gap={4}>
-            <Input
-              variant="filter"
-              value={searchText}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchTextChange(e.target.value)}
-              placeholder="Search"
-              width="fit-content"
-              minWidth="unset"
-            />
-            <Select
-              variant="formTokenSelector"
-              width="12rem"
-              placeholder="All"
-              value={daoType}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDAOTypeChange(e.target.value)}
+          {/* Hero Section */}
+          <Box py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }} mb={4}>
+            <VStack spacing={6} align="center" textAlign="center">
+              {/* Badge */}
+              <Flex
+                px={4}
+                py={2}
+                bg="rgba(126, 34, 206, 0.15)"
+                borderRadius="full"
+                border="1px solid rgba(126, 34, 206, 0.3)"
+                align="center"
+                gap={2}
+              >
+                <Box w="8px" h="8px" borderRadius="full" bg={theme.accentLight} />
+                <Text fontSize="sm" fontWeight="600" color={theme.accentLight}>
+                  Decentralized Governance
+                </Text>
+              </Flex>
+
+              <Heading
+                as="h1"
+                fontSize={{ base: "2xl", md: "4xl", lg: "5xl" }}
+                fontWeight="800"
+                color={theme.text}
+                lineHeight="1.1"
+                letterSpacing="-1px"
+              >
+                Explore
+                <Text as="span" display="block" bgGradient="linear(to-r, #A855F7, #6366F1)" bgClip="text">
+                  DAOs on Hedera
+                </Text>
+              </Heading>
+              <Text fontSize={{ base: "md", md: "lg" }} color={theme.textSecondary} maxW="600px">
+                Create, manage, and participate in DAOs. Empower your community with transparent and secure
+                decision-making.
+              </Text>
+              <Flex gap={3} mt={2} direction={{ base: "column", sm: "row" }} width={{ base: "100%", sm: "auto" }}>
+                <Button variant="primary" size="lg" onClick={handleCreateDAOClick} px={8}>
+                  Create a DAO
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => navigate("/")}
+                  px={8}
+                  color={theme.text}
+                  borderColor={theme.border}
+                  _hover={{
+                    bg: theme.bgCardHover,
+                    borderColor: theme.borderHover,
+                  }}
+                >
+                  About
+                </Button>
+              </Flex>
+            </VStack>
+          </Box>
+
+          <Box id="dao-list">
+            <Flex
+              direction={{ base: "column", md: "row" }}
+              justifyContent="space-between"
+              alignItems={{ base: "stretch", md: "center" }}
+              gap={{ base: 3, md: 4 }}
+              mb={4}
             >
-              {Object.values(DAOType).map((option) => {
+              <Tabs
+                defaultIndex={isMyDAOsTabSelected ? 1 : 0}
+                onChange={handleTabChange}
+                bg="transparent"
+                variant="dao-dashboard-tab"
+              >
+                <TabList borderBottom={`1px solid ${theme.border}`}>
+                  <Tab
+                    color={theme.textMuted}
+                    _selected={{
+                      color: theme.accentLight,
+                      borderBottom: `2px solid ${theme.accentLight}`,
+                    }}
+                    _hover={{
+                      color: theme.text,
+                    }}
+                  >
+                    <Box>{DAOTabs.All}</Box>
+                  </Tab>
+                  <Tab
+                    color={theme.textMuted}
+                    _selected={{
+                      color: theme.accentLight,
+                      borderBottom: `2px solid ${theme.accentLight}`,
+                    }}
+                    _hover={{
+                      color: theme.text,
+                    }}
+                  >
+                    <Box>{DAOTabs.MyDAOs}</Box>
+                  </Tab>
+                </TabList>
+              </Tabs>
+              <Flex
+                gap={{ base: 2, md: 3 }}
+                direction={{ base: "column", sm: "row" }}
+                width={{ base: "100%", md: "auto" }}
+              >
+                <Input
+                  variant="filter"
+                  value={searchText}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => handleSearchTextChange(e.target.value)}
+                  placeholder="Search DAOs..."
+                  width={{ base: "100%", sm: "200px", md: "220px" }}
+                />
+                <Select
+                  variant="formTokenSelector"
+                  width={{ base: "100%", sm: "10rem", md: "12rem" }}
+                  placeholder="All Types"
+                  value={daoType}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => handleDAOTypeChange(e.target.value)}
+                >
+                  {Object.values(DAOType).map((option) => {
+                    return (
+                      <option key={option} value={option} style={{ background: theme.bgSecondary }}>
+                        {option}
+                      </option>
+                    );
+                  })}
+                </Select>
+              </Flex>
+            </Flex>
+            {paginatedDAOs?.length === 0 && !daos.isLoading && (
+              <Box p={8} borderRadius="16px" bg={theme.bgCard} border={`1px solid ${theme.border}`} textAlign="center">
+                <Text color={theme.textMuted}>No DAOs found with the selected filters</Text>
+              </Box>
+            )}
+            <CardGridLayout<DAO[]>
+              columns={{ base: 1, sm: 2, lg: 3 }}
+              queryResult={daos}
+              message={"It looks like no DAOs have been created yet."}
+              preLinkText={"Click on this link to"}
+              linkText={"create the first DAO"}
+              onLinkClick={handleLinkClick}
+            >
+              {paginatedDAOs?.map((dao: DAO, index: number) => {
+                const { accountEVMAddress, name, type, isPrivate, logoUrl } = dao;
                 return (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
+                  <DAOCard
+                    key={index}
+                    accountEVMAddress={accountEVMAddress}
+                    name={name}
+                    type={type}
+                    logoUrl={logoUrl}
+                    isPrivate={isPrivate}
+                  />
                 );
               })}
-            </Select>
-          </Flex>
-          {paginatedDAOs?.length === 0 && !daos.isLoading && (
-            <NotFound message="No DAOs have been found with the filters selected" />
-          )}
-          <CardGridLayout<DAO[]>
-            columns={{ md: 2, lg: 3 }}
-            queryResult={daos}
-            message={"It looks like no DAOs have been created yet."}
-            preLinkText={"Click on this link to"}
-            linkText={"create the first DAO"}
-            onLinkClick={handleLinkClick}
-          >
-            {paginatedDAOs?.map((dao: DAO, index: number) => {
-              const { accountEVMAddress, name, type, isPrivate, logoUrl } = dao;
-              /*
-              if (isPrivate) {
-                <DAOCard key={index} accountEVMAddress={accountEVMAddress} name={name} type={type} logoUrl={logoUrl}
-                isPrivate={isPrivate} />
-              }
-                //return null;
-
- */
-              return (
-                <DAOCard
-                  key={index}
-                  accountEVMAddress={accountEVMAddress}
-                  name={name}
-                  type={type}
-                  logoUrl={logoUrl}
-                  isPrivate={isPrivate}
-                />
-              );
-            })}
-          </CardGridLayout>
-          <Pagination
-            pageCount={pageCount}
-            isPaginationVisible={isPaginationVisible}
-            isPreviousButtonVisible={isPreviousButtonVisible}
-            isNextButtonVisible={isNextButtonVisible}
-            handlePageClick={handlePageClick}
-          />
-          <Flex fontSize={15}>
-            <Alert>
-              <p>
-                <strong>Caution</strong>: DAOs listed above are created and named by the DAO creators.
-                <br />
-                <strong>Please exercise caution and be aware of scammers and impersonators</strong>. We do not verify,
-                control, curate, endorse or adopt any Third-Party Content on this site, including the DAOs shown here,
-                and have no responsibility or liability for them.
-              </p>
+            </CardGridLayout>
+            <Box mt={6}>
+              <Pagination
+                pageCount={pageCount}
+                isPaginationVisible={isPaginationVisible}
+                isPreviousButtonVisible={isPreviousButtonVisible}
+                isNextButtonVisible={isNextButtonVisible}
+                handlePageClick={handlePageClick}
+              />
+            </Box>
+          </Box>
+          <Flex fontSize={{ base: 13, md: 15 }}>
+            <Alert
+              borderRadius="16px"
+              bg={theme.bgCard}
+              border={`1px solid ${theme.border}`}
+              color={theme.textSecondary}
+            >
+              <Box>
+                <Text fontWeight="700" color={theme.text} mb={1}>
+                  Caution
+                </Text>
+                <Text>
+                  DAOs listed above are created and named by the DAO creators. Please exercise caution and be aware of
+                  scammers and impersonators. We do not verify, control, curate, endorse or adopt any Third-Party
+                  Content on this site, including the DAOs shown here, and have no responsibility or liability for them.
+                </Text>
+              </Box>
             </Alert>
           </Flex>
         </Flex>

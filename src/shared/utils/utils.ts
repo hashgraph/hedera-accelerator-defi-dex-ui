@@ -416,7 +416,7 @@ export const solidityAddressToTokenIdString = (address: string): string => {
 
 export const solidityAddressToAccountIdString = (address: string): string => {
   try {
-    return AccountId.fromEvmAddress(0, 0, address).toString();
+    return AccountId.fromSolidityAddress(address).toString();
   } catch {
     return address;
   }
@@ -424,7 +424,7 @@ export const solidityAddressToAccountIdString = (address: string): string => {
 
 export const solidityAddressToContractIdString = (address: string): string => {
   try {
-    return ContractId.fromEvmAddress(0, 0, address).toString();
+    return ContractId.fromSolidityAddress(address).toString();
   } catch {
     return address;
   }

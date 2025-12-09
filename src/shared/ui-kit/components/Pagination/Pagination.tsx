@@ -1,4 +1,5 @@
-import { Box, chakra, Text } from "@chakra-ui/react";
+import { Box, chakra } from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import ReactPaginate from "react-paginate";
 import { PaginationStyles } from "./PaginationStyles";
 
@@ -21,15 +22,17 @@ function PaginationBase(props: PaginationProps) {
       <ReactPaginate
         containerClassName="pagination"
         pageLinkClassName="pagination__page-link"
-        previousLinkClassName="pagination__page-link"
-        nextLinkClassName="pagination__page-link"
+        previousLinkClassName="pagination__nav-link"
+        nextLinkClassName="pagination__nav-link"
+        disabledClassName="pagination__nav--disabled"
         activeClassName="pagination__page-item--active"
         activeLinkClassName="pagination__page-link--active"
         breakLabel="..."
-        nextLabel={props.isPreviousButtonVisible ? <Text textStyle="h3">Next</Text> : <></>}
-        previousLabel={props.isNextButtonVisible ? <Text textStyle="h3">Previous</Text> : <></>}
+        breakClassName="pagination__break"
+        nextLabel={<ChevronRightIcon boxSize={5} />}
+        previousLabel={<ChevronLeftIcon boxSize={5} />}
         onPageChange={props.handlePageClick}
-        pageRangeDisplayed={3}
+        pageRangeDisplayed={5}
         marginPagesDisplayed={1}
         pageCount={props.pageCount}
         renderOnZeroPageCount={undefined}

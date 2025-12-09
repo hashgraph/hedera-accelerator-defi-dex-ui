@@ -1,4 +1,4 @@
-import { Color, CopyTextButton, FormInput, LoadingDialog, SuccessCheckIcon, Text } from "@shared/ui-kit";
+import { Color, CopyTextButton, FormInput, LoadingDialog, SuccessCheckIcon, Text, useTheme } from "@shared/ui-kit";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateANFTDAOForm } from "../types";
 import { useFormContext } from "react-hook-form";
@@ -16,6 +16,7 @@ import { isNil } from "ramda";
 import { checkForValidAccountId, createHashScanTransactionLink } from "@dex/utils";
 
 export function CreateTokenNFTDAOForm() {
+  const theme = useTheme();
   const {
     register,
     getValues,
@@ -213,16 +214,18 @@ export function CreateTokenNFTDAOForm() {
           {isFormInReadOnlyMode ? (
             <Flex justifyContent="space-between">
               <Flex direction="column" gap="2">
-                <Text.P_Small_Medium>Token ID</Text.P_Small_Medium>
+                <Text.P_Small_Medium color={theme.textMuted}>Token ID</Text.P_Small_Medium>
                 <Flex gap="2" alignItems="center">
-                  <Text.P_Medium_Regular>{governance.newNFT.id}</Text.P_Medium_Regular>
+                  <Text.P_Medium_Regular color={theme.text}>{governance.newNFT.id}</Text.P_Medium_Regular>
                   <CopyTextButton onClick={handleCopyTextButtonTapped} />
                 </Flex>
               </Flex>
               <Flex direction="column" gap="2" alignItems="flex-end">
                 <Flex alignItems="center" gap="1">
                   <SuccessCheckIcon boxSize="4" />
-                  <Text.P_Small_Medium> {governance.newNFT.symbol} token was successfully created.</Text.P_Small_Medium>
+                  <Text.P_Small_Medium color={theme.text}>
+                    {governance.newNFT.symbol} token was successfully created.
+                  </Text.P_Small_Medium>
                 </Flex>
                 {hashscanTransactionLink && (
                   <Link href={hashscanTransactionLink} isExternal flexDirection="row">
@@ -233,7 +236,7 @@ export function CreateTokenNFTDAOForm() {
             </Flex>
           ) : undefined}
         </DAOFormContainer>
-        <Text.P_Large_Regular>Initial token distribution</Text.P_Large_Regular>
+        <Text.P_Large_Regular color={theme.text}>Initial token distribution</Text.P_Large_Regular>
         <DAOFormContainer>
           <FormInput<"governance.newNFT.treasuryWalletAccountId">
             inputProps={{

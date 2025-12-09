@@ -12,6 +12,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
+import { useTheme } from "../../themes";
 
 interface AlertDialogProps {
   title: string;
@@ -49,6 +50,7 @@ const DEFAULT_DIALOG_SIZE = "md";
  * dynamic state management of opening and closing
  */
 const AlertDialogBase = (props: AlertDialogProps) => {
+  const theme = useTheme();
   const {
     title,
     openModalComponent,
@@ -119,13 +121,20 @@ const AlertDialogBase = (props: AlertDialogProps) => {
           gap="20px"
           padding="20px"
           boxShadow="0px 4px 15px rgba(0, 0, 0, 0.15)"
-          borderRadius="2px"
+          borderRadius="12px"
+          bg={theme.bgCard}
+          border={`1px solid ${theme.border}`}
+          backdropFilter="blur(20px)"
         >
           <AlertDialogHeader padding="0" display="flex" justifyContent="space-between" alignItems="center">
-            <Text textStyle="h3">{title}</Text>
-            <CloseIcon textStyle="h3" w="3" h="3" onClick={closeDialog} cursor="pointer" />
+            <Text textStyle="h3" color={theme.text}>
+              {title}
+            </Text>
+            <CloseIcon textStyle="h3" w="3" h="3" onClick={closeDialog} cursor="pointer" color={theme.textMuted} />
           </AlertDialogHeader>
-          <AlertDialogBody padding="0">{body}</AlertDialogBody>
+          <AlertDialogBody padding="0" color={theme.text}>
+            {body}
+          </AlertDialogBody>
           <AlertDialogFooter padding="0">{footer ? cloneElement(footer, { ref: cancelRef }) : <></>}</AlertDialogFooter>
         </AlertDialogContent>
       </ChakraAlertDialog>

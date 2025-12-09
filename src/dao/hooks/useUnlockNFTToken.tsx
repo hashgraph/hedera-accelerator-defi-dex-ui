@@ -16,9 +16,9 @@ export function useUnlockNFTToken(
 ) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse | undefined, Error, UseUnLockNFTTokenParams, DAOMutations.UnlockNFTToken>(
     async (params: UseUnLockNFTTokenParams) => {
+      const signer = wallet.getSigner();
       return DAOService.sendUnLockNFTTokenTransaction({ ...params, signer });
     },
     {

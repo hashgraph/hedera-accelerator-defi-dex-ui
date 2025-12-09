@@ -14,7 +14,7 @@ export const StepsV2Theme = {
         },
         "&[data-highlighted]": {
           ":after": {
-            backgroundColor: `${Color.Blue._500} !important`,
+            backgroundColor: `${Color.Primary._500} !important`,
           },
         },
       },
@@ -31,14 +31,14 @@ export const StepsV2Theme = {
           height: "24px !important",
           width: "24px !important",
           background: `transparent !important`,
-          border: `1.5px solid ${Color.Blue._500} !important`,
-          boxShadow: "0px 0px 0px 2.66667px #BFDCEC",
+          border: `1.5px solid ${Color.Primary._500} !important`,
+          boxShadow: `0px 0px 0px 2.66667px ${Color.Primary._100}`,
         },
         "&[data-highlighted]": {
           height: "24px !important",
           width: "24px !important",
           backgroundColor: `${Color.White} !important`,
-          borderColor: `${Color.Blue._500} !important`,
+          borderColor: `${Color.Primary._500} !important`,
         },
         "&:not([data-highlighted])": {
           height: "24px !important",
@@ -54,7 +54,7 @@ export const StepsV2Theme = {
         marginInlineStart: "0 !important",
         "-webkitMarginStart": "0 !important",
         "&[aria-current=step] > span": {
-          color: Color.Blue._500,
+          color: Color.Primary._500,
         },
       },
       label: {},

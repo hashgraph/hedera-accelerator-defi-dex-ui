@@ -17,10 +17,10 @@ interface UseUpdateDAODetailsParams {
 export function useUpdateDAODetails(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<TransactionResponse | undefined, Error, UseUpdateDAODetailsParams, DAOMutations.UpdateDAODetails>(
     async (params: UseUpdateDAODetailsParams) => {
+      const signer = wallet.getSigner();
       return DexService.sendUpdateDAODetailsTransaction({ ...params, signer });
     },
     {

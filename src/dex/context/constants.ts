@@ -1,8 +1,16 @@
 import { DappMetadata } from "hashconnect";
 
+// Use the current window location as the URL to ensure WalletConnect works on any deployment
+const getAppUrl = () => {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return "https://hashiodao.netlify.app/";
+};
+
 export const DEFAULT_APP_METADATA: DappMetadata = {
-  name: "Hedera Open DEX",
-  description: "An example of a Hedera based DEX",
+  name: "HashioDao",
+  description: "A Hedera based DAO and DEX platform",
   icons: [],
-  url: "https://defi-ui.zilbo.com/",
+  url: getAppUrl(),
 };

@@ -3,12 +3,12 @@ import { Button, Divider, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs 
 import {
   Text,
   AlertDialog,
-  Color,
   FormInput,
   TwoLayerSettingsIcon,
   Notification,
   NotficationTypes,
   formulaTypes,
+  useTheme,
 } from "@shared/ui-kit";
 import { halfOf } from "@shared/utils";
 import { GOVTokenDetails } from "./GOVTokenDetails";
@@ -38,16 +38,18 @@ interface ManageVotingPowerModalBodyProps {
 export interface InputLabelProps {
   tokenSymbol: string;
   balance: string;
+  theme: ReturnType<typeof useTheme>;
 }
 
 const InputLabel = (props: InputLabelProps): React.ReactElement => {
+  const { theme } = props;
   return (
     <Flex alignItems="center" justifyContent="space-between" flex="1">
-      <Text.P_Small_Medium>Amount</Text.P_Small_Medium>
+      <Text.P_Small_Medium color={theme.text}>Amount</Text.P_Small_Medium>
       <Flex alignItems="center" gap="3px">
-        <Text.P_XSmall_Regular color={Color.Neutral._400}>Available:&nbsp;</Text.P_XSmall_Regular>
-        <Text.P_XSmall_Semibold color={Color.Neutral._900}>{props.balance}</Text.P_XSmall_Semibold>
-        <Text.P_XSmall_Medium color={Color.Neutral._400}>{props.tokenSymbol}</Text.P_XSmall_Medium>
+        <Text.P_XSmall_Regular color={theme.textMuted}>Available:&nbsp;</Text.P_XSmall_Regular>
+        <Text.P_XSmall_Semibold color={theme.text}>{props.balance}</Text.P_XSmall_Semibold>
+        <Text.P_XSmall_Medium color={theme.textMuted}>{props.tokenSymbol}</Text.P_XSmall_Medium>
       </Flex>
     </Flex>
   );
@@ -57,10 +59,11 @@ interface RightUnitItemProps {
   tokenSymbol: string;
   handleHalfButtonClicked: () => void;
   handleMaxButtonClicked: () => void;
+  theme: ReturnType<typeof useTheme>;
 }
 
 const RightUnitItem = (props: RightUnitItemProps): React.ReactElement => {
-  const { tokenSymbol, handleHalfButtonClicked, handleMaxButtonClicked } = props;
+  const { tokenSymbol, handleHalfButtonClicked, handleMaxButtonClicked, theme } = props;
   return (
     <Flex alignItems="center" gap="5px">
       <Flex gap="5px">
@@ -71,13 +74,15 @@ const RightUnitItem = (props: RightUnitItemProps): React.ReactElement => {
           MAX
         </Button>
       </Flex>
-      <Divider height="35px" orientation="vertical"></Divider>
-      {<Text.P_Medium_Regular>{tokenSymbol}</Text.P_Medium_Regular>}
+      <Divider height="35px" orientation="vertical" borderColor={theme.border}></Divider>
+      {<Text.P_Medium_Regular color={theme.text}>{tokenSymbol}</Text.P_Medium_Regular>}
     </Flex>
   );
 };
 
 function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
+  const theme = useTheme();
+
   function setInputAmountWithFormula(formula: formulaTypes = formulaTypes.MAX) {
     const godTokenAmount =
       formula === formulaTypes.MAX
@@ -121,8 +126,14 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
 
   return (
     <Flex flexDirection="column" height="fit-content">
-      <Divider marginBottom="20px" />
-      <HStack height="120px" justify="center" borderRadius="8px" background={Color.Neutral._50}>
+      <Divider marginBottom="20px" borderColor={theme.border} />
+      <HStack
+        height="120px"
+        justify="center"
+        borderRadius="8px"
+        background={theme.bgSecondary}
+        border={`1px solid ${theme.border}`}
+      >
         <GOVTokenDetails
           tokenSymbol={props.tokenSymbol}
           lockedGODToken={props.lockedGODToken}
@@ -144,13 +155,16 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
                 isReadOnly: isLockTabDisabled,
                 id: "lockAmount",
                 pointerEvents: "all",
-                label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.availableGODTokenBalance} />,
+                label: (
+                  <InputLabel tokenSymbol={props.tokenSymbol} balance={props.availableGODTokenBalance} theme={theme} />
+                ),
                 type: "number",
                 unit: (
                   <RightUnitItem
                     tokenSymbol={props.tokenSymbol}
                     handleHalfButtonClicked={handleHalfButtonClicked}
                     handleMaxButtonClicked={handleMaxButtonClicked}
+                    theme={theme}
                   />
                 ),
                 placeholder: "",
@@ -183,13 +197,14 @@ function ManageVotingPowerModalBody(props: ManageVotingPowerModalBodyProps) {
                   id: "unLockAmount",
                   isReadOnly: !isUnlockButtonEnabled,
                   pointerEvents: "all",
-                  label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.lockedGODToken} />,
+                  label: <InputLabel tokenSymbol={props.tokenSymbol} balance={props.lockedGODToken} theme={theme} />,
                   type: "number",
                   unit: (
                     <RightUnitItem
                       tokenSymbol={props.tokenSymbol}
                       handleHalfButtonClicked={handleHalfButtonClicked}
                       handleMaxButtonClicked={handleMaxButtonClicked}
+                      theme={theme}
                     />
                   ),
                   placeholder: "",
@@ -286,7 +301,7 @@ export const ManageVotingPower = (props: ManageVotingPowerProps) => {
             width="104px"
             leftIcon={<TwoLayerSettingsIcon />}
           >
-            <Text.P_Small_Semibold>Manage</Text.P_Small_Semibold>
+            <Text.P_Small_Semibold color="inherit">Manage</Text.P_Small_Semibold>
           </Button>
         }
         openDialogButtonText="Manage"

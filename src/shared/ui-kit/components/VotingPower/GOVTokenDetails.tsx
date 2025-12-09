@@ -1,5 +1,5 @@
-import { Divider, Flex } from "@chakra-ui/react";
-import { Color, LockIcon, MetricLabel, Tooltip } from "@shared/ui-kit";
+import { Divider, Flex, useBreakpointValue } from "@chakra-ui/react";
+import { LockIcon, MetricLabel, Tooltip, useTheme } from "@shared/ui-kit";
 
 interface GOVTokenDetailsProps {
   tokenSymbol: string;
@@ -14,70 +14,82 @@ interface GOVTokenDetailsProps {
 }
 
 export const GOVTokenDetails = (props: GOVTokenDetailsProps) => {
+  const theme = useTheme();
   const { tokenSymbol, lockedGODToken, totalGODTokenBalance, availableGODTokenBalance } = props;
   const toolTipString = `Pending amount of ${tokenSymbol} token unlocks until
     the in-progress proposals are either complete or canceled`;
+
+  const gap = useBreakpointValue({ base: "1rem", md: "1.5rem", lg: "2.5rem" });
+  const showDivider = useBreakpointValue({ base: false, lg: true });
+
   return (
-    <Flex height="6rem" alignItems="center" justify="center" gap="2.5rem">
+    <Flex
+      height={{ base: "auto", lg: "6rem" }}
+      alignItems="center"
+      justify="center"
+      gap={gap}
+      flexWrap="wrap"
+      py={{ base: 2, lg: 0 }}
+    >
       <MetricLabel
         isLoading={props.isLoading}
         label="TOTAL BALANCE"
-        labelTextColor={Color.Neutral._700}
+        labelTextColor={theme.textMuted}
         labelTextStyle="p xsmall medium"
         labelOpacity="1.0"
         value={totalGODTokenBalance}
         valueStyle="p large semibold"
-        valueTextColor={Color.Grey_Blue._800}
+        valueTextColor={theme.text}
         valueUnitSymbol={tokenSymbol}
-        valueUnitSymbolColor={Color.Grey_Blue._900}
+        valueUnitSymbolColor={theme.text}
         amount="$--.--"
-        amountLabelColor={Color.Neutral._700}
+        amountLabelColor={theme.textMuted}
       />
-      <Divider orientation="vertical" />
+      {showDivider && <Divider orientation="vertical" borderColor={theme.border} />}
       <MetricLabel
         label="LOCKED"
         isLoading={props.isLoading}
-        labelTextColor={Color.Neutral._500}
+        labelTextColor={theme.textMuted}
         labelTextStyle="p xsmall medium"
         labelLeftIcon={<LockIcon />}
         labelOpacity="1.0"
         value={lockedGODToken}
         valueStyle="p medium medium"
-        valueTextColor={Color.Grey_Blue._700}
+        valueTextColor={theme.text}
         valueUnitSymbol={tokenSymbol}
-        valueUnitSymbolColor={Color.Grey_Blue._700}
+        valueUnitSymbolColor={theme.text}
         amount="$--.--"
-        amountLabelColor={Color.Neutral._500}
+        amountLabelColor={theme.textMuted}
       />
       <MetricLabel
         label="AVAILABLE"
         isLoading={props.isLoading}
-        labelTextColor={Color.Neutral._500}
+        labelTextColor={theme.textMuted}
         labelTextStyle="p xsmall medium"
         labelOpacity="1.0"
         value={availableGODTokenBalance}
         valueStyle="p medium medium"
-        valueTextColor={Color.Grey_Blue._700}
+        valueTextColor={theme.text}
         valueUnitSymbol={tokenSymbol}
-        valueUnitSymbolColor={Color.Grey_Blue._700}
+        valueUnitSymbolColor={theme.text}
         amount="$--.--"
-        amountLabelColor={Color.Neutral._500}
+        amountLabelColor={theme.textMuted}
       />
       {!props.hidePendingStatus ? (
         <MetricLabel
           label="PENDING TO UNLOCK"
           isLoading={props.isLoading}
-          labelTextColor={Color.Neutral._500}
+          labelTextColor={theme.textMuted}
           labelTextStyle="p xsmall medium"
-          labelRightIcon={<Tooltip label={toolTipString} placement={"top"} fill={Color.Neutral._500} />}
+          labelRightIcon={<Tooltip label={toolTipString} placement={"top"} fill={theme.textMuted} />}
           labelOpacity="1.0"
           value="200000.00"
           valueStyle="p large semibold"
-          valueTextColor={Color.Grey_Blue._700}
+          valueTextColor={theme.text}
           valueUnitSymbol={tokenSymbol}
-          valueUnitSymbolColor={Color.Grey_Blue._700}
+          valueUnitSymbolColor={theme.text}
           amount="$--.--"
-          amountLabelColor={Color.Neutral._500}
+          amountLabelColor={theme.textMuted}
         />
       ) : null}
     </Flex>

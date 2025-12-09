@@ -22,8 +22,8 @@ const active = definePartsStyle({
   container: {
     ...baseTagStyles.container,
     ...baseTagStyles.label,
-    color: Color.Blue._500,
-    bg: Color.Blue._50,
+    color: Color.Primary._600,
+    bg: Color.Primary._50,
   },
 });
 

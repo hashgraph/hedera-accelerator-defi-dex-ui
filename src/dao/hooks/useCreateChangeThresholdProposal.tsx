@@ -16,7 +16,6 @@ interface ChangeThresholdForm {
 export function useCreateChangeThresholdProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -25,6 +24,7 @@ export function useCreateChangeThresholdProposal(handleOnSuccess: HandleOnSucces
     DAOMutations.CreateChangeThresholdProposal
   >(
     async (params: ChangeThresholdForm) => {
+      const signer = wallet.getSigner();
       return DexService.proposeChangeThreshold({ ...params, signer });
     },
     {

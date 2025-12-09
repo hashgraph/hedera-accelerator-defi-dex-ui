@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { TransactionResponse } from "@hashgraph/sdk";
 import { CreateATokenDAOForm } from "../types";
 import { DAOFormContainer } from "./DAOFormContainer";
-import { Color, CopyTextButton, FormInput, LoadingDialog, SuccessCheckIcon, Text } from "@shared/ui-kit";
+import { Color, CopyTextButton, FormInput, LoadingDialog, SuccessCheckIcon, Text, useTheme } from "@shared/ui-kit";
 import {
   useCreateToken,
   useFetchAccountInfo,
@@ -17,6 +17,7 @@ import { checkForValidAccountId, createHashScanTransactionLink } from "@dex/util
 import { DefaultCreateATokenDAOFormData } from "@dao/pages";
 
 export function CreateTokenDAOGovernanceForm() {
+  const theme = useTheme();
   const {
     getValues,
     register,
@@ -131,7 +132,7 @@ export function CreateTokenDAOGovernanceForm() {
     <>
       <Flex gap="1.5rem" direction="column">
         <DAOFormContainer>
-          <Text.P_Small_Medium paddingBottom="0.4rem">
+          <Text.P_Small_Medium paddingBottom="0.4rem" color={theme.textMuted}>
             To generate the token ID, define the following inputs. Once the token is created, the token&apos;s ID will
             be automatically displayed.
           </Text.P_Small_Medium>
@@ -275,16 +276,16 @@ export function CreateTokenDAOGovernanceForm() {
           {isFormInReadOnlyMode ? (
             <Flex justifyContent="space-between">
               <Flex direction="column" gap="2">
-                <Text.P_Small_Medium>Token ID</Text.P_Small_Medium>
+                <Text.P_Small_Medium color={theme.textMuted}>Token ID</Text.P_Small_Medium>
                 <Flex gap="2" alignItems="center">
-                  <Text.P_Medium_Regular>{governance.newToken.id}</Text.P_Medium_Regular>
+                  <Text.P_Medium_Regular color={theme.text}>{governance.newToken.id}</Text.P_Medium_Regular>
                   <CopyTextButton onClick={handleCopyTextButtonTapped} />
                 </Flex>
               </Flex>
               <Flex direction="column" gap="2" alignItems="flex-end">
                 <Flex alignItems="center" gap="1">
                   <SuccessCheckIcon boxSize="4" />
-                  <Text.P_Small_Medium>
+                  <Text.P_Small_Medium color={theme.text}>
                     {governance.newToken.symbol} token was successfully created.
                   </Text.P_Small_Medium>
                 </Flex>
@@ -297,7 +298,7 @@ export function CreateTokenDAOGovernanceForm() {
             </Flex>
           ) : undefined}
         </DAOFormContainer>
-        <Text.P_Large_Regular>Initial token distribution</Text.P_Large_Regular>
+        <Text.P_Large_Regular color={theme.text}>Initial token distribution</Text.P_Large_Regular>
         <DAOFormContainer>
           <FormInput<"governance.newToken.treasuryWalletAccountId">
             inputProps={{

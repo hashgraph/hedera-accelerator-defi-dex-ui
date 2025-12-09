@@ -17,10 +17,10 @@ interface UseDepositTokensParams {
 export function useDepositTokens(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<TransactionResponse | undefined, Error, UseDepositTokensParams, DAOMutations.DepositTokens>(
     async (params: UseDepositTokensParams) => {
+      const signer = wallet.getSigner();
       return DexService.sendTokensTransaction({ ...params, signer });
     },
     {

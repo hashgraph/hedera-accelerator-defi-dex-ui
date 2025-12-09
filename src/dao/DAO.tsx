@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { ChakraProvider } from "@chakra-ui/react";
 import { RouterProvider } from "react-router-dom";
 import { router } from "@dao/routes";
-import { DefaultTheme, TermsConditionModal, ToastContainer } from "@shared/ui-kit";
+import { DefaultTheme, TermsConditionModal, ToastContainer, ThemeProvider } from "@shared/ui-kit";
 
 const SEVEN_SECONDS = 7 * 1000;
 
@@ -28,13 +28,15 @@ const queryClient = new QueryClient({
 
 export function DAO() {
   return (
-    <ChakraProvider theme={DefaultTheme}>
-      <QueryClientProvider client={queryClient}>
-        <ToastContainer />
-        <TermsConditionModal />
-        <RouterProvider router={router} />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ChakraProvider>
+    <ThemeProvider>
+      <ChakraProvider theme={DefaultTheme}>
+        <QueryClientProvider client={queryClient}>
+          <ToastContainer />
+          <TermsConditionModal />
+          <RouterProvider router={router} />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ChakraProvider>
+    </ThemeProvider>
   );
 }

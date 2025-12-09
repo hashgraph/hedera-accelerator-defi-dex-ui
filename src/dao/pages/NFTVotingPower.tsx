@@ -1,6 +1,5 @@
 import { VotingPower } from "@shared/ui-kit";
 import { useManageNFTVotingPower } from "@dao/hooks";
-import { useNavigate } from "react-router-dom";
 
 export interface NFTVotingPowerComponentProps {
   governanceTokenId: string;
@@ -25,12 +24,6 @@ export const NFTVotingPower = (props: NFTVotingPowerComponentProps) => {
     tokenNFTs,
     lockedNFTSerialId,
   } = useManageNFTVotingPower(governanceTokenId, tokenHolderAddress);
-
-  const navigate = useNavigate();
-
-  function handleClickSwapButton() {
-    navigate("/swap");
-  }
 
   function handleConnectToWalletClick() {
     wallet.connectToWallet();
@@ -74,9 +67,10 @@ export const NFTVotingPower = (props: NFTVotingPowerComponentProps) => {
       handleClickLockGodTokenButton={handleClickLockGodTokenButton}
       handleClickUnLockGodTokenButton={handleClickUnLockGodTokenButton}
       handleConnectToWalletClick={handleConnectToWalletClick}
-      handleClickSwapButton={handleClickSwapButton}
+      handleClickSwapButton={() => {}}
       handleErrorDialogDismissButtonClicked={handleErrorDialogDismissButtonClicked}
       isWalletConnected={isWalletConnected}
+      hideSwapButton
     />
   );
 };

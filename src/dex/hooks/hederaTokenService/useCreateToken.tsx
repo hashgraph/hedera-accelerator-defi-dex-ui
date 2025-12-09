@@ -18,9 +18,9 @@ export function useCreateToken(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<TransactionResponse, Error, UseCreateTokenParams, HTSMutations.CreateToken>(
     (params: UseCreateTokenParams) => {
+      const signer = wallet.getSigner();
       return DexService.createToken({ ...params, signer });
     },
     {

@@ -131,12 +131,12 @@ export function useGovernanceDAOProposals(
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
   const currentWalletId = wallet?.savedPairingData?.accountIds[0] ?? "";
 
-  const convertDataToProposal = (
+  const convertDataToProposal = async (
     proposalData: ProposalData,
     index: number,
     godTokenData: MirrorNodeTokenById | null | undefined,
     tokenData: MirrorNodeTokenById | null | undefined
-  ): Proposal => {
+  ): Promise<Proposal> => {
     const proposalState = proposalData.state
       ? (ContractProposalState[proposalData.state] as keyof typeof ContractProposalState)
       : (ContractProposalState[0] as keyof typeof ContractProposalState);
@@ -148,6 +148,19 @@ export function useGovernanceDAOProposals(
         (voterInfo) => currentWalletId === solidityAddressToAccountIdString(voterInfo.voter)
       )
     );
+
+    // Fetch proper Hedera account ID for the author
+    let authorAccountId = "";
+    if (proposalData.coreInformation.creator) {
+      try {
+        const accountInfo = await DexService.fetchAccountInfo(proposalData.coreInformation.creator);
+        authorAccountId = accountInfo.account;
+      } catch (error) {
+        console.warn(`Could not fetch account info for author ${proposalData.coreInformation.creator}:`, error);
+        authorAccountId = proposalData.coreInformation.creator;
+      }
+    }
+
     return {
       id: index,
       timeRemaining,
@@ -170,9 +183,7 @@ export function useGovernanceDAOProposals(
       hexStringData: "",
       msgValue: 0,
       title: proposalData.coreInformation.inputs.title,
-      author: proposalData.coreInformation.creator
-        ? solidityAddressToAccountIdString(proposalData.coreInformation.creator)
-        : "",
+      author: authorAccountId,
       description: proposalData.coreInformation.inputs.description,
       metadata: proposalData.coreInformation.inputs.metadata,
       link: proposalData.coreInformation.inputs.discussionLink,
@@ -202,17 +213,19 @@ export function useGovernanceDAOProposals(
       ]);
       const tokenDataCache = new Map<string, Promise<MirrorNodeTokenById | null>>();
       const proposals = await Promise.all(
-        data[0].map(async (proposal, index) => {
-          const tokenId = proposal.tokenToTransfer ?? "";
-          let tokenData;
-          if (!isEmpty(tokenId)) {
-            if (!tokenDataCache.has(tokenId)) {
-              tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
+        data[0]
+          .filter((proposal) => proposal !== undefined && proposal !== null)
+          .map(async (proposal, index) => {
+            const tokenId = proposal.tokenToTransfer ?? "";
+            let tokenData;
+            if (!isEmpty(tokenId)) {
+              if (!tokenDataCache.has(tokenId)) {
+                tokenDataCache.set(tokenId, DexService.fetchTokenData(tokenId));
+              }
+              tokenData = await tokenDataCache.get(tokenId);
             }
-            tokenData = await tokenDataCache.get(tokenId);
-          }
-          return convertDataToProposal(proposal, index, data[1], tokenData);
-        })
+            return await convertDataToProposal(proposal, index, data[1], tokenData);
+          })
       );
       return proposals;
     },

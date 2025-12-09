@@ -1,21 +1,23 @@
 import { Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { Color } from "@shared/ui-kit";
+import { useTheme } from "@shared/ui-kit";
 
 interface DAOFormContainerProps extends PropsWithChildren {
   rest?: any;
 }
 
 export function DAOFormContainer(props: DAOFormContainerProps) {
+  const theme = useTheme();
   return (
     <Flex
       direction="column"
-      backgroundColor={Color.White}
-      border={`1px solid ${Color.Neutral._200}`}
+      backgroundColor={theme.bgCard}
+      border={`1px solid ${theme.border}`}
       padding="1rem 1.5rem"
-      borderRadius="4px"
+      borderRadius="16px"
       width="100%"
       gap="0.75rem"
+      backdropFilter="blur(20px)"
       {...props.rest}
     >
       {props.children}

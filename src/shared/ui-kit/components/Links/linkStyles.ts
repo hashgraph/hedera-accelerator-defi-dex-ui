@@ -5,7 +5,7 @@ const toastLink = defineStyle({
   width: "fit-content",
   display: "flex",
   alignItems: "center",
-  color: Color.Primary._500,
+  color: Color.Primary._700,
 });
 
 const externalLink = defineStyle({

@@ -22,7 +22,6 @@ interface UseCreateDAOTextProposalParams {
 export function useCreateDAOTextProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -31,6 +30,7 @@ export function useCreateDAOTextProposal(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.CreateDAOTextProposal
   >(
     async (params: UseCreateDAOTextProposalParams) => {
+      const signer = wallet.getSigner();
       return DexService.createTextProposal({ ...params, signer });
     },
     {

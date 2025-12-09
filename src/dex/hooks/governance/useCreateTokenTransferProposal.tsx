@@ -20,7 +20,6 @@ export function useCreateTokenTransferProposal(
 ) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -29,6 +28,7 @@ export function useCreateTokenTransferProposal(
     GovernanceMutations.CreateTokenTransferProposal
   >(
     async (params: CreateTokenTransferProposalData) => {
+      const signer = wallet.getSigner();
       const preciseTransferTokenAmount = wallet.getTokenAmountWithPrecision(
         params.tokenToTransfer,
         params.amountToTransfer

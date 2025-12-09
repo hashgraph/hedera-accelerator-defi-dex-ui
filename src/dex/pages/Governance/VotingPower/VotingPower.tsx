@@ -1,10 +1,10 @@
-import { HStack, Button, Spacer, Flex } from "@chakra-ui/react";
+import { HStack, Button, Spacer, Flex, useBreakpointValue } from "@chakra-ui/react";
 import { WarningIcon } from "@chakra-ui/icons";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { ManageVotingPower } from "./ManageVotingPower";
 import { useManageVotingPower } from "./useManageVotingPower";
 import { InputTokenAmountData } from "./types";
-import { Text, LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, Color } from "@shared/ui-kit";
+import { Text, LoadingDialog, MetricLabel, LightningBoltIcon, SwapIcon, useTheme } from "@shared/ui-kit";
 
 export interface VotingPowerComponentProps {
   governanceTokenId: string;
@@ -12,6 +12,7 @@ export interface VotingPowerComponentProps {
 }
 
 export const VotingPower = (props: VotingPowerComponentProps) => {
+  const theme = useTheme();
   const { governanceTokenId, tokenHolderAddress } = props;
 
   const {
@@ -60,67 +61,101 @@ export const VotingPower = (props: VotingPowerComponentProps) => {
     resetServerState();
   }
 
+  const padding = useBreakpointValue({ base: "0.75rem 1rem", sm: "1rem 1.5rem", md: "1rem 3rem", lg: "1rem 5rem" });
+  const flexDirection = useBreakpointValue({ base: "column", lg: "row" }) as "column" | "row";
+  const showTokenDetails = useBreakpointValue({ base: false, md: true });
+
   return (
     <>
       {walletId && (
-        <Flex padding="16px 80px 0 80px">
-          <p>Connected wallet ID: {walletId}</p>
+        <Flex padding={{ base: "0.75rem 1rem", sm: "1rem 1.5rem", md: "1rem 3rem", lg: "1rem 5rem" }}>
+          <Text.P_Small_Regular>Connected wallet ID: {walletId}</Text.P_Small_Regular>
         </Flex>
       )}
-      <Flex direction="row" alignItems="center" height="120px" padding="16px 80px 0 80px" maxWidth="100%">
+      <Flex
+        direction={flexDirection}
+        alignItems={{ base: "stretch", lg: "center" }}
+        minHeight={{ base: "auto", lg: "120px" }}
+        padding={padding}
+        maxWidth="100%"
+        gap={{ base: 3, lg: 0 }}
+      >
         <MetricLabel
           label="VOTING POWER"
           isLoading={isFormLoading}
           labelLeftIcon={<LightningBoltIcon />}
-          labelTextColor={Color.Neutral._500}
+          labelTextColor={theme.textMuted}
           labelTextStyle="p xsmall medium"
           labelOpacity="1.0"
           value={votingPower!}
-          valueTextColor={Color.Primary._600}
+          valueTextColor={theme.accent}
           valueStyle="h3 medium"
           valueUnitSymbol={tokenData.symbol}
           amount="$--.--"
+          amountLabelColor={theme.textMuted}
         />
-        <Spacer />
-        <HStack padding="8px 24px" gap="40px" justify="right" borderRadius="8px" background={Color.Neutral._50}>
-          <GOVTokenDetails
-            tokenSymbol={tokenData.symbol ?? ""}
-            lockedGODToken={votingPower!}
-            totalGODTokenBalance={tokenData.total}
-            availableGODTokenBalance={tokenData.available}
-            isLoading={isFormLoading}
-            hidePendingStatus
-          />
-          {doesUserHaveGOVTokensToLockAndUnlock ? (
-            <ManageVotingPower
+        <Spacer display={{ base: "none", lg: "block" }} />
+        <Flex
+          direction={{ base: "column", sm: "row" }}
+          padding={{ base: "0.5rem", sm: "0.5rem 1rem", md: "0.5rem 1.5rem" }}
+          gap={{ base: 2, sm: 3, md: "2.5rem" }}
+          justify={{ base: "center", sm: "space-between", md: "right" }}
+          alignItems={{ base: "stretch", sm: "center" }}
+          borderRadius="8px"
+          background={theme.bgSecondary}
+          border={`1px solid ${theme.border}`}
+          flexWrap="wrap"
+        >
+          {showTokenDetails && (
+            <GOVTokenDetails
               tokenSymbol={tokenData.symbol ?? ""}
-              isLoading={isFormLoading}
-              canUserClaimGODTokens={canUserClaimGODTokens}
               lockedGODToken={votingPower!}
               totalGODTokenBalance={tokenData.total}
               availableGODTokenBalance={tokenData.available}
-              onLockClick={handleClickLockGodTokenButton}
-              onUnlockClick={handleClickUnLockGodTokenButton}
+              isLoading={isFormLoading}
+              hidePendingStatus
             />
-          ) : isWalletConnected ? (
-            <Button
-              as="a"
-              key="swap"
-              variant="secondary"
-              width="105px"
-              leftIcon={<SwapIcon />}
-              href={"https://defi-ui.zilbo.com/swap"}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
-            </Button>
-          ) : (
-            <Button key="swap" variant="secondary" width="155px" onClick={handleConnectToWalletClick}>
-              <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
-            </Button>
           )}
-        </HStack>
+          <Flex justify={{ base: "center", sm: "flex-end" }} gap={2}>
+            {doesUserHaveGOVTokensToLockAndUnlock ? (
+              <ManageVotingPower
+                tokenSymbol={tokenData.symbol ?? ""}
+                isLoading={isFormLoading}
+                canUserClaimGODTokens={canUserClaimGODTokens}
+                lockedGODToken={votingPower!}
+                totalGODTokenBalance={tokenData.total}
+                availableGODTokenBalance={tokenData.available}
+                onLockClick={handleClickLockGodTokenButton}
+                onUnlockClick={handleClickUnLockGodTokenButton}
+              />
+            ) : isWalletConnected ? (
+              <Button
+                key="swap"
+                variant="secondary"
+                width={{ base: "100%", sm: "105px" }}
+                size={{ base: "sm", md: "md" }}
+                leftIcon={<SwapIcon />}
+                onClick={() => {
+                  const protocol = window.location.protocol;
+                  const port = window.location.port ? `:${window.location.port}` : "";
+                  window.open(`${protocol}//defi-ui.localhost${port}/swap`, "_blank");
+                }}
+              >
+                <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
+              </Button>
+            ) : (
+              <Button
+                key="swap"
+                variant="secondary"
+                width={{ base: "100%", sm: "auto" }}
+                size={{ base: "sm", md: "md" }}
+                onClick={handleConnectToWalletClick}
+              >
+                <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
+              </Button>
+            )}
+          </Flex>
+        </Flex>
         <LoadingDialog isOpen={isLoading} message={loadingDialogMessage} />
         <LoadingDialog
           isOpen={isErrorDialogOpen}

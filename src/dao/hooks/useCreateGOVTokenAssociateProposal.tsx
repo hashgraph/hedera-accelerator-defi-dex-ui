@@ -21,7 +21,6 @@ interface UseCreateGOVTokenAssociateProposalParams {
 export function useCreateGOVTokenAssociateProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -30,6 +29,7 @@ export function useCreateGOVTokenAssociateProposal(handleOnSuccess: HandleOnSucc
     DAOMutations.CreateGOVTokenAssociateProposal
   >(
     async (params: UseCreateGOVTokenAssociateProposalParams) => {
+      const signer = wallet.getSigner();
       return DexService.createGOVTokenAssociateProposal({ ...params, signer });
     },
     {

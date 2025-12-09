@@ -75,7 +75,7 @@ export function DAODetailsForm() {
         <FormInput<"logoUrl">
           inputProps={{
             id: "logoUrl",
-            label: "Logo",
+            label: "Logo (optional)",
             type: "text",
             placeholder: "Enter image URL",
             register: {
@@ -99,13 +99,12 @@ export function DAODetailsForm() {
       <FormInput<"infoUrl">
         inputProps={{
           id: "infoUrl",
-          label: "Info Url",
+          label: "Info Url (optional)",
           type: "text",
           placeholder: "Enter the info url of your DAO",
           register: {
             ...register("infoUrl", {
-              required: { value: true, message: "An info url is required." },
-              validate: (value) => isValidUrl(value) || "Invalid URL, Please try again.",
+              validate: (value) => !value || isValidUrl(value) || "Invalid URL, Please try again.",
             }),
           },
         }}

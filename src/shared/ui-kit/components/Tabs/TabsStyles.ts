@@ -1,6 +1,6 @@
 import { tabsAnatomy } from "@chakra-ui/anatomy";
 import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
-import { Color } from "../../themes";
+import { Color, DarkTheme } from "../../themes";
 
 /**
  * TODO: Investigate why the chakra theming API is not applying these styles.
@@ -10,8 +10,11 @@ const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpe
 const baseStyle = definePartsStyle({
   tabList: {
     borderBottom: "0",
+    gap: "0.5rem",
   },
-  tab: {},
+  tab: {
+    transition: "all 0.2s ease-in-out",
+  },
 });
 
 /**
@@ -23,29 +26,49 @@ export const TabsStyles = defineMultiStyleConfig({
   sizes: {},
   variants: {
     "dao-dashboard-tab": {
+      tabList: {
+        bg: "transparent",
+        padding: "0",
+        borderBottom: `1px solid ${DarkTheme.border}`,
+        gap: "0",
+      },
       tab: {
         height: "fit-content",
         textStyle: "p medium medium",
-        color: Color.Neutral._400,
-        stroke: Color.Neutral._400,
+        color: DarkTheme.textMuted,
+        stroke: DarkTheme.textMuted,
+        padding: "0.75rem 1.5rem",
+        borderRadius: "0",
+        marginBottom: "-1px",
+        borderBottom: "2px solid transparent",
+        transition: "all 0.2s ease-in-out",
         _selected: {
-          color: Color.Neutral._900,
-          borderBottom: `4px solid ${Color.Primary._500}`,
-          stroke: Color.Primary._500,
+          color: DarkTheme.accentLight,
+          bg: "transparent",
+          borderBottom: `2px solid ${DarkTheme.accentLight}`,
+          stroke: DarkTheme.accentLight,
         },
         _hover: {
-          color: Color.Neutral._900,
+          color: DarkTheme.text,
+          bg: "transparent",
         },
       },
     },
     "dao-create-new": {
       tab: {
         color: Color.Neutral._500,
-        stroke: Color.Neutral._400,
+        stroke: Color.Neutral._500,
+        borderRadius: "full",
+        padding: "0.5rem 1rem",
+        transition: "all 0.2s ease-in-out",
         _selected: {
-          color: Color.White_02,
-          bg: Color.Grey_Blue._500,
-          borderRadius: "0.25rem",
+          color: Color.White,
+          bg: DarkTheme.accentGradient,
+          borderRadius: "full",
+          boxShadow: "0 4px 14px rgba(126, 34, 206, 0.3)",
+        },
+        _hover: {
+          color: Color.Neutral._700,
         },
       },
     },

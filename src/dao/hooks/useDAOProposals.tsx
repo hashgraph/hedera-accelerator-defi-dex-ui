@@ -158,6 +158,18 @@ export function useDAOProposals(
             transactionType,
             metaData,
           } = proposalInfo;
+
+          // Fetch proper Hedera account ID for the author
+          let authorAccountId = "";
+          if (creator) {
+            try {
+              const accountInfo = await DexService.fetchAccountInfo(creator);
+              authorAccountId = accountInfo.account;
+            } catch (error) {
+              console.warn(`Could not fetch account info for author ${creator}:`, error);
+              authorAccountId = creator;
+            }
+          }
           const { amount, receiver, token } = data ?? {};
           const threshold = await daoSDK.getThreshold(safeEVMAddress);
           const approvers = getApprovers(proposalLogs, transactionHash);
@@ -218,7 +230,7 @@ export function useDAOProposals(
             data: isContractUpgradeProposal ? parsedData : { ...data },
             msgValue: value ? BigNumber.from(value).toNumber() : 0,
             title,
-            author: creator ? solidityAddressToAccountIdString(creator) : "",
+            author: authorAccountId,
             description,
             link: linkToDiscussion,
             threshold,

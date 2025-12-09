@@ -27,15 +27,12 @@ export function TermsConditionModal() {
               Our{" "}
               <Link
                 style={{ color: "blue", textDecoration: "underline" }}
-                href="https://swirldslabs.com/terms-of-service/"
+                href="https://hashgraph.com/terms-of-service/"
               >
                 terms and conditions
               </Link>
               &nbsp; and our{" "}
-              <Link
-                style={{ color: "blue", textDecoration: "underline" }}
-                href="https://swirldslabs.com/privacy-policy/"
-              >
+              <Link style={{ color: "blue", textDecoration: "underline" }} href="https://hashgraph.com/privacy-policy/">
                 Privacy Policy
               </Link>
               &nbsp; are on our main site. Use of this service implies you have accepted these.

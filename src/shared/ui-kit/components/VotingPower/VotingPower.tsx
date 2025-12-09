@@ -1,7 +1,7 @@
 import { WarningIcon } from "@chakra-ui/icons";
-import { HStack, Button, Spacer, Flex } from "@chakra-ui/react";
+import { HStack, Button, Spacer, Flex, useBreakpointValue, Box } from "@chakra-ui/react";
 import { MirrorNodeTokenNFT } from "@dex/services";
-import { Text, Color, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon } from "@shared/ui-kit";
+import { Text, LightningBoltIcon, LoadingDialog, MetricLabel, SwapIcon, useTheme } from "@shared/ui-kit";
 import { GOVTokenDetails } from "./GOVTokenDetails";
 import { ManageVotingPower } from "./ManageVotingPower";
 import { InputTokenData } from "./types";
@@ -23,9 +23,11 @@ export interface VotingPowerProps {
   handleClickSwapButton: () => void;
   handleErrorDialogDismissButtonClicked: () => void;
   isWalletConnected: boolean;
+  hideSwapButton?: boolean;
 }
 
 export const VotingPower = (props: VotingPowerProps) => {
+  const theme = useTheme();
   const {
     tokenData,
     tokenNFTs,
@@ -43,54 +45,96 @@ export const VotingPower = (props: VotingPowerProps) => {
     handleClickSwapButton,
     handleErrorDialogDismissButtonClicked,
     isWalletConnected,
+    hideSwapButton = false,
   } = props;
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const padding = useBreakpointValue({ base: "0.75rem 1rem", sm: "1rem 1.5rem", md: "1rem 3rem", lg: "1rem 5rem" });
+  const flexDirection = useBreakpointValue({ base: "column", lg: "row" }) as "column" | "row";
+  const showTokenDetails = useBreakpointValue({ base: false, md: true });
+
   return (
-    <Flex direction="row" alignItems="center" height="7.5rem" padding="1rem 5rem 0 5rem" maxWidth="100%">
+    <Flex
+      direction={flexDirection}
+      alignItems={{ base: "stretch", lg: "center" }}
+      minHeight={{ base: "auto", lg: "7.5rem" }}
+      padding={padding}
+      maxWidth="100%"
+      gap={{ base: 3, lg: 0 }}
+    >
       <MetricLabel
         label="VOTING POWER"
         isLoading={isFormLoading}
         labelLeftIcon={<LightningBoltIcon />}
-        labelTextColor={Color.Neutral._500}
+        labelTextColor={theme.textMuted}
         labelTextStyle="p xsmall medium"
         labelOpacity="1.0"
         value={tokenData.locked}
-        valueTextColor={Color.Primary._600}
+        valueTextColor={theme.accent}
         valueStyle="h3 medium"
         valueUnitSymbol={tokenData.symbol}
         amount="$--.--"
+        amountLabelColor={theme.textMuted}
       />
-      <Spacer />
-      <HStack padding="0.5rem 1.5rem" gap="2.5rem" justify="right" borderRadius="0.5rem" background={Color.Neutral._50}>
-        <GOVTokenDetails
-          tokenSymbol={tokenData.symbol ?? ""}
-          lockedGODToken={tokenData.locked}
-          totalGODTokenBalance={tokenData.total}
-          availableGODTokenBalance={tokenData.available}
-          isLoading={isFormLoading}
-          hidePendingStatus
-        />
-        {doesUserHaveGOVTokensToLockAndUnlock ? (
-          <ManageVotingPower
+      <Spacer display={{ base: "none", lg: "block" }} />
+      <Flex
+        direction={{ base: "column", sm: "row" }}
+        padding={{ base: "0.5rem", sm: "0.5rem 1rem", md: "0.5rem 1.5rem" }}
+        gap={{ base: 2, sm: 3, md: "2.5rem" }}
+        justify={{ base: "center", sm: "space-between", md: "right" }}
+        alignItems={{ base: "stretch", sm: "center" }}
+        borderRadius="0.5rem"
+        background={theme.bgSecondary}
+        border={`1px solid ${theme.border}`}
+        flexWrap="wrap"
+      >
+        {showTokenDetails && (
+          <GOVTokenDetails
             tokenSymbol={tokenData.symbol ?? ""}
-            tokenNFTs={tokenNFTs}
-            isLoading={isFormLoading}
-            canUserClaimGODTokens={canUserClaimGODTokens}
-            lockedNFTSerialId={lockedNFTSerialId}
+            lockedGODToken={tokenData.locked}
             totalGODTokenBalance={tokenData.total}
             availableGODTokenBalance={tokenData.available}
-            onLockClick={(data: InputTokenData) => handleClickLockGodTokenButton(Number(data.lockNFTSerialId))}
-            onUnlockClick={handleClickUnLockGodTokenButton}
+            isLoading={isFormLoading}
+            hidePendingStatus
           />
-        ) : isWalletConnected ? (
-          <Button key="swap" variant="secondary" width="6.5rem" leftIcon={<SwapIcon />} onClick={handleClickSwapButton}>
-            <Text.P_Small_Semibold>Swap</Text.P_Small_Semibold>
-          </Button>
-        ) : (
-          <Button key="swap" variant="secondary" width="9.5rem" onClick={handleConnectToWalletClick}>
-            <Text.P_Small_Semibold>Connect To Wallet</Text.P_Small_Semibold>
-          </Button>
         )}
-      </HStack>
+        <Flex justify={{ base: "center", sm: "flex-end" }} gap={2}>
+          {doesUserHaveGOVTokensToLockAndUnlock ? (
+            <ManageVotingPower
+              tokenSymbol={tokenData.symbol ?? ""}
+              tokenNFTs={tokenNFTs}
+              isLoading={isFormLoading}
+              canUserClaimGODTokens={canUserClaimGODTokens}
+              lockedNFTSerialId={lockedNFTSerialId}
+              totalGODTokenBalance={tokenData.total}
+              availableGODTokenBalance={tokenData.available}
+              onLockClick={(data: InputTokenData) => handleClickLockGodTokenButton(Number(data.lockNFTSerialId))}
+              onUnlockClick={handleClickUnLockGodTokenButton}
+            />
+          ) : isWalletConnected && !hideSwapButton ? (
+            <Button
+              key="swap"
+              variant="secondary"
+              width={{ base: "100%", sm: "6.5rem" }}
+              size={{ base: "sm", md: "md" }}
+              leftIcon={<SwapIcon />}
+              onClick={() => window.open("/swap", "_blank")}
+            >
+              Swap
+            </Button>
+          ) : !isWalletConnected ? (
+            <Button
+              key="swap"
+              variant="secondary"
+              width={{ base: "100%", sm: "auto" }}
+              size={{ base: "sm", md: "md" }}
+              onClick={handleConnectToWalletClick}
+            >
+              Connect To Wallet
+            </Button>
+          ) : null}
+        </Flex>
+      </Flex>
       <LoadingDialog isOpen={isLoading} message={loadingDialogMessage} />
       <LoadingDialog
         isOpen={isErrorDialogOpen}

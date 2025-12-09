@@ -40,3 +40,4 @@ export * from "./Text";
 export * from "./Table";
 export * from "./MarkdownRenderer";
 export * from "./TermsConditionModal";
+export * from "./ThemeToggle";

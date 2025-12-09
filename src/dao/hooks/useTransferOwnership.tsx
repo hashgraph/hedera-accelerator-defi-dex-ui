@@ -22,7 +22,6 @@ export function useTransferOwnership(handleOnSuccess: HandleOnSuccess) {
   const { wallet } = useDexContext(({ wallet }) => ({
     wallet,
   }));
-  const signer = wallet.getSigner();
   return useMutation<
     TransactionResponse | undefined,
     Error,
@@ -30,6 +29,7 @@ export function useTransferOwnership(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.TransferOwnership
   >(
     async (params: UseTransferOwnershipParams) => {
+      const signer = wallet.getSigner();
       const { newOwnerEVMAddress, targetAddress } = params;
       return DexService.sendTransferOwnershipTransaction({ newOwnerEVMAddress, targetAddress, signer });
     },

@@ -1,5 +1,5 @@
 import { Tab, TabList } from "@chakra-ui/react";
-import { Color } from "../../shared/ui-kit";
+import { useTheme } from "../../shared/ui-kit";
 
 export interface TabFilter<T> {
   name: string;
@@ -15,6 +15,7 @@ interface TabFiltersProps<T> {
 }
 
 export function TabFilters<T>(props: TabFiltersProps<T>) {
+  const theme = useTheme();
   return (
     <TabList borderBottom="0">
       {props.filters.map((filter: TabFilter<T>, index: number) => {
@@ -25,8 +26,8 @@ export function TabFilters<T>(props: TabFiltersProps<T>) {
             height="fit-content"
             padding="0.75rem 1.25rem"
             textStyle="p medium medium"
-            color={Color.Neutral._400}
-            _selected={{ color: Color.Neutral._900, borderBottom: `4px solid ${Color.Primary._500}` }}
+            color={theme.textMuted}
+            _selected={{ color: theme.text, borderBottom: `4px solid ${theme.accent}` }}
           >
             {filter.name}
           </Tab>

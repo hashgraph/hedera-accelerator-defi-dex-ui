@@ -1,6 +1,6 @@
-import { Box, Flex, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { Box, Flex, Tab, TabList, Tabs, useBreakpointValue } from "@chakra-ui/react";
 import { ErrorLayout, LoadingSpinnerLayout, NotFound, Page, PageLayout } from "@dex/layouts";
-import { BoxIcon, Color, LayoutIcon, LockIcon2, SettingsIcon, TransactionIcon, UsersIcon } from "@shared/ui-kit";
+import { BoxIcon, LayoutIcon, LockIcon2, SettingsIcon, TransactionIcon, UsersIcon, useTheme } from "@shared/ui-kit";
 import { useTabFilters } from "@dex/hooks";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PropsWithChildren } from "react";
@@ -29,6 +29,19 @@ interface DAODashboardProps extends PropsWithChildren {
 export function DAODashboard(props: DAODashboardProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const { accountId: daoAccountId = "" } = useParams();
+
+  // All hooks must be called before any early returns
+  const tabPadding = useBreakpointValue({
+    base: "0px 1rem",
+    sm: "0px 1.5rem",
+    md: "0px 2rem",
+    lg: "0px 3rem",
+    xl: "0px 5rem",
+  });
+  const showTabText = useBreakpointValue({ base: false, md: true });
+
   const daoTabs = [
     {
       icon: <LayoutIcon boxSize="4" />,
@@ -55,7 +68,7 @@ export function DAODashboard(props: DAODashboardProps) {
       title: "Settings",
     },
   ];
-  const { accountId: daoAccountId = "" } = useParams();
+
   const { dao, isNotFound, isDAOFound, isError, isLoading, errorMessage, isSuccess, isMember, isAdmin, handleMintNFT } =
     props;
   const { type = "", infoUrl } = dao ?? {};
@@ -117,6 +130,7 @@ export function DAODashboard(props: DAODashboardProps) {
     );
   }
 */
+
   if (dao && isDAOFound && isSuccess) {
     const { accountEVMAddress, type, name, logoUrl } = dao;
     const isGovernance = type === DAOType.GovernanceToken;
@@ -143,7 +157,7 @@ export function DAODashboard(props: DAODashboardProps) {
           />
         }
         body={
-          <Flex direction="column" gap="0.75rem" height="100%" bg={dao.isPrivate ? Color.Yellow_01 : Color.White}>
+          <Flex direction="column" gap="0.75rem" height="100%" bg={theme.bg}>
             {isGovernance ? (
               <VotingPower governanceTokenId={tokenId} tokenHolderAddress={daoTokenHolder} />
             ) : (
@@ -154,19 +168,40 @@ export function DAODashboard(props: DAODashboardProps) {
               defaultIndex={initialTabIndex}
               onChange={handleTabChange}
               isLazy
-              bg={dao.isPrivate ? Color.Yellow_01 : Color.White}
+              bg={theme.bg}
               variant="dao-dashboard-tab"
               height="100%"
             >
-              <Flex flex="row" padding="0px 5rem" borderBottom={`1px solid ${Color.Neutral._200}`}>
-                <TabList borderBottom="0">
+              <Flex
+                flex="row"
+                padding={tabPadding}
+                borderBottom={`1px solid ${theme.border}`}
+                overflowX="auto"
+                css={{
+                  "&::-webkit-scrollbar": { display: "none" },
+                  scrollbarWidth: "none",
+                }}
+              >
+                <TabList borderBottom="0" gap={{ base: 0, md: 1 }}>
                   {daoNavigationTabs.map((tab, index: number) => {
                     return (
                       <NavLink to={tab.title.toLowerCase()} key={index}>
-                        <Tab tabIndex={index}>
-                          <Flex gap={2.5} alignItems="center" justifyContent="center">
+                        <Tab
+                          tabIndex={index}
+                          px={{ base: 2, md: 4 }}
+                          py={2}
+                          color={theme.textMuted}
+                          _selected={{
+                            color: theme.accentLight,
+                            borderBottom: `2px solid ${theme.accentLight}`,
+                          }}
+                          _hover={{
+                            color: theme.text,
+                          }}
+                        >
+                          <Flex gap={{ base: 0, md: 2.5 }} alignItems="center" justifyContent="center">
                             {tab.icon}
-                            <Box>{tab.title}</Box>
+                            {showTabText && <Box>{tab.title}</Box>}
                           </Flex>
                         </Tab>
                       </NavLink>
@@ -174,7 +209,7 @@ export function DAODashboard(props: DAODashboardProps) {
                   })}
                 </TabList>
               </Flex>
-              <Box bg={Color.Primary_Bg} height={`calc(100% - ${TabsHeight}px)`}>
+              <Box bg={theme.bg} height={`calc(100% - ${TabsHeight}px)`}>
                 {props.children}
               </Box>
             </Tabs>

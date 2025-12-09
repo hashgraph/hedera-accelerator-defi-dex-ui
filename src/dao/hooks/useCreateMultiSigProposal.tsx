@@ -23,7 +23,6 @@ interface UseCreateMultiSigProposalParams {
 export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
   const queryClient = useQueryClient();
   const { wallet } = useDexContext(({ wallet }) => ({ wallet }));
-  const signer = wallet.getSigner();
 
   return useMutation<
     TransactionResponse | undefined,
@@ -32,6 +31,7 @@ export function useCreateMultiSigProposal(handleOnSuccess: HandleOnSuccess) {
     DAOMutations.CreateMultiSigProposal
   >(
     async (params: UseCreateMultiSigProposalParams) => {
+      const signer = wallet.getSigner();
       const {
         tokenId,
         receiverId,
